@@ -1,36 +1,52 @@
-> [!CAUTION]  
-> Updates run on a gifted Oracle API key (thanks @fgdfg!) that expires **2026-08-07** (30 days from 2026-07-08). After that, decompilation will break and this repo will stop updating until a new decompiler is set up.
->
-> If you see this and the repo is still broken past that date, harass me to figure out another decompiler.
-
----
-
 # Repo Info
-A full decompilation of every CoreScript Roblox currently ships in the client.
+The goal of this repo is to decompile and archive all of Roblox's CoreScripts across every available surface.
+Currently doesn't touch Studio, but I hope to get that working soon.
+
+If you are unable to locate a specific corescript here, please let me know. It may be in a bundle I don't yet handle.
 
 > [!CAUTION]  
 > Consider all code inside this repo to be unlicensed. This is provided solely as reference.
+> There are valid reasons to want to look at this code (such as confirming performance issues, feature changes, or bugs), but it is NOT free-use!
 
-> [!NOTE]  
-> Keep in mind that this code is decompiled. You're going to find a lot of things that don't make a lot of sense.
-> - If you see a function with name `_` and a comment saying `[[ Name: NAME ]]`, it most likely got inlined (and thus orphaned) by the bytecode compiler. To find where that function may have been called, look for areas where its logic is duplicated.
-> - A LOT of variable names are ugly. In the future I'd like to do a postprocess to clean things up; out of scope for now.
+Currently made possible by [Tovek Decompiler](https://github.com/Kiet1308/Tovek). 
+I am using a fork capable of reading [LuauForge bundles](extracontent-models/UniversalApp/LuauForgeUnbundled/README.md).
 
-Made possible by the [Oracle Decompiler.](https://discord.gg/prHW9TA4QW)
-
-# Quick Reference
+## Quick Reference
 
 There's a lot of things you might find interesting in here. 
-All of it lives in `extracontent-models`:
+Here are some of my personal highlights:
 
-[**In-Game UI Modules**](extracontent-models/InExperience/InExperience/PatchRoot/DataModelInstances/CoreGui/RobloxGui/Modules/) - topbar, Chrome, escape menu, settings, leaderboard, chat, voice chat, emotes, backpack, dev console, and more.
+### General
 
-[**In-Game CoreScript Entry Points**](extracontent-models/InExperience/InExperience/PatchRoot/CoreScripts/CoreScripts/) - the scripts that bootstrap chat, voice, notifications, proximity prompts, etc.
+General starting points.
 
-[**CoreScripts Container**](extracontent-models/InExperience/InExperience/PatchRoot/CoreScripts/) - lots of misc. CoreScript related stuff, including an entry point for the server-side CoreScripts & its related modules.
+- **Ingame:**
+  - [**Client Corescripts**](extracontent-models/InExperience/InExperience/PatchRoot/CoreScripts/CoreScripts)
+  - [**Server Corescripts**](extracontent-models/InExperience/InExperience/PatchRoot/CoreScripts/ServerCoreScripts)
 
-[**Universal App Modules**](extracontent-models/UniversalApp/UniversalApp/PatchRoot/DataModelInstances/CoreGui/RobloxGui/Modules/) - app topbar, avatar editor, home feed, catalog, search, settings, and console/10-foot UI.
+### In-game Core UI
 
-[**Shared Core Packages**](extracontent-models/UniversalApp/UniversalApp/PatchRoot/DataModelInstances/CorePackages/) - React/Roact, Rodux, networking, UI component libraries.
+What you see when you play a game.
 
-[extracontent-places](extracontent-places/) seems like test or dead code; it is kept for completeness.
+- [**Chrome**](extracontent-models/InExperience/InExperience/PatchRoot/DataModelInstances/CoreGui/RobloxGui/Modules/Chrome): Roblox's name for the topbar. [Integrations](extracontent-models/InExperience/InExperience/PatchRoot/DataModelInstances/CoreGui/RobloxGui/Modules/Chrome/Integrations) contains all of the features.
+- [**Escape menu**](extracontent-models/InExperience/InExperience/PatchRoot/DataModelInstances/CoreGui/RobloxGui/Modules/Settings): has all of the ingame settings, sorted by [Pages](extracontent-models/InExperience/InExperience/PatchRoot/DataModelInstances/CoreGui/RobloxGui/Modules/Settings). Some of the newer ones are handled by [SettingsFields](extracontent-models/InExperience/InExperience/PatchRoot/DataModelInstances/CoreGui/RobloxGui/Modules/Settings/Integrations/SettingFields), and legacy ones are handled by [GameSettings](extracontent-models/InExperience/InExperience/PatchRoot/DataModelInstances/CoreGui/RobloxGui/Modules/Settings/Pages/GameSettings.luau).
+  - There's also a React [InGameMenu](extracontent-models/InExperience/InExperience/PatchRoot/DataModelInstances/CoreGui/RobloxGui/Modules/InGameMenu), not sure which one is in use right now.
+- **Chat**:
+  - [ExpChat](extracontent-models/InExperience/InExperience/PatchRoot/DataModelInstances/CorePackages/Workspace/Packages/_Workspace/ExpChat) handles the TextChatService-based UI.
+  - [ExperienceChatMain](extracontent-models/InExperience/InExperience/PatchRoot/CoreScripts/CoreScripts/ExperienceChatMain.luau) initializes everything, and things like translation branch off from it.
+  - [ClientChat](extracontent-models/InExperience/InExperience/PatchRoot/DataModelInstances/CoreGui/RobloxGui/Modules/Server/ClientChat) appears to be the old Lua chat, pre-TextChatService.
+- **Voice Chat**:
+  - [VoiceChatServiceManager](extracontent-models/InExperience/InExperience/PatchRoot/DataModelInstances/CoreGui/RobloxGui/Modules/VoiceChat/VoiceChatServiceManager.luau) sets up all of the user-facing parts of Voice Chat, including moderation, button controls, etc.
+  - [VoiceChatCore](extracontent-models/InExperience/InExperience/PatchRoot/DataModelInstances/CorePackages/Workspace/Packages/_Workspace/VoiceChatCore) creates the underlying Audio instances.
+- Misc: [**Leaderboard**](extracontent-models/InExperience/InExperience/PatchRoot/DataModelInstances/CoreGui/RobloxGui/Modules/PlayerList), [**backpack**](extracontent-models/InExperience/InExperience/PatchRoot/DataModelInstances/CoreGui/RobloxGui/Modules/BackpackScript.luau), [**emote wheel**](extracontent-models/InExperience/InExperience/PatchRoot/DataModelInstances/CoreGui/RobloxGui/Modules/EmotesMenu), [**proximity prompt UI**](extracontent-models/InExperience/InExperience/PatchRoot/CoreScripts/CoreScripts/ProximityPrompt.luau).
+
+### Lua App
+
+The app that you use when using the desktop or mobile app.
+
+- [**Root directory**](extracontent-models/UniversalApp/LuauForgeUnbundled): it all starts here. There's also a [README](extracontent-models/UniversalApp/LuauForgeUnbundled/README.md) specific to this folder, because the Lua app isn't quite as tidy as the rest of the decompilation.
+- [**Home page**](extracontent-models/UniversalApp/LuauForgeUnbundled/CorePackages/Workspace/Packages/_Index/Home): what you see when you first open the app. Not much interesting to see though since it's [server-driven UI](extracontent-models/UniversalApp/LuauForgeUnbundled/CorePackages/Workspace/Packages/_Workspace/SduiCoreSystem).
+- [**Catalog**](extracontent-models/UniversalApp/LuauForgeUnbundled/CorePackages/Workspace/Packages/_Index/AvatarExperienceCatalog): self-explanatory.
+- [**Build**](extracontent-models/UniversalApp/LuauForgeUnbundled/CorePackages/Workspace/Packages/_Workspace/BuildExperience): Roblox's ~~attempt at copying Claude Code~~ agentic game-builder AI.
+- [**Profiles**](extracontent-models/UniversalApp/LuauForgeUnbundled/CorePackages/Workspace/Packages/_Workspace/ProfilePlatform): user profiles.
+- [**Moments**](extracontent-models/UniversalApp/LuauForgeUnbundled/CorePackages/Workspace/Packages/_Index/Moments): short-form videos embedded in-app. Kinda like Tiktok.
