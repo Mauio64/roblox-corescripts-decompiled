@@ -1,3 +1,3 @@
-local _Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent.Parent._Workspace
 
-return require(_Workspace.SquadsCore.SquadsCore.Common.clearSquadStorage)
+return require(Workspace.SquadsCore.SquadsCore.Common.clearSquadStorage)

@@ -1,19 +1,22 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Core = ParentParentParent.Core
-local ParentParentParentParent = ParentParentParent.Parent
-local Roact = require(ParentParentParentParent.Roact)
-local t = require(ParentParentParentParent.t)
-local Cryo = require(ParentParentParentParent.Cryo)
-local Images = require(ParentParent.ImageSet.Images)
-local ImageSetComponent = require(Core.ImageSet.ImageSetComponent)
-local Controllable = require(Core.Control.Controllable)
-local GenericTextLabel = require(Core.Text.GenericTextLabel.GenericTextLabel)
-local withStyle = require(ParentParentParent.Core.Style.withStyle)
-local CloseButtonIcon = require(script.Parent.Enum.CloseButtonIcon)
-local v14 = Roact.PureComponent:extend("ModalTitle")
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+local core = parent2.Core
+local parent3 = parent2.Parent
 
-v14.validateProps = t.strictInterface({
+local Roact = require(parent3.Roact)
+local t = require(parent3.t)
+local Cryo = require(parent3.Cryo)
+
+local Images = require(parent.ImageSet.Images)
+local ImageSetComponent = require(core.ImageSet.ImageSetComponent)
+local Controllable = require(core.Control.Controllable)
+local GenericTextLabel = require(core.Text.GenericTextLabel.GenericTextLabel)
+local withStyle = require(parent2.Core.Style.withStyle)
+local CloseButtonIcon = require(script.Parent.Enum.CloseButtonIcon)
+
+local extended = Roact.PureComponent:extend("ModalTitle")
+
+extended.validateProps = t.strictInterface({
 	title = t.string,
 	position = t.optional(t.UDim2),
 	anchor = t.optional(t.Vector2),
@@ -26,215 +29,193 @@ v14.validateProps = t.strictInterface({
 	})),
 	onTitleSizeChanged = t.optional(t.callback)
 })
-v14.defaultProps = {
+
+extended.defaultProps = {
 	title = "",
 	position = UDim2.new(0.5, 0, 0, 0),
 	anchor = Vector2.new(0.5, 0),
 	closeButtonIcon = CloseButtonIcon.Close
 }
 
-function v14.GetHeight(_) -- line: 53
+function extended.GetHeight(_): number
 	return 48
 end
 
-local function getCloseButtonIcon(p2) -- line: 57
-	-- upvalues: CloseButtonIcon (copy)
-	if p2 == CloseButtonIcon.Close then
+local function getCloseButtonIcon(closeButtonIcon): nil | string -- 1 equivalent call inferred from this helper
+	if closeButtonIcon == CloseButtonIcon.Close then
 		return "icons/navigation/close"
 	end
 
-	if p2 == CloseButtonIcon.Back then
+	if closeButtonIcon == CloseButtonIcon.Back then
 		return "icons/actions/cycleLeft"
 	end
 
 	return nil
 end
-local function renderBackgroundImage(p3, p4, p5) -- line: 67
-	-- upvalues: Cryo (copy), Roact (copy), GenericTextLabel (copy), ImageSetComponent (copy)
-	local text = p3.text
-	local v23 = text and #text > 0
-	local v24 = text and #text > 0
-	local v25 = math.clamp(p3.imageHeight, 48, 261)
 
-	if v23 then
-		v25 += 8
-		p5 = Cryo.Dictionary.join(p5, {
-			UICorner = Roact.createElement("UICorner", {
-				CornerRadius = UDim.new(0, 8)
-			})
+local function renderBackgroundImage(props, p, p2)
+	local text = props.text
+
+	local v = text and #text > 0
+	local v2 = text and #text > 0
+
+	local v3 = math.clamp(props.imageHeight, 48, 261)
+
+	if v then
+		v3 += 8
+		p2 = Cryo.Dictionary.join(p2, {
+			UICorner = Roact.createElement("UICorner", { CornerRadius = UDim.new(0, 8) })
 		})
 	end
 
 	if text and #text > 0 then
-		p5 = Cryo.Dictionary.join(p5, {
+		p2 = Cryo.Dictionary.join(p2, {
 			BackgroundText = Roact.createElement(GenericTextLabel, {
-				RichText = true,
-				ZIndex = 2,
 				Size = UDim2.new(1, 0, 1, -56),
 				AnchorPoint = Vector2.new(0.5, 0),
 				Position = UDim2.new(0.5, 0, 0, 48),
-				fontStyle = p4.Font.Body,
-				colorStyle = p4.Theme.TextEmphasis,
+				fontStyle = p.Font.Body,
+				colorStyle = p.Theme.TextEmphasis,
+				RichText = true,
 				Text = text,
-				TextTruncate = Enum.TextTruncate.AtEnd
+				TextTruncate = Enum.TextTruncate.AtEnd,
+				ZIndex = 2
 			})
 		})
 	end
 
-	if v24 then
-		p5 = Cryo.Dictionary.join(p5, {
+	if v2 then
+		p2 = Cryo.Dictionary.join(p2, {
 			BackgroundTextShadow = Roact.createElement("Frame", {
+				Size = UDim2.new(1, 0, 1, v and -8 or 0),
+				Position = UDim2.new(0, 0, 0, 0),
 				BackgroundTransparency = 0,
-				ZIndex = 1,
-				Size = UDim2.new(1, 0, 1, not v23 and 0 or -8),
-				Position = UDim2.new(0, 0, 0, 0)
+				ZIndex = 1
 			}, {
 				UIGradient = Roact.createElement("UIGradient", {
-					Rotation = 90,
 					Color = ColorSequence.new(Color3.new(0, 0, 0)),
 					Transparency = NumberSequence.new({
 						NumberSequenceKeypoint.new(0, 1),
 						NumberSequenceKeypoint.new(0.6, 0.25),
 						NumberSequenceKeypoint.new(1, 1)
-					})
+					}),
+					Rotation = 90
 				})
 			})
 		})
 	end
 
-	local v26 = Roact.createElement(ImageSetComponent.Label, {
-		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
+	local backgroundImage = Roact.createElement(ImageSetComponent.Label, {
 		AnchorPoint = Vector2.new(0, 0),
-		Size = UDim2.new(1, 0, 0, v25),
+		Size = UDim2.new(1, 0, 0, v3),
 		Position = UDim2.new(0, 0, 0, 0),
+		BackgroundTransparency = 1,
 		ScaleType = Enum.ScaleType.Crop,
-		Image = p3.image,
+		BorderSizePixel = 0,
+		Image = props.image,
 		ImageColor3 = Color3.fromRGB(255, 255, 255)
-	}, p5)
+	}, p2)
 
-	if v23 then
-		v26 = Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			ClipsDescendants = true,
+	if v then
+		backgroundImage = Roact.createElement("Frame", {
 			AnchorPoint = Vector2.new(0.5, 0.5),
-			Size = UDim2.new(1, 0, 0, v25 - 8),
-			Position = UDim2.new(0.5, 0, 0.5, 0)
-		}, {
-			TitleBackground = v26
-		})
+			Size = UDim2.new(1, 0, 0, v3 - 8),
+			Position = UDim2.new(0.5, 0, 0.5, 0),
+			BackgroundTransparency = 1,
+			ClipsDescendants = true
+		}, { TitleBackground = backgroundImage })
 	end
 
-	return v26
+	return backgroundImage
 end
 
-function v14.render(p6) -- line: 147
-	-- upvalues: withStyle (copy), Roact (copy), Controllable (copy), ImageSetComponent (copy), Images (copy), CloseButtonIcon (copy), GenericTextLabel (copy), renderBackgroundImage (copy)
-	local titleBackgroundImageProps = p6.props.titleBackgroundImageProps
+function extended.render(p)
+	local titleBackgroundImageProps = p.props.titleBackgroundImageProps
 
-	return withStyle(function(p7) -- line: 150
-		-- upvalues: Roact (copy), p6 (copy), Controllable (copy), ImageSetComponent (copy), Images (copy), CloseButtonIcon (copy), GenericTextLabel (copy), titleBackgroundImageProps (copy), renderBackgroundImage (copy)
-		local p7Font = p7.Font
-		local Theme = p7.Theme
-		local v32 = p7Font.BaseSize * p7Font.Header1.RelativeSize
+	return withStyle(function(p2)
+		local font = p2.Font
+		local theme = p2.Theme
+
+		local textSize = font.BaseSize * font.Header1.RelativeSize
+
 		local createElement = Roact.createElement
-		local t1 = {
+		local onTitleSizeChangedsByAbsoluteSize = {
 			AutomaticSize = Enum.AutomaticSize.Y,
 			Size = UDim2.new(1, 0, 0, 48),
 			BackgroundTransparency = 1,
-			[Roact.Change.AbsoluteSize] = p6.props.onTitleSizeChanged
+			[Roact.Change.AbsoluteSize] = p.props.onTitleSizeChanged
 		}
-		local t2 = {}
-		local g47 = nil
-		local v46 = nil
+		local closeButton
 
-		if p6.props.onCloseClicked then
+		if p.props.onCloseClicked then
 			local createElement2 = Roact.createElement
-			local v37 = Controllable
-			local t3 = {}
-			local t4 = {
+			local controlComponent = {
 				component = ImageSetComponent.Button,
-				props = {
-					BackgroundTransparency = 1,
-					AnchorPoint = Vector2.new(0.5, 0.5),
-					Position = UDim2.new(0, 32, 0.5, 0),
-					Size = UDim2.new(0, 48, 0, 48),
-					[Roact.Event.Activated] = p6.props.onCloseClicked
-				}
+				props = 0,
+				children = 0
 			}
-			local t5 = {}
-			local createElement3 = Roact.createElement
-			local ImageSetComponentLabel = ImageSetComponent.Label
-			local t6 = {
+			local onCloseClickedsByActivated = {
 				BackgroundTransparency = 1,
-				Size = UDim2.new(0, 36, 0, 36)
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Position = UDim2.new(0, 32, 0.5, 0),
+				Size = UDim2.new(0, 48, 0, 48),
+				[Roact.Event.Activated] = p.props.onCloseClicked
 			}
-			local v44 = Images
-			local closeButtonIcon = p6.props.closeButtonIcon
-
-			t6.Image = v44[if closeButtonIcon ~= CloseButtonIcon.Close then if closeButtonIcon ~= CloseButtonIcon.Back then nil else "icons/actions/cycleLeft" else "icons/navigation/close"]
-			t6.ImageColor3 = Theme.IconEmphasis.Color
-			t6.ImageTransparency = Theme.IconEmphasis.Transparency
-			t6.AnchorPoint = Vector2.new(0.5, 0.5)
-			t6.Position = UDim2.new(0.5, 0, 0.5, 0)
-			t5.InputFillImage = createElement3(ImageSetComponentLabel, t6)
-			t4.children = t5
-			t3.controlComponent = t4
-
-			function t3.onStateChanged(...) -- line: 184
-			end
-
-			v46 = createElement2(v37, t3)
-
-			if v46 then
-				g47 = true
-			end
+			controlComponent.props = onCloseClickedsByActivated
+			controlComponent.children = {
+				InputFillImage = Roact.createElement(ImageSetComponent.Label, {
+					BackgroundTransparency = 1,
+					Size = UDim2.new(0, 36, 0, 36),
+					Image = Images[getCloseButtonIcon(p.props.closeButtonIcon)], -- inferred equivalent call
+					ImageColor3 = theme.IconEmphasis.Color,
+					ImageTransparency = theme.IconEmphasis.Transparency,
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Position = UDim2.new(0.5, 0, 0.5, 0)
+				})
+			}
+			closeButton = createElement2(Controllable, {
+				controlComponent = controlComponent,
+				onStateChanged = function(...) end
+			}) or nil
 		end
 
-		if not g47 then
-			v46 = nil
-		end
-
-		g47 = false
-		t2.CloseButton = v46
-		t2.Title = Roact.createElement(GenericTextLabel, {
-			LayoutOrder = 1,
-			TextWrapped = true,
-			AnchorPoint = Vector2.new(0.5, 0),
-			Position = UDim2.new(0.5, 0, 0, 0),
-			AutomaticSize = Enum.AutomaticSize.Y,
-			Size = UDim2.new(1, -104, 1, 0),
-			colorStyle = Theme.TextEmphasis,
-			fontStyle = p7Font.Header1,
-			Text = p6.props.title,
-			TextSize = v32,
-			TextTruncate = Enum.TextTruncate.AtEnd
-		}, {
-			Padding = Roact.createElement("UIPadding", {
-				PaddingTop = UDim.new(0, 8),
-				PaddingBottom = UDim.new(0, 8)
+		local element = createElement("Frame", onTitleSizeChangedsByAbsoluteSize, {
+			CloseButton = closeButton,
+			Title = Roact.createElement(GenericTextLabel, {
+				AnchorPoint = Vector2.new(0.5, 0),
+				Position = UDim2.new(0.5, 0, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				Size = UDim2.new(1, -104, 1, 0),
+				colorStyle = theme.TextEmphasis,
+				fontStyle = font.Header1,
+				LayoutOrder = 1,
+				Text = p.props.title,
+				TextSize = textSize,
+				TextWrapped = true,
+				TextTruncate = Enum.TextTruncate.AtEnd
+			}, {
+				Padding = Roact.createElement("UIPadding", {
+					PaddingTop = UDim.new(0, 8),
+					PaddingBottom = UDim.new(0, 8)
+				})
+			}),
+			Underline = not titleBackgroundImageProps and Roact.createElement("Frame", {
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Position = UDim2.new(0.5, 0, 1, 0),
+				BorderSizePixel = 0,
+				BackgroundColor3 = theme.Divider.Color,
+				BackgroundTransparency = theme.Divider.Transparency,
+				LayoutOrder = 2,
+				Size = UDim2.new(1, 0, 0, 1)
 			})
 		})
-		t2.Underline = not titleBackgroundImageProps and Roact.createElement("Frame", {
-			BorderSizePixel = 0,
-			LayoutOrder = 2,
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			Position = UDim2.new(0.5, 0, 1, 0),
-			BackgroundColor3 = Theme.Divider.Color,
-			BackgroundTransparency = Theme.Divider.Transparency,
-			Size = UDim2.new(1, 0, 0, 1)
-		})
-
-		local v48 = createElement("Frame", t1, t2)
 
 		if titleBackgroundImageProps then
-			return (renderBackgroundImage(titleBackgroundImageProps, p7, {
-				TitleText = v48
-			}))
+			return renderBackgroundImage(titleBackgroundImageProps, p2, { TitleText = element })
 		end
 
-		return v48
+		return element
 	end)
 end
 
-return v14
+return extended

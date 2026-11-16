@@ -1,4 +1,5 @@
-local scriptParent = script.Parent
+local parent = script.Parent
+
 local IconWithTooltip = require(script.IconWithTooltip)
 local InfoPeekView = require(script.InfoPeekView)
 local CheckboxFeedbackFormModal = require(script.CheckboxFeedbackFormModal)
@@ -12,57 +13,73 @@ local InfoCarouselCell = require(script.InfoCarouselCell)
 local InsetBackground = require(script.InsetBackground)
 local Banner = require(script.Banner)
 local BannerBadge = require(script.Banner.BannerBadge)
-local UpsellModal = require(script.UpsellModal)
 local ScrollingAppCarousel = require(script.ScrollingAppCarousel.ScrollingAppCarousel)
 local InfoTable = require(script.InfoTable)
 local InfoTableCell = require(script.InfoTableCell)
 local ExpandableText = require(script.ExpandableText)
 local AnimateScrollViewToSelectionHelper = require(script.AnimateScrollViewToSelectionHelper)
-local SharedFlags = require(scriptParent.SharedFlags)
+local Composer = require(script.Composer)
+
+local SharedFlags = require(parent.SharedFlags)
 local FFlagUseAnimateScrollViewToSelectionHelper = SharedFlags.FFlagUseAnimateScrollViewToSelectionHelper
 local FFlagLuaAppTextFeedbackFormModal = SharedFlags.FFlagLuaAppTextFeedbackFormModal
 
 require(script.MediaGallery.MediaGalleryTypes)
 
-return {
-	CloseOnlyInteractiveAlert = CloseOnlyInteractiveAlert,
-	ConfirmationDialog = ConfirmationDialog,
-	LoadingBar = require(script.LoadingBar),
-	InlinePrompt = require(script.InlinePrompt),
-	FullscreenFrame = FullscreenFrame,
-	FullscreenPageWithSafeArea = FullscreenPageWithSafeArea,
-	IconWithTooltip = IconWithTooltip,
-	ImagePile = ImagePile,
-	InfoPeekView = InfoPeekView,
-	InfoCarousel = InfoCarousel,
-	InfoCarouselCell = InfoCarouselCell,
-	InsetBackground = InsetBackground,
-	Banner = Banner,
-	BannerBadge = BannerBadge,
-	UpsellModal = UpsellModal,
-	AnimateScrollViewToSelectionHelper = if not FFlagUseAnimateScrollViewToSelectionHelper then nil else AnimateScrollViewToSelectionHelper,
-	ContentPosition = require(script.DetailsPage.ContentPosition),
-	DetailsPageLayout = require(script.DetailsPageLayout),
-	DetailsPageSelector = require(script.DetailsPage.DetailsPageSelector),
-	DetailsPageTemplate = require(script.DetailsPage.DetailsPageTemplate),
-	InfoTable = InfoTable,
-	InfoTableCell = InfoTableCell,
-	ScrollingAppCarousel = ScrollingAppCarousel,
-	CrossFadeAnimatedView = require(script.MediaGallery.CrossFadeAnimatedView),
-	MediaGalleryCarousel = require(script.MediaGallery.MediaGalleryCarousel),
-	MediaGalleryExpandableView = require(script.MediaGallery.MediaGalleryExpandableView),
-	MediaGalleryFullScreen = require(script.MediaGallery.MediaGalleryFullScreen),
-	MediaGalleryPreview = require(script.MediaGallery.MediaGalleryPreview),
-	calcMediaGallerySizesFromWidth = require(script.MediaGallery.calcMediaGallerySizesFromWidth),
-	useAnimateScrollViewToSelection = require(script.useAnimateScrollViewToSelection),
-	ExpandableText = ExpandableText,
-	CheckboxFeedbackFormModal = CheckboxFeedbackFormModal,
-	TextFeedbackFormModal = if not FFlagLuaAppTextFeedbackFormModal then nil else require(script.TextFeedbackFormModal),
-	ProvideFeedbackToast = require(script.ProvideFeedbackToast),
-	EmptyTile = require(script.EmptyTile),
-	useCloseWithBackButton = require(script.DetailsPage.Hooks.useCloseWithBackButton),
-	OverflowMenu = require(script.OverflowMenu.OverflowMenu),
-	getOverflowMenuSignalStore = require(script.OverflowMenu.getOverflowMenuSignalStore),
-	useOverflowMenuOpen = require(script.OverflowMenu.useOverflowMenuOpen),
-	["jest.config"] = script["jest.config"]
-}
+local AppBlox = {}
+AppBlox.CloseOnlyInteractiveAlert = CloseOnlyInteractiveAlert
+AppBlox.Composer = Composer
+AppBlox.ConfirmationDialog = ConfirmationDialog
+AppBlox.LoadingBar = require(script.LoadingBar)
+AppBlox.InlinePrompt = require(script.InlinePrompt)
+AppBlox.FullscreenFrame = FullscreenFrame
+AppBlox.FullscreenPageWithSafeArea = FullscreenPageWithSafeArea
+AppBlox.IconWithTooltip = IconWithTooltip
+AppBlox.ImagePile = ImagePile
+AppBlox.InfoPeekView = InfoPeekView
+AppBlox.InfoCarousel = InfoCarousel
+AppBlox.InfoCarouselCell = InfoCarouselCell
+AppBlox.InsetBackground = InsetBackground
+AppBlox.Banner = Banner
+AppBlox.BannerBadge = BannerBadge
+
+if not FFlagUseAnimateScrollViewToSelectionHelper then
+	AnimateScrollViewToSelectionHelper = nil
+end
+
+AppBlox.AnimateScrollViewToSelectionHelper = AnimateScrollViewToSelectionHelper
+
+AppBlox.ContentPosition = require(script.DetailsPage.ContentPosition)
+AppBlox.DetailsPageLayout = require(script.DetailsPageLayout)
+AppBlox.DetailsPageSelector = require(script.DetailsPage.DetailsPageSelector)
+AppBlox.DetailsPageTemplate = require(script.DetailsPage.DetailsPageTemplate)
+AppBlox.InfoTable = InfoTable
+AppBlox.InfoTableCell = InfoTableCell
+AppBlox.ScrollingAppCarousel = ScrollingAppCarousel
+
+AppBlox.CrossFadeAnimatedView = require(script.MediaGallery.CrossFadeAnimatedView)
+AppBlox.MediaGalleryCarousel = require(script.MediaGallery.MediaGalleryCarousel)
+AppBlox.MediaGalleryExpandableView = require(script.MediaGallery.MediaGalleryExpandableView)
+AppBlox.MediaGalleryFullScreen = require(script.MediaGallery.MediaGalleryFullScreen)
+AppBlox.MediaGalleryPreview = require(script.MediaGallery.MediaGalleryPreview)
+AppBlox.calcMediaGallerySizesFromWidth = require(script.MediaGallery.calcMediaGallerySizesFromWidth)
+AppBlox.useAnimateScrollViewToSelection = require(script.useAnimateScrollViewToSelection)
+AppBlox.ExpandableText = ExpandableText
+AppBlox.CheckboxFeedbackFormModal = CheckboxFeedbackFormModal
+local textFeedbackFormModal
+
+if FFlagLuaAppTextFeedbackFormModal then
+	textFeedbackFormModal = require(script.TextFeedbackFormModal)
+end
+
+AppBlox.TextFeedbackFormModal = textFeedbackFormModal
+
+AppBlox.ProvideFeedbackToast = require(script.ProvideFeedbackToast)
+AppBlox.SnackbarWrapper = require(script.SnackbarWrapper)
+AppBlox.EmptyTile = require(script.EmptyTile)
+AppBlox.useCloseWithBackButton = require(script.DetailsPage.Hooks.useCloseWithBackButton)
+AppBlox.OverflowMenu = require(script.OverflowMenu.OverflowMenu)
+AppBlox.getOverflowMenuSignalStore = require(script.OverflowMenu.getOverflowMenuSignalStore)
+AppBlox.useOverflowMenuOpen = require(script.OverflowMenu.useOverflowMenuOpen)
+AppBlox["jest.config"] = script["jest.config"]
+return AppBlox

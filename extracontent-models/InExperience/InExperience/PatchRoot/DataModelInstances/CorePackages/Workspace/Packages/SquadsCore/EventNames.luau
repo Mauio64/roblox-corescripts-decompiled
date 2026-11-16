@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent._Workspace
+local EventNames = require(Workspace.SquadsCore.SquadsCore.Analytics.EventNames)
 
-return (require(_Workspace.SquadsCore.SquadsCore.Analytics.EventNames))
+return EventNames

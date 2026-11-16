@@ -1,1 +1,3 @@
-return (require(script.Avatar))
+local Avatar = require(script.Avatar)
+
+return Avatar

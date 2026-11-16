@@ -1,20 +1,22 @@
-local ParentParent = script.Parent.Parent
-local APIUtil = require(ParentParent.util.APIUtil)
-local HttpService = game:GetService("HttpService")
-local v4 = APIUtil.getBaseDomain()
-local v5 = string.format("https://itemconfiguration.%s", v4) .. "v1/creations/get-asset-details"
+local parent = script.Parent.Parent
 
-local function getAssetCreationDetails(p1) -- line: 13
-	-- upvalues: APIUtil (copy), v5 (copy), HttpService (copy)
-	local v8, v9 = APIUtil.requestAndRetryPost(v5, HttpService:JSONEncode({
-		assetIds = p1
+local APIUtil = require(parent.util.APIUtil)
+
+local HttpService = game:GetService("HttpService")
+
+local baseDomain = APIUtil.getBaseDomain()
+local v = string.format("https://itemconfiguration.%s", baseDomain) .. "v1/creations/get-asset-details"
+
+local function getAssetCreationDetails(assetIds)
+	local requestAndRetryPost, v2 = APIUtil.requestAndRetryPost(v, HttpService:JSONEncode({
+		assetIds = assetIds
 	}))
 
-	if v8 then
-		return true, HttpService:JSONDecode(v9)
+	if requestAndRetryPost then
+		return true, HttpService:JSONDecode(v2)
 	end
 
-	return false, v9
+	return false, v2
 end
 
 return getAssetCreationDetails

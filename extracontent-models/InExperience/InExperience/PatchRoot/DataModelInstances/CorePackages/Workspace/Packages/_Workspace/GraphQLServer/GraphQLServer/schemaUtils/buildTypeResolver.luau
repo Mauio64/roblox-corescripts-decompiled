@@ -1,15 +1,13 @@
-local Parent = script:FindFirstAncestor("GraphQLServer").Parent
+local parent = script:FindFirstAncestor("GraphQLServer").Parent
+require(parent.GraphQL)
+require(parent.LuauPolyfill)
 
-require(Parent.GraphQL)
-require(Parent.LuauPolyfill)
+local function buildTypeResolver(p)
+	return function(p2, p3, p4, p5)
+		local v = p[p5.name]
 
-local function buildTypeResolver(p1) -- line: 8
-	return function(p2, p3, p4, p5) -- line: 9
-		-- upvalues: p1 (copy)
-		local v8 = p1[p5.name]
-
-		if type(v8) == "table" and type(v8.__resolveType) == "function" then
-			return v8.__resolveType(p2, p3, p4, p5)
+		if type(v) == "table" and type(v.__resolveType) == "function" then
+			return v.__resolveType(p2, p3, p4, p5)
 		end
 
 		return p5.name

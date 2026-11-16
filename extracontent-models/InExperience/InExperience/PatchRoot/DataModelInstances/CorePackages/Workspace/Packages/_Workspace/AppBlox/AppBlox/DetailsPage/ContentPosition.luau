@@ -1,6 +1,4 @@
-local Parent = script:FindFirstAncestor("AppBlox").Parent
+local parent = script:FindFirstAncestor("AppBlox").Parent
+local enumerate = require(parent.enumerate)
 
-return require(Parent.enumerate)("ContentPosition", {
-	"Left",
-	"Right"
-})
+return enumerate("ContentPosition", { "Left", "Right" })

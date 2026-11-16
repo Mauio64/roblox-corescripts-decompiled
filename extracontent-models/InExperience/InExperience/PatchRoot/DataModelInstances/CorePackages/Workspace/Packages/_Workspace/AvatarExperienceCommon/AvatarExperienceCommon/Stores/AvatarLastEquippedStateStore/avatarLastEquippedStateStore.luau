@@ -1,30 +1,30 @@
-local u1 = nil
-local u2 = false
-local u3 = true
+local v = nil
+local v2 = false
+local v3 = true
+local AvatarLastEquippedStateStore = {}
 
-return {
-	getAvatarLastEquippedState = function() -- line: 25
-		-- upvalues: u1 (ref)
-		return u1
-	end,
-	setAvatarLastEquippedState = function(t1: {[any]: any}) -- line: 29
-		-- upvalues: u1 (ref)
-		u1 = t1
-	end,
-	getChangedLayeredMakeupSorting = function() -- line: 33
-		-- upvalues: u2 (ref)
-		return u2
-	end,
-	setChangedLayeredMakeupSorting = function(b1: boolean) -- line: 37
-		-- upvalues: u2 (ref)
-		u2 = b1
-	end,
-	getShouldRevertLastEquippedState = function() -- line: 41
-		-- upvalues: u3 (ref)
-		return u3
-	end,
-	setShouldRevertLastEquippedState = function(b2: boolean) -- line: 45
-		-- upvalues: u3 (ref)
-		u3 = b2
-	end
-}
+function AvatarLastEquippedStateStore.getAvatarLastEquippedState()
+	return v
+end
+
+function AvatarLastEquippedStateStore.setAvatarLastEquippedState(p)
+	v = p
+end
+
+function AvatarLastEquippedStateStore.getChangedLayeredMakeupSorting()
+	return v2
+end
+
+function AvatarLastEquippedStateStore.setChangedLayeredMakeupSorting(flag: boolean)
+	v2 = flag
+end
+
+function AvatarLastEquippedStateStore.getShouldRevertLastEquippedState()
+	return v3
+end
+
+function AvatarLastEquippedStateStore.setShouldRevertLastEquippedState(flag: boolean)
+	v3 = flag
+end
+
+return AvatarLastEquippedStateStore

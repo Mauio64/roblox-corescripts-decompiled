@@ -1,7 +1,4 @@
-local LogGamepadOpenExperienceControlsMenu = require(script.LogGamepadOpenExperienceControlsMenu)
-local GamepadMenuTelemetry = require(script.GamepadMenuTelemetry)
-
 return {
-	LogGamepadOpenExperienceControlsMenu = LogGamepadOpenExperienceControlsMenu,
-	GamepadMenuTelemetry = GamepadMenuTelemetry
+	LogGamepadOpenExperienceControlsMenu = require(script.LogGamepadOpenExperienceControlsMenu),
+	GamepadMenuTelemetry = require(script.GamepadMenuTelemetry)
 }

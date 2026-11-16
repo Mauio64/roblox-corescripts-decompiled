@@ -1,42 +1,63 @@
-local t1 = {}
+local ExperienceStateReplayMain = {}
 
-if not game:GetEngineFeature("RecordingServicePlaybackApiLua") then
-	return t1
+if
+	not game:GetEngineFeature("RecordingServicePlaybackApiLua")
+	or not game:GetEngineFeature("DmctPlaybackClientApp") and game.PlaceId ~= 123012592984338
+then
+	return ExperienceStateReplayMain
 end
 
-if not game:GetEngineFeature("DmctPlaybackClientApp") and game.PlaceId ~= 123012592984338 then
-	return t1
-end
+local CoreGui = game:GetService("CoreGui")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local parent = script.Parent
+local PlaybackState = require(parent.PlaybackState)
 
-local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
-local scriptParent = script.Parent
+ExperienceStateReplayMain.state = PlaybackState.new(false, false, false)
 
-t1.state = require(scriptParent.PlaybackState).new(false, false, false)
-t1.screenGui = Instance.new("ScreenGui")
-t1.screenGui.Parent = RobloxGui
-require(scriptParent.CreateControlBar).createControlBar(t1)
-require(scriptParent.CreateLoadingOverlay).createLoadingOverlay(t1)
-require(scriptParent.CreateButtonsTime).createButtonsTime(t1)
-require(scriptParent.CreateScrubber).createScrubber(t1)
-require(scriptParent.CreateHelpText).createHelpText(t1)
-require(scriptParent.ControlButtonsTime).setupControl(t1)
-require(scriptParent.ControlVisibility).setupControl(t1)
+ExperienceStateReplayMain.screenGui = Instance.new("ScreenGui")
+ExperienceStateReplayMain.screenGui.Parent = RobloxGui
 
-local LoadSlices = require(scriptParent.LoadSlices)
+local CreateControlBar = require(parent.CreateControlBar)
+CreateControlBar.createControlBar(ExperienceStateReplayMain)
+
+local CreateLoadingOverlay = require(parent.CreateLoadingOverlay)
+CreateLoadingOverlay.createLoadingOverlay(ExperienceStateReplayMain)
+
+local CreateButtonsTime = require(parent.CreateButtonsTime)
+CreateButtonsTime.createButtonsTime(ExperienceStateReplayMain)
+
+local CreateScrubber = require(parent.CreateScrubber)
+CreateScrubber.createScrubber(ExperienceStateReplayMain)
+
+local CreateHelpText = require(parent.CreateHelpText)
+CreateHelpText.createHelpText(ExperienceStateReplayMain)
+
+local ControlButtonsTime = require(parent.ControlButtonsTime)
+ControlButtonsTime.setupControl(ExperienceStateReplayMain)
+
+local ControlVisibility = require(parent.ControlVisibility)
+ControlVisibility.setupControl(ExperienceStateReplayMain)
+
+local LoadSlices = require(parent.LoadSlices)
 
 if not game:GetEngineFeature("DmctPlaybackClientApp") then
-	LoadSlices.experienceCallback(t1)
+	LoadSlices.experienceCallback(ExperienceStateReplayMain)
 end
 
-require(scriptParent.ControlScrubber).setupControl(t1)
-require(scriptParent.ListenPlaybackStatusUpdated).setupListener(t1)
-require(scriptParent.CreateSpectatorCamera).createSpectatorCamera(t1)
+local ControlScrubber = require(parent.ControlScrubber)
+ControlScrubber.setupControl(ExperienceStateReplayMain)
+
+local ListenPlaybackStatusUpdated = require(parent.ListenPlaybackStatusUpdated)
+ListenPlaybackStatusUpdated.setupListener(ExperienceStateReplayMain)
+
+local CreateSpectatorCamera = require(parent.CreateSpectatorCamera)
+CreateSpectatorCamera.createSpectatorCamera(ExperienceStateReplayMain)
 
 if game:GetEngineFeature("DmctPlaybackClientApp") then
-	require(scriptParent.ReplaySelector).create(t1, function(p1) -- line: 59
-		-- upvalues: LoadSlices (copy), t1 (copy)
-		LoadSlices.loadGUID(t1, p1)
+	local ReplaySelector = require(parent.ReplaySelector)
+	ReplaySelector.create(ExperienceStateReplayMain, function(p)
+		LoadSlices.loadGUID(ExperienceStateReplayMain, p)
 	end)
 end
 
-return t1
+return ExperienceStateReplayMain

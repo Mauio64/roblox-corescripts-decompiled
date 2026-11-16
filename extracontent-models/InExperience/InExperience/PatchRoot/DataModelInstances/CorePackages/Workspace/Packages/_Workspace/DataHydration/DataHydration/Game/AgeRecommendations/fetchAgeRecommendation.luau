@@ -1,28 +1,25 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
-local Http = require(Parent.Http)
-local HttpRequest = require(Parent.HttpRequest)
+local parent = script:FindFirstAncestor("DataHydration").Parent
+
+local Http = require(parent.Http)
+local HttpRequest = require(parent.HttpRequest)
 local HttpService = game:GetService("HttpService")
-local UrlBuilder = require(Parent.UrlBuilder).UrlBuilder
+
+local UrlBuilder = require(parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder
 local Url = Http.Url
-local v7 = UrlBuilder.new({
-	path = "experience-guidelines-api/experience-guidelines/get-age-recommendation",
-	base = Url.APIS_URL
+
+local v = urlBuilder.new({
+	base = Url.APIS_URL,
+	path = "experience-guidelines-api/experience-guidelines/get-age-recommendation"
 })()
 
-local function requestAgeRecommendation(s1: string) -- line: 20
-	-- upvalues: HttpService (copy), HttpRequest (copy), v7 (copy)
-	local json = HttpService:JSONEncode({
-		universeId = s1
-	})
-
+local function requestAgeRecommendation(universeId: string)
+	local jsonEncode = HttpService:JSONEncode({ universeId = universeId })
 	return HttpRequest.config({
-		requestFunction = function(s2: string, s3: string, p1) -- line: 23
-			-- upvalues: HttpRequest (copy)
-			return HttpRequest.requestFunctions.HttpRbxApi(s2, s3, p1)
+		requestFunction = function(p: string, p2: string, p3)
+			return HttpRequest.requestFunctions.HttpRbxApi(p, p2, p3)
 		end
-	})(v7, "POST", {
-		postBody = json
-	})
+	})(v, "POST", { postBody = jsonEncode })
 end
 
 return requestAgeRecommendation

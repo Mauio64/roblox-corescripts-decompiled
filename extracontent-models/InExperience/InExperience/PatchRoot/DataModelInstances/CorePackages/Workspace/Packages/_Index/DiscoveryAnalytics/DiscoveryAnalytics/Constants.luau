@@ -1,5 +1,6 @@
 return {
 	AiOverviewSentiment = require(script.AiOverviewSentiment),
+	SafetyResourceBannerAction = require(script.SafetyResourceBannerAction),
 	Context = {
 		ExperienceTile = "ExperienceTile",
 		SearchExperienceTile = "SearchExperienceTile",
@@ -7,6 +8,7 @@ return {
 		GamePlayIntentInPlacesList = "gamePlayIntentInPlacesList",
 		PlayerContextualMenu = "PlayerContextualMenu",
 		HoldToPlayLauncher = "HoldToPlayLauncher",
-		InExpHistoryTile = "InExpHistoryTile"
+		InExpHistoryTile = "InExpHistoryTile",
+		InstantPlay = "InstantPlay"
 	}
 }

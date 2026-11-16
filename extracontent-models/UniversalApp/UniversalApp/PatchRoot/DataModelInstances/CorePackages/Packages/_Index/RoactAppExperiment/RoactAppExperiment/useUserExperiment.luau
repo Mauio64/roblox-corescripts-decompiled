@@ -1,6 +1,13 @@
-local v1 = require(script.Parent.makeUseExperiment)("OnUserLayerLoadingStatusChanged", "GetUserLayerLoadingStatus", "GetUserLayerVariables", "LogUserLayerExposure", "GetUserStatusForLayer")
+local makeUseExperiment = require(script.Parent.makeUseExperiment)
 
-return function(t1: {[any]: any}, p1, b1: boolean?) -- line: 35
-	-- upvalues: v1 (copy)
-	return v1(t1, p1, b1)
+local useExperiment = makeUseExperiment(
+	"OnUserLayerLoadingStatusChanged",
+	"GetUserLayerLoadingStatus",
+	"GetUserLayerVariables",
+	"LogUserLayerExposure",
+	"GetUserStatusForLayer"
+)
+
+return function(p, p2, flag: boolean?)
+	return useExperiment(p, p2, flag)
 end

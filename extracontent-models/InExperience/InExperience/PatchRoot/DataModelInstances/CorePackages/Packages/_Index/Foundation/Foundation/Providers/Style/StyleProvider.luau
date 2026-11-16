@@ -1,70 +1,62 @@
-local scriptParent = script.Parent
+local parent = script.Parent
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent2 = Foundation.Parent
+local React = require(parent2.React)
 
-require(Foundation.Enums.ColorMode)
-
+local ColorMode = require(Foundation.Enums.ColorMode)
 local Device = require(Foundation.Enums.Device)
-local StyleSheetContext = require(scriptParent.StyleSheetContext)
-local TagsContext = require(scriptParent.TagsContext)
-local TextSizeOffsetContext = require(scriptParent.TextSizeOffsetContext)
-local Theme = require(Foundation.Enums.Theme)
-local Tokens = require(scriptParent.Tokens)
-local TokensContext = require(scriptParent.TokensContext)
-local VariantsContext = require(scriptParent.VariantsContext)
+local StyleSheetContext = require(parent.StyleSheetContext)
+local TagsContext = require(parent.TagsContext)
+local TextSizeOffsetContext = require(parent.TextSizeOffsetContext)
+local ThemeName = require(Foundation.Enums.ThemeName)
+local Tokens = require(parent.Tokens)
+local TokensContext = require(parent.TokensContext)
+local VariantsContext = require(parent.VariantsContext)
 local getTextSizeOffset = require(Foundation.Utility.getTextSizeOffset)
 local usePreferences = require(Foundation.Providers.Preferences.usePreferences)
 local withDefaults = require(Foundation.Utility.withDefaults)
+
 local getTokens = Tokens.getTokens
-local useRegistryStyleSheet = require(scriptParent.useRegistryStyleSheet)
-local t1 = {
-	scale = 1,
-	theme = Theme.Dark,
-	device = Device.Desktop
+
+local useRegistryStyleSheet = require(parent.useRegistryStyleSheet)
+
+local v = {
+	themeName = ThemeName.Default,
+	colorMode = ColorMode.Dark,
+	device = Device.Desktop,
+	scale = 1
 }
 
-local function StyleProvider(t2: {[any]: any}) -- line: 55
-	-- upvalues: withDefaults (copy), t1 (copy), VariantsContext (copy), React (copy), getTokens (copy), usePreferences (copy), getTextSizeOffset (copy), useRegistryStyleSheet (copy), TokensContext (copy), TextSizeOffsetContext (copy), TagsContext (copy), StyleSheetContext (copy)
-	local v21 = withDefaults({
-		theme = t2.colorMode or t2.theme,
-		device = t2.device,
-		scale = t2.scale
-	}, t1)
-	local v22 = VariantsContext.useVariantsState()
-	local v23 = React.useMemo(function() -- line: 64
-		-- upvalues: getTokens (copy), v21 (copy), t2 (copy)
-		return getTokens(v21.theme, v21.device, v21.scale, t2.tokenOverrides)
-	end, {
-		v21.device,
-		v21.theme,
-		v21.scale,
-		t2.tokenOverrides
-	})
-	local preferredTextSize = usePreferences().preferredTextSize
-	local v25 = React.useMemo(function() -- line: 71
-		-- upvalues: getTextSizeOffset (copy)
-		return getTextSizeOffset() or 0
-	end, { preferredTextSize })
-	local v26, v27 = useRegistryStyleSheet(v21.theme, v21.device, v21.scale, t2.tokenOverrides)
+local function StyleProvider(props)
+	local v2 = withDefaults({
+		themeName = props.themeName,
+		colorMode = props.colorMode or props.theme,
+		device = props.device,
+		scale = props.scale
+	}, v)
 
-	return React.createElement(TokensContext.Provider, {
-		value = v23
-	}, {
-		TextSizeOffsetContext = React.createElement(TextSizeOffsetContext.Provider, {
-			value = v25
-		}, {
-			VariantsContext = React.createElement(VariantsContext.Provider, {
-				value = v22
-			}, {
-				TagsContext = React.createElement(TagsContext.Provider, {
-					value = v27
-				}, React.createElement(StyleSheetContext.Provider, {
-					value = v26
-				}, t2.children)),
-				StyleSheet = React.createElement("StyleLink", {
-					StyleSheet = v26
-				})
+	local v3 = VariantsContext.useVariantsState()
+
+	local v4 = React.useMemo(function()
+		return getTokens(v2.colorMode, v2.device, v2.scale, props.tokenOverrides, v2.themeName)
+	end, { v2.colorMode, v2.device, v2.scale, props.tokenOverrides, v2.themeName })
+
+	local v5 = { usePreferences().preferredTextSize }
+	local v6 = React.useMemo(function()
+		return getTextSizeOffset() or 0
+	end, v5)
+
+	local styleSheet, v7 = useRegistryStyleSheet(v2.themeName, v2.colorMode, v2.device, v2.scale, props.tokenOverrides)
+
+	return React.createElement(TokensContext.Provider, { value = v4 }, {
+		TextSizeOffsetContext = React.createElement(TextSizeOffsetContext.Provider, { value = v6 }, {
+			VariantsContext = React.createElement(VariantsContext.Provider, { value = v3 }, {
+				TagsContext = React.createElement(
+					TagsContext.Provider,
+					{ value = v7 },
+					React.createElement(StyleSheetContext.Provider, { value = styleSheet }, props.children)
+				),
+				StyleSheet = React.createElement("StyleLink", { StyleSheet = styleSheet })
 			})
 		})
 	})

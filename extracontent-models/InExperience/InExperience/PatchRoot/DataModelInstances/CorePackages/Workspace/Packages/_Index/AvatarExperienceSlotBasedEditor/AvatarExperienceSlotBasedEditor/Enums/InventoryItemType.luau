@@ -1,5 +1,1 @@
-return {
-	Asset = "Asset",
-	Outfit = "Outfit",
-	Unknown = "Unknown"
-}
+return { Asset = "Asset", Outfit = "Outfit", Unknown = "Unknown" }

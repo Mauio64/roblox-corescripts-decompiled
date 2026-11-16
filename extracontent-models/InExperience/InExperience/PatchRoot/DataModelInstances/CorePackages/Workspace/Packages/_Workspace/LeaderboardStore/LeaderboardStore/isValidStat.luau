@@ -1,5 +1,10 @@
-local function isValidStat(p1) -- line: 1
-	return p1:IsA("StringValue") or (p1:IsA("IntValue") or (p1:IsA("BoolValue") or (p1:IsA("NumberValue") or (p1:IsA("DoubleConstrainedValue") or p1:IsA("IntConstrainedValue")))))
+local function isValidStat(instance)
+	return instance:IsA("StringValue")
+		or instance:IsA("IntValue")
+		or instance:IsA("BoolValue")
+		or instance:IsA("NumberValue")
+		or instance:IsA("DoubleConstrainedValue")
+		or instance:IsA("IntConstrainedValue")
 end
 
 return isValidStat

@@ -1,7 +1,5 @@
 local CorePackages = game:GetService("CorePackages")
-
-return require(CorePackages.Packages.Rodux).makeActionCreator(script.Name, function(p1) -- line: 8
-	return {
-		promptVisible = p1
-	}
+local Rodux = require(CorePackages.Packages.Rodux)
+return Rodux.makeActionCreator(script.Name, function(promptVisible)
+	return { promptVisible = promptVisible }
 end)

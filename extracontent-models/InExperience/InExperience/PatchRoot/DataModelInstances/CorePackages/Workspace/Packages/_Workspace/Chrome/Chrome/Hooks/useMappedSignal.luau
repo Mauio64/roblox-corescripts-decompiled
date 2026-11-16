@@ -1,38 +1,35 @@
 local Chrome = script:FindFirstAncestor("Chrome")
-local ChromeParent = Chrome.Parent
-local React = require(ChromeParent.React)
-local SharedFlags = require(ChromeParent.SharedFlags)
 
+local parent = Chrome.Parent
+local React = require(parent.React)
 require(Chrome.Common.Types)
 
-local FFlagChromeActivatedMappedSignal = SharedFlags.FFlagChromeActivatedMappedSignal
+return function(object)
+	local v
 
-return function(p1) -- line: 14
-	-- upvalues: FFlagChromeActivatedMappedSignal (copy), React (copy)
-	local v7 = if not FFlagChromeActivatedMappedSignal or p1 ~= nil then p1:get() else nil
-	local v8, v9 = React.useState(v7)
+	if object ~= nil then
+		v = object:get()
+	end
 
-	React.useEffect(function() -- line: 19
-		-- upvalues: FFlagChromeActivatedMappedSignal (copy), p1 (copy), v9 (copy), v8 (copy)
-		if FFlagChromeActivatedMappedSignal and p1 == nil then
+	local state, setState = React.useState(v)
+	React.useEffect(function()
+		if object == nil then
 			return
 		end
 
-		local v10 = p1
-		local v11 = v10:connect(function(p2) -- line: 24
-			-- upvalues: v9 (copy)
-			v9(p2)
+		local v2 = object
+		local connection = v2:connect(function(p)
+			setState(p)
 		end)
 
-		if v8 ~= v10:get() then
-			v9(v10:get())
+		if state ~= v2:get() then
+			setState(v2:get())
 		end
 
-		return function() -- line: 34
-			-- upvalues: v11 (copy)
-			v11:disconnect()
+		return function()
+			connection:disconnect()
 		end
-	end, { p1 })
+	end, { object })
 
-	return v8
+	return state
 end

@@ -1,57 +1,60 @@
-local Parent = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local RobloxSubscriptionPurchaseApp = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp")
+local parent = RobloxSubscriptionPurchaseApp.Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local View = Foundation.View
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local Badge = Foundation.Badge
 local BadgeVariant = Foundation.Enums.BadgeVariant
-local useLocalization = require(Parent.Localization).Hooks.useLocalization
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local FFlagRobloxPlusUpsellBannerUseTryItForFree = require(RobloxSubscriptionPurchaseApp.Flags.FFlagRobloxPlusUpsellBannerUseTryItForFree)
 
-local function RobloxPlusUpsellBannerCTA(t1: {[any]: any}) -- line: 25
-	-- upvalues: useLocalization (copy), React (copy), View (copy), Badge (copy), BadgeVariant (copy), FoundationText (copy)
-	local v11 = useLocalization({
-		getFreeTrialText = "Feature.RobloxSubscription.Label.FreeTrialText",
+local function RobloxPlusUpsellBannerCTA(p)
+	local v = useLocalization({
+		getFreeTrialText = FFlagRobloxPlusUpsellBannerUseTryItForFree and "Feature.RobloxSubscription.Action.TryItForFree" or "Feature.RobloxSubscription.Label.FreeTrialText",
 		subscribe = "Feature.RobloxSubscription.Action.Subscribe",
 		newBadge = "Feature.Catalog.Label.New"
 	})
-	local v12 = React.useCallback(function() -- line: 32
-		-- upvalues: t1 (copy), v11 (copy)
-		if t1.productInfo.isFreeTrial then
-			return v11.getFreeTrialText
+
+	local v2 = React.useCallback(function()
+		if p.productInfo.isFreeTrial then
+			return v.getFreeTrialText
 		end
 
-		return v11.subscribe
-	end, {
-		t1.productInfo.isFreeTrial,
-		v11.getFreeTrialText,
-		v11.subscribe
-	})
+		return v.subscribe
+	end, { p.productInfo.isFreeTrial, v.getFreeTrialText, v.subscribe })
 
-	if t1.shouldShowNewBadge then
-		return React.createElement(View, {
-			tag = "row align-y-center gap-xsmall auto-xy",
-			AnchorPoint = Vector2.new(1, 0.5),
-			Position = UDim2.new(1, 0, 0.5, 0)
-		}, {
-			NewBadge = React.createElement(Badge, {
-				LayoutOrder = 1,
-				text = v11.newBadge,
-				variant = BadgeVariant.Contrast
-			})
-		})
+	if p.shouldShowNewBadge then
+		return React.createElement(
+			View,
+			{
+				AnchorPoint = Vector2.new(1, 0.5),
+				Position = UDim2.new(1, 0, 0.5, 0),
+				tag = "row align-y-center gap-xsmall auto-xy"
+			},
+			{
+				NewBadge = React.createElement(Badge, {
+					text = v.newBadge,
+					variant = BadgeVariant.Contrast,
+					LayoutOrder = 1
+				})
+			}
+		)
 	end
 
-	return React.createElement(View, {
-		tag = "auto-xy",
-		AnchorPoint = Vector2.new(1, 0.5),
-		Position = UDim2.new(1, 0, 0.5, 0)
-	}, {
-		SubscribeText = React.createElement(FoundationText, {
-			tag = "auto-xy text-body-small content-default",
-			RichText = true,
-			Text = "<u>" .. v12() .. "</u>"
-		})
-	})
+	return React.createElement(
+		View,
+		{ AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, 0, 0.5, 0), tag = "auto-xy" },
+		{
+			SubscribeText = React.createElement(Text, {
+				tag = "auto-xy text-body-small content-default",
+				Text = "<u>" .. v2() .. "</u>",
+				RichText = true
+			})
+		}
+	)
 end
 
 return RobloxPlusUpsellBannerCTA

@@ -1,16 +1,14 @@
-local scriptParent = script.Parent
-local networkRequests = scriptParent.networkRequests
+local parent = script.Parent
+local networkRequests = parent.networkRequests
 local createGetUserSettings = require(networkRequests.createGetUserSettings)
 local createUpdateUserSettings = require(networkRequests.createUpdateUserSettings)
 local createGetUserSettingsMetadata = require(networkRequests.createGetUserSettingsMetadata)
+require(parent.Types.networkRequestsTypes)
 
-require(scriptParent.Types.networkRequestsTypes)
-
-return function(p1) -- line: 8
-	-- upvalues: createGetUserSettings (copy), createUpdateUserSettings (copy), createGetUserSettingsMetadata (copy)
+return function(p)
 	return {
-		GetUserSettings = createGetUserSettings(p1),
-		UpdateUserSettings = createUpdateUserSettings(p1),
-		GetUserSettingsMetadata = createGetUserSettingsMetadata(p1)
+		GetUserSettings = createGetUserSettings(p),
+		UpdateUserSettings = createUpdateUserSettings(p),
+		GetUserSettingsMetadata = createGetUserSettingsMetadata(p)
 	}
 end

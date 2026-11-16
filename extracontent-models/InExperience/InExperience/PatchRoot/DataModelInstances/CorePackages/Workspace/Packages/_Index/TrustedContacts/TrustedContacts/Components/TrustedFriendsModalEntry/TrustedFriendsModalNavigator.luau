@@ -1,38 +1,39 @@
 local TrustedContacts = script:FindFirstAncestor("TrustedContacts")
-local TrustedContactsParent = TrustedContacts.Parent
-local RoactNavigation = require(TrustedContactsParent.RoactNavigation)
-local AppPage = require(TrustedContactsParent.RobloxAppEnums).AppPage
-local t1 = {
-	{
-		[AppPage.TrustedFriendsUserModal] = {
-			getScreen = function() -- line: 15
-				-- upvalues: TrustedContacts (copy)
-				return require(TrustedContacts.Components.TrustedContactsModal).Screen
-			end,
-			navigationOptions = {
-				renderUnderlyingPage = true,
-				disableBackButton = true,
-				overlayEnabled = true
-			}
-		}
-	},
-	{
-		[AppPage.TrustedFriendsVPCPrologue] = {
-			getScreen = function() -- line: 27
-				-- upvalues: TrustedContacts (copy)
-				return require(TrustedContacts.Components.TrustedFriendsVPCPrologue).Screen
-			end,
-			navigationOptions = {
-				renderUnderlyingPage = true,
-				disableBackButton = true,
-				overlayEnabled = true
-			}
+local parent = TrustedContacts.Parent
+
+local RoactNavigation = require(parent.RoactNavigation)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+
+local v = {
+	[AppPage.TrustedFriendsUserModal] = {
+		getScreen = function()
+			local TrustedContactsModal = require(TrustedContacts.Components.TrustedContactsModal)
+			return TrustedContactsModal.Screen
+		end,
+		navigationOptions = {
+			renderUnderlyingPage = true,
+			disableBackButton = true,
+			overlayEnabled = true
 		}
 	}
 }
 
-return (RoactNavigation.createRobloxStackNavigator(t1, {
-	keepVisitedScreensMounted = false,
+local v2 = {
+	[AppPage.TrustedFriendsVPCPrologue] = {
+		getScreen = function()
+			local TrustedFriendsVPCPrologue = require(TrustedContacts.Components.TrustedFriendsVPCPrologue)
+			return TrustedFriendsVPCPrologue.Screen
+		end,
+		navigationOptions = {
+			renderUnderlyingPage = true,
+			disableBackButton = true,
+			overlayEnabled = true
+		}
+	}
+}
+return (RoactNavigation.createRobloxStackNavigator({ v, v2 }, {
 	initialRouteName = AppPage.TrustedFriendsUserModal,
+	keepVisitedScreensMounted = false,
 	backBehavior = RoactNavigation.BackBehavior.History
 }))

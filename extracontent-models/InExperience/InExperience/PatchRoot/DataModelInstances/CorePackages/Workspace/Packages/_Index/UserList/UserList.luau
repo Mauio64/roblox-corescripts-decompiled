@@ -4,18 +4,42 @@ local Enums = require(script.Common.Enums)
 
 require(script.Common.Types)
 
-return {
-	["jest.config"] = script["jest.config"],
-	RoduxKey = require(script.Common.Constants).RODUX_KEY,
-	installReducer = installReducer,
-	Components = Deprecated.Components,
-	Enums = Enums,
-	UserListHeader = require(script.Components).UserListHeader,
-	UserListFooter = require(script.Components).UserListFooter,
-	UserListLayoutAdaptor = require(script.Components).UserListLayoutAdaptor,
-	UserRow = require(script.Components).UserRow,
-	EntityRow = require(script.Components).EntityRow,
-	VerticalUserList = require(script.Components).VerticalUserList,
-	HorizontalUserList = require(script.Components).HorizontalUserList,
-	ContactsContext = require(script.Context).ContactsContext
+local UserList = {
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = script["jest.config"]
 }
+local Constants = require(script.Common.Constants)
+UserList.RoduxKey = Constants.RODUX_KEY
+UserList.installReducer = installReducer
+UserList.Components = Deprecated.Components
+
+UserList.Enums = Enums
+
+local Components = require(script.Components)
+UserList.UserListHeader = Components.UserListHeader
+local Components2 = require(script.Components)
+UserList.UserListFooter = Components2.UserListFooter
+
+local Components3 = require(script.Components)
+UserList.UserListLayoutAdaptor = Components3.UserListLayoutAdaptor
+
+local Components4 = require(script.Components)
+UserList.UserRow = Components4.UserRow
+local Components5 = require(script.Components)
+UserList.EntityRow = Components5.EntityRow
+
+local Components6 = require(script.Components)
+UserList.VerticalUserList = Components6.VerticalUserList
+local Components7 = require(script.Components)
+UserList.HorizontalUserList = Components7.HorizontalUserList
+
+local Context = require(script.Context)
+UserList.ContactsContext = Context.ContactsContext
+return UserList

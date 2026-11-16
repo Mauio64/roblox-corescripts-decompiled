@@ -1,5 +1,1 @@
-return {
-	Opening = "Opening",
-	Opened = "Opened",
-	Closing = "Closing"
-}
+return { Opening = "Opening", Opened = "Opened", Closing = "Closing" }

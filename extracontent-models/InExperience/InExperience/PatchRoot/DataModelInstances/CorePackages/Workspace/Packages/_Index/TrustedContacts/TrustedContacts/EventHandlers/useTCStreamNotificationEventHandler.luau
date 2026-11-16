@@ -1,53 +1,60 @@
-local Parent = script:FindFirstAncestor("TrustedContacts").Parent
-local React = require(Parent.React)
-local AppPage = require(Parent.RobloxAppEnums).AppPage
-local useLocalization = require(Parent.Localization).Hooks.useLocalization
-local useDispatch = require(Parent.RoactUtils).Hooks.RoactRodux.useDispatch
-local SetCurrentToastMessage = require(Parent.ToastRodux).Actions.SetCurrentToastMessage
-local Sources = require(Parent.SocialLuaAnalytics).Analytics.Enums.Sources
-local NavigateDown = require(Parent.NavigationRodux).Thunks.NavigateDown
-local FFlagSignalsNavP3Dispatch = require(Parent.SharedFlags).FFlagSignalsNavP3Dispatch
-local v10 = if not FFlagSignalsNavP3Dispatch then nil else require(Parent.RobloxAppNavigation).NavigationCommands
+local parent = script:FindFirstAncestor("TrustedContacts").Parent
 
-return function() -- line: 22
-	-- upvalues: useDispatch (copy), useLocalization (copy), React (copy), AppPage (copy), Sources (copy), FFlagSignalsNavP3Dispatch (copy), v10 (copy), NavigateDown (copy), SetCurrentToastMessage (copy)
-	local v11 = useDispatch()
-	local v12 = useLocalization({
+local React = require(parent.React)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local ToastRodux = require(parent.ToastRodux)
+local SetCurrentToastMessage = ToastRodux.Actions.SetCurrentToastMessage
+local SocialLuaAnalytics = require(parent.SocialLuaAnalytics)
+local Sources = SocialLuaAnalytics.Analytics.Enums.Sources
+
+local NavigationRodux = require(parent.NavigationRodux)
+local NavigateDown = NavigationRodux.Thunks.NavigateDown
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSignalsNavP3Dispatch = SharedFlags.FFlagSignalsNavP3Dispatch
+local navigationCommands
+
+if FFlagSignalsNavP3Dispatch then
+	local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+	navigationCommands = RobloxAppNavigation.NavigationCommands
+else
+	navigationCommands = nil
+end
+
+return function()
+	local v = useDispatch()
+
+	local v2 = useLocalization({
 		somethingIsWrongToast = "Feature.Toast.NetworkingError.SomethingIsWrong"
 	})
 
-	return (React.useCallback(function(t1: {[any]: any}?) -- line: 30
-		-- upvalues: AppPage (copy), Sources (copy), FFlagSignalsNavP3Dispatch (copy), v10 (copy), v11 (copy), NavigateDown (copy), SetCurrentToastMessage (copy), v12 (copy)
-		local v14 = t1 and t1.callback
-		local v15 = t1 and (t1.clientEventsPayload and t1.clientEventsPayload.sender_userid)
+	return (React.useCallback(function(p)
+		local callback = p and p.callback
+		local sender_userid = p and p.clientEventsPayload and p.clientEventsPayload.sender_userid
 
-		if v15 then
-			local t2 = {
-				name = AppPage.TrustedContactsModal,
-				props = {
-					userId = v15,
-					source = Sources.StreamNotification,
-					onRequestAccepted = v14
-				}
-			}
-
-			if FFlagSignalsNavP3Dispatch then
-				v10.down(v10.fromLegacyPage(t2), true)
-
-				return
-			end
-
-			v11(NavigateDown(t2, true))
+		if not sender_userid then
+			v(SetCurrentToastMessage({ toastMessage = v2.somethingIsWrongToast, isLocalized = true }))
 
 			return
 		end
 
-		v11(SetCurrentToastMessage({
-			isLocalized = true,
-			toastMessage = v12.somethingIsWrongToast
-		}))
-	end, {
-		v11,
-		v12
-	}))
+		local v3 = {
+			name = AppPage.TrustedContactsModal,
+			props = {
+				userId = sender_userid,
+				source = Sources.StreamNotification,
+				onRequestAccepted = callback
+			}
+		}
+
+		if FFlagSignalsNavP3Dispatch then
+			navigationCommands.down(navigationCommands.fromLegacyPage(v3), true)
+		else
+			v(NavigateDown(v3, true))
+		end
+	end, { v, v2 }))
 end

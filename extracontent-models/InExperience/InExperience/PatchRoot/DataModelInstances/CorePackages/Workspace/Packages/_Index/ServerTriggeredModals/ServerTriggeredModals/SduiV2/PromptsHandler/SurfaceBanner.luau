@@ -1,76 +1,135 @@
-local Parent = script:FindFirstAncestor("ServerTriggeredModals").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
-local AppNavBar = require(Parent.AppNavBar)
-local SduiSharedUtilities = require(Parent.SduiSharedUtilities)
-local SignalsReact = require(Parent.SignalsReact)
-local RobloxAppHooks = require(Parent.RobloxAppHooks)
+local ServerTriggeredModals = script:FindFirstAncestor("ServerTriggeredModals")
+local parent = ServerTriggeredModals.Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local AppNavBar = require(parent.AppNavBar)
+local SduiSharedUtilities = require(parent.SduiSharedUtilities)
+local SignalsReact = require(parent.SignalsReact)
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+
 local View = Foundation.View
 local SduiFeatureEntryPoint = SduiSharedUtilities.SduiFeatureEntryPoint
 local useComponentConfig = SduiSharedUtilities.useComponentConfig
 local useStatusBarHeight = RobloxAppHooks.useStatusBarHeight
 local useTopBarHeight = RobloxAppHooks.useTopBarHeight
 local VisibilityControl = AppNavBar.VisibilityControl
+local FFlagPromptsActionEventLogging = require(ServerTriggeredModals.Flags.FFlagPromptsActionEventLogging)
 
-local function noopGetter() -- line: 30
+local function noopGetter(): nil
 	return nil
 end
-local function SurfaceBanner(t1: {[any]: any}) -- line: 34
-	-- upvalues: useStatusBarHeight (copy), useTopBarHeight (copy), React (copy), VisibilityControl (copy), useComponentConfig (copy), noopGetter (copy), SignalsReact (copy), View (copy), SduiFeatureEntryPoint (copy)
-	local v17 = useStatusBarHeight()
-	local v18 = useTopBarHeight()
-	local v19, v20 = React.useState(0)
-	local v21 = VisibilityControl.getHeaderBinding()
-	local v22 = t1.identifier ~= nil
-	local v23 = useComponentConfig(t1.configKey, t1.identifier)
-	local v24 = if not v22 then nil else v23
-	local v25 = if not v24 or not v24.props then nil else v24.props.backgroundStyle
-	local v26 = if not v24 or (not v24.propSignals or not v24.propSignals.backgroundStyle) then noopGetter else v24.propSignals.backgroundStyle
-	local v27 = SignalsReact.useSignalState(v26)
-	local v28 = if v25 == nil then if v27 == nil then nil else v27.data else v25
-	local v29 = v21:map(function(n1: number) -- line: 70
-		-- upvalues: v17 (copy), v18 (copy)
-		return UDim2.new(0, 0, 0, (math.max(v17, n1 * v18)))
-	end)
-	local v30 = v21:map(function(n2: number) -- line: 80
-		-- upvalues: v17 (copy), v18 (copy)
-		return UDim2.new(1, 0, 0, (math.max(0, v17 - n2 * v18)))
-	end)
-	local surfaceBannerContent = t1.surfaceBannerContent
-	local v32 = surfaceBannerContent and (not not surfaceBannerContent.props and surfaceBannerContent.props.canvasTopPadding) or 0
-	local v33 = if not surfaceBannerContent then nil else React.cloneElement(surfaceBannerContent, {
-		canvasTopPadding = v32 + v19
-	})
 
-	return React.createElement(View, {
-		tag = "size-full"
-	}, {
-		Content = v33,
-		Filler = if not v22 then nil else React.createElement(View, {
-			ZIndex = 2,
-			backgroundStyle = v28,
-			AnchorPoint = Vector2.new(0, 1),
-			Position = v29,
-			Size = v30
-		}),
-		Banner = React.createElement(View, {
-			ZIndex = 2,
-			Position = v29,
-			Size = UDim2.new(1, 0, 0, 0),
-			AutomaticSize = Enum.AutomaticSize.Y,
-			onAbsoluteSizeChanged = function(p1) -- line: 110
-				-- upvalues: v20 (copy)
-				v20(p1.AbsoluteSize.Y)
-			end
-		}, {
-			SurfaceBanner = if not v22 then nil else React.createElement(SduiFeatureEntryPoint, {
-				shouldDisplayLoading = false,
-				shouldDisplayError = false,
-				configKey = t1.configKey,
-				identifier = t1.identifier,
-				appPage = t1.appPage
-			})
+local function SurfaceBanner(props)
+	local v = useStatusBarHeight()
+	local v2 = useTopBarHeight()
+	local state, setState = React.useState(0)
+	local headerBinding = VisibilityControl.getHeaderBinding()
+
+	local v3 = props.identifier ~= nil
+	local v4 = useComponentConfig(props.configKey, props.identifier)
+
+	if not v3 then
+		v4 = nil
+	end
+
+	local backgroundStyle
+
+	if v4 and v4.props then
+		backgroundStyle = v4.props.backgroundStyle
+	end
+
+	local v5
+
+	if v4 and v4.propSignals and v4.propSignals.backgroundStyle then
+		v5 = v4.propSignals.backgroundStyle
+	else
+		v5 = noopGetter
+	end
+
+	local v6 = SignalsReact.useSignalState(v5)
+
+	if backgroundStyle == nil then
+		backgroundStyle = if v6 ~= nil then v6.data else nil
+	end
+
+	local mapped = headerBinding:map(function(p: number)
+		return UDim2.new(0, 0, 0, (math.max(v, p * v2)))
+	end)
+
+	local mapped2 = headerBinding:map(function(p: number)
+		return UDim2.new(1, 0, 0, (math.max(0, v - p * v2)))
+	end)
+
+	local surfaceBannerContent = props.surfaceBannerContent
+	local canvasTopPadding = surfaceBannerContent
+		and surfaceBannerContent.props
+		and surfaceBannerContent.props.canvasTopPadding
+		or 0
+	local content
+
+	if surfaceBannerContent then
+		content = React.cloneElement(surfaceBannerContent, {
+			canvasTopPadding = canvasTopPadding + state
 		})
+	end
+
+	local createElement = React.createElement
+	local filler
+
+	if v3 then
+		filler = React.createElement(View, {
+			backgroundStyle = backgroundStyle,
+			AnchorPoint = Vector2.new(0, 1),
+			Position = mapped,
+			Size = mapped2,
+			ZIndex = 2
+		})
+	end
+
+	local createElement2 = React.createElement
+	local v7 = {
+		Position = mapped,
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		ZIndex = 2,
+		onAbsoluteSizeChanged = function(p)
+			setState(p.AbsoluteSize.Y)
+		end
+	}
+	local surfaceBanner
+
+	if v3 then
+		local createElement3 = React.createElement
+		local v8 = {
+			configKey = props.configKey,
+			identifier = props.identifier,
+			appPage = props.appPage,
+			additionalAnalyticsData = 0,
+			shouldDisplayLoading = false,
+			shouldDisplayError = false
+		}
+		local additionalAnalyticsData
+
+		if FFlagPromptsActionEventLogging then
+			additionalAnalyticsData = { promptInstanceId = 0 }
+			local promptInstanceId
+
+			if props.identifier then
+				promptInstanceId = props.identifier
+			end
+
+			additionalAnalyticsData.promptInstanceId = promptInstanceId
+		end
+
+		v8.additionalAnalyticsData = additionalAnalyticsData
+		surfaceBanner = createElement3(SduiFeatureEntryPoint, v8)
+	end
+
+	return createElement(View, { tag = "size-full" }, {
+		Content = content,
+		Filler = filler,
+		Banner = createElement2(View, v7, { SurfaceBanner = surfaceBanner })
 	})
 end
 

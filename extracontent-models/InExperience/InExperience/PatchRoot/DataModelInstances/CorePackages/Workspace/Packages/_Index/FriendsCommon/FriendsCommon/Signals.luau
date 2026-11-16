@@ -1,3 +1,4 @@
+local FriendsCommonPresenceUpdateSignal = require(script.FriendsCommonPresenceUpdateSignal)
 return {
-	FriendsCommonPresenceUpdateSignal = require(script.FriendsCommonPresenceUpdateSignal)()
+	FriendsCommonPresenceUpdateSignal = FriendsCommonPresenceUpdateSignal()
 }

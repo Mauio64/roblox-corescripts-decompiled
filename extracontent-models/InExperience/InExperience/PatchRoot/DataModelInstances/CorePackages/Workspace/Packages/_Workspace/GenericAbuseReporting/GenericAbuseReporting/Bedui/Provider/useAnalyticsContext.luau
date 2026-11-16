@@ -1,10 +1,10 @@
 local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
-local GenericAbuseReportingParent = GenericAbuseReporting.Parent
-local React = require(GenericAbuseReportingParent.React)
+local parent = GenericAbuseReporting.Parent
+local React = require(parent.React)
+
 local AbuseReportAnalyticsContext = require(GenericAbuseReporting.Bedui.Provider.AbuseReportAnalyticsContext)
 
-local function useAnalyticsContext() -- line: 7
-	-- upvalues: React (copy), AbuseReportAnalyticsContext (copy)
+local function useAnalyticsContext()
 	return React.useContext(AbuseReportAnalyticsContext)
 end
 

@@ -1,7 +1,10 @@
-local Parent = script:FindFirstAncestor("InterventionShared").Parent
+local parent = script:FindFirstAncestor("InterventionShared").Parent
+
 local LocalizationService = game:GetService("LocalizationService")
-local v3 = require(Parent.RobloxAppLocales).Localization.new(LocalizationService.RobloxLocaleId)
-local t1 = {
+local RobloxAppLocales = require(parent.RobloxAppLocales)
+local localization = RobloxAppLocales.Localization.new(LocalizationService.RobloxLocaleId)
+
+local v = {
 	{
 		threshold = 1380,
 		unit = 1440,
@@ -22,19 +25,16 @@ local t1 = {
 	}
 }
 
-return function(n1: number) -- line: 39
-	-- upvalues: t1 (copy), v3 (copy)
-	for _, v7 in t1 do
-		if n1 >= v7.threshold then
-			local v8 = math.ceil(n1 / v7.unit)
+return function(p: number)
+	for _, v2 in v do
+		if v2.threshold <= p then
+			local number = math.ceil(p / v2.unit)
 
-			if v8 == 1 then
-				return (v3:Format(v7.headingSingle))
+			if number == 1 then
+				return (localization:Format(v2.headingSingle))
 			end
 
-			return (v3:Format(v7.headingPlural, {
-				number = v8
-			}))
+			return (localization:Format(v2.headingPlural, { number = number }))
 		end
 	end
 

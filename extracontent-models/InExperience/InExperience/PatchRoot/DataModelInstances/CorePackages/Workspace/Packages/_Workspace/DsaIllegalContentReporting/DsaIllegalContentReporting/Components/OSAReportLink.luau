@@ -1,28 +1,29 @@
-local Parent = script:FindFirstAncestor("DsaIllegalContentReporting").Parent
+local parent = script:FindFirstAncestor("DsaIllegalContentReporting").Parent
 local GuiService = game:GetService("GuiService")
 local HttpService = game:GetService("HttpService")
-local Foundation = require(Parent.Foundation)
-local React = require(Parent.React)
-local Localization = require(Parent.Localization)
-local Responsive = require(Parent.Responsive)
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local Localization = require(parent.Localization)
+local Responsive = require(parent.Responsive)
 local usePreferredInput = Responsive.usePreferredInput
+
 local ControlState = Foundation.Enums.ControlState
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local useLocalization = Localization.Hooks.useLocalization
 local useTokens = Foundation.Hooks.useTokens
 local View = Foundation.View
-local _ = {
-	OPEN_CUSTOM_WEBVIEW = 20
-}
 
-local function OSAReportLink() -- line: 24
-	-- upvalues: useTokens (copy), React (copy), usePreferredInput (copy), Responsive (copy), useLocalization (copy), HttpService (copy), GuiService (copy), ControlState (copy), View (copy), FoundationText (copy)
-	local v16 = useTokens()
-	local v17, v18 = React.useState(nil)
-	local v19 = usePreferredInput() == Responsive.Input.Directional
-	local v20 = Responsive.useIsSpatial()
-	local v21 = v19 or v20
-	local v22 = useLocalization({
+local _ = { OPEN_CUSTOM_WEBVIEW = 20 }
+
+local function OSAReportLink()
+	local v = useTokens()
+	local state, setState = React.useState(nil)
+	local v2 = usePreferredInput() == Responsive.Input.Directional
+	local v3 = Responsive.useIsSpatial()
+	local v4 = v2 or v3
+
+	local v5 = useLocalization({
 		HelpPageTitle = "Feature.ReportAbuse.DSAIllegal.ReportPageTitle",
 		OSACopy1 = "Feature.ReportAbuse.Message.OSACopy1",
 		OSACopy2 = "Feature.ReportAbuse.Message.OSACopy2",
@@ -30,50 +31,67 @@ local function OSAReportLink() -- line: 24
 		OSACopy4 = "Feature.ReportAbuse.Message.OSACopy4",
 		OSACopyReadOnly = "Feature.ReportAbuse.Message.OSACopyReadOnly"
 	})
-	local v23 = React.useCallback(function() -- line: 40
-		-- upvalues: HttpService (copy), v22 (copy), GuiService (copy)
-		local json = HttpService:JSONEncode({
-			presentationStyle = nil,
-			visible = true,
-			url = "https://www.roblox.com/illegal-content-reporting",
-			title = v22.HelpPageTitle
-		})
 
-		GuiService:BroadcastNotification(json, 20)
-	end, {})
-	local v24 = React.useCallback(function(p1) -- line: 50
-		-- upvalues: ControlState (copy), v18 (copy), v16 (copy)
-		if p1 == ControlState.Hover then
-			v18(v16.Color.State.Hover)
-
-			return
-		end
-
-		if p1 == ControlState.Pressed then
-			v18(v16.Color.State.Press)
-
-			return
-		end
-
-		v18(nil)
+	local onActivated = React.useCallback(function()
+		GuiService:BroadcastNotification(
+			HttpService:JSONEncode({
+				title = v5.HelpPageTitle,
+				presentationStyle = nil,
+				visible = true,
+				url = "https://www.roblox.com/illegal-content-reporting"
+			}),
+			20
+		)
 	end, {})
 
-	return React.createElement(View, {
-		tag = "size-full col gap-small"
-	}, {
-		OSALink = React.createElement(FoundationText, {
-			RichText = true,
-			TextWrapped = true,
-			tag = "auto-xy radius-small padding-xsmall",
-			LayoutOrder = 2,
-			Text = if not v21 then `<b>{ v22.OSACopy4 }</b>` else `<b>{ v22.OSACopyReadOnly }</b>`,
-			backgroundStyle = v17,
-			fontStyle = v16.Typography.BodySmall,
-			textStyle = v16.Color.Content.Emphasis,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			onActivated = if not v21 then v23 else nil,
-			onStateChanged = if not v21 then v24 else nil
-		})
+	local onStateChanged = React.useCallback(function(p)
+		if p == ControlState.Hover then
+			setState(v.Color.State.Hover)
+		elseif p == ControlState.Pressed then
+			setState(v.Color.State.Press)
+		else
+			setState(nil)
+		end
+	end, {})
+
+	local createElement = React.createElement
+
+	local createElement2 = React.createElement
+	local text
+
+	if v4 then
+		text = `<b>{v5.OSACopyReadOnly}</b>`
+	else
+		text = `<b>{v5.OSACopy4}</b>`
+	end
+
+	local v6 = {
+		Text = text,
+		RichText = true,
+		backgroundStyle = state,
+		fontStyle = v.Typography.BodySmall,
+		textStyle = v.Color.Content.Emphasis,
+		TextWrapped = true,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		onActivated = 0,
+		onStateChanged = 0,
+		tag = "auto-xy radius-small padding-xsmall",
+		LayoutOrder = 2
+	}
+
+	if v4 then
+		onActivated = nil
+	end
+
+	v6.onActivated = onActivated
+
+	if v4 then
+		onStateChanged = nil
+	end
+
+	v6.onStateChanged = onStateChanged
+	return createElement(View, { tag = "size-full col gap-small" }, {
+		OSALink = createElement2(Text, v6)
 	})
 end
 

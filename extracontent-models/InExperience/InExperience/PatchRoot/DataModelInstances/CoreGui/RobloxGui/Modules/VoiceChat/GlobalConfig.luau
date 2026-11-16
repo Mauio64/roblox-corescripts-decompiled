@@ -1,3 +1,1 @@
-return {
-	actionValidation = false
-}
+return { actionValidation = false }

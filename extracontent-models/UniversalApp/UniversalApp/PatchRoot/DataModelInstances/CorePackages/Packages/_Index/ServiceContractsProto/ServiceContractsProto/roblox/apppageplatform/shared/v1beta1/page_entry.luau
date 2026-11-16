@@ -1,186 +1,180 @@
 local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
 local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
-local t1 = {}
+
+local v = {}
+
 local surfacing = require(script.Parent.surfacing)
-local t2 = {}
 
-t2.__index = t2
+local class = {}
+class.__index = class
 
-function t2.new(t3: {[any]: any}?) -- line: 49
-	-- upvalues: t2 (copy)
-	return (setmetatable({
-		roblox_component = if t3 ~= nil and t3.roblox_component ~= nil then t3.roblox_component else "",
-		identifier = if t3 ~= nil and t3.identifier ~= nil then t3.identifier else "",
-		title = if t3 ~= nil and t3.title ~= nil then t3.title else "",
-		category = if t3 ~= nil and t3.category ~= nil then t3.category else "",
-		surfacing = if t3 ~= nil and t3.surfacing ~= nil then t3.surfacing else nil
-	}, t2))
+function class.new(data)
+	local v2 = {
+		roblox_component = (data == nil or data.roblox_component == nil) and "" or data.roblox_component,
+		identifier = (data == nil or data.identifier == nil) and "" or data.identifier,
+		title = (data == nil or data.title == nil) and "" or data.title,
+		category = (data == nil or data.category == nil) and "" or data.category,
+		surfacing = 0
+	}
+	local surfacing2
+
+	if not (data == nil or data.surfacing == nil) then
+		surfacing2 = data.surfacing
+	end
+
+	v2.surfacing = surfacing2
+	return (setmetatable(v2, class))
 end
-function t2.encode(p1) -- line: 59
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n1 = 0
 
-	if p1.roblox_component ~= nil and p1.roblox_component ~= "" then
-		local v10, v11 = proto.writeTag(buf, n1, 1, proto.wireTypes.lengthDelimited)
+function class:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n1 = proto.writeString(v10, v11, p1.roblox_component)
+	if self.roblox_component ~= nil and self.roblox_component ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.roblox_component)
 	end
 
-	if p1.identifier ~= nil and p1.identifier ~= "" then
-		local v12, v13 = proto.writeTag(buf, n1, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v12, v13, p1.identifier)
+	if self.identifier ~= nil and self.identifier ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.identifier)
 	end
 
-	if p1.title ~= nil and p1.title ~= "" then
-		local v14, v15 = proto.writeTag(buf, n1, 3, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v14, v15, p1.title)
+	if self.title ~= nil and self.title ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.title)
 	end
 
-	if p1.category ~= nil and p1.category ~= "" then
-		local v16, v17 = proto.writeTag(buf, n1, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v16, v17, p1.category)
+	if self.category ~= nil and self.category ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.category)
 	end
 
-	if p1.surfacing ~= nil then
-		local v18 = p1.surfacing:encode()
-		local v19, v20 = proto.writeTag(buf, n1, 5, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeBuffer(v19, v20, v18, buffer.len(v18))
+	if self.surfacing ~= nil then
+		local encoded = self.surfacing:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 	end
 
-	local buf2 = buffer.create(n1)
-
-	buffer.copy(buf2, 0, buf, 0, n1)
-
-	return buf2
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t2.decode(p2: buffer) -- line: 94
-	-- upvalues: t2 (copy), proto (copy), surfacing (copy)
-	local v23 = t2.new()
-	local n2 = 0
 
-	while n2 < buffer.len(p2) do
-		local v25, v26
+function class.decode(buf: buffer)
+	local result = class.new()
+	local v2 = 0
 
-		v25, v26, n2 = proto.readTag(p2, n2)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v26 == proto.wireTypes.varint then
-			local v27
-
-			v27, n2 = proto.readVarInt(p2, n2)
-		elseif v26 == proto.wireTypes.lengthDelimited then
-			if v25 == 1 then
-				local v28
-
-				v28, n2 = proto.readBuffer(p2, n2)
-				v23.roblox_component = buffer.tostring(v28)
-			elseif v25 == 2 then
-				local v29
-
-				v29, n2 = proto.readBuffer(p2, n2)
-				v23.identifier = buffer.tostring(v29)
-			elseif v25 == 3 then
-				local v30
-
-				v30, n2 = proto.readBuffer(p2, n2)
-				v23.title = buffer.tostring(v30)
-			elseif v25 == 4 then
-				local v31
-
-				v31, n2 = proto.readBuffer(p2, n2)
-				v23.category = buffer.tostring(v31)
-			elseif v25 == 5 then
-				local v32
-
-				v32, n2 = proto.readBuffer(p2, n2)
-				v23.surfacing = surfacing.Surfacing.decode(v32)
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.roblox_component = buffer.tostring(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.identifier = buffer.tostring(v5)
+			elseif v3 == 3 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.title = buffer.tostring(v5)
+			elseif v3 == 4 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.category = buffer.tostring(v5)
+			elseif v3 == 5 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.surfacing = surfacing.Surfacing.decode(v5)
 			else
-				local v33, v34 = proto.readVarInt(p2, n2)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n2 = v34 + v33
+				v2 = v5 + varInt
 			end
-		elseif v26 == proto.wireTypes.i32 then
-			local v35
-
-			v35, n2 = proto.readFixed32(p2, n2)
-		elseif v26 == proto.wireTypes.i64 then
-			local v36
-
-			v36, n2 = proto.readFixed64(p2, n2)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v26)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v23
-end
-function t2.jsonEncode(p3) -- line: 157
-	local t4 = {}
-
-	if p3.roblox_component ~= nil and p3.roblox_component ~= "" then
-		t4.robloxComponent = p3.roblox_component
-	end
-
-	if p3.identifier ~= nil and p3.identifier ~= "" then
-		t4.identifier = p3.identifier
-	end
-
-	if p3.title ~= nil and p3.title ~= "" then
-		t4.title = p3.title
-	end
-
-	if p3.category ~= nil and p3.category ~= "" then
-		t4.category = p3.category
-	end
-
-	if p3.surfacing ~= nil then
-		t4.surfacing = p3.surfacing:jsonEncode()
-	end
-
-	return t4
-end
-function t2.jsonDecode(t5: {[any]: any}) -- line: 183
-	-- upvalues: t2 (copy), surfacing (copy)
-	local v40 = t2.new()
-
-	if t5.roblox_component ~= nil then
-		v40.roblox_component = t5.roblox_component
-	end
-
-	if t5.robloxComponent ~= nil then
-		v40.roblox_component = t5.robloxComponent
-	end
-
-	if t5.identifier ~= nil then
-		v40.identifier = t5.identifier
-	end
-
-	if t5.title ~= nil then
-		v40.title = t5.title
-	end
-
-	if t5.category ~= nil then
-		v40.category = t5.category
-	end
-
-	if t5.surfacing ~= nil then
-		v40.surfacing = surfacing.Surfacing.jsonDecode(t5.surfacing)
-	end
-
-	return v40
+	return result
 end
 
-t2.descriptor = {
+function class:jsonEncode()
+	local v2 = {}
+
+	if self.roblox_component ~= nil and self.roblox_component ~= "" then
+		v2.robloxComponent = self.roblox_component
+	end
+
+	if self.identifier ~= nil and self.identifier ~= "" then
+		v2.identifier = self.identifier
+	end
+
+	if self.title ~= nil and self.title ~= "" then
+		v2.title = self.title
+	end
+
+	if self.category ~= nil and self.category ~= "" then
+		v2.category = self.category
+	end
+
+	if self.surfacing ~= nil then
+		v2.surfacing = self.surfacing:jsonEncode()
+	end
+
+	return v2
+end
+
+function class.jsonDecode(data)
+	local v2 = class.new()
+
+	if data.roblox_component ~= nil then
+		v2.roblox_component = data.roblox_component
+	end
+
+	if data.robloxComponent ~= nil then
+		v2.roblox_component = data.robloxComponent
+	end
+
+	if data.identifier ~= nil then
+		v2.identifier = data.identifier
+	end
+
+	if data.title ~= nil then
+		v2.title = data.title
+	end
+
+	if data.category ~= nil then
+		v2.category = data.category
+	end
+
+	if data.surfacing ~= nil then
+		v2.surfacing = surfacing.Surfacing.jsonDecode(data.surfacing)
+	end
+
+	return v2
+end
+
+class.descriptor = {
 	name = "PageEntry",
 	fullName = "roblox.apppageplatform.shared.v1beta1.PageEntry"
 }
-t1.PageEntry = t2
-typeRegistry.default:register(t1.PageEntry)
 
-return {
-	PageEntry = t1.PageEntry
-}
+v.PageEntry = class
+
+typeRegistry.default:register(v.PageEntry)
+
+return { PageEntry = v.PageEntry }

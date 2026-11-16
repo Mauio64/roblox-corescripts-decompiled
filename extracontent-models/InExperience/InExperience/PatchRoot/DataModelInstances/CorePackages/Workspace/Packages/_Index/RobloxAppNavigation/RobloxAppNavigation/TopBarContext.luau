@@ -1,7 +1,8 @@
-local Parent = script:FindFirstAncestor("RobloxAppNavigation").Parent
+local parent = script:FindFirstAncestor("RobloxAppNavigation").Parent
+local React = require(parent.React)
 
-return require(Parent.React).createContext({
-	render = function(p1) -- line: 9
-		return p1
+return React.createContext({
+	render = function(p)
+		return p
 	end
 })

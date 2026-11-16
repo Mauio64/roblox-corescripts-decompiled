@@ -1,4 +1,6 @@
 local event = require(script.Parent.event)
-local Actions = script:FindFirstAncestor("ExpChat").Actions
 
-return event((require(Actions.SetCoreGuiEnabledChanged)))
+local actions = script:FindFirstAncestor("ExpChat").Actions
+local SetCoreGuiEnabledChanged = require(actions.SetCoreGuiEnabledChanged)
+
+return event(SetCoreGuiEnabledChanged)

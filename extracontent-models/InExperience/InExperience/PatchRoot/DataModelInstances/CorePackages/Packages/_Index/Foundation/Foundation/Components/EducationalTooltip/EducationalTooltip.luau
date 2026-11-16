@@ -1,3 +1,5 @@
 local Foundation = script:FindFirstAncestor("Foundation")
 
-return (require(Foundation.Components.Coachmark))
+local Coachmark = require(Foundation.Components.Coachmark)
+
+return Coachmark

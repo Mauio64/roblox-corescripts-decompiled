@@ -1,68 +1,80 @@
 local HttpService = game:GetService("HttpService")
-local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local HttpClient = require(DataHydrationParent.HttpClient)
-local UrlBase = require(DataHydrationParent.UrlBuilder).UrlBase
-local withCsrfRetry = require(DataHydration.withCsrfRetry)
 
+local DataHydration = script:FindFirstAncestor("DataHydration")
+local parent = DataHydration.Parent
+
+local HttpClient = require(parent.HttpClient)
+local UrlBuilder = require(parent.UrlBuilder)
+local UrlBase = UrlBuilder.UrlBase
+
+local withCsrfRetry = require(DataHydration.withCsrfRetry)
 require(script.Parent.UniverseCreateStoreTypes)
 
-local function tryJsonDecode(p1) -- line: 15
-	-- upvalues: HttpService (copy)
-	if p1 == nil or p1 == "" then
+local function tryJsonDecode(buf)
+	if buf == nil or buf == "" then
 		return nil
 	end
 
-	local v11 = if typeof(p1) ~= "buffer" then p1 else buffer.tostring(p1)
-	local ok, result = pcall(HttpService.JSONDecode, HttpService, v11)
-
-	if ok then
-		return result
+	if typeof(buf) == "buffer" then
+		buf = buffer.tostring(buf)
 	end
 
-	return nil
+	local success, result = pcall(HttpService.JSONDecode, HttpService, buf)
+	return if success then result else nil
 end
-local function decode(p2) -- line: 25
-	-- upvalues: HttpService (copy)
-	local responseBody = p2.responseBody
-	local v16
 
-	if responseBody == nil or responseBody == "" then
-		v16 = nil
+local function decode(p)
+	local responseBody = p.responseBody
+	local result
+
+	if not (responseBody == nil or responseBody == "") then
+		if typeof(responseBody) == "buffer" then
+			responseBody = buffer.tostring(responseBody)
+		end
+
+		local success
+		success, result = pcall(HttpService.JSONDecode, HttpService, responseBody)
+
+		if not success then
+			result = nil
+		end
+	end
+
+	if typeof(result) == "table" and typeof(result.code) == "string" and typeof(result.message) == "string" then
+		return nil, ("%s: %s"):format(result.code, result.message), p.statusCode
+	end
+
+	if not (p.statusCode < 200 or p.statusCode >= 300) then
+		return result, nil, nil
+	end
+
+	local v
+
+	if typeof(p.responseBody) == "buffer" then
+		v = buffer.tostring(p.responseBody)
 	else
-		local v17 = if typeof(responseBody) ~= "buffer" then responseBody else buffer.tostring(responseBody)
-		local ok, result = pcall(HttpService.JSONDecode, HttpService, v17)
-
-		v16 = if not ok then nil else result
+		v = p.responseBody or ""
 	end
 
-	if typeof(v16) == "table" and typeof(v16.code) == "string" and typeof(v16.message) == "string" then
-		return nil, ("%s: %s"):format(v16.code, v16.message), p2.statusCode
-	end
-
-	if p2.statusCode < 200 or p2.statusCode >= 300 then
-		local v20 = if typeof(p2.responseBody) ~= "buffer" then p2.responseBody or "" else buffer.tostring(p2.responseBody)
-
-		return nil, ("http %d: %s"):format(p2.statusCode, v20), p2.statusCode
-	end
-
-	return v16, nil, nil
+	return nil, ("http %d: %s"):format(p.statusCode, v), p.statusCode
 end
-local function fetchUniverseCreate(p3, t1: {[any]: any}?) -- line: 43
-	-- upvalues: withCsrfRetry (copy), HttpClient (copy), UrlBase (copy), decode (copy)
-	local v23 = t1 or {}
-	local v24 = v23.network or withCsrfRetry(HttpClient.createRequestInternalNetwork())
-	local v25 = v23.baseUrl or UrlBase.APIS
-	local v26 = HttpClient.createRequest({
+
+local function fetchUniverseCreate(body, options)
+	local v = options or {}
+
+	local network = v.network or withCsrfRetry(HttpClient.createRequestInternalNetwork())
+	local baseUrl = v.baseUrl or UrlBase.APIS
+
+	local request = HttpClient.createRequest({
+		networkImpl = network,
 		method = "POST",
+		url = baseUrl .. "/universes/v1/universes/create",
+		body = body,
 		analyticsKey = "universes-create.create",
-		networkImpl = v24,
-		url = v25 .. "/universes/v1/universes/create",
-		body = p3,
 		decode = decode
 	})
 
-	return HttpClient.asPromise(v26)
+	return HttpClient.asPromise(request)
 end
 
 return fetchUniverseCreate

@@ -1,14 +1,14 @@
-local Parent = script:FindFirstAncestor("Charts").Parent
-local UrlBuilder = require(Parent.UrlBuilder).UrlBuilder
-local Url = require(Parent.Http).Url
-local v4 = UrlBuilder.new({
-	path = "charts-api/v1/charts-sort-detail",
-	base = Url.APIS_URL
-})
+local parent = script:FindFirstAncestor("Charts").Parent
 
-local function getChartsSortDetailPostUrl() -- line: 16
-	-- upvalues: v4 (copy)
-	return v4()
+local UrlBuilder = require(parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder
+local Http = require(parent.Http)
+local Url = Http.Url
+
+local v = urlBuilder.new({ base = Url.APIS_URL, path = "charts-api/v1/charts-sort-detail" })
+
+local function getChartsSortDetailPostUrl()
+	return v()
 end
 
 return getChartsSortDetailPostUrl

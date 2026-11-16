@@ -1,13 +1,17 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local Cryo = require(AppChatParent.Cryo)
-local React = require(AppChatParent.React)
+local parent = AppChat.Parent
+
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
 local memo = React.memo
 local IconWithTextCell = require(AppChat.Components.Cells.IconWithTextCell)
-local RoactFitComponents = require(AppChatParent.LuaSocialLibrariesDeps).RoactFitComponents
+local LuaSocialLibrariesDeps = require(parent.LuaSocialLibrariesDeps)
+local RoactFitComponents = LuaSocialLibrariesDeps.RoactFitComponents
+
 local FFlagDebugAppChatEnableDomLocators = require(AppChat.Flags.FFlagDebugAppChatEnableDomLocators)
 local DomLocators = require(AppChat.Utils.DomLocators)
-local t1 = {
+
+local v = {
 	leaveGroupText = "leaveGroupText",
 	onActivated = nil,
 	iconImage = nil,
@@ -18,32 +22,39 @@ local t1 = {
 	style = nil
 }
 
-function LeaveGroupCell(t2: {[any]: any}) -- line: 37
-	-- upvalues: Cryo (copy), t1 (copy), React (copy), RoactFitComponents (copy), IconWithTextCell (copy), FFlagDebugAppChatEnableDomLocators (copy), DomLocators (copy)
-	local v12 = Cryo.Dictionary.join(t1, t2)
+function LeaveGroupCell(p)
+	local joined = Cryo.Dictionary.join(v, p)
 
-	return React.createElement(RoactFitComponents.FitFrameVertical, {
+	local createElement = React.createElement
+	local fitFrameVertical = RoactFitComponents.FitFrameVertical
+	local v2 = {
 		BackgroundTransparency = 1,
-		LayoutOrder = v12.LayoutOrder,
+		LayoutOrder = joined.LayoutOrder,
 		width = UDim.new(1, 0),
-		margin = {
-			left = 0,
-			right = 0,
-			bottom = 0,
-			top = v12.marginTop
-		}
-	}, {
-		LeaveGroupRow = React.createElement(IconWithTextCell, {
-			showDivider = false,
-			LayoutOrder = v12.LayoutOrder,
-			onActivated = v12.onActivated,
-			primaryIcon = v12.iconImage,
-			Size = UDim2.new(1, 0, 0, v12.cellHeight),
-			style = v12.style,
-			Text = v12.leaveGroupText,
-			iconCellWidth = v12.iconCellWidth,
-			testId = if not FFlagDebugAppChatEnableDomLocators then nil else DomLocators.chatDetailsListActionButton(v12.leaveGroupText)
-		})
+		margin = { top = joined.marginTop, left = 0, right = 0, bottom = 0 }
+	}
+
+	local createElement2 = React.createElement
+	local v3 = {
+		LayoutOrder = joined.LayoutOrder,
+		onActivated = joined.onActivated,
+		primaryIcon = joined.iconImage,
+		showDivider = false,
+		Size = UDim2.new(1, 0, 0, joined.cellHeight),
+		style = joined.style,
+		Text = joined.leaveGroupText,
+		iconCellWidth = joined.iconCellWidth,
+		testId = 0
+	}
+	local testId
+
+	if FFlagDebugAppChatEnableDomLocators then
+		testId = DomLocators.chatDetailsListActionButton(joined.leaveGroupText)
+	end
+
+	v3.testId = testId
+	return createElement(fitFrameVertical, v2, {
+		LeaveGroupRow = createElement2(IconWithTextCell, v3)
 	})
 end
 

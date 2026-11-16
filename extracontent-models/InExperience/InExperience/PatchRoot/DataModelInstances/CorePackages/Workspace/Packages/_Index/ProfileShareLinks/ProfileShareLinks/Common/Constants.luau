@@ -1,3 +1,1 @@
-return {
-	RODUX_KEY = "ProfileShareLinks"
-}
+return { RODUX_KEY = "ProfileShareLinks" }

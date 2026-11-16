@@ -1,10 +1,11 @@
-local ParentParent = script.Parent.Parent
-local JestConfigs = require(ParentParent.Dev.JestConfigs)
+local parent = script.Parent.Parent
+
+local JestConfigs = require(parent.Dev.JestConfigs)
 
 return {
 	displayName = "GenericAbuseReporting-MockDataModel",
-	mockDataModel = true,
 	testMatch = { "**/analyticsService.test" },
+	mockDataModel = true,
 	setupFilesAfterEnv = {
 		JestConfigs.setupFiles.ErrorLogHandler,
 		JestConfigs.setupFiles.createPromiseRejectionHandler(),

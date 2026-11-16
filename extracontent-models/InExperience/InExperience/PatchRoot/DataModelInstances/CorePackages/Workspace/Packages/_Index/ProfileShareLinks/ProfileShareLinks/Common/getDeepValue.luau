@@ -1,3 +1,3 @@
-local Parent = script:FindFirstAncestor("ProfileShareLinks").Parent
-
-return require(Parent.LuaSocialLibrariesDeps).SocialLibraries.config({}).Dictionary.getDeepValue
+local parent = script:FindFirstAncestor("ProfileShareLinks").Parent
+local LuaSocialLibrariesDeps = require(parent.LuaSocialLibrariesDeps)
+return LuaSocialLibrariesDeps.SocialLibraries.config({}).Dictionary.getDeepValue

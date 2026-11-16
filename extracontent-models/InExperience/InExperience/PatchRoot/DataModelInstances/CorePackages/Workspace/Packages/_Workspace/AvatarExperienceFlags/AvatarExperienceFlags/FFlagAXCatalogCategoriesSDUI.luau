@@ -1,7 +1,10 @@
-local FFlagAXRemoveCatalogCategoryNavKey = require(script.Parent.FFlagAXRemoveCatalogCategoryNavKey)
 local FFlagAXCatalogSupportDisableFilters = require(script.Parent.FFlagAXCatalogSupportDisableFilters)
 local FFlagAXMigrateCategoryTooltip = require(script.Parent.FFlagAXMigrateCategoryTooltip)
 local FFlagAXFixHydratedWidgetsParams = require(script.Parent.FFlagAXFixHydratedWidgetsParams)
 local FFlagAXUnifiedMarketplaceResultsFetcher = require(script.Parent.FFlagAXUnifiedMarketplaceResultsFetcher)
 
-return FFlagAXRemoveCatalogCategoryNavKey and (FFlagAXCatalogSupportDisableFilters and (FFlagAXMigrateCategoryTooltip and (FFlagAXFixHydratedWidgetsParams and (FFlagAXUnifiedMarketplaceResultsFetcher and game:DefineFastFlag("AXCatalogCategoriesSDUI14", false)))))
+return FFlagAXCatalogSupportDisableFilters
+	and FFlagAXMigrateCategoryTooltip
+	and FFlagAXFixHydratedWidgetsParams
+	and FFlagAXUnifiedMarketplaceResultsFetcher
+	and game:DefineFastFlag("AXCatalogCategoriesSDUI14", false)

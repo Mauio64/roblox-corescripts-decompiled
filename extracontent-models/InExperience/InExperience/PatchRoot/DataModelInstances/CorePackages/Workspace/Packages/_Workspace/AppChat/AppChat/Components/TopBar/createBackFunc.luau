@@ -1,37 +1,35 @@
 local AppChat = script:FindFirstAncestor("AppChat")
+
 local EnumScreens = require(AppChat.EnumScreens)
 local FFlagAppChatFixBackButtonOnRotation = require(AppChat.Flags.FFlagAppChatFixBackButtonOnRotation)
 local canPopParentStack = require(AppChat.Utils.canPopParentStack)
 
-local function createBackFunc(t1: {[any]: any}) -- line: 14
-	-- upvalues: FFlagAppChatFixBackButtonOnRotation (copy), canPopParentStack (copy), EnumScreens (copy)
-	local navigateToRootStack = t1.navigateToRootStack
+local function createBackFunc(data)
+	local navigateToRootStack = data.navigateToRootStack
 
 	if navigateToRootStack then
-		return function() -- line: 18
-			-- upvalues: t1 (copy), FFlagAppChatFixBackButtonOnRotation (copy), canPopParentStack (copy), EnumScreens (copy), navigateToRootStack (copy)
-			if t1.closeInputBar then
-				t1.closeInputBar()
+		return function()
+			if data.closeInputBar then
+				data.closeInputBar()
 			end
 
-			if t1.isRoot then
-				if FFlagAppChatFixBackButtonOnRotation and canPopParentStack(t1.navigation) then
-					t1.navigation.pop()
-
-					return
-				end
-
-				t1.navigation.navigate(EnumScreens.EmptyConversation)
-				navigateToRootStack()
+			if not data.isRoot then
+				data.navigation.pop()
 
 				return
 			end
 
-			t1.navigation.pop()
+			if FFlagAppChatFixBackButtonOnRotation and canPopParentStack(data.navigation) then
+				data.navigation.pop()
+				return
+			end
+
+			data.navigation.navigate(EnumScreens.EmptyConversation)
+			navigateToRootStack()
 		end
 	end
 
-	return t1.navigation.pop
+	return data.navigation.pop
 end
 
 return createBackFunc

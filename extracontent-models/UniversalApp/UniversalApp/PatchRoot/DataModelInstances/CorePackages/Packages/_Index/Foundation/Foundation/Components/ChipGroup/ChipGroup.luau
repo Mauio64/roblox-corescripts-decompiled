@@ -1,164 +1,243 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+
 local ChipGroupVariant = require(Foundation.Enums.ChipGroupVariant)
+
+local Flags = require(Foundation.Utility.Flags)
+
 local ChipSize = require(Foundation.Enums.ChipSize)
 
 require(Foundation.Enums.ChipVariant)
+
 require(Foundation.Components.Chip.Accessory)
 
 local Visibility = require(Foundation.Enums.Visibility)
-local useBackgroundStyle = require(Foundation.Providers.Style.BackgroundStyleContext).useBackgroundStyle
+
+local BackgroundStyleContext = require(Foundation.Providers.Style.BackgroundStyleContext)
+local useBackgroundStyle = BackgroundStyleContext.useBackgroundStyle
+
 local Chip = require(Foundation.Components.Chip)
+local OverflowScrollContainer = require(Foundation.Components.OverflowScrollContainer)
 local ScrollView = require(Foundation.Components.ScrollView)
-
 require(Foundation.Components.Types)
-
 local View = require(Foundation.Components.View)
 local useChipGroupVariants = require(Foundation.Components.ChipGroup.useChipGroupVariants)
 local useClippingRect = require(Foundation.Components.ChipGroup.useClippingRect)
 local useTokens = require(Foundation.Providers.Style.useTokens)
 local withCommonProps = require(Foundation.Utility.withCommonProps)
 local withDefaults = require(Foundation.Utility.withDefaults)
+
 local numberSequence = NumberSequence.new({
 	NumberSequenceKeypoint.new(0, 0),
 	NumberSequenceKeypoint.new(0.5, 0),
 	NumberSequenceKeypoint.new(1, 1)
 })
+
 local numberSequence2 = NumberSequence.new({
 	NumberSequenceKeypoint.new(0, 1),
 	NumberSequenceKeypoint.new(0.5, 0),
 	NumberSequenceKeypoint.new(1, 0)
 })
-local t1 = {
-	testId = "--foundation-chip-group",
+
+local v = {
 	size = ChipSize.Medium,
-	variant = ChipGroupVariant.Row
+	variant = ChipGroupVariant.Row,
+	testId = "--foundation-chip-group"
 }
 
-local function Scrim(t2: {[any]: any}) -- line: 81
-	-- upvalues: useBackgroundStyle (copy), React (copy), View (copy)
-	local v22 = useBackgroundStyle()
+local function Scrim(props)
+	local backgroundStyle = useBackgroundStyle()
 
-	return React.createElement(View, {
-		LayoutOrder = t2.LayoutOrder,
-		Size = UDim2.new(0, t2.width, 1, 0),
-		backgroundStyle = v22,
-		testId = t2.testId
-	}, {
-		UIGradient = React.createElement("UIGradient", {
-			Transparency = t2.gradient
-		})
-	})
+	return React.createElement(
+		View,
+		{
+			LayoutOrder = props.LayoutOrder,
+			Size = UDim2.new(0, props.width, 1, 0),
+			backgroundStyle = backgroundStyle,
+			testId = props.testId
+		},
+		{
+			UIGradient = React.createElement("UIGradient", { Transparency = props.gradient })
+		}
+	)
 end
-local function ChipGroup(p1, p2) -- line: 101
-	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), useChipGroupVariants (copy), React (copy), useClippingRect (copy), Chip (copy), withCommonProps (copy), View (copy), ScrollView (copy), Visibility (copy), Scrim (copy), numberSequence (copy), numberSequence2 (copy)
-	local v25 = withDefaults(p1, t1)
-	local v26 = useTokens()
-	local v27 = useChipGroupVariants(v26, v25.variant, v25.size)
-	local v28, v29 = React.useBinding(false)
-	local v30, v31 = React.useBinding(false)
-	local v32 = React.useRef(nil)
-	local v33 = useClippingRect(v32)
-	local v34 = React.useCallback(function(p3) -- line: 111
-		-- upvalues: v27 (copy), v29 (copy), v31 (copy)
-		if not v27.hasScrim or p3.AbsoluteWindowSize.X == 0 then
-			return
+
+local function ChipGroup(p, ref2)
+	local v2 = withDefaults(p, v)
+	local v3 = useChipGroupVariants(useTokens(), v2.variant, v2.size)
+
+	if Flags.FoundationUnifiedScrimScrolling then
+		local size = v2.size
+		local children = {}
+
+		for k, chip in v2.chips do
+			children[`Chip{k}`] = React.createElement(Chip, {
+				text = chip.text,
+				leading = chip.leading,
+				trailing = chip.trailing,
+				onActivated = chip.onActivated,
+				isChecked = chip.isChecked,
+				variant = chip.variant,
+				size = size,
+				LayoutOrder = k,
+				testId = `{v2.testId}--chip-{k}`
+			})
 		end
 
-		v29(p3.CanvasPosition.X ~= 0)
-		v31(p3.AbsoluteWindowSize.X + p3.CanvasPosition.X < p3.AbsoluteCanvasSize.X - 1)
-	end, { v27.hasScrim })
-	local v35 = React.useCallback(function() -- line: 123
-		-- upvalues: v32 (copy), v34 (copy)
-		if v32.current then
-			v34(v32.current)
-		end
-	end, {
-		v25.onAbsoluteSizeChanged,
-		v34
-	})
-	local v36 = React.useCallback(function() -- line: 129
-		-- upvalues: v32 (copy), v34 (copy)
-		if v32.current then
-			v34(v32.current)
-		end
-	end, {
-		v25.onAbsolutePositionChanged,
-		v34
-	})
-	local size = v25.size
-	local scrimWidth = v27.scrimWidth
-	local t3 = {}
+		local element = React.createElement(View, {
+			tag = "auto-xy",
+			layout = {
+				FillDirection = Enum.FillDirection.Horizontal,
+				Padding = UDim.new(0, v3.gap),
+				Wraps = v3.isWrapped
+			}
+		}, children)
 
-	for v40, v41 in v25.chips do
-		t3[`Chip{ v40 }`] = React.createElement(Chip, {
-			text = v41.text,
-			leading = v41.leading,
-			trailing = v41.trailing,
-			onActivated = v41.onActivated,
-			isChecked = v41.isChecked,
-			variant = v41.variant,
-			size = size,
-			LayoutOrder = v40,
-			testId = `{ v25.testId }--chip-{ v40 }`
+		if v3.isWrapped then
+			return React.createElement(View, withCommonProps(v2, {
+				tag = "size-full-0 auto-y",
+				ref = ref2
+			}), {
+				ChipContainer = element
+			})
+		end
+
+		return React.createElement(OverflowScrollContainer, withCommonProps(v2, {
+			size = v2.size,
+			ref = ref2
+		}), {
+			ChipContainer = element
 		})
-	end
+	else
+		local v4, v5 = React.useBinding(false)
+		local v6, v7 = React.useBinding(false)
+		local ref = React.useRef(nil)
+		local v8 = useClippingRect(ref)
 
-	local v42 = withCommonProps(v25, {
-		tag = "size-full-0 auto-y",
-		ref = p2
-	})
+		local v9 = React.useCallback(function(data)
+			if not v3.hasScrim or data.AbsoluteWindowSize.X == 0 then
+				return
+			end
 
-	v42.onAbsoluteSizeChanged = v35
-	v42.onAbsolutePositionChanged = v36
+			v5(data.CanvasPosition.X ~= 0)
+			v7(data.AbsoluteWindowSize.X + data.CanvasPosition.X < data.AbsoluteCanvasSize.X - 1)
+		end, { v3.hasScrim })
 
-	return React.createElement(View, v42, {
-		ScrollView = React.createElement(ScrollView, {
+		local onAbsoluteSizeChanged = React.useCallback(function()
+			if ref.current then
+				v9(ref.current)
+			end
+		end, { v2.onAbsoluteSizeChanged, v9 })
+
+		local onAbsolutePositionChanged = React.useCallback(function()
+			if ref.current then
+				v9(ref.current)
+			end
+		end, { v2.onAbsolutePositionChanged, v9 })
+
+		local size = v2.size
+		local scrimWidth = v3.scrimWidth
+		local children = {}
+
+		for k, chip in v2.chips do
+			children[`Chip{k}`] = React.createElement(Chip, {
+				text = chip.text,
+				leading = chip.leading,
+				trailing = chip.trailing,
+				onActivated = chip.onActivated,
+				isChecked = chip.isChecked,
+				variant = chip.variant,
+				size = size,
+				LayoutOrder = k,
+				testId = `{v2.testId}--chip-{k}`
+			})
+		end
+
+		local v10 = withCommonProps(v2, { ref = ref2, tag = "size-full-0 auto-y" })
+
+		v10.onAbsoluteSizeChanged = onAbsoluteSizeChanged
+		v10.onAbsolutePositionChanged = onAbsolutePositionChanged
+
+		local createElement = React.createElement
+		local createElement2 = React.createElement
+		local v11 = {
 			tag = "size-full-0 auto-y",
 			scroll = {
 				AutomaticSize = Enum.AutomaticSize.Y,
 				AutomaticCanvasSize = Enum.AutomaticSize.X,
 				CanvasSize = UDim2.fromScale(0, 1),
 				ScrollingDirection = Enum.ScrollingDirection.X,
-				ScrollingEnabled = not v27.isWrapped,
+				ScrollingEnabled = not v3.isWrapped,
 				scrollBarVisibility = Visibility.None
 			},
 			layout = {
 				FillDirection = Enum.FillDirection.Horizontal,
-				Padding = UDim.new(0, v27.gap),
-				Wraps = v27.isWrapped
+				Padding = UDim.new(0, v3.gap),
+				Wraps = v3.isWrapped
 			},
-			ClipsDescendants = v27.isWrapped,
-			scrollingFrameRef = v32,
-			onCanvasPositionChanged = if not v27.hasScrim then nil else v34,
-			onAbsoluteCanvasSizeChanged = if not v27.hasScrim then nil else v34,
-			onAbsoluteWindowSizeChanged = if not v27.hasScrim then nil else v34
-		}, t3),
-		ScrimWrapper = if not v27.hasScrim then nil else React.createElement(View, {
-			tag = "row flex-between",
-			ZIndex = 2,
-			Size = v33:map(function(rect: Rect) -- line: 185
-				-- upvalues: scrimWidth (copy)
-				return UDim2.fromOffset(rect.Max.X - rect.Min.X, scrimWidth)
-			end),
-			AnchorPoint = Vector2.new(0.5, 0),
-			Position = UDim2.fromScale(0.5, 0)
-		}, {
-			ScrimStart = v28 and React.createElement(Scrim, {
-				LayoutOrder = 1,
-				gradient = numberSequence,
-				width = scrimWidth,
-				testId = `{ v25.testId }--scrim-start`
-			}),
-			ScrimEnd = v30 and React.createElement(Scrim, {
-				LayoutOrder = 2,
-				gradient = numberSequence2,
-				width = scrimWidth,
-				testId = `{ v25.testId }--scrim-end`
+			ClipsDescendants = v3.isWrapped,
+			scrollingFrameRef = ref,
+			onCanvasPositionChanged = 0,
+			onAbsoluteCanvasSizeChanged = 0,
+			onAbsoluteWindowSizeChanged = 0
+		}
+		local onCanvasPositionChanged
+
+		if v3.hasScrim then
+			onCanvasPositionChanged = v9
+		end
+
+		v11.onCanvasPositionChanged = onCanvasPositionChanged
+		local onAbsoluteCanvasSizeChanged
+
+		if v3.hasScrim then
+			onAbsoluteCanvasSizeChanged = v9
+		end
+
+		v11.onAbsoluteCanvasSizeChanged = onAbsoluteCanvasSizeChanged
+		local onAbsoluteWindowSizeChanged
+
+		if v3.hasScrim then
+			onAbsoluteWindowSizeChanged = v9
+		end
+
+		v11.onAbsoluteWindowSizeChanged = onAbsoluteWindowSizeChanged
+		local v12 = {
+			ScrollView = createElement2(ScrollView, v11, children),
+			ScrimWrapper = 0
+		}
+		local scrimWrapper
+
+		if v3.hasScrim then
+			scrimWrapper = React.createElement(View, {
+				tag = "row flex-between",
+				Size = v8:map(function(rect: Rect)
+					return UDim2.fromOffset(rect.Max.X - rect.Min.X, scrimWidth)
+				end),
+				AnchorPoint = Vector2.new(0.5, 0),
+				Position = UDim2.fromScale(0.5, 0),
+				ZIndex = 2
+			}, {
+				ScrimStart = v4 and React.createElement(Scrim, {
+					LayoutOrder = 1,
+					gradient = numberSequence,
+					width = scrimWidth,
+					testId = `{v2.testId}--scrim-start`
+				}),
+				ScrimEnd = v6 and React.createElement(Scrim, {
+					LayoutOrder = 2,
+					gradient = numberSequence2,
+					width = scrimWidth,
+					testId = `{v2.testId}--scrim-end`
+				})
 			})
-		})
-	})
+		end
+
+		v12.ScrimWrapper = scrimWrapper
+		return createElement(View, v10, v12)
+	end
 end
 
 return React.memo(React.forwardRef(ChipGroup))

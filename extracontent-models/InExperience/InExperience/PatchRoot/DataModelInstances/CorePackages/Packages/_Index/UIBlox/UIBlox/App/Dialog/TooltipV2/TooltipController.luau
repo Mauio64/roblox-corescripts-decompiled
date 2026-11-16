@@ -1,182 +1,193 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local ParentParent = scriptParentParent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local Portal = require(ParentParentParent.Roact).Portal
-local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent.Parent
+local parent4 = parent3.Parent
 
-require(scriptParent.Types)
+local React = require(parent4.React)
+local Roact = require(parent4.Roact)
+local Portal = Roact.Portal
+local LuauPolyfill = require(parent4.LuauPolyfill)
 
-local Constants = require(scriptParent.Constants)
-local withAnimation = require(ParentParent.Core.Animation.withAnimation)
-local TooltipCallout = require(scriptParent.TooltipCallout)
-local TooltipOrientation = require(scriptParentParent.Tooltip.Enum.TooltipOrientation)
+require(parent.Types)
+local Constants = require(parent.Constants)
+local withAnimation = require(parent3.Core.Animation.withAnimation)
+local TooltipCallout = require(parent.TooltipCallout)
 
-local function argmax(t1: {[any]: any}, t2: {[any]: any}) -- line: 19
-	local v17 = nil
+local TooltipOrientation = require(parent2.Tooltip.Enum.TooltipOrientation)
 
-	for k, v in pairs(t1) do
-		if not t2[k] and (v17 == nil or v > t1[v17]) then
-			v17 = k
+local function argmax(items, set)
+	local v = nil
+
+	for k, item in pairs(items) do
+		if set[k] or not (v == nil or items[v] < item) then
+			continue
 		end
+
+		v = k
 	end
 
-	return v17
+	return v
 end
-local function getDistances(vector2: Vector2, vector2_2: Vector2) -- line: 32
-	-- upvalues: TooltipOrientation (copy), Constants (copy)
+
+local function getDistances(vector2: Vector2, state: Vector2)
 	return {
 		[TooltipOrientation.Top] = vector2.Y - Constants.SCREEN_MARGIN,
-		[TooltipOrientation.Bottom] = vector2_2.Y - vector2.Y - Constants.SCREEN_MARGIN,
+		[TooltipOrientation.Bottom] = state.Y - vector2.Y - Constants.SCREEN_MARGIN,
 		[TooltipOrientation.Left] = vector2.X - Constants.SCREEN_MARGIN,
-		[TooltipOrientation.Right] = vector2_2.X - vector2.X - Constants.SCREEN_MARGIN
+		[TooltipOrientation.Right] = state.X - vector2.X - Constants.SCREEN_MARGIN
 	}
 end
 
-function getOrientationAndContentOffset(p1, p2, vector2: Vector2, vector2_3: Vector2) -- line: 43
-	-- upvalues: argmax (copy), TooltipOrientation (copy), Constants (copy)
-	local t3 = {}
-	local zero = Vector2.zero
+function getOrientationAndContentOffset(p, p2, vector2: Vector2, vector2_2: Vector2)
+	local v = Vector2.zero
+	local set = {}
 
 	while true do
-		if not p1 or t3[p1] then
-			local v28 = argmax(p2, t3)
+		if not p or set[p] then
+			local v2 = argmax(p2, set)
 
-			if not v28 then
-				return p1, zero
+			if not v2 then
+				return p, v
 			end
 
-			p1 = v28
+			p = v2
 		end
 
-		if p1 == TooltipOrientation.Top or p1 == TooltipOrientation.Bottom then
-			if vector2.Y + Constants.DISTANCE_TO_CONTENT + vector2_3.Y <= p2[p1] then
-				local Left = TooltipOrientation.Left
+		if p == TooltipOrientation.Top or p == TooltipOrientation.Bottom then
+			if vector2.Y + Constants.DISTANCE_TO_CONTENT + vector2_2.Y <= p2[p] then
+				local v2 = TooltipOrientation.Left
 
 				if p2[TooltipOrientation.Right] < p2[TooltipOrientation.Left] then
-					Left = TooltipOrientation.Right
+					v2 = TooltipOrientation.Right
 				end
 
-				local v30 = p2[Left]
+				local v3 = p2[v2]
 
-				if v30 >= Constants.MIN_DISTANCE_TO_CARET_MIDDLE then
-					zero = math.max(0, vector2_3.X / 2 - v30) * -1 * Constants.ORIENTATION_VECTOR[Left]
+				if Constants.MIN_DISTANCE_TO_CARET_MIDDLE <= v3 then
+					v = math.max(0, vector2_2.X / 2 - v3) * -1 * Constants.ORIENTATION_VECTOR[v2]
 
-					return p1, zero
+					return p, v
 				end
 
-				t3[Constants.OPPOSITE_ORIENTATION[p1]] = true
+				set[Constants.OPPOSITE_ORIENTATION[p]] = true
 			end
-		elseif vector2.X + Constants.DISTANCE_TO_CONTENT + vector2_3.X <= p2[p1] then
-			local Top = TooltipOrientation.Top
+		elseif vector2.X + Constants.DISTANCE_TO_CONTENT + vector2_2.X <= p2[p] then
+			local v2 = TooltipOrientation.Top
 
 			if p2[TooltipOrientation.Bottom] < p2[TooltipOrientation.Top] then
-				Top = TooltipOrientation.Bottom
+				v2 = TooltipOrientation.Bottom
 			end
 
-			local v32 = p2[Top]
+			local v3 = p2[v2]
 
-			if v32 >= Constants.MIN_DISTANCE_TO_CARET_MIDDLE then
-				zero = math.max(0, vector2_3.Y / 2 - v32) * -1 * Constants.ORIENTATION_VECTOR[Top]
+			if Constants.MIN_DISTANCE_TO_CARET_MIDDLE <= v3 then
+				v = math.max(0, vector2_2.Y / 2 - v3) * -1 * Constants.ORIENTATION_VECTOR[v2]
 
-				return p1, zero
+				return p, v
 			end
 
-			t3[Constants.OPPOSITE_ORIENTATION[p1]] = true
+			set[Constants.OPPOSITE_ORIENTATION[p]] = true
 		end
 
-		t3[p1] = true
-		p1 = Constants.OPPOSITE_ORIENTATION[p1]
+		set[p] = true
+
+		p = Constants.OPPOSITE_ORIENTATION[p]
 	end
 end
 
-local function TooltipController(p3) -- line: 106
-	-- upvalues: React (copy), TooltipOrientation (copy), getDistances (copy), Constants (copy), LuauPolyfill (copy), TooltipCallout (copy), Portal (copy), withAnimation (copy)
-	local v34, v35 = React.useState(Vector2.zero)
-	local v36, v37 = React.useState(Vector2.zero)
-	local v38, v39 = React.useState(Vector2.zero)
-	local v40, v41 = React.useState(Vector2.zero)
-	local v42, v43 = React.useState(Vector2.zero)
-	local v44 = React.useCallback(function(p4) -- line: 113
-		-- upvalues: v35 (copy), v37 (copy)
-		v35(p4.AbsolutePosition)
-		v37(p4.AbsoluteSize)
+local function TooltipController(props)
+	local state, setState = React.useState(Vector2.zero)
+	local state2, setState2 = React.useState(Vector2.zero)
+	local state3, setState3 = React.useState(Vector2.zero)
+	local state4, setState4 = React.useState(Vector2.zero)
+	local state5, setState5 = React.useState(Vector2.zero)
+
+	local v = React.useCallback(function(p)
+		setState(p.AbsolutePosition)
+		setState2(p.AbsoluteSize)
 	end)
 
-	local function v45(p5) -- line: 119
-		-- upvalues: v41 (copy), v39 (copy)
-		if p5 then
-			v41(p5.AbsolutePosition)
-			v39(p5.AbsoluteSize)
+	local function fn(p)
+		if p then
+			setState4(p.AbsolutePosition)
+			setState3(p.AbsoluteSize)
 		end
 	end
 
-	local v46 = v36 / 2
-	local v47 = v34 + v46 - v40
-	local v48 = p3.preferredOrientation or TooltipOrientation.Top
-	local v49, v50 = React.useMemo(function() -- line: 131
-		-- upvalues: getDistances (copy), v47 (copy), v38 (copy), v48 (copy), v46 (copy), v42 (copy)
-		local v57 = getDistances(v47, v38)
+	local triggerPointRadius = state2 / 2
+	local triggerPointCenter = state + triggerPointRadius - state4
 
-		return getOrientationAndContentOffset(v48, v57, v46, v42)
-	end, {
-		v48,
-		v38,
-		v47,
-		v46,
-		v42
-	})
-	local v51 = if not (not p3.disabled and p3.active) then Constants.INACTIVE_ANIMATION_TARGETS else Constants.ACTIVE_ANIMATION_TARGETS
+	local preferredOrientation = props.preferredOrientation or TooltipOrientation.Top
 
-	local function renderWithAnimation(p6) -- line: 142
-		-- upvalues: v49 (copy), v47 (copy), v46 (copy), v50 (copy), v43 (copy), LuauPolyfill (copy), p3 (copy), React (copy), TooltipCallout (copy), v45 (copy), Portal (copy)
-		if p6.transparency == 1 then
+	local orientation, contentOffsetVector = React.useMemo(function()
+		local distances = getDistances(triggerPointCenter, state3)
+
+		return getOrientationAndContentOffset(preferredOrientation, distances, triggerPointRadius, state5)
+	end, { preferredOrientation, state3, triggerPointCenter, triggerPointRadius, state5 })
+
+	local v2 = not props.disabled and props.active
+	local v3
+
+	if v2 then
+		v3 = Constants.ACTIVE_ANIMATION_TARGETS
+	else
+		v3 = Constants.INACTIVE_ANIMATION_TARGETS
+	end
+
+	local function renderWithAnimation(p)
+		if p.transparency == 1 then
 			return nil
 		end
 
-		local t4 = {
-			orientation = v49,
-			triggerPointCenter = v47,
-			triggerPointRadius = v46,
-			contentOffsetVector = v50,
-			onContentSizeChanged = v43,
-			distanceOffset = p6.distanceOffset,
-			transparency = p6.transparency
+		local v4 = {
+			orientation = orientation,
+			triggerPointCenter = triggerPointCenter,
+			triggerPointRadius = triggerPointRadius,
+			contentOffsetVector = contentOffsetVector,
+			onContentSizeChanged = setState5,
+			distanceOffset = p.distanceOffset,
+			transparency = p.transparency
 		}
-		local v60 = LuauPolyfill.Object.assign({}, p3.tooltipProps, t4)
-		local t5 = {
-			Tooltip = React.createElement(TooltipCallout, v60)
-		}
-		local v62 = if not p3.DEBUG_useTargetDirectly then React.createElement("ScreenGui", {
-			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
-			IgnoreGuiInset = true,
-			DisplayOrder = p3.DisplayOrder,
-			[React.Change.AbsoluteSize] = v45,
-			[React.Change.AbsolutePosition] = v45,
-			ref = v45
-		}, t5) else React.createElement("Frame", {
-			ZIndex = p3.DisplayOrder,
-			Size = UDim2.fromScale(1, 1),
-			BackgroundTransparency = 1,
-			[React.Change.AbsoluteSize] = v45,
-			[React.Change.AbsolutePosition] = v45,
-			ref = v45
-		}, t5)
 
-		return React.createElement(Portal, {
-			target = p3.guiTarget
-		}, {
-			TooltipLayer = v62
+		local v5 = LuauPolyfill.Object.assign({}, props.tooltipProps, v4)
+
+		local v6 = {
+			Tooltip = React.createElement(TooltipCallout, v5)
+		}
+		local tooltipLayer
+
+		if props.DEBUG_useTargetDirectly then
+			tooltipLayer = React.createElement("Frame", {
+				ZIndex = props.DisplayOrder,
+				Size = UDim2.fromScale(1, 1),
+				BackgroundTransparency = 1,
+				[React.Change.AbsoluteSize] = fn,
+				[React.Change.AbsolutePosition] = fn,
+				ref = fn
+			}, v6)
+		else
+			tooltipLayer = React.createElement("ScreenGui", {
+				ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+				IgnoreGuiInset = true,
+				DisplayOrder = props.DisplayOrder,
+				[React.Change.AbsoluteSize] = fn,
+				[React.Change.AbsolutePosition] = fn,
+				ref = fn
+			}, v6)
+		end
+
+		return React.createElement(Portal, { target = props.guiTarget }, {
+			TooltipLayer = tooltipLayer
 		})
 	end
 
-	local v53 = withAnimation(v51, renderWithAnimation, Constants.ANIMATION_OPTIONS)
-	local v54 = p3.triggerPointName or "TriggerPoint"
+	local portal = withAnimation(v3, renderWithAnimation, Constants.ANIMATION_OPTIONS)
+
+	local triggerPointName = props.triggerPointName or "TriggerPoint"
 
 	return React.createElement(React.Fragment, nil, {
-		Portal = v53,
-		[v54] = p3.renderTriggerPoint(v44)
+		Portal = portal,
+		[triggerPointName] = props.renderTriggerPoint(v)
 	})
 end
 

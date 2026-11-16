@@ -1,22 +1,31 @@
 local ContentProvider = game:GetService("ContentProvider")
+
 local CurrencyTransfers = script:FindFirstAncestor("CurrencyTransfers")
-local CurrencyTransfersParent = CurrencyTransfers.Parent
-local React = require(CurrencyTransfersParent.React)
-local SignalsReact = require(CurrencyTransfersParent.SignalsReact)
+local parent = CurrencyTransfers.Parent
+
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+
 local getBalanceRequest = require(CurrencyTransfers.NetworkRequests.getBalanceRequest)
 local useUserNameFromUserId = require(CurrencyTransfers.Hooks.useUserNameFromUserId)
 local TransferLocalizationKeys = require(CurrencyTransfers.Localization.TransferLocalizationKeys)
 local transferLocaleFormat = require(CurrencyTransfers.Localization.transferLocaleFormat)
-local useDispatch = require(CurrencyTransfersParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local NavigateDown = require(CurrencyTransfersParent.NavigationRodux).Thunks.NavigateDown
-local AppPage = require(CurrencyTransfersParent.RobloxAppEnums).AppPage
-local UrlBuilder = require(CurrencyTransfersParent.UrlBuilder).UrlBuilder
+
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local NavigationRodux = require(parent.NavigationRodux)
+local NavigateDown = NavigationRodux.Thunks.NavigateDown
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+local UrlBuilder = require(parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder
 local TransferOrigination = require(CurrencyTransfers.Enums.TransferOrigination)
 local WebViewServiceWrapper = require(CurrencyTransfers.Utils.WebViewServiceWrapper)
-local Foundation = require(CurrencyTransfersParent.Foundation)
+
+local Foundation = require(parent.Foundation)
 local Sheet = Foundation.Sheet
 local View = Foundation.View
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local Button = Foundation.Button
 local Icon = Foundation.Icon
 local ButtonVariant = Foundation.Enums.ButtonVariant
@@ -24,284 +33,371 @@ local FillBehavior = Foundation.Enums.FillBehavior
 local useScaledValue = Foundation.Hooks.useScaledValue
 local useTokens = Foundation.Hooks.useTokens
 local Enums = Foundation.Enums
-local useLocalization = require(CurrencyTransfersParent.Localization).Hooks.useLocalization
+
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local FailureReason = require(CurrencyTransfers.Enums.FailureReason)
+
 local GetFIntCurrencyTransferMinAmount = require(CurrencyTransfers.Flags.GetFIntCurrencyTransferMinAmount)
 local GetFIntCurrencyTransferMaxAmount = require(CurrencyTransfers.Flags.GetFIntCurrencyTransferMaxAmount)
+
 local GetFFlagCurrencyTransferUseBackendTransferLimits = require(CurrencyTransfers.Flags.GetFFlagCurrencyTransferUseBackendTransferLimits)
+
 local GetFFlagCurrencyTransferReceiveLimitExceededError = require(CurrencyTransfers.Flags.GetFFlagCurrencyTransferReceiveLimitExceededError)
 local GetFFlagEnableLimitHit2SVUpsell = require(CurrencyTransfers.Flags.GetFFlagEnableLimitHit2SVUpsell)
+
 local TransferRobuxHeader = require(CurrencyTransfers.Components.Generic.TransferRobuxHeader)
 local useTransferStore = require(CurrencyTransfers.Hooks.useTransferStore)
 
-local function getErrorMessageAndButton(p1, p2, p3, p4, p5, p6) -- line: 58
-	-- upvalues: GetFFlagEnableLimitHit2SVUpsell (copy), FailureReason (copy), GetFFlagCurrencyTransferReceiveLimitExceededError (copy), transferLocaleFormat (copy)
-	if not p1 then
-		return p2.GenericError, p2.TryAgain
+local function getErrorMessageAndButton(failureReason, data, value, p, p2, p3)
+	if not failureReason then
+		return data.GenericError, data.TryAgain
 	end
 
-	local OK = p2.OK
-	local DailyLimitTwoStepVerificationUpsell
+	local v = data.OK
+	local v2
 
 	if GetFFlagEnableLimitHit2SVUpsell() then
-		if p1 == FailureReason.TransferDailyLimitExceeded then
-			if p6 then
-				DailyLimitTwoStepVerificationUpsell = p2.DailyLimitTwoStepVerificationUpsell
-				OK = p2.TurnOnTwoStepVerification
+		if failureReason == FailureReason.TransferDailyLimitExceeded then
+			if p3 then
+				v2 = data.DailyLimitTwoStepVerificationUpsell
+				v = data.TurnOnTwoStepVerification
 			else
-				DailyLimitTwoStepVerificationUpsell = p2.DailyLimitExceeded
+				v2 = data.DailyLimitExceeded
 			end
-		elseif p1 == FailureReason.TransferMonthlyLimitExceeded then
-			if p6 then
-				DailyLimitTwoStepVerificationUpsell = p2.MonthlyLimitTwoStepVerificationUpsell
-				OK = p2.TurnOnTwoStepVerification
+		elseif failureReason == FailureReason.TransferMonthlyLimitExceeded then
+			if p3 then
+				v2 = data.MonthlyLimitTwoStepVerificationUpsell
+				v = data.TurnOnTwoStepVerification
 			else
-				DailyLimitTwoStepVerificationUpsell = p2.MonthlyLimitExceeded
+				v2 = data.MonthlyLimitExceeded
 			end
-		elseif p1 == FailureReason.TransferDisabledForUser then
-			DailyLimitTwoStepVerificationUpsell = p2.AccountDisabled
-		elseif GetFFlagCurrencyTransferReceiveLimitExceededError() and p1 == FailureReason.ReceiveLimitExceeded then
-			DailyLimitTwoStepVerificationUpsell = p2.ReceiveLimitExceeded
-		elseif p1 == FailureReason.ReceiverNotAllowed then
-			DailyLimitTwoStepVerificationUpsell = transferLocaleFormat.substituteUsername(p2.ReceiverNotAllowed, p3 or "")
-		elseif p1 == FailureReason.TransferAmountBelowMinimum then
-			DailyLimitTwoStepVerificationUpsell = transferLocaleFormat.substituteMinAmount(p2.TransferAmountBelowMinimum, (tostring(p4)))
-			OK = p2.TryAgain
-		elseif p1 == FailureReason.TransferAmountExceedsMaximum then
-			DailyLimitTwoStepVerificationUpsell = transferLocaleFormat.substituteMaxAmount(p2.TransferAmountExceedsMaximum, (tostring(p5)))
-			OK = p2.TryAgain
-		elseif p1 == FailureReason.TransferAmountExceedsNonSecuredMaximum then
-			DailyLimitTwoStepVerificationUpsell = transferLocaleFormat.substituteMaxAmount(p2.TransferAmountExceedsMaximum, (tostring(p5)))
-			OK = p2.TryAgain
+		elseif failureReason == FailureReason.TransferDisabledForUser then
+			v2 = data.AccountDisabled
+		elseif
+			GetFFlagCurrencyTransferReceiveLimitExceededError()
+			and failureReason == FailureReason.ReceiveLimitExceeded
+		then
+			v2 = data.ReceiveLimitExceeded
+		elseif failureReason == FailureReason.ReceiverNotAllowed then
+			v2 = transferLocaleFormat.substituteUsername(data.ReceiverNotAllowed, value or "")
 		else
-			DailyLimitTwoStepVerificationUpsell = p2.GenericError
-			OK = p2.TryAgain
+			if failureReason == FailureReason.TransferAmountBelowMinimum then
+				v2 = transferLocaleFormat.substituteMinAmount(data.TransferAmountBelowMinimum, (tostring(p)))
+			elseif failureReason == FailureReason.TransferAmountExceedsMaximum then
+				v2 = transferLocaleFormat.substituteMaxAmount(data.TransferAmountExceedsMaximum, (tostring(p2)))
+			elseif failureReason == FailureReason.TransferAmountExceedsNonSecuredMaximum then
+				v2 = transferLocaleFormat.substituteMaxAmount(data.TransferAmountExceedsMaximum, (tostring(p2)))
+			else
+				v2 = data.GenericError
+			end
+
+			v = data.TryAgain
 		end
-	elseif p1 == FailureReason.TransferDailyLimitExceeded then
-		DailyLimitTwoStepVerificationUpsell = p2.DailyLimitExceeded
-	elseif p1 == FailureReason.TransferMonthlyLimitExceeded then
-		DailyLimitTwoStepVerificationUpsell = p2.MonthlyLimitExceeded
-	elseif p1 == FailureReason.TransferDisabledForUser then
-		DailyLimitTwoStepVerificationUpsell = p2.AccountDisabled
-	elseif GetFFlagCurrencyTransferReceiveLimitExceededError() and p1 == FailureReason.ReceiveLimitExceeded then
-		DailyLimitTwoStepVerificationUpsell = p2.ReceiveLimitExceeded
-	elseif p1 == FailureReason.ReceiverNotAllowed then
-		DailyLimitTwoStepVerificationUpsell = transferLocaleFormat.substituteUsername(p2.ReceiverNotAllowed, p3 or "")
-	elseif p1 == FailureReason.TransferAmountBelowMinimum then
-		DailyLimitTwoStepVerificationUpsell = transferLocaleFormat.substituteMinAmount(p2.TransferAmountBelowMinimum, (tostring(p4)))
-		OK = p2.TryAgain
-	elseif p1 == FailureReason.TransferAmountExceedsMaximum then
-		DailyLimitTwoStepVerificationUpsell = transferLocaleFormat.substituteMaxAmount(p2.TransferAmountExceedsMaximum, (tostring(p5)))
-		OK = p2.TryAgain
-	elseif p1 == FailureReason.TransferAmountExceedsNonSecuredMaximum then
-		DailyLimitTwoStepVerificationUpsell = transferLocaleFormat.substituteMaxAmount(p2.TransferAmountExceedsMaximum, (tostring(p5)))
-		OK = p2.TryAgain
+	elseif failureReason == FailureReason.TransferDailyLimitExceeded then
+		v2 = data.DailyLimitExceeded
+	elseif failureReason == FailureReason.TransferMonthlyLimitExceeded then
+		v2 = data.MonthlyLimitExceeded
+	elseif failureReason == FailureReason.TransferDisabledForUser then
+		v2 = data.AccountDisabled
+	elseif
+		GetFFlagCurrencyTransferReceiveLimitExceededError()
+		and failureReason == FailureReason.ReceiveLimitExceeded
+	then
+		v2 = data.ReceiveLimitExceeded
+	elseif failureReason == FailureReason.ReceiverNotAllowed then
+		v2 = transferLocaleFormat.substituteUsername(data.ReceiverNotAllowed, value or "")
 	else
-		DailyLimitTwoStepVerificationUpsell = p2.GenericError
-		OK = p2.TryAgain
+		if failureReason == FailureReason.TransferAmountBelowMinimum then
+			v2 = transferLocaleFormat.substituteMinAmount(data.TransferAmountBelowMinimum, (tostring(p)))
+		elseif failureReason == FailureReason.TransferAmountExceedsMaximum then
+			v2 = transferLocaleFormat.substituteMaxAmount(data.TransferAmountExceedsMaximum, (tostring(p2)))
+		elseif failureReason == FailureReason.TransferAmountExceedsNonSecuredMaximum then
+			v2 = transferLocaleFormat.substituteMaxAmount(data.TransferAmountExceedsMaximum, (tostring(p2)))
+		else
+			v2 = data.GenericError
+		end
+
+		v = data.TryAgain
 	end
 
-	return DailyLimitTwoStepVerificationUpsell, OK
+	return v2, v
 end
-local function TransferRobuxErrorSheet(_: {[any]: any}) -- line: 163
-	-- upvalues: useTransferStore (copy), useTokens (copy), SignalsReact (copy), GetFFlagEnableLimitHit2SVUpsell (copy), useDispatch (copy), FailureReason (copy), useUserNameFromUserId (copy), Enums (copy), TransferOrigination (copy), ContentProvider (copy), WebViewServiceWrapper (copy), NavigateDown (copy), AppPage (copy), UrlBuilder (copy), React (copy), getBalanceRequest (copy), useLocalization (copy), TransferLocalizationKeys (copy), GetFFlagCurrencyTransferUseBackendTransferLimits (copy), GetFIntCurrencyTransferMinAmount (copy), GetFIntCurrencyTransferMaxAmount (copy), getErrorMessageAndButton (copy), Sheet (copy), useScaledValue (copy), TransferRobuxHeader (copy), View (copy), Icon (copy), FoundationText (copy), Button (copy), ButtonVariant (copy), FillBehavior (copy)
-	local v47 = useTransferStore()
-	local v48 = useTokens()
-	local v49 = SignalsReact.useSignalState(v47.getRobuxBalanceAmount) or 0
-	local v50 = v47.getBalanceReceivedFromApi(false)
-	local v51 = v47.getErrorTransferModel(false)
-	local v52 = v47.getRecipient(false)
-	local v53 = v47.getRecipientUserId(false)
-	local triggerOnClose = v47.triggerOnClose
+
+local GetFFlagCurrencyTransferFocusNavigation = require(CurrencyTransfers.Flags.GetFFlagCurrencyTransferFocusNavigation)
+local useTransferSheetFocus = require(CurrencyTransfers.Hooks.useTransferSheetFocus)
+
+local function TransferRobuxErrorSheet(_)
+	local v = useTransferStore()
+	local v2 = useTokens()
+	local robuxBalanceAmount = SignalsReact.useSignalState(v.getRobuxBalanceAmount) or 0
+	local balanceReceivedFromApi = v.getBalanceReceivedFromApi(false)
+	local errorTransferModel = v.getErrorTransferModel(false)
+	local recipient = v.getRecipient(false)
+	local recipientUserId = v.getRecipientUserId(false)
+	local triggerOnClose = v.triggerOnClose
+	local ref, ref2
+
+	if GetFFlagCurrencyTransferFocusNavigation() then
+		ref, ref2 = useTransferSheetFocus(triggerOnClose)
+	end
 
 	if GetFFlagEnableLimitHit2SVUpsell() then
-		local v55 = useDispatch()
-		local v56 = if not v51 then nil else v51.failureReason
-		local v57 = v56 == FailureReason.ReceiverNotAllowed and (not v52 and (v53 and v53 ~= 0))
-		local v58 = useUserNameFromUserId(if not v57 or (not v53 or v53 == 0) then nil else v53)
-		local v59 = not not v51 and v51.isEligibleForElevatedLimitUpsell
-		local v60 = (v56 == FailureReason.TransferDailyLimitExceeded or v56 == FailureReason.TransferMonthlyLimitExceeded) and v59
-		local v61 = if not v60 then Enums.IconName.TriangleExclamation else Enums.IconName.CircleArrowUp
+		local v3 = useDispatch()
+		local failureReason
 
-		local function handleButtonActivated() -- line: 195
-			-- upvalues: triggerOnClose (copy), v60 (copy), v47 (copy), TransferOrigination (copy), ContentProvider (copy), WebViewServiceWrapper (copy), v55 (copy), NavigateDown (copy), AppPage (copy), UrlBuilder (copy)
+		if errorTransferModel then
+			failureReason = errorTransferModel.failureReason
+		end
+
+		local v4
+
+		if failureReason == FailureReason.ReceiverNotAllowed then
+			v4 = not recipient and recipientUserId and recipientUserId ~= 0
+		else
+			v4 = false
+		end
+
+		if not v4 or not recipientUserId or recipientUserId == 0 then
+			recipientUserId = nil
+		end
+
+		local v5 = useUserNameFromUserId(recipientUserId)
+		local v6
+
+		if errorTransferModel then
+			v6 = errorTransferModel.isEligibleForElevatedLimitUpsell
+		else
+			v6 = false
+		end
+
+		local v7
+
+		if
+			failureReason == FailureReason.TransferDailyLimitExceeded
+			or failureReason == FailureReason.TransferMonthlyLimitExceeded
+		then
+			v7 = v6
+		else
+			v7 = false
+		end
+
+		local name
+
+		if v7 then
+			name = Enums.IconName.CircleArrowUp
+		else
+			name = Enums.IconName.TriangleExclamation
+		end
+
+		local function handleButtonActivated()
 			triggerOnClose()
 
-			if v60 then
-				if v47.getTransferOrigination(false) == TransferOrigination.InExperience then
-					local v82 = string.gsub(ContentProvider.BaseUrl:lower(), "/m.", "/www.")
-					local v83 = string.gsub(v82, "http:", "https:") .. "my/account#!/robux"
-
-					WebViewServiceWrapper.new({
-						title = "Robux",
-						url = v83
-					}):open()
-
-					return
+			if v7 then
+				if v.getTransferOrigination(false) == TransferOrigination.InExperience then
+					local v8 = string.gsub(ContentProvider.BaseUrl:lower(), "/m.", "/www.")
+					local url = string.gsub(v8, "http:", "https:") .. "my/account#!/robux"
+					WebViewServiceWrapper.new({ url = url, title = "Robux" }):open()
+				else
+					v3(NavigateDown({
+						name = AppPage.SettingsSubPage,
+						detail = urlBuilder.static.settings.robux(),
+						extraProps = { titleKey = "Feature.AccountSettings.Heading.Tab.Robux" }
+					}))
 				end
-
-				v55(NavigateDown({
-					name = AppPage.SettingsSubPage,
-					detail = UrlBuilder.static.settings.robux(),
-					extraProps = {
-						titleKey = "Feature.AccountSettings.Heading.Tab.Robux"
-					}
-				}))
 			end
 		end
 
-		React.useEffect(function() -- line: 224
-			-- upvalues: v50 (copy), getBalanceRequest (copy), v47 (copy)
-			if v50 then
+		React.useEffect(function()
+			if balanceReceivedFromApi then
 				return
 			end
 
-			getBalanceRequest(nil, v47.getNetworkImpl()):andThen(function(p7) -- line: 229
-				-- upvalues: v47 (copy)
-				v47.setRobuxBalanceAmount(p7)
-				v47.setBalanceReceivedFromApi(true)
-			end):catch(function() -- line: 233
-			end)
-		end, { v50 })
+			getBalanceRequest(nil, v.getNetworkImpl()):andThen(function(p)
+				v.setRobuxBalanceAmount(p)
+				v.setBalanceReceivedFromApi(true)
+			end):catch(function() end)
+		end, { balanceReceivedFromApi })
 
-		local v63 = useLocalization(TransferLocalizationKeys.Presets.TransferRobuxErrorSheet)
-		local v64 = SignalsReact.useSignalState(v47.getMinimumTransferAmount)
-		local v65 = SignalsReact.useSignalState(v47.getMaximumTransferAmount)
-		local v66 = GetFFlagCurrencyTransferUseBackendTransferLimits() and v64 or GetFIntCurrencyTransferMinAmount()
-		local v67 = GetFFlagCurrencyTransferUseBackendTransferLimits() and v65 or GetFIntCurrencyTransferMaxAmount()
-		local v68 = if not v52 or not v52.targetName and not v52.targetDisplayName then if not v57 or (not v58 or v58 == "") then nil else v58 else v52.targetName or v52.targetDisplayName
-		local v69, v70 = getErrorMessageAndButton(v56, v63, v68 or "", v66, v67, v59)
+		local v8 = useLocalization(TransferLocalizationKeys.Presets.TransferRobuxErrorSheet)
+
+		local v9 = SignalsReact.useSignalState(v.getMinimumTransferAmount)
+		local v10 = SignalsReact.useSignalState(v.getMaximumTransferAmount)
+		local v11 = GetFFlagCurrencyTransferUseBackendTransferLimits() and v9 or GetFIntCurrencyTransferMinAmount()
+		local v12 = GetFFlagCurrencyTransferUseBackendTransferLimits() and v10 or GetFIntCurrencyTransferMaxAmount()
+
+		if recipient and (recipient.targetName or recipient.targetDisplayName) then
+			v5 = recipient.targetName or recipient.targetDisplayName
+		elseif not v4 or not v5 or v5 == "" then
+			v5 = nil
+		end
+
+		local errorMessageAndButton, text = getErrorMessageAndButton(failureReason, v8, v5 or "", v11, v12, v6)
 
 		return React.createElement(Sheet.Root, {
 			preferCenterSheet = true,
-			snapPoints = {
-				useScaledValue(300),
-				0.5
-			},
-			onClose = triggerOnClose
+			snapPoints = { useScaledValue(300), 0.5 },
+			onClose = triggerOnClose,
+			ref = ref
 		}, {
 			Header = React.createElement(Sheet.Header, {}, {
 				TransferRobuxHeader = React.createElement(TransferRobuxHeader, {
-					titleText = v63.SendRobux or "",
-					robuxBalanceAmount = v49
+					titleText = v8.SendRobux or "",
+					robuxBalanceAmount = robuxBalanceAmount
 				})
 			}),
-			Content = React.createElement(Sheet.Content, {
-				LayoutOrder = 2
-			}, {
-				SheetContentContainer = React.createElement(View, {
-					tag = "col gap-xlarge auto-y size-full-0 align-x-center align-y-center padding-top-xlarge"
-				}, {
-					ErrorIconContainer = React.createElement(View, {
-						tag = "size-1200-1200 radius-circle align-x-center align-y-center bg-inverse-emphasis",
-						LayoutOrder = 1
-					}, {
-						ErrorIcon = React.createElement(Icon, {
-							tag = "content-inverse-emphasis",
-							name = v61,
-							size = v48.Size.Size_1200
+			Content = React.createElement(Sheet.Content, { LayoutOrder = 2 }, {
+				SheetContentContainer = React.createElement(
+					View,
+					{
+						tag = "col gap-xlarge auto-y size-full-0 align-x-center align-y-center padding-top-xlarge"
+					},
+					{
+						ErrorIconContainer = React.createElement(
+							View,
+							{
+								tag = "size-1200-1200 radius-circle align-x-center align-y-center bg-inverse-emphasis",
+								LayoutOrder = 1
+							},
+							{
+								ErrorIcon = React.createElement(Icon, {
+									name = name,
+									size = v2.Size.Size_1200,
+									tag = "content-inverse-emphasis"
+								})
+							}
+						),
+						ErrorMessage = React.createElement(Text, {
+							Text = errorMessageAndButton,
+							tag = "text-body-large content-emphasis text-align-x-center auto-y text-wrap",
+							Size = UDim2.new(1, 0, 0, 0),
+							LayoutOrder = 2
 						})
-					}),
-					ErrorMessage = React.createElement(FoundationText, {
-						tag = "text-body-large content-emphasis text-align-x-center auto-y text-wrap",
-						LayoutOrder = 2,
-						Text = v69,
-						Size = UDim2.new(1, 0, 0, 0)
+					}
+				)
+			}),
+			Actions = React.createElement(Sheet.Actions, { LayoutOrder = 3 }, {
+				React.createElement(View, {
+					tag = "col auto-y align-y-center align-x-center size-full-0 gap-small"
+				}, {
+					React.createElement(View, { tag = "row auto-y size-full-0 gap-small" }, {
+						React.createElement(Button, {
+							ref = ref2,
+							text = text,
+							onActivated = handleButtonActivated,
+							variant = ButtonVariant.Emphasis,
+							fillBehavior = FillBehavior.Fill
+						})
 					})
 				})
-			}),
-			Actions = React.createElement(Sheet.Actions, {
-				LayoutOrder = 3
-			}, { React.createElement(View, {
-				tag = "col auto-y align-y-center align-x-center size-full-0 gap-small"
-			}, { React.createElement(View, {
-				tag = "row auto-y size-full-0 gap-small"
-			}, { React.createElement(Button, {
-				text = v70,
-				onActivated = handleButtonActivated,
-				variant = ButtonVariant.Emphasis,
-				fillBehavior = FillBehavior.Fill
-			}) }) }) })
+			})
 		})
-	end
+	else
+		local failureReason
 
-	local v71 = if not v51 then nil else v51.failureReason
-	local v72 = v71 == FailureReason.ReceiverNotAllowed and (not v52 and (v53 and v53 ~= 0))
-	local v73 = useUserNameFromUserId(if not v72 or (not v53 or v53 == 0) then nil else v53)
-
-	React.useEffect(function() -- line: 340
-		-- upvalues: v50 (copy), getBalanceRequest (copy), v47 (copy)
-		if v50 then
-			return
+		if errorTransferModel then
+			failureReason = errorTransferModel.failureReason
 		end
 
-		getBalanceRequest(nil, v47.getNetworkImpl()):andThen(function(p8) -- line: 345
-			-- upvalues: v47 (copy)
-			v47.setRobuxBalanceAmount(p8)
-			v47.setBalanceReceivedFromApi(true)
-		end):catch(function() -- line: 349
-		end)
-	end, { v50 })
+		local v3
 
-	local v74 = useLocalization(TransferLocalizationKeys.Presets.TransferRobuxErrorSheet)
-	local v75 = SignalsReact.useSignalState(v47.getMinimumTransferAmount)
-	local v76 = SignalsReact.useSignalState(v47.getMaximumTransferAmount)
-	local v77 = GetFFlagCurrencyTransferUseBackendTransferLimits() and v75 or GetFIntCurrencyTransferMinAmount()
-	local v78 = GetFFlagCurrencyTransferUseBackendTransferLimits() and v76 or GetFIntCurrencyTransferMaxAmount()
-	local v79 = if not v52 or not v52.targetName and not v52.targetDisplayName then if not v72 or (not v73 or v73 == "") then nil else v73 else v52.targetName or v52.targetDisplayName
-	local v80, v81 = getErrorMessageAndButton(v71, v74, v79 or "", v77, v78, false)
+		if failureReason == FailureReason.ReceiverNotAllowed then
+			v3 = not recipient and recipientUserId and recipientUserId ~= 0
+		else
+			v3 = false
+		end
 
-	return React.createElement(Sheet.Root, {
-		preferCenterSheet = true,
-		snapPoints = {
-			useScaledValue(300),
-			0.5
-		},
-		onClose = triggerOnClose
-	}, {
-		Header = React.createElement(Sheet.Header, {}, {
-			TransferRobuxHeader = React.createElement(TransferRobuxHeader, {
-				titleText = v74.SendRobux or "",
-				robuxBalanceAmount = v49
-			})
-		}),
-		Content = React.createElement(Sheet.Content, {
-			LayoutOrder = 2
+		if not v3 or not recipientUserId or recipientUserId == 0 then
+			recipientUserId = nil
+		end
+
+		local v4 = useUserNameFromUserId(recipientUserId)
+
+		React.useEffect(function()
+			if balanceReceivedFromApi then
+				return
+			end
+
+			getBalanceRequest(nil, v.getNetworkImpl()):andThen(function(p)
+				v.setRobuxBalanceAmount(p)
+				v.setBalanceReceivedFromApi(true)
+			end):catch(function() end)
+		end, { balanceReceivedFromApi })
+
+		local v5 = useLocalization(TransferLocalizationKeys.Presets.TransferRobuxErrorSheet)
+
+		local v6 = SignalsReact.useSignalState(v.getMinimumTransferAmount)
+		local v7 = SignalsReact.useSignalState(v.getMaximumTransferAmount)
+		local v8 = GetFFlagCurrencyTransferUseBackendTransferLimits() and v6 or GetFIntCurrencyTransferMinAmount()
+		local v9 = GetFFlagCurrencyTransferUseBackendTransferLimits() and v7 or GetFIntCurrencyTransferMaxAmount()
+
+		if recipient and (recipient.targetName or recipient.targetDisplayName) then
+			v4 = recipient.targetName or recipient.targetDisplayName
+		elseif not v3 or not v4 or v4 == "" then
+			v4 = nil
+		end
+
+		local errorMessageAndButton, text = getErrorMessageAndButton(failureReason, v5, v4 or "", v8, v9, false)
+
+		return React.createElement(Sheet.Root, {
+			preferCenterSheet = true,
+			snapPoints = { useScaledValue(300), 0.5 },
+			onClose = triggerOnClose,
+			ref = ref
 		}, {
-			SheetContentContainer = React.createElement(View, {
-				tag = "col gap-xlarge auto-y size-full-0 align-x-center align-y-center padding-top-xlarge"
-			}, {
-				ErrorIconContainer = React.createElement(View, {
-					tag = "size-1200-1200 radius-circle align-x-center align-y-center bg-inverse-emphasis",
-					LayoutOrder = 1
+			Header = React.createElement(Sheet.Header, {}, {
+				TransferRobuxHeader = React.createElement(TransferRobuxHeader, {
+					titleText = v5.SendRobux or "",
+					robuxBalanceAmount = robuxBalanceAmount
+				})
+			}),
+			Content = React.createElement(Sheet.Content, { LayoutOrder = 2 }, {
+				SheetContentContainer = React.createElement(
+					View,
+					{
+						tag = "col gap-xlarge auto-y size-full-0 align-x-center align-y-center padding-top-xlarge"
+					},
+					{
+						ErrorIconContainer = React.createElement(
+							View,
+							{
+								tag = "size-1200-1200 radius-circle align-x-center align-y-center bg-inverse-emphasis",
+								LayoutOrder = 1
+							},
+							{
+								ErrorIcon = React.createElement(Icon, {
+									name = Enums.IconName.TriangleExclamation,
+									size = v2.Size.Size_1200,
+									tag = "content-inverse-emphasis"
+								})
+							}
+						),
+						ErrorMessage = React.createElement(Text, {
+							Text = errorMessageAndButton,
+							tag = "text-body-large content-emphasis text-align-x-center auto-y text-wrap",
+							Size = UDim2.new(1, 0, 0, 0),
+							LayoutOrder = 2
+						})
+					}
+				)
+			}),
+			Actions = React.createElement(Sheet.Actions, { LayoutOrder = 3 }, {
+				React.createElement(View, {
+					tag = "col auto-y align-y-center align-x-center size-full-0 gap-small"
 				}, {
-					ErrorIcon = React.createElement(Icon, {
-						tag = "content-inverse-emphasis",
-						name = Enums.IconName.TriangleExclamation,
-						size = v48.Size.Size_1200
+					React.createElement(View, { tag = "row auto-y size-full-0 gap-small" }, {
+						React.createElement(Button, {
+							ref = ref2,
+							text = text,
+							onActivated = triggerOnClose,
+							variant = ButtonVariant.Emphasis,
+							fillBehavior = FillBehavior.Fill
+						})
 					})
-				}),
-				ErrorMessage = React.createElement(FoundationText, {
-					tag = "text-body-large content-emphasis text-align-x-center auto-y text-wrap",
-					LayoutOrder = 2,
-					Text = v80,
-					Size = UDim2.new(1, 0, 0, 0)
 				})
 			})
-		}),
-		Actions = React.createElement(Sheet.Actions, {
-			LayoutOrder = 3
-		}, { React.createElement(View, {
-			tag = "col auto-y align-y-center align-x-center size-full-0 gap-small"
-		}, { React.createElement(View, {
-			tag = "row auto-y size-full-0 gap-small"
-		}, { React.createElement(Button, {
-			text = v81,
-			onActivated = triggerOnClose,
-			variant = ButtonVariant.Emphasis,
-			fillBehavior = FillBehavior.Fill
-		}) }) }) })
-	})
+		})
+	end
 end
 
 return TransferRobuxErrorSheet

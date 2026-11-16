@@ -9,15 +9,27 @@ local CorePackages = game:GetService("CorePackages")
 local RobloxReplicatedStorage = game:GetService("RobloxReplicatedStorage")
 local ScriptContext = game:GetService("ScriptContext")
 local CoreGui = game:GetService("CoreGui")
-local GetFFlagDisplayServerChannel = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagDisplayServerChannel
-local getFFlagExpChatAlwaysRunTCS = require(CorePackages.Workspace.Packages.SharedFlags).getFFlagExpChatAlwaysRunTCS
-local GetFFlagEnableReferredPlayerJoinRemoteEvent = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagEnableReferredPlayerJoinRemoteEvent
-local v10 = game:DefineFastFlag("DebugLogExpchatMigration", false)
-local FFlagAXEnableInspectAndBuyBulkPurchase = require(CorePackages.Workspace.Packages.SharedFlags).FFlagAXEnableInspectAndBuyBulkPurchase
-local FFlagPlatformLeaderboardRccEnabled = require(CorePackages.Workspace.Packages.SharedFlags).FFlagPlatformLeaderboardRccEnabled
-local v13 = game:DefineFastFlag("EmoteSkinningDisableEnabled", false)
-local RobloxGui = CoreGui:WaitForChild("RobloxGui", 1e999)
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local GetFFlagDisplayServerChannel = SharedFlags.GetFFlagDisplayServerChannel
+local SharedFlags2 = require(CorePackages.Workspace.Packages.SharedFlags)
+local getFFlagExpChatAlwaysRunTCS = SharedFlags2.getFFlagExpChatAlwaysRunTCS
 
+local SharedFlags3 = require(CorePackages.Workspace.Packages.SharedFlags)
+local GetFFlagEnableReferredPlayerJoinRemoteEvent = SharedFlags3.GetFFlagEnableReferredPlayerJoinRemoteEvent
+local defineFastFlag = game:DefineFastFlag("DebugLogExpchatMigration", false)
+
+local SharedFlags4 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagAXEnableInspectAndBuyBulkPurchase = SharedFlags4.FFlagAXEnableInspectAndBuyBulkPurchase
+
+local SharedFlags5 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagPlatformLeaderboardRccEnabled = SharedFlags5.FFlagPlatformLeaderboardRccEnabled
+
+local SharedFlags6 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagLuaAppsEnablePromptVIPServerPurchase = SharedFlags6.FFlagLuaAppsEnablePromptVIPServerPurchase
+local defineFastFlag2 = game:DefineFastFlag("DebugServerPlatformLeaderboardDevMock", false)
+local defineFastFlag3 = game:DefineFastFlag("EmoteSkinningDisableEnabled", false)
+
+local RobloxGui = CoreGui:WaitForChild("RobloxGui", 1e999)
 assert(RobloxGui ~= nil, "RobloxGui should exist")
 
 local ServerUtil = require(RobloxGui.Modules.Server.ServerUtil)
@@ -26,11 +38,10 @@ if ServerUtil.getFFlagServerCoreScriptSourceCode() then
 	ServerUtil.initSourceCodeFolder()
 end
 
-require(RobloxGui.Modules.Server.RemoteAllowList)()
+local RemoteAllowList = require(RobloxGui.Modules.Server.RemoteAllowList)
+RemoteAllowList()
 
-if game:DefineFastFlag("OpenCloudCoreScriptLuaEnabled", false) then
-	ScriptContext:AddCoreScriptLocal("ServerCoreScripts/OpenCloud/OpenCloudV2", script.Parent)
-end
+ScriptContext:AddCoreScriptLocal("ServerCoreScripts/OpenCloud/OpenCloudV2", script.Parent)
 
 if game:DefineFastFlag("OpenCloudClientLibraryCoreScriptEnabled", false) then
 	ScriptContext:AddCoreScriptLocal("ServerCoreScripts/OpenCloud/OpenCloudClientLibraryCoreScript", script.Parent)
@@ -39,16 +50,20 @@ end
 ScriptContext:AddCoreScriptLocal("ServerCoreScripts/ServerInGameMenu", script.Parent)
 ScriptContext:AddCoreScriptLocal("ServerCoreScripts/ServerSocialScript", script.Parent)
 
-if v13 then
+if defineFastFlag3 then
 	ScriptContext:AddCoreScriptLocal("ServerCoreScripts/EmoteSkinningDisable", script.Parent)
 end
 
-if FFlagPlatformLeaderboardRccEnabled then
+if defineFastFlag2 and RunService:IsStudio() then
+	ScriptContext:AddCoreScriptLocal("ServerCoreScripts/ServerPlatformLeaderboardDevMock", script.Parent)
+elseif FFlagPlatformLeaderboardRccEnabled then
 	ScriptContext:AddCoreScriptLocal("ServerCoreScripts/ServerPlatformLeaderboard", script.Parent)
 end
 
 ScriptContext:AddCoreScriptLocal("ServerCoreScripts/ServerLeaderstats", script.Parent)
+
 ScriptContext:AddCoreScriptLocal("ServerCoreScripts/PlayerRagdollRigCreator", script.Parent)
+
 game:DefineFastFlag("DebugFreeCameraForAdmins", true)
 
 if FFlagAXEnableInspectAndBuyBulkPurchase then
@@ -59,95 +74,120 @@ local SendChatAnalytics = require(RobloxGui.Modules.Server.SendChatAnalytics)
 
 ScriptContext:AddCoreScriptLocal("ServerCoreScripts/ServerDialog", script.Parent)
 
-local RemoteFunction = Instance.new("RemoteFunction")
-
-RemoteFunction.Name = "GetServerVersion"
-RemoteFunction.Parent = RobloxReplicatedStorage
-
-local RemoteFunction2 = nil
+local getServerVersion = Instance.new("RemoteFunction")
+getServerVersion.Name = "GetServerVersion"
+getServerVersion.Parent = RobloxReplicatedStorage
+local getServerChannel
 
 if GetFFlagDisplayServerChannel() then
-	RemoteFunction2 = Instance.new("RemoteFunction")
-	RemoteFunction2.Name = "GetServerChannel"
-	RemoteFunction2.Parent = RobloxReplicatedStorage
+	getServerChannel = Instance.new("RemoteFunction")
+	getServerChannel.Name = "GetServerChannel"
+	getServerChannel.Parent = RobloxReplicatedStorage
 end
 
-local function getServerVersion() -- line: 94
-	-- upvalues: RunService (copy)
-	local RobloxVersion = RunService:GetRobloxVersion()
-	local v25 = if RobloxVersion ~= "?" then if not RunService:IsStudio() then RobloxVersion else "ROBLOX Studio" else "DEBUG_SERVER"
+local function getServerVersion2()
+	local robloxVersion = RunService:GetRobloxVersion()
 
-	if not RunService:IsStudio() then
-		local ClientGitHash = RunService.ClientGitHash
+	local v = robloxVersion == "?" and "DEBUG_SERVER" or RunService:IsStudio() and "ROBLOX Studio" or robloxVersion
 
-		return string.format("%s (%.6s)", v25, ClientGitHash)
+	if RunService:IsStudio() then
+		return v
 	end
 
-	return v25
+	local clientGitHash = RunService.ClientGitHash
+	return string.format("%s (%.6s)", v, clientGitHash)
 end
-local function getServerChannel() -- line: 115
-	-- upvalues: RunService (copy)
+
+local function getServerChannel2()
 	return RunService:GetRobloxClientChannel()
 end
 
-RemoteFunction.OnServerInvoke = getServerVersion
+getServerVersion.OnServerInvoke = getServerVersion2
 
 if GetFFlagDisplayServerChannel() then
-	RemoteFunction2.OnServerInvoke = getServerChannel
+	getServerChannel.OnServerInvoke = getServerChannel2
 end
 
-local function shouldLoadLuaChat() -- line: 123
-	return game:GetService("Chat").LoadDefaultChat and (game:GetService("TextChatService").ChatVersion == Enum.ChatVersion.LegacyChatService and not game:GetService("GuiService"):IsTenFootInterface())
+local function shouldLoadLuaChat() -- 1 equivalent call inferred from this helper
+	local Chat = game:GetService("Chat")
+	local loadDefaultChat = Chat.LoadDefaultChat
+
+	if loadDefaultChat then
+		local TextChatService = game:GetService("TextChatService")
+		return TextChatService.ChatVersion == Enum.ChatVersion.LegacyChatService
+	end
+
+	return loadDefaultChat
 end
 
-if shouldLoadLuaChat() then
-	require(game:GetService("CoreGui").RobloxGui.Modules.Server.ClientChat.ChatWindowInstaller)()
-	require(game:GetService("CoreGui").RobloxGui.Modules.Server.ServerChat.ChatServiceInstaller)()
+if shouldLoadLuaChat() then -- inferred equivalent call
+	local CoreGui2 = game:GetService("CoreGui")
+	require(CoreGui2.RobloxGui.Modules.Server.ClientChat.ChatWindowInstaller)()
+	local CoreGui3 = game:GetService("CoreGui")
+	require(CoreGui3.RobloxGui.Modules.Server.ServerChat.ChatServiceInstaller)()
 else
 	SendChatAnalytics("NoLoadDefaultChat")
 end
 
 if game:GetFastFlag("DebugFreeCameraForAdmins") then
-	require(game:GetService("CoreGui").RobloxGui.Modules.Server.FreeCamera.FreeCameraInstaller)()
+	local CoreGui2 = game:GetService("CoreGui")
+	require(CoreGui2.RobloxGui.Modules.Server.FreeCamera.FreeCameraInstaller)()
 end
 
-require(game:GetService("CoreGui").RobloxGui.Modules.Server.ServerSound.SoundDispatcherInstaller)()
-require(game:GetService("CoreGui").RobloxGui.Modules.Server.UGCValidation.UGCValidationFunctionInstaller)()
+local CoreGui2 = game:GetService("CoreGui")
+require(CoreGui2.RobloxGui.Modules.Server.ServerSound.SoundDispatcherInstaller)()
 
-local ChatVersion = game:GetService("TextChatService").ChatVersion
+local CoreGui3 = game:GetService("CoreGui")
+require(CoreGui3.RobloxGui.Modules.Server.UGCValidation.UGCValidationFunctionInstaller)()
+
+local TextChatService = game:GetService("TextChatService")
+local ChatVersion = TextChatService.ChatVersion
 
 if getFFlagExpChatAlwaysRunTCS() or ChatVersion == Enum.ChatVersion.TextChatService then
-	require(CorePackages.Workspace.Packages.ExpChatServer).mountServerApp({})
+	local ExpChatServer = require(CorePackages.Workspace.Packages.ExpChatServer)
+	ExpChatServer.mountServerApp({})
 elseif ChatVersion == Enum.ChatVersion.LegacyChatService then
 	local Chat = game:GetService("Chat")
-
-	Chat:GetPropertyChangedSignal("IsAutoMigrated"):Connect(function() -- line: 151
-		-- upvalues: Chat (copy), v10 (copy), CorePackages (copy)
+	Chat:GetPropertyChangedSignal("IsAutoMigrated"):Connect(function()
 		if Chat.IsAutoMigrated then
-			if v10 then
+			if defineFastFlag then
 				print("Migrating to ExpChat")
 			end
 
-			require(CorePackages.Workspace.Packages.ExpChatServer).mountServerApp({})
+			local ExpChatServer = require(CorePackages.Workspace.Packages.ExpChatServer)
+			ExpChatServer.mountServerApp({})
 		end
 	end)
 end
 
 if RunService:IsStudio() == false then
-	RbxAnalyticsService:ReportCounter(ChatVersion ~= Enum.ChatVersion.TextChatService and "textChatServiceChatVersionLegacy" or "textChatServiceChatVersionTextChatService", 1)
+	RbxAnalyticsService:ReportCounter(
+		ChatVersion == Enum.ChatVersion.TextChatService and "textChatServiceChatVersionTextChatService" or "textChatServiceChatVersionLegacy",
+		1
+	)
 end
 
 if game:DefineFastFlag("VersionedFlags_Dev", false) then
 	ScriptContext:AddCoreScriptLocal("ServerCoreScripts/VersionedFlagTest", script.Parent)
 end
 
-if game:DefineFastFlag("AppBuildReloadRemote", false) then
-	ScriptContext:AddCoreScriptLocal("ServerCoreScripts/ServerBuildExperiencePlaytestTeleport", script.Parent)
+ScriptContext:AddCoreScriptLocal("ServerCoreScripts/ServerBuildExperiencePlaytestTeleport", script.Parent)
+
+if FFlagLuaAppsEnablePromptVIPServerPurchase then
+	ScriptContext:AddCoreScriptLocal("ServerCoreScripts/ServerVIPServerTeleport", script.Parent)
+end
+
+local FStringRoCaptchaUniverseIds = require(RobloxGui.Modules.Common.Flags.FStringRoCaptchaUniverseIds)
+
+if game:DefineFastFlag("RoCaptchaServerHandlerEnabled", false) and FStringRoCaptchaUniverseIds ~= "" then
+	ScriptContext:AddCoreScriptLocal("ServerCoreScripts/ServerRoCaptchaHandler", script.Parent)
 end
 
 ScriptContext:AddCoreScriptLocal("ServerCoreScripts/PlayerViewCapability", script.Parent)
 
-if require(RobloxGui.Modules.Common.Flags.GetFFlagEnableVoiceDefaultServerScript)() then
+local GetFFlagEnableVoiceDefaultServerScript = require(RobloxGui.Modules.Common.Flags.GetFFlagEnableVoiceDefaultServerScript)
+
+if GetFFlagEnableVoiceDefaultServerScript() then
 	ScriptContext:AddCoreScriptLocal("ServerCoreScripts/VoiceDefault", script.Parent)
 end
 
@@ -155,4 +195,5 @@ if GetFFlagEnableReferredPlayerJoinRemoteEvent() then
 	ScriptContext:AddCoreScriptLocal("ServerCoreScripts/ReferredByPlayerRemoteEvent", script.Parent)
 end
 
-require(game:GetService("CoreGui").RobloxGui.Modules.Server.VR.VRAvatarGesturesServer).new()
+local CoreGui4 = game:GetService("CoreGui")
+require(CoreGui4.RobloxGui.Modules.Server.VR.VRAvatarGesturesServer).new()

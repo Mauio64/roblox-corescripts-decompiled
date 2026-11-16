@@ -1,66 +1,82 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local Foundation = require(ParentParentParent.Foundation)
-local InputTypesEnum = require(ParentParent.Enums.InputTypesEnum)
-local Responsive = require(ParentParentParent.Responsive)
-local KeyboardHelpPage = require(ParentParent.Components.Keyboard.KeyboardHelpPage)
-local GamepadHelpPage = require(ParentParent.Components.Gamepad.GamepadHelpPage)
-local TouchHelpPage = require(ParentParent.Components.Touch.TouchHelpPage)
-local HelpPageTelemetry = require(ParentParent.Telemetry.HelpPageTelemetry)
-local RobloxAppHooks = require(ParentParentParent.RobloxAppHooks)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
 
-require(ParentParentParent.RobloxAppEnums)
+local React = require(parent2.React)
+local Foundation = require(parent2.Foundation)
+local InputTypesEnum = require(parent.Enums.InputTypesEnum)
+local Responsive = require(parent2.Responsive)
+local KeyboardHelpPage = require(parent.Components.Keyboard.KeyboardHelpPage)
+local GamepadHelpPage = require(parent.Components.Gamepad.GamepadHelpPage)
+local TouchHelpPage = require(parent.Components.Touch.TouchHelpPage)
+local CCLTouchHelpPageContainer = require(parent.Components.Touch.CCLTouchHelpPage.CCLTouchHelpPageContainer)
+local FFlagHelpPageCCL = require(parent.Flags.FFlagHelpPageCCL)
+local HelpPageTelemetry = require(parent.Telemetry.HelpPageTelemetry)
+local RobloxAppHooks = require(parent2.RobloxAppHooks)
+require(parent2.RobloxAppEnums)
 
 local View = Foundation.View
 local useDeviceOrientation = RobloxAppHooks.useDeviceOrientation
 
-local function HelpPageContainer() -- line: 43
-	-- upvalues: Responsive (copy), InputTypesEnum (copy), useDeviceOrientation (copy), React (copy), HelpPageTelemetry (copy), KeyboardHelpPage (copy), GamepadHelpPage (copy), TouchHelpPage (copy), View (copy)
-	local v18 = Responsive.useLastInput()
-	local v19 = Responsive.useIsSpatial()
-	local v20 = Responsive.usePreferredInput()
-	local SPATIAL_GAMEPAD
+local function HelpPageContainer()
+	local v = Responsive.useLastInput()
+	local v2 = Responsive.useIsSpatial()
+	local v3 = Responsive.usePreferredInput()
+	local last_input_type
 
-	if v19 then
-		SPATIAL_GAMEPAD = InputTypesEnum.InputType.SPATIAL_GAMEPAD
+	if v2 then
+		last_input_type = InputTypesEnum.InputType.SPATIAL_GAMEPAD
 	else
-		if v18 == nil then
-			v18 = v20
+		if v ~= nil then
+			v3 = v
 		end
 
-		SPATIAL_GAMEPAD = if v18 ~= Responsive.Input.Pointer then if v18 ~= Responsive.Input.Directional then if v18 ~= Responsive.Input.Touch then InputTypesEnum.InputType.KEYBOARD else InputTypesEnum.InputType.TOUCH else InputTypesEnum.InputType.GAMEPAD else InputTypesEnum.InputType.KEYBOARD
+		if v3 == Responsive.Input.Pointer then
+			last_input_type = InputTypesEnum.InputType.KEYBOARD
+		elseif v3 == Responsive.Input.Directional then
+			last_input_type = InputTypesEnum.InputType.GAMEPAD
+		elseif v3 == Responsive.Input.Touch then
+			last_input_type = InputTypesEnum.InputType.TOUCH
+		else
+			last_input_type = InputTypesEnum.InputType.KEYBOARD
+		end
 	end
 
-	local v22 = SPATIAL_GAMEPAD
-	local v23 = useDeviceOrientation()
+	local orientation = useDeviceOrientation()
 
-	React.useEffect(function() -- line: 50
-		-- upvalues: HelpPageTelemetry (copy), v23 (copy), v22 (copy)
+	React.useEffect(function()
 		HelpPageTelemetry.default:logHelpPageInteraction("Help_Interaction", {
-			orientation = v23,
-			last_input_type = v22
+			orientation = orientation,
+			last_input_type = last_input_type
 		})
-	end, {
-		v23,
-		v22
-	})
+	end, { orientation, last_input_type })
 
-	if v22 == InputTypesEnum.InputType.KEYBOARD then
+	if last_input_type == InputTypesEnum.InputType.KEYBOARD then
 		return React.createElement(KeyboardHelpPage)
 	end
 
-	if v22 == InputTypesEnum.InputType.GAMEPAD or v22 == InputTypesEnum.InputType.SPATIAL_GAMEPAD then
+	if
+		last_input_type == InputTypesEnum.InputType.GAMEPAD
+		or last_input_type == InputTypesEnum.InputType.SPATIAL_GAMEPAD
+	then
 		return React.createElement(GamepadHelpPage, {
-			isSpatial = v22 == InputTypesEnum.InputType.SPATIAL_GAMEPAD
+			isSpatial = last_input_type == InputTypesEnum.InputType.SPATIAL_GAMEPAD
 		})
 	end
 
-	if v22 == InputTypesEnum.InputType.TOUCH then
-		return React.createElement(TouchHelpPage)
+	if last_input_type ~= InputTypesEnum.InputType.TOUCH then
+		return React.createElement(View, nil, {})
 	end
 
-	return React.createElement(View, nil, {})
+	local createElement = React.createElement
+	local v4
+
+	if FFlagHelpPageCCL then
+		v4 = CCLTouchHelpPageContainer
+	else
+		v4 = TouchHelpPage
+	end
+
+	return createElement(v4)
 end
 
 return React.memo(HelpPageContainer)

@@ -1,5 +1,5 @@
-local function exhaustiveMatch(p1) -- line: 1
-	error(`Unknown value in exhaustive match: { p1 }`)
+local function exhaustiveMatch(p)
+	error(`Unknown value in exhaustive match: {p}`)
 end
 
 return exhaustiveMatch

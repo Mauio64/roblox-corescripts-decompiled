@@ -1,1 +1,3 @@
-return not require(script.Parent.FFlagPeoplePageEnablePersonSignalStore)() and game:DefineFastFlag("PeopleCardsEnableVirtualizedGrid", false)
+local FFlagPeoplePageEnablePersonSignalStore = require(script.Parent.FFlagPeoplePageEnablePersonSignalStore)
+
+return not FFlagPeoplePageEnablePersonSignalStore() and game:DefineFastFlag("PeopleCardsEnableVirtualizedGrid", false)

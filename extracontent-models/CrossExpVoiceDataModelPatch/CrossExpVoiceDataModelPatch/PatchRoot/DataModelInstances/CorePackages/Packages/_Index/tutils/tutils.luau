@@ -1,12 +1,18 @@
-return {
+local Tutils = {
 	checkListConsistency = require(script.checkListConsistency),
 	deepEqual = require(script.deepEqual),
 	deepCopy = require(script.deepCopy),
 	equalKey = require(script.equalKey),
 	fieldCount = require(script.fieldCount),
 	listDifferences = require(script.listDifferences),
-	print = require(script.print)(print),
-	shallowEqual = require(script.shallowEqual),
-	tableDifference = require(script.tableDifference),
-	toString = require(script.toString)
+	print = 0,
+	shallowEqual = 0,
+	tableDifference = 0,
+	toString = 0
 }
+local Print = require(script.print)
+Tutils.print = Print(print)
+Tutils.shallowEqual = require(script.shallowEqual)
+Tutils.tableDifference = require(script.tableDifference)
+Tutils.toString = require(script.toString)
+return Tutils

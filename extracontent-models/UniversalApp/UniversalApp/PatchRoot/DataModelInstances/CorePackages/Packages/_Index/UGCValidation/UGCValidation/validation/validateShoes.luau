@@ -1,8 +1,8 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 
-require(ParentParent.util.Types)
+require(parent.util.Types)
 
-local function validateShoes(_) -- line: 9
+local function validateShoes(_): boolean
 	return true
 end
 

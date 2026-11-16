@@ -1,5 +1,4 @@
 local InGameAssetReporting = script:FindFirstAncestor("InGameAssetReporting")
-
 require(InGameAssetReporting.InGameAssetReportUI.Resources.Types)
 
 return {
@@ -63,8 +62,5 @@ return {
 		NoEligibleContents = "no_eligible_contents",
 		Unknown = "unknown"
 	},
-	HighlightModeVariants = {
-		Default = "default",
-		NoPreview = "no_preview"
-	}
+	HighlightModeVariants = { Default = "default", NoPreview = "no_preview" }
 }

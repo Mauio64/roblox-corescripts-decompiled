@@ -2,14 +2,11 @@ local networkRequests = script.networkRequests
 local createGetCurrentlyWearing = require(networkRequests.createGetCurrentlyWearing)
 local createGetItemDetails = require(networkRequests.createGetItemDetails)
 
-local function createRequestThunks(p1) -- line: 9
-	-- upvalues: createGetCurrentlyWearing (copy), createGetItemDetails (copy)
+local function createRequestThunks(p)
 	return {
-		GetCurrentlyWearing = createGetCurrentlyWearing(p1),
-		GetItemDetails = createGetItemDetails(p1)
+		GetCurrentlyWearing = createGetCurrentlyWearing(p),
+		GetItemDetails = createGetItemDetails(p)
 	}
 end
 
-return {
-	config = createRequestThunks
-}
+return { config = createRequestThunks }

@@ -1,11 +1,11 @@
-return function(p1) -- line: 4
-	local assetId = p1.detailsInformation.assetId
+return function(p)
+	local assetId = p.detailsInformation.assetId
 
 	if assetId == nil then
 		return nil
 	end
 
-	local v3 = p1.assets[assetId]
+	local asset = p.assets[assetId]
 
-	return v3 and v3.parentBundleId ~= nil
+	return asset and asset.parentBundleId ~= nil
 end

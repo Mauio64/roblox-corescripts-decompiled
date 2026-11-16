@@ -1,96 +1,123 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
+local parent = script:FindFirstAncestor("DataHydration").Parent
 
-require(Parent.MomentsTypes)
+require(parent.MomentsTypes)
 
-local function decodeEmoji(p1) -- line: 11
-	if type(p1) ~= "table" then
+local function decodeEmoji(data)
+	if type(data) ~= "table" or (type(data.id) ~= "string" or data.id == "") then
 		return nil
 	end
 
-	if type(p1.id) ~= "string" or p1.id == "" then
+	if type(data.name) ~= "string" or data.name == "" then
 		return nil
 	end
 
-	if type(p1.name) ~= "string" or p1.name == "" then
-		return nil
+	local v = { id = data.id, name = data.name, assetSource = 0, unicode = 0 }
+	local assetSource
+
+	if type(data.asset_source) == "string" then
+		assetSource = data.asset_source
 	end
 
-	return {
-		id = p1.id,
-		name = p1.name,
-		assetSource = if type(p1.asset_source) ~= "string" then nil else p1.asset_source,
-		unicode = if type(p1.unicode) ~= "string" then nil else p1.unicode
-	}
-end
-local function decodeEmojiSet(p2) -- line: 30
-	-- upvalues: decodeEmoji (copy)
-	if type(p2) ~= "table" then
-		return nil
+	v.assetSource = assetSource
+	local unicode
+
+	if type(data.unicode) == "string" then
+		unicode = data.unicode
 	end
 
-	if type(p2.emoji_set_id) ~= "string" or p2.emoji_set_id == "" then
-		return nil
-	end
-
-	if type(p2.emoji_set_name) ~= "string" or p2.emoji_set_name == "" then
-		return nil
-	end
-
-	local t1 = {}
-
-	if type(p2.emoji_page) == "table" then
-		for _, v8 in p2.emoji_page do
-			local v9 = decodeEmoji(v8)
-
-			if v9 ~= nil then
-				table.insert(t1, v9)
-			end
-		end
-	end
-
-	return {
-		emojiSetId = p2.emoji_set_id,
-		emojiSetName = p2.emoji_set_name,
-		emojiPage = t1,
-		nextCursor = if type(p2.next_cursor) ~= "string" then nil else p2.next_cursor,
-		previousCursor = if type(p2.previous_cursor) ~= "string" then nil else p2.previous_cursor
-	}
+	v.unicode = unicode
+	return v
 end
 
-return {
-	decodeGetEmojiSetsResponse = function(p3) -- line: 60
-		-- upvalues: decodeEmojiSet (copy)
-		local t2 = {}
-
-		if type(p3) == "table" and type(p3.emoji_sets) == "table" then
-			for _, v13 in p3.emoji_sets do
-				local v14 = decodeEmojiSet(v13)
-
-				if v14 ~= nil then
-					table.insert(t2, v14)
-				end
-			end
-		end
-
-		return {
-			emojiSets = t2,
-			nextCursor = if type(p3) ~= "table" or type(p3.next_cursor) ~= "string" then nil else p3.next_cursor,
-			previousCursor = if type(p3) ~= "table" or type(p3.previous_cursor) ~= "string" then nil else p3.previous_cursor
-		}
-	end,
-	flattenEmojis = function(p4) -- line: 82
-		if p4 == nil then
-			return {}
-		end
-
-		local t3 = {}
-
-		for _, v18 in p4.emojiSets do
-			for _, v20 in v18.emojiPage do
-				table.insert(t3, v20)
-			end
-		end
-
-		return t3
+local function decodeEmojiSet(emoji_set)
+	if type(emoji_set) ~= "table" or (type(emoji_set.emoji_set_id) ~= "string" or emoji_set.emoji_set_id == "") then
+		return nil
 	end
-}
+
+	if type(emoji_set.emoji_set_name) ~= "string" or emoji_set.emoji_set_name == "" then
+		return nil
+	end
+
+	local emojiPage = {}
+
+	if type(emoji_set.emoji_page) == "table" then
+		for _, v in emoji_set.emoji_page do
+			local v2 = decodeEmoji(v)
+
+			if v2 ~= nil then
+				table.insert(emojiPage, v2)
+			end
+		end
+	end
+
+	local v = {
+		emojiSetId = emoji_set.emoji_set_id,
+		emojiSetName = emoji_set.emoji_set_name,
+		emojiPage = emojiPage,
+		nextCursor = 0,
+		previousCursor = 0
+	}
+	local nextCursor
+
+	if type(emoji_set.next_cursor) == "string" then
+		nextCursor = emoji_set.next_cursor
+	end
+
+	v.nextCursor = nextCursor
+	local previousCursor
+
+	if type(emoji_set.previous_cursor) == "string" then
+		previousCursor = emoji_set.previous_cursor
+	end
+
+	v.previousCursor = previousCursor
+	return v
+end
+
+local DecodeEmojiSets = {}
+
+function DecodeEmojiSets.decodeGetEmojiSetsResponse(data)
+	local emojiSets = {}
+
+	if type(data) == "table" and type(data.emoji_sets) == "table" then
+		for _, emoji_set in data.emoji_sets do
+			local v = decodeEmojiSet(emoji_set)
+
+			if v ~= nil then
+				table.insert(emojiSets, v)
+			end
+		end
+	end
+
+	local nextCursor
+
+	if type(data) == "table" and type(data.next_cursor) == "string" then
+		nextCursor = data.next_cursor
+	end
+
+	local previousCursor
+
+	if type(data) == "table" and type(data.previous_cursor) == "string" then
+		previousCursor = data.previous_cursor
+	end
+
+	return { emojiSets = emojiSets, nextCursor = nextCursor, previousCursor = previousCursor }
+end
+
+function DecodeEmojiSets.flattenEmojis(p)
+	if p == nil then
+		return {}
+	end
+
+	local result = {}
+
+	for _, emojiSet in p.emojiSets do
+		for _, v in emojiSet.emojiPage do
+			table.insert(result, v)
+		end
+	end
+
+	return result
+end
+
+return DecodeEmojiSets

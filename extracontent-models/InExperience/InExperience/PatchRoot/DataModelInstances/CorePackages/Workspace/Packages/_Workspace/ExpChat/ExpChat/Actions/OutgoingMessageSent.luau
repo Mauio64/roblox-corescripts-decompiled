@@ -1,8 +1,13 @@
-local Parent = script:FindFirstAncestor("ExpChat").Parent
+local parent = script:FindFirstAncestor("ExpChat").Parent
+local Rodux = require(parent.Rodux)
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(p1, s1: string?) -- line: 10
-	return {
-		textChatMessage = p1,
-		channelNameOverride = s1
-	}
-end)
+return Rodux.makeActionCreator(
+	script.Name,
+	function(textChatMessage, channelNameOverride: string?, isUniverseChat: boolean?)
+		return {
+			textChatMessage = textChatMessage,
+			channelNameOverride = channelNameOverride,
+			isUniverseChat = isUniverseChat
+		}
+	end
+)

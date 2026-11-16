@@ -1,24 +1,30 @@
 local CorePackages = game:GetService("CorePackages")
 local CoreGui = game:GetService("CoreGui")
+
 local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
 local t = require(CorePackages.Packages.t)
 local UIBlox = require(CorePackages.Packages.UIBlox)
+
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
 
 CoreGui:WaitForChild("RobloxGui")
-
 local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local PromptWithTextField = require(ParentParent.Prompts.PromptWithTextField)
-local SignalRenameOutfitPermissionDenied = require(ParentParentParent.Thunks.SignalRenameOutfitPermissionDenied)
-local PerformRenameOutfit = require(ParentParentParent.Thunks.PerformRenameOutfit)
-local AvatarEditorPromptsPolicy = require(ParentParentParent.AvatarEditorPromptsPolicy)
-local v16 = Roact.PureComponent:extend("RenameOutfitNamePrompt")
 
-v16.validateProps = t.strictInterface({
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
+local PromptWithTextField = require(parent.Prompts.PromptWithTextField)
+
+local SignalRenameOutfitPermissionDenied = require(parent2.Thunks.SignalRenameOutfitPermissionDenied)
+local PerformRenameOutfit = require(parent2.Thunks.PerformRenameOutfit)
+
+local AvatarEditorPromptsPolicy = require(parent2.AvatarEditorPromptsPolicy)
+
+local extended = Roact.PureComponent:extend("RenameOutfitNamePrompt")
+
+extended.validateProps = t.strictInterface({
 	outfitId = t.integer,
 	outfitName = t.string,
 	screenSize = t.Vector2,
@@ -27,100 +33,92 @@ v16.validateProps = t.strictInterface({
 	showCustomOutfitNames = t.boolean
 })
 
-function v16.init(p1) -- line: 43
-	p1:setState({
-		outfitName = "",
-		alertPosition = UDim2.fromScale(0.5, 0.5)
-	})
+function extended:init()
+	self:setState({ outfitName = "", alertPosition = UDim2.fromScale(0.5, 0.5) })
 
-	function p1.textUpdated(p2) -- line: 49
-		-- upvalues: p1 (copy)
-		p1:setState({
-			outfitName = p2
-		})
+	function self.textUpdated(outfitName)
+		self:setState({ outfitName = outfitName })
 	end
-	function p1.confirmRenameOutfit() -- line: 55
-		-- upvalues: p1 (copy)
-		p1.props.performRenameOutfit(p1.state.outfitName)
+
+	function self.confirmRenameOutfit()
+		self.props.performRenameOutfit(self.state.outfitName)
 	end
 end
-function v16.render(p3) -- line: 60
-	-- upvalues: Roact (copy), InteractiveAlert (copy), RobloxTranslator (copy), ButtonType (copy), PromptWithTextField (copy)
-	if not p3.props.showCustomOutfitNames then
-		return Roact.createElement(InteractiveAlert, {
-			isMiddleContentFocusable = false,
-			title = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.DisabledRenameOutfitPromptTitle"),
-			bodyText = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.DisabledRenameOutfitPromptText"),
-			buttonStackInfo = {
-				buttons = {{
-					isDefaultChild = true,
-					buttonType = ButtonType.PrimarySystem,
-					props = {
-						onActivated = p3.props.signalRenameOutfitPermissionDenied,
-						text = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.DisabledRenameOutfitPromptOkay")
-					}
-				}}
-			},
-			position = UDim2.fromScale(0.5, 0.5),
-			screenSize = p3.props.screenSize
-		})
-	end
 
-	return Roact.createElement(PromptWithTextField, {
-		fieldText = p3.state.outfitName,
-		onFieldTextUpdated = p3.textUpdated,
-		title = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.RenameOutfitNamePromptTitle"),
-		bodyText = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.RenameOutfitPromptText", {
-			RBX_NAME = p3.props.outfitName
-		}),
-		buttonStackInfo = {
-			buttons = {
-				{
-					isDefaultChild = true,
-					props = {
-						onActivated = p3.props.signalRenameOutfitPermissionDenied,
-						text = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.EnterOutfitNamePromptNo")
-					}
-				},
-				{
-					isDefaultChild = false,
-					buttonType = ButtonType.PrimarySystem,
-					props = {
-						isDisabled = p3.state.outfitName == "",
-						onActivated = p3.confirmRenameOutfit,
-						text = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.EnterOutfitNamePromptYes")
+function extended.render(props)
+	if props.props.showCustomOutfitNames then
+		return Roact.createElement(PromptWithTextField, {
+			fieldText = props.state.outfitName,
+			onFieldTextUpdated = props.textUpdated,
+			title = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.RenameOutfitNamePromptTitle"),
+			bodyText = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.RenameOutfitPromptText", {
+				RBX_NAME = props.props.outfitName
+			}),
+			buttonStackInfo = {
+				buttons = {
+					{
+						props = {
+							onActivated = props.props.signalRenameOutfitPermissionDenied,
+							text = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.EnterOutfitNamePromptNo")
+						},
+						isDefaultChild = true
+					},
+					{
+						buttonType = ButtonType.PrimarySystem,
+						props = {
+							isDisabled = props.state.outfitName == "",
+							onActivated = props.confirmRenameOutfit,
+							text = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.EnterOutfitNamePromptYes")
+						},
+						isDefaultChild = false
 					}
 				}
 			}
-		}
+		})
+	end
+
+	return Roact.createElement(InteractiveAlert, {
+		title = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.DisabledRenameOutfitPromptTitle"),
+		bodyText = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.DisabledRenameOutfitPromptText"),
+		buttonStackInfo = {
+			buttons = {
+				{
+					buttonType = ButtonType.PrimarySystem,
+					props = {
+						onActivated = props.props.signalRenameOutfitPermissionDenied,
+						text = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.DisabledRenameOutfitPromptOkay")
+					},
+					isDefaultChild = true
+				}
+			}
+		},
+		position = UDim2.fromScale(0.5, 0.5),
+		screenSize = props.props.screenSize,
+		isMiddleContentFocusable = false
 	})
 end
 
-local function mapStateToProps(p4) -- line: 119
+local function mapStateToProps(p)
 	return {
-		outfitId = p4.promptInfo.outfitId,
-		outfitName = p4.promptInfo.outfitName,
-		screenSize = p4.screenSize
+		outfitId = p.promptInfo.outfitId,
+		outfitName = p.promptInfo.outfitName,
+		screenSize = p.screenSize
 	}
 end
-local function mapDispatchToProps(p5) -- line: 127
-	-- upvalues: SignalRenameOutfitPermissionDenied (copy), PerformRenameOutfit (copy)
+
+local function mapDispatchToProps(callback)
 	return {
-		signalRenameOutfitPermissionDenied = function() -- line: 129
-			-- upvalues: p5 (copy), SignalRenameOutfitPermissionDenied (copy)
-			return p5(SignalRenameOutfitPermissionDenied)
+		signalRenameOutfitPermissionDenied = function()
+			return callback(SignalRenameOutfitPermissionDenied)
 		end,
-		performRenameOutfit = function(p6) -- line: 133
-			-- upvalues: p5 (copy), PerformRenameOutfit (copy)
-			return p5(PerformRenameOutfit(p6))
+		performRenameOutfit = function(p)
+			return callback(PerformRenameOutfit(p))
 		end
 	}
 end
 
-local v19 = RoactRodux.connect(mapStateToProps, mapDispatchToProps)(v16)
+local v = RoactRodux.connect(mapStateToProps, mapDispatchToProps)(extended)
 
-return (AvatarEditorPromptsPolicy.connect(function(p7, _) -- line: 141
-	return {
-		showCustomOutfitNames = p7.getCustomOutfitNames()
-	}
-end)(v19))
+return (AvatarEditorPromptsPolicy.connect(function(p, _)
+	return { showCustomOutfitNames = p.getCustomOutfitNames() }
+end)(v))

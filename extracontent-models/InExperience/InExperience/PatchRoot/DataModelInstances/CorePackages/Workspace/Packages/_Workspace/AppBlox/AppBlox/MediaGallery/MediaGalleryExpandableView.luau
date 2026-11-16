@@ -1,189 +1,247 @@
-local Parent = script:FindFirstAncestor("AppBlox").Parent
-local Cryo = require(Parent.Cryo)
-local React = require(Parent.React)
-local ReactOtter = require(Parent.ReactOtter)
-local UIBlox = require(Parent.UIBlox)
+local parent = script:FindFirstAncestor("AppBlox").Parent
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
+local ReactOtter = require(parent.ReactOtter)
+
+local UIBlox = require(parent.UIBlox)
 local CursorKind = UIBlox.App.SelectionImage.CursorKind
 local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
 local useCursor = UIBlox.App.SelectionCursor.useCursor
 local useSelectionCursor = UIBlox.App.SelectionImage.useSelectionCursor
-local useStyle = require(Parent.UIBlox).Core.Style.useStyle
-local Foundation = require(Parent.Foundation)
+local UIBlox2 = require(parent.UIBlox)
+local useStyle = UIBlox2.Core.Style.useStyle
+
+local Foundation = require(parent.Foundation)
 local Icon = Foundation.Icon
 local View = Foundation.View
 local IconSize = Foundation.Enums.IconSize
 local useTokens = Foundation.Hooks.useTokens
-local SharedFlags = require(Parent.SharedFlags)
+
+local SharedFlags = require(parent.SharedFlags)
 local FFlagLuaAppEdpConsoleMediaGalleryVideo = SharedFlags.FFlagLuaAppEdpConsoleMediaGalleryVideo
 local FFlagLuaAppEdpConsoleMediaGalleryVideoPlayIcon = SharedFlags.FFlagLuaAppEdpConsoleMediaGalleryVideoPlayIcon
-local Constants = require(script.Parent.Constants)
 
+local Constants = require(script.Parent.Constants)
 require(script.Parent.MediaGalleryTypes)
 
-local t1 = {
+local v = {
 	titleText = "Media",
 	numItemsShown = 4,
-	itemAspectRatio = 1.7777777777777777,
+	itemAspectRatio = 16 / 9,
 	animationConfig = {
 		dampingRatio = 1,
-		frequency = 6.666666666666667
+		frequency = 20 / 3
 	},
-	onActivated = function() -- line: 39
-	end,
-	onSelectionGained = function() -- line: 40
-	end,
-	exitFullscreen = function() -- line: 41
-	end
+	onActivated = function() end,
+	onSelectionGained = function() end,
+	exitFullscreen = function() end
 }
 
-local function MediaGalleryExpandableView(t2: {[any]: any}) -- line: 79
-	-- upvalues: Cryo (copy), t1 (copy), useStyle (copy), FFlagLuaAppEdpConsoleMediaGalleryVideoPlayIcon (copy), useTokens (copy), Constants (copy), ReactOtter (copy), React (copy), useCursor (copy), useSelectionCursor (copy), CursorKind (copy), View (copy), Icon (copy), IconSize (copy), FFlagLuaAppEdpConsoleMediaGalleryVideo (copy), StyledTextLabel (copy)
-	local v23 = Cryo.Dictionary.join(t1, t2)
-	local v24 = useStyle()
-	local v25 = if not FFlagLuaAppEdpConsoleMediaGalleryVideoPlayIcon then nil else useTokens()
-	local v26 = Constants.getDefaultStyleProps(v24)
-	local v27 = Cryo.Dictionary.join(v26, v23.styleProps or {})
-	local borderRadius = v27.borderRadius
-	local gutter = v27.gutter
-	local contentGap = v27.contentGap
-	local titleFont = v27.titleFont
-	local titleTextColor = v27.titleTextColor
-	local v33, v34 = ReactOtter.useAnimatedBinding(0)
-	local v35, v36 = React.useState(Vector2.zero)
-	local v37 = React.useCallback(function(p1, _: boolean, _, _) -- line: 96
-		-- upvalues: gutter (copy), v23 (copy), v36 (copy)
-		local v48 = gutter * (v23.numItemsShown - 1)
-		local v49 = (p1.AbsoluteSize.X - v48) / v23.numItemsShown
+local function MediaGalleryExpandableView(p)
+	local joined = Cryo.Dictionary.join(v, p)
+	local v2 = useStyle()
+	local v3
 
-		v36(Vector2.new(v49, v49 / v23.itemAspectRatio))
-	end, {
-		gutter,
-		v23.itemAspectRatio,
-		v23.numItemsShown
-	})
-	local v38 = React.useCallback(function(p4, _: boolean, p5, p6) -- line: 110
-		-- upvalues: v34 (copy), ReactOtter (copy), v23 (copy)
-		if not p4 then
+	if FFlagLuaAppEdpConsoleMediaGalleryVideoPlayIcon then
+		v3 = useTokens()
+	else
+		v3 = nil
+	end
+
+	local defaultStyleProps = Constants.getDefaultStyleProps(v2)
+	local joined2 = Cryo.Dictionary.join(defaultStyleProps, joined.styleProps or {})
+	local borderRadius = joined2.borderRadius
+	local gutter = joined2.gutter
+	local contentGap = joined2.contentGap
+	local titleFont = joined2.titleFont
+	local titleTextColor = joined2.titleTextColor
+
+	local v4, v5 = ReactOtter.useAnimatedBinding(0)
+
+	local state, setState = React.useState(Vector2.zero)
+	local v6 = React.useCallback(function(p2, _: boolean, _, _)
+		local v6 = gutter * (joined.numItemsShown - 1)
+		local v7 = (p2.AbsoluteSize.X - v6) / joined.numItemsShown
+		setState(Vector2.new(v7, v7 / joined.itemAspectRatio))
+	end, { gutter, joined.itemAspectRatio, joined.numItemsShown })
+
+	local v7 = React.useCallback(function(ancestor, _: boolean, instance, instance2): nil
+		if not ancestor then
 			return nil
 		end
 
-		local v54 = p6 ~= nil and p6:IsDescendantOf(p4)
-		local v55 = p5 ~= nil and p5:IsDescendantOf(p4)
-		local v56 = v54 and not v55
-		local v57 = not v54 and v55
+		local v7
 
-		if v56 then
-			v34(ReactOtter.spring(v23.expandableAreaHeightOffset, v23.animationConfig))
-			v23.mediaGalleryGainFocused(true)
-
-			return nil
+		if instance2 == nil then
+			v7 = false
+		else
+			v7 = instance2:IsDescendantOf(ancestor)
 		end
 
-		if v57 then
-			if p6 == nil or not (p6.AbsolutePosition.Y > p5.AbsolutePosition.Y) then
-				v34(ReactOtter.spring(0, v23.animationConfig))
+		local v8
+
+		if instance == nil then
+			v8 = false
+		else
+			v8 = instance:IsDescendantOf(ancestor)
+		end
+
+		local v9 = not v7 and v8
+
+		if v7 and not v8 then
+			v5(ReactOtter.spring(joined.expandableAreaHeightOffset, joined.animationConfig))
+			joined.mediaGalleryGainFocused(true)
+			return nil
+		else
+			if not v9 then
+				return nil
 			end
 
-			v23.exitFullscreen()
-			v23.mediaGalleryGainFocused(false)
+			local v10
 
+			if instance2 == nil then
+				v10 = false
+			else
+				v10 = instance2.AbsolutePosition.Y > instance.AbsolutePosition.Y
+			end
+
+			if not v10 then
+				v5(ReactOtter.spring(0, joined.animationConfig))
+			end
+
+			joined.exitFullscreen()
+			joined.mediaGalleryGainFocused(false)
 			return nil
 		end
-
-		return nil
 	end, {
-		v23.expandableAreaHeightOffset,
-		v23.animationConfig,
-		v23.exitFullscreen,
-		v23.mediaGalleryGainFocused
+		joined.expandableAreaHeightOffset,
+		joined.animationConfig,
+		joined.exitFullscreen,
+		joined.mediaGalleryGainFocused
 	})
-	local v39 = useCursor(borderRadius)
-	local v40 = useSelectionCursor(CursorKind.Invisible)
-	local v41 = if not v23.showCursor then v40 else v39
-	local v42 = React.useMemo(function() -- line: 161
-		-- upvalues: v23 (copy), React (copy), v35 (copy), v41 (copy), borderRadius (copy), FFlagLuaAppEdpConsoleMediaGalleryVideoPlayIcon (copy), View (copy), Icon (copy), IconSize (copy), v25 (copy)
-		local t3 = {}
 
-		for v59, v60 in v23.items do
-			t3["Item" .. v59] = React.createElement("ImageButton", {
-				LayoutOrder = v59,
-				Size = UDim2.fromOffset(v35.X, v35.Y),
-				Image = v60.imageId,
+	local selectionImageObject = useCursor(borderRadius)
+	local v8 = useSelectionCursor(CursorKind.Invisible)
+
+	if not joined.showCursor then
+		selectionImageObject = v8
+	end
+
+	local useMemo = React.useMemo
+	local function fn()
+		local children = {}
+
+		for k, item in joined.items do
+			local v9 = "Item" .. k
+			local createElement = React.createElement
+			local v10 = {
+				LayoutOrder = k,
+				Size = UDim2.fromOffset(state.X, state.Y),
+				Image = item.imageId,
 				ScaleType = Enum.ScaleType.Crop,
 				BackgroundTransparency = 1,
 				AutoButtonColor = false,
-				SelectionImageObject = v41,
-				[React.Event.Activated] = function() -- line: 172
-					-- upvalues: v23 (copy), v59 (copy)
-					v23.onActivated(v59)
+				SelectionImageObject = selectionImageObject,
+				[React.Event.Activated] = function()
+					joined.onActivated(k)
 				end,
-				[React.Event.SelectionGained] = function() -- line: 175
-					-- upvalues: v23 (copy), v59 (copy)
-					v23.onSelectionGained(v59)
+				[React.Event.SelectionGained] = function()
+					joined.onSelectionGained(k)
 				end
-			}, {
-				Corner = React.createElement("UICorner", {
-					CornerRadius = borderRadius
-				}),
-				PlayIcon = if not FFlagLuaAppEdpConsoleMediaGalleryVideoPlayIcon or not v60.videoId then nil else React.createElement(View, {
+			}
+			local v11 = {
+				Corner = React.createElement("UICorner", { CornerRadius = borderRadius }),
+				PlayIcon = 0
+			}
+			local playIcon
+
+			if FFlagLuaAppEdpConsoleMediaGalleryVideoPlayIcon and item.videoId then
+				playIcon = React.createElement(View, {
 					tag = "auto-xy padding-medium radius-circle bg-over-media-100",
-					ZIndex = 2,
 					AnchorPoint = Vector2.new(0.5, 0.5),
 					Position = UDim2.fromScale(0.5, 0.5),
-					selection = {
-						Selectable = false
-					}
+					ZIndex = 2,
+					selection = { Selectable = false }
 				}, {
 					Icon = React.createElement(Icon, {
 						name = "play-large",
 						size = IconSize.Medium,
-						style = v25.Color.Content.Emphasis
+						style = v3.Color.Content.Emphasis
 					})
 				})
-			})
+			end
+
+			v11.PlayIcon = playIcon
+			children[v9] = createElement("ImageButton", v10, v11)
 		end
 
-		return t3
-	end, {
-		v35,
-		v23.items,
-		v23.onActivated,
-		v23.onSelectionGained,
-		v41,
-		borderRadius,
-		if not FFlagLuaAppEdpConsoleMediaGalleryVideoPlayIcon then nil else v25
-	})
-	local v43 = if not titleFont.RelativeSize then titleFont.FontSize else titleFont.RelativeSize * v24.Font.BaseSize
+		return children
+	end
 
-	return React.createElement("CanvasGroup", {
-		BackgroundTransparency = 1,
-		GroupTransparency = v23.groupTransparency,
+	local items = joined.items
+	local onActivated = joined.onActivated
+	local onSelectionGained = joined.onSelectionGained
+	local v9
+
+	if FFlagLuaAppEdpConsoleMediaGalleryVideoPlayIcon then
+		v9 = v3
+	end
+
+	local v10 = useMemo(fn, {
+		state,
+		items,
+		onActivated,
+		onSelectionGained,
+		selectionImageObject,
+		borderRadius,
+		v9
+	})
+	local v11
+
+	if titleFont.RelativeSize then
+		v11 = titleFont.RelativeSize * v2.Font.BaseSize
+	else
+		v11 = titleFont.FontSize
+	end
+
+	local createElement = React.createElement
+	local v12 = {
+		GroupTransparency = joined.groupTransparency,
 		Size = UDim2.new(1, 0, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
-		ref = if not FFlagLuaAppEdpConsoleMediaGalleryVideo then nil else v23.rootRef
-	}, {
+		BackgroundTransparency = 1,
+		ref = 0
+	}
+	local ref
+
+	if FFlagLuaAppEdpConsoleMediaGalleryVideo then
+		ref = joined.rootRef
+	end
+
+	v12.ref = ref
+	return createElement("CanvasGroup", v12, {
 		UIListLayout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			Padding = UDim.new(0, contentGap)
 		}),
 		ExpandableArea = React.createElement("Frame", {
+			Size = v4:map(function(p2)
+				return UDim2.new(1, 0, 0, p2)
+			end),
 			BackgroundTransparency = 1,
-			LayoutOrder = 1,
-			Size = v33:map(function(p7) -- line: 229
-				return UDim2.new(1, 0, 0, p7)
-			end)
+			LayoutOrder = 1
 		}),
 		Title = React.createElement(StyledTextLabel, {
-			layoutOrder = 2,
-			text = v23.titleText,
+			text = joined.titleText,
 			fontStyle = titleFont,
 			colorStyle = titleTextColor,
 			textXAlignment = Enum.TextXAlignment.Left,
-			size = UDim2.new(1, 0, 0, v43)
+			size = UDim2.new(1, 0, 0, v11),
+			layoutOrder = 2
 		}),
 		MediaGallery = React.createElement("ScrollingFrame", {
-			Size = UDim2.new(1, 0, 0, v35.Y),
+			Size = UDim2.new(1, 0, 0, state.Y),
 			BackgroundTransparency = 1,
 			AutomaticCanvasSize = Enum.AutomaticSize.XY,
 			ScrollBarImageTransparency = 1,
@@ -191,15 +249,15 @@ local function MediaGalleryExpandableView(t2: {[any]: any}) -- line: 79
 			ScrollingDirection = Enum.ScrollingDirection.X,
 			Selectable = false,
 			LayoutOrder = 3,
-			[React.Change.AbsoluteSize] = v37,
-			[React.Event.SelectionChanged] = v38
+			[React.Change.AbsoluteSize] = v6,
+			[React.Event.SelectionChanged] = v7
 		}, {
 			Layout = React.createElement("UIListLayout", {
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				FillDirection = Enum.FillDirection.Horizontal,
 				Padding = UDim.new(0, gutter)
 			}),
-			Items = React.createElement(React.Fragment, {}, v42)
+			Items = React.createElement(React.Fragment, {}, v10)
 		})
 	})
 end

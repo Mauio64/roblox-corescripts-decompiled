@@ -1,31 +1,25 @@
-local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
-local React = require(BuildExperienceParent.React)
-local SignalsReact = require(BuildExperienceParent.SignalsReact)
-local GetPlaytestLoadingStore = require(BuildExperience.Stores.GetPlaytestLoadingStore)
+local parent = script:FindFirstAncestor("BuildExperience").Parent
 
-require(BuildExperience.Stores.GetPlaytestLoadingStore.createPlaytestLoadingStore)
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
 
+local GetPlaytestLoadingStore = require(parent.BuildExperiencePlaytestLaunch.GetPlaytestLoadingStore)
+require(parent.BuildExperiencePlaytestLaunch.createPlaytestLoadingStore)
 local PlaytestStatusIndicator = require(script.Parent.PlaytestStatusIndicator)
 
-local function getStatusForPlaceId(p1, n1: number, p2) -- line: 20
-	-- upvalues: GetPlaytestLoadingStore (copy)
-	return (p2 or GetPlaytestLoadingStore(p1)).getStatusForPlaceId(n1)(p1)
+local function getStatusForPlaceId(p, placeId: number, playtestLoadingStore)
+	return (playtestLoadingStore or GetPlaytestLoadingStore(p)).getStatusForPlaceId(placeId)(p)
 end
-local function PlaytestStatusIndicatorForPlace(t1: {[any]: any}) -- line: 29
-	-- upvalues: React (copy), getStatusForPlaceId (copy), SignalsReact (copy), PlaytestStatusIndicator (copy)
-	local v13 = React.useCallback(function(p3) -- line: 30
-		-- upvalues: getStatusForPlaceId (copy), t1 (copy)
-		return getStatusForPlaceId(p3, t1.placeId, t1.playtestLoadingStore)
-	end, {
-		t1.placeId,
-		t1.playtestLoadingStore
-	})
-	local v14 = SignalsReact.useSignalState(v13)
+
+local function PlaytestStatusIndicatorForPlace(props)
+	local v = React.useCallback(function(p)
+		return getStatusForPlaceId(p, props.placeId, props.playtestLoadingStore)
+	end, { props.placeId, props.playtestLoadingStore })
+	local status = SignalsReact.useSignalState(v)
 
 	return React.createElement(PlaytestStatusIndicator, {
-		LayoutOrder = t1.LayoutOrder,
-		status = v14
+		LayoutOrder = props.LayoutOrder,
+		status = status
 	})
 end
 

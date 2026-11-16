@@ -1,12 +1,8 @@
-local function isRobloxSubscriptionProductFreeTrial(p1) -- line: 4
-	if not p1 then
-		return false
-	end
+local RobloxSubscriptionPurchaseApp = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp")
+local getFreeTrialOffer = require(RobloxSubscriptionPurchaseApp.Utils.getFreeTrialOffer)
 
-	local EligibleOffers = p1.EligibleOffers
-	local v4 = EligibleOffers and EligibleOffers[1]
-
-	return v4 ~= nil and v4.OfferType == "FreeTrial"
+local function isRobloxSubscriptionProductFreeTrial(p): boolean
+	return getFreeTrialOffer(p) ~= nil
 end
 
 return isRobloxSubscriptionProductFreeTrial

@@ -1,34 +1,27 @@
-local ParentParent = script.Parent.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Object = LuauPolyfill.Object
+local StyleSheet = {}
 
-return {
-	compose = function(p1, p2) -- line: 22
-		if p1 ~= nil and p2 ~= nil then
-			return {
-				p1,
-				p2
-			}
-		end
-
-		if p1 ~= nil then
-			return p1
-		end
-
-		return p2
-	end,
-	create = function(p3) -- line: 31
-		-- upvalues: Array (copy), Object (copy)
-		if _G.__DEV__ then
-			Array.forEach(Object.keys(p3), function(p4) -- line: 36
-				-- upvalues: p3 (copy), Object (copy)
-				if p3[p4] then
-					Object.freeze(p3[p4])
-				end
-			end)
-		end
-
-		return p3
+function StyleSheet.compose(p, p2)
+	if p ~= nil and p2 ~= nil then
+		return { p, p2 }
 	end
-}
+
+	return if p == nil then p2 else p
+end
+
+function StyleSheet.create(p)
+	if _G.__DEV__ then
+		Array.forEach(Object.keys(p), function(p2)
+			if p[p2] then
+				Object.freeze(p[p2])
+			end
+		end)
+	end
+
+	return p
+end
+
+return StyleSheet

@@ -1,32 +1,30 @@
 local MomentsCreation = script:FindFirstAncestor("MomentsCreation")
-local MomentsCreationParent = MomentsCreation.Parent
-local React = require(MomentsCreationParent.React)
+local parent = MomentsCreation.Parent
 
-require(MomentsCreationParent.Signals)
+local React = require(parent.React)
+require(parent.Signals)
+local MomentsCommon = require(parent.MomentsCommon)
 
-local MomentsCommon = require(MomentsCreationParent.MomentsCommon)
-local enableAudioPlaybackInApp = require(MomentsCreationParent.MediaPlayback).enableAudioPlaybackInApp
+local MediaPlayback = require(parent.MediaPlayback)
+local enableAudioPlaybackInApp = MediaPlayback.enableAudioPlaybackInApp
+
 local feedPlaybackSuspension = MomentsCommon.Media.feedPlaybackSuspension
 
 require(MomentsCreation.Types.CreationFlowTypes)
 
-local function CreationMediaProvider(t1: {[any]: any}) -- line: 45
-	-- upvalues: React (copy), enableAudioPlaybackInApp (copy), feedPlaybackSuspension (copy)
-	React.useEffect(function() -- line: 46
-		-- upvalues: enableAudioPlaybackInApp (copy)
+local function CreationMediaProvider(p)
+	React.useEffect(function()
 		enableAudioPlaybackInApp()
 	end, {})
-	React.useEffect(function() -- line: 51
-		-- upvalues: feedPlaybackSuspension (copy)
-		feedPlaybackSuspension.setSuspended(true)
 
-		return function() -- line: 53
-			-- upvalues: feedPlaybackSuspension (copy)
+	React.useEffect(function()
+		feedPlaybackSuspension.setSuspended(true)
+		return function()
 			feedPlaybackSuspension.setSuspended(false)
 		end
 	end, {})
 
-	return React.createElement(React.Fragment, nil, t1.children)
+	return React.createElement(React.Fragment, nil, p.children)
 end
 
 return CreationMediaProvider

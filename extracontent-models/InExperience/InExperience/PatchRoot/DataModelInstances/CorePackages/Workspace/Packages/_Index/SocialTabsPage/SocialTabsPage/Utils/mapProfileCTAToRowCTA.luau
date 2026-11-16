@@ -1,13 +1,14 @@
 local SocialTabsPage = script:FindFirstAncestor("SocialTabsPage")
-local SocialTabsPageParent = SocialTabsPage.Parent
-local ButtonTypes = require(SocialTabsPageParent.UserList).Enums.ButtonTypes
+local parent = SocialTabsPage.Parent
+
+local UserList = require(parent.UserList)
+local ButtonTypes = UserList.Enums.ButtonTypes
 
 require(SocialTabsPage.Common.Types)
 
-local function v4() -- line: 13
-end
+local function fn() end
 
-local t1 = {
+local v = {
 	JoinExperience = ButtonTypes.Join,
 	Chat = ButtonTypes.Chat,
 	AddFriend = ButtonTypes.Add,
@@ -15,26 +16,23 @@ local t1 = {
 	PendingFriendRequest = ButtonTypes.Pending
 }
 
-local function mapProfileCTAToRowCTA(p1, p2, s1: string) -- line: 23
-	-- upvalues: t1 (copy), v4 (copy), ButtonTypes (copy)
-	if not p1 or not p1.buttons then
+local function mapProfileCTAToRowCTA(p, p2, p3: string)
+	if not (p and p.buttons) then
 		return nil
 	end
 
-	for _, v11 in p1.buttons do
-		local v12 = t1[v11.type]
+	for _, button in p.buttons do
+		local v2 = v[button.type]
 
-		if v12 then
-			local v13 = p2[v12]
-
+		if v2 then
+			local v3 = p2[v2]
 			return {
-				type = v12,
-				onActivated = if not v13 then v4 else function() -- line: 39
-					-- upvalues: v13 (copy), s1 (copy)
-					v13(s1)
-				end,
-				isDisabled = v12 == ButtonTypes.Pending or nil,
-				disabledReason = v11.disabledReason
+				type = v2,
+				onActivated = v3 and function()
+					v3(p3)
+				end or fn,
+				isDisabled = v2 == ButtonTypes.Pending or nil,
+				disabledReason = button.disabledReason
 			}
 		end
 	end

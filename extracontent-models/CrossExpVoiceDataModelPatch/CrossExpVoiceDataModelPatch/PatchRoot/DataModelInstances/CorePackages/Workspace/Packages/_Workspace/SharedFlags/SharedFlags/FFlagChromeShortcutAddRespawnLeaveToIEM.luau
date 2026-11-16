@@ -1,5 +1,5 @@
-local scriptParent = script.Parent
-local FFlagEnableConsoleExpControls = require(scriptParent:WaitForChild("FFlagEnableConsoleExpControls"))
-local v3 = game:DefineFastFlag("ChromeShortcutAddRespawnLeaveToIEM", false)
+local parent = script.Parent
+local FFlagEnableConsoleExpControls = require(parent:WaitForChild("FFlagEnableConsoleExpControls"))
+local defineFastFlag = game:DefineFastFlag("ChromeShortcutAddRespawnLeaveToIEM", false)
 
-return FFlagEnableConsoleExpControls and v3
+return FFlagEnableConsoleExpControls and defineFastFlag

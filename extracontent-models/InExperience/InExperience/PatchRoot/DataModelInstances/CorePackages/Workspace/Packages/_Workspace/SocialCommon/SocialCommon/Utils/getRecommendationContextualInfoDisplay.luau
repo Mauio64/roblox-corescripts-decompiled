@@ -1,44 +1,41 @@
 local SocialCommon = script:FindFirstAncestor("SocialCommon")
-local SocialCommonParent = SocialCommon.Parent
+local parent = SocialCommon.Parent
+
 local getMutualFriendsText = require(SocialCommon.Utils.getMutualFriendsText)
 local RecommendationContextType = require(SocialCommon.Enums.RecommendationContextType)
-local Images = require(SocialCommonParent.UIBlox).App.ImageSet.Images
-local FFlagHomepagePYMKUseHorizontalUserList = require(SocialCommonParent.SharedFlags).FFlagHomepagePYMKUseHorizontalUserList
+local FFlagShowClassmatesOnPYMK = require(parent.SharedFlags.FFlagShowClassmatesOnPYMK)
 
-return function(t1: {[any]: any}) -- line: 45
-	-- upvalues: FFlagHomepagePYMKUseHorizontalUserList (copy), RecommendationContextType (copy), getMutualFriendsText (copy), Images (copy)
-	local connectionRequests = nil
-	local v9 = nil
-	local v10 = t1.recommendation.contextType and t1.recommendation.contextType.rawValue()
-	local v11 = t1.recommendation.mutualFriendsCount or 0
+local UIBlox = require(parent.UIBlox)
+local Images = UIBlox.App.ImageSet.Images
 
-	if FFlagHomepagePYMKUseHorizontalUserList and t1.recommendation.hasIncomingFriendRequest then
-		connectionRequests = t1.localized.connectionRequests
-		v9 = nil
+return function(p)
+	local v = p.recommendation.contextType and p.recommendation.contextType.rawValue()
+	local mutualFriendsCount = p.recommendation.mutualFriendsCount or 0
+	local text
+
+	if p.recommendation.hasIncomingFriendRequest then
+		text = p.localized.connectionRequests
 	end
 
-	if v10 == RecommendationContextType.Contacts.rawValue() then
-		connectionRequests = t1.localized.contacts
-	elseif v10 == RecommendationContextType.MutualFriends.rawValue() and v11 > 0 then
-		connectionRequests = getMutualFriendsText({
-			mutualFriendsCount = v11,
+	local iconsstatusplayerfriend = nil
+
+	if v == RecommendationContextType.Contacts.rawValue() then
+		text = p.localized.contacts
+	elseif v == RecommendationContextType.MutualFriends.rawValue() and mutualFriendsCount > 0 then
+		text = getMutualFriendsText({
+			mutualFriendsCount = mutualFriendsCount,
 			localized = {
-				mutualConnections = t1.localized.mutualConnections,
-				singularMutualConnection = t1.localized.singularMutualConnection
+				mutualConnections = p.localized.mutualConnections,
+				singularMutualConnection = p.localized.singularMutualConnection
 			}
 		})
-		v9 = Images["icons/status/player/friend"]
-	elseif v10 == RecommendationContextType.Frequents.rawValue() then
-		connectionRequests = t1.localized.frequents
+
+		iconsstatusplayerfriend = Images["icons/status/player/friend"]
+	elseif v == RecommendationContextType.Frequents.rawValue() then
+		text = p.localized.frequents
+	elseif FFlagShowClassmatesOnPYMK and v == RecommendationContextType.Classmates.rawValue() then
+		text = p.localized.classmates
 	end
 
-	if not FFlagHomepagePYMKUseHorizontalUserList and t1.recommendation.hasIncomingFriendRequest then
-		connectionRequests = t1.localized.connectionRequests
-		v9 = nil
-	end
-
-	return {
-		text = connectionRequests,
-		icon = v9
-	}
+	return { text = text, icon = iconsstatusplayerfriend }
 end

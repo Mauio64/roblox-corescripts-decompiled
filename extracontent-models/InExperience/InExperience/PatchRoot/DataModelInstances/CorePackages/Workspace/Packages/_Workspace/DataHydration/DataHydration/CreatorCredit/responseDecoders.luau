@@ -1,82 +1,164 @@
 require(script.Parent.types)
+local parent = script:FindFirstAncestor("DataHydration").Parent
+local SharedFlags = require(parent.SharedFlags)
+local FFlagBuildExperienceModelPickerData = SharedFlags.FFlagBuildExperienceModelPickerData
 
-local t1 = {
+local v = {
 	BLOCK_REASON_FREE_TRIAL_EXHAUSTED = "FreeTrialExhausted",
 	BLOCK_REASON_DAILY_LIMIT_REACHED = "DailyLimitReached",
-	BLOCK_REASON_INSUFFICIENT_ROBUX_BALANCE = "InsufficientRobuxBalance"
+	BLOCK_REASON_INSUFFICIENT_ROBUX_BALANCE = "InsufficientRobuxBalance",
+	"InsufficientRobuxBalance",
+	"DailyLimitReached",
+	"FreeTrialExhausted"
 }
 
-local function decodeNumber(p1) -- line: 13
-	if typeof(p1) == "number" then
-		return p1
+local v2 = {
+	MODEL_TIER_DEFAULT = "default",
+	MODEL_TIER_ADVANCED = "advanced",
+	"default",
+	"advanced"
+}
+
+local v3 = {
+	FREE_TRIAL_RESET_PERIOD_DAILY = "Daily",
+	FREE_TRIAL_RESET_PERIOD_WEEKLY = "Weekly",
+	FREE_TRIAL_RESET_PERIOD_MONTHLY = "Monthly"
+}
+
+local function decodeNumber(value) -- 7 equivalent calls inferred from this helper
+	if typeof(value) == "number" then
+		return value
 	end
 
-	if typeof(p1) == "string" then
-		return tonumber(p1) or 0
+	if typeof(value) == "string" then
+		return tonumber(value) or 0
 	end
 
 	return 0
 end
-local function decodeDailyLimitSettings(p2) -- line: 23
-	local v7 = if typeof(p2) ~= "table" then {} else p2
-	local v8 = if typeof(v7.limitSettings) ~= "table" then v7 else v7.limitSettings
-	local t2 = {
-		additionalUsageEnabled = v8.additionalUsageEnabled == true,
-		dailyLimitSet = v8.dailyLimitSet == true
+
+local function decodeDailyLimitSettings(limitSettings)
+	local v4 = typeof(limitSettings) ~= "table" and {} or limitSettings
+
+	if typeof(v4.limitSettings) == "table" then
+		v4 = v4.limitSettings
+	end
+
+	return {
+		additionalUsageEnabled = v4.additionalUsageEnabled == true,
+		dailyLimitSet = v4.dailyLimitSet == true,
+		dailyLimit = decodeNumber(v4.dailyLimit) -- inferred equivalent call
 	}
-	local dailyLimit = v8.dailyLimit
-
-	t2.dailyLimit = if typeof(dailyLimit) ~= "number" then typeof(dailyLimit) ~= "string" and 0 or (tonumber(dailyLimit) or 0) else dailyLimit
-
-	return t2
 end
-local function decodeQuotaBlockReason(p3) -- line: 33
-	-- upvalues: t1 (copy)
-	if typeof(p3) ~= "string" then
+
+local function decodeQuotaBlockReason(reason) -- 1 equivalent call inferred from this helper
+	if typeof(reason) == "string" then
+		return v[reason]
+	end
+
+	return nil
+end
+
+local function decodeFreeTrialResetPeriod(freeTrialResetPeriod) -- 1 equivalent call inferred from this helper
+	if typeof(freeTrialResetPeriod) == "string" then
+		return v3[freeTrialResetPeriod] or "Daily"
+	end
+
+	return "Daily"
+end
+
+local function decodeModelTier(modelTier) -- 1 equivalent call inferred from this helper
+	if typeof(modelTier) == "string" or typeof(modelTier) == "number" then
+		return v2[modelTier]
+	end
+
+	return nil
+end
+
+local function decodeOptionalRobux(value) -- 2 equivalent calls inferred from this helper
+	if typeof(value) ~= "number" and typeof(value) ~= "string" then
 		return nil
 	end
 
-	return t1[p3]
+	local v4 = tonumber(value)
+
+	if v4 == nil or v4 < 0 or v4 > 9007199254740991 or v4 % 1 ~= 0 then
+		return nil
+	end
+
+	return v4
+end
+
+local function decodeQuotaSummary(p)
+	local v4 = typeof(p) ~= "table" and {} or p
+
+	if typeof(v4.summary) == "table" then
+		v4 = v4.summary
+	end
+
+	local v5 = {
+		freeTrialDailyAllowance = decodeNumber(v4.freeTrialDailyAllowance), -- inferred equivalent call
+		freeTrialRemaining = decodeNumber(v4.freeTrialRemaining), -- inferred equivalent call
+		freeTrialPctUsed = decodeNumber(v4.freeTrialPctUsed), -- inferred equivalent call
+		nextResetEligibleTime = v4.nextResetEligibleTime or "",
+		robuxBalance = decodeNumber(v4.robuxBalance), -- inferred equivalent call
+		limitSettings = decodeDailyLimitSettings(v4.limitSettings),
+		robuxSpentToday = decodeNumber(v4.robuxSpentToday), -- inferred equivalent call
+		limitRemaining = decodeNumber(v4.limitRemaining), -- inferred equivalent call
+		allowed = 0,
+		reason = 0,
+		freeTrialResetPeriod = 0
+	}
+	local allowed
+
+	if typeof(v4.allowed) == "boolean" then
+		allowed = v4.allowed
+	end
+
+	v5.allowed = allowed
+	v5.reason = decodeQuotaBlockReason(v4.reason) -- inferred equivalent call
+	v5.freeTrialResetPeriod = decodeFreeTrialResetPeriod(v4.freeTrialResetPeriod) -- inferred equivalent call
+
+	if not FFlagBuildExperienceModelPickerData then
+		return v5
+	end
+
+	local blockDetails = v4.blockDetails
+
+	if typeof(blockDetails) == "table" then
+		v5.blockDetails = {
+			modelTier = decodeModelTier(blockDetails.modelTier), -- inferred equivalent call
+			requiredRobux = decodeOptionalRobux(blockDetails.requiredRobux), -- inferred equivalent call
+			availableRobux = decodeOptionalRobux(blockDetails.availableRobux) -- inferred equivalent call
+		}
+	end
+
+	return v5
 end
 
 return {
 	decodeDailyLimitSettings = decodeDailyLimitSettings,
-	decodeQuotaSummary = function(p4) -- line: 40
-		-- upvalues: decodeDailyLimitSettings (copy), t1 (copy)
-		local v13 = if typeof(p4) ~= "table" then {} else p4
-		local v14 = if typeof(v13.summary) ~= "table" then v13 else v13.summary
-		local t3 = {}
-		local freeTrialDailyAllowance = v14.freeTrialDailyAllowance
+	decodeQuotaSummary = decodeQuotaSummary,
+	decodeTierQuotaSummary = function(p)
+		local v4 = decodeQuotaSummary(p)
+		local summary
 
-		t3.freeTrialDailyAllowance = if typeof(freeTrialDailyAllowance) ~= "number" then typeof(freeTrialDailyAllowance) ~= "string" and 0 or (tonumber(freeTrialDailyAllowance) or 0) else freeTrialDailyAllowance
+		if typeof(p) == "table" then
+			summary = p.summary
+		end
 
-		local freeTrialRemaining = v14.freeTrialRemaining
+		if typeof(summary) ~= "table" then
+			return v4
+		end
 
-		t3.freeTrialRemaining = if typeof(freeTrialRemaining) ~= "number" then typeof(freeTrialRemaining) ~= "string" and 0 or (tonumber(freeTrialRemaining) or 0) else freeTrialRemaining
+		if summary.allowed == nil then
+			v4.allowed = false
+		end
 
-		local freeTrialPctUsed = v14.freeTrialPctUsed
+		if typeof(summary.reason) == "number" then
+			v4.reason = v[summary.reason]
+		end
 
-		t3.freeTrialPctUsed = if typeof(freeTrialPctUsed) ~= "number" then typeof(freeTrialPctUsed) ~= "string" and 0 or (tonumber(freeTrialPctUsed) or 0) else freeTrialPctUsed
-		t3.nextResetEligibleTime = v14.nextResetEligibleTime or ""
-
-		local robuxBalance = v14.robuxBalance
-
-		t3.robuxBalance = if typeof(robuxBalance) ~= "number" then typeof(robuxBalance) ~= "string" and 0 or (tonumber(robuxBalance) or 0) else robuxBalance
-		t3.limitSettings = decodeDailyLimitSettings(v14.limitSettings)
-
-		local robuxSpentToday = v14.robuxSpentToday
-
-		t3.robuxSpentToday = if typeof(robuxSpentToday) ~= "number" then typeof(robuxSpentToday) ~= "string" and 0 or (tonumber(robuxSpentToday) or 0) else robuxSpentToday
-
-		local limitRemaining = v14.limitRemaining
-
-		t3.limitRemaining = if typeof(limitRemaining) ~= "number" then typeof(limitRemaining) ~= "string" and 0 or (tonumber(limitRemaining) or 0) else limitRemaining
-		t3.allowed = if typeof(v14.allowed) ~= "boolean" then nil else v14.allowed
-
-		local reason = v14.reason
-
-		t3.reason = if typeof(reason) == "string" then t1[reason] else nil
-
-		return t3
+		return v4
 	end
 }

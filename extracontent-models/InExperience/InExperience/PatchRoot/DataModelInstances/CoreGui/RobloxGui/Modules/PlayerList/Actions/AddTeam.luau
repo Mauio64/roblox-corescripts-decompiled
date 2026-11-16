@@ -1,5 +1,5 @@
-return require(script.Parent.Parent.ActionCreator)("AddTeam", function(p1) -- line: 4
-	return {
-		team = p1
-	}
+local ActionCreator = require(script.Parent.Parent.ActionCreator)
+
+return ActionCreator("AddTeam", function(team)
+	return { team = team }
 end)

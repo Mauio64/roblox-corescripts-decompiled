@@ -1,19 +1,30 @@
 local CorePackages = game:GetService("CorePackages")
+
 local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
 local Roact = InGameMenuDependencies.Roact
 local UIBlox = InGameMenuDependencies.UIBlox
+
 local InGameMenu = script:FindFirstAncestor("InGameMenu")
-local Array = require(CorePackages.Packages.LuauPolyfill).Array
+local LuauPolyfill = require(CorePackages.Packages.LuauPolyfill)
+local Array = LuauPolyfill.Array
+
 local ControlLayoutContainer = require(script.Parent.Parent.ControlLayoutContainer)
 local ThemedTextLabel = require(InGameMenu.Components.ThemedTextLabel)
+
 local Assets = require(InGameMenu.Resources.Assets)
 local Controls = require(InGameMenu.Resources.Controls)
 local React = require(CorePackages.Packages.React)
+
 local withLocalization = require(InGameMenu.Localization.withLocalization)
+
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
-local Image = require(CorePackages.Packages.Foundation).Image
-local FFlagCoreUiMigrateUIBloxToFoundation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
-local t1 = {
+
+local Foundation = require(CorePackages.Packages.Foundation)
+local Image = Foundation.Image
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagCoreUiMigrateUIBloxToFoundation = SharedFlags.FFlagCoreUiMigrateUIBloxToFoundation
+
+local v = {
 	ResetCameraLabel = "CoreScripts.InGameMenu.Controls.ResetCameraLabel",
 	MenuLabel = "CoreScripts.InGameMenu.Controls.MenuLabel",
 	SelectItemLabel = "CoreScripts.InGameMenu.Controls.SelectItemLabel",
@@ -22,42 +33,46 @@ local t1 = {
 	JumpSelectLabel = "CoreScripts.InGameMenu.Controls.JumpSelectLabel"
 }
 
-local function GamepadControls(_) -- line: 43
-	-- upvalues: Roact (copy), ControlLayoutContainer (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Image (copy), ImageSetLabel (copy), Assets (copy), React (copy), Array (copy), Controls (copy), t1 (copy), withLocalization (copy), ThemedTextLabel (copy)
-	return Roact.createElement(ControlLayoutContainer, {
+local function GamepadControls(_)
+	local createElement = Roact.createElement
+
+	local createElement2 = Roact.createElement
+	local v2
+
+	if FFlagCoreUiMigrateUIBloxToFoundation then
+		v2 = Image
+	else
+		v2 = ImageSetLabel
+	end
+
+	return createElement(ControlLayoutContainer, {
 		titleText = "CoreScripts.InGameMenu.Controls.GamepadTitle"
 	}, {
-		GamepadImage = Roact.createElement(if not FFlagCoreUiMigrateUIBloxToFoundation then ImageSetLabel else Image, {
+		GamepadImage = createElement2(v2, {
 			BackgroundTransparency = not FFlagCoreUiMigrateUIBloxToFoundation and 1 or nil,
-			backgroundStyle = if not FFlagCoreUiMigrateUIBloxToFoundation then nil else {
-				Transparency = 1
-			},
+			backgroundStyle = FFlagCoreUiMigrateUIBloxToFoundation and { Transparency = 1 } or nil,
 			Image = Assets.Images.GamepadQuest,
 			Size = UDim2.new(1, 0, 0.6, 0),
 			Position = UDim2.new(0.5, 16.5, 0.5, 0),
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			SizeConstraint = Enum.SizeConstraint.RelativeXX,
-			testId = if not FFlagCoreUiMigrateUIBloxToFoundation then nil else "VRGamepadInstructions",
+			testId = FFlagCoreUiMigrateUIBloxToFoundation and "VRGamepadInstructions" or nil,
 			[React.Tag] = not FFlagCoreUiMigrateUIBloxToFoundation and "data-testid=VRGamepadInstructions" or nil
-		}, { Array.map(Controls.questGamepadLabels, function(p2, p3) -- line: 58
-			-- upvalues: t1 (copy), withLocalization (copy), Roact (copy), ThemedTextLabel (copy)
-			local v21 = t1[p2.labelKey]
-
-			return withLocalization({ v21 })(function(p4) -- line: 61
-				-- upvalues: Roact (copy), ThemedTextLabel (copy), p2 (copy), p3 (copy)
-				return Roact.createElement(ThemedTextLabel, {
-					fontKey = "Header2",
-					themeKey = "TextEmphasis",
-					TextScaled = true,
-					key = p2.labelKey,
-					TextXAlignment = p2.xAlignment or Enum.TextXAlignment.Right,
-					Size = UDim2.new(p2.width, 0, 0.026, 0),
-					Text = p4[1],
-					LayoutOrder = p3,
-					Position = UDim2.new(p2.xPosition, 0, p2.yPosition, 0)
-				})
-			end)
-		end) })
+		}, { Array.map(Controls.questGamepadLabels, function(data, layoutOrder)
+				return withLocalization({ v[data.labelKey] })(function(list)
+					return Roact.createElement(ThemedTextLabel, {
+						key = data.labelKey,
+						fontKey = "Header2",
+						themeKey = "TextEmphasis",
+						TextXAlignment = data.xAlignment or Enum.TextXAlignment.Right,
+						Size = UDim2.new(data.width, 0, 0.026, 0),
+						Text = list[1],
+						LayoutOrder = layoutOrder,
+						Position = UDim2.new(data.xPosition, 0, data.yPosition, 0),
+						TextScaled = true
+					})
+				end)
+			end) })
 	})
 end
 

@@ -1,4 +1,1 @@
-return {
-	vertical = require(script.vertical),
-	insert = require(script.insert)
-}
+return { vertical = require(script.vertical), insert = require(script.insert) }

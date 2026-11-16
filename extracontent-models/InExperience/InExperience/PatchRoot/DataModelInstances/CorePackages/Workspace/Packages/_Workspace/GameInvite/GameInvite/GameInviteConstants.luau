@@ -1,29 +1,19 @@
 return {
-	ParentComponentName = "GameInviteModal",
 	Layout = {
 		TitleHeight = 50,
 		TitleIconSize = 28,
-		SidePadding = 24
+		SidePadding = 24,
+		JoinCtaMinWidth = 64,
+		JoinCtaMaxWidth = 90
 	},
-	PageRoute = {
-		NONE = "NONE",
-		SETTINGS_HUB = "SETTINGS_HUB",
-		SHARE_GAME = "SHARE_GAME"
-	},
-	RenderLocation = {
-		CoreScripts = "CoreScripts",
-		UniversalApp = "UniversalApp"
-	},
-	GameInviteInviteExperimentVariant = {
-		Default = "default",
-		UxRefresh = "uxRefresh",
-		InviteLimit = "uxRefreshInviteLimit"
-	},
+	PageRoute = { NONE = "NONE", SETTINGS_HUB = "SETTINGS_HUB", SHARE_GAME = "SHARE_GAME" },
+	RenderLocation = { CoreScripts = "CoreScripts", UniversalApp = "UniversalApp" },
 	Triggers = {
 		DeveloperMultiple = "DeveloperMultiple",
 		DeveloperSingle = "DeveloperSingle",
 		GameMenu = "GameMenu",
 		GameDetailsMoreMenu = "GameDetailsMoreMenu",
 		GameDetailsPlayWithFriendsMenu = "GameDetailsPlayWithFriendsMenu"
-	}
+	},
+	ParentComponentName = "GameInviteModal"
 }

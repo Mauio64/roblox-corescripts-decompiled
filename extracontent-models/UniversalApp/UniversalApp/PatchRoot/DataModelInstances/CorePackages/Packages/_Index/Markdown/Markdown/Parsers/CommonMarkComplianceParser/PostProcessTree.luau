@@ -1,367 +1,630 @@
 local Markdown = script:FindFirstAncestor("Markdown")
-
 require(Markdown.Types)
+local MarkdownCore = require(Markdown.Parent.MarkdownCore)
+local Flags = MarkdownCore.Flags
+local NodeType = require(Markdown.Enums.NodeType)
+local TableAlignment = require(Markdown.Enums.TableAlignment)
 
 local insert = table.insert
+
 local Constants = require(script.Parent.Parent.Constants)
-local CONTAINERS = Constants.CONTAINERS
+local containers = Constants.CONTAINERS
 local INLINE_TEXT = Constants.INLINE_TEXT
 local PLAIN_TEXT = Constants.PLAIN_TEXT
 local STYLED_TEXT = Constants.STYLED_TEXT
+
 local getNodeType = require(script.Parent.Parent.getNodeType)
 local isNodeBlock = require(script.Parent.Parent.isNodeBlock)
-local t1 = {}
 
-function t1.postProcessTree(p1, p2) -- line: 23
-	-- upvalues: CONTAINERS (copy), INLINE_TEXT (copy), t1 (copy), insert (copy), PLAIN_TEXT (copy), isNodeBlock (copy)
-	local t2 = {}
-	local n1 = 1
-	local children = p1.children
-	local v16 = p1.name == "TAG" and p2.inlineTags[p1.text]
-	local v17 = CONTAINERS[p1.name] and not v16
+local v = {}
 
-	while n1 <= #children do
-		local v18 = children[n1]
-		local v19 = v18.name == "TAG" and (v18.text and p2.inlineTags[v18.text])
+local function trimLeadingWhitespace(items, flag: boolean)
+	local result = {}
 
-		if (INLINE_TEXT[v18.name] or v19) and v17 then
-			local v20, v21 = t1.buildParagraph(children, n1, p2)
+	for _, item in items do
+		if flag and item.name == "TEXT" and item.text then
+			item.text = item.text:gsub("^[ \t]+", "")
 
-			assert(v20 > 0, "Did not find an inline node when expected")
-
-			if #v21.children > 0 then
-				insert(t2, v21)
+			if #item.text == 0 then
+				continue
 			end
+		end
 
-			n1 += v20
-		elseif PLAIN_TEXT[v18.name] then
-			local v22, v23 = t1.mergeTextNodes(children, n1, nil, p2)
-
-			assert(v22 > 0, "Did not find a text node when expected")
-
-			if v23.text and #v23.text > 0 then
-				insert(t2, v23)
-			end
-
-			n1 += v22
-		elseif v18.name == "LIST_ITEM" then
-			local v24, v25 = t1.buildList(children, n1, p2)
-
-			insert(t2, v25)
-			assert(v24 > 0, "Did not find a list node when expected")
-			n1 += v24
-		elseif v18.name == "TABLE_ROW" then
-			local v26, v27 = t1.buildTable(children, n1, p2)
-
-			insert(t2, v27)
-			assert(v26 > 0, "Did not find a table row node when expected")
-			n1 += v26
-		elseif v18.name == "LINE_BREAK" then
-			n1 += 1
+		if item.name == "BREAK" and item.text ~= nil then
+			flag = string.sub(item.text, -1) == "\n"
 		else
-			v18.children = t1.postProcessTree(v18, p2)
-			insert(t2, v18)
-			n1 += 1
+			flag = false
 		end
+
+		insert(result, item)
 	end
 
-	if isNodeBlock(p1) then
-		local v28 = t2[1]
-
-		if v28 and v28.text then
-			v28.text = v28.text:gsub("^%s+", "")
-		end
-
-		local v29 = t2[#t2]
-
-		if v29 and v29.text then
-			v29.text = v29.text:gsub("%s+$", "")
-		end
-	end
-
-	return t2
+	return result
 end
-function t1.buildParagraph(t3: {[any]: any}, n2: number, p3, b1: boolean?) -- line: 88
-	-- upvalues: INLINE_TEXT (copy), PLAIN_TEXT (copy), t1 (copy), insert (copy), getNodeType (copy)
-	local t4 = {}
-	local n3 = 0
-	local v36 = n2
 
-	while v36 <= #t3 do
-		local v37 = t3[v36]
-		local v38 = v37.name == "TAG" and (v37.text and p3.inlineTags[v37.text])
-		local v39 = INLINE_TEXT[v37.name] or v38
+local function makeContentInline(state, p)
+	if state.name == "TAG" then
+		state.type = NodeType.InlineSpan
+	elseif state.name == "DIVIDER" then
+		state.name = "BREAK"
+		state.type = getNodeType("BREAK", p)
+	end
 
-		if PLAIN_TEXT[v37.name] then
-			local v40, v41 = t1.mergeTextNodes(t3, v36, b1, p3)
+	for _, child in state.children do
+		makeContentInline(child, p)
+	end
+end
 
-			if v41.text and #v41.text > 0 then
-				insert(t4, v41)
+function v.postProcessTree(data, p)
+	local result = {}
+	local total = 1
+	local children = data.children
+	local v2 = data.name == "TAG"
+		and (p.inlineTags[data.text] or Flags.FFlagMarkdownTagFallbacks and data.type == NodeType.InlineSpan)
+
+	local v3 = containers[data.name] and not v2
+	local v4 = Flags.FFlagMarkdownTagFallbacks
+
+	if v4 then
+		if data.type == NodeType.TextBlock then
+			v4 = true
+		else
+			v4 = data.type == NodeType.InlineSpan
+		end
+	end
+
+	while total <= #children do
+		local child = children[total]
+
+		if v4 and child.name == "TAG" then
+			makeContentInline(child, p)
+		end
+
+		local v5
+
+		if child.name == "TAG" then
+			v5 = child.text and p.inlineTags[child.text]
+		else
+			v5 = false
+		end
+
+		if (INLINE_TEXT[child.name] or v5) and v3 then
+			local paragraph, v6 = v.buildParagraph(children, total, p)
+			assert(paragraph > 0, "Did not find an inline node when expected")
+
+			if #v6.children > 0 then
+				insert(result, v6)
 			end
 
-			assert(v40 > 0, "Did not find a rich text node when expected")
-			n3 += v40
-			v36 += v40
+			total += paragraph
+		elseif PLAIN_TEXT[child.name] then
+			local mergeTextNodes, v6 = v.mergeTextNodes(children, total, nil, p)
+			assert(mergeTextNodes > 0, "Did not find a text node when expected")
 
-			continue
+			if v6.text and #v6.text > 0 then
+				insert(result, v6)
+			end
+
+			total += mergeTextNodes
+		elseif child.name == "LIST_ITEM" then
+			local list, v6 = v.buildList(children, total, p)
+			insert(result, v6)
+			assert(list > 0, "Did not find a list node when expected")
+			total += list
+		elseif child.name == "TABLE_ROW" then
+			local tbl, v6 = v.buildTable(children, total, p)
+			insert(result, v6)
+			assert(tbl > 0, "Did not find a table row node when expected")
+			total += tbl
+		elseif child.name == "QUOTE" then
+			local quote, v6 = v.buildQuote(children, total, p)
+			insert(result, v6)
+			assert(quote > 0, "Did not find a quote node when expected")
+			total += quote
+		else
+			if child.name ~= "LINE_BREAK" then
+				child.children = v.postProcessTree(child, p)
+				insert(result, child)
+			end
+
+			total += 1
 		end
+	end
 
-		if v37.name == "STYLED_TEXT" then
-			local _, v43 = t1.buildParagraph(v37.children, 1, p3, true)
+	if not isNodeBlock(data) then
+		return result
+	end
 
-			if v37.attributes and v37.attributes.style == "INLINE_CODE" then
-				v37.children = t1.applyCodeSpanRules(v43.children)
+	result = trimLeadingWhitespace(result, false)
+
+	local v5 = result[1]
+
+	if v5 and v5.text then
+		v5.text = v5.text:gsub("^%s+", "")
+	end
+
+	local v6 = result[#result]
+
+	if v6 and v6.text then
+		v6.text = v6.text:gsub("%s+$", "")
+	end
+
+	return result
+end
+
+function v.buildParagraph(list, p: number, p2, flag: boolean?)
+	local v2 = p
+	local children = {}
+	local total = 0
+
+	while v2 <= #list do
+		local item = list[v2]
+		local v3 = item.name == "TAG" and item.text and p2.inlineTags[item.text]
+		local v4 = INLINE_TEXT[item.name] or v3
+
+		if PLAIN_TEXT[item.name] then
+			local mergeTextNodes, v5 = v.mergeTextNodes(list, v2, flag, p2)
+
+			if v5.text and #v5.text > 0 then
+				insert(children, v5)
+			end
+
+			assert(mergeTextNodes > 0, "Did not find a rich text node when expected")
+			total += mergeTextNodes
+			v2 += mergeTextNodes
+		elseif item.name == "STYLED_TEXT" then
+			local _, v5 = v.buildParagraph(item.children, 1, p2, true)
+
+			if item.attributes and item.attributes.style == "INLINE_CODE" then
+				item.children = v.applyCodeSpanRules(v5.children)
 			else
-				v37.children = v43.children
+				item.children = trimLeadingWhitespace(v5.children, false)
 			end
 
-			insert(t4, v37)
-			n3 += 1
-			v36 += 1
-
-			continue
-		end
-
-		if not v39 then
-			return n3, {
-				name = "PARAGRAPH",
-				children = t4,
-				offset = t3[n2].offset,
-				type = getNodeType("PARAGRAPH", p3)
-			}
-		end
-
-		insert(t4, v37)
-		n3 += 1
-		v36 += 1
-	end
-
-	return n3, {
-		name = "PARAGRAPH",
-		children = t4,
-		offset = t3[n2].offset,
-		type = getNodeType("PARAGRAPH", p3)
-	}
-end
-function t1.outputRichText(p4, p5) -- line: 141
-	-- upvalues: STYLED_TEXT (copy), t1 (copy)
-	local v46 = if not p4.attributes then nil else STYLED_TEXT[p4.attributes.style]
-
-	if v46 then
-		local v47, v48 = t1.mergeTextNodes(p4.children, 1, nil, p5)
-
-		assert(v47 == #p4.children, `Found non-inline content inside inline element at { p4.offset }`)
-
-		return `<{ v46 }>{ v48.text }</{ v46 }>`
-	end
-
-	if p4.text then
-		return p4.text
-	end
-
-	assert(false, `No text for node at { p4.offset }`)
-end
-function t1.buildList(t5: {[any]: any}, n4: number, p6) -- line: 155
-	-- upvalues: t1 (copy), insert (copy), getNodeType (copy)
-	local n5 = 0
-	local depth = t5[n4].attributes.depth
-	local t6 = {}
-	local v55 = n4
-
-	while v55 <= #t5 do
-		local v56 = t5[v55]
-
-		if v56.name ~= "LIST_ITEM" then
-			return n5, {
-				name = "LIST",
-				attributes = {
-					depth = depth
-				},
-				children = t6,
-				offset = t5[n4].offset,
-				type = getNodeType("LIST", p6)
-			}
-		end
-
-		if depth ~= v56.attributes.depth then
-			if not (depth < v56.attributes.depth) then
-				return n5, {
-					name = "LIST",
-					attributes = {
-						depth = depth
-					},
-					children = t6,
-					offset = t5[n4].offset,
-					type = getNodeType("LIST", p6)
-				}
-			end
-
-			local v57, v58 = t1.buildList(t5, v55, p6)
-
-			insert(t6, v58)
-			assert(v57 > 0, "Did not find a list node when expected")
-			v55 += v57
-			n5 += v57
-
-			continue
-		end
-
-		v56.children = t1.postProcessTree(v56, p6)
-		insert(t6, v56)
-		n5 += 1
-		v55 += 1
-	end
-
-	return n5, {
-		name = "LIST",
-		attributes = {
-			depth = depth
-		},
-		children = t6,
-		offset = t5[n4].offset,
-		type = getNodeType("LIST", p6)
-	}
-end
-function t1.buildTable(t7: {[any]: any}, n6: number, p7) -- line: 195
-	-- upvalues: t1 (copy), insert (copy), getNodeType (copy)
-	local n7 = 0
-	local t8 = {}
-
-	for i = n6, #t7 do
-		local v65 = t7[i]
-
-		if v65.name ~= "TABLE_ROW" then
-			return n7, {
-				name = "TABLE",
-				children = t8,
-				offset = t7[n6].offset,
-				type = getNodeType("TABLE", p7)
-			}
-		end
-
-		local v66 = t1.buildTableCells(v65, p7)
-
-		if v66 then
-			v65.children = v66
-			insert(t8, v65)
-		elseif #t8 > 0 then
-			t8[#t8].name = "TABLE_HEADER"
-		end
-
-		n7 += 1
-	end
-
-	return n7, {
-		name = "TABLE",
-		children = t8,
-		offset = t7[n6].offset,
-		type = getNodeType("TABLE", p7)
-	}
-end
-function t1.buildTableCells(p8, p9) -- line: 225
-	-- upvalues: getNodeType (copy), t1 (copy), insert (copy)
-	local t9 = {}
-	local t10 = {}
-	local v71 = true
-	local v72 = p8.children[1]
-
-	for i = 1, #p8.children do
-		local v74 = p8.children[i]
-
-		if v74.name == "TABLE_DIVIDER" then
-			local t11 = {
-				name = "TABLE_CELL",
-				children = t10,
-				offset = if not t10[1] then p8.offset else t10[1].offset,
-				type = getNodeType("TABLE_CELL", p9)
-			}
-
-			t11.children = t1.postProcessTree(t11, p9)
-			insert(t9, t11)
-
-			local v76 = v72.text and v72.text:match("^[ \t-=]+$") ~= nil
-
-			v71 = not not v71 and (v76 or false)
-			t10 = {}
+			insert(children, item)
+			total += 1
+			v2 += 1
 		else
-			insert(t10, v74)
+			if not v4 then
+				break
+			end
+
+			if Flags.FFlagMarkdownTagFallbacks and item.name == "TAG" then
+				makeContentInline(item, p2)
+			end
+
+			insert(children, item)
+			total += 1
+			v2 += 1
 		end
 	end
 
-	if v71 then
-		return nil
+	if not flag then
+		local item = list[p - 1]
+		children = trimLeadingWhitespace(children, not item or item.name ~= "TAG")
 	end
 
-	return t9
+	return
+		total,
+		{
+			name = "PARAGRAPH",
+			children = children,
+			offset = list[p].offset,
+			type = getNodeType("PARAGRAPH", p2)
+		}
 end
-function t1.mergeTextNodes(t12: {[any]: any}, n8: number, b2: boolean?, p10) -- line: 258
-	-- upvalues: PLAIN_TEXT (copy), getNodeType (copy)
-	local s1 = ""
-	local n9 = 0
 
-	for i = n8, #t12 do
-		local v84 = t12[i]
+function v.outputRichText(data, p)
+	local v2
 
-		if not PLAIN_TEXT[v84.name] then
+	if data.attributes then
+		v2 = STYLED_TEXT[data.attributes.style]
+	end
+
+	if v2 then
+		local mergeTextNodes, v3 = v.mergeTextNodes(data.children, 1, nil, p)
+		assert(mergeTextNodes == #data.children, `Found non-inline content inside inline element at {data.offset}`)
+		return `<{v2}>{v3.text}</{v2}>`
+	end
+
+	if data.text then
+		return data.text
+	end
+
+	assert(false, `No text for node at {data.offset}`)
+end
+
+function v.buildList(list, p: number, p2)
+	local depth = list[p].attributes.depth
+	local v2 = p
+	local children = {}
+	local total = 0
+
+	while v2 <= #list do
+		local item = list[v2]
+
+		if item.name ~= "LIST_ITEM" then
 			break
 		end
 
-		s1 ..= v84.text
-		n9 += 1
+		if item.attributes.depth == depth then
+			item.children = v.postProcessTree(item, p2)
+			insert(children, item)
+			total += 1
+			v2 += 1
+		else
+			if not (depth < item.attributes.depth) then
+				break
+			end
+
+			local list2, v3 = v.buildList(list, v2, p2)
+			insert(children, v3)
+			assert(list2 > 0, "Did not find a list node when expected")
+			v2 += list2
+			total += list2
+		end
 	end
 
-	if not b2 then
-		s1 = s1:gsub("^\n*(.-)\n*$", "%1")
-	end
-
-	return n9, {
-		name = "TEXT",
-		text = s1,
-		children = {},
-		offset = t12[n8].offset,
-		type = getNodeType("TEXT", p10)
+	return total, {
+		name = "LIST",
+		attributes = { depth = depth },
+		children = children,
+		offset = list[p].offset,
+		type = getNodeType("LIST", p2)
 	}
 end
-function t1.applyCodeSpanRules(t13: {[any]: any}) -- line: 289
-	local v86 = nil
-	local v87 = nil
-	local v88 = false
 
-	for _, v90 in t13 do
-		if v90.text and #v90.text > 0 then
-			if v86 == nil then
-				v86 = v90
-			end
-
-			v87 = v90
-
-			if v90.text:find("[^\n ]") then
-				v88 = true
-			end
+local function isEmptyQuoteLine(children): boolean
+	for _, item in children do
+		if item.name ~= "TEXT" or item.text and #item.text > 0 then
+			return false
 		end
 	end
 
-	if v86 == nil or v87 == nil then
-		return t13
-	end
-
-	local v91 = (v86.text or ""):gsub("\n", " ")
-	local v92 = (v87.text or ""):gsub("\n", " ")
-
-	if v91:sub(1, 1) == " " and v92:sub(-1, -1) == " " and v88 then
-		if v86 == v87 then
-			v91 = v91:sub(2, -2)
-			v92 = v91
-		else
-			v91 = v91:sub(2)
-			v92 = v92:sub(1, -2)
-		end
-	end
-
-	v86.text = v91
-	v87.text = v92
-
-	return t13
+	return true
 end
 
-return t1.postProcessTree
+function v.buildQuote(list, p: number, p2)
+	local v2 = p
+	local v3 = {}
+	local count = 0
+
+	while v2 <= #list and list[v2].name == "QUOTE" do
+		local item = list[v2]
+		insert(v3, { node = item, children = v.postProcessTree(item, p2) })
+		count += 1
+		v2 += 1
+	end
+
+	local count2 = #v3
+	local v4 = 1
+
+	while v4 <= count2 and isEmptyQuoteLine(v3[v4].children) do
+		v4 += 1
+	end
+
+	while v4 <= count2 and isEmptyQuoteLine(v3[count2].children) do
+		count2 -= 1
+	end
+
+	local children = {}
+
+	for i = v4, count2 do
+		local v5 = v3[i]
+
+		if v4 < i then
+			insert(children, {
+				name = "BREAK",
+				children = {},
+				offset = v5.node.offset,
+				type = getNodeType("BREAK", p2)
+			})
+		end
+
+		for _, child in v5.children do
+			if child.name ~= "TEXT" or child.text ~= "" then
+				insert(children, child)
+			end
+		end
+	end
+
+	local item = list[p]
+	item.children = children
+	return count, item
+end
+
+local function buildTableCellsLegacy(item, p)
+	local child = item.children[1]
+	local children = {}
+	local result = {}
+	local v2 = true
+
+	for i = 1, #item.children do
+		local child2 = item.children[i]
+
+		if child2.name == "TABLE_DIVIDER" then
+			local offset
+
+			if children[1] then
+				offset = children[1].offset
+			else
+				offset = item.offset
+			end
+
+			local v3 = {
+				name = "TABLE_CELL",
+				children = children,
+				offset = offset,
+				type = getNodeType("TABLE_CELL", p)
+			}
+
+			v3.children = v.postProcessTree(v3, p)
+			insert(result, v3)
+
+			local v4 = child.text and child.text:match("^[ \t-=]+$") ~= nil
+
+			children = {}
+			v2 = v2 and v4 or false
+		else
+			insert(children, child2)
+		end
+	end
+
+	return if not v2 then result else nil
+end
+
+local function buildTableLegacy(list, p: number, p2)
+	local count = 0
+	local children = {}
+
+	for i = p, #list do
+		local item = list[i]
+
+		if item.name ~= "TABLE_ROW" then
+			break
+		end
+
+		local tableCellsLegacy = buildTableCellsLegacy(item, p2)
+
+		if tableCellsLegacy then
+			item.children = tableCellsLegacy
+			insert(children, item)
+		elseif #children > 0 then
+			children[#children].name = "TABLE_HEADER"
+		end
+
+		count += 1
+	end
+
+	return count, {
+		name = "TABLE",
+		children = children,
+		offset = list[p].offset,
+		type = getNodeType("TABLE", p2)
+	}
+end
+
+local function getDelimiterAlignment(tableCell)
+	local v2 = ""
+
+	for _, child in tableCell.children do
+		v2 ..= child.text or ""
+	end
+
+	local v3 = string.match(v2, "^%s*(.-)%s*$") or ""
+	local v4 = string.sub(v3, 1, 1) == ":"
+	local v5 = string.sub(v3, -1) == ":"
+
+	if v4 and v5 then
+		return TableAlignment.Center
+	end
+
+	if v5 then
+		return TableAlignment.Right
+	end
+
+	return if v4 then TableAlignment.Left else nil
+end
+
+function v.buildTable(list, p: number, p2)
+	if not Flags.FFlagMarkdownTables then
+		return buildTableLegacy(list, p, p2)
+	end
+
+	local children = {}
+	local v2 = {}
+	local count = 0
+
+	for i = p, #list do
+		local item = list[i]
+
+		if item.name ~= "TABLE_ROW" then
+			break
+		end
+
+		local tableCells, v3 = v.buildTableCells(item, p2)
+		local v4 = count == 1
+
+		if v3 and v4 then
+			children[1].name = "TABLE_HEADER"
+
+			for k, tableCell in tableCells do
+				v2[k] = getDelimiterAlignment(tableCell)
+			end
+		else
+			item.children = tableCells
+			insert(children, item)
+		end
+
+		count += 1
+	end
+
+	if children[1] then
+		local count2 = #children[1].children
+
+		for _, v3 in children do
+			for _ = #v3.children + 1, count2 do
+				insert(v3.children, v.buildTableCell({}, v3, p2))
+			end
+
+			for _ = count2 + 1, #v3.children do
+				table.remove(v3.children)
+			end
+
+			for k, child in v3.children do
+				local alignment = v2[k]
+
+				if alignment then
+					child.attributes = { alignment = alignment }
+				end
+			end
+		end
+	end
+
+	return count, {
+		name = "TABLE",
+		children = children,
+		offset = list[p].offset,
+		type = getNodeType("TABLE", p2)
+	}
+end
+
+local function isDividerCell(tableCell): boolean
+	local v2 = ""
+
+	for _, child in tableCell.children do
+		if child.name ~= "TEXT" then
+			return false
+		end
+
+		v2 ..= child.text or ""
+	end
+
+	return v2:match("^%s*:?%-+:?%s*$") ~= nil
+end
+
+local function hasContent(children): boolean
+	for _, item in children do
+		if item.name ~= "TEXT" or item.text and item.text:find("%S") then
+			return true
+		end
+	end
+
+	return false
+end
+
+function v.buildTableCell(children, p, p2)
+	local offset = if children[1] then children[1].offset else p.offset
+	local tableCell = {
+		name = "TABLE_CELL",
+		children = children,
+		offset = offset,
+		type = getNodeType("TABLE_CELL", p2)
+	}
+
+	tableCell.children = v.postProcessTree(tableCell, p2)
+
+	return tableCell
+end
+
+function v.buildTableCells(p, p2)
+	local children = {}
+	local tableCells = {}
+	local v2 = true
+
+	for i = 1, #p.children do
+		local child = p.children[i]
+
+		if child.name == "TABLE_DIVIDER" then
+			local tableCell = v.buildTableCell(children, p, p2)
+			insert(tableCells, tableCell)
+			v2 = v2 and isDividerCell(tableCell)
+			children = {}
+		else
+			insert(children, child)
+		end
+	end
+
+	if hasContent(children) then
+		local tableCell = v.buildTableCell(children, p, p2)
+		insert(tableCells, tableCell)
+		v2 = v2 and isDividerCell(tableCell)
+	end
+
+	return tableCells, v2 and #tableCells > 0
+end
+
+function v.mergeTextNodes(list, p: number, flag: boolean?, p2)
+	local text = ""
+	local count = 0
+
+	for i = p, #list do
+		local item = list[i]
+
+		if not PLAIN_TEXT[item.name] then
+			break
+		end
+
+		text ..= item.text
+		count += 1
+	end
+
+	if not flag then
+		text = text:gsub("^\n*(.-)\n*$", "%1")
+	end
+
+	return count, {
+		name = "TEXT",
+		text = text,
+		children = {},
+		offset = list[p].offset,
+		type = getNodeType("TEXT", p2)
+	}
+end
+
+function v.applyCodeSpanRules(items)
+	local v2 = nil
+	local v3 = nil
+	local v4 = false
+
+	for _, item in items do
+		if not (item.text and #item.text > 0) then
+			continue
+		end
+
+		if v2 == nil then
+			v2 = item
+		end
+
+		if item.text:find("[^\n ]") then
+			v3 = item
+			v4 = true
+		else
+			v3 = item
+		end
+	end
+
+	if v2 == nil or v3 == nil then
+		return items
+	end
+
+	local text = (v2.text or ""):gsub("\n", " ")
+	local text2 = (v3.text or ""):gsub("\n", " ")
+
+	if text:sub(1, 1) == " " and text2:sub(-1, -1) == " " and v4 then
+		if v2 == v3 then
+			text = text:sub(2, -2)
+			text2 = text
+		else
+			text = text:sub(2)
+			text2 = text2:sub(1, -2)
+		end
+	end
+
+	v2.text = text
+	v3.text = text2
+
+	return items
+end
+
+return v.postProcessTree

@@ -1,49 +1,52 @@
 local CorePackages = game:GetService("CorePackages")
-local PerformFetch = require(CorePackages.Workspace.Packages.Http).PerformFetch
-local ParentParent = script.Parent.Parent
-local Thunk = require(ParentParent.Thunk)
-local Network = require(ParentParent.Services.Network)
-local AssetInfo = require(ParentParent.Models.AssetInfo)
-local SetAssets = require(ParentParent.Actions.SetAssets)
-local createInspectAndBuyKeyMapper = require(ParentParent.createInspectAndBuyKeyMapper)
-local GetExperiencePlayability = require(ParentParent.Thunks.GetExperiencePlayability)
-local GetExperienceInfo = require(ParentParent.Thunks.GetExperienceInfo)
-local SendCounter = require(ParentParent.Thunks.SendCounter)
-local Constants = require(ParentParent.Constants)
-local t1 = { Network }
-local v14 = createInspectAndBuyKeyMapper("getVersionInfo")
+local Http = require(CorePackages.Workspace.Packages.Http)
+local PerformFetch = Http.PerformFetch
+local parent = script.Parent.Parent
+local Thunk = require(parent.Thunk)
+local Network = require(parent.Services.Network)
+local AssetInfo = require(parent.Models.AssetInfo)
+local SetAssets = require(parent.Actions.SetAssets)
+local createInspectAndBuyKeyMapper = require(parent.createInspectAndBuyKeyMapper)
+local GetExperiencePlayability = require(parent.Thunks.GetExperiencePlayability)
+local GetExperienceInfo = require(parent.Thunks.GetExperienceInfo)
+local SendCounter = require(parent.Thunks.SendCounter)
+local Constants = require(parent.Constants)
 
-local function GetVersionInfo(p1) -- line: 29
-	-- upvalues: Thunk (copy), t1 (copy), Network (copy), v14 (copy), PerformFetch (copy), AssetInfo (copy), SetAssets (copy), GetExperiencePlayability (copy), GetExperienceInfo (copy), SendCounter (copy), Constants (copy)
-	return Thunk.new(script.Name, t1, function(p2, p3) -- line: 30
-		-- upvalues: Network (copy), v14 (copy), p1 (copy), PerformFetch (copy), AssetInfo (copy), SetAssets (copy), GetExperiencePlayability (copy), GetExperienceInfo (copy), SendCounter (copy), Constants (copy)
-		local v19 = p3[Network]
-		local v20 = v14(p2:getState().storeId, p1)
+local v = { Network }
 
-		return PerformFetch.Single(v20, function() -- line: 35
-			-- upvalues: v19 (copy), p1 (copy), AssetInfo (copy), p2 (copy), SetAssets (copy), GetExperiencePlayability (copy), GetExperienceInfo (copy), SendCounter (copy), Constants (copy)
-			return v19.getVersionInfo(p1):andThen(function(p4) -- line: 36
-				-- upvalues: AssetInfo (copy), p1 (copy), p2 (copy), SetAssets (copy), GetExperiencePlayability (copy), GetExperienceInfo (copy), SendCounter (copy), Constants (copy)
-				local v23 = p4.data[1]
-				local v24 = if not v23 then nil else v23.creatingUniverseId
+local inspectAndBuyKeyMapper = createInspectAndBuyKeyMapper("getVersionInfo")
 
-				if v24 then
-					local str = tostring(v24)
-					local v26 = AssetInfo.fromGetVersionInfo(p1, v23)
+local function GetVersionInfo(p)
+	return Thunk.new(script.Name, v, function(object, p2)
+		local v2 = p2[Network]
 
-					p2:dispatch(SetAssets({ v26 }))
-					p2:dispatch(GetExperiencePlayability(str))
-					p2:dispatch(GetExperienceInfo(str))
+		local v3 = inspectAndBuyKeyMapper(object:getState().storeId, p)
+
+		return PerformFetch.Single(v3, function()
+			return v2.getVersionInfo(p):andThen(function(p3)
+				local v4 = p3.data[1]
+				local creatingUniverseId
+
+				if v4 then
+					creatingUniverseId = v4.creatingUniverseId
 				end
 
-				p2:dispatch(SendCounter(Constants.Counters.GetVersionInfo .. Constants.CounterSuffix.RequestSucceeded))
-			end, function(_) -- line: 55
-				-- upvalues: p2 (copy), SendCounter (copy), Constants (copy)
-				p2:dispatch(SendCounter(Constants.Counters.GetVersionInfo .. Constants.CounterSuffix.RequestRejected))
+				if creatingUniverseId then
+					local v5 = tostring(creatingUniverseId)
+
+					object:dispatch(SetAssets({ (AssetInfo.fromGetVersionInfo(p, v4)) }))
+
+					object:dispatch(GetExperiencePlayability(v5))
+
+					object:dispatch(GetExperienceInfo(v5))
+				end
+
+				object:dispatch(SendCounter(Constants.Counters.GetVersionInfo .. Constants.CounterSuffix.RequestSucceeded))
+			end, function(_)
+				object:dispatch(SendCounter(Constants.Counters.GetVersionInfo .. Constants.CounterSuffix.RequestRejected))
 			end)
-		end)(p2):catch(function(_) -- line: 60
-			-- upvalues: p2 (copy), SendCounter (copy), Constants (copy)
-			p2:dispatch(SendCounter(Constants.Counters.GetVersionInfo .. Constants.CounterSuffix.RequestFailed))
+		end)(object):catch(function(_)
+			object:dispatch(SendCounter(Constants.Counters.GetVersionInfo .. Constants.CounterSuffix.RequestFailed))
 		end)
 	end)
 end

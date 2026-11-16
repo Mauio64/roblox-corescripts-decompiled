@@ -1,70 +1,77 @@
-local MomentsCommon = script:FindFirstAncestor("MomentsCommon")
-local MomentsCommonParent = MomentsCommon.Parent
-local Foundation = require(MomentsCommonParent.Foundation)
-local React = require(MomentsCommonParent.React)
+local parent = script:FindFirstAncestor("MomentsCommon").Parent
+local Foundation = require(parent.Foundation)
+
+local React = require(parent.React)
+
 local MomentMediaView = require(script.Parent.MomentMediaView)
-
 require(script.Parent.Parent.MediaTypes)
-
 local useVideoPosterFrame = require(script.Parent.Parent.useVideoPosterFrame)
-local GetFFlagMomentsTileSkeletonPoster = require(MomentsCommon.Flags.GetFFlagMomentsTileSkeletonPoster)
+
 local Skeleton = Foundation.Skeleton
-local EnumsRadius = Foundation.Enums.Radius
+local Radius = Foundation.Enums.Radius
 
-local function MomentMediaTile(t1: {[any]: any}) -- line: 42
-	-- upvalues: useVideoPosterFrame (copy), GetFFlagMomentsTileSkeletonPoster (copy), React (copy), MomentMediaView (copy), Skeleton (copy), EnumsRadius (copy)
-	local mediaItem = t1.mediaItem
+local function MomentMediaTile(p)
+	local mediaItem = p.mediaItem
 	local cornerRadius = mediaItem.cornerRadius
-	local v14 = mediaItem.captureType == Enum.CaptureType.Video
-	local v15 = if not v14 then nil else mediaItem.content
-	local v16 = useVideoPosterFrame(v15)
-	local v17 = if not GetFFlagMomentsTileSkeletonPoster() then v16 or mediaItem.posterContent else if not v14 then mediaItem.posterContent else v16
+	local v = mediaItem.captureType == Enum.CaptureType.Video
+	local v2
 
-	if t1.isActive and v14 then
+	if v then
+		v2 = mediaItem.content
+	end
+
+	local v3 = useVideoPosterFrame(v2)
+
+	if not v then
+		v3 = mediaItem.posterContent
+	end
+
+	if p.isActive and v then
 		return React.createElement(MomentMediaView, {
+			momentId = mediaItem.momentId,
+			posterContent = v3,
+			cornerRadius = cornerRadius,
 			suppressTapToToggle = true,
 			holdPosterUntilPlaying = true,
-			tag = "size-full clip",
-			momentId = mediaItem.momentId,
-			posterContent = v17,
-			cornerRadius = cornerRadius
+			tag = "size-full clip"
 		})
 	end
 
-	if GetFFlagMomentsTileSkeletonPoster() then
-		return React.createElement("Frame", {
+	local createElement = React.createElement
+	local v4 = { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1) }
+
+	local createElement2 = React.createElement
+	local radius = if cornerRadius then Radius.Large else Radius.None
+	local v5 = {
+		Shimmer = createElement2(Skeleton, {
+			radius = radius,
+			Size = UDim2.fromScale(1, 1),
+			ZIndex = 1
+		}),
+		Poster = 0
+	}
+	local poster
+
+	if v3 ~= nil then
+		local createElement3 = React.createElement
+		local v6 = {
 			BackgroundTransparency = 1,
-			Size = UDim2.fromScale(1, 1)
-		}, {
-			Shimmer = React.createElement(Skeleton, {
-				ZIndex = 1,
-				radius = if not cornerRadius then EnumsRadius.None else EnumsRadius.Large,
-				Size = UDim2.fromScale(1, 1)
-			}),
-			Poster = if v17 == nil then nil else React.createElement("ImageLabel", {
-				BackgroundTransparency = 1,
-				ZIndex = 2,
-				Size = UDim2.fromScale(1, 1),
-				ImageContent = v17,
-				ScaleType = Enum.ScaleType.Crop
-			}, {
-				Corner = if cornerRadius == nil then nil else React.createElement("UICorner", {
-					CornerRadius = UDim.new(0, cornerRadius)
-				})
-			})
-		})
+			Size = UDim2.fromScale(1, 1),
+			ImageContent = v3,
+			ScaleType = Enum.ScaleType.Crop,
+			ZIndex = 2
+		}
+		local corner
+
+		if cornerRadius ~= nil then
+			corner = React.createElement("UICorner", { CornerRadius = UDim.new(0, cornerRadius) })
+		end
+
+		poster = createElement3("ImageLabel", v6, { Corner = corner })
 	end
 
-	return React.createElement("ImageLabel", {
-		BackgroundTransparency = 1,
-		Size = UDim2.fromScale(1, 1),
-		ImageContent = v17,
-		ScaleType = Enum.ScaleType.Crop
-	}, {
-		Corner = if cornerRadius == nil then nil else React.createElement("UICorner", {
-			CornerRadius = UDim.new(0, cornerRadius)
-		})
-	})
+	v5.Poster = poster
+	return createElement("Frame", v4, v5)
 end
 
 return MomentMediaTile
