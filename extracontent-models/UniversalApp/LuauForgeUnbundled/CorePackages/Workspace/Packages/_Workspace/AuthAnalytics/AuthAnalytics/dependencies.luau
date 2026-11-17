@@ -1,1 +1,0 @@
-return { Analytics = require("@game/CorePackages/Workspace/Packages/_Workspace/AuthAnalytics/Analytics"), Logging = require("@game/CorePackages/Workspace/Packages/_Workspace/AuthAnalytics/AppCommonLib").Logging }

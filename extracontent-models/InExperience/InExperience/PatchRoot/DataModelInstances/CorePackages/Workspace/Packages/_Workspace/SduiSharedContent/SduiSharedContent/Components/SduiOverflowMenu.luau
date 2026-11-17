@@ -13,6 +13,8 @@ local Foundation = require(parent.Foundation)
 
 local SharedFlags = require(parent.SharedFlags)
 local FFlagLuaAppSduiGameTileFeedback = SharedFlags.FFlagLuaAppSduiGameTileFeedback
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagSduiOverflowMenuHideWhenEmpty = SharedFlags2.FFlagSduiOverflowMenuHideWhenEmpty
 
 local function addMenuItemTelemetry(items)
 	local ids = {}
@@ -95,6 +97,10 @@ local function SduiOverflowMenu(props)
 		end
 
 		menuItems = v4
+	end
+
+	if FFlagSduiOverflowMenuHideWhenEmpty and #menuItems == 0 then
+		return nil
 	end
 
 	local v4 = props.layoutOrder ~= nil

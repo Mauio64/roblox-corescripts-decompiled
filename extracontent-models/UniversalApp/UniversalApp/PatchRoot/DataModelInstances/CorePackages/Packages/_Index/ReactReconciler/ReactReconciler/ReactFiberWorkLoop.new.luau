@@ -659,10 +659,11 @@ function v3:finishConcurrentRender(p, p2)
 					self.timeoutHandle = ReactFiberHostConfig.scheduleTimeout(function()
 						return v3.commitRoot(self)
 					end, v29)
-				else
-					markRootPinged(self, suspendedLanes, (New.requestEventTime()))
+
+					return
 				end
 
+				markRootPinged(self, suspendedLanes, (New.requestEventTime()))
 				return
 			end
 		end

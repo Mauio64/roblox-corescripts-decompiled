@@ -10,6 +10,7 @@ local SharedFlags = require(parent2.SharedFlags)
 local FFlagEnableVirtualCursorMoveAssist = SharedFlags.FFlagEnableVirtualCursorMoveAssist
 local FIntVirtualCursorMoveAssistLevel = SharedFlags.FIntVirtualCursorMoveAssistLevel
 local FIntVirtualCursorMoveAssistHoverSpeed = SharedFlags.FIntVirtualCursorMoveAssistHoverSpeed
+local FFlagVirtualCursorInputSink = SharedFlags.FFlagVirtualCursorInputSink
 local FIntVirtualCursorMoveAssistSpeedSizeMinScale = SharedFlags.FIntVirtualCursorMoveAssistSpeedSizeMinScale
 local FIntVirtualCursorMoveAssistSpeedSizeMaxScale = SharedFlags.FIntVirtualCursorMoveAssistSpeedSizeMaxScale
 local FIntVirtualCursorMoveAssistSpeedSmoothingTimeMs = SharedFlags.FIntVirtualCursorMoveAssistSpeedSmoothingTimeMs
@@ -18,6 +19,7 @@ local Properties = require(parent.Properties)
 
 local Util = require(parent.Util)
 local GetMaxSpeed = Util.GetMaxSpeed
+local GetUsesInputSink = Util.GetUsesInputSink
 local IsCircleContainedInGuiObject = Util.IsCircleContainedInGuiObject
 local IsScreenSpaceGuiObject = Util.IsScreenSpaceGuiObject
 local IsSelectableGuiObject = Util.IsSelectableGuiObject
@@ -109,16 +111,20 @@ function SelectionController:processScrolling(scrollingFrame, vector2: Vector2, 
 		scrollingFrame.CanvasPosition += Vector2.new(sign(v5) * v, 0)
 		self._cursorController:SetArrow(sign(v5), 0)
 		return true
-	elseif abs(v7.X) >= abs(v7.Y) and v3 then
-		scrollingFrame.CanvasPosition += Vector2.new(0, sign(v6) * v)
-		self._cursorController:SetArrow(0, (sign(v6)))
-		return true
+	else
+		local v8 = abs(v7.X)
+
+		if abs(v7.Y) <= v8 and v3 then
+			scrollingFrame.CanvasPosition += Vector2.new(0, sign(v6) * v)
+			self._cursorController:SetArrow(0, (sign(v6)))
+			return true
+		end
 	end
 
 	return false
 end
 
-function SelectionController:getClosestCandidate(list, vector2: Vector2, _: number, p: number, data)
+function SelectionController:getClosestCandidate(items, vector2: Vector2, _: number, p: number, data, coreGui)
 	local v, occludingCandidate, v2
 
 	if data then
@@ -129,53 +135,79 @@ function SelectionController:getClosestCandidate(list, vector2: Vector2, _: numb
 		v2 = 1e999
 	end
 
-	for _, item in ipairs(list) do
+	local v3
+
+	if coreGui == nil then
+		v3 = false
+	else
+		v3 = coreGui:IsA("CoreGui")
+	end
+
+	for _, item in items do
 		if self:processScrolling(item, vector2, p) then
 			self._isScrolling = true
 			return v, occludingCandidate, v2
 		end
 
-		if IsSelectableGuiObject(item) then
-			local absolutePosition = item.AbsolutePosition
-			local v3 = item.AbsolutePosition + item.AbsoluteSize
+		local v4
 
-			local v4 = 0
-			local v5
+		if FFlagVirtualCursorInputSink and coreGui ~= nil then
+			v4 = GetUsesInputSink(item, v3)
+		else
+			v4 = false
+		end
+
+		local v5
+
+		if FFlagVirtualCursorInputSink then
+			v5 = v4
+		end
+
+		if IsSelectableGuiObject(item, v5) then
+			local absolutePosition = item.AbsolutePosition
+			local v6 = item.AbsolutePosition + item.AbsoluteSize
+
+			local v7 = 0
+			local v8
 
 			if item.AbsoluteRotation == 0 then
-				v5 = vector2
+				v8 = vector2
 			else
-				v5 = GetPointRotatedAroundObject(vector2, item)
+				v8 = GetPointRotatedAroundObject(vector2, item)
 			end
 
-			if v5.X < absolutePosition.X or v5.Y < absolutePosition.Y or v5.X > v3.X or v5.Y > v3.Y then
-				local v6
+			if v8.X < absolutePosition.X or v8.Y < absolutePosition.Y or v8.X > v6.X or v8.Y > v6.Y then
+				local v9
 
-				if v5.X < absolutePosition.X then
-					v6 = absolutePosition.X - v5.X
+				if v8.X < absolutePosition.X then
+					v9 = absolutePosition.X - v8.X
 				else
-					v6 = not (v5.X > v3.X) and 0 or v5.X - v3.X
+					v9 = not (v8.X > v6.X) and 0 or v8.X - v6.X
 				end
 
-				local v7
+				local v10
 
-				if v5.Y < absolutePosition.Y then
-					v7 = absolutePosition.Y - v5.Y
+				if v8.Y < absolutePosition.Y then
+					v10 = absolutePosition.Y - v8.Y
 				else
-					v7 = not (v5.Y > v3.Y) and 0 or v5.Y - v3.Y
+					v10 = not (v8.Y > v6.Y) and 0 or v8.Y - v6.Y
 				end
 
-				v4 = math.sqrt(math.pow(v6, 2) + math.pow(v7, 2))
+				v7 = math.sqrt(math.pow(v9, 2) + math.pow(v10, 2))
 			end
 
-			if v4 < v2 or v == nil then
-				v2 = v4
+			if v7 < v2 or v == nil then
+				v2 = v7
 				v = item
 			end
 		end
 
+		if not FFlagVirtualCursorInputSink then
+			v4 = nil
+		end
+
 		if
-			IsSinkingGuiObject(item)
+			IsSinkingGuiObject(item, v4)
 			and IsCircleContainedInGuiObject(vector2, Properties.CursorRadius * Properties.OcclusionRadiusScale, item)
 		then
 			return v, item, v2
@@ -309,11 +341,25 @@ function SelectionController:processCandidates(vector2: Vector2, p: number, p2: 
 
 	for _, candidate in ipairs(candidates) do
 		local v2 = candidate[1]
-		closestCandidate, occludingCandidate, closestDistance = self:getClosestCandidate(candidate[2], v, p, p2, {
-			closestCandidate = closestCandidate,
-			occludingCandidate = occludingCandidate,
-			closestDistance = closestDistance
-		})
+		local v3 = candidate[2]
+		local v4
+
+		if FFlagVirtualCursorInputSink then
+			v4 = v2
+		end
+
+		closestCandidate, occludingCandidate, closestDistance = self:getClosestCandidate(
+			v3,
+			v,
+			p,
+			p2,
+			{
+				closestCandidate = closestCandidate,
+				occludingCandidate = occludingCandidate,
+				closestDistance = closestDistance
+			},
+			v4
+		)
 
 		if self._isScrolling then
 			return nil, 1e999
@@ -344,20 +390,73 @@ function SelectionController:processCandidates(vector2: Vector2, p: number, p2: 
 end
 
 function SelectionController:getAssistCandidateList(vector2: Vector2, p: number)
+	local v = {}
 	local guiObjects = {}
 
-	for _, v in self:getCandidates(vector2 - GuiService:GetGuiInset(), p) do
-		for _, guiObject in v[2] do
-			if guiObject:IsA("GuiObject") then
+	for _, v2 in self:getCandidates(vector2 - GuiService:GetGuiInset(), p) do
+		for _, guiObject in v2[2] do
+			if not guiObject:IsA("GuiObject") then
+				continue
+			end
+
+			if v2[1] == CoreGui then
+				local v3
+
+				if FFlagVirtualCursorInputSink then
+					v3 = v
+				else
+					v3 = guiObjects
+				end
+
+				table.insert(v3, guiObject)
+			else
 				table.insert(guiObjects, guiObject)
 			end
 		end
 	end
 
-	return self:filterAssistCandidates(guiObjects)
+	if FFlagVirtualCursorInputSink then
+		return self:filterAssistCandidates(v, guiObjects)
+	end
+
+	return self:DEPRECATED_filterAssistCandidates(guiObjects)
 end
 
-function SelectionController:filterAssistCandidates(items)
+function SelectionController:filterAssistCandidates(p, p2)
+	local v = Properties.CursorRadius * Properties.OcclusionRadiusScale
+	local v2 = {}
+	local result = {}
+
+	for _, v3 in { p, p2 } do
+		for _, v4 in v3 do
+			local usesInputSink = GetUsesInputSink(v4, v3 == p)
+
+			if IsSelectableGuiObject(v4, usesInputSink) then
+				local v5 = v4.AbsolutePosition + v4.AbsoluteSize * 0.5
+				local v6 = false
+
+				for _, v7 in v2 do
+					if v7 ~= v4 and IsCircleContainedInGuiObject(v5, v, v7) then
+						v6 = true
+						break
+					end
+				end
+
+				if not v6 then
+					table.insert(result, v4)
+				end
+			end
+
+			if IsSinkingGuiObject(v4, usesInputSink) then
+				table.insert(v2, v4)
+			end
+		end
+	end
+
+	return result
+end
+
+function SelectionController:DEPRECATED_filterAssistCandidates(items)
 	local v = Properties.CursorRadius * Properties.OcclusionRadiusScale
 	local v2 = {}
 	local result = {}

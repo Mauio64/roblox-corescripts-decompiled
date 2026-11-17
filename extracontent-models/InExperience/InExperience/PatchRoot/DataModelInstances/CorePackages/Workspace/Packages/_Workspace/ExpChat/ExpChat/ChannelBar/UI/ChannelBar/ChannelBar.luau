@@ -24,11 +24,9 @@ local useInterpolatedClientSettings = require(ExpChat.ClientSettings.useInterpol
 local GetFocusNavigationStore = require(ExpChat.Stores.GetFocusNavigationStore)
 local focusNavigationStore = GetFocusNavigationStore(false)
 local SharedFlags = require(parent.SharedFlags)
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
+local FFlagExpChatUseChannelTabsStore = SharedFlags.FFlagExpChatUseChannelTabsStore
 local SharedFlags2 = require(parent.SharedFlags)
-local FFlagExpChatUseChannelTabsStore = SharedFlags2.FFlagExpChatUseChannelTabsStore
-local SharedFlags3 = require(parent.SharedFlags)
-local FFlagExpChatTabShortcutNav = SharedFlags3.FFlagExpChatTabShortcutNav
+local FFlagExpChatTabShortcutNav = SharedFlags2.FFlagExpChatTabShortcutNav
 local ChatUIPrimitives = require(parent.ChatUIPrimitives)
 local ExpChatPerfTracker = ChatUIPrimitives.Telemetry.ExpChatPerfTracker
 local ChatUIPrimitives2 = require(parent.ChatUIPrimitives)
@@ -270,7 +268,7 @@ local function ChannelBar(props)
 		end
 
 		return false
-	end, FFlagExpChatEnableFriendsTab and { v6, props.allChannelTabs } or nil)
+	end, { v6, props.allChannelTabs })
 
 	local children = {}
 	children["$layout"] = React.createElement("UIListLayout", {

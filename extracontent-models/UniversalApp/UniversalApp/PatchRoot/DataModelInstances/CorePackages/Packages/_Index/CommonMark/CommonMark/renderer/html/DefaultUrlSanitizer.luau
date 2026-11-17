@@ -61,11 +61,19 @@ function DefaultUrlSanitizer:stripHtmlSpaces(value: string)
 	local count = #value
 	local count2 = 0
 
-	while count2 < count and self:isHtmlSpace(byte(value, count - 1 + 1)) do
+	while count2 < count do
+		if not self:isHtmlSpace(byte(value, count - 1 + 1)) then
+			break
+		end
+
 		count -= 1
 	end
 
-	while count2 < count and self:isHtmlSpace(byte(value, count2 + 1)) do
+	while count2 < count do
+		if not self:isHtmlSpace(byte(value, count2 + 1)) then
+			break
+		end
+
 		count2 += 1
 	end
 

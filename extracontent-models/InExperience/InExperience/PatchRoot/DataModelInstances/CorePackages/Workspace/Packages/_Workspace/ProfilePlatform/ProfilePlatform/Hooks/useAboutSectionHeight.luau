@@ -1,12 +1,9 @@
-local TextService = game:GetService("TextService")
-
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
 local parent = ProfilePlatform.Parent
 local React = require(parent.React)
 local Foundation = require(parent.Foundation)
 local Style = require(parent.Style)
 local GetTextSize = Style.GetTextSize
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local Responsive = require(parent.Responsive)
 local useTokens = Foundation.Hooks.useTokens
 local useIsSpatial = Responsive.useIsSpatial
@@ -22,49 +19,39 @@ return function(value: string?, p: number, p2: number)
 
 	local useMemo = React.useMemo
 	local function fn()
-		local v5 = string.gsub(value or "", "[\r\n]+", " ")
-		local y
+		local y = GetTextSize(
+			string.gsub(value or "", "[\r\n]+", " "),
+			bodyMedium.FontSize,
+			bodyMedium.Font,
+			Vector2.new(1e999, 1e999),
+			{ addTemporaryPadding = false }
+		).Y
 
-		if FoundationFontFaceMigration then
-			y = GetTextSize(v5, bodyMedium.FontSize, bodyMedium.Font, Vector2.new(1e999, 1e999), {
-				addTemporaryPadding = false
-			}).Y
-		else
-			y = TextService:GetTextSize(v5, bodyMedium.FontSize, bodyMedium.Font, Vector2.new(1e999, 1e999)).Y
-		end
-
-		local v6 = (v4 and 1.3 or 1) * bodyMedium.LineHeight
-		local v7
+		local v5 = (v4 and 1.3 or 1) * bodyMedium.LineHeight
+		local selected
 
 		if FFlagProfilePlatformFixBioTruncation then
-			v7 = bodyMedium.FontSize * v6 * 2
+			selected = bodyMedium.FontSize * v5 * 2
 		else
-			v7 = y * v6 + y
+			selected = y * v5 + y
 		end
 
 		if not value or value == "" then
-			return 0, v7
+			return 0, selected
 		end
 
-		local v8
+		local textSize = GetTextSize(value, bodyMedium.FontSize, bodyMedium.Font, Vector2.new(p, 1e999), {
+			addTemporaryPadding = false
+		})
+		local v6
 
-		if FoundationFontFaceMigration then
-			v8 = GetTextSize(value, bodyMedium.FontSize, bodyMedium.Font, Vector2.new(p, 1e999), {
-				addTemporaryPadding = false
-			})
+		if selected < textSize.Y then
+			v6 = selected + y + v.Gap.XSmall
 		else
-			v8 = TextService:GetTextSize(value, bodyMedium.FontSize, bodyMedium.Font, Vector2.new(p, 1e999))
+			v6 = textSize.Y
 		end
 
-		local v9
-
-		if v7 < v8.Y then
-			v9 = v7 + y + v.Gap.XSmall
-		else
-			v9 = v8.Y
-		end
-
-		return v9, v7
+		return v6, selected
 	end
 
 	local fontSize = bodyMedium.FontSize

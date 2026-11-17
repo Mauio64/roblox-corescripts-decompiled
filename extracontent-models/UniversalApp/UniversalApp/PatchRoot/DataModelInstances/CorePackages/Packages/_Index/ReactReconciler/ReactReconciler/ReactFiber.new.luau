@@ -146,7 +146,7 @@ function _shouldConstruct(callback)
 	return type(callback) ~= "function" and (callback.isReactComponent and true or false)
 end
 
-local function createFiberFromTypeAndProps(kind, key: string?, props, debugOwner, p, p2)
+local function createFiberFromTypeAndProps(kind, key: string?, props, owner, p, p2)
 	local v = IndeterminateComponent
 
 	local v2 = type(kind)
@@ -249,13 +249,13 @@ local function createFiberFromTypeAndProps(kind, key: string?, props, debugOwner
 
 					local v6
 
-					if debugOwner then
-						v6 = getComponentName(debugOwner.type)
+					if owner then
+						v6 = getComponentName(owner.type)
 					end
 
 					if v6 == nil or v6 == "" then
-						if debugOwner then
-							v5 ..= "\n" .. inspect(debugOwner)
+						if owner then
+							v5 ..= "\n" .. inspect(owner)
 						end
 					else
 						v5 ..= "\n\nCheck the render method of `" .. v6 .. "`."
@@ -284,7 +284,7 @@ local function createFiberFromTypeAndProps(kind, key: string?, props, debugOwner
 	local fiber = createFiber(v, props, key, p, kind, v3, nil, p2)
 
 	if __DEV__ then
-		fiber._debugOwner = debugOwner
+		fiber._debugOwner = owner
 	end
 
 	return fiber
@@ -591,13 +591,13 @@ end
 New.createFiberFromTypeAndProps = createFiberFromTypeAndProps
 
 function New.createFiberFromElement(data, p, p2)
-	local v
+	local owner
 
 	if __DEV__ then
-		v = data._owner
+		owner = data._owner
 	end
 
-	local fiberFromTypeAndProps = createFiberFromTypeAndProps(data.type, data.key, data.props, v, p, p2)
+	local fiberFromTypeAndProps = createFiberFromTypeAndProps(data.type, data.key, data.props, owner, p, p2)
 
 	if __DEV__ then
 		fiberFromTypeAndProps._debugSource = data._source

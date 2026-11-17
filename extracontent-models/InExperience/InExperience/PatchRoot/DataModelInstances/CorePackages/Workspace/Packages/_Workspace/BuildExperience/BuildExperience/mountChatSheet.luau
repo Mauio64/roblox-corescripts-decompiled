@@ -6,17 +6,14 @@ local parent = BuildExperience.Parent
 
 local SharedFlags = require(parent.SharedFlags)
 local FFlagBuildExperienceInGameShell = SharedFlags.FFlagBuildExperienceInGameShell
-local fFlagBuildExperienceChatResourceAttachments = SharedFlags.FFlagBuildExperienceInstanceSelection
-	and FFlagBuildExperienceInGameShell
-	and SharedFlags.FFlagBuildExperienceChatResourceAttachments
-local FFlagBuildExperienceChatImageAttachments = require(BuildExperience.Flags.FFlagBuildExperienceChatImageAttachments)
-local v
+local v = SharedFlags.FFlagBuildExperienceInstanceSelection and FFlagBuildExperienceInGameShell
+local v2
 
-if SharedFlags.FFlagBuildExperienceInGameCaptureToChat and FFlagBuildExperienceChatImageAttachments then
-	v = require(BuildExperience.utils.isImageAttachmentSupported)
+if SharedFlags.FFlagBuildExperienceInGameCaptureToChat then
+	v2 = require(BuildExperience.utils.isImageAttachmentSupported)
 end
 
-local v2 = SharedFlags.FFlagBuildExperienceInGameCaptureToChat and FFlagBuildExperienceChatImageAttachments and v()
+local v3 = SharedFlags.FFlagBuildExperienceInGameCaptureToChat and v2()
 local Display
 
 if FFlagBuildExperienceInGameShell then
@@ -52,7 +49,7 @@ end
 
 local InstanceSelectionProtocol
 
-if fFlagBuildExperienceChatResourceAttachments then
+if v then
 	InstanceSelectionProtocol = require(BuildExperience.Components.ChatSheet.InstanceSelectionProtocol)
 else
 	InstanceSelectionProtocol = nil
@@ -60,7 +57,7 @@ end
 
 local LibraryTypes
 
-if fFlagBuildExperienceChatResourceAttachments then
+if v then
 	LibraryTypes = require(BuildExperience.Components.Library.LibraryTypes)
 else
 	LibraryTypes = nil
@@ -68,7 +65,7 @@ end
 
 local clientDataModelCollector
 
-if fFlagBuildExperienceChatResourceAttachments then
+if v then
 	clientDataModelCollector = require(BuildExperience.Chat.clientDataModelCollector)
 else
 	clientDataModelCollector = nil
@@ -89,7 +86,6 @@ local teamCreateUtils = require(parent.BuildExperiencePlaytestLaunch.teamCreateU
 local trackBuildOpenSafetyService = require(BuildExperience.utils.trackBuildOpenSafetyService)
 local FFlagReportBuildUIVisibility = require(BuildExperience.Flags.FFlagReportBuildUIVisibility)
 local clientLogsCollector = require(BuildExperience.Chat.clientLogsCollector)
-local FFlagBuildExperienceChatSheetReversedContent = require(BuildExperience.Flags.FFlagBuildExperienceChatSheetReversedContent)
 local LocalizationProvider = Localization.LocalizationProvider
 
 local RobloxAppInteractionFeedbackConfig = require(parent.RobloxAppInteractionFeedbackConfig)
@@ -102,9 +98,9 @@ end
 
 local defineFastInt = game:DefineFastInt("FIntInGameBuildChatSheetSnapPoint", 50)
 
-local v3 = { defineFastInt / 100 }
+local v4 = { defineFastInt / 100 }
 
-local v4 = { defineFastInt / 100, 1 }
+local v5 = { defineFastInt / 100, 1 }
 
 local function beginInstanceSelection()
 	InstanceSelectionProtocol.beginSelection(function(data)
@@ -132,10 +128,10 @@ end
 local function ConnectedChatSheet(p)
 	local playButtonStore = GetPlayButtonStore()
 	local isOpen = playButtonStore.useIsActive()
-	local v5
+	local v6
 
-	if v2 then
-		v5 = useCaptureToChat(function()
+	if v3 then
+		v6 = useCaptureToChat(function()
 			playButtonStore.setIsActive(true)
 		end, p.takeCapture)
 	end
@@ -147,14 +143,14 @@ local function ConnectedChatSheet(p)
 		isNewGameTarget = false
 	}
 
-	local v6 = playButtonStore.useResumeTarget()
+	local v7 = playButtonStore.useResumeTarget()
 	local sessionId
 
-	if v6 then
-		sessionId = v6.sessionId
+	if v7 then
+		sessionId = v7.sessionId
 	end
 
-	if viewer and v6 == nil then
+	if viewer and v7 == nil then
 		sessionId = BuildModeLaunch:getChatSessionId(game.PlaceId)
 	end
 
@@ -167,23 +163,15 @@ local function ConnectedChatSheet(p)
 	end, { playButtonStore })
 
 	local createElement = React.createElement
-	local v7
+	local v8
 
 	if viewer then
-		v7 = require(BuildExperience.Components.Library.LibraryChatSheet)
+		v8 = require(BuildExperience.Components.Library.LibraryChatSheet)
 	else
-		v7 = ChatSheet
+		v8 = ChatSheet
 	end
 
-	local snapPoints
-
-	if viewer then
-		snapPoints = v3
-	elseif FFlagBuildExperienceChatSheetReversedContent then
-		snapPoints = v4
-	else
-		snapPoints = { defineFastInt / 100 }
-	end
+	local snapPoints = if viewer then v4 else v5
 
 	if not isOpen or viewer then
 		topBarPillMenuTarget = nil
@@ -191,29 +179,29 @@ local function ConnectedChatSheet(p)
 
 	local universeId
 
-	if v6 then
-		universeId = v6.universeId
+	if v7 then
+		universeId = v7.universeId
 	end
 
 	local placeId
 
-	if v6 then
-		placeId = v6.placeId
+	if v7 then
+		placeId = v7.placeId
 	end
 
 	local captureToAttach
 
-	if v5 ~= nil then
-		captureToAttach = v5.captureToAttach
+	if v6 ~= nil then
+		captureToAttach = v6.captureToAttach
 	end
 
 	local onCaptureAttached
 
-	if v5 ~= nil then
-		onCaptureAttached = v5.onCaptureAttached
+	if v6 ~= nil then
+		onCaptureAttached = v6.onCaptureAttached
 	end
 
-	local element = createElement(v7, {
+	local element = createElement(v8, {
 		isOpen = isOpen,
 		onClose = onClose,
 		snapPoints = snapPoints,
@@ -243,7 +231,7 @@ local function ConnectedChatSheet(p)
 	local fragment = React.Fragment
 
 	local createElement3 = React.createElement
-	local v8 = {
+	local v9 = {
 		isVisible = isVisible,
 		isLibraryMode = viewer,
 		onActivated = function()
@@ -255,22 +243,22 @@ local function ConnectedChatSheet(p)
 	}
 	local onCaptureActivated
 
-	if v5 ~= nil then
-		onCaptureActivated = v5.onCaptureActivated
+	if v6 ~= nil then
+		onCaptureActivated = v6.onCaptureActivated
 	end
 
-	v8.onCaptureActivated = onCaptureActivated
-	v8.onInsetsChanged = onInsetsChanged
+	v9.onCaptureActivated = onCaptureActivated
+	v9.onInsetsChanged = onInsetsChanged
 	local onSelectionActivated
 
-	if fFlagBuildExperienceChatResourceAttachments and not viewer then
+	if v and not viewer then
 		onSelectionActivated = beginInstanceSelection
 	end
 
-	v8.onSelectionActivated = onSelectionActivated
+	v9.onSelectionActivated = onSelectionActivated
 	return createElement2(fragment, nil, {
 		ChatSheet = element,
-		Shell = createElement3(InGameBuildShell, v8)
+		Shell = createElement3(InGameBuildShell, v9)
 	})
 end
 
@@ -298,19 +286,19 @@ local function mountChatSheet(p)
 
 	local root = ReactRoblox.createRoot(buildExperienceChatSheet)
 	local appLocalization = createAppLocalization(LocalizationService.RobloxLocaleId) -- inferred equivalent call
-	local v5 = {
+	local v6 = {
 		CompositionStyleSheet = React.createElement(BuildExperienceCompositionStyleSheet),
 		Sheet = React.createElement(lazyComponent, p)
 	}
 	local foundationProvider
 
 	if teamCreateUtils.isViewer() then
-		foundationProvider = React.createElement(LibraryThemeProvider, { displayOrder = 9 }, v5)
+		foundationProvider = React.createElement(LibraryThemeProvider, { displayOrder = 9 }, v6)
 	else
 		foundationProvider = React.createElement(Foundation.FoundationProvider, {
 			colorMode = Foundation.Enums.ColorMode.Dark,
 			overlayGui = { DisplayOrder = 9 }
-		}, v5)
+		}, v6)
 	end
 
 	local element = React.createElement(AppInteractionFeedbackProvider, nil, {

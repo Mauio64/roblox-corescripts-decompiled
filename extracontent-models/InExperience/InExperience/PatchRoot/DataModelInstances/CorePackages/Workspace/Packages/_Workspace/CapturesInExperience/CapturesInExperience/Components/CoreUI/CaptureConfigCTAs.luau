@@ -4,7 +4,6 @@ local parent2 = parent.Parent
 local GuiService = game:GetService("GuiService")
 local UserInputService = game:GetService("UserInputService")
 
-local AppCommonLib = require(parent2.AppCommonLib)
 local Localization = require(parent2.Localization)
 local React = require(parent2.React)
 local UIBlox = require(parent2.UIBlox)
@@ -12,12 +11,9 @@ local Foundation = require(parent2.Foundation)
 local Style = require(parent2.Style)
 local GetTextSize = Style.GetTextSize
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local useLocalization = Localization.Hooks.useLocalization
 local useStyle = UIBlox.Core.Style.useStyle
-
-local Text = AppCommonLib.Text
 
 local CapturesContext = require(parent.Context.CapturesContext)
 local CapturesPolicy = require(parent.App.CapturesPolicy)
@@ -71,25 +67,11 @@ end)(function(props)
 	local transparency = v.Theme.BackgroundDefault.Transparency
 
 	local color2 = v.Theme.TextDefault.Color
-	local font
-
-	if FoundationFontFaceMigration then
-		font = v.Tokens.Typography.BodySmall.Font
-	else
-		font = v.Font.CaptionBody.Font
-	end
-
+	local font = v.Tokens.Typography.BodySmall.Font
 	local textSize = v.Font.BaseSize * v.Font.CaptionBody.RelativeSize
 
 	local color3 = v.Theme.TextEmphasis.Color
-	local font2
-
-	if FoundationFontFaceMigration then
-		font2 = v.Tokens.Typography.TitleLarge.Font
-	else
-		font2 = v.Font.Header2.Font
-	end
-
+	local font2 = v.Tokens.Typography.TitleLarge.Font
 	local textSize2 = v.Font.BaseSize * v.Font.Header2.RelativeSize
 
 	local v3 = React.useCallback(function(p)
@@ -101,30 +83,13 @@ end)(function(props)
 	end, {})
 
 	local v4 = React.useMemo(function()
-		if FoundationFontFaceMigration then
-			return GetTextSize(text, textSize, font, Vector2.new(10000, 10000)).X
-		end
-
-		return (Text.GetTextWidth(text, font, textSize))
+		return GetTextSize(text, textSize, font, Vector2.new(10000, 10000)).X
 	end, { font, textSize, state2, text })
 
 	local x = state.X
 	local v5 = v4 < x - 224 - 24
-	local v6
 
-	if v5 or v4 < x - 24 then
-		v6 = 20
-	else
-		local v7
-
-		if FoundationFontFaceMigration then
-			v7 = GetTextSize(text, textSize, font, Vector2.new(x - 24, 10000)).Y
-		else
-			v7 = Text.GetTextHeight(text, font, textSize, x - 24)
-		end
-
-		v6 = v7 + 10
-	end
+	local v6 = (v5 or v4 < x - 24) and 20 or GetTextSize(text, textSize, font, Vector2.new(x - 24, 10000)).Y + 10
 
 	local createElement = React.createElement
 	local v7 = {
@@ -173,80 +138,48 @@ end)(function(props)
 			LayoutOrder = 1,
 			Size = UDim2.fromScale(1, 0)
 		}
-
-		local createElement3 = React.createElement
 		local v10 = {
-			AutomaticSize = Enum.AutomaticSize.Y,
-			BackgroundTransparency = 1,
-			Size = UDim2.fromScale(1, 0)
-		}
-		local children2 = {
-			Layout = React.createElement("UIListLayout", {
-				FillDirection = Enum.FillDirection.Vertical,
-				HorizontalAlignment = Enum.HorizontalAlignment.Center,
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				VerticalAlignment = Enum.VerticalAlignment.Top
-			}),
-			Title = 0,
-			EducationalLabel = 0
-		}
-
-		local createElement4 = React.createElement
-		local font3
-
-		if not FoundationFontFaceMigration then
-			font3 = font2
-		end
-
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(font2)
-		end
-
-		children2.Title = createElement4("TextLabel", {
-			BackgroundTransparency = 1,
-			Font = font3,
-			FontFace = fontFace,
-			LayoutOrder = 1,
-			Size = UDim2.new(1, 0, 0, 30),
-			Text = v2.capturesTitle,
-			TextColor3 = color3,
-			TextSize = textSize2,
-			TextXAlignment = Enum.TextXAlignment.Left
-		})
-
-		local createElement5 = React.createElement
-		local font4
-
-		if not FoundationFontFaceMigration then
-			font4 = font
-		end
-
-		local fontFace2
-
-		if FoundationFontFaceMigration then
-			fontFace2 = normalizeFontFace(font)
-		end
-
-		children2.EducationalLabel = createElement5("TextLabel", {
-			BackgroundTransparency = 1,
-			Font = font4,
-			FontFace = fontFace2,
-			LayoutOrder = 2,
-			Size = UDim2.new(1, 0, 0, v6),
-			Text = text,
-			TextColor3 = color2,
-			TextSize = textSize,
-			TextWrapped = true,
-			TextXAlignment = Enum.TextXAlignment.Left
-		})
-		local children = {
-			TextFrame = createElement3("Frame", v10, children2),
+			TextFrame = React.createElement(
+				"Frame",
+				{
+					AutomaticSize = Enum.AutomaticSize.Y,
+					BackgroundTransparency = 1,
+					Size = UDim2.fromScale(1, 0)
+				},
+				{
+					Layout = React.createElement("UIListLayout", {
+						FillDirection = Enum.FillDirection.Vertical,
+						HorizontalAlignment = Enum.HorizontalAlignment.Center,
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						VerticalAlignment = Enum.VerticalAlignment.Top
+					}),
+					Title = React.createElement("TextLabel", {
+						BackgroundTransparency = 1,
+						FontFace = normalizeFontFace(font2),
+						LayoutOrder = 1,
+						Size = UDim2.new(1, 0, 0, 30),
+						Text = v2.capturesTitle,
+						TextColor3 = color3,
+						TextSize = textSize2,
+						TextXAlignment = Enum.TextXAlignment.Left
+					}),
+					EducationalLabel = React.createElement("TextLabel", {
+						BackgroundTransparency = 1,
+						FontFace = normalizeFontFace(font),
+						LayoutOrder = 2,
+						Size = UDim2.new(1, 0, 0, v6),
+						Text = text,
+						TextColor3 = color2,
+						TextSize = textSize,
+						TextWrapped = true,
+						TextXAlignment = Enum.TextXAlignment.Left
+					})
+				}
+			),
 			CapturesToggleFrame = 0
 		}
 
-		local createElement6 = React.createElement
+		local createElement3 = React.createElement
 		local anchorPoint
 
 		if v5 then
@@ -263,7 +196,7 @@ end)(function(props)
 			position = UDim2.new(1, 0, 0, -10)
 		end
 
-		children.CapturesToggleFrame = createElement6(
+		v10.CapturesToggleFrame = createElement3(
 			"Frame",
 			{
 				AnchorPoint = anchorPoint,
@@ -275,7 +208,7 @@ end)(function(props)
 				OnOffButton = React.createElement(OnOffButton, { height = 44, width = 224 })
 			}
 		)
-		capturesToggleCTA = createElement2("Frame", v9, children)
+		capturesToggleCTA = createElement2("Frame", v9, v10)
 	end
 
 	v8.CapturesToggleCTA = capturesToggleCTA

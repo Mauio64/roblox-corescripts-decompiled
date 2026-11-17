@@ -5,7 +5,6 @@ local Cryo = require(parent.Cryo)
 local Responsive = require(parent.Responsive)
 local Foundation = require(parent.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local Core = UIBlox.Core
 local App = UIBlox.App
@@ -119,87 +118,41 @@ local function InlinePrompt(props)
 			VerticalAlignment = Enum.VerticalAlignment.Center
 		}),
 		UIPadding = React.createElement("UIPadding", { PaddingRight = UDim.new(0, 12) }),
-		Title = 0,
+		Title = React.createElement("TextLabel", {
+			LayoutOrder = 1,
+			Text = props.titleMessage,
+			BackgroundTransparency = 1,
+			TextColor3 = v.Color.Content.Emphasis.Color3,
+			TextTransparency = v.Color.Content.Emphasis.Transparency,
+			TextSize = v.Typography.CaptionLarge.FontSize,
+			FontFace = normalizeFontFace(v.Typography.CaptionLarge.Font),
+			TextXAlignment = Enum.TextXAlignment.Left,
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			TextWrapped = true,
+			TextScaled = false,
+			LineHeight = v.LineHeight.LineHeight_140
+		}),
 		Subline = 0
 	}
-
-	local createElement5 = React.createElement
-	local v11 = {
-		LayoutOrder = 1,
-		Text = props.titleMessage,
-		BackgroundTransparency = 1,
-		TextColor3 = v.Color.Content.Emphasis.Color3,
-		TextTransparency = v.Color.Content.Emphasis.Transparency,
-		TextSize = v.Typography.CaptionLarge.FontSize,
-		Font = 0,
-		FontFace = 0,
-		TextXAlignment = 0,
-		Size = 0,
-		AutomaticSize = 0,
-		TextWrapped = true,
-		TextScaled = false,
-		LineHeight = 0
-	}
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = v.Typography.CaptionLarge.Font
-	end
-
-	v11.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(v.Typography.CaptionLarge.Font)
-	end
-
-	v11.FontFace = fontFace
-
-	v11.TextXAlignment = Enum.TextXAlignment.Left
-	v11.Size = UDim2.new(1, 0, 0, 0)
-	v11.AutomaticSize = Enum.AutomaticSize.Y
-
-	v11.LineHeight = v.LineHeight.LineHeight_140
-	v10.Title = createElement5("TextLabel", v11)
 	local subline
 
 	if props.sublineMessage then
-		local createElement6 = React.createElement
-		local v12 = {
+		subline = React.createElement("TextLabel", {
 			LayoutOrder = 2,
 			Text = props.sublineMessage,
 			BackgroundTransparency = 1,
 			TextColor3 = v.Color.Content.Default.Color3,
 			TextTransparency = v.Color.Content.Default.Transparency,
 			TextSize = v.Typography.BodySmall.FontSize,
-			Font = 0,
-			FontFace = 0,
-			TextXAlignment = 0,
-			Size = 0,
-			AutomaticSize = 0,
+			FontFace = normalizeFontFace(v.Typography.BodySmall.Font),
+			TextXAlignment = Enum.TextXAlignment.Left,
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
 			TextWrapped = true,
 			TextScaled = false,
 			LineHeight = 1
-		}
-		local font2
-
-		if not FoundationFontFaceMigration then
-			font2 = v.Typography.BodySmall.Font
-		end
-
-		v12.Font = font2
-		local fontFace2
-
-		if FoundationFontFaceMigration then
-			fontFace2 = normalizeFontFace(v.Typography.BodySmall.Font)
-		end
-
-		v12.FontFace = fontFace2
-
-		v12.TextXAlignment = Enum.TextXAlignment.Left
-		v12.Size = UDim2.new(1, 0, 0, 0)
-		v12.AutomaticSize = Enum.AutomaticSize.Y
-		subline = createElement6("TextLabel", v12)
+		})
 	end
 
 	v10.Subline = subline
@@ -238,8 +191,8 @@ local function InlinePrompt(props)
 	children.DismissButtonFrame = dismissButtonFrame
 	local element = createElement("Frame", v5, children)
 
-	local createElement6 = React.createElement
-	local v12 = {
+	local createElement5 = React.createElement
+	local v11 = {
 		BackgroundTransparency = props.backgroundTransparency or v.Color.Surface.Surface_300.Transparency,
 		BackgroundColor3 = props.backgroundColor3 or v.Color.Surface.Surface_300.Color3,
 		AutomaticSize = Enum.AutomaticSize.Y,
@@ -247,15 +200,15 @@ local function InlinePrompt(props)
 		ref = ref
 	}
 
-	local v13 = {
+	local v12 = {
 		UICorner = React.createElement("UICorner", { CornerRadius = UDim.new(0, 8) }),
 		ContainerRef = 0
 	}
 
-	local createElement7 = React.createElement
+	local createElement6 = React.createElement
 	local provider = Responsive.ContainerRef.Provider
 
-	local v14 = {
+	local v13 = {
 		UIPadding = React.createElement("UIPadding", {
 			PaddingLeft = UDim.new(0, 8),
 			PaddingRight = UDim.new(0, 12),
@@ -288,9 +241,9 @@ local function InlinePrompt(props)
 		)
 	end
 
-	v14.Button = button2
-	v13.ContainerRef = createElement7(provider, { value = ref }, v14)
-	return createElement6("Frame", v12, v13)
+	v13.Button = button2
+	v12.ContainerRef = createElement6(provider, { value = ref }, v13)
+	return createElement5("Frame", v11, v12)
 end
 
 return InlinePrompt

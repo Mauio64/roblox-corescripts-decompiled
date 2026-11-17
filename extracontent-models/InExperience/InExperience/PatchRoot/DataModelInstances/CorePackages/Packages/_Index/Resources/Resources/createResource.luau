@@ -15,8 +15,7 @@ local function disposeChildren(list)
 	local v = {}
 
 	for i = #list, 1, -1 do
-		local item = list[i]
-		local success, result = pcall(item)
+		local success, result = pcall(list[i])
 
 		if not success then
 			table.insert(v, result)

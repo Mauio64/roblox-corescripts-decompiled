@@ -17,7 +17,13 @@ local GetConversationSearchDataHydration = require(AppChat.Stores.GetConversatio
 local searchIntroducedConversationIds = require(AppChat.Stores.searchIntroducedConversationIds)
 local NetworkingBlocking = require(AppChat.Http.NetworkingBlocking)
 local NetworkingChat = require(AppChat.Http.NetworkingChat)
-local getPreciseUnixTimestamp = require(AppChat.Utils.getPreciseUnixTimestamp)
+local getMessageSentUnixSeconds = require(AppChat.Utils.getMessageSentUnixSeconds)
+local getUnixTimestampMillis = require(AppChat.Utils.getUnixTimestampMillis)
+local getUnixTimestampSeconds = require(AppChat.Utils.getUnixTimestampSeconds)
+require(AppChat.AppChatData.Types)
+local findNewestPreviewableMessage = require(AppChat.AppChatData.Conversations.findNewestPreviewableMessage)
+local hasPreviewableMessageNewerThan = require(AppChat.AppChatData.Conversations.hasPreviewableMessageNewerThan)
+local shouldMarkUnread = require(AppChat.AppChatData.Unread.shouldMarkUnread)
 
 local ChangedParticipants = require(AppChat.Conversations.Actions.ChangedParticipants)
 local ConversationModerationTypeChanged = require(AppChat.Conversations.Actions.ConversationModerationTypeChanged)
@@ -100,54 +106,7 @@ local function updateConversation(p, p2: string?, p3) -- 8 equivalent calls infe
 	p.upsertConversation(Cryo.Dictionary.join(conversation, p3), false)
 end
 
-local function getUnixTimestamp(value) -- 5 equivalent calls inferred from this helper
-	if value == nil then
-		return nil
-	end
-
-	if typeof(value) == "DateTime" then
-		return value.UnixTimestamp
-	end
-
-	if type(value) == "table" and value.GetUnixTimestamp ~= nil then
-		return value:GetUnixTimestamp()
-	end
-
-	return nil
-end
-
-local function getDateTimeFromIsoDate(value) -- 2 equivalent calls inferred from this helper
-	if type(value) ~= "string" then
-		return nil
-	end
-
-	local success, result = pcall(function()
-		return DateTime.fromIsoDate(value)
-	end)
-	return if success then result else nil
-end
-
-local function getMessageSentTime(data)
-	if data.sent == nil then
-		return getDateTimeFromIsoDate(data.created_at or data.createdAt) -- inferred equivalent call
-	end
-
-	if type(data.sent) ~= "string" then
-		return data.sent
-	end
-
-	return getDateTimeFromIsoDate(data.sent) -- inferred equivalent call
-end
-
-local function isMessagePreviewable(item) -- 2 equivalent calls inferred from this helper
-	if item.isPreviewable ~= nil then
-		return item.isPreviewable
-	end
-
-	return item.is_previewable ~= nil and item.is_previewable
-end
-
-local function getNewestMessageUnixTime(p: string?)
+local function getNewestMessageUnixSeconds(p: string?)
 	if p == nil then
 		return 0
 	end
@@ -156,152 +115,32 @@ local function getNewestMessageUnixTime(p: string?)
 
 	local v2 = conversationMessageViewModelStore.conversationMessageListStore.getOrderedIds(p, false)[1]
 
-	local result = v2 and conversationMessageViewModelStore.conversationMessageStore.getMessage(v2, false)
-
-	if result then
-		if result.sent == nil then
-			local created_at = result.created_at or result.createdAt
-
-			if type(created_at) == "string" then
-				local success
-				success, result = pcall(function()
-					return DateTime.fromIsoDate(created_at)
-				end)
-
-				if not success then
-					result = nil
-				end
-			else
-				result = nil
-			end
-		elseif type(result.sent) == "string" then
-			local sent = result.sent
-
-			if type(sent) == "string" then
-				local success
-				success, result = pcall(function()
-					return DateTime.fromIsoDate(sent)
-				end)
-
-				if not success then
-					result = nil
-				end
-			else
-				result = nil
-			end
-		else
-			result = result.sent
-		end
-	end
-
-	return getUnixTimestamp(result) or 0 -- inferred equivalent call
+	local v3 = v2 and conversationMessageViewModelStore.conversationMessageStore.getMessage(v2, false)
+	return v3 and getMessageSentUnixSeconds(v3) or 0
 end
 
-local function shouldMarkConversationUnreadFromMessages(conversation_id: string?, messages): boolean
+local function shouldMarkConversationUnreadFromMessages(conversation_id: string?, messages)
 	if messages == nil then
 		return false
 	end
 
-	local newestMessageUnixTime = getNewestMessageUnixTime(conversation_id)
-	local userId = tostring(Players.LocalPlayer.UserId)
-
-	for _, item in messages do
-		local result
-
-		if item.sent == nil then
-			local created_at = item.created_at or item.createdAt
-
-			if type(created_at) == "string" then
-				local success
-				success, result = pcall(function()
-					return DateTime.fromIsoDate(created_at)
-				end)
-
-				if not success then
-					result = nil
-				end
-			end
-		elseif type(item.sent) == "string" then
-			local sent = item.sent
-
-			if type(sent) == "string" then
-				local success
-				success, result = pcall(function()
-					return DateTime.fromIsoDate(sent)
-				end)
-
-				if not success then
-					result = nil
-				end
-			end
-		else
-			result = item.sent
-		end
-
-		local unixTimestamp = getUnixTimestamp(result) -- inferred equivalent call
-		local sender_user_id = item.sender_user_id or item.senderTargetId
-
-		if
-			unixTimestamp ~= nil
-			and newestMessageUnixTime < unixTimestamp
-			and sender_user_id ~= nil
-			and tostring(sender_user_id) ~= userId
-			and item.is_badgeable == true
-		then
-			return true
-		end
-	end
-
-	return false
+	return shouldMarkUnread(
+		messages,
+		getNewestMessageUnixSeconds(conversation_id),
+		(tostring(Players.LocalPlayer.UserId))
+	)
 end
 
-local function getPreviewMessageUnixTime(conversation) -- 1 equivalent call inferred from this helper
+local function getPreviewMessageUnixSeconds(conversation) -- 1 equivalent call inferred from this helper
 	if conversation.previewMessageId == nil then
 		return 0
 	end
 
-	local result = GetConversationMessageViewModelStore(false).conversationMessageStore.getMessage(
+	local message = GetConversationMessageViewModelStore(false).conversationMessageStore.getMessage(
 		conversation.previewMessageId,
 		false
 	)
-
-	if result then
-		if result.sent == nil then
-			local created_at = result.created_at or result.createdAt
-
-			if type(created_at) == "string" then
-				local success
-				success, result = pcall(function()
-					return DateTime.fromIsoDate(created_at)
-				end)
-
-				if not success then
-					result = nil
-				end
-			else
-				result = nil
-			end
-		elseif type(result.sent) == "string" then
-			local sent = result.sent
-
-			if type(sent) == "string" then
-				local success
-				success, result = pcall(function()
-					return DateTime.fromIsoDate(sent)
-				end)
-
-				if not success then
-					result = nil
-				end
-			else
-				result = nil
-			end
-		else
-			result = result.sent
-		end
-	end
-
-	return getUnixTimestamp(result) or 0 -- inferred equivalent call
+	return message and getMessageSentUnixSeconds(message) or 0
 end
 
 local function updateConversationLastUpdatedFromMessages(p, p2: string?, messages, flag: boolean?)
@@ -315,68 +154,18 @@ local function updateConversationLastUpdatedFromMessages(p, p2: string?, message
 		return
 	end
 
-	local lastUpdated = nil
-	local id = nil
-	local previewMessageUnixTime = getPreviewMessageUnixTime(conversation) -- inferred equivalent call
-	local v2 = getUnixTimestamp(conversation.lastUpdated) or 0 -- inferred equivalent call
+	local newestPreviewableMessage = findNewestPreviewableMessage(messages, getPreviewMessageUnixSeconds(conversation)) -- inferred equivalent call
+	local v2 = getUnixTimestampSeconds(conversation.lastUpdated) or 0
 
-	for _, item in messages do
-		if not (item ~= nil and isMessagePreviewable(item)) then -- inferred equivalent call
-			continue
-		end
-
-		local result
-
-		if item.sent == nil then
-			local created_at = item.created_at or item.createdAt
-
-			if type(created_at) == "string" then
-				local success
-				success, result = pcall(function()
-					return DateTime.fromIsoDate(created_at)
-				end)
-
-				if not success then
-					result = nil
-				end
-			end
-		elseif type(item.sent) == "string" then
-			local sent = item.sent
-
-			if type(sent) == "string" then
-				local success
-				success, result = pcall(function()
-					return DateTime.fromIsoDate(sent)
-				end)
-
-				if not success then
-					result = nil
-				end
-			end
-		else
-			result = item.sent
-		end
-
-		local unixTimestamp = getUnixTimestamp(result) -- inferred equivalent call
-
-		if not (unixTimestamp ~= nil and previewMessageUnixTime < unixTimestamp) then
-			continue
-		end
-
-		id = item.id
-		lastUpdated = result
-		previewMessageUnixTime = unixTimestamp
-	end
-
-	if lastUpdated == nil then
+	if newestPreviewableMessage == nil then
 		if flag then
 			updateConversation(p, p2, { hasUnreadMessages = true }) -- inferred equivalent call
 		end
 	else
-		local v3 = { previewMessageId = id }
+		local v3 = { previewMessageId = newestPreviewableMessage.messageId }
 
-		if v2 < previewMessageUnixTime then
-			v3.lastUpdated = lastUpdated
+		if v2 < newestPreviewableMessage.sentUnixSeconds then
+			v3.lastUpdated = newestPreviewableMessage.sentDateTime
 
 			if FFlagAppChatAnyServerSideConversationSearch then
 				searchIntroducedConversationIds.remove(p2)
@@ -389,52 +178,6 @@ local function updateConversationLastUpdatedFromMessages(p, p2: string?, message
 
 		updateConversation(p, p2, v3) -- inferred equivalent call
 	end
-end
-
-local function hasPreviewableMessageNewerThan(items, p: number): boolean
-	for _, item in items do
-		if not (item ~= nil and isMessagePreviewable(item)) then -- inferred equivalent call
-			continue
-		end
-
-		local result
-
-		if item.sent == nil then
-			local created_at = item.created_at or item.createdAt
-
-			if type(created_at) == "string" then
-				local success
-				success, result = pcall(function()
-					return DateTime.fromIsoDate(created_at)
-				end)
-
-				if not success then
-					result = nil
-				end
-			end
-		elseif type(item.sent) == "string" then
-			local sent = item.sent
-
-			if type(sent) == "string" then
-				local success
-				success, result = pcall(function()
-					return DateTime.fromIsoDate(sent)
-				end)
-
-				if not success then
-					result = nil
-				end
-			end
-		else
-			result = item.sent
-		end
-
-		if p < (getPreciseUnixTimestamp(result) or 0) then
-			return true
-		end
-	end
-
-	return false
 end
 
 local function updateConversationFromMessages(p, p2: string?, messages, flag: boolean?)
@@ -453,7 +196,7 @@ local function updateConversationFromMessages(p, p2: string?, messages, flag: bo
 	if
 		FFlagAppChatAnyServerSideConversationSearch
 		and searchIntroducedConversationIds.has(p2)
-		and hasPreviewableMessageNewerThan(messages, getPreciseUnixTimestamp(conversation.lastUpdated) or 0)
+		and hasPreviewableMessageNewerThan(messages, getUnixTimestampMillis(conversation.lastUpdated) or 0)
 	then
 		searchIntroducedConversationIds.remove(p2)
 		v2 = true

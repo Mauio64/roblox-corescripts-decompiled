@@ -31,9 +31,13 @@ local useCreationEntry = require(Moments.Hooks.useCreationEntry)
 local useUploadHost = require(Moments.Hooks.useUploadHost)
 local logCreateIntent = require(Moments.Analytics.logCreateIntent)
 local logMomentsLayerExposure = MomentsCommon.Utils.logMomentsLayerExposure
+local FFlagMomentsCreateAvatarPosts = SharedFlags.FFlagMomentsCreateAvatarPosts
 local FFlagMomentsFlushDwellBeforeNavigation = require(Moments.Flags.FFlagMomentsFlushDwellBeforeNavigation)
 local NavigationDestinationType = require(Moments.Enums.NavigationDestinationType)
+local MomentsFeedType = require(Moments.Enums.MomentsFeedType)
 local FFlagMomentsNavigationEvent = require(Moments.Flags.FFlagMomentsNavigationEvent)
+
+local FFlagMomentsPersonalizedRecommendationsEntryPoint = require(Moments.Flags.FFlagMomentsPersonalizedRecommendationsEntryPoint)
 local defineFastFlag = game:DefineFastFlag("MomentsImmersiveNavigationMenu", false)
 local FFlagMomentsRenderAvatarPostsInFeed = SharedFlags.FFlagMomentsRenderAvatarPostsInFeed
 
@@ -58,6 +62,7 @@ local FunnelEventNames = Analytics.FunnelEventNames
 local fireAnalyticsEvent = Analytics.fireAnalyticsEvent
 local feedPlaybackSuspension = MomentsCommon.Media.feedPlaybackSuspension
 local reportModalCovering = MomentsCommon.Media.reportModalCovering
+local accountSettingsCovering = require(Moments.Components.Feed.accountSettingsCovering)
 local useDeviceInsets = MomentsCommon.Hooks.useDeviceInsets
 local useMomentsGating = MomentsCommon.Hooks.useMomentsGating
 
@@ -180,7 +185,8 @@ local function MomentsImmersivePresentation(props)
 		if feedKind == ImmersiveFeedKind.Trending and FFlagEnableArgus then
 			return createRecommendationTelemetry({
 				getMomentsSessionId = current.getMomentsSessionId,
-				signalTracker = current2
+				signalTracker = current2,
+				feedType = MomentsFeedType.Trending
 			})
 		end
 
@@ -238,90 +244,121 @@ local function MomentsImmersivePresentation(props)
 	local v8 = useSignalState(GetMomentsPreferencesStore(false).getIsTeleporting)
 
 	local v9 = useSignalState(reportModalCovering.getCovering)
+	local v10
 
-	local v10 = React.useCallback(function(p)
+	if FFlagMomentsPersonalizedRecommendationsEntryPoint then
+		v10 = useSignalState(accountSettingsCovering.getCovering)
+	else
+		v10 = false
+	end
+
+	local v11 = React.useCallback(function(p)
 		local current3 = ref.current
 
 		if current3 ~= nil then
 			current3.flushView(p)
 		end
 	end, {})
-	local v11 = React.useCallback(function(p)
+	local v12
+
+	if FFlagMomentsCreateAvatarPosts then
+		v12 = React.useCallback(function()
+			logCreateIntent(FunnelEventNames.CreationIntentSource.TopBar)
+
+			if FFlagMomentsNavigationEvent then
+				v11(NavigationDestinationType.Create)
+			end
+
+			if props.openAvatarMomentsCreation ~= nil then
+				props.openAvatarMomentsCreation()
+			end
+		end, { v11, props.openAvatarMomentsCreation })
+	else
+		v12 = nil
+	end
+
+	if not FFlagMomentsCreateAvatarPosts or props.openAvatarMomentsCreation == nil then
+		v12 = nil
+	end
+
+	local v13 = React.useCallback(function(p)
 		local current3 = ref.current
 
 		if current3 ~= nil then
 			current3.refresh(p)
 		end
 	end, {})
-	local v12
+	local v14
 
 	if FFlagMomentsFlushDwellBeforeNavigation then
-		v12 = useNavigation()
+		v14 = useNavigation()
 	else
-		v12 = nil
+		v14 = nil
 	end
 
 	React.useEffect(function()
-		if not FFlagMomentsFlushDwellBeforeNavigation or v12 == nil or v12.addListener == nil then
+		if not FFlagMomentsFlushDwellBeforeNavigation or v14 == nil or v14.addListener == nil then
 			return nil
 		end
 
-		local v13 = v12.addListener(RoactNavigation.Events.WillBlur, function()
-			v10()
+		local v15 = v14.addListener(RoactNavigation.Events.WillBlur, function()
+			v11()
 		end)
 		return function()
-			v13.remove()
+			v15.remove()
 		end
-	end, { v12, v10 })
+	end, { v14, v11 })
 
 	local onBack = props.onBack
 	local onBack2 = React.useCallback(function()
 		if FFlagMomentsFlushDwellBeforeNavigation then
-			local v13
+			local v15
 
 			if FFlagMomentsNavigationEvent then
-				v13 = NavigationDestinationType.Exit
+				v15 = NavigationDestinationType.Exit
 			end
 
-			v10(v13)
+			v11(v15)
 		end
 
 		onBack()
-	end, { onBack, v10 })
-	local v13 = React.useCallback(function()
+	end, { onBack, v11 })
+	local v15 = React.useCallback(function()
 		fireAnalyticsEvent(EventNames.FeedHomeButtonPressed)
-		local v13
+		local v15
 
 		if FFlagMomentsNavigationEvent then
-			v13 = NavigationDestinationType.Trending
+			v15 = NavigationDestinationType.Trending
 		end
 
-		v11(v13)
-	end, { v11 })
+		v13(v15)
+	end, { v13 })
 	local openOwnMoments = props.openOwnMoments
-	local v14 = React.useCallback(function()
+	local v16 = React.useCallback(function()
 		fireAnalyticsEvent(EventNames.MyCreationButtonPressed)
 
 		if openOwnMoments ~= nil then
 			if FFlagMomentsFlushDwellBeforeNavigation then
-				local v14
+				local v16
 
 				if FFlagMomentsNavigationEvent then
-					v14 = NavigationDestinationType.MyMoments
+					v16 = NavigationDestinationType.MyMoments
 				end
 
-				v10(v14)
+				v11(v16)
 			end
 
 			openOwnMoments()
 		end
-	end, { openOwnMoments, v10 })
-	local v15 = defineFastFlag and feedKind == ImmersiveFeedKind.Trending
-	local header = React.useMemo(function()
+	end, { openOwnMoments, v11 })
+	local v17 = defineFastFlag and feedKind == ImmersiveFeedKind.Trending
+	local useMemo = React.useMemo
+	local function fn()
 		local createElement = React.createElement
-		local v16 = {
+		local v18 = {
 			onBack = onBack2,
 			onCreatePressed = nil,
+			onCreateAvatarMomentPressed = nil,
 			onNavigateToTrending = nil,
 			onNavigateToMyMoments = nil
 		}
@@ -331,23 +368,38 @@ local function MomentsImmersivePresentation(props)
 			onCreatePressed2 = v2
 		end
 
-		v16.onCreatePressed = onCreatePressed2
+		v18.onCreatePressed = onCreatePressed2
+		local onCreateAvatarMomentPressed
+
+		if FFlagMomentsCreateAvatarPosts then
+			onCreateAvatarMomentPressed = v12
+		end
+
+		v18.onCreateAvatarMomentPressed = onCreateAvatarMomentPressed
 		local onNavigateToTrending
 
-		if v15 then
-			onNavigateToTrending = v13
+		if v17 then
+			onNavigateToTrending = v15
 		end
 
-		v16.onNavigateToTrending = onNavigateToTrending
+		v18.onNavigateToTrending = onNavigateToTrending
 		local onNavigateToMyMoments
 
-		if v15 then
-			onNavigateToMyMoments = v14
+		if v17 then
+			onNavigateToMyMoments = v16
 		end
 
-		v16.onNavigateToMyMoments = onNavigateToMyMoments
-		return createElement(MomentsBackHeader, v16)
-	end, { onBack2, v3, v2, v15, v13, v14 })
+		v18.onNavigateToMyMoments = onNavigateToMyMoments
+		return createElement(MomentsBackHeader, v18)
+	end
+
+	local v18
+
+	if FFlagMomentsCreateAvatarPosts then
+		v18 = v12
+	end
+
+	local header = useMemo(fn, { onBack2, v3, v2, v18, v17, v15, v16 })
 	local inactiveDestination
 
 	if FFlagMomentsNavigationEvent then
@@ -362,8 +414,8 @@ local function MomentsImmersivePresentation(props)
 		source = source,
 		telemetry = telemetry,
 		inactiveDestination = inactiveDestination,
-		active = v6 and not (v9 or v4),
-		playbackActive = v6 and not (v7 or v8) and not (v9 or v4),
+		active = v6 and not v9 and not (v4 or v10),
+		playbackActive = v6 and not v7 and not (v8 or v9) and not (v4 or v10),
 		initialIndex = initialIndex,
 		header = header,
 		controllerRef = ref
@@ -406,7 +458,7 @@ local function MomentsImmersivePresentation(props)
 	end
 
 	local createElement = React.createElement
-	local v16 = {
+	local v19 = {
 		sessionStore = current,
 		openProfile = props.openProfile,
 		openOwnMoments = props.openOwnMoments,
@@ -421,10 +473,10 @@ local function MomentsImmersivePresentation(props)
 		openAvatarLookTryOn = props.openAvatarLookTryOn
 	end
 
-	v16.openAvatarLookTryOn = openAvatarLookTryOn
-	v16.openMomentCommentReport = props.openMomentCommentReport
-	v16.openBlockUser = props.openBlockUser
-	return createElement(MomentsHostShell, v16, feed)
+	v19.openAvatarLookTryOn = openAvatarLookTryOn
+	v19.openMomentCommentReport = props.openMomentCommentReport
+	v19.openBlockUser = props.openBlockUser
+	return createElement(MomentsHostShell, v19, feed)
 end
 
 return React.memo(MomentsImmersivePresentation)

@@ -5,6 +5,7 @@ local Foundation = require(parent.Foundation)
 local React = require(parent.React)
 
 local FFlagMomentsCommentRowRedesign = require(Moments.Flags.FFlagMomentsCommentRowRedesign)
+local FFlagMomentsCommentRowTrailingReaction = require(Moments.Flags.FFlagMomentsCommentRowTrailingReaction)
 local getLineHeights = require(script.Parent.getLineHeights)
 
 local Skeleton = Foundation.Skeleton
@@ -71,7 +72,8 @@ local function CommentRowSkeletonView(props)
 			radius = Radius.Circle,
 			testId = `{props.testId}--avatar`
 		}),
-		TextColumn = 0
+		TextColumn = 0,
+		Trailing = 0
 	}
 
 	local createElement2 = React.createElement
@@ -150,48 +152,54 @@ local function CommentRowSkeletonView(props)
 	local footer
 
 	if FFlagMomentsCommentRowRedesign then
-		footer = React.createElement(
-			View,
-			{
-				LayoutOrder = 2,
-				Size = UDim2.new(1, 0, 0, v.Size.Size_600),
-				tag = "row align-y-center gap-small",
-				testId = `{props.testId}--footer`
-			},
-			{
-				Timestamp = React.createElement(View, {
-					LayoutOrder = 1,
-					tag = "row align-y-center fill auto-y"
-				}, {
-					Bar = React.createElement(Skeleton, {
-						Size = UDim2.fromOffset(props.timestampWidth, size_300),
-						radius = Radius.Medium,
-						testId = `{props.testId}--timestamp`
-					})
-				}),
-				Reaction = React.createElement(
-					View,
-					{
+		local createElement5 = React.createElement
+		local v10 = {
+			LayoutOrder = 2,
+			Size = UDim2.new(1, 0, 0, v.Size.Size_600),
+			tag = "row align-y-center gap-small",
+			testId = `{props.testId}--footer`
+		}
+		local v11 = {
+			Timestamp = React.createElement(View, {
+				LayoutOrder = 1,
+				tag = "row align-y-center fill auto-y"
+			}, {
+				Bar = React.createElement(Skeleton, {
+					Size = UDim2.fromOffset(props.timestampWidth, size_300),
+					radius = Radius.Medium,
+					testId = `{props.testId}--timestamp`
+				})
+			}),
+			Reaction = 0
+		}
+		local reaction2
+
+		if not FFlagMomentsCommentRowTrailingReaction then
+			reaction2 = React.createElement(
+				View,
+				{
+					LayoutOrder = 2,
+					tag = "row align-y-center gap-xsmall auto-xy padding-right-small",
+					testId = `{props.testId}--reaction`
+				},
+				{
+					Icon = React.createElement(Skeleton, {
+						LayoutOrder = 1,
+						Size = UDim2.fromOffset(v.Size.Size_400, v.Size.Size_400),
+						radius = Radius.Circle
+					}),
+					Count = React.createElement(Skeleton, {
 						LayoutOrder = 2,
-						tag = "row align-y-center gap-xsmall auto-xy padding-right-small",
-						testId = `{props.testId}--reaction`
-					},
-					{
-						Icon = React.createElement(Skeleton, {
-							LayoutOrder = 1,
-							Size = UDim2.fromOffset(v.Size.Size_400, v.Size.Size_400),
-							radius = Radius.Circle
-						}),
-						Count = React.createElement(Skeleton, {
-							LayoutOrder = 2,
-							Size = UDim2.fromOffset(v.Size.Size_400, size_300),
-							radius = Radius.Medium,
-							testId = `{props.testId}--reaction-count`
-						})
-					}
-				)
-			}
-		)
+						Size = UDim2.fromOffset(v.Size.Size_400, size_300),
+						radius = Radius.Medium,
+						testId = `{props.testId}--reaction-count`
+					})
+				}
+			)
+		end
+
+		v11.Reaction = reaction2
+		footer = createElement5(View, v10, v11)
 	end
 
 	v8.Footer = footer
@@ -203,6 +211,37 @@ local function CommentRowSkeletonView(props)
 			["gap-small"] = not FFlagMomentsCommentRowRedesign
 		}
 	}, v8)
+	local trailing
+
+	if FFlagMomentsCommentRowTrailingReaction then
+		trailing = React.createElement(
+			View,
+			{ LayoutOrder = 3, tag = "col align-x-right align-y-center self-stretch auto-x" },
+			{
+				Reaction = React.createElement(View, {
+					tag = "row align-y-center gap-xsmall auto-xy",
+					padding = {
+						right = UDim.new(0, (v.Size.Size_600 - v.Size.Size_400) / 2)
+					},
+					testId = `{props.testId}--reaction`
+				}, {
+					Icon = React.createElement(Skeleton, {
+						LayoutOrder = 1,
+						Size = UDim2.fromOffset(v.Size.Size_400, v.Size.Size_400),
+						radius = Radius.Circle
+					}),
+					Count = React.createElement(Skeleton, {
+						LayoutOrder = 2,
+						Size = UDim2.fromOffset(v.Size.Size_400, size_300),
+						radius = Radius.Medium,
+						testId = `{props.testId}--reaction-count`
+					})
+				})
+			}
+		)
+	end
+
+	v6.Trailing = trailing
 	return createElement(View, v5, v6)
 end
 

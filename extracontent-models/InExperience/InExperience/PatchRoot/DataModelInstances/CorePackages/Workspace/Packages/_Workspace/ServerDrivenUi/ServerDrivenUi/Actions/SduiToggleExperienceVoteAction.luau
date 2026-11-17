@@ -79,8 +79,9 @@ local function SduiToggleExperienceVoteAction(p, _, data, _)
 		voteDirection = nil
 	end
 
+	local userId = Players.LocalPlayer and Players.LocalPlayer.UserId
 	local v = {
-		uid = tostring(Players.LocalPlayer and Players.LocalPlayer.UserId),
+		uid = tostring(userId),
 		placeId = tostring(placeId),
 		vote = convertBooleanToVoteForAnalytics(voteDirection), -- inferred equivalent call
 		prevVote = convertBooleanToVoteForAnalytics(userVote), -- inferred equivalent call

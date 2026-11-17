@@ -19,6 +19,8 @@ local GameConfigurationLabels = require(BuildExperience.utils.GameConfigurationL
 local refreshPublishEligibility = require(BuildExperience.utils.refreshPublishEligibility)
 local useGamePermissions = require(BuildExperience.useGamePermissions)
 local FFlagBuildCheckGamePermissions = require(BuildExperience.Flags.FFlagBuildCheckGamePermissions)
+local FFlagBuildExperienceConfigurationRowTelemetry = require(BuildExperience.Flags.FFlagBuildExperienceConfigurationRowTelemetry)
+local sendConfigurationRowClick = require(BuildExperience.Telemetry.sendConfigurationRowClick)
 
 local FFlagMyStatsMediaSelector = SharedFlags.FFlagMyStatsMediaSelector
 
@@ -81,12 +83,23 @@ local function usePublishConfigurationContentViewModel(data)
 			refreshPublishEligibility(data.universeId)
 		end)
 	end, { creatorHub, v2, data.universeId })
+	local onRowActivated
+
+	if FFlagBuildExperienceConfigurationRowTelemetry then
+		onRowActivated = React.useCallback(function(p: string)
+			sendConfigurationRowClick(
+				"publish",
+				{ universeId = data.universeId, placeId = data.placeId, sessionId = data.sessionId },
+				p
+			)
+		end, { data.universeId, data.placeId, data.sessionId })
+	end
 
 	if FFlagMyStatsMediaSelector then
 		onOpenIconAndThumbnails = data.onOpenMediaSelectionPage
 	end
 
-	return {
+	local v8 = {
 		buildMaturityBannerText = buildMaturityBannerText,
 		contentMaturityText = contentMaturityText,
 		onOpenIconAndThumbnails = onOpenIconAndThumbnails,
@@ -94,11 +107,24 @@ local function usePublishConfigurationContentViewModel(data)
 		onOpenContentMaturity = onOpenContentMaturity,
 		onOpenVersionTitleDescriptionPage = data.onOpenVersionTitleDescriptionPage,
 		onOpenVersionHistory = data.onOpenVersionHistory,
-		isEditDisabled = FFlagBuildCheckGamePermissions and not v3.canEdit,
-		isIconAndThumbnailsDisabled = FFlagBuildCheckGamePermissions and not (FFlagMyStatsMediaSelector or v3.canViewOnCreatorHub),
-		layoutOrder = data.layoutOrder,
-		testId = data.testId
+		onRowActivated = 0,
+		isEditDisabled = 0,
+		isIconAndThumbnailsDisabled = 0,
+		layoutOrder = 0,
+		testId = 0
 	}
+
+	if not FFlagBuildExperienceConfigurationRowTelemetry then
+		onRowActivated = nil
+	end
+
+	v8.onRowActivated = onRowActivated
+	v8.isEditDisabled = FFlagBuildCheckGamePermissions and not v3.canEdit
+	v8.isIconAndThumbnailsDisabled = FFlagBuildCheckGamePermissions
+		and not (FFlagMyStatsMediaSelector or v3.canViewOnCreatorHub)
+	v8.layoutOrder = data.layoutOrder
+	v8.testId = data.testId
+	return v8
 end
 
 return usePublishConfigurationContentViewModel

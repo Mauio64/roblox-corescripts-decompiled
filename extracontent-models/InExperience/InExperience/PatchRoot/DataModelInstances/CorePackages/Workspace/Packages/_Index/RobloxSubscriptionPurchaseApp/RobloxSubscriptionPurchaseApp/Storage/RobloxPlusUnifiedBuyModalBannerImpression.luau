@@ -28,10 +28,8 @@ function RobloxPlusUnifiedBuyModalBannerImpression.incrementImpressionCount()
 	end
 
 	pcall(function()
-		AppStorageService:SetItem(
-			"RobloxPlusUpsellBannerUnifiedBuyModalImpressionCount",
-			(tostring(RobloxPlusUnifiedBuyModalBannerImpression.getImpressionCount() + 1))
-		)
+		local v = RobloxPlusUnifiedBuyModalBannerImpression.getImpressionCount() + 1
+		AppStorageService:SetItem("RobloxPlusUpsellBannerUnifiedBuyModalImpressionCount", (tostring(v)))
 		AppStorageService:Flush()
 	end)
 end

@@ -1,0 +1,3 @@
+local FFlagSocialCarouselInGamePlayIcon = require(script.Parent.FFlagSocialCarouselInGamePlayIcon)
+
+return game:DefineFastFlag("SocialCarouselInGameTileInstantJoin", false) and FFlagSocialCarouselInGamePlayIcon

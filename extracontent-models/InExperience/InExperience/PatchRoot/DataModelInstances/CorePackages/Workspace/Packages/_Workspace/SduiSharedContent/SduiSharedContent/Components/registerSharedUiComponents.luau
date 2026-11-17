@@ -20,6 +20,7 @@ local getLuaTableEnumParser = SduiParsers.getLuaTableEnumParser
 local SharedFlags = require(parent.SharedFlags)
 local FFlagSduiCardComponent = SharedFlags.FFlagSduiCardComponent
 local FFlagSduiContentRowStateLayer = require(SduiSharedContent.Flags.FFlagSduiContentRowStateLayer)
+local FFlagSduiCollectionSlotsLayout = require(SduiSharedContent.Flags.FFlagSduiCollectionSlotsLayout)
 local FFlagSDUIContentRowSelectable = require(SduiSharedContent.Flags.FFlagSDUIContentRowSelectable)
 local SharedFlags2 = require(parent.SharedFlags)
 local FFlagSduiListComponents = SharedFlags2.FFlagSduiListComponents
@@ -67,6 +68,8 @@ local SharedFlags22 = require(parent.SharedFlags)
 local FFlagEnableGameJoinEarlyAccess = SharedFlags22.FFlagEnableGameJoinEarlyAccess
 local SharedFlags23 = require(parent.SharedFlags)
 local FFlagSduiReactionsComponent = SharedFlags23.FFlagSduiReactionsComponent
+local SharedFlags24 = require(parent.SharedFlags)
+local FFlagSduiMuralSection = SharedFlags24.FFlagSduiMuralSection
 
 local function registerSharedUiComponents()
 	local v = {
@@ -165,6 +168,11 @@ local function registerSharedUiComponents()
 		[SduiComponentType.LineLimitedText] = FFlagSduiPreferredTextSizeLineBudgets and {
 			getLazyComponent = function()
 				return require(SduiSharedContent.Components.SduiLineLimitedText)
+			end
+		} or nil,
+		[SduiComponentType.CollectionSlotsLayout] = FFlagSduiCollectionSlotsLayout and {
+			getLazyComponent = function()
+				return require(SduiSharedContent.Components.SduiCollectionSlotsLayout)
 			end
 		} or nil,
 		[SduiComponentType.ContentRatingLabel] = {
@@ -348,6 +356,12 @@ local function registerSharedUiComponents()
 	v[SduiComponentType.Reactions] = FFlagSduiReactionsComponent and {
 		getLazyComponent = function()
 			return require(SduiSharedContent.Components.SduiReactions)
+		end
+	} or nil
+
+	v[SduiComponentType.MuralSection] = FFlagSduiMuralSection and {
+		getLazyComponent = function()
+			return require(SduiSharedContent.Components.SduiMuralSection)
 		end
 	} or nil
 

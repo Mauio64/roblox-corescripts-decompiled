@@ -1,9 +1,11 @@
 local AvatarExperienceCatalog = script:FindFirstAncestor("AvatarExperienceCatalog")
 local parent = AvatarExperienceCatalog.Parent
 local AvatarExperienceCommon = require(parent.AvatarExperienceCommon)
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
 local normalize = AvatarExperienceCommon.Utils.normalize
 local normalizeBoolean = normalize.normalizeBoolean
 local normalizeString = normalize.normalizeString
+local normalizeNotEmptyString = normalize.normalizeNotEmptyString
 local normalizeNumber = normalize.normalizeNumber
 local normalizeStringToBoolean = normalize.normalizeStringToBoolean
 local makeNormalizeTableFn = normalize.makeNormalizeTableFn
@@ -11,6 +13,8 @@ local makeNormalizeListFn = normalize.makeNormalizeListFn
 local makeNormalizeUnionFn = normalize.makeNormalizeUnionFn
 local makeNormalizeValueFn = normalize.makeNormalizeValueFn
 local makeRequired = normalize.makeRequired
+
+local FFlagAXHeroUnitActionButton = AvatarExperienceFlags.FFlagAXHeroUnitActionButton
 
 require(AvatarExperienceCatalog.Models.WidgetListInfo)
 
@@ -130,6 +134,14 @@ local normalizeTableFn10 = makeNormalizeTableFn({
 	previewRows = normalizeResponsiveValueFn,
 	previewColumns = normalizeResponsiveValueFn
 })
+local button
+
+if FFlagAXHeroUnitActionButton then
+	button = makeNormalizeTableFn({
+		action = makeRequired(makeNormalizeValueFn({ "OpenRobloxPlus", "OpenFreeRobloxPlus" })),
+		localizedText = { fn = normalizeNotEmptyString }
+	})
+end
 
 local normalizeTableFn11 = makeNormalizeTableFn({
 	type = makeRequired(makeNormalizeValueFn({ "HeroUnit" })),
@@ -144,7 +156,8 @@ local normalizeTableFn11 = makeNormalizeTableFn({
 	itemFooters = normalizeListFn,
 	previewRows = normalizeResponsiveValueFn,
 	previewColumns = normalizeResponsiveValueFn,
-	availableUntil = normalizeString
+	availableUntil = normalizeString,
+	button = button
 })
 
 local normalizeTableFn12 = makeNormalizeTableFn({

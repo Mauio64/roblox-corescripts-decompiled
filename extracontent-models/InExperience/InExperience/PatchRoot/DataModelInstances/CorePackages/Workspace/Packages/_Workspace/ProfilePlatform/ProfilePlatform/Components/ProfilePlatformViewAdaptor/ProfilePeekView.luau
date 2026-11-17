@@ -8,6 +8,7 @@ local PeekViewState = PeekView.PeekViewState
 local RoactUtils = require(parent.RoactUtils)
 local Foundation = require(parent.Foundation)
 local View = Foundation.View
+local BackgroundStyleContext = Foundation.BackgroundStyleContext
 local UIBlox = require(parent.UIBlox)
 local useStyle = UIBlox.Core.Style.useStyle
 local Enums = require(ProfilePlatform.Common.Enums)
@@ -15,9 +16,19 @@ local SharedFlags = require(parent.SharedFlags)
 local FFlagProfilePlatformNewProfileHeader = SharedFlags.FFlagProfilePlatformNewProfileHeader
 local SharedFlags2 = require(parent.SharedFlags)
 local FFlagProfilePlatformPeekDraggerContrast = SharedFlags2.FFlagProfilePlatformPeekDraggerContrast
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagSduiMarkdownTextComponentEnabled = SharedFlags3.FFlagSduiMarkdownTextComponentEnabled
 
 local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 local v = FFlagProfilePlatformNewProfileHeader and 0 or 25
+
+local function SheetBackground(p)
+	local theme = useStyle().Theme
+	local v2 = React.useMemo(function()
+		return { Color3 = theme.BackgroundContrast.Color, Transparency = 0 }
+	end, { theme })
+	return React.createElement(BackgroundStyleContext.Provider, { value = v2 }, p.children)
+end
 
 local function ProfilePeekView(props)
 	local statusBarHeight = props.statusBarHeight or useSelector(function(p)
@@ -127,18 +138,28 @@ local function ProfilePeekView(props)
 		and nil
 
 	v6.draggerImageStyle = contrast
+	local v8 = {
+		UIListLayout = React.createElement("UIListLayout", {
+			Padding = UDim.new(0, 0),
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			VerticalAlignment = Enum.VerticalAlignment.Top
+		}),
+		Content = 0
+	}
+	local content
+
+	if FFlagSduiMarkdownTextComponentEnabled then
+		content = React.createElement(SheetBackground, nil, { Content = props.contentSlot })
+	else
+		content = props.contentSlot
+	end
+
+	v8.Content = content
 	local v7 = {
 		StatusBarSpace = statusBarSpace,
 		ProfileContent = createElement2(View, { Size = udim, Position = udim2 }, {
-			PeekView = createElement3(peekView, v6, {
-				UIListLayout = React.createElement("UIListLayout", {
-					Padding = UDim.new(0, 0),
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					HorizontalAlignment = Enum.HorizontalAlignment.Left,
-					VerticalAlignment = Enum.VerticalAlignment.Top
-				}),
-				Content = props.contentSlot
-			})
+			PeekView = createElement3(peekView, v6, v8)
 		}),
 		PeekViewTopBar = 0,
 		TransparentTopBarOverlay = 0

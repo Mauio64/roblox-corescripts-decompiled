@@ -10,6 +10,7 @@ local SharedFlags = require(parent.SharedFlags)
 local defineFastFlag = game:DefineFastFlag("LuaAppFixImpressionsHookDependencies", false)
 
 local FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions = SharedFlags.FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions
+local FFlagLuaAppSduiGameDwell = SharedFlags.FFlagLuaAppSduiGameDwell
 
 return function(props)
 	local ref = React.useRef({})
@@ -129,13 +130,22 @@ return function(props)
 	local createElement = React.createElement
 	local v4 = {
 		parentRef = props.parentRef,
-		viewPortBounds = viewPortBounds,
+		visibilityObserver = 0,
+		viewPortBounds = 0,
 		viewPortFillBounds = 0,
 		onRequestImpressionsSignal = 0,
 		filterImpressionFunc = 0,
 		onImpressionsDetected = 0,
 		impressionsTag = 0
 	}
+	local visibilityObserver
+
+	if FFlagLuaAppSduiGameDwell then
+		visibilityObserver = props.visibilityObserver
+	end
+
+	v4.visibilityObserver = visibilityObserver
+	v4.viewPortBounds = viewPortBounds
 	local viewPortFillBounds
 
 	if FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions then

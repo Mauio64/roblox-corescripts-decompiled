@@ -5,7 +5,6 @@ local Foundation = require(parent.Foundation)
 local React = require(parent.React)
 local SignalsReact = require(parent.SignalsReact)
 local FFlagBuildExperienceModelPicker = require(BuildExperience.Flags.FFlagBuildExperienceModelPicker)
-local FFlagBuildExperienceConfirmStop = require(BuildExperience.Flags.FFlagBuildExperienceConfirmStop)
 
 local FFlagBuildExperienceGateSendDuringResponse = require(BuildExperience.Flags.FFlagBuildExperienceGateSendDuringResponse)
 local StopAssistantResponseDialog = require(script.Parent.StopAssistantResponseDialog)
@@ -57,32 +56,24 @@ local function ChatActionsRow(props)
 
 	local v6 = not v4
 		and (FFlagBuildExperienceGateSendDuringResponse and not v5 or v2 and props.hasAttachments ~= true and true or props.isSendDisabled == true)
-	local state, v7, onCancel, onConfirm
 
-	if FFlagBuildExperienceConfirmStop then
-		local setState
-		state, setState = React.useState(false)
-		v7 = setState
-		onCancel = React.useCallback(function()
-			setState(false)
-		end, {})
-		onConfirm = React.useCallback(function()
-			setState(false)
-			props.onStop()
-		end, { props.onStop })
+	local state, setState = React.useState(false)
+	local onCancel = React.useCallback(function()
+		setState(false)
+	end, {})
+	local onConfirm = React.useCallback(function()
+		setState(false)
+		props.onStop()
+	end, { props.onStop })
 
-		React.useEffect(function()
-			if not v4 then
-				setState(false)
-			end
-		end, { v4 })
-	else
-		v7 = nil
-		state = false
-	end
+	React.useEffect(function()
+		if not v4 then
+			setState(false)
+		end
+	end, { v4 })
 
 	local createElement = React.createElement
-	local v8 = {
+	local v7 = {
 		LayoutOrder = props.LayoutOrder,
 		icon = 0,
 		size = 0,
@@ -99,8 +90,8 @@ local function ChatActionsRow(props)
 		icon = IconName.ArrowWideShortUp
 	end
 
-	v8.icon = icon
-	v8.size = InputSize.Small
+	v7.icon = icon
+	v7.size = InputSize.Small
 	local variant
 
 	if v4 then
@@ -111,24 +102,18 @@ local function ChatActionsRow(props)
 		variant = ButtonVariant.Emphasis
 	end
 
-	v8.variant = variant
+	v7.variant = variant
 
-	v8.isDisabled = v6 or v4 and props.isStopDisabled == true
-	function v8.onActivated()
-		if not v4 then
-			props.onSend()
-		elseif FFlagBuildExperienceConfirmStop then
-			v7(true)
+	v7.isDisabled = v6 or v4 and props.isStopDisabled == true
+	function v7.onActivated()
+		if v4 then
+			setState(true)
 		else
-			props.onStop()
+			props.onSend()
 		end
 	end
 
-	local element = createElement(IconButton, v8)
-
-	if not FFlagBuildExperienceConfirmStop then
-		return element
-	end
+	local element = createElement(IconButton, v7)
 
 	local createElement2 = React.createElement
 	local fragment = React.Fragment

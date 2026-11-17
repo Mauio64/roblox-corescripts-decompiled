@@ -55,11 +55,9 @@ local function PlayEmote(_, p, p2, _, _)
 		object:dispatch(HideMenu())
 
 		local humanoid = v2.Character:FindFirstChildOfClass("Humanoid")
-		local function fn()
+		local success, result, _ = pcall(function()
 			return humanoid:PlayEmoteAndGetAnimTrackById(p2)
-		end
-
-		local success, result, _ = pcall(fn)
+		end)
 
 		if success and result then
 			v:onEmotePlayed(p, p2)

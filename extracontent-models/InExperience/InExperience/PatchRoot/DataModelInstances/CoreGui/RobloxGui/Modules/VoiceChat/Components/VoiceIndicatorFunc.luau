@@ -42,17 +42,18 @@ local function mapLevelToIcon(iconStyle, showConnectingShimmer) -- 1 equivalent 
 			end
 
 			return default:GetIcon("Connecting", iconStyle)
-		end
+		else
+			if item == Constants.VOICE_STATE.INACTIVE then
+				return default:GetIcon("Unmuted0", iconStyle)
+			end
 
-		if item == Constants.VOICE_STATE.INACTIVE then
-			return default:GetIcon("Unmuted0", iconStyle)
-		end
+			if item ~= Constants.VOICE_STATE.TALKING then
+				return default:GetIcon("Error", iconStyle)
+			end
 
-		if item == Constants.VOICE_STATE.TALKING then
-			return default:GetIcon("Unmuted" .. tostring(math.floor(0.5 + 5 * item2) * 20), iconStyle)
+			local v = math.floor(0.5 + 5 * item2) * 20
+			return default:GetIcon("Unmuted" .. tostring(v), iconStyle)
 		end
-
-		return default:GetIcon("Error", iconStyle)
 	end
 end
 

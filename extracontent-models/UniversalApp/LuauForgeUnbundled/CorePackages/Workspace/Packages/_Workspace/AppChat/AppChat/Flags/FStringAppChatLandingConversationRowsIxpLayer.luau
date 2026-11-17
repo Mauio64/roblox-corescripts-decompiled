@@ -1,1 +1,0 @@
-return game:DefineFastString("AppChatLandingConversationRowsIxpLayer", "Party.LandingPage.ConversationRows")

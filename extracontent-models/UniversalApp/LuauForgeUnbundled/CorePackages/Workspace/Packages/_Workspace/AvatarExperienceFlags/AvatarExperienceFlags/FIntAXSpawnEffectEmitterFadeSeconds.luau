@@ -1,1 +1,0 @@
-return game:DefineFastInt("AXSpawnEffectEmitterFadeSeconds", 5)

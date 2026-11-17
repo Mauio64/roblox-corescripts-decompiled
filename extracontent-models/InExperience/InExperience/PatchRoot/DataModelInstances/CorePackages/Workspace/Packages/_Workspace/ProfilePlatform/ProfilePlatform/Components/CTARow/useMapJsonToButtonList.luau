@@ -146,10 +146,9 @@ local function useMapJsonToButtonList(p: string)
 		local function fn()
 			if FFlagProfilePlatformPresenceStoreMigration then
 				v.RefreshPresenceByUserId(p)
-				return
+			else
+				v2(NetworkingPresence.GetPresencesFromUserIds.API({ p }))
 			end
-
-			v2(NetworkingPresence.GetPresencesFromUserIds.API({ p }))
 		end
 
 		useEffectOnce(

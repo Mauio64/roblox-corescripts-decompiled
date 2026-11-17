@@ -29,6 +29,9 @@ local function TopBarChip(props)
 		LayoutOrder = props.LayoutOrder,
 		ref = props.chipRef,
 		testId = props.testId,
+		sizeConstraint = props.maxWidth ~= nil and {
+			MaxSize = Vector2.new(props.maxWidth, 1e999)
+		} or nil,
 		cursor = {
 			radius = UDim.new(0, v.Radius.Circle),
 			offset = thicker * 2,

@@ -1,1 +1,0 @@
-return { Component = require("@game/CorePackages/Workspace/Packages/_Index/ContactImporter/ContactImporter/ContactsList/Components/ContactsSyncWarningMessage/ContactsSyncWarningMessage"), useIsVisible = require("@game/CorePackages/Workspace/Packages/_Index/ContactImporter/ContactImporter/ContactsList/Components/ContactsSyncWarningMessage/useIsVisibleContactsSyncWarningMessage") }

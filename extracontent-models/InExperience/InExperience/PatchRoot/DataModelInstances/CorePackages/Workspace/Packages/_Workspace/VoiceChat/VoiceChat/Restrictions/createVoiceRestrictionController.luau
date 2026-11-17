@@ -1,12 +1,19 @@
-local parent = script:FindFirstAncestor("VoiceChat").Parent
+local VoiceChat = script:FindFirstAncestor("VoiceChat")
+local parent = VoiceChat.Parent
 
 local Promise = require(parent.Promise)
 local Signals = require(parent.Signals)
 
-local v = { UNACKNOWLEDGED = 8, ACKNOWLEDGED = 9 }
+local FIntVoiceRestrictionExpiryGraceSeconds = require(VoiceChat.Flags.FIntVoiceRestrictionExpiryGraceSeconds)
+
+local v = { UNACKNOWLEDGED_UNEXPIRED = 8, ACKNOWLEDGED_UNEXPIRED = 9, UNACKNOWLEDGED_EXPIRED = 10 }
 
 local function isUFRBanReason(p: number?): boolean
-	return p == 8 or p == 9
+	return p == 8 or p == 9 or p == 10
+end
+
+local function isUnacknowledgedBanReason(p: number?): boolean
+	return p == 8 or p == 10
 end
 
 local function isJoinLikeTrigger(p: string): boolean -- 1 equivalent call inferred from this helper
@@ -16,46 +23,71 @@ end
 local function createVoiceRestrictionController(data)
 	local signal, v2 = Signals.createSignal("normal")
 
+	local getNow = data.getNow
+
 	local flag = false
 	local v3 = nil
 	local thread = nil
 
 	local flag2 = false
+
+	local flag3 = false
 	local check
 
-	local function cancelExpiry() -- 4 equivalent calls inferred from this helper
+	local function hasEnded(p): boolean -- 2 equivalent calls inferred from this helper
+		local bannedUntil = p.bannedUntil
+		return bannedUntil ~= nil and bannedUntil.Seconds <= getNow()
+	end
+
+	local function cancelExpiry() -- 5 equivalent calls inferred from this helper
+		flag3 = false
+
 		if thread then
 			task.cancel(thread)
 			thread = nil
 		end
 	end
 
-	local function endRestriction() -- 2 equivalent calls inferred from this helper
+	local function endRestriction() -- 3 equivalent calls inferred from this helper
 		cancelExpiry() -- inferred equivalent call
 		flag2 = false
 		v2("hiddenUntilRejoin")
 	end
 
-	local function scheduleExpiry(p: number?)
+	local function scheduleExpiryCheck(p: number) -- 2 equivalent calls inferred from this helper
 		cancelExpiry() -- inferred equivalent call
-		local v4 = not p and 0 or p - DateTime.now().UnixTimestamp
+		local v4 = math.max(p - getNow(), 0)
+		thread = task.delay(v4, function()
+			thread = nil
+			flag3 = false
+			check("expiry")
+		end)
+	end
 
-		if v4 > 0 then
-			thread = task.delay(v4, function()
-				thread = nil
-				check("expiry")
-			end)
+	local function scheduleExpiryAfterEnd(p: number?) -- 2 equivalent calls inferred from this helper
+		if p then
+			scheduleExpiryCheck(p + FIntVoiceRestrictionExpiryGraceSeconds) -- inferred equivalent call
+		else
+			cancelExpiry() -- inferred equivalent call
 		end
 	end
 
 	local function createAcknowledgementHandler(p) -- 1 equivalent call inferred from this helper
 		return function()
+			if signal(false) ~= "restricted" or flag2 then
+				return
+			end
+
 			local bannedUntil = p.bannedUntil
 
-			if not bannedUntil or bannedUntil.Seconds <= DateTime.now().UnixTimestamp then
+			if not bannedUntil or bannedUntil.Seconds <= getNow() then
 				check("acknowledgement")
 			end
 		end
+	end
+
+	local function showUFRRestriction(p, p2: string) -- 5 equivalent calls inferred from this helper
+		data.showUFRRestriction(p, p2, createAcknowledgementHandler(p)) -- inferred equivalent call
 	end
 
 	local function failCheck(p: string, p2: string) -- 2 equivalent calls inferred from this helper
@@ -68,17 +100,19 @@ local function createVoiceRestrictionController(data)
 		endRestriction() -- inferred equivalent call
 	end
 
-	local function showDialogIfUnseen(p, data2, isCurrent)
+	local function showDialogIfUnseen(p, p2, isCurrent)
 		local v4 = p.trigger
-		local banReason = data2.banReason
-		local v5 = banReason == v.UNACKNOWLEDGED or banReason == v.ACKNOWLEDGED
+		local banReason = p2.banReason
+		local v5 = banReason == v.UNACKNOWLEDGED_UNEXPIRED
+			or banReason == v.ACKNOWLEDGED_UNEXPIRED
+			or banReason == v.UNACKNOWLEDGED_EXPIRED
 		local v6
 
 		if v5 and v4 == "removedFromVoice" then
 			v6 = true
 		elseif isJoinLikeTrigger(v4) then -- inferred equivalent call
 			if v5 then
-				v6 = data2.banReason == 9
+				v6 = p2.banReason == 9
 			else
 				v6 = data.getInformedOfBan()
 
@@ -104,43 +138,75 @@ local function createVoiceRestrictionController(data)
 		end
 
 		if v5 then
-			data.showUFRRestriction(data2, v4, v4 == "gameJoin" and createAcknowledgementHandler(data2) or nil) -- inferred equivalent call
+			showUFRRestriction(p2, v4) -- inferred equivalent call
 		else
-			data.showLegacyRestriction(data2, v4, isCurrent)
+			data.showLegacyRestriction(p2, v4, isCurrent)
 		end
 	end
 
-	local function runCheck(p, data2)
+	local function handleEndedRestriction(p, p2)
+		local trigger = p.trigger
+		local banReason = p2.banReason
+		local v4 = banReason == v.UNACKNOWLEDGED_UNEXPIRED
+			or banReason == v.ACKNOWLEDGED_UNEXPIRED
+			or banReason == v.UNACKNOWLEDGED_EXPIRED
+
+		if trigger == "removedFromVoice" then
+			scheduleExpiryCheck(getNow() + FIntVoiceRestrictionExpiryGraceSeconds) -- inferred equivalent call
+			flag3 = true
+		end
+
+		if flag3 then
+			if v4 and (trigger == "micTap" or p.micTapped) then
+				showUFRRestriction(p2, "micTap") -- inferred equivalent call
+			end
+		else
+			endRestriction() -- inferred equivalent call
+			local banReason2 = p2.banReason
+
+			if
+				(banReason2 == v.UNACKNOWLEDGED_UNEXPIRED or banReason2 == v.UNACKNOWLEDGED_EXPIRED)
+				and trigger ~= "acknowledgement"
+			then
+				showUFRRestriction(p2, trigger) -- inferred equivalent call
+			end
+		end
+	end
+
+	local function runCheck(p, p2)
 		local function isCurrent(): boolean -- 1 equivalent call inferred from this helper
 			return v3 == p
 		end
 
 		local trigger = p.trigger
-
-		if not data2 or data2.banReason == nil then
-			data2 = data.getSettings()
-		end
+		local v4 = p2 or data.getSettings()
 
 		if not isCurrent() then -- inferred equivalent call
 			return
 		end
 
-		if data2 then
-			if data2.isBanned then
+		if v4 then
+			if v4.isBanned and not hasEnded(v4) then -- inferred equivalent call
+				flag2 = false
 				v2("restricted")
-				local v4
+				local v5
 
-				if data2.bannedUntil then
-					v4 = data2.bannedUntil.Seconds
+				if v4.bannedUntil then
+					v5 = v4.bannedUntil.Seconds
 				end
 
-				scheduleExpiry(v4)
-				showDialogIfUnseen(p, data2, isCurrent)
+				scheduleExpiryAfterEnd(v5) -- inferred equivalent call
+				showDialogIfUnseen(p, v4, isCurrent)
 			elseif flag2 then
 				if trigger == "micTap" or p.micTapped then
-					data.showUFRRestriction(data2, "micTap", nil)
+					showUFRRestriction(v4, "micTap") -- inferred equivalent call
 				end
 			else
+				if v4.isBanned or v4.banReason == 10 then
+					handleEndedRestriction(p, v4)
+					return
+				end
+
 				if trigger == "gameJoin" or trigger == "removedFromVoice" then
 					data.onError("PlayerModeratedBadState")
 					return
@@ -176,7 +242,19 @@ local function createVoiceRestrictionController(data)
 		local v5 = { trigger = trigger, micTapped = false }
 		v3 = v5
 
-		if trigger ~= "micTap" then
+		if not p or p.banReason == nil then
+			p = nil
+		end
+
+		local v6
+
+		if trigger == "gameJoin" and p ~= nil then
+			v6 = p.isBanned and hasEnded(p) -- inferred equivalent call
+		else
+			v6 = false
+		end
+
+		if trigger ~= "micTap" and not v6 then
 			v2("restricted")
 		end
 
@@ -204,7 +282,19 @@ local function createVoiceRestrictionController(data)
 		v3 = nil
 		flag2 = true
 		v2("restricted")
-		scheduleExpiry(p)
+		scheduleExpiryAfterEnd(p) -- inferred equivalent call
+	end
+
+	local function showPendingAcknowledgement(p)
+		if flag or p.isBanned or p.banReason ~= 10 then
+			return
+		end
+
+		if signal(false) ~= "normal" or v3 or flag2 then
+			return
+		end
+
+		showUFRRestriction(p, "gameJoin") -- inferred equivalent call
 	end
 
 	local function dispose()
@@ -223,6 +313,7 @@ local function createVoiceRestrictionController(data)
 		getPresentationState = signal,
 		check = check,
 		applyUFRTimeout = applyUFRTimeout,
+		showPendingAcknowledgement = showPendingAcknowledgement,
 		dispose = dispose
 	}
 end

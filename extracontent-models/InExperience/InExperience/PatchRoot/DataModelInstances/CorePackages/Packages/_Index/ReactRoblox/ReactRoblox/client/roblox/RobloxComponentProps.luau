@@ -36,10 +36,10 @@ local function setRobloxInstanceProperty(instance, p, p2)
 
 		if success then
 			return
-		else
-			local v
-			v, p2 = getDefaultInstanceProperty(instance.ClassName, p)
 		end
+
+		local v
+		v, p2 = getDefaultInstanceProperty(instance.ClassName, p)
 	end
 
 	instance[p] = p2
@@ -180,10 +180,10 @@ local function applyProp(instance, p, item, p2)
 
 			if success then
 				return
-			else
-				local v4
-				v4, item = getDefaultInstanceProperty(instance.ClassName, p)
 			end
+
+			local v4
+			v4, item = getDefaultInstanceProperty(instance.ClassName, p)
 		end
 
 		instance[p] = item

@@ -26,20 +26,19 @@ local VPCApiProvider = {}
 
 function VPCApiProvider.sendRequestToNewParent(callback, email: string, list, requestDetails, analyticsSessionId: string?)
 	local v4 = v()
-	local v5 = {
-		email = email,
-		requestType = list == nil and VPCRequestTypeEnum.LinkToChild or list[1],
-		requestDetails = requestDetails,
-		analyticsSessionId = 0
-	}
+	local linkToChild = list == nil and VPCRequestTypeEnum.LinkToChild or list[1]
 
 	if analyticsSessionId == "" then
 		analyticsSessionId = nil
 	end
 
-	v5.analyticsSessionId = analyticsSessionId
 	return callback(v4, "POST", {
-		postBody = HttpService:JSONEncode(v5),
+		postBody = HttpService:JSONEncode({
+			email = email,
+			requestType = linkToChild,
+			requestDetails = requestDetails,
+			analyticsSessionId = analyticsSessionId
+		}),
 		headers = { ["Content-Type"] = "application/json", Accept = "application/json" }
 	}):andThen(function(p)
 		return { sessionId = p.responseBody.sessionId, lockedUntil = p.responseBody.lockedUntil }
@@ -54,15 +53,18 @@ end
 
 function VPCApiProvider.sendRequestToAllParents(callback, list, requestDetails, analyticsSessionId: string?)
 	local v4 = v2()
-	local v5 = { requestType = list[1], requestDetails = requestDetails, analyticsSessionId = 0 }
+	local item = list[1]
 
 	if analyticsSessionId == "" then
 		analyticsSessionId = nil
 	end
 
-	v5.analyticsSessionId = analyticsSessionId
 	return callback(v4, "POST", {
-		postBody = HttpService:JSONEncode(v5),
+		postBody = HttpService:JSONEncode({
+			requestType = item,
+			requestDetails = requestDetails,
+			analyticsSessionId = analyticsSessionId
+		}),
 		headers = { ["Content-Type"] = "application/json", Accept = "application/json" }
 	}):andThen(function(p)
 		return { sessionId = p.responseBody.sessionId, lockedUntil = p.responseBody.lockedUntil }

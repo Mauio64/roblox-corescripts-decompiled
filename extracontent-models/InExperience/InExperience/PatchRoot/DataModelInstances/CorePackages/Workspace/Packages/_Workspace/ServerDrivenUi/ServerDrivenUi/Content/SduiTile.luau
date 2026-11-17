@@ -7,7 +7,6 @@ local GetInputModeStore = Responsive.GetInputModeStore
 local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local UIBlox = require(parent.UIBlox)
 local Cryo = require(parent.Cryo)
 local LoadableImage = UIBlox.App.Loading.LoadableImage
@@ -539,46 +538,20 @@ local function SduiTile(props)
 	if props.titleComponent then
 		_1_Title = props.titleComponent
 	elseif props.titleText and props.titleText ~= "" then
-		local createElement5 = React.createElement
-		local v23 = {
+		_1_Title = React.createElement("TextLabel", {
 			Size = UDim2.new(1, 0, 0, v4),
 			BackgroundTransparency = 1,
 			Text = props.titleText,
-			Font = 0,
-			FontFace = 0,
-			TextSize = 0,
-			TextTransparency = 0,
-			TextColor3 = 0,
-			TextWrapped = 0,
-			TextTruncate = 0,
-			TextXAlignment = 0,
-			TextYAlignment = 0,
-			AutomaticSize = 0
-		}
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = titleFont.Font
-		end
-
-		v23.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(titleFont.Font)
-		end
-
-		v23.FontFace = fontFace
-
-		v23.TextSize = titleFont.FontSize
-		v23.TextTransparency = emphasis.Transparency
-		v23.TextColor3 = emphasis.Color3
-		v23.TextWrapped = titleLines > 1
-		v23.TextTruncate = Enum.TextTruncate.SplitWord
-		v23.TextXAlignment = props.titleTextXAlignment or Enum.TextXAlignment.Left
-		v23.TextYAlignment = Enum.TextYAlignment.Top
-		v23.AutomaticSize = v5 and Enum.AutomaticSize.X or nil
-		_1_Title = createElement5("TextLabel", v23)
+			FontFace = normalizeFontFace(titleFont.Font),
+			TextSize = titleFont.FontSize,
+			TextTransparency = emphasis.Transparency,
+			TextColor3 = emphasis.Color3,
+			TextWrapped = titleLines > 1,
+			TextTruncate = Enum.TextTruncate.SplitWord,
+			TextXAlignment = props.titleTextXAlignment or Enum.TextXAlignment.Left,
+			TextYAlignment = Enum.TextYAlignment.Top,
+			AutomaticSize = v5 and Enum.AutomaticSize.X or nil
+		})
 	end
 
 	v22["1_Title"] = _1_Title

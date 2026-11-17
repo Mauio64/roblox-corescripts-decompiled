@@ -6,7 +6,6 @@ local UIBlox = require(parent.UIBlox)
 local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local CollectionViews = require(parent.CollectionViews)
 local checkAndFormatPossibleLink = CollectionViews.checkAndFormatPossibleLink
@@ -128,42 +127,29 @@ local function SduiTextIconRow(props)
 
 	local createElement2 = React.createElement
 
-	local v8 = {}
-	v8.BackgroundTransparency = 1
-	v8.Text = v5 or ""
-	v8.AutomaticSize = Enum.AutomaticSize.X
-	v8.Size = size or UDim2.new(0, 0, 0, v3)
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = fontStyle.Font
-	end
-
-	v8.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(fontStyle.Font)
-	end
-
-	v8.FontFace = fontFace
-	v8.TextSize = fontStyle.FontSize
-	v8.TextTransparency = 0
-	v8.TextColor3 = textColor
-	v8.TextWrapped = false
-	v8.TextTruncate = Enum.TextTruncate.SplitWord
-	v8.TextXAlignment = Enum.TextXAlignment.Left
-	v8.LayoutOrder = (props.iconFirst and -1 or 1) * 1
-	v8.RichText = v4 and true or nil
-	v8[React.Tag] = "data-testid=--sdui-text-icon-row-text"
-	local v9 = applyOverrides(v8, props.textOverrides)
+	local v8 = applyOverrides({
+		BackgroundTransparency = 1,
+		Text = v5 or "",
+		AutomaticSize = Enum.AutomaticSize.X,
+		Size = size or UDim2.new(0, 0, 0, v3),
+		FontFace = normalizeFontFace(fontStyle.Font),
+		TextSize = fontStyle.FontSize,
+		TextTransparency = 0,
+		TextColor3 = textColor,
+		TextWrapped = false,
+		TextTruncate = Enum.TextTruncate.SplitWord,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		LayoutOrder = (props.iconFirst and -1 or 1) * 1,
+		RichText = v4 and true or nil,
+		[React.Tag] = "data-testid=--sdui-text-icon-row-text"
+	}, props.textOverrides)
 	local uiFlexItem
 
 	if props.textFlexMode then
 		uiFlexItem = React.createElement("UIFlexItem", { FlexMode = props.textFlexMode })
 	end
 
-	children.Text = createElement2("TextLabel", v9, { UIFlexItem = uiFlexItem })
+	children.Text = createElement2("TextLabel", v8, { UIFlexItem = uiFlexItem })
 	local icon
 
 	if props.icon then

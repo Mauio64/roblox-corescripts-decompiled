@@ -3,7 +3,6 @@ local CorePackages = game:GetService("CorePackages")
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local Foundation = require(CorePackages.Packages.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local React = require(CorePackages.Packages.React)
 
 local ButtonStack = UIBlox.App.Button.ButtonStack
@@ -42,92 +41,57 @@ local function RestartScreenshotDialog(props)
 		ZIndex = 5
 	}
 
-	local children = {
+	local v7 = {
 		Corner = React.createElement("UICorner", { CornerRadius = UDim.new(0, 8) }),
-		HeaderAndContent = 0,
+		HeaderAndContent = React.createElement("Frame", {
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundTransparency = 1
+		}, {
+			Layout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			Header = React.createElement(HeaderBar, {
+				backgroundTransparency = 1,
+				barHeight = 48,
+				renderLeft = function() end,
+				renderRight = function() end,
+				title = RobloxTranslator:FormatByKey("Feature.ReportAbuse.Action.RetakeScene"),
+				LayoutOrder = 1
+			}),
+			Divider = React.createElement(Divider, { LayoutOrder = 2 }),
+			Description = React.createElement("Frame", {
+				Size = UDim2.new(1, 0, 1, -v3 - 1),
+				BackgroundTransparency = 1,
+				LayoutOrder = 3
+			}, {
+				Padding = React.createElement("UIPadding", {
+					PaddingTop = UDim.new(0, 8),
+					PaddingBottom = UDim.new(0, 8),
+					PaddingLeft = UDim.new(0, 16),
+					PaddingRight = UDim.new(0, 16)
+				}),
+				TextBody = React.createElement("TextLabel", {
+					Text = RobloxTranslator:FormatByKey("Feature.ReportAbuse.Message.RetakeScene"),
+					FontFace = normalizeFontFace(v.Tokens.Typography.BodyLarge.Font),
+					LayoutOrder = 3,
+					TextColor3 = theme.TextEmphasis.Color,
+					TextTransparency = theme.TextEmphasis.Transparency,
+					TextSize = 16,
+					TextWrapped = true,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextYAlignment = Enum.TextYAlignment.Top,
+					Size = UDim2.new(1, 0, 0, v4),
+					BackgroundTransparency = 1
+				})
+			})
+		}),
 		Footer = 0
 	}
 
 	local createElement2 = React.createElement
-	local v7 = { Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1 }
-
 	local v8 = {
-		Layout = React.createElement("UIListLayout", {
-			FillDirection = Enum.FillDirection.Vertical,
-			HorizontalAlignment = Enum.HorizontalAlignment.Center,
-			SortOrder = Enum.SortOrder.LayoutOrder
-		}),
-		Header = React.createElement(HeaderBar, {
-			backgroundTransparency = 1,
-			barHeight = 48,
-			renderLeft = function() end,
-			renderRight = function() end,
-			title = RobloxTranslator:FormatByKey("Feature.ReportAbuse.Action.RetakeScene"),
-			LayoutOrder = 1
-		}),
-		Divider = React.createElement(Divider, { LayoutOrder = 2 }),
-		Description = 0
-	}
-
-	local createElement3 = React.createElement
-	local v9 = {
-		Size = UDim2.new(1, 0, 1, -v3 - 1),
-		BackgroundTransparency = 1,
-		LayoutOrder = 3
-	}
-
-	local v10 = {
-		Padding = React.createElement("UIPadding", {
-			PaddingTop = UDim.new(0, 8),
-			PaddingBottom = UDim.new(0, 8),
-			PaddingLeft = UDim.new(0, 16),
-			PaddingRight = UDim.new(0, 16)
-		}),
-		TextBody = 0
-	}
-
-	local createElement4 = React.createElement
-	local v11 = {
-		Text = RobloxTranslator:FormatByKey("Feature.ReportAbuse.Message.RetakeScene"),
-		Font = 0,
-		FontFace = 0,
-		LayoutOrder = 3,
-		TextColor3 = 0,
-		TextTransparency = 0,
-		TextSize = 16,
-		TextWrapped = true,
-		TextXAlignment = 0,
-		TextYAlignment = 0,
-		Size = 0,
-		BackgroundTransparency = 1
-	}
-	local font2
-
-	if not FoundationFontFaceMigration then
-		font2 = font.Body.Font
-	end
-
-	v11.Font = font2
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(v.Tokens.Typography.BodyLarge.Font)
-	end
-
-	v11.FontFace = fontFace
-
-	v11.TextColor3 = theme.TextEmphasis.Color
-	v11.TextTransparency = theme.TextEmphasis.Transparency
-
-	v11.TextXAlignment = Enum.TextXAlignment.Left
-	v11.TextYAlignment = Enum.TextYAlignment.Top
-	v11.Size = UDim2.new(1, 0, 0, v4)
-	v10.TextBody = createElement4("TextLabel", v11)
-	v8.Description = createElement3("Frame", v9, v10)
-	children.HeaderAndContent = createElement2("Frame", v7, v8)
-
-	local createElement5 = React.createElement
-	local v12 = {
 		BackgroundTransparency = 1,
 		Size = UDim2.new(1, 0, 0, v3),
 		Position = UDim2.new(0, 0, 1, -v3),
@@ -135,7 +99,7 @@ local function RestartScreenshotDialog(props)
 		LayoutOrder = 4
 	}
 
-	local v13 = {
+	local v9 = {
 		Padding = React.createElement("UIPadding", {
 			PaddingTop = UDim.new(0, 6),
 			PaddingBottom = UDim.new(0, 6),
@@ -145,7 +109,7 @@ local function RestartScreenshotDialog(props)
 		ActionButtons = 0
 	}
 
-	local createElement6 = React.createElement
+	local createElement3 = React.createElement
 	local forcedFillDirection
 
 	if props.isSmallPortraitMode then
@@ -154,7 +118,7 @@ local function RestartScreenshotDialog(props)
 		forcedFillDirection = Enum.FillDirection.Horizontal
 	end
 
-	local v14 = { buttonType = ButtonType.Secondary, props = 0 }
+	local v10 = { buttonType = ButtonType.Secondary, props = 0 }
 	local props2
 
 	if props.isSmallPortraitMode then
@@ -171,9 +135,9 @@ local function RestartScreenshotDialog(props)
 		}
 	end
 
-	v14.props = props2
+	v10.props = props2
 
-	local v15 = { buttonType = ButtonType.PrimarySystem, props = 0 }
+	local v11 = { buttonType = ButtonType.PrimarySystem, props = 0 }
 	local props3
 
 	if props.isSmallPortraitMode then
@@ -190,13 +154,13 @@ local function RestartScreenshotDialog(props)
 		}
 	end
 
-	v15.props = props3
-	v13.ActionButtons = createElement6(ButtonStack, {
+	v11.props = props3
+	v9.ActionButtons = createElement3(ButtonStack, {
 		forcedFillDirection = forcedFillDirection,
-		buttons = { v14, v15 }
+		buttons = { v10, v11 }
 	})
-	children.Footer = createElement5("Frame", v12, v13)
-	return createElement("Frame", v6, children)
+	v7.Footer = createElement2("Frame", v8, v9)
+	return createElement("Frame", v6, v7)
 end
 
 return RestartScreenshotDialog

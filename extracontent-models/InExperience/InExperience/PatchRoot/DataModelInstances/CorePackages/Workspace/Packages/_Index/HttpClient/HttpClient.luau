@@ -2,7 +2,6 @@ require(script.types)
 local decoders = require(script.decoders)
 local encoders = require(script.encoders)
 local statusCodeActions = require(script.statusCodeActions)
-local FFlagHttpClientRetryExtensions = require(script.Flags.FFlagHttpClientRetryExtensions)
 
 return {
 	fetch = require(script.fetch),
@@ -17,6 +16,5 @@ return {
 	encodeRaw = encoders.encodeRaw,
 	decodeJson = decoders.decodeJson,
 	decodeLegacyJson = decoders.decodeLegacyJson,
-	FFlagHttpClientRetryExtensions = FFlagHttpClientRetryExtensions,
 	["jest.config"] = script["jest.config"]
 }

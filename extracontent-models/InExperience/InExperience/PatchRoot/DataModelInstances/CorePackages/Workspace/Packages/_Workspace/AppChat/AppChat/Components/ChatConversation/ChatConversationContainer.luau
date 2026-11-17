@@ -429,19 +429,21 @@ function ChatConversationContainer(p)
 
 		return ref.current.itemList
 	end, { conversation, joined.conversationId, users, localUserId, v10 })
-	local v12
+
+	local v12 = conversation
+	local v13
 
 	if FFlagAppChatUseUserProfileHydration then
-		v12 = v7
+		v13 = v7
 	end
 
-	local osaState = getOsaState(conversation, localUserId, v6, v12)
+	local osaState = getOsaState(v12, localUserId, v6, v13)
 
 	local itemList = React.useMemo(function()
-		local v13 = {}
+		local v14 = {}
 
 		if osaState.shouldShowOsaCardOnInitialLoad and not osaState.fetchedOldestMessage then
-			return v13
+			return v14
 		end
 
 		local clone = table.clone(v11)
@@ -466,26 +468,26 @@ function ChatConversationContainer(p)
 	local isInitialMessageLoading
 
 	if FFlagAppChatConversationLoadingSkeleton then
-		local v13 = useSelector(function(p2)
+		local v14 = useSelector(function(p2)
 			return AppChatNetworking.rodux.GetOlderMessages.getStatus(p2, joined.conversationId)
 		end)
-		local v14, v15
+		local v15, v16
 
 		if osaState.isFriendsConversation then
-			v14 = osaState.isOsaCardReady
-			v15 = osaState.willShowOsaCard
+			v15 = osaState.isOsaCardReady
+			v16 = osaState.willShowOsaCard
 		elseif osaState.shouldShowOsaCardOnInitialLoad then
 			if osaState.fetchedOldestMessage == true then
-				v14 = osaState.isOsaCardReady
+				v15 = osaState.isOsaCardReady
 			else
-				v14 = false
+				v15 = false
 			end
 
-			v15 = true
+			v16 = true
 		else
-			v14 = v13 == RoduxNetworking.Enum.NetworkStatus.Done or osaState.fetchedOldestMessage == true
-			v15 = v13 == RoduxNetworking.Enum.NetworkStatus.NotStarted
-				or v13 == RoduxNetworking.Enum.NetworkStatus.Fetching
+			v15 = v14 == RoduxNetworking.Enum.NetworkStatus.Done or osaState.fetchedOldestMessage == true
+			v16 = v14 == RoduxNetworking.Enum.NetworkStatus.NotStarted
+				or v14 == RoduxNetworking.Enum.NetworkStatus.Fetching
 		end
 
 		local ref2 = React.useRef({ conversationId = nil, hasLoadedFirstPage = false })
@@ -494,42 +496,42 @@ function ChatConversationContainer(p)
 			ref2.current = { conversationId = joined.conversationId, hasLoadedFirstPage = false }
 		end
 
-		ref2.current.hasLoadedFirstPage = ref2.current.hasLoadedFirstPage or v14
+		ref2.current.hasLoadedFirstPage = ref2.current.hasLoadedFirstPage or v15
 
-		isInitialMessageLoading = conversation and not ref2.current.hasLoadedFirstPage and v15
+		isInitialMessageLoading = conversation and not ref2.current.hasLoadedFirstPage and v16
 	else
 		isInitialMessageLoading = false
-	end
-
-	local v13
-
-	if FFlagAppChatUseUserProfileHydration then
-		v13 = getCombinedNameFromProfileNames(v7, usersTyping[1] and usersTyping[1].id)
-	elseif usersTyping[1] and v6.data then
-		v13 = UserProfiles.Selectors.getCombinedNameFromId(v6.data, usersTyping[1].id)
 	end
 
 	local v14
 
 	if FFlagAppChatUseUserProfileHydration then
-		v14 = getCombinedNameFromProfileNames(v7, usersTyping[2] and usersTyping[2].id)
+		v14 = getCombinedNameFromProfileNames(v7, usersTyping[1] and usersTyping[1].id)
+	elseif usersTyping[1] and v6.data then
+		v14 = UserProfiles.Selectors.getCombinedNameFromId(v6.data, usersTyping[1].id)
+	end
+
+	local v15
+
+	if FFlagAppChatUseUserProfileHydration then
+		v15 = getCombinedNameFromProfileNames(v7, usersTyping[2] and usersTyping[2].id)
 	elseif usersTyping[2] and v6.data then
-		v14 = UserProfiles.Selectors.getCombinedNameFromId(v6.data, usersTyping[2].id)
+		v15 = UserProfiles.Selectors.getCombinedNameFromId(v6.data, usersTyping[2].id)
 	end
 
 	local displayNamesAvailable = true
 
-	if #usersTyping == 1 and not v13 then
+	if #usersTyping == 1 and not v14 then
 		displayNamesAvailable = false
-	elseif #usersTyping == 2 and not (v13 and v14) then
+	elseif #usersTyping == 2 and not (v14 and v15) then
 		displayNamesAvailable = false
 	end
 
 	local isInExperience = GetFFlagEnableAppChatInExperience() and useIsInExperience()
-	local v15
+	local v16
 
 	if FFlagAppChatSignalsReplyStore then
-		v15 = GetReplyingToStore(false)
+		v16 = GetReplyingToStore(false)
 	end
 
 	local conversationMessageStore
@@ -541,28 +543,28 @@ function ChatConversationContainer(p)
 	local replyingToMessage = nil
 	local replyingToMessageDispatch = nil
 	local replyingToMessageId = nil
-	local v16 = nil
 	local v17 = nil
+	local v18 = nil
 
 	if FFlagAppChatSignalsReplyStore then
-		replyingToMessageId = useSignalState(v15.getMessageId)
+		replyingToMessageId = useSignalState(v16.getMessageId)
 
 		if replyingToMessageId then
-			local v18 = conversationMessageStore.messages(false)[replyingToMessageId]
+			local v19 = conversationMessageStore.messages(false)[replyingToMessageId]
 			local sender_user_id
 
-			if v18 and v18.sender_user_id then
-				sender_user_id = tostring(v18.sender_user_id)
+			if v19 and v19.sender_user_id then
+				sender_user_id = tostring(v19.sender_user_id)
 			end
 
-			v17 = sender_user_id == localUserId
+			v18 = sender_user_id == localUserId
 
 			if FFlagAppChatUseUserProfileHydration then
-				if not v17 then
-					v16 = getCombinedNameFromProfileNames(v7, sender_user_id)
+				if not v18 then
+					v17 = getCombinedNameFromProfileNames(v7, sender_user_id)
 				end
-			elseif not (v17 or not (sender_user_id and v6.data)) then
-				v16 = UserProfiles.Selectors.getCombinedNameFromId(v6.data, sender_user_id)
+			elseif not (v18 or not (sender_user_id and v6.data)) then
+				v17 = UserProfiles.Selectors.getCombinedNameFromId(v6.data, sender_user_id)
 			end
 		end
 	else
@@ -570,23 +572,23 @@ function ChatConversationContainer(p)
 		replyingToMessageDispatch = useReplyingToMessageDispatch()
 
 		if replyingToMessage then
-			v17 = replyingToMessage.senderTargetId == localUserId
+			v18 = replyingToMessage.senderTargetId == localUserId
 
 			if FFlagAppChatUseUserProfileHydration then
-				if not v17 then
-					v16 = getCombinedNameFromProfileNames(v7, replyingToMessage.senderTargetId)
+				if not v18 then
+					v17 = getCombinedNameFromProfileNames(v7, replyingToMessage.senderTargetId)
 				end
-			elseif not (v17 or not v6.data) then
-				v16 = UserProfiles.Selectors.getCombinedNameFromId(v6.data, replyingToMessage.senderTargetId)
+			elseif not (v18 or not v6.data) then
+				v17 = UserProfiles.Selectors.getCombinedNameFromId(v6.data, replyingToMessage.senderTargetId)
 			end
 		end
 	end
 
-	local v18 = useLocalization({
+	local v19 = useLocalization({
 		chatInputPlaceholder = joined.chatInputPlaceholderKey,
 		replyChatInputPlaceholder = {
 			joined.replyChatInputPlaceholderKey,
-			DISPLAY_NAME = v16
+			DISPLAY_NAME = v17
 		},
 		replyToYourselfChatInputPlaceholder = joined.replyToYourselfChatInputPlaceholderKey,
 		invalidMessageTypeText = joined.notImplementedMessageTypeKey,
@@ -599,81 +601,81 @@ function ChatConversationContainer(p)
 		unknownUserText = joined.unknownUserTextKey,
 		oneUserTyping = {
 			"Feature.Chat.Message.OneUserTyping",
-			DISPLAY_NAME = v13
+			DISPLAY_NAME = v14
 		},
 		twoUsersTyping = {
 			"Feature.Chat.Message.TwoUsersTyping",
-			DISPLAY_NAME_1 = v13,
-			DISPLAY_NAME_2 = v14
+			DISPLAY_NAME_1 = v14,
+			DISPLAY_NAME_2 = v15
 		},
 		severalUsersTyping = joined.severalUsersTyping,
 		bottomModalText = joined.chatUnavailableWithUserKey,
 		inputBarDisabledText = joined.inputBarDisabledKey
 	})
 
-	local v19 = useTelemetry(ChatConversationTelemetryLayer.Context)
-	local v20 = ChatConversationTelemetryState.useMergeState()
-	local v21 = ChatConversationTelemetryState.useClearState()
+	local v20 = useTelemetry(ChatConversationTelemetryLayer.Context)
+	local v21 = ChatConversationTelemetryState.useMergeState()
+	local v22 = ChatConversationTelemetryState.useClearState()
 
 	local moderationType = conversation and conversation.moderationType or Cryo.None
 	local userPendingStatus = conversation and conversation.userPendingStatus or Cryo.None
 	useEffect(function()
-		v20({
+		v21({
 			conversationId = joined.conversationId,
 			moderationType = moderationType,
 			userPendingStatus = userPendingStatus
 		})
-	end, { v20, joined.conversationId, moderationType, userPendingStatus })
+	end, { v21, joined.conversationId, moderationType, userPendingStatus })
 
-	local v22 = useIsUserPending(conversation or {})
+	local v23 = useIsUserPending(conversation or {})
 	local source = conversation and conversation.source
 
-	local v23, v24 = useCallbackWithDynamicConversationId(
+	local v24, v25 = useCallbackWithDynamicConversationId(
 		AppChatNetworking.rodux.GetModalSequence.API,
 		joined.conversationId
 	)
 
 	useEffect(function()
-		if not v24 then
+		if not v25 then
 			return
 		end
 
-		if v22 and source == "channels" then
+		if v23 and source == "channels" then
 			dispatch(AppChatNetworking.rodux.GetPendingStateModal.API(joined.conversationId, isInExperience)):catch(function(p2)
 				Logger:warning(`GetPendingStateModal error in ChatConversationContainer {tostring(p2)}`)
 			end)
 		end
 
-		if not v22 then
-			local v25 = dispatch(v23({
+		if not v23 then
+			local v26 = dispatch(v24({
 				modalSequence = AppChatNetworking.Constants.ModalSequence.ConversationTopModal,
 				isInExperience = isInExperience
 			}))
 
 			if FFlagAppChatConversationTrustedFriendUpsellBanner then
-				v25 = seedConversationTopModalFromRequest(v25, joined.conversationId)
+				v26 = seedConversationTopModalFromRequest(v26, joined.conversationId)
 			end
 
-			v25:catch(function(p2)
+			v26:catch(function(p2)
 				Logger:warning(`GetModalSequence for ConversationTopModal error in ChatConversationContainer {tostring(p2)}`)
 			end)
 		end
-	end, { joined.conversationId, v24, isInExperience, v22, source })
-	local v25, v26 = useCallbackWithDynamicConversationId(
+	end, { joined.conversationId, v25, isInExperience, v23, source })
+	local v26, v27 = useCallbackWithDynamicConversationId(
 		AppChatNetworking.rodux.GetModalSequence.API,
 		joined.conversationId
 	)
 
 	useEffect(function()
-		if not v22 and v26 then
-			dispatch(v25({
+		if not v23 and v27 then
+			dispatch(v26({
 				modalSequence = AppChatNetworking.Constants.ModalSequence.ConversationOverlay,
 				isInExperience = isInExperience
 			})):catch(function(p2)
 				Logger:warning(`GetModalSequence error in ChatConversationContainer {tostring(p2)}`)
 			end)
 		end
-	end, { v26, joined.conversationId, v22, isInExperience, moderationType })
+	end, { v27, joined.conversationId, v23, isInExperience, moderationType })
 
 	if FFlagDebugEnableTCDoubleOptIn_DEV then
 		useKeybind({ keyCode = Enum.KeyCode.O, modifierKey = Enum.ModifierKey.Ctrl }, function()
@@ -706,81 +708,81 @@ function ChatConversationContainer(p)
 		end, { dispatch, joined.conversationId })
 	end
 
-	local v27, v28 = useCallbackWithDynamicConversationId(
+	local v28, v29 = useCallbackWithDynamicConversationId(
 		AppChatNetworking.rodux.GetModalSequence.API,
 		joined.conversationId
 	)
 
 	useEffect(function()
-		if not v28 then
+		if not v29 then
 			return
 		end
 
-		dispatch(v27({
+		dispatch(v28({
 			modalSequence = AppChatNetworking.Constants.ModalSequence.ConversationBottomModal,
 			isInExperience = isInExperience
 		})):catch(function(p2)
 			Logger:warning(`GetModalSequence for ConversationBottomModal error in ChatConversationContainer {tostring(p2)}`)
 		end)
-	end, { joined.conversationId, v28, isInExperience, dispatch, v27 })
+	end, { joined.conversationId, v29, isInExperience, dispatch, v28 })
 
-	local v29 = useShouldShowConversationOverlay(joined.conversationId)
+	local v30 = useShouldShowConversationOverlay(joined.conversationId)
 	useEffect(function()
-		if v29 then
+		if v30 then
 			joined.navigateToConversationOverlay()
 		end
-	end, { v29, joined.conversationId })
-	local v30 = source ~= "channels"
-	local v31 = useSelector(function(p2): boolean
-		local v31
+	end, { v30, joined.conversationId })
+	local v31 = source ~= "channels"
+	local v32 = useSelector(function(p2): boolean
+		local v32
 
-		if v30 then
-			v31 = AppChatNetworking.rodux.GetChatModerationStatuses.getStatus(p2)
+		if v31 then
+			v32 = AppChatNetworking.rodux.GetChatModerationStatuses.getStatus(p2)
 		else
-			v31 = AppChatNetworking.rodux.GetChatModerationStatuses.getStatus(p2, joined.conversationId)
+			v32 = AppChatNetworking.rodux.GetChatModerationStatuses.getStatus(p2, joined.conversationId)
 		end
 
-		return v31 == RoduxNetworking.Enum.NetworkStatus.NotStarted
+		return v32 == RoduxNetworking.Enum.NetworkStatus.NotStarted
 	end)
 
 	useEffect(function()
-		if v31 and not FFlagAppChatUseDataHydrationForChatTimeouts then
-			dispatch(AppChatNetworking.rodux.GetChatModerationStatuses.API(not v30 and { joined.conversationId } or nil)):catch(function(p2)
+		if v32 and not FFlagAppChatUseDataHydrationForChatTimeouts then
+			dispatch(AppChatNetworking.rodux.GetChatModerationStatuses.API(not v31 and { joined.conversationId } or nil)):catch(function(p2)
 				warn("GetChatModerationStatuses error in ChatConversationContainer " .. tostring(p2))
 			end)
 		end
-	end, { joined.conversationId, v30, dispatch, v31 })
-	local v32
+	end, { joined.conversationId, v31, dispatch, v32 })
+	local v47
 
 	if FFlagAppChatUseDataHydrationForChatTimeouts then
-		v32 = useSignalState(useChatTimeoutDetailsFromHydration({
+		v47 = useSignalState(useChatTimeoutDetailsFromHydration({
 			conversationId = joined.conversationId,
 			conversationModerationType = moderationType
 		}))
 	else
-		v32 = useChatTimeoutDetails({
+		v47 = useChatTimeoutDetails({
 			conversationId = joined.conversationId,
 			conversationModerationType = moderationType
 		})
 	end
 
-	local isTimedOut = v32.isTimedOut
-	local timeoutEndTimestamp = v32.timeoutEndTimestamp
-	local decisionEventId = v32.decisionEventId
-	local duration = v32.duration
+	local isTimedOut = v47.isTimedOut
+	local timeoutEndTimestamp = v47.timeoutEndTimestamp
+	local decisionEventId = v47.decisionEventId
+	local duration = v47.duration
 
 	useEffect(function()
-		v19.emit(ChatConversationTelemetryEvents.ScreenRendered, {
+		v20.emit(ChatConversationTelemetryEvents.ScreenRendered, {
 			loadedMessageCount = #v11
 		})
 	end, { joined.conversationId })
 
 	if defineFastFlag then
-		local v47 = v11[1]
+		local v48 = v11[1]
 		local id
 
-		if v47 then
-			id = v47.id
+		if v48 then
+			id = v48.id
 		else
 			id = nil
 		end
@@ -793,9 +795,9 @@ function ChatConversationContainer(p)
 	end
 
 	if FFlagAppChatBlueSentBubblesIxpEnabled then
-		local v47 = React.useMemo(function(): boolean
-			for _, v48 in v11 do
-				if not v48.isIncoming and v48.messageType == EnumMessageTypes.PlainText then
+		local v48 = React.useMemo(function(): boolean
+			for _, v49 in v11 do
+				if not v49.isIncoming and v49.messageType == EnumMessageTypes.PlainText then
 					return true
 				end
 			end
@@ -803,19 +805,19 @@ function ChatConversationContainer(p)
 			return false
 		end, { v11 })
 		useEffect(function()
-			if v47 then
+			if v48 then
 				IXPService:LogFlagLinkedUserLayerExposure(FStringAppChatBlueSentBubblesIxpLayer)
 			end
-		end, { joined.conversationId, v47 })
+		end, { joined.conversationId, v48 })
 	end
 
 	local onConversationUnmount = React.useCallback(function(conversationExitType: string)
-		v19.emit(ChatConversationTelemetryEvents.ScreenExit, {
+		v20.emit(ChatConversationTelemetryEvents.ScreenExit, {
 			conversationExitType = conversationExitType
 		})
 
-		v21()
-	end, { v19, v21 })
+		v22()
+	end, { v20, v22 })
 
 	conversation = conversation or {}
 	local shouldShowChatInputBar
@@ -826,43 +828,43 @@ function ChatConversationContainer(p)
 		shouldShowChatInputBar = v8
 	end
 
-	local v50 = useIsExternalNavigationAvailable({ EnumScreens.ViewUserProfile })
+	local v51 = useIsExternalNavigationAvailable({ EnumScreens.ViewUserProfile })
 
-	local v51 = conversation.conversationType == Conversation.Type.MULTI_USER_CONVERSATION
-	local v52 = useSelector(function(p2)
-		return v51 and conversation.initiator == p2.LocalUserId
+	local v52 = conversation.conversationType == Conversation.Type.MULTI_USER_CONVERSATION
+	local v53 = useSelector(function(p2)
+		return v52 and conversation.initiator == p2.LocalUserId
 	end)
 
 	local function fn(participantId)
-		if v50[EnumScreens.ViewUserProfile] then
+		if v51[EnumScreens.ViewUserProfile] then
 			v3(participantId)
 		else
 			joined.navigateToScreen(GenericDialogType.ParticipantDialog, {
 				conversationId = joined.conversationId,
 				participantId = participantId,
-				showRemoveUserButton = not v22 and v51 and v52
+				showRemoveUserButton = not v23 and v52 and v53
 			}, true)
 		end
 	end
 
-	local v53
+	local v54
 
 	if FFlagAppChatSignalsReplyStore then
-		v53 = replyingToMessageId
+		v54 = replyingToMessageId
 	else
-		v53 = replyingToMessage
+		v54 = replyingToMessage
 	end
 
 	local chatInputPlaceholder
 
-	if v53 then
-		if v17 then
-			chatInputPlaceholder = v18.replyToYourselfChatInputPlaceholder
+	if v54 then
+		if v18 then
+			chatInputPlaceholder = v19.replyToYourselfChatInputPlaceholder
 		else
-			chatInputPlaceholder = v18.replyChatInputPlaceholder
+			chatInputPlaceholder = v19.replyChatInputPlaceholder
 		end
 	else
-		chatInputPlaceholder = v18.chatInputPlaceholder
+		chatInputPlaceholder = v19.chatInputPlaceholder
 	end
 
 	useEffect(function()
@@ -882,7 +884,7 @@ function ChatConversationContainer(p)
 
 		local AbuseVector = require(parent.UniversalFeatureRestrictions.AbuseVector)
 		local showFeatureRestriction = require(parent.UniversalFeatureRestrictions.showFeatureRestriction)
-		local v56 = {
+		local v57 = {
 			onShown = joined.releaseInputBarFocus,
 			onAppeal = function() end
 		}
@@ -890,27 +892,27 @@ function ChatConversationContainer(p)
 		if FFlagAppChatReactiveFeatureRestrictions then
 			local InterventionShared4 = require(parent.InterventionShared)
 			local partyChatTimeoutReceivedSignal = InterventionShared4.Signals.partyChatTimeoutReceivedSignal
-			function v56.onAcknowledgementSuccess()
+			function v57.onAcknowledgementSuccess()
 				partyChatTimeoutReceivedSignal:fire(nil)
 			end
 		end
 
-		showFeatureRestriction(AbuseVector.PartyChat, v56)
+		showFeatureRestriction(AbuseVector.PartyChat, v57)
 	end, { joined.releaseInputBarFocus, timeoutEndTimestamp, decisionEventId, duration })
 
 	local state, setState = React.useState(joined.navigation and joined.navigation.isFocused and joined.navigation.isFocused())
-	local v56, v57
+	local v57, v58
 
 	if FFlagAppChatPerfTracking then
 		if joined.isFocused and not joined.isFocused() then
-			v56 = false
+			v57 = false
 		else
-			v56 = state
+			v57 = state
 		end
 
-		v57 = v56 and not v22
+		v58 = v57 and not v23
 	else
-		v57 = nil
+		v58 = nil
 	end
 
 	local onChatInputBarReady
@@ -922,10 +924,10 @@ function ChatConversationContainer(p)
 			ref2.current = not shouldShowChatInputBar
 		end, { joined.conversationId, shouldShowChatInputBar })
 
-		local v59 = React.useCallback(function(p2: string)
+		local v60 = React.useCallback(function(p2: string)
 			if not (AppChatPerfTracker.isActive(AppChatPerfTracker.Events.ChatConversationTTI, {
 				conversationId = joined.conversationId
-			}) and v57) then
+			}) and v58) then
 				return
 			end
 
@@ -944,18 +946,18 @@ function ChatConversationContainer(p)
 		end, {
 			joined.conversationId,
 			state,
-			v22,
+			v23,
 			#v11
 		})
 
 		React.useEffect(function()
-			v59("messages_ready")
-		end, { v59, #v11, joined.conversationId })
+			v60("messages_ready")
+		end, { v60, #v11, joined.conversationId })
 
 		onChatInputBarReady = React.useCallback(function()
 			ref2.current = true
-			v59("input_bar_ready")
-		end, { v59 })
+			v60("input_bar_ready")
+		end, { v60 })
 	end
 
 	if FFlagAppChatPerfTracking then
@@ -966,75 +968,75 @@ function ChatConversationContainer(p)
 
 			ref2.current = nil
 
-			local v59 = { conversationId = joined.conversationId }
+			local v60 = { conversationId = joined.conversationId }
 
 			if FFlagAppChatMessageTTIMilestones then
-				AppChatPerfTracker.cancel(AppChatPerfTracker.Events.MessageSendTTI, v59)
-				AppChatPerfTracker.cancel(AppChatPerfTracker.Events.MessageReceiveTTI, v59)
+				AppChatPerfTracker.cancel(AppChatPerfTracker.Events.MessageSendTTI, v60)
+				AppChatPerfTracker.cancel(AppChatPerfTracker.Events.MessageReceiveTTI, v60)
 			else
-				AppChatPerfTracker.cancel(AppChatPerfTracker.Events.MessageSendToPendingRender, v59)
-				AppChatPerfTracker.cancel(AppChatPerfTracker.Events.MessageSendResponseToFinalRender, v59)
-				AppChatPerfTracker.cancel(AppChatPerfTracker.Events.MessageSendToFinalRender, v59)
-				AppChatPerfTracker.cancel(AppChatPerfTracker.Events.MessageReceiveToRender, v59)
+				AppChatPerfTracker.cancel(AppChatPerfTracker.Events.MessageSendToPendingRender, v60)
+				AppChatPerfTracker.cancel(AppChatPerfTracker.Events.MessageSendResponseToFinalRender, v60)
+				AppChatPerfTracker.cancel(AppChatPerfTracker.Events.MessageSendToFinalRender, v60)
+				AppChatPerfTracker.cancel(AppChatPerfTracker.Events.MessageReceiveToRender, v60)
 			end
 		end, { joined.conversationId })
 
 		React.useEffect(function()
-			local v59 = v11[1]
+			local v60 = v11[1]
 
-			if not (v59 and v59.id) then
+			if not (v60 and v60.id) then
 				return
 			end
 
-			local v60 = { conversationId = joined.conversationId }
-			local v61 = v59.senderTargetId == localUserId
+			local v61 = { conversationId = joined.conversationId }
+			local v62 = v60.senderTargetId == localUserId
 
-			if not v59.isSending and (v59.senderType == "system" or not v61) then
-				if v59.id ~= ref2.current then
-					ref2.current = v59.id
+			if not v60.isSending and (v60.senderType == "system" or not v62) then
+				if v60.id ~= ref2.current then
+					ref2.current = v60.id
 
 					if FFlagAppChatMessageTTIMilestones then
-						AppChatPerfTracker.finish(AppChatPerfTracker.Events.MessageReceiveTTI, v60)
+						AppChatPerfTracker.finish(AppChatPerfTracker.Events.MessageReceiveTTI, v61)
 					else
-						AppChatPerfTracker.finish(AppChatPerfTracker.Events.MessageReceiveToRender, v60)
+						AppChatPerfTracker.finish(AppChatPerfTracker.Events.MessageReceiveToRender, v61)
 					end
 				end
 			elseif FFlagAppChatMessageTTIMilestones then
-				if AppChatPerfTracker.isActive(AppChatPerfTracker.Events.MessageReceiveTTI, v60) then
-					AppChatPerfTracker.cancel(AppChatPerfTracker.Events.MessageReceiveTTI, v60)
+				if AppChatPerfTracker.isActive(AppChatPerfTracker.Events.MessageReceiveTTI, v61) then
+					AppChatPerfTracker.cancel(AppChatPerfTracker.Events.MessageReceiveTTI, v61)
 				end
-			elseif AppChatPerfTracker.isActive(AppChatPerfTracker.Events.MessageReceiveToRender, v60) then
-				AppChatPerfTracker.cancel(AppChatPerfTracker.Events.MessageReceiveToRender, v60)
+			elseif AppChatPerfTracker.isActive(AppChatPerfTracker.Events.MessageReceiveToRender, v61) then
+				AppChatPerfTracker.cancel(AppChatPerfTracker.Events.MessageReceiveToRender, v61)
 			end
 
-			if not v61 then
+			if not v62 then
 				return
 			end
 
 			if FFlagAppChatMessageTTIMilestones then
-				if v59.isSending then
+				if v60.isSending then
 					AppChatPerfTracker.trackMilestone(
 						AppChatPerfTracker.Events.MessageSendTTI,
 						AppChatPerfTracker.Milestone.FunctionallyReady,
-						v60
+						v61
 					)
 				else
-					AppChatPerfTracker.finish(AppChatPerfTracker.Events.MessageSendTTI, v60)
+					AppChatPerfTracker.finish(AppChatPerfTracker.Events.MessageSendTTI, v61)
 				end
 			else
-				if v59.isSending then
-					AppChatPerfTracker.finish(AppChatPerfTracker.Events.MessageSendToPendingRender, v60)
+				if v60.isSending then
+					AppChatPerfTracker.finish(AppChatPerfTracker.Events.MessageSendToPendingRender, v61)
 					return
 				end
 
-				AppChatPerfTracker.finish(AppChatPerfTracker.Events.MessageSendResponseToFinalRender, v60)
-				AppChatPerfTracker.finish(AppChatPerfTracker.Events.MessageSendToFinalRender, v60)
+				AppChatPerfTracker.finish(AppChatPerfTracker.Events.MessageSendResponseToFinalRender, v61)
+				AppChatPerfTracker.finish(AppChatPerfTracker.Events.MessageSendToFinalRender, v61)
 			end
 		end, { v11, localUserId, joined.conversationId })
 	end
 
 	useEffect(function()
-		local v59 = joined.navigation
+		local v60 = joined.navigation
 			and joined.navigation.addListener
 			and joined.navigation.addListener(RoactNavigation.Events.WillBlur, function(p2)
 				if FFlagAppChatPerfTracking then
@@ -1059,19 +1061,19 @@ function ChatConversationContainer(p)
 				end
 			end)
 
-		local v60 = joined.navigation
+		local v61 = joined.navigation
 			and joined.navigation.addListener
 			and joined.navigation.addListener(RoactNavigation.Events.WillFocus, function(_)
 				setState(true)
 			end)
 
 		return function()
-			if v59 then
-				v59.remove()
-			end
-
 			if v60 then
 				v60.remove()
+			end
+
+			if v61 then
+				v61.remove()
 			end
 		end
 	end, { joined.navigation, joined.conversationId })
@@ -1085,7 +1087,7 @@ function ChatConversationContainer(p)
 			)):catch(function()
 				joined.navigateToToast({
 					toastProps = {
-						toastContent = { toastTitle = v18.networkErrorText }
+						toastContent = { toastTitle = v19.networkErrorText }
 					}
 				})
 			end)
@@ -1095,15 +1097,15 @@ function ChatConversationContainer(p)
 	local getCanAccessParty = joined.getCanAccessParty
 
 	if FFlagAppChatPerfTracking then
-		if not v56 then
+		if not v57 then
 			return nil
 		end
 
-		if v22 then
+		if v23 then
 			return React.createElement(PendingStateConversationPage, {
 				conversationId = joined.conversationId,
 				topBarHeight = joined.topBarHeight,
-				networkErrorText = v18.networkErrorText,
+				networkErrorText = v19.networkErrorText,
 				navigateToToast = joined.navigateToToast,
 				wideMode = joined.wideMode,
 				onConversationUnmount = onConversationUnmount,
@@ -1115,11 +1117,11 @@ function ChatConversationContainer(p)
 			return nil
 		end
 
-		if v22 then
+		if v23 then
 			return React.createElement(PendingStateConversationPage, {
 				conversationId = joined.conversationId,
 				topBarHeight = joined.topBarHeight,
-				networkErrorText = v18.networkErrorText,
+				networkErrorText = v19.networkErrorText,
 				navigateToToast = joined.navigateToToast,
 				wideMode = joined.wideMode,
 				onConversationUnmount = onConversationUnmount,
@@ -1132,7 +1134,7 @@ function ChatConversationContainer(p)
 	local createElement = React.createElement
 
 	local join = Cryo.Dictionary.join
-	local v59 = {
+	local v60 = {
 		moreMenuEnabled = getCanAccessParty,
 		conversation = conversation,
 		conversationTitle = conversationTitle,
@@ -1168,54 +1170,54 @@ function ChatConversationContainer(p)
 		replyingToMessageId = nil
 	end
 
-	v59.replyingToMessageId = replyingToMessageId
+	v60.replyingToMessageId = replyingToMessageId
 
 	if FFlagAppChatSignalsReplyStore then
 		replyingToMessage = nil
 	end
 
-	v59.replyingToMessage = replyingToMessage
+	v60.replyingToMessage = replyingToMessage
 
 	if FFlagAppChatSignalsReplyStore then
 		replyingToMessageDispatch = nil
 	end
 
-	v59.replyingToMessageDispatch = replyingToMessageDispatch
+	v60.replyingToMessageDispatch = replyingToMessageDispatch
 
-	v59.shouldShowChatInputBar = shouldShowChatInputBar
-	v59.shouldShowLegacyBottomModal = not shouldShowChatInputBar and v8
-	v59.shouldDisableChatInputBar = isTimedOut
+	v60.shouldShowChatInputBar = shouldShowChatInputBar
+	v60.shouldShowLegacyBottomModal = not shouldShowChatInputBar and v8
+	v60.shouldDisableChatInputBar = isTimedOut
 
 	if not FFlagAppChatPerfTracking then
 		onChatInputBarReady = nil
 	end
 
-	v59.onChatInputBarReady = onChatInputBarReady
-	v59.inputBarDisabledEndTimestampDisplay = timeoutEndTimestamp
-	v59.onDisabledInputBarActivated = onDisabledInputBarActivated
-	v59.scrollToTopOnInitialOsaLoad = osaState.shouldShowOsaCardOnInitialLoad and osaState.fetchedOldestMessage
-	v59.openMessageListAtStart = osaState.shouldShowOsaCardOnInitialLoad
+	v60.onChatInputBarReady = onChatInputBarReady
+	v60.inputBarDisabledEndTimestampDisplay = timeoutEndTimestamp
+	v60.onDisabledInputBarActivated = onDisabledInputBarActivated
+	v60.scrollToTopOnInitialOsaLoad = osaState.shouldShowOsaCardOnInitialLoad and osaState.fetchedOldestMessage
+	v60.openMessageListAtStart = osaState.shouldShowOsaCardOnInitialLoad
 	local navigateToSquadLobby
 
 	if getCanAccessParty then
 		navigateToSquadLobby = joined.navigateToSquadLobby
 	end
 
-	v59.navigateToSquadLobby = navigateToSquadLobby
+	v60.navigateToSquadLobby = navigateToSquadLobby
 	local shouldHideMoreMenuButton
 
 	if getCanAccessParty then
 		shouldHideMoreMenuButton = not shouldShowChatInputBar
 	end
 
-	v59.shouldHideMoreMenuButton = shouldHideMoreMenuButton
+	v60.shouldHideMoreMenuButton = shouldHideMoreMenuButton
 
 	if not FFlagAppChatConversationLoadingSkeleton then
 		isInitialMessageLoading = nil
 	end
 
-	v59.isInitialMessageLoading = isInitialMessageLoading
-	return createElement(ChatConversation, join(joined, v4, v18, v59))
+	v60.isInitialMessageLoading = isInitialMessageLoading
+	return createElement(ChatConversation, join(joined, v4, v19, v60))
 end
 
 return universalAppPolicy.connect(function(p)

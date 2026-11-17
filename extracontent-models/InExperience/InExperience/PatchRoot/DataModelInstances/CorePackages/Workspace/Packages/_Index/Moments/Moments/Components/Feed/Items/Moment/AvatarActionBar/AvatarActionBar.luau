@@ -17,9 +17,15 @@ local useTokens = Foundation.Hooks.useTokens
 
 local ImageWithSkeleton = require(Moments.Components.ImageWithSkeleton)
 
+local FFlagMomentsHideUnavailableAvatarActionBar = require(Moments.Flags.FFlagMomentsHideUnavailableAvatarActionBar)
+
 local function AvatarActionBar(props)
 	local v = useTokens()
 	local size_1000 = v.Size.Size_1000
+
+	if FFlagMomentsHideUnavailableAvatarActionBar and props.hasLookError then
+		return nil
+	end
 
 	if props.isLoading then
 		return React.createElement(

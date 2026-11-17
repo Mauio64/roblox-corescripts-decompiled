@@ -7,6 +7,7 @@ local Selectors = NavigationRodux.Selectors
 local SharedFlags = require(parent.SharedFlags)
 local FFlagUseNavigationSelectors = SharedFlags.FFlagUseNavigationSelectors
 local FFlagSignalsNavP2NavigationPrimitives = SharedFlags.FFlagSignalsNavP2NavigationPrimitives
+local FFlagSignalsNavPendingLock = SharedFlags.FFlagSignalsNavPendingLock
 local appNavigationRegistry
 
 if FFlagSignalsNavP2NavigationPrimitives then
@@ -20,7 +21,11 @@ return function(callback)
 	ArgCheck.isType(callback, "function", "navigationCallback")
 	return function(object)
 		if FFlagSignalsNavP2NavigationPrimitives then
-			if appNavigationRegistry.get().getIsNavigating(false) then
+			if FFlagSignalsNavPendingLock then
+				if appNavigationRegistry.isNavigationLocked(false) then
+					return
+				end
+			elseif appNavigationRegistry.get().getIsNavigating(false) then
 				return
 			end
 

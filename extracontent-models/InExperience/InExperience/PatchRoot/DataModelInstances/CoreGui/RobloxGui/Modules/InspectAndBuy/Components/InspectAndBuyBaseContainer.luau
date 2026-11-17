@@ -111,6 +111,10 @@ local function InspectAndBuyBaseContainer(props)
 		avatarBackgroundImageUrl = useAvatarBackgroundImageUrl(props.playerId)
 	end
 
+	local function onPromptPurchase(p, p2, p3, p4, p5, p6, p7)
+		v3(PromptPurchase(p, p2, p3, p4, p5, p6, p7))
+	end
+
 	local v5 = useResponsivePanelLayoutProps({
 		onInspectMenuClosed = React.useCallback(function()
 			GuiService:CloseInspectMenu()
@@ -195,9 +199,7 @@ local function InspectAndBuyBaseContainer(props)
 		openAttributionOverlay = React.useCallback(function(p)
 			v3(OpenOverlay(Overlay.AttributionTraversal, p))
 		end, { v3 }),
-		onPromptPurchase = function(p, p2, p3, p4, p5, p6, p7)
-			v3(PromptPurchase(p, p2, p3, p4, p5, p6, p7))
-		end,
+		onPromptPurchase = onPromptPurchase,
 		renderTryOnViewport = React.useCallback(function(p)
 			if props.localPlayerModel and props.localPlayerModel.Humanoid then
 				local clone = props.localPlayerModel.Humanoid.HumanoidDescription:Clone()

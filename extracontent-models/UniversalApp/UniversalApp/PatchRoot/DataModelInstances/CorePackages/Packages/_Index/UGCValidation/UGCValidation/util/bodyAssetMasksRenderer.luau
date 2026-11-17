@@ -105,12 +105,12 @@ local function addTransformedTriangle(object, face: number, p, list)
 	table.insert(list, v)
 end
 
-local function pushTransformedMesh(object, p, p2, p3)
+local function pushTransformedMesh(object, assetMeshesValidationSpaceTransform, p, p2)
 	local faces = object:GetFaces()
 
 	for _, face in faces do
-		addTransformedTriangle(object, face, p, p3)
-		tryYield(p2)
+		addTransformedTriangle(object, face, assetMeshesValidationSpaceTransform, p2)
+		tryYield(p)
 	end
 end
 
@@ -158,13 +158,13 @@ local function normalizedSpaceToScreenSpace(normalizedCoordinate: Vector3, floor
 	return (Vector2.new(normalizedCoordinate.X, normalizedCoordinate.Y) * Vector2.new(0.5, -0.5) + Vector2.new(0.5, 0.5)) * (floor - Vector2.new(1, 1))
 end
 
-local function rasterMesh(viewSpaceMesh, p, p2: number, p3)
+local function rasterMesh(viewSpaceMesh, p, fIntUGCValidationBodyAssetMaskHeightPixels: number, p2)
 	local v = p.max - p.min
 	local v2 = v / 2
 	local v3 = p.min + v2
 
-	local v4 = v.X / v.Y * p2
-	local vector2 = Vector2.new(v4, p2)
+	local v4 = v.X / v.Y * fIntUGCValidationBodyAssetMaskHeightPixels
+	local vector2 = Vector2.new(v4, fIntUGCValidationBodyAssetMaskHeightPixels)
 
 	local floor = (vector2 * math.min(1024 / math.max(vector2.X, vector2.Y), 1) + Vector2.new(0.5)):Floor()
 
@@ -184,7 +184,7 @@ local function rasterMesh(viewSpaceMesh, p, p2: number, p3)
 		end
 
 		editableImage:DrawTriangle(v5[1], v5[2], v5[3], Color3.new(1, 1, 1), 0)
-		tryYield(p3)
+		tryYield(p2)
 	end
 
 	return editableImage

@@ -1,6 +1,9 @@
-local parent = script:FindFirstAncestor("CloudClientOffer").Parent
+local CloudClientOffer = script:FindFirstAncestor("CloudClientOffer")
+local parent = CloudClientOffer.Parent
 
 local Promise = require(parent.Promise)
+
+local FFlagLuaAppCloudClientSyncOfferEligibility = require(CloudClientOffer.Flags.FFlagLuaAppCloudClientSyncOfferEligibility)
 
 local function parseReservationError(result)
 	local v = tostring(result)
@@ -21,6 +24,10 @@ local function createCloudClientServiceAdapter(result)
 		checkEligibility = function(p)
 			return Promise.new(function(callback, callback2)
 				local success, result2 = pcall(function()
+					if FFlagLuaAppCloudClientSyncOfferEligibility then
+						return result:CheckOfferEligibility(p.kind)
+					end
+
 					return result:CheckOfferEligibilityAsync(p.kind)
 				end)
 
@@ -54,6 +61,11 @@ local function createCloudClientServiceAdapter(result)
 		releaseReservation = function(p: string)
 			pcall(function()
 				result:ReleaseReservation(p)
+			end)
+		end,
+		reportDecision = function(p: string, p2: string)
+			pcall(function()
+				result:ReportOfferDecision(p, p2)
 			end)
 		end,
 		onReservationExpired = function(onReservationExpired)

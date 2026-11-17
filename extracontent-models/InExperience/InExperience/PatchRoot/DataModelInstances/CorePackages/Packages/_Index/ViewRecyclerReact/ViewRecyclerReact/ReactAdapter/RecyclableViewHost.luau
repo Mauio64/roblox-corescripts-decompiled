@@ -1,5 +1,7 @@
 local Flags = require(script:FindFirstAncestor("ViewRecyclerReact").Flags)
-local FFlagViewRecyclerReact08 = Flags.FFlagViewRecyclerReact08
+local FFlagViewRecyclerReact084 = Flags.FFlagViewRecyclerReact084
+local Flags2 = require(script:FindFirstAncestor("ViewRecyclerReact").Flags)
+local FFlagViewRecyclerReact08 = Flags2.FFlagViewRecyclerReact08
 local ViewRecyclerReact = script:FindFirstAncestor("ViewRecyclerReact")
 local ViewRecyclerRoblox = require(ViewRecyclerReact.Parent.ViewRecyclerRoblox)
 
@@ -38,11 +40,15 @@ local function RecyclableViewHost(p)
 	end)
 
 	React.useLayoutEffect(function()
-		local detachFromPlaceholder = not FFlagViewRecyclerReact08 and function(p2)
-			if portalFrame.Parent == p2 then
-				ReparentableHost.detach(portalFrame)
-			end
-		end or nil
+		local detachFromPlaceholder
+
+		if not FFlagViewRecyclerReact084 then
+			detachFromPlaceholder = not FFlagViewRecyclerReact08 and function(p2)
+				if portalFrame.Parent == p2 then
+					ReparentableHost.detach(portalFrame)
+				end
+			end or nil
+		end
 
 		local bindHost = itemView.bindHost
 		local v2 = {
@@ -52,7 +58,9 @@ local function RecyclableViewHost(p)
 			detachFromPlaceholder = 0
 		}
 
-		if FFlagViewRecyclerReact08 then
+		if FFlagViewRecyclerReact084 then
+			detachFromPlaceholder = nil
+		elseif FFlagViewRecyclerReact08 then
 			detachFromPlaceholder = nil
 		end
 

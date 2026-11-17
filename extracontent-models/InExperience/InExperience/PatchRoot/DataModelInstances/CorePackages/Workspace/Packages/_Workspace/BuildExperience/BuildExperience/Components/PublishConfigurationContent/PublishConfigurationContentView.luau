@@ -97,6 +97,7 @@ local function PublishConfigurationContentView(props)
 			title = versionInformationTitle,
 			body = versionInformationBody,
 			rows = rows3,
+			onRowActivated = props.onRowActivated,
 			testId = `{testId}-version-information`
 		}),
 		GameDetails = React.createElement(GameConfigurationList, {
@@ -104,6 +105,7 @@ local function PublishConfigurationContentView(props)
 			title = gameDetails,
 			body = gameDetailsBody,
 			rows = rows,
+			onRowActivated = props.onRowActivated,
 			testId = `{testId}-game-details`
 		}),
 		Content = 0
@@ -121,6 +123,7 @@ local function PublishConfigurationContentView(props)
 			title = contentTitle,
 			body = contentBody,
 			rows = rows2,
+			onRowActivated = props.onRowActivated,
 			testId = `{testId}-content`
 		}),
 		BuildMaturityBanner = 0

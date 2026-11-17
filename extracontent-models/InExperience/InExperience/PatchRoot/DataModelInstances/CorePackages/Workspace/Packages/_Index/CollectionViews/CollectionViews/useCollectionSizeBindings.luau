@@ -6,7 +6,7 @@ local calculateItemWidth = require(CollectionViews.calculateItemWidth)
 local RoactUtils = require(parent.RoactUtils)
 local useStore = RoactUtils.Hooks.RoactRodux.useStore
 
-local function getItemSize(p: number, p2: number, p3: number, x: number, p4: number, callback, p5: number?)
+local function getItemSize(p: number, p2: number, p3: number, x: number, p4: number, callback, p5: number?) -- 1 equivalent call inferred from this helper
 	local v = calculateItemWidth(p, p2, p3, x, p4, p5)
 	local v2 = callback(v)
 	return Vector2.new(v, v2)
@@ -35,9 +35,10 @@ local function useCollectionSizeBindings(p: number, p2: number, p3: number, p4: 
 		end
 
 		v3(absoluteSize)
-		local v6 = calculateItemWidth(p, p2, p3, absoluteSize and absoluteSize.X or 0, p4, p5)
-		local v7 = callback(v6)
-		v5((Vector2.new(v6, v7)))
+
+		local itemSize = getItemSize(p, p2, p3, absoluteSize and absoluteSize.X or 0, p4, callback, p5) -- inferred equivalent call
+
+		v5(itemSize)
 	end, { p, p2, p3, p4, callback, callback2, p5 })
 
 	React.useEffect(function()

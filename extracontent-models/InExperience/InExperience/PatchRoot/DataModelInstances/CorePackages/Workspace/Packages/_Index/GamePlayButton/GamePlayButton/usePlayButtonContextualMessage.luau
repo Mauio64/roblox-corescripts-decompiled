@@ -10,13 +10,9 @@ local GameLaunch = require(parent.GameLaunch)
 local LaunchErrorLocalizationKeys = GameLaunch.LaunchErrorLocalizationKeys
 local RoactUtils = require(parent.RoactUtils)
 local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
-local GameInfosRodux = require(parent.GameInfosRodux)
-local useGameInfosSelector = GameInfosRodux.useGameInfosSelector
 local GameHydrationReact = require(parent.GameHydrationReact)
 local SharedFlags = require(parent.SharedFlags)
-local FFlagMigrateGameInfoToStore = SharedFlags.FFlagMigrateGameInfoToStore
-local SharedFlags2 = require(parent.SharedFlags)
-local FFlagEnableGameJoinEarlyAccess = SharedFlags2.FFlagEnableGameJoinEarlyAccess
+local FFlagEnableGameJoinEarlyAccess = SharedFlags.FFlagEnableGameJoinEarlyAccess
 local GameProductInfoRodux = require(parent.GameProductInfoRodux)
 local useGameProductInfoSelector = GameProductInfoRodux.useGameProductInfoSelector
 local UniversalAppPolicy2 = require(parent.UniversalAppPolicy)
@@ -26,20 +22,20 @@ local useLocalization = Localization.Hooks.useLocalization
 local DiscoveryTypes2 = require(parent.DiscoveryTypes)
 local ExperienceDetailsNoticeType = DiscoveryTypes2.ExperienceDetailsNoticeType
 
-local function fn(p, p2, p3)
-	if not p2 then
+local function fn(rootPlaceId, p, p2)
+	if not p then
 		return nil
 	end
 
 	if
-		p == nil
-		or (p2.playabilityStatus == PlayabilityStatusEnum.PurchaseRequired or p2.playabilityStatus == PlayabilityStatusEnum.FiatPurchaseRequired)
-		and (p3 == nil or p3.isForSale == false)
+		rootPlaceId == nil
+		or (p.playabilityStatus == PlayabilityStatusEnum.PurchaseRequired or p.playabilityStatus == PlayabilityStatusEnum.FiatPurchaseRequired)
+		and (p2 == nil or p2.isForSale == false)
 	then
 		return "Feature.ExperienceDetails.UnplayableError.UnplayableOther"
 	end
 
-	if p2.playabilityStatus == PlayabilityStatusEnum.DeviceRestricted then
+	if p.playabilityStatus == PlayabilityStatusEnum.DeviceRestricted then
 		local device = getAppFeaturePolicies().getPlatformDisplayName() or ""
 
 		if device ~= "" then
@@ -49,7 +45,7 @@ local function fn(p, p2, p3)
 		end
 	end
 
-	return LaunchErrorLocalizationKeys[p2.playabilityStatus]
+	return LaunchErrorLocalizationKeys[p.playabilityStatus]
 end
 
 return function(p, p2: string, p3)
@@ -67,46 +63,26 @@ return function(p, p2: string, p3)
 		return p4.GameDetails[p]
 	end)
 
-	local v4 = nil
-	local v5 = nil
+	local v4 = GameHydrationReact.useGameInfo(p)
+	local rootPlaceId = v3 and v3.rootPlaceId or v4 and v4.rootPlaceId or nil
 
-	if FFlagMigrateGameInfoToStore then
-		v5 = GameHydrationReact.useGameInfo(p)
-	else
-		v4 = useGameInfosSelector(p)
-	end
-
-	local v6 = v3 and v3.rootPlaceId
-
-	if not v6 then
-		local v7
-
-		if FFlagMigrateGameInfoToStore then
-			v7 = v5 and v5.rootPlaceId
-		else
-			v7 = v4 and v4.placeId
-		end
-
-		v6 = v7 or nil
-	end
-
-	local v7 = useGameProductInfoSelector(p)
+	local v5 = useGameProductInfoSelector(p)
 	local unplayableOtherFallback
 
 	if p2 == PlayButtonStates.UnplayableOther then
-		local v8, v9 = fn(v6, p3, v7)
+		local v6, v7 = fn(rootPlaceId, p3, v5)
 
-		if v8 ~= nil then
-			if v9 then
-				unplayableOtherFallback = table.clone(v9)
-				unplayableOtherFallback[1] = v8
+		if v6 ~= nil then
+			if v7 then
+				unplayableOtherFallback = table.clone(v7)
+				unplayableOtherFallback[1] = v6
 			else
-				unplayableOtherFallback = v8
+				unplayableOtherFallback = v6
 			end
 		end
 	end
 
-	local v8 = useLocalization({
+	local v6 = useLocalization({
 		agreeToNotice = "Feature.ExperienceDetails.PlayButtonMessage.AgreeToNotice",
 		unplayableOtherFallback = unplayableOtherFallback
 	})
@@ -115,7 +91,7 @@ return function(p, p2: string, p3)
 		(p2 == PlayButtonStates.Playable or p2 == PlayButtonStates.PlayableWithParty or p2 == PlayButtonStates.WaitingForParty)
 		and v.experienceDetailsNoticeType == ExperienceDetailsNoticeType.InExperiencePurchase
 	then
-		return v8.agreeToNotice
+		return v6.agreeToNotice
 	end
 
 	if
@@ -131,7 +107,7 @@ return function(p, p2: string, p3)
 	end
 
 	if p2 == PlayButtonStates.UnplayableOther then
-		return v8.unplayableOtherFallback
+		return v6.unplayableOtherFallback
 	end
 
 	return nil

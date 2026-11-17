@@ -33,6 +33,7 @@ else
 	v = MomentsCommon.Components.Reaction
 end
 
+local ReactionAssets = MomentsCommon.Components.ReactionAssets
 local ReactionSize = MomentsCommon.Enums.ReactionSize
 local FormFactor = MomentsCommon.Enums.FormFactor
 local useDeviceInsets = MomentsCommon.Hooks.useDeviceInsets
@@ -43,6 +44,10 @@ require(script.Parent.usePostInsightsPageViewModel)
 
 local vector2 = Vector2.new(83, 124)
 
+local vector2_2 = Vector2.new(94, 140)
+
+local udim = UDim2.fromOffset(64, 24)
+
 local navigateBacks = {
 	[Enum.KeyCode.ButtonB] = FocusNavigationEventNameEnum.NavigateBack,
 	[Enum.KeyCode.Escape] = FocusNavigationEventNameEnum.NavigateBack
@@ -52,20 +57,23 @@ local frozen = table.freeze({ ZIndex = Constants.DisplayOrder.Modals })
 
 local function noop() end
 
-local function Thumbnail(p)
+local function Thumbnail(props)
 	local v2 = useTokens()
 	local createElement = React.createElement
 	local v3 = {
-		LayoutOrder = p.LayoutOrder,
+		LayoutOrder = props.LayoutOrder,
 		cornerRadius = UDim.new(0, v2.Radius.Small),
-		Size = UDim2.fromOffset(vector2.X, vector2.Y),
+		Size = UDim2.fromOffset(props.size.X, props.size.Y),
 		tag = "radius-small clip bg-surface-300",
 		testId = "post-insights-thumbnail"
 	}
 	local media
 
-	if p.mediaItem ~= nil then
-		media = React.createElement(MomentMediaTile, { mediaItem = p.mediaItem, isActive = false })
+	if props.mediaItem ~= nil then
+		media = React.createElement(MomentMediaTile, {
+			mediaItem = props.mediaItem,
+			isActive = false
+		})
 	end
 
 	return createElement(View, v3, { Media = media })
@@ -76,36 +84,44 @@ local function InteractionCounts(props)
 	local children = {}
 
 	for k, interactionCount in props.interactionCounts do
-		children[interactionCount.key] = React.createElement(
-			View,
-			{
-				LayoutOrder = k,
-				Size = UDim2.fromOffset(52, 0),
-				tag = "col align-x-center gap-xsmall auto-y padding-y-small"
-			},
-			{
-				Icon = React.createElement(Icon, {
-					LayoutOrder = 1,
-					name = interactionCount.icon,
-					size = v2.Size.Size_600,
-					style = v2.Color.Content.Emphasis
-				}),
-				Count = React.createElement(Text, {
-					LayoutOrder = 2,
-					Text = interactionCount.countText,
-					tag = "auto-xy text-label-small content-emphasis",
-					testId = `post-insights-count-{interactionCount.key}`
-				})
+		local key = interactionCount.key
+		local createElement = React.createElement
+		local size
+
+		if not props.isWide then
+			size = UDim2.fromOffset(52, 0)
+		end
+
+		children[key] = createElement(View, {
+			LayoutOrder = k,
+			Size = size,
+			tag = {
+				["col align-x-center gap-xsmall padding-y-small"] = true,
+				["auto-xy"] = props.isWide,
+				["auto-y"] = not props.isWide
 			}
-		)
+		}, {
+			Icon = React.createElement(Icon, {
+				LayoutOrder = 1,
+				name = interactionCount.icon,
+				size = v2.Size.Size_600,
+				style = v2.Color.Content.Emphasis
+			}),
+			Count = React.createElement(Text, {
+				LayoutOrder = 2,
+				Text = interactionCount.countText,
+				tag = "auto-xy text-label-small content-emphasis",
+				testId = `post-insights-count-{interactionCount.key}`
+			})
+		})
 	end
 
 	return React.createElement(View, {
 		LayoutOrder = props.LayoutOrder,
 		tag = {
-			["row gap-small"] = true,
-			["auto-xy"] = props.isWide,
-			["align-x-center size-full-0 auto-y"] = not props.isWide
+			row = true,
+			["gap-xxlarge auto-xy"] = props.isWide,
+			["align-x-center gap-small size-full-0 auto-y"] = not props.isWide
 		}
 	}, children)
 end
@@ -123,7 +139,8 @@ local function Summary(props)
 			{
 				Thumbnail = React.createElement(Thumbnail, {
 					LayoutOrder = 1,
-					mediaItem = viewProps.mediaItem
+					mediaItem = viewProps.mediaItem,
+					size = vector2
 				}),
 				Counts = React.createElement(InteractionCounts, {
 					LayoutOrder = 2,
@@ -137,31 +154,61 @@ local function Summary(props)
 	local createElement = React.createElement
 	local v2 = {
 		LayoutOrder = props.LayoutOrder,
-		tag = "row align-y-center gap-large size-full-0 auto-y"
+		tag = "row align-y-center gap-xxlarge size-full-0 auto-y"
 	}
 
 	local v3 = {
 		Thumbnail = React.createElement(Thumbnail, {
 			LayoutOrder = 1,
-			mediaItem = viewProps.mediaItem
+			mediaItem = viewProps.mediaItem,
+			size = vector2_2
 		}),
 		Details = 0
 	}
 
 	local createElement2 = React.createElement
-	local caption
+	local text
 
-	if viewProps.caption ~= nil then
-		caption = React.createElement(Text, {
-			LayoutOrder = 1,
-			Text = viewProps.caption,
-			tag = "size-full-0 auto-y text-title-large text-align-x-left text-truncate-end content-emphasis",
-			testId = "post-insights-caption"
-		})
+	if not (viewProps.caption == nil and viewProps.postedOnText == nil) then
+		local createElement3 = React.createElement
+		local caption
+
+		if viewProps.caption ~= nil then
+			caption = React.createElement(Text, {
+				LayoutOrder = 1,
+				Text = viewProps.caption,
+				tag = "size-full-0 auto-y text-heading-small text-align-x-left text-truncate-end content-emphasis",
+				testId = "post-insights-caption"
+			})
+		end
+
+		local postedOn
+
+		if viewProps.postedOnText ~= nil then
+			postedOn = React.createElement(Text, {
+				LayoutOrder = 2,
+				Text = viewProps.postedOnText,
+				tag = "size-full-0 auto-y text-body-medium text-align-x-left content-default",
+				testId = "post-insights-posted-on"
+			})
+		end
+
+		text = createElement3(
+			View,
+			{
+				LayoutOrder = 1,
+				tag = "col align-x-left gap-xsmall size-full-0 auto-y",
+				testId = "post-insights-summary-text"
+			},
+			{ Caption = caption, PostedOn = postedOn }
+		)
 	end
 
-	v3.Details = createElement2(View, { LayoutOrder = 2, tag = "col fill gap-small auto-y" }, {
-		Caption = caption,
+	v3.Details = createElement2(View, {
+		LayoutOrder = 2,
+		tag = "col align-x-left fill gap-medium auto-y"
+	}, {
+		Text = text,
 		Counts = React.createElement(InteractionCounts, {
 			LayoutOrder = 2,
 			interactionCounts = viewProps.interactionCounts,
@@ -180,26 +227,36 @@ local function SectionHeading(p)
 end
 
 local function Metric(props)
-	return React.createElement(
-		View,
-		{
-			LayoutOrder = props.LayoutOrder,
-			tag = "col fill gap-xxsmall auto-y padding-x-xsmall padding-y-small"
-		},
-		{
-			Label = React.createElement(Text, {
-				LayoutOrder = 1,
-				Text = props.label,
-				tag = "auto-xy text-body-medium content-default"
-			}),
-			Value = React.createElement(Text, {
-				LayoutOrder = 2,
-				Text = props.valueText,
-				tag = "auto-xy text-heading-small content-emphasis",
-				testId = props.testId
-			})
-		}
-	)
+	local createElement = React.createElement
+	local v2 = { LayoutOrder = props.LayoutOrder, tag = props.tag }
+	local v3 = {
+		Label = React.createElement(Text, {
+			LayoutOrder = 1,
+			Text = props.label,
+			tag = "auto-xy text-body-medium content-default",
+			testId = `{props.testId}-label`
+		}),
+		Value = 0
+	}
+	local v4
+
+	if props.isLoading then
+		v4 = React.createElement(Skeleton, {
+			LayoutOrder = 2,
+			Size = udim,
+			testId = `{props.testId}-skeleton`
+		})
+	else
+		v4 = React.createElement(Text, {
+			LayoutOrder = 2,
+			Text = props.valueText,
+			tag = "auto-xy text-heading-small content-emphasis",
+			testId = props.testId
+		})
+	end
+
+	v3.Value = v4
+	return createElement(View, v2, v3)
 end
 
 local function ViewsChartSkeleton(p)
@@ -238,8 +295,21 @@ local function OverviewSection(props)
 
 	if props.isViewsChartLoading then
 		viewsChart = React.createElement(ViewsChartSkeleton, { LayoutOrder = 2 })
-	else
-		viewsChart = React.createElement(AnalyticsMetricChart.MetricChart, clone)
+	elseif props.isViewsChartVisible then
+		viewsChart = React.createElement(View, {
+			LayoutOrder = 2,
+			tag = "col gap-large size-full-0 auto-y"
+		}, {
+			TotalViews = React.createElement(Metric, {
+				LayoutOrder = 1,
+				label = props.totalViewsLabel,
+				valueText = props.totalViewsText,
+				isLoading = props.isTotalViewsLoading,
+				tag = "col gap-xxsmall auto-xy",
+				testId = "post-insights-total-views"
+			}),
+			Chart = React.createElement(AnalyticsMetricChart.MetricChart, clone)
+		})
 	end
 
 	children.ViewsChart = viewsChart
@@ -255,6 +325,8 @@ local function OverviewSection(props)
 					LayoutOrder = j,
 					label = overviewMetric.label,
 					valueText = overviewMetric.valueText,
+					isLoading = overviewMetric.isLoading,
+					tag = "col fill gap-xxsmall auto-y padding-y-small",
 					testId = `post-insights-metric-{overviewMetric.key}`
 				})
 			end
@@ -277,30 +349,36 @@ local function OverviewSection(props)
 end
 
 local function EngagementSection(p)
+	local v2 = useTokens()
+	local v3
+
+	if FFlagMomentsUseSharedReactions then
+		v3 = v2.Size.Size_600
+	else
+		v3 = assert(ReactionAssets.getSizePixels(ReactionSize.Small), "expected a pixel size for Small reactions")
+	end
+
 	local children = {}
 
 	for k, reactionCount in p.viewProps.reactionCounts do
-		children[reactionCount.reactionType] = React.createElement(
-			View,
-			{
-				LayoutOrder = k,
-				Size = UDim2.fromOffset(38, 0),
-				tag = "col align-x-center gap-xxsmall auto-y"
-			},
-			{
-				Reaction = React.createElement(v, {
-					LayoutOrder = 1,
-					reactionType = reactionCount.reactionType,
-					size = ReactionSize.Small
-				}),
-				Count = React.createElement(Text, {
-					LayoutOrder = 2,
-					Text = reactionCount.countText,
-					tag = "auto-xy text-caption-medium content-emphasis",
-					testId = `post-insights-reaction-{reactionCount.reactionType}`
-				})
-			}
-		)
+		children[reactionCount.reactionType] = React.createElement(View, {
+			LayoutOrder = k,
+			sizeConstraint = { MinSize = Vector2.new(v3, 0) },
+			tag = "col align-x-center gap-xxsmall auto-xy",
+			testId = `post-insights-reaction-item-{reactionCount.reactionType}`
+		}, {
+			Reaction = React.createElement(v, {
+				LayoutOrder = 1,
+				reactionType = reactionCount.reactionType,
+				size = ReactionSize.Small
+			}),
+			Count = React.createElement(Text, {
+				LayoutOrder = 2,
+				Text = reactionCount.countText,
+				tag = "auto-xy text-caption-medium content-emphasis",
+				testId = `post-insights-reaction-{reactionCount.reactionType}`
+			})
+		})
 	end
 
 	return React.createElement(
@@ -313,23 +391,18 @@ local function EngagementSection(p)
 			}),
 			Card = React.createElement(
 				View,
-				{ LayoutOrder = 2, tag = "col gap-large size-full-0 auto-y padding-xsmall" },
 				{
-					Total = React.createElement(View, {
+					LayoutOrder = 2,
+					tag = "col gap-large size-full-0 auto-y padding-y-xsmall",
+					testId = "post-insights-engagement-card"
+				},
+				{
+					Total = React.createElement(Metric, {
 						LayoutOrder = 1,
-						tag = "col gap-xsmall auto-xy"
-					}, {
-						Label = React.createElement(Text, {
-							LayoutOrder = 1,
-							Text = p.viewProps.totalReactionsLabel,
-							tag = "auto-xy text-label-medium content-muted"
-						}),
-						Value = React.createElement(Text, {
-							LayoutOrder = 2,
-							Text = p.viewProps.totalReactionsText,
-							tag = "auto-xy text-heading-small content-emphasis",
-							testId = "post-insights-total-reactions"
-						})
+						label = p.viewProps.totalReactionsLabel,
+						valueText = p.viewProps.totalReactionsText,
+						tag = "col gap-xxsmall auto-xy",
+						testId = "post-insights-total-reactions"
 					}),
 					Reactions = React.createElement(View, {
 						LayoutOrder = 2,
@@ -436,8 +509,12 @@ local function PostInsightsPageView(props)
 							Overview = React.createElement(OverviewSection, {
 								LayoutOrder = 2,
 								heading = props.overviewHeading,
+								totalViewsLabel = props.totalViewsLabel,
+								totalViewsText = props.totalViewsText,
+								isTotalViewsLoading = props.isTotalViewsLoading,
 								viewsChart = props.viewsChart,
 								isViewsChartLoading = props.isViewsChartLoading,
+								isViewsChartVisible = props.isViewsChartVisible,
 								overviewMetrics = props.overviewMetrics
 							}),
 							Engagement = React.createElement(EngagementSection, {

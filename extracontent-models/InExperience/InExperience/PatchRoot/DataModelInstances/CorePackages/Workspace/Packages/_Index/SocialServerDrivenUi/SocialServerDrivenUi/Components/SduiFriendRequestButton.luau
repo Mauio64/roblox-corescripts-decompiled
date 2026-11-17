@@ -30,7 +30,6 @@ local IconButton = Foundation.IconButton
 local enums = Foundation.Enums
 
 local FFlagSduiSearchPeoplePlayerTileTelemetry = SharedFlags.FFlagSduiSearchPeoplePlayerTileTelemetry
-local FFlagSduiRequestFriendshipActionHandler = SharedFlags.FFlagSduiRequestFriendshipActionHandler
 
 local FFlagSduiFriendRequestButtonHideForSelf = require(SocialServerDrivenUi.Flags.FFlagSduiFriendRequestButtonHideForSelf)
 
@@ -45,13 +44,12 @@ local function SduiFriendRequestButton(props)
 
 	local isDisabled = v2 == Enum.FriendStatus.FriendRequestSent or v2 == Enum.FriendStatus.FriendRequestReceived
 
-	local useCallback = React.useCallback
-	local function fn()
+	local onActivated = React.useCallback(function()
 		if isDisabled or userId == nil then
 			return
 		end
 
-		if FFlagSduiRequestFriendshipActionHandler and props.sduiContext then
+		if props.sduiContext then
 			SduiRequestFriendshipAction({
 				actionType = SduiActionType.RequestFriendship,
 				actionParams = { targetUserId = userId, source = props.source }
@@ -89,22 +87,7 @@ local function SduiFriendRequestButton(props)
 		if FFlagSduiSearchPeoplePlayerTileTelemetry then
 			firePlayerFriendAddTelemetry(userId, props.analyticsContext, props.sduiContext)
 		end
-	end
-
-	local source = props.source
-	local analyticsContext
-
-	if FFlagSduiSearchPeoplePlayerTileTelemetry or FFlagSduiRequestFriendshipActionHandler then
-		analyticsContext = props.analyticsContext
-	end
-
-	local v3
-
-	if FFlagSduiSearchPeoplePlayerTileTelemetry or FFlagSduiRequestFriendshipActionHandler then
-		v3 = props.sduiContext
-	end
-
-	local onActivated = useCallback(fn, { isDisabled, userId, source, v, analyticsContext, v3 })
+	end, { isDisabled, userId, props.source, v, props.analyticsContext, props.sduiContext })
 
 	if
 		v2 == nil

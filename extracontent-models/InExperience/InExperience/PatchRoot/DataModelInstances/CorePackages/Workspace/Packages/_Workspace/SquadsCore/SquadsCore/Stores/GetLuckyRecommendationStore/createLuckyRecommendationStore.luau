@@ -18,14 +18,14 @@ return function()
 	local v2 = nil
 	local v3 = nil
 
-	local function fn(pickRequestId: string, squadId: string)
+	local function fn(guid: string, squadId: string)
 		if v2 then
 			v2()
 			v2 = nil
 		end
 
 		local v4 = {
-			pickRequestId = pickRequestId,
+			pickRequestId = guid,
 			squadId = squadId,
 			revealType = SquadLuckyRecommendationRevealType.Default,
 			result = nil
@@ -34,7 +34,7 @@ return function()
 		v3 = v4
 		v({ phase = SquadLuckyRecommendationPhase.Rolling })
 
-		v2 = getLuckyRecommendation(pickRequestId, function(recommendation)
+		v2 = getLuckyRecommendation(guid, function(recommendation)
 			v2 = nil
 			v4.result = { isSuccess = true, recommendation = recommendation }
 		end, function(err)

@@ -4,7 +4,6 @@ local Loggers = require(parent.Loggers)
 local mutedError = Loggers.mutedError
 
 require(script.Parent.types)
-local FFlagHttpClientRetryExtensions = require(script.Parent.Flags.FFlagHttpClientRetryExtensions)
 
 local _ = { maxRetryCount = 4, retryJitterMinMs = 0, retryJitterMaxMs = 4000 }
 
@@ -15,19 +14,14 @@ local function backoffSeconds(count: number, p: number, p2: number) -- 1 equival
 end
 
 local function shouldRetry(data, retryOnStatuses, retryOnHttpErrors)
-	if FFlagHttpClientRetryExtensions then
-		if
-			data.wasTransportFailure and retryOnHttpErrors == nil
-			or retryOnHttpErrors ~= nil
-			and data.httpError ~= nil
-			and data.httpError ~= Enum.HttpError.OK
-			and retryOnHttpErrors[data.httpError]
-		then
-			return true, nil
-		end
-	end
-
-	if retryOnStatuses[data.statusCode] then
+	if
+		data.wasTransportFailure and retryOnHttpErrors == nil
+		or retryOnHttpErrors ~= nil
+		and data.httpError ~= nil
+		and data.httpError ~= Enum.HttpError.OK
+		and retryOnHttpErrors[data.httpError]
+		or retryOnStatuses[data.statusCode]
+	then
 		return true, nil
 	end
 
@@ -48,21 +42,8 @@ local function withRetry(p, options)
 	local v4 = v2.retryJitterMinMs or 0
 	local v5 = v2.retryJitterMaxMs or 4000
 	local retryOnStatuses = v2.retryOnStatuses or v
-	local retryOnHttpErrors
-
-	if FFlagHttpClientRetryExtensions then
-		retryOnHttpErrors = v2.retryOnHttpErrors
-	else
-		retryOnHttpErrors = nil
-	end
-
-	local retryBudgetSec
-
-	if FFlagHttpClientRetryExtensions then
-		retryBudgetSec = v2.retryBudgetSec
-	else
-		retryBudgetSec = nil
-	end
+	local retryOnHttpErrors = v2.retryOnHttpErrors
+	local retryBudgetSec = v2.retryBudgetSec
 
 	if v3 < 0 then
 		mutedError(`withRetry: maxRetryCount must be >= 0, got {v3}; falling back to default`)
@@ -81,26 +62,20 @@ local function withRetry(p, options)
 	end
 
 	return {
-		request = function(data, callback)
+		request = function(p2, callback)
 			local count = 0
-			local lastTime
-
-			if FFlagHttpClientRetryExtensions then
-				lastTime = os.clock()
-			else
-				lastTime = nil
-			end
-
+			local lastTime = os.clock()
 			local flag = false
-			local v6 = false
-			local v7 = nil
+			local flag2 = false
+			local v6 = nil
 			local thread = nil
 
-			local onMessage = data.onMessage
+			local onMessage = p2.onMessage
 
-			local function handleMessage(p2: string)
-				v6 = true
-				onMessage(p2)
+			local function handleMessage(p3: string)
+				flag2 = true
+
+				onMessage(p3)
 			end
 
 			local function fn()
@@ -108,81 +83,67 @@ local function withRetry(p, options)
 					return
 				end
 
-				local v8 = data
+				local v7 = p2
 
-				if FFlagHttpClientRetryExtensions and onMessage ~= nil then
-					v8 = table.clone(data)
-					v8.onMessage = handleMessage
+				if onMessage ~= nil then
+					v7 = table.clone(p2)
+					v7.onMessage = handleMessage
 				end
 
 				if count > 0 then
-					local headers = not data.headers and {} or table.clone(data.headers)
+					local headers = not p2.headers and {} or table.clone(p2.headers)
 					headers["X-Retry-Attempt"] = tostring(count)
 
-					if FFlagHttpClientRetryExtensions then
-						if v8 == data then
-							v8 = table.clone(data)
-						end
-
-						v8.headers = headers
-					else
-						v8 = {
-							url = data.url,
-							method = data.method,
-							body = data.body,
-							headers = headers
-						}
+					if v7 == p2 then
+						v7 = table.clone(p2)
 					end
 
-					if FFlagHttpClientRetryExtensions and v2.onRetry ~= nil then
+					v7.headers = headers
+
+					if v2.onRetry ~= nil then
 						v2.onRetry(count)
 					end
 				end
 
-				v7 = p.request(v8, function(p2, p3)
-					v7 = nil
+				v6 = p.request(v7, function(p3, p4)
+					v6 = nil
 
 					if flag then
 						return
 					end
 
-					if FFlagHttpClientRetryExtensions and v6 then
-						callback(p2, p3)
+					if flag2 then
+						callback(p3, p4)
 						return
 					end
 
-					local v9 = nil
+					local v8 = nil
 
-					if p2 then
-						local v10
-						v10, v9 = shouldRetry(p3, retryOnStatuses, retryOnHttpErrors)
+					if p3 then
+						local v9
+						v9, v8 = shouldRetry(p4, retryOnStatuses, retryOnHttpErrors)
 
-						if not (v10 and count < v3) then
-							callback(true, p3)
+						if not (v9 and count < v3) then
+							callback(true, p4)
 							return
 						end
 					elseif retryOnHttpErrors ~= nil or v3 <= count then
-						callback(false, p3)
+						callback(false, p4)
 						return
 					end
 
 					count += 1
 
-					if not v9 then
-						v9 = backoffSeconds(count, v4, v5) -- inferred equivalent call
+					if not v8 then
+						v8 = backoffSeconds(count, v4, v5) -- inferred equivalent call
 					end
 
-					if
-						FFlagHttpClientRetryExtensions
-						and retryBudgetSec ~= nil
-						and lastTime ~= nil
-						and retryBudgetSec <= os.clock() - lastTime + v9
-					then
-						callback(p2, p3)
+					if retryBudgetSec ~= nil and lastTime ~= nil and retryBudgetSec <= os.clock() - lastTime + v8 then
+						callback(p3, p4)
 						return
 					end
 
-					thread = task.delay(v9, function()
+					thread = task.delay(v8, function()
 						thread = nil
 						fn()
 					end)
@@ -203,9 +164,9 @@ local function withRetry(p, options)
 					thread = nil
 				end
 
-				if v7 ~= nil then
-					v7()
-					v7 = nil
+				if v6 ~= nil then
+					v6()
+					v6 = nil
 				end
 			end
 		end

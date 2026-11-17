@@ -1,1 +1,0 @@
-return { UserModel = require("@game/CorePackages/Workspace/Packages/_Workspace/UserLib/UserLib/Models/User"), MockUser = require("@game/CorePackages/Workspace/Packages/_Workspace/UserLib/UserLib/Models/MockUser") }

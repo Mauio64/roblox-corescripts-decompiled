@@ -1,1 +1,0 @@
-return game:DefineFastFlag("EnableUserRecentActivityEntryPoint_v2", false)

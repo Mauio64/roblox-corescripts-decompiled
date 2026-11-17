@@ -19,9 +19,15 @@ require(script.Parent.AvatarActionBar)
 
 local FFlagAXEnableUnifiedLoggingAvatarMoment = SharedFlags.FFlagAXEnableUnifiedLoggingAvatarMoment
 local FFlagMomentsRenderAvatarPostsInFeed = SharedFlags.FFlagMomentsRenderAvatarPostsInFeed
+local FFlagMomentsHideUnavailableAvatarActionBar = require(Moments.Flags.FFlagMomentsHideUnavailableAvatarActionBar)
+local FFlagMomentsAvatarActionBarOutfitThumbnail = require(Moments.Flags.FFlagMomentsAvatarActionBarOutfitThumbnail)
 
 local function getLookThumbnail(lookId: string) -- 1 equivalent call inferred from this helper
 	return `rbxthumb://type=Look&id={lookId}&w={150}&h={150}`
+end
+
+local function getOutfitThumbnail(p: number) -- 1 equivalent call inferred from this helper
+	return `rbxthumb://type=Outfit&id={p}&w={150}&h={150}&includeBackground=true`
 end
 
 local function useAvatarActionBarViewModel(p)
@@ -70,7 +76,8 @@ local function useAvatarActionBarViewModel(p)
 
 	local v5 = {
 		LayoutOrder = p.LayoutOrder,
-		isLoading = v2 == nil and v.status ~= "Ready",
+		hasLookError = 0,
+		isLoading = 0,
 		thumbnailImage = 0,
 		priceText = 0,
 		itemCountText = 0,
@@ -79,9 +86,24 @@ local function useAvatarActionBarViewModel(p)
 		isShopDisabled = 0,
 		onShop = 0
 	}
+	local hasLookError = FFlagMomentsHideUnavailableAvatarActionBar
+
+	if hasLookError then
+		if data.kind == "avatar" and v2 == nil then
+			hasLookError = v.status == "Unavailable"
+		else
+			hasLookError = false
+		end
+	end
+
+	v5.hasLookError = hasLookError
+
+	v5.isLoading = v2 == nil and v.status ~= "Ready"
 	local thumbnailImage
 
-	if lookId ~= nil then
+	if FFlagMomentsAvatarActionBarOutfitThumbnail and outfitId ~= nil then
+		thumbnailImage = getOutfitThumbnail(outfitId) -- inferred equivalent call
+	elseif lookId ~= nil then
 		thumbnailImage = getLookThumbnail(lookId) -- inferred equivalent call
 	end
 

@@ -6,36 +6,52 @@ local ValidationEnums = require(parent.validationSystem.ValidationEnums)
 local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 
 local GetFStringUGCValidateMaxAnimationMovementPerPart = require(parent.flags.GetFStringUGCValidateMaxAnimationMovementPerPart)
-return {
-	categories = { ValidationEnums.UploadCategory.EMOTE_ANIMATION, ValidationEnums.UploadCategory.ANIMATION },
-	requiredData = {
-		ValidationEnums.SharedDataMember.curveAnimations,
-		ValidationEnums.SharedDataMember.curveAnimComputedFrames
-	},
-	expectedFailures = {},
-	prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable },
-	run = function(object, p)
-		local v = {}
+local CurveAnimPositionBounded = {}
 
-		for _, positionMagnitudeFrame in p.curveAnimComputedFrames.positionMagnitudeFrames do
-			for k, v2 in positionMagnitudeFrame do
-				if k == Constants.NAMED_R15_BODY_PARTS.LowerTorso then
-					continue
+CurveAnimPositionBounded.categories = {
+	ValidationEnums.UploadCategory.EMOTE_ANIMATION,
+	ValidationEnums.UploadCategory.ANIMATION
+}
+CurveAnimPositionBounded.requiredData = {
+	ValidationEnums.SharedDataMember.curveAnimations,
+	ValidationEnums.SharedDataMember.curveAnimComputedFrames
+}
+
+CurveAnimPositionBounded.expectedFailures = {}
+CurveAnimPositionBounded.prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable }
+
+local function validateCurveAnimClip(object, curveAnimComputedFrame)
+	local fullName = curveAnimComputedFrame.animation and curveAnimComputedFrame.animation:GetFullName()
+	local v = {}
+
+	for _, positionMagnitudeFrame in curveAnimComputedFrame.positionMagnitudeFrames do
+		for k, v2 in positionMagnitudeFrame do
+			if k == Constants.NAMED_R15_BODY_PARTS.LowerTorso then
+				continue
+			end
+
+			if not v[k] then
+				v[k] = GetFStringUGCValidateMaxAnimationMovementPerPart.asNumber(k)
+			end
+
+			if v[k] < v2 then
+				local v3 = { bodyPart = k, maxMovement = tostring(v[k]) }
+
+				if fullName then
+					v3.animationName = fullName
 				end
 
-				if not v[k] then
-					v[k] = GetFStringUGCValidateMaxAnimationMovementPerPart.asNumber(k)
-				end
-
-				if v[k] < v2 then
-					object:fail(ErrorSourceStrings.Keys.CurveAnim_PositionSeparation, {
-						bodyPart = k,
-						maxMovement = tostring(v[k])
-					})
-
-					return
-				end
+				object:fail(ErrorSourceStrings.Keys.CurveAnim_PositionSeparation, v3, curveAnimComputedFrame.animation)
+				return
 			end
 		end
 	end
-}
+end
+
+function CurveAnimPositionBounded.run(p, p2)
+	for _, curveAnimComputedFrame in p2.curveAnimComputedFrames do
+		validateCurveAnimClip(p, curveAnimComputedFrame)
+	end
+end
+
+return CurveAnimPositionBounded

@@ -156,10 +156,12 @@ local function activateSquad(data, p: string, flag: boolean, callback, p2)
 				callback,
 				p2
 			)
-		elseif data.onSquadJoinButtonActivated then
-			data.onSquadJoinButtonActivated(p)
+
+			return
 		end
-	elseif data.onSquadJoinButtonActivated then
+	end
+
+	if data.onSquadJoinButtonActivated then
 		data.onSquadJoinButtonActivated(p)
 	end
 end

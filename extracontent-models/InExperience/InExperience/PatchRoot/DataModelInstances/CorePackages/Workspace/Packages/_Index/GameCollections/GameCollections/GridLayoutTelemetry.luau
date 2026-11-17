@@ -3,10 +3,6 @@ local TelemetryService = game:GetService("TelemetryService")
 local parent = GameCollections.Parent
 
 require(parent.DiscoveryTypes)
-local SharedFlags = require(parent.SharedFlags)
-
-local defineFastFlag = game:DefineFastFlag("LuaAppNullableGridLayoutTelemetryFields", false)
-local FFlagLuaAppFixTotalColsBound = SharedFlags.FFlagLuaAppFixTotalColsBound
 
 local standardizedFields = { "addOSInfo", "addSessionInfo", "addSessionId" }
 
@@ -27,47 +23,39 @@ local v2 = {
 }
 local GridLayoutTelemetry = {}
 
-function GridLayoutTelemetry.logTileSkipped(value: string?, value2: string?, tileType, pageContext: string, numColumns: number, numRows: number, originalFeedIndex: number, value3: number?, value4: string?)
+function GridLayoutTelemetry.logTileSkipped(adId: string?, universeId: string?, tileType, pageContext: string, numColumns: number, numRows: number, originalFeedIndex: number, sortIndex: number?, topicId: string?)
 	TelemetryService:LogEvent(v, {
 		standardizedFields = standardizedFields,
 		customFields = {
-			adId = not defineFastFlag and (value or "") or value,
-			universeId = not defineFastFlag and (value2 or "") or value2,
+			adId = adId,
+			universeId = universeId,
 			tileType = tileType,
 			pageContext = pageContext,
 			numColumns = numColumns,
 			numRows = numRows,
 			originalFeedIndex = originalFeedIndex,
-			sortIndex = not defineFastFlag and (value3 or -1) or value3,
-			topicId = not defineFastFlag and (value4 or "") or value4
+			sortIndex = sortIndex,
+			topicId = topicId
 		}
 	})
 end
 
-function GridLayoutTelemetry.logTilePlaced(value: string?, value2: string?, tileType, pageContext: string, numColumns: number, numRows: number, originalFeedIndex: number, finalFeedIndex: number, sortIndex: number?, topicId: string?, totalFilledColumns: number?)
-	local customFields = {
-		adId = not defineFastFlag and (value or "") or value,
-		universeId = not defineFastFlag and (value2 or "") or value2,
-		tileType = tileType,
-		pageContext = pageContext,
-		numColumns = numColumns,
-		numRows = numRows,
-		originalFeedIndex = originalFeedIndex,
-		finalFeedIndex = finalFeedIndex,
-		sortIndex = sortIndex,
-		topicId = topicId,
-		totalFilledColumns = nil
-	}
-
-	if not FFlagLuaAppFixTotalColsBound then
-		totalFilledColumns = nil
-	end
-
-	customFields.totalFilledColumns = totalFilledColumns
-
+function GridLayoutTelemetry.logTilePlaced(adId: string?, universeId: string?, tileType, pageContext: string, numColumns: number, numRows: number, originalFeedIndex: number, finalFeedIndex: number, sortIndex: number?, topicId: string?, totalFilledColumns: number?)
 	TelemetryService:LogEvent(v2, {
 		standardizedFields = standardizedFields,
-		customFields = customFields
+		customFields = {
+			adId = adId,
+			universeId = universeId,
+			tileType = tileType,
+			pageContext = pageContext,
+			numColumns = numColumns,
+			numRows = numRows,
+			originalFeedIndex = originalFeedIndex,
+			finalFeedIndex = finalFeedIndex,
+			sortIndex = sortIndex,
+			topicId = topicId,
+			totalFilledColumns = totalFilledColumns
+		}
 	})
 end
 

@@ -12,7 +12,6 @@ local Foundation = require(CorePackages.Packages.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
 
 local FFlagEnableConsoleExpControls = SharedFlags.FFlagEnableConsoleExpControls
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local useEventConnection = ReactUtils.useEventConnection
 local Style = require(CorePackages.Workspace.Packages.Style)
@@ -36,8 +35,6 @@ local useObservableValue = require(chrome.ChromeShared.Hooks.useObservableValue)
 local InExperienceLocales = require(CorePackages.Workspace.Packages.InExperienceLocales)
 local Localization = InExperienceLocales.Localization
 
-local FFlagLocalizeMenuNavigationToggleDialog = require(CoreGui.RobloxGui.Modules.TopBar.Flags.FFlagLocalizeMenuNavigationToggleDialog)
-
 local function MenuNavigationToggleDialog(p)
 	local v = useDesignTokens()
 	local captionMedium = v.Typography.CaptionMedium
@@ -49,39 +46,28 @@ local function MenuNavigationToggleDialog(p)
 	local color3 = v.Color.Content.Emphasis.Color3
 	local size_100 = v.Size.Size_100
 
-	local image = not (FFlagLocalizeMenuNavigationToggleDialog and game:GetEngineFeature("GetImageForKeyCode"))
+	local image = not game:GetEngineFeature("GetImageForKeyCode")
 		and "rbxasset://textures/ui/Controls/DesignSystem/ButtonSelect@2x.png"
 		or UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonSelect)
-	local text, text2
 
-	if FFlagLocalizeMenuNavigationToggleDialog then
-		local state, setState = React.useState(LocalizationService.RobloxLocaleId)
-		useEventConnection(LocalizationService:GetPropertyChangedSignal("RobloxLocaleId"), function()
-			setState(LocalizationService.RobloxLocaleId)
-		end)
+	local state, setState = React.useState(LocalizationService.RobloxLocaleId)
+	useEventConnection(LocalizationService:GetPropertyChangedSignal("RobloxLocaleId"), function()
+		setState(LocalizationService.RobloxLocaleId)
+	end)
 
-		text, text2 = React.useMemo(function()
-			local v2 = Localization.new(state)
+	local text, text2 = React.useMemo(function()
+		local v2 = Localization.new(state)
 
-			local success, result = pcall(v2.Format, v2, "CoreScripts.InGameMenu.VirtualCursorHintPreIcon")
+		local success, result = pcall(v2.Format, v2, "CoreScripts.InGameMenu.VirtualCursorHintPreIcon")
+		local success2, result2 = pcall(v2.Format, v2, "CoreScripts.InGameMenu.VirtualCursorHintPostIcon")
+		local selected = not success and "Some experiences require pressing" or result
 
-			local success2, result2 = pcall(v2.Format, v2, "CoreScripts.InGameMenu.VirtualCursorHintPostIcon")
-			local selected = not success and "Some experiences require pressing" or result
+		if success2 then
+			return selected, result2
+		end
 
-			if success2 then
-				return selected, result2
-			end
-
-			return selected, "to toggle menu navigation"
-		end, { state })
-	else
-		local _ = {
-			VirtualCursorHintPreIcon = "Some experiences require pressing ",
-			VirtualCursorHintPostIcon = " to toggle menu navigation"
-		}
-		text = "Some experiences require pressing "
-		text2 = " to toggle menu navigation"
-	end
+		return selected, "to toggle menu navigation"
+	end, { state })
 
 	local v2, v3 = React.useMemo(function()
 		return
@@ -95,118 +81,59 @@ local function MenuNavigationToggleDialog(p)
 		v4 = useObservableValue(GamepadConnector:getSelectedCoreObject())
 	end
 
-	local createElement = React.createElement
-	local v5 = {
+	return React.createElement("Frame", {
 		BackgroundColor3 = overMedia_0.Color3,
 		BackgroundTransparency = overMedia_0.Transparency,
 		AutomaticSize = Enum.AutomaticSize.XY,
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = p.Position,
 		Visible = not (enabled and FFlagEnableConsoleExpControls) or v4 ~= nil
-	}
-
-	local children = {
+	}, {
 		Corner = React.createElement("UICorner", { CornerRadius = UDim.new(0, medium) }),
-		Layout = 0,
-		LeftText = 0,
-		Icon = 0,
-		RightText = 0,
-		Padding = 0
-	}
-
-	local createElement2 = React.createElement
-	local v6 = {
-		FillDirection = Enum.FillDirection.Horizontal,
-		SortOrder = Enum.SortOrder.LayoutOrder,
-		HorizontalAlignment = Enum.HorizontalAlignment.Center,
-		VerticalAlignment = Enum.VerticalAlignment.Center,
-		Padding = 0
-	}
-	local padding
-
-	if FFlagLocalizeMenuNavigationToggleDialog then
-		padding = UDim.new(0, size_100)
-	end
-
-	v6.Padding = padding
-	children.Layout = createElement2("UIListLayout", v6)
-
-	local createElement3 = React.createElement
-	local v7 = {
-		Size = UDim2.fromOffset(v2.X, v2.Y),
-		Text = text,
-		TextXAlignment = Enum.TextXAlignment.Center,
-		TextYAlignment = Enum.TextYAlignment.Center,
-		TextColor3 = color3,
-		Font = 0,
-		FontFace = 0,
-		TextSize = 0,
-		TextWrapped = false,
-		BackgroundTransparency = 1,
-		LayoutOrder = 0
-	}
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = captionMedium.Font
-	end
-
-	v7.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(captionMedium.Font)
-	end
-
-	v7.FontFace = fontFace
-	v7.TextSize = captionMedium.FontSize
-	children.LeftText = createElement3("TextLabel", v7)
-
-	children.Icon = React.createElement("ImageLabel", {
-		Size = UDim2.fromOffset(size_600, size_600),
-		BackgroundTransparency = 1,
-		LayoutOrder = 100,
-		Image = image
+		Layout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Horizontal,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			Padding = UDim.new(0, size_100)
+		}),
+		LeftText = React.createElement("TextLabel", {
+			Size = UDim2.fromOffset(v2.X, v2.Y),
+			Text = text,
+			TextXAlignment = Enum.TextXAlignment.Center,
+			TextYAlignment = Enum.TextYAlignment.Center,
+			TextColor3 = color3,
+			FontFace = normalizeFontFace(captionMedium.Font),
+			TextSize = captionMedium.FontSize,
+			TextWrapped = false,
+			BackgroundTransparency = 1,
+			LayoutOrder = 0
+		}),
+		Icon = React.createElement("ImageLabel", {
+			Size = UDim2.fromOffset(size_600, size_600),
+			BackgroundTransparency = 1,
+			LayoutOrder = 100,
+			Image = image
+		}),
+		RightText = React.createElement("TextLabel", {
+			Size = UDim2.fromOffset(v3.X, v3.Y),
+			Text = text2,
+			TextXAlignment = Enum.TextXAlignment.Center,
+			TextYAlignment = Enum.TextYAlignment.Center,
+			TextColor3 = color3,
+			FontFace = normalizeFontFace(captionMedium.Font),
+			TextSize = captionMedium.FontSize,
+			TextWrapped = false,
+			BackgroundTransparency = 1,
+			LayoutOrder = 200
+		}),
+		Padding = React.createElement("UIPadding", {
+			PaddingTop = UDim.new(0, size_150),
+			PaddingBottom = UDim.new(0, size_150),
+			PaddingLeft = UDim.new(0, size_400),
+			PaddingRight = UDim.new(0, size_400)
+		})
 	})
-
-	local createElement4 = React.createElement
-	local v8 = {
-		Size = UDim2.fromOffset(v3.X, v3.Y),
-		Text = text2,
-		TextXAlignment = Enum.TextXAlignment.Center,
-		TextYAlignment = Enum.TextYAlignment.Center,
-		TextColor3 = color3,
-		Font = 0,
-		FontFace = 0,
-		TextSize = 0,
-		TextWrapped = false,
-		BackgroundTransparency = 1,
-		LayoutOrder = 200
-	}
-	local font2
-
-	if not FoundationFontFaceMigration then
-		font2 = captionMedium.Font
-	end
-
-	v8.Font = font2
-	local fontFace2
-
-	if FoundationFontFaceMigration then
-		fontFace2 = normalizeFontFace(captionMedium.Font)
-	end
-
-	v8.FontFace = fontFace2
-	v8.TextSize = captionMedium.FontSize
-	children.RightText = createElement4("TextLabel", v8)
-
-	children.Padding = React.createElement("UIPadding", {
-		PaddingTop = UDim.new(0, size_150),
-		PaddingBottom = UDim.new(0, size_150),
-		PaddingLeft = UDim.new(0, size_400),
-		PaddingRight = UDim.new(0, size_400)
-	})
-	return createElement("Frame", v5, children)
 end
 
 return MenuNavigationToggleDialog

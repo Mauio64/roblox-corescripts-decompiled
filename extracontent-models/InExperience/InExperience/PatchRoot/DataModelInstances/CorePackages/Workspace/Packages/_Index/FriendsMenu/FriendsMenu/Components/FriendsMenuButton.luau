@@ -6,7 +6,6 @@ local React = require(parent.React)
 local UIBlox = require(parent.UIBlox)
 local Foundation = require(parent.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local RoactUtils = require(parent.RoactUtils)
 local Signals = require(parent.Signals)
 local SignalsReact = require(parent.SignalsReact)
@@ -98,8 +97,7 @@ return function(props)
 
 	local text = localizedStrings[v2] or localizedStrings.inviteFriend
 
-	local createElement = React.createElement
-	local v6 = {
+	return React.createElement("TextLabel", {
 		BackgroundTransparency = 1,
 		Text = text,
 		TextSize = textSize,
@@ -108,25 +106,7 @@ return function(props)
 		AnchorPoint = props.anchorPoint,
 		Position = props.position,
 		TextColor3 = theme.TextDefault.Color,
-		Font = 0,
-		FontFace = 0,
-		LayoutOrder = 0
-	}
-	local font2
-
-	if not FoundationFontFaceMigration then
-		font2 = font.CaptionHeader.Font
-	end
-
-	v6.Font = font2
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(v4.Tokens.Typography.CaptionLarge.Font)
-	end
-
-	v6.FontFace = fontFace
-
-	v6.LayoutOrder = props.layoutOrder
-	return createElement("TextLabel", v6)
+		FontFace = normalizeFontFace(v4.Tokens.Typography.CaptionLarge.Font),
+		LayoutOrder = props.layoutOrder
+	})
 end

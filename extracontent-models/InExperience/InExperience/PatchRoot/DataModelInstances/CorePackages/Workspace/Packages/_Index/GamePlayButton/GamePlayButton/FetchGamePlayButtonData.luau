@@ -10,11 +10,7 @@ local FetchGamePlayabilityAndProductInfo = GameDetailRodux.FetchGamePlayabilityA
 local ApiFetchAgeRecommendations = GameDetailRodux.AgeRecommendations.ApiFetchAgeRecommendations
 local GameVotesRodux = require(parent.GameVotesRodux)
 local FetchUserGameVotes = GameVotesRodux.UserGameVotes.FetchUserGameVotes
-local GameInfosRodux = require(parent.GameInfosRodux)
-local GameInfosReducer = GameInfosRodux.GameInfosReducer
 local DataHydration = require(parent.DataHydration)
-local SharedFlags = require(parent.SharedFlags)
-local FFlagMigrateGameInfoToStore = SharedFlags.FFlagMigrateGameInfoToStore
 local NextDataExpirationTimeRodux = require(parent.NextDataExpirationTimeRodux)
 local SetNextDataExpirationTime = NextDataExpirationTimeRodux.SetNextDataExpirationTime
 local NextDataExpirationTimeReducer = NextDataExpirationTimeRodux.NextDataExpirationTimeReducer
@@ -26,11 +22,11 @@ local VoiceChat = require(parent.VoiceChat)
 local ApiFetchShowAgeVerificationOverlay = VoiceChat.AgeVerificationOverlay.ApiFetchShowAgeVerificationOverlay
 local Promise = require(parent.Promise)
 
-local SharedFlags2 = require(parent.SharedFlags)
-local FFlagLuaAppPlayButtonCoalescePlayabilityFetch = SharedFlags2.FFlagLuaAppPlayButtonCoalescePlayabilityFetch
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppPlayButtonCoalescePlayabilityFetch = SharedFlags.FFlagLuaAppPlayButtonCoalescePlayabilityFetch
 
-local SharedFlags3 = require(parent.SharedFlags)
-local GetFIntLuaAppThrottleRefreshPlayabilityIntervalSeconds = SharedFlags3.GetFIntLuaAppThrottleRefreshPlayabilityIntervalSeconds
+local SharedFlags2 = require(parent.SharedFlags)
+local GetFIntLuaAppThrottleRefreshPlayabilityIntervalSeconds = SharedFlags2.GetFIntLuaAppThrottleRefreshPlayabilityIntervalSeconds
 
 local RunService = game:GetService("RunService")
 
@@ -85,18 +81,11 @@ local function finishInFlightBatch(object2, p: string, flag: boolean) -- 1 equiv
 	return not v2.hadFailure
 end
 
-local function hasContentMaturity(p, p2)
+local function hasContentMaturity(p, p2): boolean
 	local v = p.AgeRecommendations and p.AgeRecommendations[p2]
 
 	if v and v.summary and v.summary.ageRecommendation and v.summary.ageRecommendation.contentMaturity then
 		return true
-	end
-
-	if not FFlagMigrateGameInfoToStore then
-		local v2 = p.Personalization
-			and p.Personalization[GameInfosReducer.key]
-			and p.Personalization[GameInfosReducer.key][p2]
-		return v2 and v2.contentMaturity ~= nil
 	end
 
 	local data = DataHydration.Game.getGameInfoStore(false).getGameInfo(p2).data(false)

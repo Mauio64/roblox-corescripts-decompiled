@@ -93,8 +93,9 @@ local function ExperienceDetailsVoteChip(p)
 		end
 
 		if rootPlaceId then
+			local userId = Players.LocalPlayer and Players.LocalPlayer.UserId
 			local v6 = {
-				uid = tostring(Players.LocalPlayer and Players.LocalPlayer.UserId),
+				uid = tostring(userId),
 				placeId = rootPlaceId,
 				vote = convertBooleanToVoteForAnalytics(flag), -- inferred equivalent call
 				prevVote = convertBooleanToVoteForAnalytics(userVote), -- inferred equivalent call

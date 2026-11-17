@@ -4,7 +4,6 @@ local t = require(CorePackages.Packages.t)
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local Foundation = require(CorePackages.Packages.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local CoreGuiCommon = require(CorePackages.Workspace.Packages.CoreGuiCommon)
 local withFoundationOrUIBloxStyle = CoreGuiCommon.withFoundationOrUIBloxStyle
@@ -71,57 +70,49 @@ function extended:init()
 end
 
 function extended.render(data)
-	return withFoundationOrUIBloxStyle(function(p)
-		local tokens
-
-		if FoundationFontFaceMigration then
-			tokens = p
-		end
-
+	return withFoundationOrUIBloxStyle(function(tokens)
 		return {
 			Tokens = tokens,
 			Theme = {
 				Divider = {
-					Color = p.Color.Stroke.Emphasis.Color3,
-					Transparency = p.Color.Stroke.Emphasis.Transparency
+					Color = tokens.Color.Stroke.Emphasis.Color3,
+					Transparency = tokens.Color.Stroke.Emphasis.Transparency
 				},
 				SystemPrimaryContent = {
-					Color = p.Color.ActionSubEmphasis.Foreground.Color3,
-					Transparency = p.Color.ActionSubEmphasis.Foreground.Transparency
+					Color = tokens.Color.ActionSubEmphasis.Foreground.Color3,
+					Transparency = tokens.Color.ActionSubEmphasis.Foreground.Transparency
 				},
 				TextDefault = {
-					Color = p.Color.Content.Default.Color3,
-					Transparency = p.Color.Content.Default.Transparency
+					Color = tokens.Color.Content.Default.Color3,
+					Transparency = tokens.Color.Content.Default.Transparency
 				},
 				TextEmphasis = {
-					Color = p.Color.Content.Emphasis.Color3,
-					Transparency = p.Color.Content.Emphasis.Transparency
+					Color = tokens.Color.Content.Emphasis.Color3,
+					Transparency = tokens.Color.Content.Emphasis.Transparency
 				}
 			},
 			Font = {
 				BaseSize = 1,
 				CaptionHeader = {
-					Font = p.Typography.CaptionLarge.Font,
-					RelativeSize = p.Typography.CaptionLarge.FontSize
+					Font = tokens.Typography.CaptionLarge.Font,
+					RelativeSize = tokens.Typography.CaptionLarge.FontSize
 				},
 				Header1 = {
-					Font = p.Typography.HeadingSmall.Font,
-					RelativeSize = p.Typography.HeadingSmall.FontSize
+					Font = tokens.Typography.HeadingSmall.Font,
+					RelativeSize = tokens.Typography.HeadingSmall.FontSize
 				}
 			}
 		}
 	end, function(props)
 		local baseSize = props.Font.BaseSize
 
-		local createElement = Roact.createElement
-		local v = {
+		return Roact.createElement("Frame", {
 			Size = UDim2.fromScale(1, 1),
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Position = UDim2.fromScale(0.5, 0.5),
 			BackgroundTransparency = 1,
 			ZIndex = data.props.ZIndex
-		}
-		local children = {
+		}, {
 			uiScale = Roact.createElement("UIScale", { Scale = data.props.uiScale }),
 			layout = Roact.createElement("UIListLayout", {
 				VerticalAlignment = Enum.VerticalAlignment.Top,
@@ -130,173 +121,97 @@ function extended.render(data)
 				FillDirection = Enum.FillDirection.Vertical,
 				SortOrder = Enum.SortOrder.LayoutOrder
 			}),
-			title = 0,
-			subtitle = 0,
-			actions = 0
-		}
-
-		local createElement2 = Roact.createElement
-		local v2 = {
-			Text = data.props.titleText,
-			TextColor3 = props.Theme.TextEmphasis.Color,
-			TextTransparency = props.Theme.TextEmphasis.Transparency,
-			TextSize = props.Font.Header1.RelativeSize * baseSize,
-			Font = 0,
-			FontFace = 0,
-			BackgroundTransparency = 1,
-			AutomaticSize = 0,
-			LayoutOrder = 1
-		}
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = props.Font.Header1.Font
-		end
-
-		v2.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(props.Tokens.Typography.HeadingSmall.Font)
-		end
-
-		v2.FontFace = fontFace
-
-		v2.AutomaticSize = Enum.AutomaticSize.XY
-		children.title = createElement2("TextLabel", v2)
-
-		local createElement3 = Roact.createElement
-		local v3 = {
-			Size = UDim2.fromOffset(612, 0),
-			Text = data.props.subtitleText,
-			TextColor3 = props.Theme.TextEmphasis.Color,
-			TextTransparency = props.Theme.TextEmphasis.Transparency,
-			TextSize = props.Font.CaptionHeader.RelativeSize * baseSize,
-			Font = 0,
-			FontFace = 0,
-			TextWrapped = true,
-			BackgroundTransparency = 1,
-			AutomaticSize = 0,
-			LayoutOrder = 2
-		}
-		local font2
-
-		if not FoundationFontFaceMigration then
-			font2 = props.Font.CaptionHeader.Font
-		end
-
-		v3.Font = font2
-		local fontFace2
-
-		if FoundationFontFaceMigration then
-			fontFace2 = normalizeFontFace(props.Tokens.Typography.CaptionLarge.Font)
-		end
-
-		v3.FontFace = fontFace2
-
-		v3.AutomaticSize = Enum.AutomaticSize.Y
-		children.subtitle = createElement3("TextLabel", v3)
-
-		local createElement4 = Roact.createElement
-		local v4 = {
-			Size = UDim2.fromOffset(584, 0),
-			BackgroundTransparency = 1,
-			AutomaticSize = Enum.AutomaticSize.Y,
-			LayoutOrder = 3
-		}
-
-		local children2 = {
-			layout = Roact.createElement("UIListLayout", {
-				VerticalAlignment = Enum.VerticalAlignment.Top,
-				HorizontalAlignment = Enum.HorizontalAlignment.Center,
-				Padding = UDim.new(0, 18),
-				FillDirection = Enum.FillDirection.Vertical,
-				SortOrder = Enum.SortOrder.LayoutOrder
+			title = Roact.createElement("TextLabel", {
+				Text = data.props.titleText,
+				TextColor3 = props.Theme.TextEmphasis.Color,
+				TextTransparency = props.Theme.TextEmphasis.Transparency,
+				TextSize = props.Font.Header1.RelativeSize * baseSize,
+				FontFace = normalizeFontFace(props.Tokens.Typography.HeadingSmall.Font),
+				BackgroundTransparency = 1,
+				AutomaticSize = Enum.AutomaticSize.XY,
+				LayoutOrder = 1
 			}),
-			instruction = 0,
-			muteCheckbox = 0,
-			div = 0,
-			blockCheckbox = 0,
-			doneContainer = 0
-		}
-
-		local createElement5 = Roact.createElement
-		local v5 = {
-			Size = UDim2.fromScale(1, 0),
-			Text = data.props.instructionText,
-			TextColor3 = props.Theme.TextDefault.Color,
-			TextTransparency = props.Theme.TextDefault.Transparency,
-			TextSize = props.Font.CaptionHeader.RelativeSize * baseSize,
-			Font = 0,
-			FontFace = 0,
-			TextXAlignment = 0,
-			BackgroundTransparency = 1,
-			AutomaticSize = 0,
-			LayoutOrder = 1
-		}
-		local font3
-
-		if not FoundationFontFaceMigration then
-			font3 = props.Font.CaptionHeader.Font
-		end
-
-		v5.Font = font3
-		local fontFace3
-
-		if FoundationFontFaceMigration then
-			fontFace3 = normalizeFontFace(props.Tokens.Typography.CaptionLarge.Font)
-		end
-
-		v5.FontFace = fontFace3
-
-		v5.TextXAlignment = Enum.TextXAlignment.Left
-
-		v5.AutomaticSize = Enum.AutomaticSize.Y
-		children2.instruction = createElement5("TextLabel", v5)
-
-		children2.muteCheckbox = data.props.showVoiceMuting and Roact.createElement(CheckboxRow, {
-			height = 28,
-			image = "icons/controls/microphone",
-			descriptionText = data.props.muteText,
-			actionDisabled = data.state.isBlocked,
-			checkboxSelected = data.state.isBlocked or data.state.isVoiceMuted,
-			onCheckboxActivated = data.onMuteCheckboxActivated,
-			LayoutOrder = 2
+			subtitle = Roact.createElement("TextLabel", {
+				Size = UDim2.fromOffset(612, 0),
+				Text = data.props.subtitleText,
+				TextColor3 = props.Theme.TextEmphasis.Color,
+				TextTransparency = props.Theme.TextEmphasis.Transparency,
+				TextSize = props.Font.CaptionHeader.RelativeSize * baseSize,
+				FontFace = normalizeFontFace(props.Tokens.Typography.CaptionLarge.Font),
+				TextWrapped = true,
+				BackgroundTransparency = 1,
+				AutomaticSize = Enum.AutomaticSize.Y,
+				LayoutOrder = 2
+			}),
+			actions = Roact.createElement(
+				"Frame",
+				{
+					Size = UDim2.fromOffset(584, 0),
+					BackgroundTransparency = 1,
+					AutomaticSize = Enum.AutomaticSize.Y,
+					LayoutOrder = 3
+				},
+				{
+					layout = Roact.createElement("UIListLayout", {
+						VerticalAlignment = Enum.VerticalAlignment.Top,
+						HorizontalAlignment = Enum.HorizontalAlignment.Center,
+						Padding = UDim.new(0, 18),
+						FillDirection = Enum.FillDirection.Vertical,
+						SortOrder = Enum.SortOrder.LayoutOrder
+					}),
+					instruction = Roact.createElement("TextLabel", {
+						Size = UDim2.fromScale(1, 0),
+						Text = data.props.instructionText,
+						TextColor3 = props.Theme.TextDefault.Color,
+						TextTransparency = props.Theme.TextDefault.Transparency,
+						TextSize = props.Font.CaptionHeader.RelativeSize * baseSize,
+						FontFace = normalizeFontFace(props.Tokens.Typography.CaptionLarge.Font),
+						TextXAlignment = Enum.TextXAlignment.Left,
+						BackgroundTransparency = 1,
+						AutomaticSize = Enum.AutomaticSize.Y,
+						LayoutOrder = 1
+					}),
+					muteCheckbox = data.props.showVoiceMuting and Roact.createElement(CheckboxRow, {
+						height = 28,
+						image = "icons/controls/microphone",
+						descriptionText = data.props.muteText,
+						actionDisabled = data.state.isBlocked,
+						checkboxSelected = data.state.isBlocked or data.state.isVoiceMuted,
+						onCheckboxActivated = data.onMuteCheckboxActivated,
+						LayoutOrder = 2
+					}),
+					div = data.props.showVoiceMuting and Roact.createElement("Frame", {
+						Size = UDim2.new(1, 0, 0, 1),
+						BackgroundColor3 = props.Theme.Divider.Color,
+						BackgroundTransparency = props.Theme.Divider.Transparency,
+						BorderSizePixel = 0,
+						LayoutOrder = 3
+					}),
+					blockCheckbox = Roact.createElement(CheckboxRow, {
+						height = 28,
+						image = "icons/actions/block",
+						descriptionText = data.props.blockText,
+						checkboxSelected = data.state.isBlocked,
+						onCheckboxActivated = data.onBlockCheckboxActivated,
+						LayoutOrder = 4
+					}),
+					doneContainer = Roact.createElement("Frame", {
+						BackgroundColor3 = props.Theme.SystemPrimaryContent.Color,
+						BackgroundTransparency = props.Theme.SystemPrimaryContent.Transparency,
+						BorderSizePixel = 0,
+						Size = UDim2.new(1, 0, 0, 44),
+						LayoutOrder = 5
+					}, {
+						uiCorner = Roact.createElement("UICorner", { CornerRadius = UDim.new(0, 4) }),
+						doneButton = Roact.createElement(TextButton, {
+							size = UDim2.fromScale(1, 1),
+							text = data.props.doneText,
+							onActivated = data.onDoneActivated
+						})
+					})
+				}
+			)
 		})
-
-		children2.div = data.props.showVoiceMuting and Roact.createElement("Frame", {
-			Size = UDim2.new(1, 0, 0, 1),
-			BackgroundColor3 = props.Theme.Divider.Color,
-			BackgroundTransparency = props.Theme.Divider.Transparency,
-			BorderSizePixel = 0,
-			LayoutOrder = 3
-		})
-
-		children2.blockCheckbox = Roact.createElement(CheckboxRow, {
-			height = 28,
-			image = "icons/actions/block",
-			descriptionText = data.props.blockText,
-			checkboxSelected = data.state.isBlocked,
-			onCheckboxActivated = data.onBlockCheckboxActivated,
-			LayoutOrder = 4
-		})
-
-		children2.doneContainer = Roact.createElement("Frame", {
-			BackgroundColor3 = props.Theme.SystemPrimaryContent.Color,
-			BackgroundTransparency = props.Theme.SystemPrimaryContent.Transparency,
-			BorderSizePixel = 0,
-			Size = UDim2.new(1, 0, 0, 44),
-			LayoutOrder = 5
-		}, {
-			uiCorner = Roact.createElement("UICorner", { CornerRadius = UDim.new(0, 4) }),
-			doneButton = Roact.createElement(TextButton, {
-				size = UDim2.fromScale(1, 1),
-				text = data.props.doneText,
-				onActivated = data.onDoneActivated
-			})
-		})
-		children.actions = createElement4("Frame", v4, children2)
-		return createElement("Frame", v, children)
 	end)
 end
 

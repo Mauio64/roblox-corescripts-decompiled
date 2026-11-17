@@ -45,8 +45,6 @@ local HandleUpdate = RobloxAppUpdate.HandleUpdate
 local launchPlaytestWithLoadingState = require(parent.BuildExperiencePlaytestLaunch.launchPlaytestWithLoadingState)
 local GameProductInfoRodux = require(parent.GameProductInfoRodux)
 local useGameProductInfoSelector = GameProductInfoRodux.useGameProductInfoSelector
-local GameInfosRodux = require(parent.GameInfosRodux)
-local useGameInfosSelector = GameInfosRodux.useGameInfosSelector
 local GameHydrationReact = require(parent.GameHydrationReact)
 local CentralOverlay = require(parent.CentralOverlay)
 local CloseCentralOverlay = CentralOverlay.Thunks.CloseCentralOverlay
@@ -91,22 +89,20 @@ local FFlagLuaAppLaunchWhenLoadingForce = SharedFlags10.FFlagLuaAppLaunchWhenLoa
 local SharedFlags11 = require(parent.SharedFlags)
 local FFlagLuaAppDemoModePlayButtonTelemetry = SharedFlags11.FFlagLuaAppDemoModePlayButtonTelemetry
 local SharedFlags12 = require(parent.SharedFlags)
-local FFlagMigrateGameInfoToStore = SharedFlags12.FFlagMigrateGameInfoToStore
+local FFlagLuaAppPlayButtonPrivatePT = SharedFlags12.FFlagLuaAppPlayButtonPrivatePT
 local SharedFlags13 = require(parent.SharedFlags)
-local FFlagLuaAppPlayButtonPrivatePT = SharedFlags13.FFlagLuaAppPlayButtonPrivatePT
+local FFlagLuaAppPrivatePlaytestEarlyTesting = SharedFlags13.FFlagLuaAppPrivatePlaytestEarlyTesting
+
 local SharedFlags14 = require(parent.SharedFlags)
-local FFlagLuaAppPrivatePlaytestEarlyTesting = SharedFlags14.FFlagLuaAppPrivatePlaytestEarlyTesting
+local FFlagLuaAppPrivatePlaytestWithoutBuildMode = SharedFlags14.FFlagLuaAppPrivatePlaytestWithoutBuildMode
 
 local SharedFlags15 = require(parent.SharedFlags)
-local FFlagLuaAppPrivatePlaytestWithoutBuildMode = SharedFlags15.FFlagLuaAppPrivatePlaytestWithoutBuildMode
+local FFlagLuaAppPlayButtonPrivatePTEnableSingleButton = SharedFlags15.FFlagLuaAppPlayButtonPrivatePTEnableSingleButton
 
 local SharedFlags16 = require(parent.SharedFlags)
-local FFlagLuaAppPlayButtonPrivatePTEnableSingleButton = SharedFlags16.FFlagLuaAppPlayButtonPrivatePTEnableSingleButton
-
+local FFlagLuaAppPlayButtonPrivatePTEnableDualButton = SharedFlags16.FFlagLuaAppPlayButtonPrivatePTEnableDualButton
 local SharedFlags17 = require(parent.SharedFlags)
-local FFlagLuaAppPlayButtonPrivatePTEnableDualButton = SharedFlags17.FFlagLuaAppPlayButtonPrivatePTEnableDualButton
-local SharedFlags18 = require(parent.SharedFlags)
-local FFlagLuaAppCloudClientPlayButtonOffer = SharedFlags18.FFlagLuaAppCloudClientPlayButtonOffer
+local FFlagLuaAppCloudClientPlayButtonOffer = SharedFlags17.FFlagLuaAppCloudClientPlayButtonOffer
 local usePlayButtonLaunchWithCloudClientOffer
 
 if FFlagLuaAppCloudClientPlayButtonOffer then
@@ -125,163 +121,135 @@ return function(universeId, referralSource, ctx, _, p, p2, p3, flag: boolean?)
 		return p4.GameDetails[universeId]
 	end)
 
-	local v6 = nil
-	local v7 = nil
-
-	if FFlagMigrateGameInfoToStore then
-		v7 = GameHydrationReact.useGameInfo(universeId)
-	else
-		v6 = useGameInfosSelector(universeId)
-	end
-
-	local v8 = useGameProductInfoSelector(universeId)
-	local v9 = useSelector(function(p4)
+	local v6 = GameHydrationReact.useGameInfo(universeId)
+	local v7 = useGameProductInfoSelector(universeId)
+	local v8 = useSelector(function(p4)
 		return p4.PlayabilityStatus[universeId]
 	end)
 
 	local experienceIconUrl = GameHydrationReact.useGameIcon(universeId)
 
 	local pageName = useRouteName()
-	local v10
+	local v9
 
 	if GetFFlagIsSquadEnabled() then
-		v10 = React.useContext(SquadExternalContractContext)
+		v9 = React.useContext(SquadExternalContractContext)
 	else
-		v10 = nil
+		v9 = nil
 	end
 
-	local placeId = v5 and v5.rootPlaceId
+	local rootPlaceId = v5 and v5.rootPlaceId
 
-	if not placeId then
-		local v11
-
-		if FFlagMigrateGameInfoToStore then
-			v11 = v7 and v7.rootPlaceId
+	if not rootPlaceId then
+		if v6 then
+			rootPlaceId = v6.rootPlaceId or nil
 		else
-			v11 = v6 and v6.placeId
+			rootPlaceId = nil
 		end
+	end
 
-		placeId = v11 or nil
+	local v10
+
+	if GetFFlagLuaAppEnableVirtualEventPlaceId() and p3 ~= "0" then
+		v10 = p3 or rootPlaceId
+	else
+		v10 = rootPlaceId
+	end
+
+	local name = v5 and v5.name
+
+	if not name then
+		if v6 then
+			name = v6.name or nil
+		else
+			name = nil
+		end
 	end
 
 	local v11
 
-	if GetFFlagLuaAppEnableVirtualEventPlaceId() and p3 ~= "0" then
-		v11 = p3 or placeId
-	else
-		v11 = placeId
-	end
-
-	local experienceName = v5 and v5.name
-
-	if not experienceName then
-		local v12
-
-		if FFlagMigrateGameInfoToStore then
-			v12 = v7 and v7.name
-		else
-			v12 = v6 and v6.name
-		end
-
-		experienceName = v12 or nil
-	end
-
-	local v12
-
 	if FFlagLuaAppPlayButtonPrivatePT then
-		local v13 = v5 and v5.creator and v5.creator.id
+		local id = v5 and v5.creator and v5.creator.id or v6 and v6.creator and v6.creator.id or nil
 
-		if not v13 then
-			local v14
-
-			if FFlagMigrateGameInfoToStore then
-				v14 = v7 and v7.creator and v7.creator.id
-			else
-				v14 = v6 and v6.creatorId
-			end
-
-			v13 = v14 or nil
-		end
-
-		if v13 ~= nil then
-			v12 = tostring(v13)
+		if id ~= nil then
+			v11 = tostring(id)
 		end
 	end
 
-	local v13 = usePlayButtonLaunchGame(universeId, v11, placeId, referralSource, ctx, p, p2)
-	local v14
+	local v12 = usePlayButtonLaunchGame(universeId, v10, rootPlaceId, referralSource, ctx, p, p2)
+	local v13
 
 	if FFlagLuaAppCloudClientPlayButtonOffer then
-		v14 = usePlayButtonLaunchWithCloudClientOffer(universeId, v11, placeId, v9, pageName, v13)
+		v13 = usePlayButtonLaunchWithCloudClientOffer(universeId, v10, rootPlaceId, v8, pageName, v12)
 	end
 
-	local v15
+	local v14
 
 	if FFlagLuaAppPlayableUxTreatment then
-		local v16
+		local v15
 
 		if FFlagLuaAppCloudClientPlayButtonOffer then
-			v16 = v14
+			v15 = v13
 		else
-			v16 = v13
+			v15 = v12
 		end
 
-		v15 = usePlayButtonLaunchWithUxTreatment(v9, universeId, v16, pageName)
+		v14 = usePlayButtonLaunchWithUxTreatment(v8, universeId, v15, pageName)
 	end
 
 	if not FFlagLuaAppPlayableUxTreatment then
-		v15 = if FFlagLuaAppCloudClientPlayButtonOffer then v14 else v13
+		v14 = if FFlagLuaAppCloudClientPlayButtonOffer then v13 else v12
 	end
 
-	local v16 = usePlayButtonLaunchAfterSeventeenPlusUpsell(v9, universeId, v15, pageName)
+	local v15 = usePlayButtonLaunchAfterSeventeenPlusUpsell(v8, universeId, v14, pageName)
 
 	if FFlagLuaAppCloudClientPlayButtonOffer then
-		v13 = v14
+		v12 = v13
 	end
 
-	local v17 = useAgeVerificationOverlayCallback(universeId, v13, v16)
+	local v16 = useAgeVerificationOverlayCallback(universeId, v12, v15)
 
-	local v18 = React.useCallback(function(p4, p5: string?)
-		local v18
+	local v17 = React.useCallback(function(p4, p5: string?)
+		local v17
 
 		if game:GetEngineFeature("VoiceChatSupported") then
-			v18 = function()
-				local v19
+			v17 = function()
+				local v18
 
 				if FFlagLuaAppDemoModePlayButtonTelemetry then
-					v19 = p5
+					v18 = p5
 				end
 
-				v17(p4, v19)
+				v16(p4, v18)
 			end
 		else
-			v18 = function()
-				local v19
+			v17 = function()
+				local v18
 
 				if FFlagLuaAppDemoModePlayButtonTelemetry then
-					v19 = p5
+					v18 = p5
 				end
 
-				v16(p4, v19)
+				v15(p4, v18)
 			end
 		end
 
-		HandleUpdate(v4, v2, engineFeature, v, ctx, v18)
-	end, { v, v2, engineFeature, ctx, v17, v16, v4 })
+		HandleUpdate(v4, v2, engineFeature, v, ctx, v17)
+	end, { v, v2, engineFeature, ctx, v16, v15, v4 })
 
-	local v19 = useRoactService(RoactNetworking)
-	local v20 = FFlagLuaAppLaunchWhenLoadingForce or FFlagLuaAppLaunchWhenLoadingEdp and flag == true
-	local v21
+	local v18 = useRoactService(RoactNetworking)
+	local v19 = FFlagLuaAppLaunchWhenLoadingForce or FFlagLuaAppLaunchWhenLoadingEdp and flag == true
+	local v20
 
 	if FFlagLuaAppPlayButtonPrivatePT then
-		local v22 = React.useCallback(function(callback, p4: string?)
-			local v22
+		local v21 = React.useCallback(function(callback, p4: string?)
+			local v21
 
-			if v11 ~= nil then
-				v22 = tonumber(v11)
+			if v10 ~= nil then
+				v21 = tonumber(v10)
 			end
 
-			if v22 == nil then
+			if v21 == nil then
 				DiscoveryEventErrorLogger.reportError(
 					"PlaytestLaunchMissingPlaceId",
 					`Cannot launch private Playtest without a valid placeId for universeId {universeId}`
@@ -290,30 +258,30 @@ return function(universeId, referralSource, ctx, _, p, p2, p3, flag: boolean?)
 				return
 			end
 
-			local v23
+			local v22
 
 			if FFlagLuaAppPrivatePlaytestEarlyTesting or FFlagLuaAppPrivatePlaytestWithoutBuildMode then
-				v23 = launchPlaytestWithLoadingState(v22, p, nil, nil, true)
+				v22 = launchPlaytestWithLoadingState(v21, p, nil, nil, true)
 			else
-				v23 = launchPlaytestWithLoadingState(v22, p, true)
+				v22 = launchPlaytestWithLoadingState(v21, p, true)
 			end
 
-			if v23 and callback ~= nil then
+			if v22 and callback ~= nil then
 				if not FFlagLuaAppDemoModePlayButtonTelemetry then
 					p4 = nil
 				end
 
 				callback(p4)
 			end
-		end, { v11, p, universeId })
+		end, { v10, p, universeId })
 
 		if FFlagLuaAppPlayButtonPrivatePTEnableSingleButton then
-			v22 = v18
+			v21 = v17
 		end
 
-		v21 = usePrivatePlaytestLaunchWithUpsell(v9, tostring(universeId), v22, ctx, pageName, v12)
+		v20 = usePrivatePlaytestLaunchWithUpsell(v8, tostring(universeId), v21, ctx, pageName, v11)
 	else
-		v21 = nil
+		v20 = nil
 	end
 
 	local useCallback = React.useCallback
@@ -321,22 +289,22 @@ return function(universeId, referralSource, ctx, _, p, p2, p3, flag: boolean?)
 		joinGamePlayButton(v.InfluxDb, "playButtonClicked", {
 			isUniversalApp = true,
 			referralSource = referralSource,
-			placeId = placeId,
+			placeId = rootPlaceId,
 			buttonState = playButtonState and playButtonState or "Invalid",
 			ctx = ctx
 		})
 
 		if referralSource == PlayButtonReferralSource.ExperienceDetailsLink then
-			local placeId2
+			local placeId
 
 			if GetFFlagLuaAppEnableVirtualEventPlaceId() then
-				placeId2 = v11
+				placeId = v10
 			else
-				placeId2 = placeId
+				placeId = rootPlaceId
 			end
 
 			GamePlayButtonShareLinkAnalytics(v, {
-				placeId = placeId2,
+				placeId = placeId,
 				playButtonState = playButtonState,
 				universeId = universeId
 			})
@@ -344,31 +312,29 @@ return function(universeId, referralSource, ctx, _, p, p2, p3, flag: boolean?)
 
 		if playButtonState == PlayButtonStates.Playable or playButtonState == PlayButtonStates.ActionNeeded then
 			if FFlagLuaAppPlayButtonPrivatePTEnableSingleButton then
-				local privatePlaytestInfo = v9 and v9.privatePlaytestInfo or nil
+				local privatePlaytestInfo = v8 and v8.privatePlaytestInfo or nil
 
 				if playButtonState == PlayButtonStates.ActionNeeded and privatePlaytestInfo ~= nil then
-					v21(p4, "PlaytestPlayButtonClick")
+					v20(p4, "PlaytestPlayButtonClick")
 
 					return
 				end
 			end
 
-			v18(p4)
+			v17(p4)
 		elseif playButtonState == PlayButtonStates.PaidAccess then
-			local price = v8 and v8.price or nil
-			local productId = v8 and v8.productId or nil
-			local sellerId = v8 and v8.sellerId or nil
-			local universeId2 = v8 and v8.universeId or nil
+			local price = v7 and v7.price or nil
+			local productId = v7 and v7.productId or nil
+			local sellerId = v7 and v7.sellerId or nil
+			local universeId2 = v7 and v7.universeId or nil
 			local function onFlowComplete()
 				v4(CloseCentralOverlay())
 			end
 			local function onPurchaseSuccess()
-				v4(FetchGamePlayabilityAndProductInfo.Fetch(v19, universeId2))
+				v4(FetchGamePlayabilityAndProductInfo.Fetch(v18, universeId2))
 			end
 			local function initiateLegacyPurchaseFlow() -- 2 equivalent calls inferred from this helper
-				v4(OpenCentralOverlayForPurchaseGame(universeId2, experienceName, price, productId, sellerId, {
-					pageName
-				}))
+				v4(OpenCentralOverlayForPurchaseGame(universeId2, name, price, productId, sellerId, { pageName }))
 			end
 
 			if FFlagShipUnifiedPurchaseFlowToPaidAccess then
@@ -376,7 +342,7 @@ return function(universeId, referralSource, ctx, _, p, p2, p3, flag: boolean?)
 					productPayload = {
 						universeId = universeId2,
 						kind = "Experience",
-						experienceName = experienceName,
+						experienceName = name,
 						experienceIconUrl = experienceIconUrl
 					},
 					purchaseCallbacks = {
@@ -386,13 +352,13 @@ return function(universeId, referralSource, ctx, _, p, p2, p3, flag: boolean?)
 					purchaseAnalyticsMetadata = { surface = ProductPurchaseSurface.PaidAccess }
 				}))
 			else
-				getIsUserEligibleForUnifiedPurchaseFlow(v19):andThen(function(p6)
+				getIsUserEligibleForUnifiedPurchaseFlow(v18):andThen(function(p6)
 					if p6 then
 						v4(OpenCentralOverlayForUnifiedPurchasePrompt({
 							productPayload = {
 								universeId = universeId2,
 								kind = "Experience",
-								experienceName = experienceName,
+								experienceName = name,
 								experienceIconUrl = experienceIconUrl
 							},
 							purchaseCallbacks = {
@@ -412,28 +378,28 @@ return function(universeId, referralSource, ctx, _, p, p2, p3, flag: boolean?)
 			end
 		elseif playButtonState == PlayButtonStates.DemoMode then
 			if FFlagLuaAppDemoModePlayButtonTelemetry then
-				v18(p4, "DemoPlayButtonClick")
+				v17(p4, "DemoPlayButtonClick")
 			else
-				v18(p4)
+				v17(p4)
 			end
 		elseif FFlagLuaAppPlayButtonPrivatePTEnableDualButton and playButtonState == PlayButtonStates.Playtest then
-			v21(p4, "PlaytestPlayButtonClick")
+			v20(p4, "PlaytestPlayButtonClick")
 		elseif playButtonState == PlayButtonStates.FiatPaidAccess then
-			if placeId and v8 and v8.fiatBasePriceId then
-				v4(ApiPostPreparePurchase.Fetch(v19, placeId, universeId, v8.fiatBasePriceId))
+			if rootPlaceId and v7 and v7.fiatBasePriceId then
+				v4(ApiPostPreparePurchase.Fetch(v18, rootPlaceId, universeId, v7.fiatBasePriceId))
 
 				unlockPlayIntent(v3, {
 					universeId = universeId,
 					upsellName = "FiatPurchase",
-					playabilityStatus = v9 and v9.playabilityStatus or nil,
+					playabilityStatus = v8 and v8.playabilityStatus or nil,
 					pageName = pageName
 				})
 			end
 		elseif playButtonState == PlayButtonStates.Loading then
-			local v22 = {
+			local v21 = {
 				universeId = universeId,
 				playButtonState = playButtonState,
-				playabilityStatus = v9 and v9.playabilityStatus or nil,
+				playabilityStatus = v8 and v8.playabilityStatus or nil,
 				pageName = 0
 			}
 			local pageName2
@@ -442,33 +408,33 @@ return function(universeId, referralSource, ctx, _, p, p2, p3, flag: boolean?)
 				pageName2 = pageName
 			end
 
-			v22.pageName = pageName2
-			invalidPlayIntent(ctx, v22)
+			v21.pageName = pageName2
+			invalidPlayIntent(ctx, v21)
 
-			if v20 then
-				v18(p4)
+			if v19 then
+				v17(p4)
 			end
 		elseif GetFFlagIsSquadEnabled() and playButtonState == PlayButtonStates.PlayableWithParty then
-			if placeId then
+			if rootPlaceId then
 				local default
 
 				if FFlagEnableSquadRegroupExperimentation then
 					default = SquadExperienceInviteSource.Default
 				end
 
-				local v22
+				local v21
 
 				if FFlagEnablePrivatePartyStartJoin and p5 and p5.isPrivateParty then
-					v22 = SquadExperienceInviteType.PlayWithPartyInPrivatePartyServer
+					v21 = SquadExperienceInviteType.PlayWithPartyInPrivatePartyServer
 				end
 
-				v4(CreateExperienceInvite(placeId, v10, default, v22))
+				v4(CreateExperienceInvite(rootPlaceId, v9, default, v21))
 			end
 		elseif playButtonState == PlayButtonStates.WaitingForParty then
-			local v22 = {
+			local v21 = {
 				universeId = universeId,
 				playButtonState = playButtonState,
-				playabilityStatus = v9 and v9.playabilityStatus or nil,
+				playabilityStatus = v8 and v8.playabilityStatus or nil,
 				pageName = 0
 			}
 			local pageName2
@@ -477,16 +443,16 @@ return function(universeId, referralSource, ctx, _, p, p2, p3, flag: boolean?)
 				pageName2 = pageName
 			end
 
-			v22.pageName = pageName2
-			invalidPlayIntent(ctx, v22)
+			v21.pageName = pageName2
+			invalidPlayIntent(ctx, v21)
 		elseif
 			playButtonState == PlayButtonStates.UnplayableOther
 			or FFlagEnableGameJoinEarlyAccess and playButtonState == PlayButtonStates.EarlyAccessLocked
 		then
-			local v22 = {
+			local v21 = {
 				universeId = universeId,
 				playButtonState = playButtonState,
-				playabilityStatus = v9 and v9.playabilityStatus or nil,
+				playabilityStatus = v8 and v8.playabilityStatus or nil,
 				pageName = 0
 			}
 			local pageName2
@@ -495,66 +461,66 @@ return function(universeId, referralSource, ctx, _, p, p2, p3, flag: boolean?)
 				pageName2 = pageName
 			end
 
-			v22.pageName = pageName2
-			invalidPlayIntent(ctx, v22)
+			v21.pageName = pageName2
+			invalidPlayIntent(ctx, v21)
 		else
 			error(`invalid play button state {playButtonState}!`)
 		end
 	end
 
-	local v22
+	local v21
 
 	if GetFFlagLuaAppEnableVirtualEventPlaceId() or FFlagLuaAppPlayButtonPrivatePT then
-		v22 = v11
+		v21 = v10
 	end
 
-	local v23
+	local v22
 
 	if FFlagLuaAppPlayButtonPrivatePT then
-		v23 = p
+		v22 = p
 	end
 
 	local v24
 
 	if FFlagLuaAppPlayButtonPrivatePT then
-		v24 = v21
+		v24 = v20
 	end
 
 	local v25
 
 	if GetFFlagIsSquadEnabled() then
-		v25 = v10
+		v25 = v9
 	end
 
-	local v26 = {
+	local v23 = {
 		v,
 		v2,
 		engineFeature,
 		universeId,
-		v22,
-		placeId,
-		experienceName,
+		v21,
+		rootPlaceId,
+		name,
 		referralSource,
 		ctx,
-		v18,
-		v8,
+		v17,
+		v7,
 		pageName,
-		v23,
+		v22,
 		v24,
 		v25,
-		v9,
+		v8,
 		nil,
 		nil,
 		nil,
 		nil,
 		nil
 	}
-	local v27
+	local v26
 
 	if FFlagLuaAppLaunchWhenLoadingForce or FFlagLuaAppLaunchWhenLoadingEdp then
-		v27 = v20
+		v26 = v19
 	end
 
-	v26[17], v26[18], v26[19], v26[20], v26[21] = v4, v3, experienceIconUrl, v19, v27
-	return (useCallback(fn, v26))
+	v23[17], v23[18], v23[19], v23[20], v23[21] = v4, v3, experienceIconUrl, v18, v26
+	return (useCallback(fn, v23))
 end

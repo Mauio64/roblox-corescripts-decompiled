@@ -6,13 +6,13 @@ local GuiService = game:GetService("GuiService")
 
 local useTokens = Foundation.Hooks.useTokens
 
-local function sameSnapPoints(list, list2): boolean
-	if #list ~= #list2 then
+local function sameSnapPoints(current, list): boolean -- 1 equivalent call inferred from this helper
+	if #current ~= #list then
 		return false
 	end
 
-	for k, item in list do
-		if list2[k] ~= item then
+	for k, item in current do
+		if list[k] ~= item then
 			return false
 		end
 	end
@@ -124,47 +124,27 @@ local function LibraryChatSheetOverlay(props)
 	local v5 = (props.top == nil or state == nil) and 0 or math.max(0, props.top - state.originY)
 	local v6 = state == nil and 0 or state.screenHeight
 	local v7 = state == nil and 0 or state.availableHeight
-	local current3 = props.snapPoints
+	local current2 = props.snapPoints
 
 	if v6 > 0 then
-		current3 = {}
+		current2 = {}
 
 		for _, snapPoint in props.snapPoints do
-			table.insert(current3, (math.max(2, (math.min(snapPoint * v6, v7 - v5)))))
+			table.insert(current2, (math.max(2, (math.min(snapPoint * v6, v7 - v5)))))
 		end
 	end
 
-	local ref = React.useRef(current3)
+	local ref = React.useRef(current2)
+
+	if not sameSnapPoints(ref.current, current2) then -- inferred equivalent call
+		ref.current = current2
+	end
+
 	local current = ref.current
-	local v8
-
-	if #current == #current3 then
-		local flag = true
-
-		for k, v9 in current do
-			if current3[k] ~= v9 then
-				v8 = false
-				flag = false
-				break
-			end
-		end
-
-		if flag then
-			v8 = true
-		end
-	else
-		v8 = false
-	end
-
-	if not v8 then
-		ref.current = current3
-	end
-
-	local current2 = ref.current
-	useSheetBounds(props, state4, state3.sheet, state3.content, state5 or current2[1], v3)
-	local v9 = not (state == nil) and state.isBottomSheet
-	local sheet = props.renderSheet(current2, v4, setState5)
-	local v10 = v9 and 0 or v5
+	useSheetBounds(props, state4, state3.sheet, state3.content, state5 or current[1], v3)
+	local v8 = not (state == nil) and state.isBottomSheet
+	local sheet = props.renderSheet(current, v4, setState5)
+	local v9 = v8 and 0 or v5
 	local createElement = React.createElement
 	local fragment = React.Fragment
 	local inset
@@ -172,8 +152,8 @@ local function LibraryChatSheetOverlay(props)
 	if v ~= nil then
 		inset = ReactRoblox.createPortal(React.createElement(Foundation.View, {
 			ref = setState4,
-			Position = UDim2.fromOffset(0, v10),
-			Size = UDim2.new(1, 0, 1, -v10),
+			Position = UDim2.fromOffset(0, v9),
+			Size = UDim2.new(1, 0, 1, -v9),
 			backgroundStyle = { Transparency = 1 }
 		}, {
 			Window = React.createElement(Foundation.View, {

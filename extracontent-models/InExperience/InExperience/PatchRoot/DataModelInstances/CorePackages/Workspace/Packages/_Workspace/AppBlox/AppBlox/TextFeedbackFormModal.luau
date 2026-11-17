@@ -3,7 +3,6 @@ local parent = script:FindFirstAncestor("AppBlox").Parent
 local CentralOverlay = require(parent.CentralOverlay)
 local Foundation = require(parent.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local Localization = require(parent.Localization)
 local NavigationRodux = require(parent.NavigationRodux)
 local React = require(parent.React)
@@ -152,32 +151,15 @@ local function TextFeedbackFormModal(props)
 	v9.AutomaticSize = Enum.AutomaticSize.Y
 	v9.BackgroundTransparency = 1
 	v9.ClearTextOnFocus = false
-	local font
+	local v10
 
-	if not FoundationFontFaceMigration then
-		if defineFastFlag then
-			font = v2.Typography.BodyMedium.Font
-		else
-			font = v2.Typography.CaptionMedium.Font
-		end
+	if defineFastFlag then
+		v10 = v2.Typography.BodyMedium.Font
+	else
+		v10 = v2.Typography.CaptionMedium.Font
 	end
 
-	v9.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		local v10
-
-		if defineFastFlag then
-			v10 = v2.Typography.BodyMedium.Font
-		else
-			v10 = v2.Typography.CaptionMedium.Font
-		end
-
-		fontFace = normalizeFontFace(v10)
-	end
-
-	v9.FontFace = fontFace
+	v9.FontFace = normalizeFontFace(v10)
 	local lineHeight
 
 	if defineFastFlag then

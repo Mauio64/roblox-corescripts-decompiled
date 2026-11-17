@@ -12,6 +12,7 @@ local createFollowingFeedSource = require(Moments.Stores.GetMomentsStore.createF
 local isStudio = require(parent.MomentsCommon.isStudio)
 local GetFFlagArgusStudioMockFeed = require(Moments.Flags.GetFFlagArgusStudioMockFeed)
 local FFlagMomentsNavigationEvent = require(Moments.Flags.FFlagMomentsNavigationEvent)
+local FFlagMomentsRecommendationFeedType = require(Moments.Flags.FFlagMomentsRecommendationFeedType)
 
 local function getFeedTypeDestination(current) -- 2 equivalent calls inferred from this helper
 	if FFlagMomentsNavigationEvent and current == MomentsFeedType.Trending then
@@ -62,12 +63,16 @@ local function useFeedSelection(data)
 		source = data.trendingSource
 	end
 
-	local trendingTelemetry
+	local telemetry
 
 	if v then
-		trendingTelemetry = nil
+		telemetry = nil
 	else
-		trendingTelemetry = data.trendingTelemetry
+		telemetry = data.trendingTelemetry
+	end
+
+	if FFlagMomentsRecommendationFeedType and v then
+		telemetry = data.followingTelemetry
 	end
 
 	local v2 = React.useMemo(function()
@@ -96,11 +101,11 @@ local function useFeedSelection(data)
 			getSelected = getSelected,
 			select = selection,
 			source = source,
-			telemetry = trendingTelemetry,
+			telemetry = telemetry,
 			emptyState = v2.emptyState,
 			caughtUpState = v2.caughtUpState
 		}
-	end, { state, getSelected, selection, source, trendingTelemetry, v2 })
+	end, { state, getSelected, selection, source, telemetry, v2 })
 end
 
 return useFeedSelection

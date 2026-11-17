@@ -18,19 +18,18 @@ local function InitiateCancelUserSubscriptionFlow(p, p2: string)
 				or p3.SubscriptionState == Enum.SubscriptionState.SubscribedRenewalPaymentPending
 			then
 				object:dispatch(CancelSubscriptionStarted(p2, (p3.NextRenewTime:FormatLocalTime("LL", robloxLocaleId))))
-				return
-			end
+			else
+				if
+					p3.SubscriptionState == Enum.SubscriptionState.NeverSubscribed
+					or p3.SubscriptionState == Enum.SubscriptionState.Expired
+				then
+					v = ErrorStateEnum.Unsubscribed
+				elseif p3.SubscriptionState == Enum.SubscriptionState.SubscribedWillNotRenew then
+					v = ErrorStateEnum.Expiring
+				end
 
-			if
-				p3.SubscriptionState == Enum.SubscriptionState.NeverSubscribed
-				or p3.SubscriptionState == Enum.SubscriptionState.Expired
-			then
-				v = ErrorStateEnum.Unsubscribed
-			elseif p3.SubscriptionState == Enum.SubscriptionState.SubscribedWillNotRenew then
-				v = ErrorStateEnum.Expiring
+				object:dispatch(CancelSubscriptionFailed(v, p2))
 			end
-
-			object:dispatch(CancelSubscriptionFailed(v, p2))
 		end):catch(function(_)
 			object:dispatch(CancelSubscriptionFailed(ErrorStateEnum.ErrorCancelling, p2))
 		end)

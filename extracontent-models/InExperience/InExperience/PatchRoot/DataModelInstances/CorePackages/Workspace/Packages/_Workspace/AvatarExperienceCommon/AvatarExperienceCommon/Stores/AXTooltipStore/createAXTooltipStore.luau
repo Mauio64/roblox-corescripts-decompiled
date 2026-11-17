@@ -11,8 +11,8 @@ local defineFastFlag = game:DefineFastFlag("AXTooltipUseMemStorage", false)
 
 local defineFastInt = game:DefineFastInt("AXTooltipMaxNumberOfTimesSeen", 2)
 
-local function deserializeSeenTooltips(value: string)
-	local parts = value:split(",")
+local function deserializeSeenTooltips(item: string)
+	local parts = item:split(",")
 	local result = {}
 
 	for _, part in parts do

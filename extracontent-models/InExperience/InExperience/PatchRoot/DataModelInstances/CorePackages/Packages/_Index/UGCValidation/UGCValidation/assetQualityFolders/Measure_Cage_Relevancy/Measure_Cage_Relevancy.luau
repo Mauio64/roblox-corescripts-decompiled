@@ -9,7 +9,6 @@ local defineFastInt = game:DefineFastInt("UGCMinCageRelevancyThreshold", 10)
 
 return {
 	categories = { ValidationEnums.UploadCategory.LAYERED_CLOTHING, ValidationEnums.UploadCategory.EYEBROW_EYELASH },
-	["fflag"] = require(parent.flags.getFFlagUGCValidateAQCageQualityLC),
 	run = function(object, p)
 		local handle_OuterCage = p.aqsSummaryData.Measure_Cage_Relevancy.Handle_OuterCage
 		local outer_cage_face_relevant_percent = handle_OuterCage

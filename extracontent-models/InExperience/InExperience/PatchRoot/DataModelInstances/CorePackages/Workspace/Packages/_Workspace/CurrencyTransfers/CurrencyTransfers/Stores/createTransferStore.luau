@@ -35,6 +35,7 @@ return function()
 	local signal21, setMaximumTransferAmount = Signals.createSignal(nil)
 	local signal22, setTransferBenefitSource = Signals.createSignal(nil)
 	local signal23, setNumFreeTransfersRemaining = Signals.createSignal(nil)
+	local signal24, setFreeTransfersExhausted = Signals.createSignal(false)
 
 	local v = nil
 	local v2 = nil
@@ -130,6 +131,8 @@ return function()
 		setTransferBenefitSource = setTransferBenefitSource,
 		getNumFreeTransfersRemaining = signal23,
 		setNumFreeTransfersRemaining = setNumFreeTransfersRemaining,
+		getFreeTransfersExhausted = signal24,
+		setFreeTransfersExhausted = setFreeTransfersExhausted,
 		setOnClose = setOnClose,
 		triggerOnClose = triggerOnClose,
 		setOnPromptOptimisticHide = setOnPromptOptimisticHide,

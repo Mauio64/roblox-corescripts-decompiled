@@ -4,12 +4,8 @@ local React = require(parent.React)
 local ReactIs = require(parent.ReactIs)
 local Foundation = require(parent.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-
 local SharedFlags = require(parent.SharedFlags)
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
-local SharedFlags2 = require(parent.SharedFlags)
-local FFlagChatInputBarGuardInvalidUtf8 = SharedFlags2.FFlagChatInputBarGuardInvalidUtf8
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+local FFlagChatInputBarGuardInvalidUtf8 = SharedFlags.FFlagChatInputBarGuardInvalidUtf8
 local FFlagExpChatHidePlaceholderUnderOverlay = require(ChatUIPrimitives.Flags.FFlagExpChatHidePlaceholderUnderOverlay)
 local FFlagExpChatComposerKeepTrayEntryMounted = require(ChatUIPrimitives.Flags.FFlagExpChatComposerKeepTrayEntryMounted)
 
@@ -117,16 +113,6 @@ local function renderSendButton(props)
 	v.isDisabled = props.isSendDisabled
 	v.onActivated = props.onSendActivated
 	return createElement(iconButton, v)
-end
-
-local function renderFallbackDisabledOverlay(props)
-	if FFlagExpChatEnableFriendsTab or props.canChat or not props.props.disabledOverlay then
-		return nil
-	end
-
-	return React.createElement(Foundation.View, { Size = UDim2.fromScale(1, 1), ZIndex = 5 }, {
-		Overlay = props.props.disabledOverlay
-	})
 end
 
 local function renderLegacy(props)
@@ -261,31 +247,14 @@ local function renderLegacy(props)
 			v12.BackgroundTransparency = 1
 			v12.ClearTextOnFocus = false
 			v12.MaxVisibleGraphemes = props2.maximumCharacterLimit or -1
-			local font
-
-			if not (props2.fontFace or FoundationFontFaceMigration) then
-				font = tokens.Typography.CaptionMedium.Font
-			end
-
-			v12.Font = font
-
-			local fontFace = props2.fontFace
-
-			if not fontFace then
-				if FoundationFontFaceMigration then
-					fontFace = normalizeFontFace(tokens.Typography.CaptionMedium.Font)
-				else
-					fontFace = nil
-				end
-			end
-
-			v12.FontFace = fontFace
+			v12.FontFace = props2.fontFace or normalizeFontFace(tokens.Typography.CaptionMedium.Font)
 			v12.PlaceholderText = FFlagExpChatHidePlaceholderUnderOverlay
 				and props2.centerOverlay ~= nil
 				and props2.centerOverlayTextHidden
 				and ""
 				or props2.placeholderText
 				or ""
+
 			v12.PlaceholderColor3 = props.placeholderColor
 			v12.Size = UDim2.fromScale(1, 0)
 			v12.Text = props2.defaultValue or ""
@@ -368,8 +337,7 @@ local function renderLegacy(props)
 			CustomDisabledContent = customDisabledContent,
 			LeadingActionContainer = leadingActionContainer,
 			TextContainer = textContainer,
-			SendButtonContainer = sendButtonContainer,
-			DisabledOverlay = renderFallbackDisabledOverlay(props)
+			SendButtonContainer = sendButtonContainer
 		})
 	})
 	return createElement(view, v5, v6)
@@ -479,68 +447,42 @@ local function renderComposer(props)
 		local textBoxContainer
 
 		if props.canChat then
-			local createElement5 = React.createElement
-			local view5 = Foundation.View
-			local v9 = {
-				tag = "position-top-right anchor-top-right auto-y clip",
-				Size = props.reserveSize
-			}
-
-			local createElement6 = React.createElement
-			local v10 = {}
-			v10.AnchorPoint = Vector2.new(0, 0)
-			v10.AutomaticSize = Enum.AutomaticSize.Y
-			v10.BackgroundTransparency = 1
-			v10.ClearTextOnFocus = false
-			v10.MaxVisibleGraphemes = props2.maximumCharacterLimit or -1
-			local font
-
-			if not (props2.fontFace or FoundationFontFaceMigration) then
-				font = tokens.Typography.BodyMedium.Font
-			end
-
-			v10.Font = font
-
-			local fontFace = props2.fontFace
-
-			if not fontFace then
-				if FoundationFontFaceMigration then
-					fontFace = normalizeFontFace(tokens.Typography.BodyMedium.Font)
-				else
-					fontFace = nil
-				end
-			end
-
-			v10.FontFace = fontFace
-			v10.PlaceholderText = FFlagExpChatHidePlaceholderUnderOverlay
-				and props2.centerOverlay ~= nil
-				and props2.centerOverlayTextHidden
-				and ""
-				or props2.placeholderText
-				or ""
-			v10.PlaceholderColor3 = props.composerPlaceholderColor
-			v10.Size = UDim2.fromScale(1, 0)
-			v10.Text = props2.defaultValue or ""
-			v10.TextColor3 = props.textColor
-			v10.TextSize = fontSize
-			v10.TextTransparency = props2.centerOverlay ~= nil and props2.centerOverlayTextHidden and 1
-				or props.textTransparency
-			v10.TextWrapped = false
-			v10.TextXAlignment = Enum.TextXAlignment.Left
-			v10.TextYAlignment = Enum.TextYAlignment.Center
-			v10.TextEditable = props2.enableFocusedWrite ~= false
-			v10.ZIndex = 2
-
-			v10[React.Change.Text] = props.onTextChanged
-			v10[React.Event.ReturnPressedFromOnScreenKeyboard] = props.onReturnPressedFromOnScreenKeyboard
-			v10[React.Event.Focused] = props.onFocused
-			v10[React.Event.FocusLost] = props.onFocusLost
-			v10.ref = props.textBoxRef
-			v10.SelectionImageObject = props2.selectionImageObject
-			v10.Selectable = props2.selectionImageObject ~= nil or nil
-			textBoxContainer = createElement5(view5, v9, {
-				TextBox = createElement6("TextBox", v10)
-			})
+			textBoxContainer = React.createElement(
+				Foundation.View,
+				{
+					tag = "position-top-right anchor-top-right auto-y clip",
+					Size = props.reserveSize
+				},
+				{
+					TextBox = React.createElement("TextBox", {
+						AnchorPoint = Vector2.new(0, 0),
+						AutomaticSize = Enum.AutomaticSize.Y,
+						BackgroundTransparency = 1,
+						ClearTextOnFocus = false,
+						MaxVisibleGraphemes = props2.maximumCharacterLimit or -1,
+						FontFace = props2.fontFace or normalizeFontFace(tokens.Typography.BodyMedium.Font),
+						PlaceholderText = FFlagExpChatHidePlaceholderUnderOverlay and props2.centerOverlay ~= nil and props2.centerOverlayTextHidden and "" or props2.placeholderText or "",
+						PlaceholderColor3 = props.composerPlaceholderColor,
+						Size = UDim2.fromScale(1, 0),
+						Text = props2.defaultValue or "",
+						TextColor3 = props.textColor,
+						TextSize = fontSize,
+						TextTransparency = props2.centerOverlay ~= nil and props2.centerOverlayTextHidden and 1 or props.textTransparency,
+						TextWrapped = false,
+						TextXAlignment = Enum.TextXAlignment.Left,
+						TextYAlignment = Enum.TextYAlignment.Center,
+						TextEditable = props2.enableFocusedWrite ~= false,
+						ZIndex = 2,
+						[React.Change.Text] = props.onTextChanged,
+						[React.Event.ReturnPressedFromOnScreenKeyboard] = props.onReturnPressedFromOnScreenKeyboard,
+						[React.Event.Focused] = props.onFocused,
+						[React.Event.FocusLost] = props.onFocusLost,
+						ref = props.textBoxRef,
+						SelectionImageObject = props2.selectionImageObject,
+						Selectable = props2.selectionImageObject ~= nil or nil
+					})
+				}
+			)
 		end
 
 		v8.TextBoxContainer = textBoxContainer
@@ -583,8 +525,7 @@ local function renderComposer(props)
 		InputGroup = createElement3(view3, v6, {
 			CustomDisabledContent = customDisabledContent,
 			TextContainer = textContainer,
-			SendButtonContainer = sendButtonContainer,
-			DisabledOverlay = renderFallbackDisabledOverlay(props)
+			SendButtonContainer = sendButtonContainer
 		})
 	})
 	return createElement(view, v4, v5)
@@ -631,9 +572,7 @@ local function ChatInputBarView(props)
 	local canLocalUserChat = props.canLocalUserChat
 	local transparencyValue = props.transparencyValue or 0
 	local maximumCharacterLimit = props.maximumCharacterLimit
-	local shouldReplaceDisabledContent = FFlagExpChatEnableFriendsTab
-		and not canLocalUserChat
-		and props.disabledOverlay ~= nil
+	local shouldReplaceDisabledContent = not canLocalUserChat and props.disabledOverlay ~= nil
 
 	local pillStrokeStyle = props.pillStrokeStyle
 	local pillTransparency = React.useMemo(function()

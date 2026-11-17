@@ -15,7 +15,13 @@ local function registerSocialImpressions()
 				return require(SocialServerDrivenUi.Impressions.SduiPlayerTileImpressionsHandler)
 			end,
 			skipItemImpressionsLog = true
-		} or nil
+		} or nil,
+		[SduiImpressionEventType.socialProofTextImpressions] = {
+			lazyHandler = function()
+				return require(SocialServerDrivenUi.Impressions.SduiSocialProofTextImpressionsHandler)
+			end,
+			skipItemImpressionsLog = true
+		}
 	}
 
 	getSduiImpressionHandlerRegistry().registerImpressionHandlerConfigs(v)

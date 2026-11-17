@@ -1,4 +1,5 @@
-local parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
+local parent = GenericAbuseReporting.Parent
 
 local Foundation = require(parent.Foundation)
 local SharedFlags = require(parent.SharedFlags)
@@ -6,6 +7,7 @@ local SharedFlags = require(parent.SharedFlags)
 local getIconRichText = Foundation.Utility.getIconRichText
 local IconName = Foundation.Enums.IconName
 
+local FFlagAbuseReportTranslateColorWrapper = require(GenericAbuseReporting.Flags.FFlagAbuseReportTranslateColorWrapper)
 local FFlagUpdateTranslateInReportRevamp = SharedFlags.FFlagUpdateTranslateInReportRevamp
 
 local function getWrappedText(wrapper, value: string)
@@ -25,6 +27,41 @@ local function getWrappedText(wrapper, value: string)
 		warn("Unknown wrapper type: " .. tostring(wrapper.type))
 		return value, nil
 	end
+end
+
+local function getWrappedTextByKey(value: string, wrapper, value2: string, p: string?, flag: boolean?)
+	local v = string.gsub(value, "%p", "%%%0")
+	local v2 = "{" .. v .. "Start}"
+	local v3 = "{" .. v .. "End}"
+
+	if wrapper.type == "link" then
+		if value2:find(v2) == nil or value2:find(v3) == nil then
+			return value2, nil
+		end
+
+		local v4 = (flag and "<u>%1</u>" or "%1") .. " " .. getIconRichText(IconName.ArrowUpRightFromSquare)
+
+		if wrapper.variant == "link" and p then
+			v4 = `<font color="{p}">{v4}</font>`
+		end
+
+		return string.gsub(value2, `{v2}(.-){v3}`, v4), wrapper
+	else
+		if wrapper.type ~= "strong" then
+			return value2, nil
+		end
+
+		local v4 = string.gsub(value2, v2, "<b>")
+		return string.gsub(v4, v3, "</b>"), nil
+	end
+end
+
+local v = FFlagAbuseReportTranslateColorWrapper and "[%w_%.%-]+" or "%w+"
+local v2 = "{" .. v .. "Start}"
+local v3 = "{" .. v .. "End}"
+
+local function stripWrapperTags(value: string) -- 2 equivalent calls inferred from this helper
+	return (value:gsub(v2 .. "(.-)(" .. v3 .. ")", "%1"):gsub(v2, ""):gsub(v3, ""))
 end
 
 local fn
@@ -58,21 +95,21 @@ fn = function(p, item)
 
 	local translate = item["$translate"]
 	local params = item.params
-	local v
+	local v4
 
 	if FFlagUpdateTranslateInReportRevamp then
-		v = resolveParams(p, params)
+		v4 = resolveParams(p, params)
 	end
 
-	local v2 = p[translate] or translate
+	local v5 = p[translate] or translate
 
-	if FFlagUpdateTranslateInReportRevamp and v ~= nil then
-		v2 = v2:gsub("{(.-)}", v)
+	if FFlagUpdateTranslateInReportRevamp and v4 ~= nil then
+		v5 = v5:gsub("{(.-)}", v4)
 	elseif params ~= nil then
-		v2 = v2:gsub("{(.-)}", params)
+		v5 = v5:gsub("{(.-)}", params)
 	end
 
-	return (v2:gsub("{%w+Start}(.-)({%w+End})", "%1"):gsub("{%w+Start}", ""):gsub("{%w+End}", ""))
+	return stripWrapperTags(v5) -- inferred equivalent call
 end
 
 local Translate = {}
@@ -99,7 +136,7 @@ end
 
 Translate.translateIntoString = fn
 
-function Translate.translateIntoRichTextString(p, value)
+function Translate.translateIntoRichTextString(p, value, p2: string?, flag: boolean?)
 	if value == nil then
 		return "", nil
 	end
@@ -119,35 +156,50 @@ function Translate.translateIntoRichTextString(p, value)
 	end
 
 	local params = value.params
-	local v
+	local v4
 
 	if FFlagUpdateTranslateInReportRevamp then
-		v = resolveParams(p, params)
+		v4 = resolveParams(p, params)
 	end
 
-	local v2 = p[translate] or translate
-	local v3 = nil
+	local v5 = p[translate] or translate
+	local v6 = nil
 
-	if FFlagUpdateTranslateInReportRevamp and v ~= nil then
-		v2 = v2:gsub("{(.-)}", v)
+	if FFlagUpdateTranslateInReportRevamp and v4 ~= nil then
+		v5 = v5:gsub("{(.-)}", v4)
 	elseif params ~= nil then
-		v2 = v2:gsub("{(.-)}", params)
+		v5 = v5:gsub("{(.-)}", params)
+	end
+
+	if FFlagAbuseReportTranslateColorWrapper then
+		if value.wrappers then
+			for k, wrapper in pairs(value.wrappers) do
+				local v7
+				v5, v7 = getWrappedTextByKey(k, wrapper, v5, p2, flag)
+
+				if v7 ~= nil and v6 == nil then
+					v6 = v7
+				end
+			end
+		end
+
+		return stripWrapperTags(v5), v6 -- inferred equivalent call
 	end
 
 	if not value.wrappers then
-		return v2, v3
+		return v5, v6
 	end
 
 	for _, wrapper in pairs(value.wrappers) do
-		local v4
-		v2, v4 = getWrappedText(wrapper, v2)
+		local v7
+		v5, v7 = getWrappedText(wrapper, v5)
 
-		if v4 ~= nil and v3 == nil then
-			v3 = v4
+		if v7 ~= nil and v6 == nil then
+			v6 = v7
 		end
 	end
 
-	return v2, v3
+	return v5, v6
 end
 
 return Translate

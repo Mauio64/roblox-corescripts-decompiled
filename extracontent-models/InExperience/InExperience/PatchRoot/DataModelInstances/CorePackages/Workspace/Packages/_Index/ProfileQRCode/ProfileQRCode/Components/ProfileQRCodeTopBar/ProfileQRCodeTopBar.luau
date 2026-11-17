@@ -37,6 +37,7 @@ local useAppPolicy = UniversalAppPolicy.useAppPolicy
 local useLocalization = Localization.Hooks.useLocalization
 local useLastInputMode = FocusNavigationUtils.useLastInputMode
 local FFlagProfileQRCodeFixFocusNavigation = require(ProfileQRCode.Flags.FFlagProfileQRCodeFixFocusNavigation)
+local FFlagProfileQRCodeGamepadBackFix = require(ProfileQRCode.Flags.FFlagProfileQRCodeGamepadBackFix)
 
 local function getTooltipWasShown(appStorageService): boolean -- 1 equivalent call inferred from this helper
 	local v = appStorageService or AppStorageService
@@ -154,7 +155,11 @@ return function(props)
 		renderRight = 0
 	}
 
-	if (not FFlagProfileQRCodeFixFocusNavigation or v) and FFlagProfileQRCodeFixFocusNavigation then
+	if
+		not FFlagProfileQRCodeGamepadBackFix
+		and (not FFlagProfileQRCodeFixFocusNavigation or v)
+		and FFlagProfileQRCodeFixFocusNavigation
+	then
 		backButton = nil
 	end
 

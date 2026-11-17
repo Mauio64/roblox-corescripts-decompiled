@@ -84,6 +84,10 @@ function AcpProtocol.buildSessionNewWireParams(data)
 		roblox.application = data.application
 	end
 
+	if data.chatOpenId ~= nil then
+		roblox.chatOpenId = data.chatOpenId
+	end
+
 	return {
 		cwd = data.cwd,
 		mcpServers = data.mcpServers,

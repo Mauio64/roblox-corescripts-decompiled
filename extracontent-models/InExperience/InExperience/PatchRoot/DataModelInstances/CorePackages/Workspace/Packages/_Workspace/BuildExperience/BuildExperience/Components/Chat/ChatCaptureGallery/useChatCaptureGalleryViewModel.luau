@@ -5,9 +5,17 @@ local React = require(parent.React)
 local SignalsReact = require(parent.SignalsReact)
 
 require(script.Parent.ChatCaptureGalleryView)
-
-local FFlagBuildExperienceChatCaptureGalleryNewestFirst = require(BuildExperience.Flags.FFlagBuildExperienceChatCaptureGalleryNewestFirst)
+require(script.Parent.ChatCaptureToolbarIllustration)
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
+
+local FFlagBuildExperienceChatCaptureGalleryEmptyEducationEnabled = require(BuildExperience.Flags.FFlagBuildExperienceChatCaptureGalleryEmptyEducationEnabled)
+local Display
+
+if FFlagBuildExperienceChatCaptureGalleryEmptyEducationEnabled then
+	Display = require(parent.Display)
+else
+	Display = nil
+end
 
 local useLocalization = Localization.Hooks.useLocalization
 
@@ -15,33 +23,12 @@ local function cloneCaptures(initialCaptures)
 	return table.clone(initialCaptures)
 end
 
-local function sortCapturesOldestFirst(items)
-	local v = {}
-
-	for k, item in items do
-		local captureTime = item.CaptureTime
-		table.insert(v, {
-			capture = item,
-			index = k,
-			timestamp = typeof(captureTime) ~= "DateTime" and 0 or captureTime.UnixTimestampMillis
-		})
+local function getToolbarLayout(p, vector2: Vector2): string -- 1 equivalent call inferred from this helper
+	if p ~= nil and p ~= Enum.DisplaySize.Small then
+		return "floating"
 	end
 
-	table.sort(v, function(a, b): boolean
-		if a.timestamp == b.timestamp then
-			return a.index < b.index
-		end
-
-		return a.timestamp < b.timestamp
-	end)
-
-	local captures = {}
-
-	for _, v2 in v do
-		table.insert(captures, v2.capture)
-	end
-
-	return captures
+	return if vector2.X > vector2.Y then "sideRail" else "bottomBar"
 end
 
 local function useChatCaptureGalleryViewModel(data)
@@ -56,11 +43,7 @@ local function useChatCaptureGalleryViewModel(data)
 			end
 		end
 
-		if FFlagBuildExperienceChatCaptureGalleryNewestFirst then
-			return result
-		end
-
-		return sortCapturesOldestFirst(result)
+		return result
 	end, { v })
 	local state, setState = React.useState(function()
 		return cloneCaptures(data.initialCaptures)
@@ -114,10 +97,33 @@ local function useChatCaptureGalleryViewModel(data)
 	local onConfirm = React.useCallback(function()
 		data.onConfirm(state)
 	end, { data.onConfirm, state })
+	local education
+
+	if FFlagBuildExperienceChatCaptureGalleryEmptyEducationEnabled then
+		local displayStore = Display.GetDisplayStore(false)
+		local v3 = SignalsReact.useSignalState(displayStore.getDisplaySize)
+		local v4 = SignalsReact.useSignalState(displayStore.getViewportSize)
+		local v5 = useLocalization({
+			description = LocalizationStrings.CHAT_CAPTURE_GALLERY_EMPTY_DESCRIPTION,
+			dismiss = LocalizationStrings.CHAT_CAPTURE_GALLERY_EMPTY_DISMISS,
+			step1 = LocalizationStrings.CHAT_CAPTURE_GALLERY_HOW_TO_STEP_1,
+			step2 = LocalizationStrings.CHAT_CAPTURE_GALLERY_HOW_TO_STEP_2,
+			step3 = LocalizationStrings.CHAT_CAPTURE_GALLERY_HOW_TO_STEP_3
+		})
+
+		education = {
+			descriptionText = v5.description,
+			dismissText = v5.dismiss,
+			howToSteps = { v5.step1, v5.step2, v5.step3 },
+			isShown = isFinished and #captures == 0,
+			toolbarLayout = getToolbarLayout(v3, v4) -- inferred equivalent call
+		}
+	end
 
 	return {
 		addText = v2.add,
 		captures = captures,
+		education = education,
 		emptyText = v2.empty,
 		isFinished = isFinished,
 		isLoading = #v == 0 and not isFinished,

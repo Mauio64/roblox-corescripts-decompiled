@@ -68,42 +68,36 @@ function ParticipantDialogDeprecated(p)
 	end
 
 	if joined.showViewProfileButton then
-		local function onActivated()
-			Logger:info("User activated viewProfile | userId: {}", participantId)
-			joined.openViewProfile(participantId)
-		end
-
 		table.insert(buttonModels, {
 			text = joined.viewProfileText,
 			stayOnActivated = nil,
-			onActivated = onActivated
+			onActivated = function()
+				Logger:info("User activated viewProfile | userId: {}", participantId)
+				joined.openViewProfile(participantId)
+			end
 		})
 	end
 
 	if joined.showChatButton then
-		local function onActivated()
-			Logger:info("User activated openChat | userId: {}", participantId)
-			v2.emit(ChatDetailsTelemetryEvents.ParticipantDialogChatClicked, {})
-			joined.openChat(participantId)
-		end
-
 		table.insert(buttonModels, {
 			text = joined.chatText,
 			stayOnActivated = nil,
-			onActivated = onActivated
+			onActivated = function()
+				Logger:info("User activated openChat | userId: {}", participantId)
+				v2.emit(ChatDetailsTelemetryEvents.ParticipantDialogChatClicked, {})
+				joined.openChat(participantId)
+			end
 		})
-	end
-
-	local function onActivated()
-		Logger:info("User activated reportUser | userId: {}, conversationId: {}", participantId, conversationId)
-		v2.emit(ChatDetailsTelemetryEvents.ParticipantDialogReportUserClicked, {})
-		joined.openReportUser(participantId, conversationId)
 	end
 
 	table.insert(buttonModels, {
 		text = joined.reportUserText,
 		stayOnActivated = nil,
-		onActivated = onActivated
+		onActivated = function()
+			Logger:info("User activated reportUser | userId: {}, conversationId: {}", participantId, conversationId)
+			v2.emit(ChatDetailsTelemetryEvents.ParticipantDialogReportUserClicked, {})
+			joined.openReportUser(participantId, conversationId)
+		end
 	})
 
 	if showRemoveUserButton then

@@ -56,11 +56,7 @@ local function useMomentsTabIsVisible()
 
 			local history = p.Navigation.history
 
-			if history then
-				return routeContainsMoments(history[#history])
-			end
-
-			return false
+			return not not history and routeContainsMoments(history[#history])
 		end)
 	end
 

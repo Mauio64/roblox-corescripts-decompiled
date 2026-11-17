@@ -381,7 +381,8 @@ local function createTimeoutStatusStore()
 					end
 
 					if isTimedOut and timeoutAction then
-						fetchTimeoutDetails(timeoutAction.featureVector or "avatar_change", complete)
+						local featureVector = timeoutAction.featureVector or "avatar_change"
+						fetchTimeoutDetails(featureVector, complete)
 					else
 						complete() -- inferred equivalent call
 					end

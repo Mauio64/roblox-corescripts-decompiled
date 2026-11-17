@@ -49,8 +49,9 @@ local function SduiToggleExperienceFavoriteAction(p, _, data, _)
 	local data2 = favoritesStore.getAndFetchFavorite(universeId).data(false)
 	local v = data2 == nil or not data2.isFavorited
 
+	local userId = Players.LocalPlayer and Players.LocalPlayer.UserId
 	local v2 = {
-		uid = tostring(Players.LocalPlayer and Players.LocalPlayer.UserId),
+		uid = tostring(userId),
 		ctx = ctx,
 		placeId = tostring(placeId),
 		state = v and "on" or "off",

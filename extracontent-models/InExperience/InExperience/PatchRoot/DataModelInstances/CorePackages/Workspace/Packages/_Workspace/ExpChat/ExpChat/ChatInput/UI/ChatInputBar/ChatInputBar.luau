@@ -398,17 +398,15 @@ local function ChatInputBar(props)
 			return
 		end
 
-		local connections = {}
+		local v11 = {}
 		local descendantAddedConnection = TextChatService.DescendantAdded:Connect(function(textChatCommand)
 			if textChatCommand:IsA("TextChatCommand") and string.sub(textChatCommand.PrimaryAlias, 1, 1) == "/" then
 				v4 = AutocompleteText.new(initializeCommands)
 
-				table.insert(
-					connections,
-					(textChatCommand:GetPropertyChangedSignal("AutocompleteVisible"):Connect(function()
-						v4 = AutocompleteText.new(initializeCommands)
-					end))
-				)
+				local autocompleteVisibleChangedConnection = textChatCommand:GetPropertyChangedSignal("AutocompleteVisible"):Connect(function()
+					v4 = AutocompleteText.new(initializeCommands)
+				end)
+				table.insert(v11, autocompleteVisibleChangedConnection)
 			end
 		end)
 
@@ -426,11 +424,11 @@ local function ChatInputBar(props)
 				v5 = AutocompleteText.new(initializeGlobalCommands)
 			end
 
-			local v11 = initialCommands()
+			local v12 = initialCommands()
 
-			if v11 then
-				for _, v12 in v11 do
-					table.insert(connections, (v12:GetPropertyChangedSignal("AutocompleteVisible"):Connect(function()
+			if v12 then
+				for _, v13 in v12 do
+					table.insert(v11, (v13:GetPropertyChangedSignal("AutocompleteVisible"):Connect(function()
 						v4 = AutocompleteText.new(initializeCommands)
 					end)))
 				end
@@ -444,11 +442,11 @@ local function ChatInputBar(props)
 
 			descendantAddedConnection:Disconnect()
 
-			for _, connection in ipairs(connections) do
+			for _, connection in ipairs(v11) do
 				connection:Disconnect()
 			end
 
-			table.clear(connections)
+			table.clear(v11)
 		end
 	end, {})
 

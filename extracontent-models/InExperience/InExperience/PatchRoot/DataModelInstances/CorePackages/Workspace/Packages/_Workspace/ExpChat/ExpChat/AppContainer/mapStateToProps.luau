@@ -13,7 +13,6 @@ local FFlagExpChatPresetChatEnabled = ExpChatShared.Flags.FFlagExpChatPresetChat
 local GetFFlagTextChatEnableUniverseChatTabs = ExpChatShared.Flags.GetFFlagTextChatEnableUniverseChatTabs
 local FFlagExpChatUseChatConfigStore = SharedFlags.FFlagExpChatUseChatConfigStore
 local FFlagExpChatUseChannelTabsStore = SharedFlags.FFlagExpChatUseChannelTabsStore
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
 
 local function getIsChatInputBarVisible(data, flag: boolean) -- 2 equivalent calls inferred from this helper
 	local isChatInputBarEnabled = data.ChatVisibility.isChatInputBarEnabled
@@ -83,7 +82,7 @@ return function(data, data2)
 		v4 = false
 	end
 
-	if not FFlagExpChatUseChannelTabsStore and FFlagExpChatEnableFriendsTab then
+	if not FFlagExpChatUseChannelTabsStore then
 		if channelTabs == nil or channelTabs.allChannelTabs == nil then
 			v4 = false
 		else
@@ -99,7 +98,7 @@ return function(data, data2)
 		selectedTabType = getSelectedTabType(data) -- inferred equivalent call
 	end
 
-	local renderingFriends = FFlagExpChatEnableFriendsTab and selectedTabType == "FriendsChat"
+	local renderingFriends = selectedTabType == "FriendsChat"
 	local isExperienceChatRendered = not renderingFriends
 	local isChatInputBarVisible
 

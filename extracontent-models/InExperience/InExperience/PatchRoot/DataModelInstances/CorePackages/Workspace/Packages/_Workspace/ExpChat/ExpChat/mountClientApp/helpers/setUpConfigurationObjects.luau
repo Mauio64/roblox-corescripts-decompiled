@@ -43,7 +43,7 @@ local parent = ExpChat.Parent
 local ExpChatShared2 = require(parent.ExpChatShared)
 local GetFFlagTextChatEnableUniverseChatTabs = ExpChatShared2.Flags.GetFFlagTextChatEnableUniverseChatTabs
 local SharedFlags = require(parent.SharedFlags)
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
+local FFlagExpChatStickyTabs = SharedFlags.FFlagExpChatStickyTabs
 local FFlagExpChatUseChannelTabsStore = SharedFlags.FFlagExpChatUseChannelTabsStore
 local FFlagExpChatUseChatConfigStore = SharedFlags.FFlagExpChatUseChatConfigStore
 local FFlagExpChatTabShortcutNav = SharedFlags.FFlagExpChatTabShortcutNav
@@ -175,21 +175,29 @@ return function(object, p)
 				end
 			end
 
-			if FFlagExpChatGlobalTabDefault and v2 and isGlobalTabFirst() then
+			local v5
+
+			if FFlagExpChatStickyTabs then
+				v5 = v2
+			else
+				v5 = FFlagExpChatGlobalTabDefault and v2 and isGlobalTabFirst()
+			end
+
+			if v5 then
 				v2 = false
-				local v5, selectedTabName
+				local v6, selectedTabName
 
 				if FFlagExpChatUseChannelTabsStore then
 					local channelTabsState = GetChannelTabsStore(false).getChannelTabsState(false)
-					v5 = channelTabsState.hasUserSelectedTab
+					v6 = channelTabsState.hasUserSelectedTab
 					selectedTabName = channelTabsState.selectedTabName
 				else
 					local channelTabs = object:getState().ChannelTabs
 
 					if channelTabs == nil then
-						v5 = false
+						v6 = false
 					else
-						v5 = channelTabs.hasUserSelectedTab
+						v6 = channelTabs.hasUserSelectedTab
 					end
 
 					if channelTabs ~= nil then
@@ -197,7 +205,27 @@ return function(object, p)
 					end
 				end
 
-				if not v5 and selectedTabName == "RBXGlobal" then
+				local v7
+
+				if FFlagExpChatStickyTabs then
+					v7 = v6 or FFlagExpChatGlobalTabDefault and isGlobalTabFirst() and selectedTabName == "RBXGlobal"
+				else
+					v7 = not v6 and selectedTabName == "RBXGlobal"
+				end
+
+				if v7 then
+					if not FFlagExpChatStickyTabs then
+						return
+					end
+
+					local targetTextChannel2
+
+					if selectedTabName then
+						targetTextChannel2 = object:getState().TextChannels.allTextChannels[selectedTabName]
+					end
+
+					chatInputBarConfiguration.TargetTextChannel = targetTextChannel2
+
 					return
 				end
 			end
@@ -217,7 +245,9 @@ return function(object, p)
 				local rbxGeneral = TextChatService:FindFirstChild("RBXGeneral", true)
 
 				if rbxGeneral and rbxGeneral:IsA("TextChannel") then
-					if FFlagExpChatGlobalTabDefault then
+					if FFlagExpChatStickyTabs then
+						v2 = chatInputBarConfiguration.TargetTextChannel ~= rbxGeneral
+					elseif FFlagExpChatGlobalTabDefault then
 						v2 = true
 					end
 
@@ -392,13 +422,11 @@ return function(object, p)
 		local channelTabsConfiguration = TextChatService:FindFirstChildOfClass("ChannelTabsConfiguration")
 		local result = {}
 
-		if FFlagExpChatEnableFriendsTab then
-			if v then
-				v()
-			end
-
-			v = syncFriendsTabVisibility(object)
+		if v then
+			v()
 		end
+
+		v = syncFriendsTabVisibility(object)
 
 		if not channelTabsConfiguration then
 			return {}

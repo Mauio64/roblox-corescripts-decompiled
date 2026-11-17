@@ -18,9 +18,15 @@ local FFlagShowSwitchServerButton = SharedFlags.FFlagShowSwitchServerButton
 local PioneerUtils = require(CorePackages.Workspace.Packages.PioneerUtils)
 local isPioneerLaunch = PioneerUtils.isPioneerLaunch
 local FFlagEnableSideSheetRobuxWidget = require(script.Parent.Flags.FFlagEnableSideSheetRobuxWidget)
+local defineFastFlag = game:DefineFastFlag("SideSheetCloseOtherWindows", false)
 
 local CoreScriptsRoactCommon = require(CorePackages.Workspace.Packages.CoreScriptsRoactCommon)
 local FFlagAddTraversalHistory = CoreScriptsRoactCommon.Traversal.Flags.FFlagAddTraversalHistory
+
+if defineFastFlag then
+	local closeShopAndAvatarSwitcherOnSideSheet = require(script.closeShopAndAvatarSwitcherOnSideSheet)
+	closeShopAndAvatarSwitcherOnSideSheet()
+end
 
 local Integrations = {
 	OverflowMenu = require(script.OverflowMenu),

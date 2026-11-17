@@ -171,7 +171,13 @@ local function createDeveloperSubscriptionStore(options)
 			return fn():andThen(function(p3)
 				local cause2 = currentTokenError(p) -- inferred equivalent call
 
-				if cause2 ~= nil then
+				if cause2 == nil then
+					if fn2(p3) then
+						return p3
+					end
+
+					return Promise.reject(verificationError(id, p2, p3)) -- inferred equivalent call
+				else
 					local id2 = id
 					return Promise.reject({
 						outcome = "unverified",
@@ -180,12 +186,6 @@ local function createDeveloperSubscriptionStore(options)
 						cause = cause2
 					})
 				end
-
-				if fn2(p3) then
-					return p3
-				end
-
-				return Promise.reject(verificationError(id, p2, p3)) -- inferred equivalent call
 			end, function(cause2)
 				if cause2 ~= frozen and currentTokenError(p) == nil then -- inferred equivalent call
 					local id2 = id
@@ -307,31 +307,31 @@ local function createDeveloperSubscriptionStore(options)
 			if flag then
 				local v6 = p3
 
-				if data.name ~= v6.name then
+				if data.name == v6.name then
+					if data.productType == v6.productType then
+						if data.productStatusType ~= DeveloperSubscriptionTypes.ProductStatusType.Inactive then
+							local id2 = id
+							return Promise.reject({
+								outcome = "unverified",
+								errorMessage = "The Developer Subscription request could not be confirmed: the new subscription is not inactive. Do not automatically retry the write; inspect existing subscriptions first.",
+								subscription = data or id2 ~= nil and { id = id2 } or nil,
+								cause = nil
+							})
+						end
+					else
+						local id2 = id
+						return Promise.reject({
+							outcome = "unverified",
+							errorMessage = "The Developer Subscription request could not be confirmed: the stored product type does not match. Do not automatically retry the write; inspect existing subscriptions first.",
+							subscription = data or id2 ~= nil and { id = id2 } or nil,
+							cause = nil
+						})
+					end
+				else
 					local id2 = id
 					return Promise.reject({
 						outcome = "unverified",
 						errorMessage = "The Developer Subscription request could not be confirmed: the stored name does not match. Do not automatically retry the write; inspect existing subscriptions first.",
-						subscription = data or id2 ~= nil and { id = id2 } or nil,
-						cause = nil
-					})
-				end
-
-				if data.productType ~= v6.productType then
-					local id2 = id
-					return Promise.reject({
-						outcome = "unverified",
-						errorMessage = "The Developer Subscription request could not be confirmed: the stored product type does not match. Do not automatically retry the write; inspect existing subscriptions first.",
-						subscription = data or id2 ~= nil and { id = id2 } or nil,
-						cause = nil
-					})
-				end
-
-				if data.productStatusType ~= DeveloperSubscriptionTypes.ProductStatusType.Inactive then
-					local id2 = id
-					return Promise.reject({
-						outcome = "unverified",
-						errorMessage = "The Developer Subscription request could not be confirmed: the new subscription is not inactive. Do not automatically retry the write; inspect existing subscriptions first.",
 						subscription = data or id2 ~= nil and { id = id2 } or nil,
 						cause = nil
 					})
@@ -643,48 +643,48 @@ local function createDeveloperSubscriptionStore(options)
 			end))
 		end,
 		deactivate = function(p: number, id: string, flag: boolean)
-			if typeof(flag) == "boolean" then
-				return reconcileMutation(p, withMutationPreflight(p, id, function(p2, cause)
-					if not flag and cause.productStatusType == DeveloperSubscriptionTypes.ProductStatusType.OffSale then
-						return Promise.resolve(cause)
-					end
-
-					if
-						cause.productStatusType == DeveloperSubscriptionTypes.ProductStatusType.Active
-						or flag and cause.productStatusType == DeveloperSubscriptionTypes.ProductStatusType.OffSale
-					then
-						return runMutation(p2, id, function()
-							return fetchDeveloperSubscription.deactivate(p, id, flag, v2)
-						end):andThen(function()
-							return verifyRead(p2, function()
-								return tokenBoundGet(p2, p, id)
-							end, function(p3): boolean
-								if flag then
-									return p3.productStatusType == DeveloperSubscriptionTypes.ProductStatusType.ToBeDeactivated
-										or p3.productStatusType == DeveloperSubscriptionTypes.ProductStatusType.Inactive
-								end
-
-								return p3.productStatusType == DeveloperSubscriptionTypes.ProductStatusType.OffSale
-							end, flag and "the subscription did not begin deactivation" or "the subscription did not go off sale", id)
-						end)
-					end
-
-					local id2 = id
-					return Promise.reject({
-						outcome = "failed",
-						errorMessage = "The Developer Subscription request was rejected: the subscription cannot be deactivated from its current state.",
-						subscription = id2 ~= nil and { id = id2 } or nil,
-						cause = cause
-					})
-				end))
+			if typeof(flag) ~= "boolean" then
+				return Promise.reject({
+					outcome = "failed",
+					errorMessage = "The Developer Subscription request was rejected: cancelRenewals must be chosen explicitly.",
+					subscription = id ~= nil and { id = id } or nil,
+					cause = nil
+				})
 			end
 
-			return Promise.reject({
-				outcome = "failed",
-				errorMessage = "The Developer Subscription request was rejected: cancelRenewals must be chosen explicitly.",
-				subscription = id ~= nil and { id = id } or nil,
-				cause = nil
-			})
+			return reconcileMutation(p, withMutationPreflight(p, id, function(p2, cause)
+				if not flag and cause.productStatusType == DeveloperSubscriptionTypes.ProductStatusType.OffSale then
+					return Promise.resolve(cause)
+				end
+
+				if
+					cause.productStatusType == DeveloperSubscriptionTypes.ProductStatusType.Active
+					or flag and cause.productStatusType == DeveloperSubscriptionTypes.ProductStatusType.OffSale
+				then
+					return runMutation(p2, id, function()
+						return fetchDeveloperSubscription.deactivate(p, id, flag, v2)
+					end):andThen(function()
+						return verifyRead(p2, function()
+							return tokenBoundGet(p2, p, id)
+						end, function(p3): boolean
+							if flag then
+								return p3.productStatusType == DeveloperSubscriptionTypes.ProductStatusType.ToBeDeactivated
+									or p3.productStatusType == DeveloperSubscriptionTypes.ProductStatusType.Inactive
+							end
+
+							return p3.productStatusType == DeveloperSubscriptionTypes.ProductStatusType.OffSale
+						end, flag and "the subscription did not begin deactivation" or "the subscription did not go off sale", id)
+					end)
+				end
+
+				local id2 = id
+				return Promise.reject({
+					outcome = "failed",
+					errorMessage = "The Developer Subscription request was rejected: the subscription cannot be deactivated from its current state.",
+					subscription = id2 ~= nil and { id = id2 } or nil,
+					cause = cause
+				})
+			end))
 		end,
 		delete = delete,
 		clear = function()

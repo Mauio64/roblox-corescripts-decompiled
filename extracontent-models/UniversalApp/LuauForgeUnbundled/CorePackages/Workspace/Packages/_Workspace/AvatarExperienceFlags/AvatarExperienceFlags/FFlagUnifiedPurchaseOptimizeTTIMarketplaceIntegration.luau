@@ -1,4 +1,0 @@
-local fFlagUnifiedPurchaseOptimizeTTIMarketplace = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/SharedFlags").FFlagUnifiedPurchaseOptimizeTTIMarketplace
-
-return game:DefineFastFlag("UnifiedPurchaseOptimizeTTIMarketplaceIntegration", false)
-	and fFlagUnifiedPurchaseOptimizeTTIMarketplace

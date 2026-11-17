@@ -16,7 +16,6 @@ local default = ToastNotificationSnoozeManager.default
 local Foundation = require(parent2.Foundation)
 local useTokens = Foundation.Hooks.useTokens
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local cryo = dependencies.Cryo
 local localization = dependencies.Localization
@@ -65,14 +64,7 @@ local v2 = {
 
 return function()
 	local v3 = useStyle()
-	local v4
-
-	if FFlagEnableAppChatSnoozeMenuFocus or FoundationFontFaceMigration then
-		v4 = useTokens()
-	else
-		v4 = nil
-	end
-
+	local v4 = useTokens()
 	local v5 = useLocalization((cryo.Dictionary.union(v, {
 		fifteenMinutes = "Feature.Notifications.Action.SnoozeFifteenMinutes",
 		fourHours = "Feature.Notifications.Action.SnoozeFourHours",
@@ -140,59 +132,44 @@ return function()
 		selectionImageObject = nil
 	end
 
-	local useMemo = react.useMemo
-	local function fn()
+	local v7 = react.useMemo(function()
 		local children = {}
 
 		for count, v7 in ipairs(v2) do
 			local createElement = react.createElement
-			local v8 = {}
-			v8.Size = UDim2.new(1, 0, 0, not FFlagEnableAppChatSnoozeMenuFocus and 56 or v4.Size.Size_1400)
-			v8.BackgroundTransparency = 1
-			local font
+			local v8 = {
+				Size = UDim2.new(1, 0, 0, not FFlagEnableAppChatSnoozeMenuFocus and 56 or v4.Size.Size_1400),
+				BackgroundTransparency = 1,
+				FontFace = normalizeFontFace(v4.Typography.TitleLarge.Font),
+				LayoutOrder = count,
+				SelectionImageObject = selectionImageObject,
+				Text = v5[v7.textKey],
+				TextSize = v3.Font.Header2.RelativeSize * v3.Font.BaseSize,
+				TextColor3 = colors.White,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				TextYAlignment = Enum.TextYAlignment.Center,
+				[react.Event.Activated] = function()
+					if state2.notificationType then
+						local v8 = state2.notificationType
 
-			if not FoundationFontFaceMigration then
-				font = v3.Font.Header2.Font
-			end
+						if type(state2.notificationType) == "table" then
+							v8 = state2.notificationType[1]
+						end
 
-			v8.Font = font
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(v4.Typography.TitleLarge.Font)
-			end
-
-			v8.FontFace = fontFace
-
-			v8.LayoutOrder = count
-			v8.SelectionImageObject = selectionImageObject
-			v8.Text = v5[v7.textKey]
-			v8.TextSize = v3.Font.Header2.RelativeSize * v3.Font.BaseSize
-			v8.TextColor3 = colors.White
-			v8.TextXAlignment = Enum.TextXAlignment.Left
-			v8.TextYAlignment = Enum.TextYAlignment.Center
-			v8[react.Event.Activated] = function()
-				if state2.notificationType then
-					local v9 = state2.notificationType
-
-					if type(state2.notificationType) == "table" then
-						v9 = state2.notificationType[1]
+						default:snoozeNotification({
+							context = state2.context,
+							notificationType = state2.notificationType,
+							durationMinutes = v7.durationMinutes,
+							modalMessage = v5.snoozeFeedback:gsub("{title}", v5[v8] or ""):gsub(
+								"{duration}",
+								v5[v7.textKey]
+							)
+						})
 					end
 
-					default:snoozeNotification({
-						context = state2.context,
-						notificationType = state2.notificationType,
-						durationMinutes = v7.durationMinutes,
-						modalMessage = v5.snoozeFeedback:gsub("{title}", v5[v9] or ""):gsub(
-							"{duration}",
-							v5[v7.textKey]
-						)
-					})
+					setState(false)
 				end
-
-				setState(false)
-			end
-
+			}
 			local uiPadding
 
 			if FFlagEnableAppChatSnoozeMenuFocus then
@@ -226,22 +203,14 @@ return function()
 		end
 
 		return children
-	end
-
-	local v7
-
-	if FoundationFontFaceMigration then
-		v7 = v4.Typography.TitleLarge.Font
-	end
-
-	local v8 = useMemo(fn, { state2, v7 })
+	end, { state2, v4.Typography.TitleLarge.Font })
 
 	if not state then
 		return nil
 	end
 
 	local createElement = react.createElement
-	local v9 = {
+	local v8 = {
 		Size = UDim2.fromScale(1, 1),
 		AutoButtonColor = false,
 		BackgroundColor3 = colors.Black,
@@ -251,18 +220,18 @@ return function()
 	}
 
 	local createElement2 = react.createElement
+	local v9
+
+	if FFlagEnableAppChatSnoozeMenuFocus then
+		v9 = FocusRoot
+	else
+		v9 = interactable
+	end
+
 	local v10
 
 	if FFlagEnableAppChatSnoozeMenuFocus then
-		v10 = FocusRoot
-	else
-		v10 = interactable
-	end
-
-	local v11
-
-	if FFlagEnableAppChatSnoozeMenuFocus then
-		v11 = {
+		v10 = {
 			eventHandlers = eventHandlers,
 			eventMap = navigateBacks,
 			frameProps = {
@@ -278,7 +247,7 @@ return function()
 			surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.PopUp
 		}
 	else
-		v11 = {
+		v10 = {
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Position = UDim2.fromScale(0.5, 0.5),
 			Size = UDim2.new(1, -16, 0, 0),
@@ -318,7 +287,7 @@ return function()
 	})
 
 	local createElement3 = react.createElement
-	local v12 = {
+	local v11 = {
 		AutomaticSize = Enum.AutomaticSize.Y,
 		Size = UDim2.new(1, 0, 0, 0),
 		BackgroundTransparency = 1,
@@ -338,7 +307,7 @@ return function()
 	}
 
 	local createElement4 = react.createElement
-	local v13 = {
+	local v12 = {
 		PaddingBottom = UDim.new(0, not FFlagEnableAppChatSnoozeMenuFocus and 20 or v4.Padding.XLarge),
 		PaddingRight = UDim.new(0, not FFlagEnableAppChatSnoozeMenuFocus and 24 or v4.Padding.XXLarge),
 		PaddingTop = UDim.new(0, not FFlagEnableAppChatSnoozeMenuFocus and 20 or v4.Padding.XLarge),
@@ -350,85 +319,45 @@ return function()
 		paddingLeft = UDim.new(0, v4.Padding.XXLarge)
 	end
 
-	v13.PaddingLeft = paddingLeft
-	children2.UIPadding = createElement4("UIPadding", v13)
+	v12.PaddingLeft = paddingLeft
+	children2.UIPadding = createElement4("UIPadding", v12)
 
 	local createElement5 = react.createElement
-	local v14 = {
+	local v13 = {
 		AutomaticSize = Enum.AutomaticSize.XY,
 		BackgroundTransparency = 1,
-		Font = 0,
-		FontFace = 0,
+		FontFace = normalizeFontFace(v4.Typography.BodyLarge.Font),
 		LayoutOrder = 1,
-		Text = 0,
-		TextSize = 0,
-		TextColor3 = 0,
+		Text = state2.title or "",
+		TextSize = v3.Font.Body.RelativeSize * v3.Font.BaseSize,
+		TextColor3 = colors.White,
 		TextWrapped = true,
 		TextXAlignment = 0
 	}
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = v3.Font.Body.Font
-	end
-
-	v14.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(v4.Typography.BodyLarge.Font)
-	end
-
-	v14.FontFace = fontFace
-
-	v14.Text = state2.title or ""
-	v14.TextSize = v3.Font.Body.RelativeSize * v3.Font.BaseSize
-	v14.TextColor3 = colors.White
 	local textXAlignment
 
 	if defineFastFlag then
 		textXAlignment = Enum.TextXAlignment.Left
 	end
 
-	v14.TextXAlignment = textXAlignment
-	children2.Title = createElement5("TextLabel", v14)
+	v13.TextXAlignment = textXAlignment
+	children2.Title = createElement5("TextLabel", v13)
 	local description
 
 	if state2 and state2.description and state2.description ~= "" then
-		local createElement6 = react.createElement
-		local v15 = {
+		description = react.createElement("TextLabel", {
 			AutomaticSize = Enum.AutomaticSize.XY,
 			BackgroundTransparency = 1,
-			Font = 0,
-			FontFace = 0,
+			FontFace = normalizeFontFace(v4.Typography.BodySmall.Font),
 			LayoutOrder = 2,
-			Text = 0,
-			TextSize = 0,
-			TextColor3 = 0
-		}
-		local font2
-
-		if not FoundationFontFaceMigration then
-			font2 = v3.Font.CaptionBody.Font
-		end
-
-		v15.Font = font2
-		local fontFace2
-
-		if FoundationFontFaceMigration then
-			fontFace2 = normalizeFontFace(v4.Typography.BodySmall.Font)
-		end
-
-		v15.FontFace = fontFace2
-
-		v15.Text = state2.description or ""
-		v15.TextSize = v3.Font.CaptionBody.RelativeSize * v3.Font.BaseSize
-		v15.TextColor3 = v3.Theme.TextDefault.Color
-		description = createElement6("TextLabel", v15)
+			Text = state2.description or "",
+			TextSize = v3.Font.CaptionBody.RelativeSize * v3.Font.BaseSize,
+			TextColor3 = v3.Theme.TextDefault.Color
+		})
 	end
 
 	children2.Description = description
-	children.TitleContainer = createElement3("Frame", v12, children2)
+	children.TitleContainer = createElement3("Frame", v11, children2)
 
 	children.SnoozeOptions = react.createElement(
 		"Frame",
@@ -443,10 +372,10 @@ return function()
 				FillDirection = Enum.FillDirection.Vertical,
 				SortOrder = Enum.SortOrder.LayoutOrder
 			}),
-			SnoozeOptions = roact.createFragment(v8)
+			SnoozeOptions = roact.createFragment(v7)
 		}
 	)
-	return (createElement(interactable, v9, {
-		SnoozeMenu = createElement2(v10, v11, children)
+	return (createElement(interactable, v8, {
+		SnoozeMenu = createElement2(v9, v10, children)
 	}))
 end

@@ -5,7 +5,6 @@ local React = require(parent.React)
 local UIBlox = require(parent.UIBlox)
 local Foundation = require(parent.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local useStyle = UIBlox.Core.Style.useStyle
 local EditSocialNetworksItem = require(EditProfile.Components.EditSocialNetworksItem)
 local DropdownMenu = UIBlox.App.Menu.DropdownMenu
@@ -91,143 +90,126 @@ return function(props)
 						anchorPoint = Vector2.new(0.5, 0),
 						position = UDim2.new(0.5, 0, 0, 30 + state7),
 						middleContent = function()
-							local createElement = React.createElement
-							local v5 = {
-								BackgroundTransparency = 1,
-								AutomaticSize = Enum.AutomaticSize.XY
-							}
-							local v6 = {
-								UIListLayout = React.createElement("UIListLayout", {
-									FillDirection = Enum.FillDirection.Vertical,
-									VerticalAlignment = Enum.VerticalAlignment.Center,
-									HorizontalAlignment = Enum.HorizontalAlignment.Left,
-									SortOrder = Enum.SortOrder.LayoutOrder
-								}),
-								Facebook = React.createElement(EditSocialNetworksItem, {
-									textChanged = setState,
-									networkTitle = v.Facebook,
-									initialText = state,
-									placeholderText = v.FacebookExample,
-									layoutOrder = v3 == SocialNetworksInEditProfileIXP.Variants.VisibilityLast and 1 or 2,
-									focusOn = v2.focusOn == 1,
-									isVisibilityNoOne = isVisibilityNoOne,
-									setKeyboardOffset = setState7
-								}),
-								Twitter = React.createElement(EditSocialNetworksItem, {
-									textChanged = setState2,
-									networkTitle = v.X,
-									initialText = state2,
-									placeholderText = v.TwitterExample,
-									layoutOrder = v3 == SocialNetworksInEditProfileIXP.Variants.VisibilityLast and 2 or 3,
-									focusOn = v2.focusOn == 2,
-									isVisibilityNoOne = isVisibilityNoOne,
-									setKeyboardOffset = setState7
-								}),
-								YouTube = React.createElement(EditSocialNetworksItem, {
-									textChanged = setState3,
-									networkTitle = v.YouTube,
-									initialText = state3,
-									placeholderText = v.YouTubeExample,
-									layoutOrder = v3 == SocialNetworksInEditProfileIXP.Variants.VisibilityLast and 3 or 4,
-									focusOn = v2.focusOn == 3,
-									isVisibilityNoOne = isVisibilityNoOne,
-									setKeyboardOffset = setState7
-								}),
-								Twitch = React.createElement(EditSocialNetworksItem, {
-									textChanged = setState4,
-									networkTitle = v.Twitch,
-									initialText = state4,
-									placeholderText = v.TwitchExample,
-									layoutOrder = v3 == SocialNetworksInEditProfileIXP.Variants.VisibilityLast and 4 or 5,
-									focusOn = v2.focusOn == 4,
-									isVisibilityNoOne = isVisibilityNoOne,
-									setKeyboardOffset = setState7
-								}),
-								Guilded = React.createElement(EditSocialNetworksItem, {
-									textChanged = setState5,
-									networkTitle = v.Guilded,
-									initialText = state5,
-									placeholderText = v.GuildedExample,
-									layoutOrder = v3 == SocialNetworksInEditProfileIXP.Variants.VisibilityLast and 5 or 6,
-									focusOn = v2.focusOn == 5,
-									isVisibilityNoOne = isVisibilityNoOne,
-									setKeyboardOffset = setState7
-								}),
-								Visibility = 0
-							}
-
-							local createElement2 = React.createElement
-							local v7 = {
-								BackgroundTransparency = 1,
-								Size = UDim2.new(1, 0, 0, 0),
-								AutomaticSize = Enum.AutomaticSize.Y,
-								LayoutOrder = v3 == SocialNetworksInEditProfileIXP.Variants.VisibilityLast and 6 or 1,
-								ZIndex = 2
-							}
-
-							local children = {
-								UIListLayout = React.createElement("UIListLayout", {
-									FillDirection = Enum.FillDirection.Vertical,
-									SortOrder = Enum.SortOrder.LayoutOrder,
-									Padding = UDim.new(0, 12)
-								}),
-								NetworkLabel = 0,
-								Dropdown = 0
-							}
-
-							local createElement3 = React.createElement
-							local font2
-
-							if not FoundationFontFaceMigration then
-								font2 = font.Body.Font
-							end
-
-							local fontFace
-
-							if FoundationFontFaceMigration then
-								fontFace = normalizeFontFace(v4.Tokens.Typography.BodyLarge.Font)
-							end
-
-							children.NetworkLabel = createElement3("TextLabel", {
-								LayoutOrder = -1,
-								BackgroundTransparency = 1,
-								Font = font2,
-								FontFace = fontFace,
-								Text = v.VisibleTo,
-								TextSize = textSize,
-								TextColor3 = theme.TextDefault.Color,
-								AutomaticSize = Enum.AutomaticSize.XY,
-								RichText = true,
-								ZIndex = 0
-							})
-
-							children.Dropdown = React.createElement(DropdownMenu, {
-								placeholder = v[state6],
-								onChange = onChange,
-								screenSize = Vector2.new(math.clamp(screenSize.X - 48, 272, 400) - 48, 640),
-								height = UDim.new(0, textSize + 20),
-								dropdownMenuListPositionFixed = true,
-								cellDatas = {
-									{
-										text = v.AllUsers,
-										key = Constants.VisibilitySettings.AllUsers
-									},
-									{
-										text = v.FriendsFollowingAndFollowers,
-										key = Constants.VisibilitySettings.FriendsFollowingAndFollowers
-									},
-									{
-										text = v.FriendsAndFollowing,
-										key = Constants.VisibilitySettings.FriendsAndFollowing
-									},
-									{ text = v.Friends, key = Constants.VisibilitySettings.Friends },
-									{ text = v.NoOne, key = Constants.VisibilitySettings.NoOne }
+							return React.createElement(
+								"Frame",
+								{
+									BackgroundTransparency = 1,
+									AutomaticSize = Enum.AutomaticSize.XY
 								},
-								showDropShadow = true,
-								defaultKey = state6
-							})
-							v6.Visibility = createElement2("Frame", v7, children)
-							return createElement("Frame", v5, v6)
+								{
+									UIListLayout = React.createElement("UIListLayout", {
+										FillDirection = Enum.FillDirection.Vertical,
+										VerticalAlignment = Enum.VerticalAlignment.Center,
+										HorizontalAlignment = Enum.HorizontalAlignment.Left,
+										SortOrder = Enum.SortOrder.LayoutOrder
+									}),
+									Facebook = React.createElement(EditSocialNetworksItem, {
+										textChanged = setState,
+										networkTitle = v.Facebook,
+										initialText = state,
+										placeholderText = v.FacebookExample,
+										layoutOrder = v3 == SocialNetworksInEditProfileIXP.Variants.VisibilityLast and 1 or 2,
+										focusOn = v2.focusOn == 1,
+										isVisibilityNoOne = isVisibilityNoOne,
+										setKeyboardOffset = setState7
+									}),
+									Twitter = React.createElement(EditSocialNetworksItem, {
+										textChanged = setState2,
+										networkTitle = v.X,
+										initialText = state2,
+										placeholderText = v.TwitterExample,
+										layoutOrder = v3 == SocialNetworksInEditProfileIXP.Variants.VisibilityLast and 2 or 3,
+										focusOn = v2.focusOn == 2,
+										isVisibilityNoOne = isVisibilityNoOne,
+										setKeyboardOffset = setState7
+									}),
+									YouTube = React.createElement(EditSocialNetworksItem, {
+										textChanged = setState3,
+										networkTitle = v.YouTube,
+										initialText = state3,
+										placeholderText = v.YouTubeExample,
+										layoutOrder = v3 == SocialNetworksInEditProfileIXP.Variants.VisibilityLast and 3 or 4,
+										focusOn = v2.focusOn == 3,
+										isVisibilityNoOne = isVisibilityNoOne,
+										setKeyboardOffset = setState7
+									}),
+									Twitch = React.createElement(EditSocialNetworksItem, {
+										textChanged = setState4,
+										networkTitle = v.Twitch,
+										initialText = state4,
+										placeholderText = v.TwitchExample,
+										layoutOrder = v3 == SocialNetworksInEditProfileIXP.Variants.VisibilityLast and 4 or 5,
+										focusOn = v2.focusOn == 4,
+										isVisibilityNoOne = isVisibilityNoOne,
+										setKeyboardOffset = setState7
+									}),
+									Guilded = React.createElement(EditSocialNetworksItem, {
+										textChanged = setState5,
+										networkTitle = v.Guilded,
+										initialText = state5,
+										placeholderText = v.GuildedExample,
+										layoutOrder = v3 == SocialNetworksInEditProfileIXP.Variants.VisibilityLast and 5 or 6,
+										focusOn = v2.focusOn == 5,
+										isVisibilityNoOne = isVisibilityNoOne,
+										setKeyboardOffset = setState7
+									}),
+									Visibility = React.createElement("Frame", {
+										BackgroundTransparency = 1,
+										Size = UDim2.new(1, 0, 0, 0),
+										AutomaticSize = Enum.AutomaticSize.Y,
+										LayoutOrder = v3 == SocialNetworksInEditProfileIXP.Variants.VisibilityLast and 6 or 1,
+										ZIndex = 2
+									}, {
+										UIListLayout = React.createElement("UIListLayout", {
+											FillDirection = Enum.FillDirection.Vertical,
+											SortOrder = Enum.SortOrder.LayoutOrder,
+											Padding = UDim.new(0, 12)
+										}),
+										NetworkLabel = React.createElement("TextLabel", {
+											LayoutOrder = -1,
+											BackgroundTransparency = 1,
+											FontFace = normalizeFontFace(v4.Tokens.Typography.BodyLarge.Font),
+											Text = v.VisibleTo,
+											TextSize = textSize,
+											TextColor3 = theme.TextDefault.Color,
+											AutomaticSize = Enum.AutomaticSize.XY,
+											RichText = true,
+											ZIndex = 0
+										}),
+										Dropdown = React.createElement(DropdownMenu, {
+											placeholder = v[state6],
+											onChange = onChange,
+											screenSize = Vector2.new(math.clamp(screenSize.X - 48, 272, 400) - 48, 640),
+											height = UDim.new(0, textSize + 20),
+											dropdownMenuListPositionFixed = true,
+											cellDatas = {
+												{
+													text = v.AllUsers,
+													key = Constants.VisibilitySettings.AllUsers
+												},
+												{
+													text = v.FriendsFollowingAndFollowers,
+													key = Constants.VisibilitySettings.FriendsFollowingAndFollowers
+												},
+												{
+													text = v.FriendsAndFollowing,
+													key = Constants.VisibilitySettings.FriendsAndFollowing
+												},
+												{
+													text = v.Friends,
+													key = Constants.VisibilitySettings.Friends
+												},
+												{
+													text = v.NoOne,
+													key = Constants.VisibilitySettings.NoOne
+												}
+											},
+											showDropShadow = true,
+											defaultKey = state6
+										})
+									})
+								}
+							)
 						end,
 						buttonStackInfo = {
 							buttons = {
@@ -265,137 +247,120 @@ return function(props)
 				anchorPoint = Vector2.new(0.5, 0),
 				position = UDim2.new(0.5, 0, 0, 30 + state7),
 				middleContent = function()
-					local createElement = React.createElement
-					local v5 = { BackgroundTransparency = 1, AutomaticSize = Enum.AutomaticSize.XY }
-					local v6 = {
-						UIListLayout = React.createElement("UIListLayout", {
-							FillDirection = Enum.FillDirection.Vertical,
-							VerticalAlignment = Enum.VerticalAlignment.Center,
-							HorizontalAlignment = Enum.HorizontalAlignment.Left,
-							SortOrder = Enum.SortOrder.LayoutOrder
-						}),
-						Facebook = React.createElement(EditSocialNetworksItem, {
-							textChanged = setState,
-							networkTitle = v.Facebook,
-							initialText = state,
-							placeholderText = v.FacebookExample,
-							layoutOrder = v3 == SocialNetworksInEditProfileIXP.Variants.VisibilityLast and 1 or 2,
-							focusOn = v2.focusOn == 1,
-							isVisibilityNoOne = isVisibilityNoOne,
-							setKeyboardOffset = setState7
-						}),
-						Twitter = React.createElement(EditSocialNetworksItem, {
-							textChanged = setState2,
-							networkTitle = v.X,
-							initialText = state2,
-							placeholderText = v.TwitterExample,
-							layoutOrder = v3 == SocialNetworksInEditProfileIXP.Variants.VisibilityLast and 2 or 3,
-							focusOn = v2.focusOn == 2,
-							isVisibilityNoOne = isVisibilityNoOne,
-							setKeyboardOffset = setState7
-						}),
-						YouTube = React.createElement(EditSocialNetworksItem, {
-							textChanged = setState3,
-							networkTitle = v.YouTube,
-							initialText = state3,
-							placeholderText = v.YouTubeExample,
-							layoutOrder = v3 == SocialNetworksInEditProfileIXP.Variants.VisibilityLast and 3 or 4,
-							focusOn = v2.focusOn == 3,
-							isVisibilityNoOne = isVisibilityNoOne,
-							setKeyboardOffset = setState7
-						}),
-						Twitch = React.createElement(EditSocialNetworksItem, {
-							textChanged = setState4,
-							networkTitle = v.Twitch,
-							initialText = state4,
-							placeholderText = v.TwitchExample,
-							layoutOrder = v3 == SocialNetworksInEditProfileIXP.Variants.VisibilityLast and 4 or 5,
-							focusOn = v2.focusOn == 4,
-							isVisibilityNoOne = isVisibilityNoOne,
-							setKeyboardOffset = setState7
-						}),
-						Guilded = React.createElement(EditSocialNetworksItem, {
-							textChanged = setState5,
-							networkTitle = v.Guilded,
-							initialText = state5,
-							placeholderText = v.GuildedExample,
-							layoutOrder = v3 == SocialNetworksInEditProfileIXP.Variants.VisibilityLast and 5 or 6,
-							focusOn = v2.focusOn == 5,
-							isVisibilityNoOne = isVisibilityNoOne,
-							setKeyboardOffset = setState7
-						}),
-						Visibility = 0
-					}
-
-					local createElement2 = React.createElement
-					local v7 = {
-						BackgroundTransparency = 1,
-						Size = UDim2.new(1, 0, 0, 0),
-						AutomaticSize = Enum.AutomaticSize.Y,
-						LayoutOrder = v3 == SocialNetworksInEditProfileIXP.Variants.VisibilityLast and 6 or 1,
-						ZIndex = 2
-					}
-
-					local children = {
-						UIListLayout = React.createElement("UIListLayout", {
-							FillDirection = Enum.FillDirection.Vertical,
-							SortOrder = Enum.SortOrder.LayoutOrder,
-							Padding = UDim.new(0, 12)
-						}),
-						NetworkLabel = 0,
-						Dropdown = 0
-					}
-
-					local createElement3 = React.createElement
-					local font2
-
-					if not FoundationFontFaceMigration then
-						font2 = font.Body.Font
-					end
-
-					local fontFace
-
-					if FoundationFontFaceMigration then
-						fontFace = normalizeFontFace(v4.Tokens.Typography.BodyLarge.Font)
-					end
-
-					children.NetworkLabel = createElement3("TextLabel", {
-						LayoutOrder = -1,
-						BackgroundTransparency = 1,
-						Font = font2,
-						FontFace = fontFace,
-						Text = v.VisibleTo,
-						TextSize = textSize,
-						TextColor3 = theme.TextDefault.Color,
-						AutomaticSize = Enum.AutomaticSize.XY,
-						RichText = true,
-						ZIndex = 0
-					})
-
-					children.Dropdown = React.createElement(DropdownMenu, {
-						placeholder = v[state6],
-						onChange = onChange,
-						screenSize = Vector2.new(math.clamp(screenSize.X - 48, 272, 400) - 48, 640),
-						height = UDim.new(0, textSize + 20),
-						dropdownMenuListPositionFixed = true,
-						cellDatas = {
-							{ text = v.AllUsers, key = Constants.VisibilitySettings.AllUsers },
-							{
-								text = v.FriendsFollowingAndFollowers,
-								key = Constants.VisibilitySettings.FriendsFollowingAndFollowers
-							},
-							{
-								text = v.FriendsAndFollowing,
-								key = Constants.VisibilitySettings.FriendsAndFollowing
-							},
-							{ text = v.Friends, key = Constants.VisibilitySettings.Friends },
-							{ text = v.NoOne, key = Constants.VisibilitySettings.NoOne }
-						},
-						showDropShadow = true,
-						defaultKey = state6
-					})
-					v6.Visibility = createElement2("Frame", v7, children)
-					return createElement("Frame", v5, v6)
+					return React.createElement(
+						"Frame",
+						{ BackgroundTransparency = 1, AutomaticSize = Enum.AutomaticSize.XY },
+						{
+							UIListLayout = React.createElement("UIListLayout", {
+								FillDirection = Enum.FillDirection.Vertical,
+								VerticalAlignment = Enum.VerticalAlignment.Center,
+								HorizontalAlignment = Enum.HorizontalAlignment.Left,
+								SortOrder = Enum.SortOrder.LayoutOrder
+							}),
+							Facebook = React.createElement(EditSocialNetworksItem, {
+								textChanged = setState,
+								networkTitle = v.Facebook,
+								initialText = state,
+								placeholderText = v.FacebookExample,
+								layoutOrder = v3 == SocialNetworksInEditProfileIXP.Variants.VisibilityLast and 1 or 2,
+								focusOn = v2.focusOn == 1,
+								isVisibilityNoOne = isVisibilityNoOne,
+								setKeyboardOffset = setState7
+							}),
+							Twitter = React.createElement(EditSocialNetworksItem, {
+								textChanged = setState2,
+								networkTitle = v.X,
+								initialText = state2,
+								placeholderText = v.TwitterExample,
+								layoutOrder = v3 == SocialNetworksInEditProfileIXP.Variants.VisibilityLast and 2 or 3,
+								focusOn = v2.focusOn == 2,
+								isVisibilityNoOne = isVisibilityNoOne,
+								setKeyboardOffset = setState7
+							}),
+							YouTube = React.createElement(EditSocialNetworksItem, {
+								textChanged = setState3,
+								networkTitle = v.YouTube,
+								initialText = state3,
+								placeholderText = v.YouTubeExample,
+								layoutOrder = v3 == SocialNetworksInEditProfileIXP.Variants.VisibilityLast and 3 or 4,
+								focusOn = v2.focusOn == 3,
+								isVisibilityNoOne = isVisibilityNoOne,
+								setKeyboardOffset = setState7
+							}),
+							Twitch = React.createElement(EditSocialNetworksItem, {
+								textChanged = setState4,
+								networkTitle = v.Twitch,
+								initialText = state4,
+								placeholderText = v.TwitchExample,
+								layoutOrder = v3 == SocialNetworksInEditProfileIXP.Variants.VisibilityLast and 4 or 5,
+								focusOn = v2.focusOn == 4,
+								isVisibilityNoOne = isVisibilityNoOne,
+								setKeyboardOffset = setState7
+							}),
+							Guilded = React.createElement(EditSocialNetworksItem, {
+								textChanged = setState5,
+								networkTitle = v.Guilded,
+								initialText = state5,
+								placeholderText = v.GuildedExample,
+								layoutOrder = v3 == SocialNetworksInEditProfileIXP.Variants.VisibilityLast and 5 or 6,
+								focusOn = v2.focusOn == 5,
+								isVisibilityNoOne = isVisibilityNoOne,
+								setKeyboardOffset = setState7
+							}),
+							Visibility = React.createElement("Frame", {
+								BackgroundTransparency = 1,
+								Size = UDim2.new(1, 0, 0, 0),
+								AutomaticSize = Enum.AutomaticSize.Y,
+								LayoutOrder = v3 == SocialNetworksInEditProfileIXP.Variants.VisibilityLast and 6 or 1,
+								ZIndex = 2
+							}, {
+								UIListLayout = React.createElement("UIListLayout", {
+									FillDirection = Enum.FillDirection.Vertical,
+									SortOrder = Enum.SortOrder.LayoutOrder,
+									Padding = UDim.new(0, 12)
+								}),
+								NetworkLabel = React.createElement("TextLabel", {
+									LayoutOrder = -1,
+									BackgroundTransparency = 1,
+									FontFace = normalizeFontFace(v4.Tokens.Typography.BodyLarge.Font),
+									Text = v.VisibleTo,
+									TextSize = textSize,
+									TextColor3 = theme.TextDefault.Color,
+									AutomaticSize = Enum.AutomaticSize.XY,
+									RichText = true,
+									ZIndex = 0
+								}),
+								Dropdown = React.createElement(DropdownMenu, {
+									placeholder = v[state6],
+									onChange = onChange,
+									screenSize = Vector2.new(math.clamp(screenSize.X - 48, 272, 400) - 48, 640),
+									height = UDim.new(0, textSize + 20),
+									dropdownMenuListPositionFixed = true,
+									cellDatas = {
+										{
+											text = v.AllUsers,
+											key = Constants.VisibilitySettings.AllUsers
+										},
+										{
+											text = v.FriendsFollowingAndFollowers,
+											key = Constants.VisibilitySettings.FriendsFollowingAndFollowers
+										},
+										{
+											text = v.FriendsAndFollowing,
+											key = Constants.VisibilitySettings.FriendsAndFollowing
+										},
+										{
+											text = v.Friends,
+											key = Constants.VisibilitySettings.Friends
+										},
+										{ text = v.NoOne, key = Constants.VisibilitySettings.NoOne }
+									},
+									showDropShadow = true,
+									defaultKey = state6
+								})
+							})
+						}
+					)
 				end,
 				buttonStackInfo = {
 					buttons = {

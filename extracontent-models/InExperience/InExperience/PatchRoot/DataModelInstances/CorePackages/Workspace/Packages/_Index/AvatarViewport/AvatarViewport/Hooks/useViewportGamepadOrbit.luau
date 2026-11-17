@@ -42,7 +42,9 @@ local function useViewportGamepadOrbit(data)
 				v2 = Vector2.new(p2.Position.X, p2.Position.Y)
 				ref.current = ViewportGamepadInput.isRotating(v2, thumbstickDeadzone)
 
-				if ref.current or zoomAxisThreshold < math.abs(v2.Y) then
+				if ref.current then
+					ref2.current = true
+				elseif zoomAxisThreshold < math.abs(v2.Y) then
 					ref2.current = true
 				end
 			elseif p == Enum.UserInputState.End or p == Enum.UserInputState.Cancel then

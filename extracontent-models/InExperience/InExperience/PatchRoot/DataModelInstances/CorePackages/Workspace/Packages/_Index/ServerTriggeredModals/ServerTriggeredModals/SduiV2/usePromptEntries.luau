@@ -5,6 +5,7 @@ local SignalsReact = require(parent.SignalsReact)
 local SduiSharedUtilities = require(parent.SduiSharedUtilities)
 
 require(script.Parent.PromptStyle)
+require(script.Parent.Types.PromptEntry)
 local getSduiApiStore = SduiSharedUtilities.getSduiApiStore
 
 local function usePromptEntries(p: string, p2)

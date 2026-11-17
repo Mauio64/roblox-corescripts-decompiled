@@ -7,6 +7,7 @@ local createPerformFetchMiddleware = require(script.createPerformFetchMiddleware
 require(script.RequestTypes)
 
 return {
+	Actions = require(script.Actions),
 	Enum = require(script.Enum),
 	Requests = Requests,
 	Url = require(script.Url),

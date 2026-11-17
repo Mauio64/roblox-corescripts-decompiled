@@ -109,7 +109,10 @@ local v = {
 				chunkAndLogString(`RETURNED CONVERSATIONS{v}`)
 			elseif string.find(data2.url, "get%-modal%-sequence") then
 				local modal_variant = result and result.modal_variant
-				logger:debug(`RETURNED MODAL VARIANT sequence: {data2.options and data2.options.postBody and data2.options.postBody.modal_sequence} variant: {modal_variant} conversationId: {conversation_id}`)
+				local modal_sequence = data2.options
+					and data2.options.postBody
+					and data2.options.postBody.modal_sequence
+				logger:debug(`RETURNED MODAL VARIANT sequence: {modal_sequence} variant: {modal_variant} conversationId: {conversation_id}`)
 			end
 		end
 	end,

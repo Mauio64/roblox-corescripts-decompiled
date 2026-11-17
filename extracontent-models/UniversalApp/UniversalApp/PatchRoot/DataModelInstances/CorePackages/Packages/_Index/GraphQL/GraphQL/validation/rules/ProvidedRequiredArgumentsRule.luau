@@ -34,7 +34,8 @@ function ProvidedRequiredArgumentsRule.ProvidedRequiredArgumentsRule(object)
 					return false
 				end
 
-				local v = keyMap2(p.arguments or {}, function(p2)
+				local arguments = p.arguments or {}
+				local v = keyMap2(arguments, function(p2)
 					return p2.name.value
 				end)
 
@@ -95,7 +96,8 @@ function ProvidedRequiredArgumentsRule.ProvidedRequiredArgumentsOnDirectivesRule
 				local v3 = v[value]
 
 				if v3 then
-					local v4 = keyMap2(p.arguments or {}, function(p2)
+					local arguments = p.arguments or {}
+					local v4 = keyMap2(arguments, function(p2)
 						return p2.name.value
 					end)
 

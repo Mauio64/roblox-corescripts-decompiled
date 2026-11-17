@@ -15,7 +15,8 @@ return {
 		"**/Hooks/useCloseOnCoreMenu.test",
 		"**/initShopGlobalIcon.test",
 		"**/submitFreeTrialMenuBadge.test",
-		"**/submitFreeTrialTooltips.test"
+		"**/submitFreeTrialTooltips.test",
+		"**/submitFreeTrialTopBarChip.test"
 	},
 	mockDataModel = true,
 	setupFilesAfterEnv = {

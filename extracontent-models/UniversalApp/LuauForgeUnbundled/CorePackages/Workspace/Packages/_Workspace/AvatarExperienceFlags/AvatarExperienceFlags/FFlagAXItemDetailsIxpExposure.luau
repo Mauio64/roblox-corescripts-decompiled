@@ -1,1 +1,0 @@
-return game:DefineFastFlag("AXItemDetailsIxpExposure2", false)

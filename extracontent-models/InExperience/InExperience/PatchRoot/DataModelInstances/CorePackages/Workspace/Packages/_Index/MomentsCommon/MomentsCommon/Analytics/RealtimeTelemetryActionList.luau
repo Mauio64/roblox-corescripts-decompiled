@@ -1,9 +1,11 @@
-local parent = script:FindFirstAncestor("MomentsCommon").Parent
+local MomentsCommon = script:FindFirstAncestor("MomentsCommon")
+local parent = MomentsCommon.Parent
 
 local SocialLuaAnalytics = require(parent.SocialLuaAnalytics)
 local SupportedTelemetryBackends = SocialLuaAnalytics.Analytics.Enums.SupportedTelemetryBackends
 
 local RealtimeEventNames = require(script.Parent.RealtimeEventNames)
+local FFlagMomentsParentTimeLimit = require(MomentsCommon.Flags.FFlagMomentsParentTimeLimit)
 
 local Telemetry = SocialLuaAnalytics.Telemetry
 
@@ -18,13 +20,17 @@ local function normalizeViewSource(source: string) -- 4 equivalent calls inferre
 	return v[source] or "unknown"
 end
 
-local function normalizeRequestFailureReason(failureReason: string?) -- 1 equivalent call inferred from this helper
-	if failureReason == nil or failureReason == "" then
+local function normalizeRequestFailureReason(p: string?)
+	if p == nil or p == "" then
 		return "unknown"
 	end
 
-	if failureReason == "requestFailed" or failureReason == "malformedResponse" then
-		return failureReason
+	if p == "requestFailed" or p == "malformedResponse" then
+		return p
+	end
+
+	if FFlagMomentsParentTimeLimit and p == "parentalTimeLimitReached" then
+		return "parentalTimeLimitReached"
 	end
 
 	return "unknown"
@@ -146,7 +152,7 @@ local function normalizeGenerateTextStatus(p: string) -- 1 equivalent call infer
 	return "unknown"
 end
 
-local function normalizeCommentsSurface(p: string) -- 6 equivalent calls inferred from this helper
+local function normalizeCommentsSurface(p: string) -- 7 equivalent calls inferred from this helper
 	return if p == "watch_tab" or p == "profile" then p else "unknown"
 end
 
@@ -207,14 +213,34 @@ local function normalizeCommentReportStatus(p: string): string -- 1 equivalent c
 	return if p == "clicked" then "clicked" else "unknown"
 end
 
-local function formatFeedOperationInfo(data, callback) -- 2 equivalent calls inferred from this helper
-	local v13 = { status = data.status, feedType = data.feedType }
+local v13 = {
+	views = "views",
+	lifetime_views = "lifetime_views",
+	lifetime_watch_time = "lifetime_watch_time",
+	lifetime_watch_time_no_replay = "lifetime_watch_time_no_replay",
+	lifetime_joins = "lifetime_joins"
+}
+
+local function normalizePostInsightsQuery(query: string) -- 2 equivalent calls inferred from this helper
+	return v13[query] or "unknown"
+end
+
+local function normalizePostInsightsRequestStatus(p: string) -- 2 equivalent calls inferred from this helper
+	return if p == "success" or p == "failed" then p else "unknown"
+end
+
+local function normalizeCommentTranslationShown(p: string) -- 1 equivalent call inferred from this helper
+	return if p == "translated" or p == "original" then p else "unknown"
+end
+
+local function formatFeedOperationInfo(data, normalizeMediaFailureReason2) -- 1 equivalent call inferred from this helper
+	local v14 = { status = data.status, feedType = data.feedType }
 
 	if data.status == "failed" then
-		v13.failureReason = callback(data.failureReason)
+		v14.failureReason = normalizeMediaFailureReason2(data.failureReason)
 	end
 
-	return v13
+	return v14
 end
 
 return {
@@ -243,13 +269,27 @@ return {
 				type = SupportedTelemetryBackends.RobloxTelemetryCounter,
 				incrementValue = 1,
 				format = function(data)
-					local v13 = { status = data.status, feedType = data.feedType }
+					local v14 = { status = data.status, feedType = data.feedType }
 
-					if data.status == "failed" then
-						v13.failureReason = normalizeRequestFailureReason(data.failureReason) -- inferred equivalent call
+					if data.status ~= "failed" then
+						return v14
 					end
 
-					return v13
+					local failureReason = data.failureReason
+
+					if failureReason == nil or failureReason == "" then
+						failureReason = "unknown"
+					else
+						failureReason = failureReason ~= "requestFailed"
+							and failureReason ~= "malformedResponse"
+							and (not FFlagMomentsParentTimeLimit or failureReason ~= "parentalTimeLimitReached")
+							and "unknown"
+							or failureReason
+					end
+
+					v14.failureReason = failureReason
+
+					return v14
 				end
 			}
 		}
@@ -264,7 +304,27 @@ return {
 				type = SupportedTelemetryBackends.RobloxTelemetryCounter,
 				incrementValue = 1,
 				format = function(data)
-					return formatFeedOperationInfo(data, normalizeRequestFailureReason) -- inferred equivalent call
+					local v14 = { status = data.status, feedType = data.feedType }
+
+					if data.status ~= "failed" then
+						return v14
+					end
+
+					local failureReason = data.failureReason
+
+					if failureReason == nil or failureReason == "" then
+						failureReason = "unknown"
+					else
+						failureReason = failureReason ~= "requestFailed"
+							and failureReason ~= "malformedResponse"
+							and (not FFlagMomentsParentTimeLimit or failureReason ~= "parentalTimeLimitReached")
+							and "unknown"
+							or failureReason
+					end
+
+					v14.failureReason = failureReason
+
+					return v14
 				end
 			}
 		}
@@ -386,19 +446,19 @@ return {
 				type = SupportedTelemetryBackends.RobloxTelemetryCounter,
 				incrementValue = 1,
 				format = function(data)
-					local v13 = {
+					local v14 = {
 						step = normalizeCreationStep(data.step) -- inferred equivalent call
 					}
 
 					if data.status ~= nil then
-						v13.status = normalizeCreationStatus(data.status) -- inferred equivalent call
+						v14.status = normalizeCreationStatus(data.status) -- inferred equivalent call
 					end
 
 					if data.reason ~= nil then
-						v13.reason = normalizeUploadFailureReason(data.reason) -- inferred equivalent call
+						v14.reason = normalizeUploadFailureReason(data.reason) -- inferred equivalent call
 					end
 
-					return v13
+					return v14
 				end
 			}
 		}
@@ -543,17 +603,17 @@ return {
 				incrementValue = 1,
 				format = function(data)
 					local commentsListLoadStatus = normalizeCommentsListLoadStatus(data.status) -- inferred equivalent call
-					local v13 = {
+					local v14 = {
 						status = commentsListLoadStatus,
 						loadType = normalizeCommentsLoadType(data.loadType), -- inferred equivalent call
 						surface = normalizeCommentsSurface(data.surface) -- inferred equivalent call
 					}
 
 					if commentsListLoadStatus == "failed" then
-						v13.failureReason = normalizeCommentsFailureReason(data.failureReason) -- inferred equivalent call
+						v14.failureReason = normalizeCommentsFailureReason(data.failureReason) -- inferred equivalent call
 					end
 
-					return v13
+					return v14
 				end
 			}
 		}
@@ -569,16 +629,16 @@ return {
 				incrementValue = 1,
 				format = function(data)
 					local commentPostStatus = normalizeCommentPostStatus(data.status) -- inferred equivalent call
-					local v13 = {
+					local v14 = {
 						status = commentPostStatus,
 						surface = normalizeCommentsSurface(data.surface) -- inferred equivalent call
 					}
 
 					if v11[commentPostStatus] then
-						v13.failureReason = normalizeCommentsFailureReason(data.failureReason) -- inferred equivalent call
+						v14.failureReason = normalizeCommentsFailureReason(data.failureReason) -- inferred equivalent call
 					end
 
-					return v13
+					return v14
 				end
 			}
 		}
@@ -594,17 +654,17 @@ return {
 				incrementValue = 1,
 				format = function(data)
 					local commentRequestStatus = normalizeCommentRequestStatus(data.status) -- inferred equivalent call
-					local v13 = {
+					local v14 = {
 						status = commentRequestStatus,
 						action = normalizeCommentReactionAction(data.action), -- inferred equivalent call
 						surface = normalizeCommentsSurface(data.surface) -- inferred equivalent call
 					}
 
 					if commentRequestStatus == "failed" then
-						v13.failureReason = normalizeCommentsFailureReason(data.failureReason) -- inferred equivalent call
+						v14.failureReason = normalizeCommentsFailureReason(data.failureReason) -- inferred equivalent call
 					end
 
-					return v13
+					return v14
 				end
 			}
 		}
@@ -620,16 +680,16 @@ return {
 				incrementValue = 1,
 				format = function(data)
 					local commentDeleteStatus = normalizeCommentDeleteStatus(data.status) -- inferred equivalent call
-					local v13 = {
+					local v14 = {
 						status = commentDeleteStatus,
 						surface = normalizeCommentsSurface(data.surface) -- inferred equivalent call
 					}
 
 					if commentDeleteStatus == "failed" then
-						v13.failureReason = normalizeCommentsFailureReason(data.failureReason) -- inferred equivalent call
+						v14.failureReason = normalizeCommentsFailureReason(data.failureReason) -- inferred equivalent call
 					end
 
-					return v13
+					return v14
 				end
 			}
 		}
@@ -664,6 +724,59 @@ return {
 				format = function(p)
 					return {
 						status = normalizeCommentRequestStatus(p.status), -- inferred equivalent call
+						surface = normalizeCommentsSurface(p.surface) -- inferred equivalent call
+					}
+				end
+			}
+		}
+	}),
+	[RealtimeEventNames.MomentsPostInsightsRequest] = Telemetry.new({
+		name = RealtimeEventNames.MomentsPostInsightsRequest,
+		description = "Counts Post insights Creator Analytics (CAaaS) request outcomes in real time, once per query per page open, by bounded query (views series or one of the four lifetime totals) and status (success or failed).",
+		lastUpdated = { 2026, 11, 10 },
+		throttlingThousandths = 10000,
+		backendsList = {
+			{
+				type = SupportedTelemetryBackends.RobloxTelemetryCounter,
+				incrementValue = 1,
+				format = function(p)
+					return {
+						query = normalizePostInsightsQuery(p.query), -- inferred equivalent call
+						status = normalizePostInsightsRequestStatus(p.status) -- inferred equivalent call
+					}
+				end
+			}
+		}
+	}),
+	[RealtimeEventNames.MomentsPostInsightsRequestLatency] = Telemetry.new({
+		name = RealtimeEventNames.MomentsPostInsightsRequestLatency,
+		description = "Post insights Creator Analytics (CAaaS) request latency in ms, as a stat (p50/p95/p99), by bounded query and status. Same requests as MomentsPostInsightsRequest: each query's first request on a cold page open, including the gateway's polling.",
+		lastUpdated = { 2026, 11, 6 },
+		throttlingThousandths = 10000,
+		backendsList = {
+			{
+				type = SupportedTelemetryBackends.RobloxTelemetryStat,
+				format = function(p)
+					return {
+						query = normalizePostInsightsQuery(p.query), -- inferred equivalent call
+						status = normalizePostInsightsRequestStatus(p.status) -- inferred equivalent call
+					}
+				end
+			}
+		}
+	}),
+	[RealtimeEventNames.MomentsCommentTranslationToggle] = Telemetry.new({
+		name = RealtimeEventNames.MomentsCommentTranslationToggle,
+		description = "Counts taps on a Moments comment's translation toggle in real time by the text shown after the tap (translated/original) and surface. Counted at the same point as the product translation-toggled event.",
+		lastUpdated = { 2026, 11, 5 },
+		throttlingThousandths = 10000,
+		backendsList = {
+			{
+				type = SupportedTelemetryBackends.RobloxTelemetryCounter,
+				incrementValue = 1,
+				format = function(p)
+					return {
+						status = normalizeCommentTranslationShown(p.status), -- inferred equivalent call
 						surface = normalizeCommentsSurface(p.surface) -- inferred equivalent call
 					}
 				end

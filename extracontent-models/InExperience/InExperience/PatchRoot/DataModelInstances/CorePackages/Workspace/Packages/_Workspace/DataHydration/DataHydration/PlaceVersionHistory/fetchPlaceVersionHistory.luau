@@ -61,8 +61,8 @@ local function appendQuery(value: string, items)
 	return value
 end
 
-local function historyUrl(baseUrl: string, p: number, data)
-	local formatted = ("%s/place-version-history-api/v1/%d/history"):format(baseUrl, p)
+local function historyUrl(p: string, p2: number, data)
+	local formatted = ("%s/place-version-history-api/v1/%d/history"):format(p, p2)
 
 	if data == nil then
 		return appendQuery(formatted, { pageSize = 100 })
@@ -87,7 +87,7 @@ local function rollbackUrl(baseUrl: string, p: number) -- 1 equivalent call infe
 	return ("%s/universes/v1/places/%d/rollback"):format(baseUrl, p)
 end
 
-local function resolveBase(options) -- 1 equivalent call inferred from this helper
+local function resolveBase(options) -- 2 equivalent calls inferred from this helper
 	local v = options or {}
 	return v.network, v.baseUrl or UrlBase.APIS
 end
@@ -115,11 +115,11 @@ end
 local FetchPlaceVersionHistory = { DEFAULT_HISTORY_PAGE_SIZE = 100 }
 
 function FetchPlaceVersionHistory.fetchHistory(p: number, options, p2)
-	local v = options or {}
+	local base, v = resolveBase(options) -- inferred equivalent call
 	return asPromise((fetch({
-		network = v.network,
+		network = base,
 		method = "GET",
-		url = historyUrl(v.baseUrl or UrlBase.APIS, p, p2),
+		url = historyUrl(v, p, p2),
 		analyticsKey = "place-version-history.get-history",
 		decode = function(p3)
 			return p3

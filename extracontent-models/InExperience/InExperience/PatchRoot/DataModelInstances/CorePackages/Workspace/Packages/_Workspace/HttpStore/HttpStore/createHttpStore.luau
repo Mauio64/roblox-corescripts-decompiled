@@ -43,7 +43,8 @@ local function createHttpStore(p, p2)
 
 			v[currentSession] = nil
 			HttpSessionTracker.cancelAll()
-			v[HttpSessionTracker.currentSession()] = {}
+			local currentSession2 = HttpSessionTracker.currentSession()
+			v[currentSession2] = {}
 		end
 	}
 end

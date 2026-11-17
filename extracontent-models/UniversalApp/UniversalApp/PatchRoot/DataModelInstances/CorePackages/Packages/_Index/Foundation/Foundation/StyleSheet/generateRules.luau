@@ -5,8 +5,8 @@ require(Foundation.Providers.Style.Tokens)
 require(script.Parent.Rules.Types)
 local formatTokens = require(script.Parent.formatTokens)
 
-local function generateRules(p, callback, flag: boolean?)
-	local v, v2, v3, v4 = callback(p, formatTokens(p), flag)
+local function generateRules(p, callback)
+	local v, v2, v3, v4 = callback(p, (formatTokens(p)))
 	return Dash.joinArrays(v, v2, v3), v, v2, v3, v4
 end
 

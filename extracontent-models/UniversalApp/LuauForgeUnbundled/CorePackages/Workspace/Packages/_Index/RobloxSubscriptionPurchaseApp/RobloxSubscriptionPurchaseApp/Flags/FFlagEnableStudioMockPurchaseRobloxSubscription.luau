@@ -1,2 +1,0 @@
-return game:DefineFastFlag("EnableStudioMockPurchaseRobloxSubscription", false)
-	and game:GetEngineFeature("EnableMockPurchaseRobloxSubscription")

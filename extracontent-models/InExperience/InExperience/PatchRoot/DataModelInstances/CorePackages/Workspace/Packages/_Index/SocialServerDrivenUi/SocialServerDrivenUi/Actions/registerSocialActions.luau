@@ -7,17 +7,15 @@ local getSduiActionHandlerRegistry = SduiCoreSystem.getSduiActionHandlerRegistry
 local SharedFlags = require(parent.SharedFlags)
 local FFlagLuaAppSduiVerificationUpsellActions = SharedFlags.FFlagLuaAppSduiVerificationUpsellActions
 local SharedFlags2 = require(parent.SharedFlags)
-local FFlagSduiRequestFriendshipActionHandler = SharedFlags2.FFlagSduiRequestFriendshipActionHandler
+local FFlagEditProfileFramesEnabled = SharedFlags2.FFlagEditProfileFramesEnabled
 local SharedFlags3 = require(parent.SharedFlags)
-local FFlagEditProfileFramesEnabled = SharedFlags3.FFlagEditProfileFramesEnabled
+local FFlagAddSDUIEditProfileFramesAction = SharedFlags3.FFlagAddSDUIEditProfileFramesAction
+
 local SharedFlags4 = require(parent.SharedFlags)
-local FFlagAddSDUIEditProfileFramesAction = SharedFlags4.FFlagAddSDUIEditProfileFramesAction
+local FFlagAppChatConversationTrustedFriendUpsellBanner = SharedFlags4.FFlagAppChatConversationTrustedFriendUpsellBanner
 
 local SharedFlags5 = require(parent.SharedFlags)
-local FFlagAppChatConversationTrustedFriendUpsellBanner = SharedFlags5.FFlagAppChatConversationTrustedFriendUpsellBanner
-
-local SharedFlags6 = require(parent.SharedFlags)
-local FFlagLuaAppExperienceLeaderboardSeeAllEnabled = SharedFlags6.FFlagLuaAppExperienceLeaderboardSeeAllEnabled
+local FFlagLuaAppExperienceLeaderboardSeeAllEnabled = SharedFlags5.FFlagLuaAppExperienceLeaderboardSeeAllEnabled
 
 local function registerSocialActions()
 	local v = {
@@ -41,12 +39,12 @@ local function registerSocialActions()
 				return require(SocialServerDrivenUi.Actions.SduiHideProfileCompletionAction)
 			end
 		},
-		[SduiActionType.RequestFriendship] = FFlagSduiRequestFriendshipActionHandler and {
+		[SduiActionType.RequestFriendship] = {
 			lazyHandler = function()
 				return require(SocialServerDrivenUi.Actions.SduiRequestFriendshipAction)
 			end,
 			skipUnifiedLogging = true
-		} or nil,
+		},
 		[SduiActionType.OpenProfileFramesEditor] = FFlagEditProfileFramesEnabled and FFlagAddSDUIEditProfileFramesAction and {
 			lazyHandler = function()
 				return require(SocialServerDrivenUi.Actions.SduiOpenProfileFramesEditorAction)

@@ -1,1 +1,0 @@
-return game:DefineFastFlag("BuildExperienceMonetizationFailureCauses", false)

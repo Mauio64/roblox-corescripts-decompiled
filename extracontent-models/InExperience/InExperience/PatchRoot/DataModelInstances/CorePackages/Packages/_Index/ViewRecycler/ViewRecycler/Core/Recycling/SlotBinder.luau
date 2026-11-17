@@ -1,5 +1,7 @@
 local Flags = require(script:FindFirstAncestor("ViewRecycler").Flags)
-local FFlagViewRecyclerReact08 = Flags.FFlagViewRecyclerReact08
+local FFlagViewRecyclerReact084 = Flags.FFlagViewRecyclerReact084
+local Flags2 = require(script:FindFirstAncestor("ViewRecycler").Flags)
+local FFlagViewRecyclerReact08 = Flags2.FFlagViewRecyclerReact08
 local ViewRecycler = script:FindFirstAncestor("ViewRecycler")
 
 require(ViewRecycler.Core.Recycling.RecyclingScope)
@@ -11,8 +13,13 @@ local frozen2 = table.freeze({ entered = frozen, updated = frozen, departed = fr
 local function createSlotBinder(data)
 	local recyclingScope = data.recyclingScope
 	local prepareDesiredAssignment = data.prepareDesiredAssignment
+	local name
 
-	local name = FFlagViewRecyclerReact08 and (data.name or "SlotBinder") or nil
+	if FFlagViewRecyclerReact084 then
+		name = data.name or "SlotBinder"
+	else
+		name = FFlagViewRecyclerReact08 and (data.name or "SlotBinder") or nil
+	end
 
 	local v = {}
 	local v2 = {}
@@ -23,7 +30,16 @@ local function createSlotBinder(data)
 	local set3 = {}
 	local makeAssignment
 
-	if FFlagViewRecyclerReact08 then
+	if FFlagViewRecyclerReact084 then
+		makeAssignment = function(p)
+			if prepareDesiredAssignment == nil then
+				return table.freeze({ key = p.key, value = p.value })
+			end
+
+			local v3 = prepareDesiredAssignment(p)
+			return table.freeze({ key = v3.key, value = v3.value })
+		end
+	elseif FFlagViewRecyclerReact08 then
 		makeAssignment = function(p)
 			if prepareDesiredAssignment == nil then
 				return table.freeze({ key = p.key, value = p.value })
@@ -85,7 +101,9 @@ local function createSlotBinder(data)
 					table.clear(set)
 					local v5
 
-					if FFlagViewRecyclerReact08 then
+					if FFlagViewRecyclerReact084 then
+						v5 = `{name}: duplicate key "{key}"`
+					elseif FFlagViewRecyclerReact08 then
 						v5 = `{name}: duplicate key "{key}"`
 					else
 						v5 = `Virtualizer: duplicate key "{key}"`
@@ -166,7 +184,9 @@ local function createSlotBinder(data)
 
 			v7.view = view
 
-			if FFlagViewRecyclerReact08 then
+			if FFlagViewRecyclerReact084 then
+				v7.assignment = makeAssignment(v7)
+			elseif FFlagViewRecyclerReact08 then
 				v7.assignment = makeAssignment(v7)
 			else
 				v7.assignment = makeAssignment(v7.key, v7.value)
@@ -188,7 +208,9 @@ local function createSlotBinder(data)
 				local v8 = v[v7.key]
 				v8.value = v7.value
 
-				if FFlagViewRecyclerReact08 then
+				if FFlagViewRecyclerReact084 then
+					v8.assignment = makeAssignment(v7)
+				elseif FFlagViewRecyclerReact08 then
 					v8.assignment = makeAssignment(v7)
 				else
 					v8.assignment = makeAssignment(v7.key, v7.value)

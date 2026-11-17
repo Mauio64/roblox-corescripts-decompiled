@@ -5,7 +5,6 @@ local Foundation = require(VerifiedBadges.Parent.Foundation)
 local React = require(VerifiedBadges.Parent.React)
 local ReactRoblox = require(VerifiedBadges.Parent.ReactRoblox)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local v = {
 	anchorPoint = Vector2.new(),
@@ -84,35 +83,14 @@ local function EmojiWrapper(p)
 	local v4 = {
 		LayoutOrder = 2,
 		Text = joined.emoji,
-		Font = 0,
-		FontFace = 0,
-		TextColor3 = 0,
-		TextSize = 0,
+		FontFace = normalizeFontFace(joined.font),
+		TextColor3 = joined.color,
+		TextSize = state,
 		BackgroundTransparency = 1,
-		TextYAlignment = 0,
-		TextXAlignment = 0,
-		Size = 0
+		TextYAlignment = Enum.TextYAlignment.Center,
+		TextXAlignment = Enum.TextXAlignment.Center,
+		Size = UDim2.fromOffset(state, state)
 	}
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = joined.font
-	end
-
-	v4.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(joined.font)
-	end
-
-	v4.FontFace = fontFace
-	v4.TextColor3 = joined.color
-	v4.TextSize = state
-
-	v4.TextYAlignment = Enum.TextYAlignment.Center
-	v4.TextXAlignment = Enum.TextXAlignment.Center
-	v4.Size = UDim2.fromOffset(state, state)
 
 	local button = p.onActivated
 

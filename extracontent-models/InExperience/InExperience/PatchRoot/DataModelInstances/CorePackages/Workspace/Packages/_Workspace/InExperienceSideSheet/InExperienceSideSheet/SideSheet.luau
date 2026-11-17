@@ -49,6 +49,8 @@ local closePeoplePageOpenedWithSideSheet = require(InExperienceSideSheet.Utils.c
 local getDidSideSheetOpenWithPeoplePage = require(InExperienceSideSheet.Utils.getDidSideSheetOpenWithPeoplePage)
 local getIsPeoplePageOpen = require(InExperienceSideSheet.Utils.getIsPeoplePageOpen)
 local getSideSheetVisibility = require(InExperienceSideSheet.Utils.getSideSheetVisibility)
+local AppCommonLib = require(parent.AppCommonLib)
+local nextWrappedInteger = AppCommonLib.nextWrappedInteger
 local toggleSideSheet = require(InExperienceSideSheet.Utils.toggleSideSheet)
 
 local Flags = require(InExperienceSideSheet.Flags)
@@ -56,6 +58,7 @@ local SharedFlags = require(parent.SharedFlags)
 local FFlagMountUnmountSideSheet = Flags.FFlagMountUnmountSideSheet
 local FFlagSideSheetOpenPeoplePage = Flags.FFlagSideSheetOpenPeoplePage
 local FFlagSideSheetOpenPeoplePageRestoreChat = Flags.FFlagSideSheetOpenPeoplePageRestoreChat
+local FFlagSideSheetUnifiedMenuOrder = SharedFlags.FFlagSideSheetUnifiedMenuOrder
 local FFlagEnableSideSheetWidgets = SharedFlags.FFlagEnableSideSheetWidgets
 local FFlagSideSheetFocusNav = SharedFlags.FFlagSideSheetFocusNav
 local FFlagEnableWhatsNew = SharedFlags.FFlagEnableWhatsNew
@@ -196,10 +199,26 @@ local function SideSheetContent(p)
 		ref3 = nil
 	end
 
-	local ref4 = React.useRef(false)
+	local ref4
+
+	if FFlagSideSheetOpenPeoplePageRestoreChat then
+		ref4 = React.useRef(false)
+	else
+		ref4 = nil
+	end
+
+	local ref5
+
+	if FFlagSideSheetOpenPeoplePageRestoreChat then
+		ref5 = React.useRef(0)
+	else
+		ref5 = nil
+	end
+
+	local ref6 = React.useRef(false)
 	local v13 = usePreferredInput()
 
-	local ref5 = React.useRef(false)
+	local ref7 = React.useRef(false)
 
 	local useEffect = React.useEffect
 	local function fn()
@@ -208,10 +227,9 @@ local function SideSheetContent(p)
 
 			if
 				FFlagSideSheetOpenPeoplePageRestoreChat
-				and ref3
 				and p.ChatSelector
 				and sideSheetVisibility
-				and not ref3.current
+				and not (ref3.current or ref4.current)
 			then
 				local visibility = p.ChatSelector:GetVisibility()
 
@@ -224,37 +242,52 @@ local function SideSheetContent(p)
 
 			GuiService:SetMenuIsOpen(sideSheetVisibility, "InExperienceSideSheet")
 
-			if FFlagSideSheetOpenPeoplePageRestoreChat and ref3 and p.ChatSelector then
+			if FFlagSideSheetOpenPeoplePageRestoreChat and p.ChatSelector then
 				if sideSheetVisibility then
+					ref5.current = nextWrappedInteger(ref5.current)
+					ref4.current = false
+
 					if ref3.current then
 						ref3.current:Disconnect()
 						ref3.current = nil
 					end
 
 					p.ChatSelector:SetVisible(false)
-				elseif ref2.current and not ref3.current then
-					local function restoreChat()
+				elseif ref2.current and not (ref3.current or ref4.current) then
+					local function restoreChat() -- 2 equivalent calls inferred from this helper
 						if ref3.current then
 							ref3.current:Disconnect()
 						end
 
 						ref3.current = nil
+						ref4.current = false
 						p.ChatSelector:SetVisible(true)
 						ref2.current = false
 					end
 
 					if GuiService.MenuIsOpen then
-						ref3.current = GuiService.MenuClosed:Once(restoreChat)
+						ref3.current = GuiService.MenuClosed:Once(function()
+							local current = ref5.current
+							ref4.current = true
+
+							if ref3.current then
+								ref3.current:Disconnect()
+								ref3.current = nil
+							end
+
+							task.defer(function()
+								if ref5.current ~= current or getSideSheetVisibility() then
+									ref4.current = false
+									return
+								end
+
+								restoreChat() -- inferred equivalent call
+							end)
+						end)
 						return
 					end
 
-					if ref3.current then
-						ref3.current:Disconnect()
-					end
-
-					ref3.current = nil
-					p.ChatSelector:SetVisible(true)
-					ref2.current = false
+					restoreChat() -- inferred equivalent call
 				end
 			end
 		end)
@@ -262,7 +295,12 @@ local function SideSheetContent(p)
 		return function()
 			effect()
 
-			if FFlagSideSheetOpenPeoplePageRestoreChat and ref3 and ref3.current then
+			if FFlagSideSheetOpenPeoplePageRestoreChat then
+				ref5.current = nextWrappedInteger(ref5.current)
+				ref4.current = false
+			end
+
+			if FFlagSideSheetOpenPeoplePageRestoreChat and ref3.current then
 				ref3.current:Disconnect()
 				ref3.current = nil
 			end
@@ -296,12 +334,12 @@ local function SideSheetContent(p)
 			end
 
 			if v13 == Responsive.Input.Pointer then
-				if sideSheetVisibility and not ref4.current then
+				if sideSheetVisibility and not ref6.current then
 					MouseIconOverrideService.push("InExperienceSideSheet", Enum.OverrideMouseIconBehavior.ForceShow)
-					ref4.current = true
-				elseif not sideSheetVisibility and ref4.current then
+					ref6.current = true
+				elseif not sideSheetVisibility and ref6.current then
 					MouseIconOverrideService.pop("InExperienceSideSheet")
-					ref4.current = false
+					ref6.current = false
 				end
 			end
 
@@ -317,9 +355,9 @@ local function SideSheetContent(p)
 				sideSheetVisibility
 				and (FFlagShowSwitchServerButton or isPioneerLaunch())
 				and GetSwitchServerStore(p2).shouldEnableSwitchServer(p2)
-				and not ref5.current
+				and not ref7.current
 			then
-				ref5.current = true
+				ref7.current = true
 				SwitchServerTelemetry.sendSwitchServerButtonActions({ event_type = "impression" })
 			end
 		end)
@@ -415,6 +453,7 @@ local function SideSheetContent(p)
 		headerRow = React.createElement(ExperienceDetailsRow, { layoutOrder = v3.ExperienceDetails })
 	end
 
+	local fFlagSideSheetUnifiedMenuOrder = FFlagSideSheetUnifiedMenuOrder
 	local headerDivider
 
 	if not v10 then
@@ -453,12 +492,13 @@ local function SideSheetContent(p)
 		firstIntegrationToFocusCallback = 0,
 		allowRightFocusEscape = 0
 	}
+	local firstIntegrationToFocusCallback2
 
-	if not FFlagSideSheetFocusNav or v10 then
-		firstIntegrationToFocusCallback = nil
+	if FFlagSideSheetFocusNav and not (v10 or fFlagSideSheetUnifiedMenuOrder) then
+		firstIntegrationToFocusCallback2 = firstIntegrationToFocusCallback
 	end
 
-	v15.firstIntegrationToFocusCallback = firstIntegrationToFocusCallback
+	v15.firstIntegrationToFocusCallback = firstIntegrationToFocusCallback2
 
 	v15.allowRightFocusEscape = allowRightFocusEscape
 	local children = {
@@ -466,18 +506,38 @@ local function SideSheetContent(p)
 		HeaderDivider = headerDivider,
 		TopWidgets = topWidgets,
 		AboveFoldList = createElement(VerticalList, v15),
-		FoldDivider = React.createElement(
+		FoldDivider = 0,
+		BelowFoldList = 0,
+		BottomWidgets = 0
+	}
+	local foldDivider
+
+	if not fFlagSideSheetUnifiedMenuOrder then
+		foldDivider = React.createElement(
 			View,
 			{ tag = "size-full-0 auto-y padding-y-xxlarge", LayoutOrder = v3.ListDivider },
 			{ Divider = React.createElement(Divider) }
-		),
-		BelowFoldList = React.createElement(VerticalList, {
-			layoutOrder = v3.SecondaryList,
-			integrationsGetter = getBelowFoldIntegrations,
-			allowRightFocusEscape = allowRightFocusEscape
-		}),
-		BottomWidgets = 0
+		)
+	end
+
+	children.FoldDivider = foldDivider
+
+	local createElement2 = React.createElement
+	local v16 = {
+		layoutOrder = v3.SecondaryList,
+		integrationsGetter = getBelowFoldIntegrations,
+		firstIntegrationToFocusCallback = 0,
+		allowRightFocusEscape = 0
 	}
+
+	if not fFlagSideSheetUnifiedMenuOrder or not FFlagSideSheetFocusNav or v10 then
+		firstIntegrationToFocusCallback = nil
+	end
+
+	v16.firstIntegrationToFocusCallback = firstIntegrationToFocusCallback
+
+	v16.allowRightFocusEscape = allowRightFocusEscape
+	children.BelowFoldList = createElement2(VerticalList, v16)
 	local bottomWidgets
 
 	if v then
@@ -490,10 +550,10 @@ local function SideSheetContent(p)
 
 	children.BottomWidgets = bottomWidgets
 
-	local createElement2 = React.createElement
-
 	local createElement3 = React.createElement
-	local v16 = {
+
+	local createElement4 = React.createElement
+	local v17 = {
 		tag = "fill size-full-0 padding-x-xlarge",
 		scroll = {
 			ScrollingDirection = Enum.ScrollingDirection.Y,
@@ -513,20 +573,20 @@ local function SideSheetContent(p)
 		scrollingFrameRef = nil
 	end
 
-	v16.scrollingFrameRef = scrollingFrameRef
-	local v17 = createElement2(View, { tag = "col size-full" }, {
-		ScrollableContent = createElement3(ScrollView, v16, children),
+	v17.scrollingFrameRef = scrollingFrameRef
+	local v18 = createElement3(View, { tag = "col size-full" }, {
+		ScrollableContent = createElement4(ScrollView, v17, children),
 		Footer = React.createElement(Footer, { layoutOrder = 2 })
 	})
 
 	if FFlagEnableWhatsNew then
-		v17 = React.createElement(whatsNewAnchor, { anchorId = "sideSheet", tag = "size-full" }, {
-			SideSheetPanel = v17
+		v18 = React.createElement(whatsNewAnchor, { anchorId = "sideSheet", tag = "size-full" }, {
+			SideSheetPanel = v18
 		})
 	end
 
-	local createElement4 = React.createElement
-	local v18 = {
+	local createElement5 = React.createElement
+	local v19 = {
 		displayOrder = 12,
 		menuWidth = menuWidth,
 		leftOffset = left,
@@ -543,25 +603,25 @@ local function SideSheetContent(p)
 		allowOutsideInteraction = allowRightFocusEscape
 	end
 
-	v18.allowOutsideInteraction = allowOutsideInteraction
-	v18.scrimIsModal = not FFlagSideSheetOpenPeoplePage or not allowRightFocusEscape
-	local v19 = {
+	v19.allowOutsideInteraction = allowOutsideInteraction
+	v19.scrimIsModal = not FFlagSideSheetOpenPeoplePage or not allowRightFocusEscape
+	local v20 = {
 		nil,
 		FoundationStyleLink = React.createElement("StyleLink", { StyleSheet = styleSheet })
 	}
 
 	if FFlagSideSheetFocusNav then
-		v17 = React.createElement(FocusRoot, {
+		v18 = React.createElement(FocusRoot, {
 			surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.PopUp,
 			isIsolated = true,
 			frameProps = allowRightFocusEscape and {
 				SelectionBehaviorRight = Enum.SelectionBehavior.Escape
 			} or nil
-		}, { Content = v17 })
+		}, { Content = v18 })
 	end
 
-	v19[1] = v17
-	return createElement4(DrawerContainer, v18, v19)
+	v20[1] = v18
+	return createElement5(DrawerContainer, v19, v20)
 end
 
 function SideSheet.createSideSheet(p, p2, p3)

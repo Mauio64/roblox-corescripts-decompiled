@@ -4,6 +4,8 @@ local React = require(parent.React)
 local HttpRequest = require(parent.HttpRequest)
 local ProfilePlatformCommon = require(parent.ProfilePlatformCommon)
 local SignalsReact = require(parent.SignalsReact)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagRobloxSubscriptionOnboardingSheet = SharedFlags.FFlagRobloxSubscriptionOnboardingSheet
 local Constants = require(AvatarExperienceProfilePictureEditor.Constants)
 require(AvatarExperienceProfilePictureEditor.Shared.parseCloseupCameraConfig)
 require(AvatarExperienceProfilePictureEditor.Common.Enums)
@@ -56,6 +58,16 @@ local function useUserAvatarConfigurations(current: string?, p)
 	local state2, setState2 = React.useState(v)
 	local state3, setState3 = React.useState(nil)
 	local state4, setState4 = React.useState(true)
+	local state5, setState5
+
+	if FFlagRobloxSubscriptionOnboardingSheet then
+		state5, setState5 = React.useState(false)
+	else
+		setState5 = function(_) end
+
+		state5 = false
+	end
+
 	local ref2 = React.useRef(false)
 	local ref3 = React.useRef(nil)
 	local ref4 = React.useRef(state)
@@ -69,6 +81,7 @@ local function useUserAvatarConfigurations(current: string?, p)
 			ref4.current = state
 			setState2(v)
 			setState3(nil)
+			setState5(false)
 			setState4(false)
 		else
 			if ref3.current ~= current then
@@ -76,6 +89,7 @@ local function useUserAvatarConfigurations(current: string?, p)
 				ref3.current = current
 				setState2(v)
 				setState3(nil)
+				setState5(false)
 			end
 
 			if ref4.current ~= state then
@@ -94,6 +108,7 @@ local function useUserAvatarConfigurations(current: string?, p)
 
 				setState2(p2.parsed.closeupCameraConfig)
 				setState3(p2.parsed.profileFrameAssetId)
+				setState5(false)
 				ref2.current = true
 				setState4(false)
 			end):catch(function(_)
@@ -101,6 +116,7 @@ local function useUserAvatarConfigurations(current: string?, p)
 					return
 				end
 
+				setState5(true)
 				ref2.current = true
 				setState4(false)
 			end)
@@ -111,7 +127,7 @@ local function useUserAvatarConfigurations(current: string?, p)
 		end
 	end, { current, state, v3 })
 
-	return state2, state3, state4
+	return state2, state3, state4, state5
 end
 
 return useUserAvatarConfigurations

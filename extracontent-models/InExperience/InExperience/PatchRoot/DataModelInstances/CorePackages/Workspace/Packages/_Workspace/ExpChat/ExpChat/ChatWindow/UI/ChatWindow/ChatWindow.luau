@@ -40,8 +40,6 @@ local FFlagExpChatEnableV2ChatWindow = require(ExpChat.Flags.FFlagExpChatEnableV
 local FFlagExpChatPresetChatEnabled = ExpChatShared.Flags.FFlagExpChatPresetChatEnabled
 local FFlagExpChatTopBannerForPresetChatAccess = require(ExpChat.Flags.FFlagExpChatTopBannerForPresetChatAccess)
 local useIsARButtonVisible = require(ExpChat.useIsARButtonVisible)
-local SharedFlags4 = require(parent.SharedFlags)
-local FFlagExpChatEnableFriendsTab = SharedFlags4.FFlagExpChatEnableFriendsTab
 local ChatUIPrimitives = require(parent.ChatUIPrimitives)
 local ExpChatPerfTracker = ChatUIPrimitives.Telemetry.ExpChatPerfTracker
 local ChatUIPrimitives2 = require(parent.ChatUIPrimitives)
@@ -286,7 +284,7 @@ return (React.memo(function(p)
 	end)
 	local topBanner
 
-	if not (FFlagExpChatEnableFriendsTab and joined.disableLineReporting or isChatRegionLocked() or not (v2 and v4)) then
+	if not (joined.disableLineReporting or isChatRegionLocked() or not (v2 and v4)) then
 		local createElement = React.createElement
 		local iconTransparency
 
@@ -321,54 +319,29 @@ return (React.memo(function(p)
 		topBanner = createElement(TopBanner, v8)
 	end
 
-	local createElement = React.createElement
-
-	local join = dictionary.join
-	local v8 = {
+	local element = React.createElement(ScrollingView, dictionary.join({
 		size = joined.size,
 		isChannelBarVisible = joined.isChannelBarVisible,
 		scrollResetKey = joined.scrollResetKey,
-		scrollToTopOnReset = 0,
-		onCanvasPositionChanged = 0,
-		contentTopPadding = 0
-	}
-	local scrollToTopOnReset
-
-	if FFlagExpChatEnableFriendsTab then
-		scrollToTopOnReset = joined.scrollToTopOnReset
-	end
-
-	v8.scrollToTopOnReset = scrollToTopOnReset
-	local onCanvasPositionChanged
-
-	if FFlagExpChatEnableFriendsTab then
-		onCanvasPositionChanged = joined.onCanvasPositionChanged
-	end
-
-	v8.onCanvasPositionChanged = onCanvasPositionChanged
-	local contentTopPadding
-
-	if FFlagExpChatEnableFriendsTab then
+		scrollToTopOnReset = joined.scrollToTopOnReset,
+		onCanvasPositionChanged = joined.onCanvasPositionChanged,
 		contentTopPadding = joined.contentTopPadding
-	end
+	}, v7))
 
-	v8.contentTopPadding = contentTopPadding
-	local element = createElement(ScrollingView, join(v8, v7))
-
-	local createElement2 = React.createElement
-	local v9 = {
+	local createElement = React.createElement
+	local v8 = {
 		["BackgroundColor3"] = backgroundColor3,
 		BorderSizePixel = 0,
 		LayoutOrder = joined.LayoutOrder,
 		Size = joined.size,
 		Visible = joined.visible,
-		BackgroundTransparency = FFlagExpChatEnableFriendsTab and joined.suppressBackground and 1 or v5(backgroundTransparency, joined.transparencyValue)
+		BackgroundTransparency = joined.suppressBackground and 1 or v5(backgroundTransparency, joined.transparencyValue)
 	}
 	local absoluteSize = React.Change.AbsoluteSize
-	local v10
+	local v9
 
 	if getFFlagChatWindowUseCallbackOptimizations() then
-		v10 = React.useCallback(function(p2)
+		v9 = React.useCallback(function(p2)
 			local chatWindowConfiguration = TextChatService:FindFirstChildOfClass("ChatWindowConfiguration")
 
 			if chatWindowConfiguration and joined.onAbsoluteSizeChanged then
@@ -376,7 +349,7 @@ return (React.memo(function(p)
 			end
 		end, { TextChatService, joined.onAbsoluteSizeChanged })
 	else
-		v10 = function(p2)
+		v9 = function(p2)
 			local chatWindowConfiguration = TextChatService:FindFirstChildOfClass("ChatWindowConfiguration")
 
 			if chatWindowConfiguration and joined.onAbsoluteSizeChanged then
@@ -385,13 +358,13 @@ return (React.memo(function(p)
 		end
 	end
 
-	v9[absoluteSize] = v10
+	v8[absoluteSize] = v9
 
 	local absolutePosition = React.Change.AbsolutePosition
-	local v11
+	local v10
 
 	if getFFlagChatWindowUseCallbackOptimizations() then
-		v11 = React.useCallback(function(p2)
+		v10 = React.useCallback(function(p2)
 			local chatWindowConfiguration = TextChatService:FindFirstChildOfClass("ChatWindowConfiguration")
 
 			if chatWindowConfiguration and joined.onAbsoluteSizeChanged then
@@ -399,7 +372,7 @@ return (React.memo(function(p)
 			end
 		end, { TextChatService, joined.onAbsolutePositionChanged })
 	else
-		v11 = function(p2)
+		v10 = function(p2)
 			local chatWindowConfiguration = TextChatService:FindFirstChildOfClass("ChatWindowConfiguration")
 
 			if chatWindowConfiguration and joined.onAbsoluteSizeChanged then
@@ -408,7 +381,7 @@ return (React.memo(function(p)
 		end
 	end
 
-	v9[absolutePosition] = v11
+	v8[absolutePosition] = v10
 
 	local children = {
 		hoverLayer = React.createElement("Frame", {
@@ -422,7 +395,7 @@ return (React.memo(function(p)
 		GlobalChatTooltip = 0
 	}
 
-	local createElement3 = React.createElement
+	local createElement2 = React.createElement
 	local maxSize
 
 	if joined.isSpatialUIEnabled then
@@ -431,7 +404,7 @@ return (React.memo(function(p)
 		maxSize = Vector2.new(Config.ChatWindowMaxWidth, Config.ChatWindowMaxHeight)
 	end
 
-	children.uiSizeConstraint = createElement3("UISizeConstraint", { MaxSize = maxSize })
+	children.uiSizeConstraint = createElement2("UISizeConstraint", { MaxSize = maxSize })
 
 	children.contentFrame = React.createElement(
 		"Frame",
@@ -449,5 +422,5 @@ return (React.memo(function(p)
 	end
 
 	children.GlobalChatTooltip = globalChatTooltip
-	return createElement2("Frame", v9, children)
+	return createElement("Frame", v8, children)
 end))

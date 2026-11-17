@@ -1,6 +1,7 @@
 local HttpService = game:GetService("HttpService")
 
-local parent = script:FindFirstAncestor("ServerTriggeredModals").Parent
+local ServerTriggeredModals = script:FindFirstAncestor("ServerTriggeredModals")
+local parent = ServerTriggeredModals.Parent
 
 local PromptsEntryPoint = require(script.Parent.PromptsEntryPoint)
 require(script.Parent.Types.PromptsTypes)
@@ -12,6 +13,8 @@ local UrlBase = UrlBuilder2.UrlBase
 
 local NotificationsUpsell = require(parent.NotificationsUpsell)
 local NativePushNotificationPermissionPrompt = NotificationsUpsell.NativePushNotificationPermissionPrompt
+local NotificationsUpsell2 = require(parent.NotificationsUpsell)
+local ChatPushUpsellLegacyPrompt = NotificationsUpsell2.ChatPushUpsellLegacyPrompt
 
 local SduiResponseType = SduiSharedUtilities.SduiResponseType
 local getSduiApiStore = SduiSharedUtilities.getSduiApiStore
@@ -44,8 +47,19 @@ else
 	SplitPaneTourPrompt = nil
 end
 
+local FFlagPlusUpsellSheetHomePrompt = require(ServerTriggeredModals.Flags.FFlagPlusUpsellSheetHomePrompt)
+local PlusUpsellSheetPrompt
+
+if FFlagPlusUpsellSheetHomePrompt then
+	PlusUpsellSheetPrompt = require(script.Parent.PlusUpsellSheetPrompt)
+else
+	PlusUpsellSheetPrompt = nil
+end
+
 local SharedFlags9 = require(parent.SharedFlags)
 local FFlagPromptsEdpOpenReplaceOnFetch = SharedFlags9.FFlagPromptsEdpOpenReplaceOnFetch
+local SharedFlags10 = require(parent.SharedFlags)
+local FFlagChatPushUpsellPromptsEnabled = SharedFlags10.FFlagChatPushUpsellPromptsEnabled
 
 local function getPromptsUrl(entryPoint, p, promptStyles)
 	local query = { entryPoint = entryPoint }
@@ -61,6 +75,45 @@ local function getPromptsUrl(entryPoint, p, promptStyles)
 	end
 
 	return `{v}&clientAttributes={HttpService:UrlEncode(HttpService:JSONEncode(p))}`
+end
+
+local function isChatLandingRequest(p) -- 2 equivalent calls inferred from this helper
+	return FFlagChatPushUpsellPromptsEnabled and p.entryPoint == PromptsEntryPoint.ChatLandingOpen
+end
+
+local function getParsePageEntriesFromResponse(data)
+	if isChatLandingRequest(data) then -- inferred equivalent call
+		return function(p)
+			ChatPushUpsellLegacyPrompt.handlePromptsResponse(p)
+			return parsePageEntriesFromResponse(p)
+		end
+	end
+
+	if
+		data.entryPoint == PromptsEntryPoint.HomepageLaunch
+		and (FFlagPushNotificationsUpsellHomePromptsExperiment and NativePushNotificationPermissionPrompt.isEnabled() or FFlagSplitPaneEducationalTour or FFlagPlusUpsellSheetHomePrompt)
+	then
+		return function(p)
+			if
+				FFlagPushNotificationsUpsellHomePromptsExperiment
+				and NativePushNotificationPermissionPrompt.isEnabled()
+			then
+				NativePushNotificationPermissionPrompt.handlePromptsResponse(p)
+			end
+
+			if FFlagSplitPaneEducationalTour then
+				SplitPaneTourPrompt.handlePromptsResponse(p)
+			end
+
+			if FFlagPlusUpsellSheetHomePrompt then
+				PlusUpsellSheetPrompt.handlePromptsResponse(p)
+			end
+
+			return parsePageEntriesFromResponse(p)
+		end
+	end
+
+	return nil
 end
 
 local function fetchPrompts(data, flag: boolean?)
@@ -102,6 +155,7 @@ local function fetchPrompts(data, flag: boolean?)
 		FFlagEdpGameLeavePromptsHandlerEnabled
 		or FFlagEdpOpenPromptsHandlerEnabled
 		or FFlagHomepagePromptsHandlerPassClientAttributes
+		or isChatLandingRequest(data) -- inferred equivalent call
 		or FFlagNotificationStreamPromptsHandlerEnabled and data.entryPoint == PromptsEntryPoint.NotificationStreamOpen
 	then
 		url = getPromptsUrl(data.entryPoint, data.clientAttributes, data.promptStyles)
@@ -130,24 +184,7 @@ local function fetchPrompts(data, flag: boolean?)
 	v2.allowNoConfigsBuilt = allowNoConfigsBuilt
 	v2.loadTimer = data.loadTimer
 	v2.apiProto = getEligiblePromptsResponse
-	v2.parsePageEntriesFromResponse = data.entryPoint == PromptsEntryPoint.HomepageLaunch
-		and (FFlagPushNotificationsUpsellHomePromptsExperiment and NativePushNotificationPermissionPrompt.isEnabled() or FFlagSplitPaneEducationalTour)
-		and function(p)
-			if
-				FFlagPushNotificationsUpsellHomePromptsExperiment
-				and NativePushNotificationPermissionPrompt.isEnabled()
-			then
-				NativePushNotificationPermissionPrompt.handlePromptsResponse(p)
-			end
-
-			if FFlagSplitPaneEducationalTour then
-				SplitPaneTourPrompt.handlePromptsResponse(p)
-			end
-
-			return parsePageEntriesFromResponse(p)
-		end
-		or nil
-
+	v2.parsePageEntriesFromResponse = getParsePageEntriesFromResponse(data)
 	v2.postConfig = FFlagSduiExtendedCapabilitiesPrompts
 		and {
 			contentType = SduiSharedUtilities.SduiApiStorePostConfigContentType.Proto,

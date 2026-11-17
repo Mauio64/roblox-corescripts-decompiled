@@ -1,5 +1,3 @@
-local TextService = game:GetService("TextService")
-
 local FriendsChat = script:FindFirstAncestor("FriendsChat")
 local parent = FriendsChat.Parent
 
@@ -7,7 +5,6 @@ local React = require(parent.React)
 local Foundation = require(parent.Foundation)
 local getTextBoundsAsync = Foundation.Utility.getTextBoundsAsync
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local Signals = require(parent.Signals)
 local SignalsReact = require(parent.SignalsReact)
 
@@ -43,18 +40,11 @@ local function FriendsChatTextMessage(props)
 		v2 = chatWindowSettings.FontFace
 	end
 
-	local font = v2 or v.Typography.BodySmall.Font
+	local fontFace = normalizeFontFace(v2 or v.Typography.BodySmall.Font)
+	local font = Font.new(fontFace.Family, Enum.FontWeight.SemiBold, fontFace.Style)
 
-	if FoundationFontFaceMigration then
-		font = normalizeFontFace(font)
-	elseif typeof(font) ~= "Font" then
-		font = Font.fromEnum(font)
-	end
-
-	local font2 = Font.new(font.Family, Enum.FontWeight.SemiBold, font.Style)
-
-	local v3 = getMessageTextSize(chatWindowSettings, props.isSpatialUIEnabled) or v.Typography.BodySmall.FontSize
-	local v4 = math.max(1, v3 - 2)
+	local textSize = getMessageTextSize(chatWindowSettings, props.isSpatialUIEnabled) or v.Typography.BodySmall.FontSize
+	local v3 = math.max(1, textSize - 2)
 	local textColor
 
 	if chatWindowSettings and chatWindowSettings.TextColor3 then
@@ -70,7 +60,7 @@ local function FriendsChatTextMessage(props)
 		textStrokeColor3 = chatWindowSettings.TextStrokeColor3
 	end
 
-	local v5 = not (chatWindowSettings and chatWindowSettings.TextStrokeTransparency) and 1
+	local v4 = not (chatWindowSettings and chatWindowSettings.TextStrokeTransparency) and 1
 		or chatWindowSettings.TextStrokeTransparency
 
 	local textTransparency = props.textTransparency or React.createBinding(0)
@@ -78,20 +68,20 @@ local function FriendsChatTextMessage(props)
 	local getDisplayId = props.getDisplayId
 	local getDisplayFromId = props.getDisplayFromId
 	local localize = props.localize
+	local v5 = React.useMemo(function()
+		return { systemTextSize = v3, localize = localize }
+	end, { v3, localize })
 	local v6 = React.useMemo(function()
-		return { systemTextSize = v4, localize = localize }
-	end, { v4, localize })
-	local v7 = React.useMemo(function()
 		return Signals.createComputed(function(p)
-			return getDisplayFromId(getDisplayId(p), p, v6)
+			return getDisplayFromId(getDisplayId(p), p, v5)
 		end)
-	end, { getDisplayId, getDisplayFromId, v6 })
+	end, { getDisplayId, getDisplayFromId, v5 })
 
-	local display2 = SignalsReact.useSignalBinding(v7)
+	local display2 = SignalsReact.useSignalBinding(v6)
 	local layoutOrder = SignalsReact.useSignalBinding(props.getLayoutOrder)
 
 	local getMessageIdFromDisplayId = props.getMessageIdFromDisplayId
-	local v8 = useFinishChatWindowMessageRenderIntervals((React.useCallback(function()
+	local v7 = useFinishChatWindowMessageRenderIntervals((React.useCallback(function()
 		if FFlagFriendsChatMessageSendPerfTracking and getMessageIdFromDisplayId then
 			return getMessageIdFromDisplayId(getDisplayId(false))
 		end
@@ -99,11 +89,11 @@ local function FriendsChatTextMessage(props)
 		return getDisplayId(false)
 	end, { getDisplayId, getMessageIdFromDisplayId })))
 	local ref = React.useRef(nil)
-	local v9 = React.useCallback(function(p)
+	local v8 = React.useCallback(function(p)
 		if p and p.Text and p.Text ~= "" then
-			v8()
+			v7()
 		end
-	end, { v8 })
+	end, { v7 })
 
 	React.useEffect(function()
 		if not FFlagFriendsChatMessageSendPerfTracking then
@@ -113,53 +103,36 @@ local function FriendsChatTextMessage(props)
 		local current = ref.current
 
 		if current ~= nil and current.Text ~= "" then
-			v8()
+			v7()
 		end
-	end, { v8 })
+	end, { v7 })
 
-	local v10 = React.useMemo(function()
-		local v10 = math.floor(v3 * 3 / 2)
-		return UDim2.fromOffset(v10, v3)
-	end, { v3 })
+	local v9 = React.useMemo(function()
+		local v9 = math.floor(textSize * 3 / 2)
+		return UDim2.fromOffset(v9, textSize)
+	end, { textSize })
 
-	local placeholder, v11 = React.useBinding(v10)
-
-	React.useEffect(function()
-		v11(v10)
-	end, { v10 })
+	local placeholder, v10 = React.useBinding(v9)
 
 	React.useEffect(function()
-		local v12 = false
+		v10(v9)
+	end, { v9 })
+
+	React.useEffect(function()
+		local v11 = false
 		task.spawn(function()
-			if FoundationFontFaceMigration then
-				local textBoundsAsync = getTextBoundsAsync("          ", font, v3)
+			local textBoundsAsync = getTextBoundsAsync("          ", fontFace, textSize)
 
-				if v12 or textBoundsAsync == nil then
-					return
-				end
-
-				v11(UDim2.fromOffset(textBoundsAsync.X, textBoundsAsync.Y))
-			else
-				local getTextBoundsParams = Instance.new("GetTextBoundsParams")
-				getTextBoundsParams.Text = "          "
-				getTextBoundsParams.Font = font
-				getTextBoundsParams.Size = v3
-				getTextBoundsParams.Width = 1e999
-				local success, result = pcall(function()
-					return TextService:GetTextBoundsAsync(getTextBoundsParams)
-				end)
-
-				if v12 or not success or result == nil then
-					return
-				end
-
-				v11(UDim2.fromOffset(result.X, result.Y))
+			if v11 or textBoundsAsync == nil then
+				return
 			end
+
+			v10(UDim2.fromOffset(textBoundsAsync.X, textBoundsAsync.Y))
 		end)
 		return function()
-			v12 = true
+			v11 = true
 		end
-	end, { font, v3 })
+	end, { fontFace, textSize })
 
 	local mapped = display2:map(function(p)
 		if p == nil then
@@ -173,16 +146,16 @@ local function FriendsChatTextMessage(props)
 		return p.content
 	end)
 
-	local v12 = { font = font, textSize = v3, textColor = textColor }
+	local v11 = { font = fontFace, textSize = textSize, textColor = textColor }
 
-	local v13 = { font = font2, textSize = v4, textColor = color3 }
+	local v12 = { font = font, textSize = v3, textColor = color3 }
 
 	local mapped2 = display2:map(function(p)
 		if isSystemDisplay(p) then -- inferred equivalent call
-			return v13
+			return v12
 		end
 
-		return v12
+		return v11
 	end)
 
 	local mapped3 = mapped2:map(function(p)
@@ -198,7 +171,7 @@ local function FriendsChatTextMessage(props)
 	end)
 
 	local mapped6 = textTransparency:map(function(p)
-		return fadeTransparency(v5, p) -- inferred equivalent call
+		return fadeTransparency(v4, p) -- inferred equivalent call
 	end)
 
 	local mapped7 = React.joinBindings({ display = display2, textTransparency = textTransparency }):map(function(p)
@@ -222,21 +195,21 @@ local function FriendsChatTextMessage(props)
 	local mapped9 = display2:map(function(p): boolean
 		return p ~= nil
 	end)
-	local v14
+	local v13
 
 	if FFlagFriendsChatLazyMountMessageSkeleton then
-		local v15 = React.useMemo(function()
+		local v14 = React.useMemo(function()
 			return Signals.createComputed(function(p)
-				return displayWantsSkeleton(v7(p)) -- inferred equivalent call
+				return displayWantsSkeleton(v6(p)) -- inferred equivalent call
 			end)
-		end, { v7 })
-		v14 = SignalsReact.useSignalState(v15)
+		end, { v6 })
+		v13 = SignalsReact.useSignalState(v14)
 	else
-		v14 = true
+		v13 = true
 	end
 
 	local createElement = React.createElement
-	local v15 = {
+	local v14 = {
 		BackgroundTransparency = 1,
 		AutomaticSize = Enum.AutomaticSize.Y,
 		Size = UDim2.new(1, 0, 0, 0),
@@ -244,7 +217,7 @@ local function FriendsChatTextMessage(props)
 		Visible = mapped9,
 		ref = props.guiObjectRef
 	}
-	local v16 = {
+	local v15 = {
 		body = React.createElement("TextLabel", {
 			BackgroundTransparency = 1,
 			AutomaticSize = Enum.AutomaticSize.Y,
@@ -261,7 +234,7 @@ local function FriendsChatTextMessage(props)
 			RichText = true,
 			Text = mapped,
 			ref = ref,
-			[React.Change.Text] = v9
+			[React.Change.Text] = v8
 		}, {
 			stroke = React.createElement("UIStroke", {
 				Color = textStrokeColor3 or Color3.fromRGB(0, 0, 0),
@@ -273,7 +246,7 @@ local function FriendsChatTextMessage(props)
 	}
 	local skeleton
 
-	if v14 then
+	if v13 then
 		skeleton = React.createElement(Foundation.Skeleton, {
 			Size = mapped8,
 			Position = UDim2.fromOffset(0, 0),
@@ -282,8 +255,8 @@ local function FriendsChatTextMessage(props)
 		})
 	end
 
-	v16.skeleton = skeleton
-	return createElement("Frame", v15, v16)
+	v15.skeleton = skeleton
+	return createElement("Frame", v14, v15)
 end
 
 return React.memo(FriendsChatTextMessage)

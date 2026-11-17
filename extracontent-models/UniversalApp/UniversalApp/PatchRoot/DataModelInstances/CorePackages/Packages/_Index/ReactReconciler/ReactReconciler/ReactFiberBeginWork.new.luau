@@ -440,8 +440,7 @@ updateSimpleMemoComponent = function(data, state, p, p2, p3, p4)
 
 		if elementType["$$typeof"] == REACT_LAZY_TYPE then
 			local payload = elementType._payload
-			local init = elementType._init
-			local success, result = xpcall(init, describeError, payload)
+			local success, result = xpcall(elementType._init, describeError, payload)
 
 			if not success then
 				result = nil
@@ -1808,11 +1807,11 @@ function New.beginWork(data, state, p)
 		)
 	end
 
-	local kind, pendingProps, kind2, pendingProps2, kind3, pendingProps3, kind4, v9, _, _, kind5, pendingProps4, v10
+	local elementType, kind, pendingProps, kind2, pendingProps2, v9, kind3, pendingProps3, kind4, pendingProps4, v10, _, _, _, kind5, pendingProps5, v11
 
 	-- [DEDUP] synthesized from 2 duplicated terminal regions
 	local function deduplicatedTail()
-		local propTypes, validateProps
+		local v12, propTypes, validateProps
 
 		if (__DEV__ or __DISABLE_ALL_WARNINGS_EXCEPT_PROP_VALIDATION__) and state.type ~= state.elementType then
 			if type(kind4) == "table" then
@@ -1821,26 +1820,27 @@ function New.beginWork(data, state, p)
 			end
 
 			if propTypes or validateProps then
-				checkPropTypes(propTypes, validateProps, v9, "prop", getComponentName(kind4))
+				checkPropTypes(propTypes, validateProps, v10, "prop", getComponentName(kind4))
 			end
 		end
 
-		return updateMemoComponent(data, state, kind4, resolveDefaultProps(kind4.type, v9), lanes, p)
+		v12 = resolveDefaultProps(kind4.type, v10)
+		return updateMemoComponent(data, state, kind4, v12, lanes, p)
 	end
 
 	if data == nil then
 		v5 = false
 	else
 		if data.memoizedProps == state.pendingProps and not hasContextChanged() then
-			local v11
+			local v12
 
 			if __DEV__ then
-				v11 = state.type ~= data.type
+				v12 = state.type ~= data.type
 			else
-				v11 = false
+				v12 = false
 			end
 
-			if not v11 then
+			if not v12 then
 				if ReactFiberLane.includesSomeLane(p, lanes) then
 					if bit32.band(data.flags, forceUpdateForLegacySuspense) == noFlags then
 						v5 = false
@@ -1855,7 +1855,8 @@ function New.beginWork(data, state, p)
 					end
 
 					if state.tag == LazyComponent then
-						return mountLazyComponent(data, state, state.elementType, lanes, p)
+						elementType = state.elementType
+						return mountLazyComponent(data, state, elementType, lanes, p)
 					end
 
 					if state.tag == FunctionComponent then
@@ -1870,13 +1871,8 @@ function New.beginWork(data, state, p)
 					elseif state.tag == ClassComponent then
 						kind2 = state.type
 						pendingProps2 = state.pendingProps
-						return updateClassComponent(
-							data,
-							state,
-							kind2,
-							state.elementType == kind2 and pendingProps2 or resolveDefaultProps(kind2, pendingProps2),
-							p
-						)
+						v9 = state.elementType == kind2 and pendingProps2 or resolveDefaultProps(kind2, pendingProps2)
+						return updateClassComponent(data, state, kind2, v9, p)
 					else
 						if state.tag == HostRoot then
 							return updateHostRoot(data, state, p)
@@ -1935,7 +1931,9 @@ function New.beginWork(data, state, p)
 
 						if state.tag == MemoComponent then
 							kind4 = state.type
-							v9 = resolveDefaultProps(kind4, state.pendingProps)
+							pendingProps4 = state.pendingProps
+
+							v10 = resolveDefaultProps(kind4, pendingProps4)
 							return deduplicatedTail()
 						end
 
@@ -1945,10 +1943,10 @@ function New.beginWork(data, state, p)
 
 						if state.tag == IncompleteClassComponent then
 							kind5 = state.type
-							pendingProps4 = state.pendingProps
-							v10 = state.elementType == kind5 and pendingProps4
-								or resolveDefaultProps(kind5, pendingProps4)
-							return mountIncompleteClassComponent(data, state, kind5, v10, p)
+							pendingProps5 = state.pendingProps
+							v11 = state.elementType == kind5 and pendingProps5
+								or resolveDefaultProps(kind5, pendingProps5)
+							return mountIncompleteClassComponent(data, state, kind5, v11, p)
 						end
 
 						return deduplicatedTail2()
@@ -1987,9 +1985,7 @@ function New.beginWork(data, state, p)
 						pushProvider(state, state.memoizedProps.value)
 
 						return bailoutOnAlreadyFinishedWork(data, state, p)
-					end
-
-					if state.tag == Profiler then
+					elseif state.tag == Profiler then
 						if enableProfilerTimer then
 							local stateNode = state.stateNode
 							stateNode.effectDuration = 0
@@ -2021,13 +2017,13 @@ function New.beginWork(data, state, p)
 
 							pushSuspenseContext(state, setDefaultShallowSuspenseContext(suspenseStackCursor.current))
 
-							local v12 = bailoutOnAlreadyFinishedWork(data, state, p)
+							local v13 = bailoutOnAlreadyFinishedWork(data, state, p)
 
-							if v12 == nil then
+							if v13 == nil then
 								return nil
 							end
 
-							return v12.sibling
+							return v13.sibling
 						end
 					elseif state.tag == SuspenseListComponent then
 						unimplemented("beginWork: SuspenseListComponent") -- inferred equivalent call
@@ -2054,7 +2050,8 @@ function New.beginWork(data, state, p)
 	end
 
 	if state.tag == LazyComponent then
-		return mountLazyComponent(data, state, state.elementType, lanes, p)
+		elementType = state.elementType
+		return mountLazyComponent(data, state, elementType, lanes, p)
 	end
 
 	if state.tag == FunctionComponent then
@@ -2069,13 +2066,8 @@ function New.beginWork(data, state, p)
 	elseif state.tag == ClassComponent then
 		kind2 = state.type
 		pendingProps2 = state.pendingProps
-		return updateClassComponent(
-			data,
-			state,
-			kind2,
-			state.elementType == kind2 and pendingProps2 or resolveDefaultProps(kind2, pendingProps2),
-			p
-		)
+		v9 = state.elementType == kind2 and pendingProps2 or resolveDefaultProps(kind2, pendingProps2)
+		return updateClassComponent(data, state, kind2, v9, p)
 	else
 		if state.tag == HostRoot then
 			return updateHostRoot(data, state, p)
@@ -2134,7 +2126,9 @@ function New.beginWork(data, state, p)
 
 		if state.tag == MemoComponent then
 			kind4 = state.type
-			v9 = resolveDefaultProps(kind4, state.pendingProps)
+			pendingProps4 = state.pendingProps
+
+			v10 = resolveDefaultProps(kind4, pendingProps4)
 			return deduplicatedTail()
 		end
 
@@ -2144,9 +2138,9 @@ function New.beginWork(data, state, p)
 
 		if state.tag == IncompleteClassComponent then
 			kind5 = state.type
-			pendingProps4 = state.pendingProps
-			v10 = state.elementType == kind5 and pendingProps4 or resolveDefaultProps(kind5, pendingProps4)
-			return mountIncompleteClassComponent(data, state, kind5, v10, p)
+			pendingProps5 = state.pendingProps
+			v11 = state.elementType == kind5 and pendingProps5 or resolveDefaultProps(kind5, pendingProps5)
+			return mountIncompleteClassComponent(data, state, kind5, v11, p)
 		end
 
 		return deduplicatedTail2()

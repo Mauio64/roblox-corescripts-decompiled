@@ -11,7 +11,6 @@ local DataHydrationUtils = require(DataHydration.DataHydrationUtils)
 local getLocalPlayerUserId = DataHydrationUtils.getLocalPlayerUserId
 local observeLocalPlayerUserId = DataHydrationUtils.observeLocalPlayerUserId
 local SharedFlags = require(parent.SharedFlags)
-local FFlagMigrateGameInfoToStore = SharedFlags.FFlagMigrateGameInfoToStore
 local FFlagDataHydrationAccountReset = SharedFlags.FFlagDataHydrationAccountReset
 local FFlagDataHydrationStaleTime = SharedFlags.FFlagDataHydrationStaleTime
 local FFlagSduiReleaseSearchResultsPageState = SharedFlags.FFlagSduiReleaseSearchResultsPageState
@@ -48,7 +47,7 @@ local function createDataCache(p: number?, p2: number?, data)
 
 	local v7 = {}
 
-	local function expiryFor(p3, p4: number) -- 6 equivalent calls inferred from this helper
+	local function expiryFor(p3, p4: number) -- 4 equivalent calls inferred from this helper
 		if ttlSecondsForItem then
 			return os.clock() + (ttlSecondsForItem(p3) or v)
 		end
@@ -188,20 +187,14 @@ local function createDataCache(p: number?, p2: number?, data)
 
 				v5[k](DataStatus.Ready)
 
-				if FFlagMigrateGameInfoToStore then
-					if flag ~= false then
-						v6[k] = expiryFor(joined, v8) -- inferred equivalent call
+				if flag == false then
+					continue
+				end
 
-						if FFlagDataHydrationStaleTime then
-							v7[k] = now
-						end
-					end
-				else
-					v6[k] = expiryFor(joined, v8) -- inferred equivalent call
+				v6[k] = expiryFor(joined, v8) -- inferred equivalent call
 
-					if FFlagDataHydrationStaleTime then
-						v7[k] = now
-					end
+				if FFlagDataHydrationStaleTime then
+					v7[k] = now
 				end
 			end
 		end
@@ -229,15 +222,7 @@ local function createDataCache(p: number?, p2: number?, data)
 
 		v5[p3](DataStatus.Ready)
 
-		if FFlagMigrateGameInfoToStore then
-			if flag ~= false then
-				v6[p3] = expiryFor(p4, os.clock() + v) -- inferred equivalent call
-
-				if FFlagDataHydrationStaleTime then
-					v7[p3] = os.clock()
-				end
-			end
-		else
+		if flag ~= false then
 			v6[p3] = expiryFor(p4, os.clock() + v) -- inferred equivalent call
 
 			if FFlagDataHydrationStaleTime then

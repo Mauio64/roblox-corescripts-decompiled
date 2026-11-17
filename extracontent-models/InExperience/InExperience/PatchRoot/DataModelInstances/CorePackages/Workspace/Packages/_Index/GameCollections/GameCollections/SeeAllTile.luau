@@ -4,7 +4,6 @@ local React = require(parent.React)
 local UIBlox = require(parent.UIBlox)
 local Foundation = require(parent.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local Images = UIBlox.App.ImageSet.Images
 local useCursor = UIBlox.App.SelectionCursor.useCursor
@@ -45,8 +44,7 @@ function SeeAllTile(props)
 	local icon = props.icon or iconsnavigationpushRight
 	local size_900 = v.Size.Size_900
 
-	local createElement = React.createElement
-	local onActivatedsByActivated = {
+	return React.createElement("TextButton", {
 		AutoButtonColor = false,
 		Text = "",
 		Size = size,
@@ -55,9 +53,7 @@ function SeeAllTile(props)
 		BackgroundColor3 = v.Color.Surface.Surface_300.Color3,
 		[React.Event.Activated] = props.onActivated,
 		SelectionImageObject = selectionImageObject
-	}
-
-	local v3 = {
+	}, {
 		UICorner = React.createElement("UICorner", { CornerRadius = udim }),
 		UIListLayout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
@@ -74,41 +70,18 @@ function SeeAllTile(props)
 			ImageTransparency = transparency,
 			LayoutOrder = 1
 		}),
-		Title = 0
-	}
-
-	local createElement2 = React.createElement
-	local v4 = {
-		Text = title,
-		Size = UDim2.new(1, 0, 0, titleLarge.FontSize),
-		TextXAlignment = Enum.TextXAlignment.Center,
-		LayoutOrder = 2,
-		Font = 0,
-		FontFace = 0,
-		TextSize = 0,
-		TextColor3 = 0,
-		TextTruncate = 0,
-		BackgroundTransparency = 1
-	}
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = titleLarge.Font
-	end
-
-	v4.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(titleLarge.Font)
-	end
-
-	v4.FontFace = fontFace
-	v4.TextSize = titleLarge.FontSize
-	v4.TextColor3 = color3
-	v4.TextTruncate = Enum.TextTruncate.AtEnd
-	v3.Title = createElement2("TextLabel", v4)
-	return createElement("TextButton", onActivatedsByActivated, v3)
+		Title = React.createElement("TextLabel", {
+			Text = title,
+			Size = UDim2.new(1, 0, 0, titleLarge.FontSize),
+			TextXAlignment = Enum.TextXAlignment.Center,
+			LayoutOrder = 2,
+			FontFace = normalizeFontFace(titleLarge.Font),
+			TextSize = titleLarge.FontSize,
+			TextColor3 = color3,
+			TextTruncate = Enum.TextTruncate.AtEnd,
+			BackgroundTransparency = 1
+		})
+	})
 end
 
 return SeeAllTile

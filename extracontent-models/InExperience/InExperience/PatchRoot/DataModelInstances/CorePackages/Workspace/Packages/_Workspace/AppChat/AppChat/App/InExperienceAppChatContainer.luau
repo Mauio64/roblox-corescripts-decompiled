@@ -57,7 +57,6 @@ local FIntAppChatWideBreakpointMinHeight = require(AppChat.Flags.FIntAppChatWide
 local FIntAppChatWideBreakpointMinWidth = require(AppChat.Flags.FIntAppChatWideBreakpointMinWidth)
 local SocialExperiments = require(parent.SocialExperiments)
 local PartyPageCarouselExperimentation = SocialExperiments.PartyPageCarouselExperimentation
-local getFFlagAppChatEnableRootedNavigation = require(AppChat.Flags.getFFlagAppChatEnableRootedNavigation)
 local FFlagDebugAppChatEnableDomLocators = require(AppChat.Flags.FFlagDebugAppChatEnableDomLocators)
 local GetRootedNavigationStore = require(AppChat.Stores.GetRootedNavigationStore)
 local DomLocators = require(AppChat.Utils.DomLocators)
@@ -96,19 +95,14 @@ return function(props)
 		wideMode = false
 	end
 
-	local fFlagAppChatEnableRootedNavigation = getFFlagAppChatEnableRootedNavigation()
 	local v4
 
-	if fFlagAppChatEnableRootedNavigation then
-		if props.requestedRoute == nil then
-			v4 = false
-		elseif props.requestedRoute.screen == getEnumScreens().ChatDetails and props.requestedRoute.params ~= nil then -- inferred equivalent call
-			v4 = props.requestedRoute.params.rooted == true
-		else
-			v4 = false
-		end
+	if props.requestedRoute == nil then
+		v4 = false
+	elseif props.requestedRoute.screen == getEnumScreens().ChatDetails and props.requestedRoute.params ~= nil then -- inferred equivalent call
+		v4 = props.requestedRoute.params.rooted == true
 	else
-		v4 = fFlagAppChatEnableRootedNavigation
+		v4 = false
 	end
 
 	local v5 = useRef(false)
@@ -121,13 +115,7 @@ return function(props)
 		wideMode = false
 	end
 
-	local v6
-
-	if fFlagAppChatEnableRootedNavigation then
-		v6 = useSignalState(GetRootedNavigationStore(false).getIsNavigationPending)
-	else
-		v6 = false
-	end
+	local v6 = useSignalState(GetRootedNavigationStore(false).getIsNavigationPending)
 
 	useEffect(function()
 		if PartyPageCarouselExperimentation.getAppChatFormFactorEnabled() then
@@ -172,7 +160,7 @@ return function(props)
 		localUserId = LocalPlayer.UserId
 	end
 
-	local v12 = createElement(AppChatEntryPoint, {
+	local element = createElement(AppChatEntryPoint, {
 		setActiveConversationId = setState,
 		localUserId = localUserId,
 		chatPlacement = ChatPlacementContext.Enum.InExperienceDefault,
@@ -189,7 +177,7 @@ return function(props)
 	local createElement2 = React.createElement
 	local fragment = React.Fragment
 	local createElement3 = React.createElement
-	local v13 = {
+	local v12 = {
 		BackgroundColor3 = Color3.new(0, 0, 0),
 		BackgroundTransparency = 1,
 		Size = v7:map(function(vector2: Vector2)
@@ -201,39 +189,38 @@ return function(props)
 		ref = ref
 	}
 
-	local v14 = {
+	local v13 = {
 		Corner = React.createElement("UICorner", { CornerRadius = UDim.new(0, 8) }),
 		containerRef = 0
 	}
 
 	local createElement4 = React.createElement
 	local provider = Responsive.ContainerRef.Provider
+	local appChatContent
 
 	if state2 then
-		if v6 then
-			v12 = nil
-		else
-			v12 = React.createElement(Loading, {
+		if not v6 then
+			appChatContent = React.createElement(Loading, {
 				size = IconSize.Large,
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				Position = UDim2.fromScale(0.5, 0.5)
 			})
 		end
-	elseif fFlagAppChatEnableRootedNavigation then
-		v12 = React.createElement("Frame", {
+	else
+		appChatContent = React.createElement("Frame", {
 			Name = "AppChatContent",
 			[React.Tag] = "data-testid=app-chat-content",
 			BackgroundTransparency = 1,
 			Size = UDim2.fromScale(1, 1),
 			Visible = not v6
-		}, { AppChatEntryPoint = v12 })
+		}, { AppChatEntryPoint = element })
 	end
 
 	local loadingOverlay
 
 	if v6 then
 		local createElement5 = React.createElement
-		local v15 = {
+		local v14 = {
 			Name = "AppChatLoadingOverlay",
 			[React.Tag] = "data-testid=app-chat-loading-overlay",
 			Active = true,
@@ -242,7 +229,7 @@ return function(props)
 			ZIndex = 2
 		}
 
-		local v16 = {
+		local v15 = {
 			Spinner = React.createElement(Loading, {
 				size = IconSize.Large,
 				AnchorPoint = Vector2.new(0.5, 0.5),
@@ -252,7 +239,7 @@ return function(props)
 		}
 
 		local createElement6 = React.createElement
-		local v17 = {
+		local v16 = {
 			icon = IconName.ChevronLargeLeft,
 			size = ButtonSize.XSmall,
 			variant = ButtonVariant.Utility,
@@ -268,17 +255,17 @@ return function(props)
 			testId = DomLocators.appChatLoadingOverlayBackButton()
 		end
 
-		v17.testId = testId
-		v16.BackButton = createElement6(IconButton, v17)
-		loadingOverlay = createElement5("Frame", v15, v16)
+		v16.testId = testId
+		v15.BackButton = createElement6(IconButton, v16)
+		loadingOverlay = createElement5("Frame", v14, v15)
 	end
 
-	v14.containerRef = createElement4(provider, { value = ref }, {
-		AppChatContent = v12,
+	v13.containerRef = createElement4(provider, { value = ref }, {
+		AppChatContent = appChatContent,
 		LoadingOverlay = loadingOverlay
 	})
 	local children = {
-		AppChatWindow = createElement3("Frame", v13, v14),
+		AppChatWindow = createElement3("Frame", v12, v13),
 		ChatEventReceiver = React.createElement(ChatEventReceiver, {
 			robloxEventReceiver = robloxEventReceiver,
 			rnBypassActionSignal = rnBypassActionSignal,

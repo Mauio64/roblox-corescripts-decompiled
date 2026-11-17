@@ -24,7 +24,7 @@ local discoveryVideoLoadEvent = DiscoveryAnalytics.Events.discoveryVideoLoadEven
 local discoveryVideoLoopEvent = DiscoveryAnalytics.Events.discoveryVideoLoopEvent
 local discoveryVideoPlayEvent = DiscoveryAnalytics.Events.discoveryVideoPlayEvent
 local SharedFlags = require(parent.SharedFlags)
-local FFlagLuaAppEnableHomepageOneByTwoTile = SharedFlags.FFlagLuaAppEnableHomepageOneByTwoTile
+local FFlagLuaAppEnableNxMRoduxApportioning = SharedFlags.FFlagLuaAppEnableNxMRoduxApportioning
 local SharedFlags2 = require(parent.SharedFlags)
 local FFlagLuaAppHomeMomentVideoFallback = SharedFlags2.FFlagLuaAppHomeMomentVideoFallback
 local SharedFlags3 = require(parent.SharedFlags)
@@ -45,7 +45,7 @@ local function getVideoAssetId(p, p2: string?)
 		return p.primaryWideVideoAssetId
 	end
 
-	if FFlagLuaAppEnableHomepageOneByTwoTile and p and p.primaryVideoAssetId then
+	if FFlagLuaAppEnableNxMRoduxApportioning and p and p.primaryVideoAssetId then
 		return p.primaryVideoAssetId
 	end
 
@@ -62,7 +62,7 @@ local function getVideoAssetId(p, p2: string?)
 end
 
 local function getVideoAssetIdAndIsMoment(p, p2: string?)
-	if FFlagLuaAppEnableHomepageOneByTwoTile and p and p.primaryVideoAssetId then
+	if FFlagLuaAppEnableNxMRoduxApportioning and p and p.primaryVideoAssetId then
 		return p.primaryVideoAssetId, false
 	end
 
@@ -88,7 +88,7 @@ local function useVideoAnalytics(p, flag: boolean, pageContext: string, sortPos:
 			if FFlagLuaAppDiscoveryMomentVideoTelemetry then
 				local v2 = gameSortId
 
-				if FFlagLuaAppEnableHomepageOneByTwoTile and v and v.primaryVideoAssetId then
+				if FFlagLuaAppEnableNxMRoduxApportioning and v and v.primaryVideoAssetId then
 					videoAssetId = v.primaryVideoAssetId
 					isMoment = false
 				else
@@ -110,7 +110,7 @@ local function useVideoAnalytics(p, flag: boolean, pageContext: string, sortPos:
 
 				if v and v.primaryWideVideoAssetId then
 					videoAssetId = v.primaryWideVideoAssetId
-				elseif FFlagLuaAppEnableHomepageOneByTwoTile and v and v.primaryVideoAssetId then
+				elseif FFlagLuaAppEnableNxMRoduxApportioning and v and v.primaryVideoAssetId then
 					videoAssetId = v.primaryVideoAssetId
 				else
 					local gameTileLayoutData = getGameTileLayoutData(v, v2)
@@ -171,7 +171,7 @@ local function useVideoAnalytics(p, flag: boolean, pageContext: string, sortPos:
 				if FFlagLuaAppDiscoveryMomentVideoTelemetry then
 					local v2 = gameSortId
 
-					if FFlagLuaAppEnableHomepageOneByTwoTile and v and v.primaryVideoAssetId then
+					if FFlagLuaAppEnableNxMRoduxApportioning and v and v.primaryVideoAssetId then
 						videoAssetId = v.primaryVideoAssetId
 						isMoment = false
 					else
@@ -193,7 +193,7 @@ local function useVideoAnalytics(p, flag: boolean, pageContext: string, sortPos:
 
 					if v and v.primaryWideVideoAssetId then
 						videoAssetId = v.primaryWideVideoAssetId
-					elseif FFlagLuaAppEnableHomepageOneByTwoTile and v and v.primaryVideoAssetId then
+					elseif FFlagLuaAppEnableNxMRoduxApportioning and v and v.primaryVideoAssetId then
 						videoAssetId = v.primaryVideoAssetId
 					else
 						local gameTileLayoutData = getGameTileLayoutData(v, v2)
@@ -219,7 +219,7 @@ local function useVideoAnalytics(p, flag: boolean, pageContext: string, sortPos:
 
 				local v2
 
-				if FFlagLuaAppEnableHomepageOneByTwoTile then
+				if FFlagLuaAppEnableNxMRoduxApportioning then
 					v2 = v.contentType == OmniRecommendationsContentType.AdLink
 				end
 
@@ -259,7 +259,7 @@ local function useVideoAnalytics(p, flag: boolean, pageContext: string, sortPos:
 				v3.isMoment = isMoment
 				discoveryVideoLoadEvent(pageContext, v3)
 
-				if FFlagLuaAppEnableHomepageOneByTwoTile then
+				if FFlagLuaAppEnableNxMRoduxApportioning then
 					if videoAssetId and (v2 or v.universeId) then
 						local reportVideoAction = VideoLogger.reportVideoAction
 						local load = VideoActions.load
@@ -309,7 +309,7 @@ local function useVideoAnalytics(p, flag: boolean, pageContext: string, sortPos:
 			if FFlagLuaAppDiscoveryMomentVideoTelemetry then
 				local v2 = gameSortId
 
-				if FFlagLuaAppEnableHomepageOneByTwoTile and v and v.primaryVideoAssetId then
+				if FFlagLuaAppEnableNxMRoduxApportioning and v and v.primaryVideoAssetId then
 					videoAssetId = v.primaryVideoAssetId
 					isMoment = false
 				else
@@ -331,7 +331,7 @@ local function useVideoAnalytics(p, flag: boolean, pageContext: string, sortPos:
 
 				if v and v.primaryWideVideoAssetId then
 					videoAssetId = v.primaryWideVideoAssetId
-				elseif FFlagLuaAppEnableHomepageOneByTwoTile and v and v.primaryVideoAssetId then
+				elseif FFlagLuaAppEnableNxMRoduxApportioning and v and v.primaryVideoAssetId then
 					videoAssetId = v.primaryVideoAssetId
 				else
 					local gameTileLayoutData = getGameTileLayoutData(v, v2)
@@ -392,7 +392,7 @@ local function useVideoAnalytics(p, flag: boolean, pageContext: string, sortPos:
 				if FFlagLuaAppDiscoveryMomentVideoTelemetry then
 					local v2 = gameSortId
 
-					if FFlagLuaAppEnableHomepageOneByTwoTile and v and v.primaryVideoAssetId then
+					if FFlagLuaAppEnableNxMRoduxApportioning and v and v.primaryVideoAssetId then
 						videoAssetId = v.primaryVideoAssetId
 						isMoment = false
 					else
@@ -414,7 +414,7 @@ local function useVideoAnalytics(p, flag: boolean, pageContext: string, sortPos:
 
 					if v and v.primaryWideVideoAssetId then
 						videoAssetId = v.primaryWideVideoAssetId
-					elseif FFlagLuaAppEnableHomepageOneByTwoTile and v and v.primaryVideoAssetId then
+					elseif FFlagLuaAppEnableNxMRoduxApportioning and v and v.primaryVideoAssetId then
 						videoAssetId = v.primaryVideoAssetId
 					else
 						local gameTileLayoutData = getGameTileLayoutData(v, v2)

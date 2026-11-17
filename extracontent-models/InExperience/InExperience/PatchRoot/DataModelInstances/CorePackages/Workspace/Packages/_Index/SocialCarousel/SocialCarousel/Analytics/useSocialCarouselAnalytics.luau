@@ -19,6 +19,7 @@ local FFlagSocialCarouselEnableUserSeenEvents = Flags.FFlagSocialCarouselEnableU
 local FFlagSocialCarouselLogNewFriendRequestsBadge = require(SocialCarousel.Flags.FFlagSocialCarouselLogNewFriendRequestsBadge)
 local FFlagSocialCarouselShareQREnabled = SharedFlags.FFlagSocialCarouselShareQREnabled
 local FFlagLuaAppUserSeenCollectionUnifiedFields = SharedFlags.FFlagLuaAppUserSeenCollectionUnifiedFields
+local FFlagSocialCarouselInGamePlayIcon = SharedFlags.FFlagSocialCarouselInGamePlayIcon
 
 local repeatValue = SocialLuaAnalytics.Analytics.Formatters.repeatValue
 
@@ -72,7 +73,8 @@ return function()
 			isRecommendation = data.contextType and true or false,
 			universeId = 0,
 			source = 0,
-			interactionUuid = 0
+			interactionUuid = 0,
+			tileClickTarget = 0
 		}
 		local universeId
 
@@ -83,6 +85,13 @@ return function()
 		v3.universeId = universeId
 		v3.source = source
 		v3.interactionUuid = HttpService:GenerateGUID(false)
+		local tileClickTarget
+
+		if FFlagSocialCarouselInGamePlayIcon then
+			tileClickTarget = p.tileClickTarget
+		end
+
+		v3.tileClickTarget = tileClickTarget
 		fireAnalyticsEvent(userPressed, v3)
 	end, { source, v2 })
 	local userSeen2

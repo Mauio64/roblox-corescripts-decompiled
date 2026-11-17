@@ -106,8 +106,10 @@ local function useBuildInternalTesting(entry, session, routeSessionId: string?)
 			end
 
 			return experimentOverride.getInternalSelection(v2(), p)
-		end, function(p, p2): boolean
-			return p.isSelected == p2.isSelected and p.previewHash == p2.previewHash
+		end, function(data, data2): boolean
+			return data.isSelected == data2.isSelected
+				and data.previewHash == data2.previewHash
+				and data.previewSpecName == data2.previewSpecName
 		end)
 	end, { session, v2 })
 	local v4 = SignalsReact.useSignalState(v3)
@@ -135,15 +137,16 @@ local function useBuildInternalTesting(entry, session, routeSessionId: string?)
 	return entry ~= nil and {
 		isSelected = v4.isSelected,
 		previewHash = v4.previewHash,
+		previewSpecName = v4.previewSpecName,
 		onSelect = function()
 			if canEdit() then -- inferred equivalent call
 				experimentOverride.selectInternal(v2(), true)
 				adoptPending() -- inferred equivalent call
 			end
 		end,
-		onSaveSpec = function(p: string?)
+		onSaveSpec = function(p: string?, p2)
 			if canEdit() and experimentOverride.getInternalSelection(v2(), false).isSelected then -- inferred equivalent call
-				experimentOverride.set(v2(), p)
+				experimentOverride.set(v2(), p, p2)
 				experimentOverride.selectInternal(v2(), true)
 				adoptPending() -- inferred equivalent call
 			end

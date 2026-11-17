@@ -15,12 +15,15 @@ local getFFlagExpChatFixChannelTabsMidExperienceToggle = require(ExpChat.Flags.g
 local GetFFlagTextChatEnableUniverseChatTabs = ExpChatShared.Flags.GetFFlagTextChatEnableUniverseChatTabs
 
 local GetFFlagExpChatSuppressWelcomeMessageTabUnread = ExpChatShared.Flags.GetFFlagExpChatSuppressWelcomeMessageTabUnread
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
 local FFlagExpChatFriendsTabRequireDefaultChannels = SharedFlags.FFlagExpChatFriendsTabRequireDefaultChannels
 
 local isGlobalTabFirst = require(ExpChat.isGlobalTabFirst)
 local getDefaultTabName = require(ExpChat.getDefaultTabName)
 local FFlagExpChatGlobalTabDefault = require(ExpChat.Flags.FFlagExpChatGlobalTabDefault)
+local FFlagExpChatStickyTabs = SharedFlags.FFlagExpChatStickyTabs
+
+local isUserSelectedTabTracked = require(ExpChat.isUserSelectedTabTracked)
+local canReplaceUserSelectedTab = require(ExpChat.canReplaceUserSelectedTab)
 
 local createSignal = Signals.createSignal
 local createComputed = Signals.createComputed
@@ -94,11 +97,7 @@ getFixedTabPriority = function(p: string?): nil | number
 		end
 	end
 
-	if p == FriendsChatTabName and FFlagExpChatEnableFriendsTab then
-		return 3
-	end
-
-	return nil
+	return if p == FriendsChatTabName then 3 else nil
 end
 
 local function pruneNonSpecialTabs(allChannelTabs)
@@ -114,7 +113,7 @@ local function pruneNonSpecialTabs(allChannelTabs)
 end
 
 local function isDefaultTabOnlyMode(p) -- 3 equivalent calls inferred from this helper
-	return (GetFFlagTextChatEnableUniverseChatTabs() or FFlagExpChatFriendsTabRequireDefaultChannels and FFlagExpChatEnableFriendsTab)
+	return (GetFFlagTextChatEnableUniverseChatTabs() or FFlagExpChatFriendsTabRequireDefaultChannels)
 		and not p.channelTabsConfigurationEnabled
 end
 
@@ -134,7 +133,7 @@ local function markTabUnread(p, p2: string)
 end
 
 local function isTargetChannelNoOp(data, selectedTabName: string?, flag: boolean, flag2: boolean?)
-	if FFlagExpChatGlobalTabDefault and flag2 and not data.hasUserSelectedTab then
+	if isUserSelectedTabTracked() and flag2 and not data.hasUserSelectedTab then
 		return false
 	end
 
@@ -169,16 +168,17 @@ local function createChannelTabsStore()
 		channelTabsConfigurationEnabled = false,
 		hasUserSelectedTab = false
 	})
+	local v2 = nil
 
 	local getSelectedTabName = createComputed(function(p)
 		return signal(p).selectedTabName
 	end)
 
 	local getUnreadChannels = createComputed(function(p)
-		local v2 = signal(p)
+		local v3 = signal(p)
 		local result = {}
 
-		for k, allChannelTab in pairs(v2.allChannelTabs) do
+		for k, allChannelTab in pairs(v3.allChannelTabs) do
 			if allChannelTab.HasUnreadMessages then
 				result[k] = true
 			end
@@ -200,23 +200,23 @@ local function createChannelTabsStore()
 
 			local clone = table.clone(p2)
 
-			local v2 = clone.allChannelTabs
+			local v3 = clone.allChannelTabs
 
 			if value ~= nil then
-				v2 = {}
+				v3 = {}
 
 				for k, allChannelTab in clone.allChannelTabs do
 					if value <= allChannelTab.tabIndex then
 						local clone2 = table.clone(allChannelTab)
 						clone2.tabIndex = allChannelTab.tabIndex + 1
-						v2[k] = clone2
+						v3[k] = clone2
 					else
-						v2[k] = allChannelTab
+						v3[k] = allChannelTab
 					end
 				end
 			end
 
-			clone.allChannelTabs = insertTabAndReorder(v2, { -- inferred equivalent call
+			clone.allChannelTabs = insertTabAndReorder(v3, { -- inferred equivalent call
 				type = p.type,
 				name = name,
 				tabIndex = value or 0,
@@ -239,7 +239,8 @@ local function createChannelTabsStore()
 			elseif
 				fixedTabPriority ~= nil
 				and fixedTabPriority < (fixedTabPriority2 or 1e999)
-				and (not FFlagExpChatEnableFriendsTab or fixedTabPriority2 ~= nil)
+				and fixedTabPriority2 ~= nil
+				and canReplaceUserSelectedTab(clone.hasUserSelectedTab)
 				and (not FFlagExpChatGlobalTabDefault or not isGlobalTabFirst() or name ~= "RBXGlobal" or not clone.hasUserSelectedTab)
 			then
 				clone.selectedTabName = name
@@ -247,6 +248,10 @@ local function createChannelTabsStore()
 
 			return clone
 		end)
+
+		if FFlagExpChatStickyTabs and v2 and signal(false).allChannelTabs[name] then
+			v2(name)
+		end
 	end
 
 	return {
@@ -326,21 +331,21 @@ local function createChannelTabsStore()
 
 				local clone = table.clone(p)
 
-				if FFlagExpChatGlobalTabDefault and flag2 then
+				if isUserSelectedTabTracked() and flag2 then
 					clone.hasUserSelectedTab = true
 				end
 
 				if selectedTabName and clone.allChannelTabs[selectedTabName] then
 					local allChannelTab = clone.allChannelTabs[selectedTabName]
 
-					local v2 = {
+					local v3 = {
 						type = allChannelTab.type,
 						name = allChannelTab.name,
 						tabIndex = flag and 0 or allChannelTab.tabIndex,
 						HasUnreadMessages = allChannelTab.type == "FriendsChat" and allChannelTab.HasUnreadMessages
 					}
 
-					clone.allChannelTabs = insertTabAndReorder(clone.allChannelTabs, v2) -- inferred equivalent call
+					clone.allChannelTabs = insertTabAndReorder(clone.allChannelTabs, v3) -- inferred equivalent call
 					clone.selectedTabName = allChannelTab.name
 					return clone
 				end
@@ -455,6 +460,9 @@ local function createChannelTabsStore()
 					return clone
 				end
 			end)
+		end,
+		setOnChannelTabAdded = function(callback)
+			v2 = callback
 		end
 	}
 end

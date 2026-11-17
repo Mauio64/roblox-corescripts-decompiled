@@ -8,6 +8,8 @@ local Enabled = Chrome.Enabled
 
 local CapturesInExperience = require(CorePackages.Workspace.Packages.CapturesInExperience)
 
+local openCapturesGallery = require(script.Parent.openCapturesGallery)
+
 local app = CapturesInExperience.App.createApp()
 
 local screenshotsCarousel = Instance.new("ScreenGui")
@@ -42,7 +44,22 @@ momentsCreationFlow.Parent = CoreGui
 
 app.mountCaptureManager(captureManager)
 app.mountCarousel(screenshotsCarousel)
-app.mountCoreUI(RobloxGui, Enabled())
+
+local function openGallery()
+	local SettingsHub = require(RobloxGui.Modules.Settings.SettingsHub)
+	return openCapturesGallery(SettingsHub)
+end
+
+local mountCoreUI = app.mountCoreUI
+
+local enabled = Enabled()
+
+if not CapturesInExperience.Flags.FFlagCapturesControlsGalleryButton then
+	openGallery = nil
+end
+
+mountCoreUI(RobloxGui, enabled, openGallery)
+
 app.mountCaptureOverlay(screenGui)
 app.mountMomentsCreationFlow(momentsCreationFlow)
 

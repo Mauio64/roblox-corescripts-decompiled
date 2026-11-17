@@ -1,19 +1,32 @@
+local parent = script:FindFirstAncestor("SocialLuaAnalytics").Parent
+
 local fireEventStream = require(script.Parent.fireEventStream)
 local fireDiag = require(script.Parent.fireDiag)
 local fireTelemetry = require(script.Parent.fireTelemetry)
 require(script.Parent.Parent.Types)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagPymkCarouselExtendProps = SharedFlags.FFlagPymkCarouselExtendProps
 
 local function setupFireEvent(data, data2)
 	local v
 
 	if data.analytics.EventStream and data2.EventStream then
-		v = fireEventStream({
+		local v2 = {
 			eventStreamImpl = data.analytics.EventStream,
 			eventList = data2.EventStream,
 			infoForAllEvents = data.infoForAllEvents,
 			getInfoForAllEvents = data.getInfoForAllEvents,
-			loggerImpl = data.loggerImpl
-		})
+			loggerImpl = data.loggerImpl,
+			context = 0
+		}
+		local context
+
+		if FFlagPymkCarouselExtendProps then
+			context = data.context
+		end
+
+		v2.context = context
+		v = fireEventStream(v2)
 	else
 		v = nil
 	end

@@ -13,10 +13,8 @@ local config = HttpRequest.config({
 
 local function fetchGamePasses(universeId: string)
 	return config(GamePassUrlBuilder.buildGamePassesUrl({ universeId = universeId }), "GET"):andThen(function(p)
-		return {
-			universeId = universeId,
-			gamePasses = p.responseBody and p.responseBody.gamePasses or {}
-		}
+		local gamePasses = p.responseBody and p.responseBody.gamePasses or {}
+		return { universeId = universeId, gamePasses = gamePasses }
 	end)
 end
 

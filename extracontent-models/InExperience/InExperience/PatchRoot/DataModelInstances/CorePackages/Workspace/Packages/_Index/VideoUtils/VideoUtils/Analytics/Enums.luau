@@ -5,6 +5,7 @@ return {
 		ExitViewport = "exitViewport",
 		ExperienceLaunched = "experienceLaunched",
 		HoverTakeover = "hoverTakeover",
+		OverlayTakeover = "overlayTakeover",
 		PlayabilityCheckFailed = "playabilityCheckFailed",
 		ScrollStart = "scrollStart",
 		ScrollSettled = "scrollSettled",

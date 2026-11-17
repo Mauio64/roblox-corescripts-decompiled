@@ -2,6 +2,8 @@ local BuildExperience = script:FindFirstAncestor("BuildExperience")
 local parent = BuildExperience.Parent
 
 local CreatorAgentChat = require(parent.DataHydration.CreatorAgentChat)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagBuildExperienceAdvancedPreviewSpecs = SharedFlags.FFlagBuildExperienceAdvancedPreviewSpecs
 require(parent.DataHydration.CreatorCredit)
 require(BuildExperience.Stores.GetBuildModelSelectionStore.createBuildModelSelectionStore)
 local chatConstants = require(script.Parent.chatConstants)
@@ -51,7 +53,7 @@ local function awaitRefreshedQuota(p, tier, isCurrent)
 	return nil
 end
 
-local function beginBuildModelSend(data, p, p2, flag: boolean?)
+local function beginBuildModelSend(data, p, p2, p3)
 	if data == nil then
 		return nil
 	end
@@ -62,52 +64,69 @@ local function beginBuildModelSend(data, p, p2, flag: boolean?)
 		return nil
 	end
 
-	local captureSendConfiguration = CreatorAgentChat.captureSendConfiguration(
-		flag and "default" or assert(data.getSelection(false)).intendedTier,
-		p2
-	)
+	local v
 
-	local v = false
-	local v2 = false
-	local v3 = nil
-	local v4 = nil
+	if p3 == nil then
+		v = false
+	else
+		v = p3.isSelected
+	end
+
+	local v2 = FFlagBuildExperienceAdvancedPreviewSpecs
+		and p3 ~= nil
+		and p3.previewSpecName == "build-on-mobile-advanced"
+		and "advanced"
+		or "default"
+
+	local captureSendConfiguration = CreatorAgentChat.captureSendConfiguration
+
+	if not v then
+		v2 = assert(data.getSelection(false)).intendedTier
+	end
+
+	local sendConfiguration = captureSendConfiguration(v2, p2)
+
+	local v3 = false
+	local v4 = false
+	local v5 = nil
+	local v6 = nil
 	local function isCurrent() -- 4 equivalent calls inferred from this helper
-		local v5 = not v
+		local v7 = not v3
 
-		if v5 then
+		if v7 then
 			if data.getSelection(false) == nil then
 				return false
 			end
 
-			return v3 == nil or v3.getCasSessionId() == v4
+			return v5 == nil or v5.getCasSessionId() == v6
 		end
 
-		return v5
+		return v7
 	end
 
 	local function release() -- 1 equivalent call inferred from this helper
-		if not v then
-			v = true
+		if not v3 then
+			v3 = true
 			data.releaseLock(lock)
 		end
 	end
 	return {
 		prepare = function(data2)
-			assert(not v2, "A model send attempt can only prepare once")
-			v2 = true
+			assert(not v4, "A model send attempt can only prepare once")
+			v4 = true
 
 			if not isCurrent() then -- inferred equivalent call
 				return nil, nil
 			end
 
-			local v5 = data2.getCasSessionId() == nil
+			local v7 = data2.getCasSessionId() == nil
 
-			if v5 then
-				data.restoreTier(captureSendConfiguration.tier)
+			if v7 then
+				data.restoreTier(sendConfiguration.tier)
 			end
 
 			local sessionId, setupError = data2.prepareSession({
-				sendConfiguration = captureSendConfiguration,
+				sendConfiguration = sendConfiguration,
 				isCancelled = function(): boolean
 					return not isCurrent() -- inferred equivalent call
 				end
@@ -140,18 +159,18 @@ local function beginBuildModelSend(data, p, p2, flag: boolean?)
 					setupError = setupError
 				}
 			else
-				v3 = data2
-				v4 = sessionId
+				v5 = data2
+				v6 = sessionId
 				local models = data2.getModels(false)
 
-				if not v5 and models ~= nil then
+				if not v7 and models ~= nil then
 					data.restoreTier(models.current)
 				end
 
 				local tier
 
-				if v5 or flag == true then
-					tier = captureSendConfiguration.tier
+				if v7 or v == true then
+					tier = sendConfiguration.tier
 				else
 					tier = assert(data.getSelection(false)).intendedTier
 				end
@@ -164,29 +183,29 @@ local function beginBuildModelSend(data, p, p2, flag: boolean?)
 
 				local frozen = table.freeze({
 					tier = tier,
-					experiment = captureSendConfiguration.experiment,
+					experiment = sendConfiguration.experiment,
 					sessionId = sessionId,
 					universeId = data2.universeId,
 					placeId = data2.placeId
 				})
 
-				local v6 = awaitRefreshedQuota(p, frozen.tier, isCurrent)
+				local v8 = awaitRefreshedQuota(p, frozen.tier, isCurrent)
 
 				if not isCurrent() then -- inferred equivalent call
 					return nil, nil
 				end
 
-				if v6 == nil or v6.allowed == nil then
+				if v8 == nil or v8.allowed == nil then
 					return nil, { kind = "quota" }
 				end
 
-				if not v6.allowed then
+				if not v8.allowed then
 					return
 						nil,
 						{
 							kind = "denied",
 							errorCode = CreatorAgentChat.ErrorCodes.OutOfCredits,
-							reason = v6.reason
+							reason = v8.reason
 						}
 				end
 

@@ -11,7 +11,6 @@ local RobloxAppNavigation = require(parent.RobloxAppNavigation)
 local useNavigationProps = RobloxAppNavigation.useNavigationProps
 local useTokens = Foundation.Hooks.useTokens
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local function InfoPeekView(p)
 	local v = useNavigationProps(function(_, p2)
@@ -37,8 +36,7 @@ local function InfoPeekView(p)
 		end
 	end, { v2 })
 
-	local createElement = React.createElement
-	local v4 = {
+	return React.createElement(peekView, {
 		briefViewContentHeight = UDim.new(0, 0),
 		contentFrameRef = ref,
 		hasScrim = true,
@@ -47,9 +45,7 @@ local function InfoPeekView(p)
 		showDraggerInClosedState = false,
 		thumbstickScrollEnabled = true,
 		viewStateChanged = viewStateChanged
-	}
-
-	local children = {
+	}, {
 		Layout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			HorizontalAlignment = Enum.HorizontalAlignment.Left,
@@ -62,66 +58,33 @@ local function InfoPeekView(p)
 			PaddingRight = UDim.new(0, v3.Padding.XXLarge),
 			PaddingBottom = UDim.new(0, v3.Padding.XXLarge)
 		}),
-		TitleText = 0,
-		BodyText = 0
-	}
-
-	local createElement2 = React.createElement
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = headingSmall.Font
-	end
-
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(headingSmall.Font)
-	end
-
-	children.TitleText = createElement2("TextLabel", {
-		BackgroundTransparency = 1,
-		Text = title,
-		Font = font,
-		FontFace = fontFace,
-		TextSize = headingSmall.FontSize,
-		TextColor3 = emphasis.Color3,
-		TextTransparency = emphasis.Transparency,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		TextWrapped = true,
-		Size = UDim2.fromScale(1, 0),
-		AutomaticSize = Enum.AutomaticSize.Y,
-		LayoutOrder = 1
+		TitleText = React.createElement("TextLabel", {
+			BackgroundTransparency = 1,
+			Text = title,
+			FontFace = normalizeFontFace(headingSmall.Font),
+			TextSize = headingSmall.FontSize,
+			TextColor3 = emphasis.Color3,
+			TextTransparency = emphasis.Transparency,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextWrapped = true,
+			Size = UDim2.fromScale(1, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			LayoutOrder = 1
+		}),
+		BodyText = React.createElement("TextLabel", {
+			BackgroundTransparency = 1,
+			Text = body,
+			FontFace = normalizeFontFace(bodyLarge.Font),
+			TextSize = bodyLarge.FontSize,
+			TextColor3 = default.Color3,
+			TextTransparency = default.Transparency,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextWrapped = true,
+			Size = UDim2.fromScale(1, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			LayoutOrder = 2
+		})
 	})
-
-	local createElement3 = React.createElement
-	local font2
-
-	if not FoundationFontFaceMigration then
-		font2 = bodyLarge.Font
-	end
-
-	local fontFace2
-
-	if FoundationFontFaceMigration then
-		fontFace2 = normalizeFontFace(bodyLarge.Font)
-	end
-
-	children.BodyText = createElement3("TextLabel", {
-		BackgroundTransparency = 1,
-		Text = body,
-		Font = font2,
-		FontFace = fontFace2,
-		TextSize = bodyLarge.FontSize,
-		TextColor3 = default.Color3,
-		TextTransparency = default.Transparency,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		TextWrapped = true,
-		Size = UDim2.fromScale(1, 0),
-		AutomaticSize = Enum.AutomaticSize.Y,
-		LayoutOrder = 2
-	})
-	return createElement(peekView, v4, children)
 end
 
 return InfoPeekView

@@ -27,6 +27,8 @@ local useTokens = Foundation.Hooks.useTokens
 
 local FFlagAppChatConversationListViewRecyclerConsoleProps = require(AppChat.Flags.FFlagAppChatConversationListViewRecyclerConsoleProps)
 local FFlagAppChatPerfTracking = require(AppChat.Flags.FFlagAppChatPerfTracking)
+
+local FFlagFriendsChatUseViewRecyclerConversationList = require(AppChat.Flags.FFlagFriendsChatUseViewRecyclerConversationList)
 local AppChatPerfTracker = require(AppChat.Telemetry.AppChatPerfTracker)
 local createScrollIntervalTracker = require(AppChat.Telemetry.createScrollIntervalTracker)
 
@@ -38,7 +40,6 @@ local SquadQuickStartExperimentation = SocialExperiments2.SquadQuickStartExperim
 local ConversationListViewRecyclerItems = require(script.Parent.ConversationListViewRecyclerItems)
 local defineFastInt = game:DefineFastInt("AppChatChatLandingInitialFetchLimit", 5)
 local FFlagAppIaScrollAway = SharedFlags.FFlagAppIaScrollAway
-local FFlagFriendsChatConversationListShowScrollBar = SharedFlags.FFlagFriendsChatConversationListShowScrollBar
 
 local defineFastInt2 = game:DefineFastInt("AppChatChatLandingInitialFetchMinimumConversations", 30)
 
@@ -272,66 +273,54 @@ local function useMeasuredLayout(entryHeight)
 end
 
 local function useConversationListScrollbar(p, scrollbarThickness, color3)
-	local ref, scrollBarImageTransparency, v5
+	local ref = React.useRef(nil)
+	local scrollBarImageTransparency, v5 = ReactOtter.useAnimatedBinding(1)
 
-	if FFlagFriendsChatConversationListShowScrollBar then
-		ref = React.useRef(nil)
-		scrollBarImageTransparency, v5 = ReactOtter.useAnimatedBinding(1)
-	else
-		ref = nil
-		v5 = nil
-	end
+	local v6 = React.useCallback(function()
+		if not p then
+			return
+		end
 
-	local v6
+		if ref.current ~= nil then
+			pcall(task.cancel, ref.current)
+			ref.current = nil
+		end
 
-	if FFlagFriendsChatConversationListShowScrollBar then
-		v6 = React.useCallback(function()
-			if not p then
-				return
-			end
+		v5(ReactOtter.instant(0))
+		ref.current = task.delay(v2, function()
+			ref.current = nil
+			v5(ReactOtter.spring(1, v3))
+		end)
+	end, { p, v5 })
 
+	React.useEffect(function()
+		return function()
 			if ref.current ~= nil then
 				pcall(task.cancel, ref.current)
 				ref.current = nil
 			end
+		end
+	end, {})
 
-			v5(ReactOtter.instant(0))
-			ref.current = task.delay(v2, function()
-				ref.current = nil
-				v5(ReactOtter.spring(1, v3))
-			end)
-		end, { p, v5 })
-
-		React.useEffect(function()
-			return function()
-				if ref.current ~= nil then
-					pcall(task.cancel, ref.current)
-					ref.current = nil
-				end
-			end
-		end, {})
-	end
-
-	local v7 = FFlagFriendsChatConversationListShowScrollBar and p
-	local v8 = {
-		ScrollBarThickness = v7 and (scrollbarThickness or 8) or 0,
+	local v7 = {
+		ScrollBarThickness = p and (scrollbarThickness or 8) or 0,
 		ScrollBarImageColor3 = nil,
 		ScrollBarImageTransparency = nil
 	}
 
-	if not v7 then
+	if not p then
 		color3 = nil
 	end
 
-	v8.ScrollBarImageColor3 = color3
+	v7.ScrollBarImageColor3 = color3
 
-	if not v7 then
+	if not p then
 		scrollBarImageTransparency = nil
 	end
 
-	v8.ScrollBarImageTransparency = scrollBarImageTransparency
+	v7.ScrollBarImageTransparency = scrollBarImageTransparency
 
-	return v8, v6
+	return v7, v6
 end
 
 local function useListData(p, p2)
@@ -419,7 +408,9 @@ local function ConversationListViewRecycler(p)
 	local scrollViewPositionChangedSignal, scrollingFrameRef, onScrollOffsetChanged = useScrollTracking(onScrollUpdate, v9)
 
 	React.useEffect(function()
-		AppChatPerfExperimentation.logExposure()
+		if not FFlagFriendsChatUseViewRecyclerConversationList or joined.shouldLogPerfExposure ~= false then
+			AppChatPerfExperimentation.logExposure()
+		end
 
 		if joined.shouldLogHeaderEntryExposures ~= false then
 			PartyPageCarouselExperimentation.logExposure()

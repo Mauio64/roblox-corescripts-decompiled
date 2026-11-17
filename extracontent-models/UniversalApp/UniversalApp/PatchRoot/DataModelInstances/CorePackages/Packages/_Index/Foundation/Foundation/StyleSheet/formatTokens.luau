@@ -103,10 +103,8 @@ local function formatTokens(p)
 	end)
 
 	for k, v2 in pairs(p.Size) do
-		table.insert(sizes, {
-			name = pascalToKebab(string.split(k, "_")[2]),
-			size = UDim.new(0, v2)
-		})
+		local v3 = string.split(k, "_")[2]
+		table.insert(sizes, { name = pascalToKebab(v3), size = UDim.new(0, v2) })
 	end
 
 	table.insert(sizes, { name = "full", size = UDim.new(1, 0) })

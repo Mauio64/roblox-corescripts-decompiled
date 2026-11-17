@@ -2,7 +2,6 @@ local AppChat = script:FindFirstAncestor("AppChat")
 local parent = AppChat.Parent
 
 local EnumScreens = require(AppChat.EnumScreens)
-local getFFlagAppChatEnableRootedNavigation = require(AppChat.Flags.getFFlagAppChatEnableRootedNavigation)
 
 local Roact = require(parent.Roact)
 
@@ -20,7 +19,7 @@ function extended:init()
 	function self.onLeaveGroupSuccess()
 		local navigation = self.props.navigation
 
-		if getFFlagAppChatEnableRootedNavigation() and navigation.getParam("isRooted", false) then
+		if navigation.getParam("isRooted", false) then
 			Logger:info("Close rooted ChatDetails after leave from {screen}")
 			local screenProps = navigation.getScreenProps("navigateToRootStack", nil)
 
@@ -51,11 +50,11 @@ function extended.render(props)
 		return nil
 	end
 
-	local isRooted = getFFlagAppChatEnableRootedNavigation() and navigation.getParam("isRooted", false)
+	local param2 = navigation.getParam("isRooted", false)
 
 	return Roact.createElement(LeaveGroupDialogContainer, {
 		conversationId = param,
-		isRooted = isRooted,
+		isRooted = param2,
 		onModalClose = props.onLeaveGroupDialogClose,
 		onLeaveSuccess = props.onLeaveGroupSuccess
 	})

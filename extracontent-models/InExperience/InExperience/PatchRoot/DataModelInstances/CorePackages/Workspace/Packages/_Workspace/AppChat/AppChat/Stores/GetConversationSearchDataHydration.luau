@@ -122,10 +122,18 @@ local function createConversationSearchDataHydrationStore()
 				cursor = v5.cursor
 			end
 
+			local placement
+
+			if v5 == nil then
+				placement = nil
+			else
+				placement = v5.placement
+			end
+
 			local v7 = count
 			v4[p] = signal(false)
 
-			return AppChatNetworking.http.SearchConversations(nil, v6, cursor):andThen(function(p2)
+			return AppChatNetworking.http.SearchConversations(nil, v6, cursor, nil, placement):andThen(function(p2)
 				if v7 ~= count then
 					return { matchedConversationIds = {}, nextCursor = nil }
 				end
@@ -152,7 +160,7 @@ local function createConversationSearchDataHydrationStore()
 				if v4[p] ~= signal(false) then
 					task.defer(function()
 						if v7 == count then
-							fetchPage(v6, cursor)
+							fetchPage(v6, cursor, placement)
 						end
 					end)
 				end
@@ -166,13 +174,13 @@ local function createConversationSearchDataHydrationStore()
 		end
 	})
 
-	fetchPage = function(query: string, cursor: string?)
+	fetchPage = function(query: string, cursor: string?, placement: string?)
 		if isEmptyQuery(query) then -- inferred equivalent call
 			return nil
 		end
 
 		local pageId = getPageId(query, cursor) -- inferred equivalent call
-		v2[pageId] = { query = query, cursor = cursor }
+		v2[pageId] = { query = query, cursor = cursor, placement = placement }
 		return dataResolver.getAndFetchItem(pageId, function(): boolean
 			return v4[pageId] ~= signal(false)
 		end)

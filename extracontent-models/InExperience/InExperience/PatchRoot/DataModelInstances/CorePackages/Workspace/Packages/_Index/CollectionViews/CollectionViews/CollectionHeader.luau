@@ -23,8 +23,6 @@ require(CollectionViews.SeeAllButtonType_Legacy)
 local SharedFlags = require(parent.SharedFlags)
 local FFlagLuaAppSortHeaderAnchorTag = SharedFlags.FFlagLuaAppSortHeaderAnchorTag
 local FFlagSduiComponentsUseFoundationTokens = SharedFlags.FFlagSduiComponentsUseFoundationTokens
-local Foundation3 = require(parent.Foundation)
-local FoundationFontFaceMigration = Foundation3.Utility.Flags.FoundationFontFaceMigration
 
 local iconsactionstruncationCollapse_small = Images["icons/actions/truncationCollapse_small"]
 local iconsactionscycleRight = Images["icons/actions/cycleRight"]
@@ -200,49 +198,26 @@ local function CollectionHeader(p)
 	local title
 
 	if typeof(joined.title) == "string" then
-		local createElement4 = React.createElement
-		local v23 = {
+		title = React.createElement("TextLabel", {
 			BackgroundTransparency = 1,
 			Text = joined.title,
 			AutomaticSize = Enum.AutomaticSize.XY,
 			Size = UDim2.new(0, 0, 0, 0),
-			Font = 0,
-			FontFace = 0,
-			TextSize = 0,
-			TextTransparency = 0,
-			TextColor3 = 0,
+			FontFace = normalizeFontFace(titleTypography.Font),
+			TextSize = titleTypography.FontSize,
+			TextTransparency = titleColor.Transparency,
+			TextColor3 = titleColor.Color3,
 			TextWrapped = false,
-			TextTruncate = 0,
-			TextXAlignment = 0,
+			TextTruncate = Enum.TextTruncate.SplitWord,
+			TextXAlignment = Enum.TextXAlignment.Left,
 			LayoutOrder = 1
-		}
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = titleTypography.Font
-		end
-
-		v23.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(titleTypography.Font)
-		end
-
-		v23.FontFace = fontFace
-		v23.TextSize = titleTypography.FontSize
-		v23.TextTransparency = titleColor.Transparency
-		v23.TextColor3 = titleColor.Color3
-
-		v23.TextTruncate = Enum.TextTruncate.SplitWord
-		v23.TextXAlignment = Enum.TextXAlignment.Left
-		title = createElement4("TextLabel", v23, {
+		}, {
 			UISizeConstraint = React.createElement("UISizeConstraint", {
 				MaxSize = v2:map(function(p2: number)
-					local v25 = p2 - v9 - v10
+					local v23 = p2 - v9 - v10
 
-					if v25 > 0 then
-						return Vector2.new(v25, 1e999)
+					if v23 > 0 then
+						return Vector2.new(v23, 1e999)
 					end
 
 					return nil
@@ -284,7 +259,7 @@ local function CollectionHeader(p)
 		v23[activated2] = v13
 		v23.Active = v16
 		v23.Selectable = v16
-		local v25 = {
+		subtitleFrame = createElement4(v16 and "TextButton" or "Frame", v23, {
 			UIListLayout = React.createElement("UIListLayout", {
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				FillDirection = Enum.FillDirection.Horizontal,
@@ -292,65 +267,34 @@ local function CollectionHeader(p)
 				HorizontalAlignment = Enum.HorizontalAlignment.Left,
 				VerticalAlignment = Enum.VerticalAlignment.Center
 			}),
-			Subtitle = 0,
-			SubtitleLinkArrow = 0
-		}
+			Subtitle = React.createElement("TextLabel", {
+				LayoutOrder = 1,
+				BackgroundTransparency = 1,
+				Text = text,
+				AutomaticSize = Enum.AutomaticSize.XY,
+				Size = UDim2.new(0, 0, 0, 0),
+				FontFace = normalizeFontFace(subtitleTypography.Font),
+				TextSize = fontSize,
+				TextTransparency = titleColor.Transparency,
+				TextColor3 = subtitleColor.Color3,
+				TextWrapped = false,
+				TextTruncate = Enum.TextTruncate.SplitWord,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				RichText = richText
+			}, {
+				UISizeConstraint = React.createElement("UISizeConstraint", {
+					MaxSize = v2:map(function(p2: number)
+						local v25 = p2 - v15
 
-		local createElement5 = React.createElement
-		local v26 = {
-			LayoutOrder = 1,
-			BackgroundTransparency = 1,
-			Text = text,
-			AutomaticSize = Enum.AutomaticSize.XY,
-			Size = UDim2.new(0, 0, 0, 0),
-			Font = 0,
-			FontFace = 0,
-			TextSize = 0,
-			TextTransparency = 0,
-			TextColor3 = 0,
-			TextWrapped = false,
-			TextTruncate = 0,
-			TextXAlignment = 0,
-			RichText = 0
-		}
-		local font
+						if v25 > 0 then
+							return Vector2.new(v25, 1e999)
+						end
 
-		if not FoundationFontFaceMigration then
-			font = subtitleTypography.Font
-		end
-
-		v26.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(subtitleTypography.Font)
-		end
-
-		v26.FontFace = fontFace
-
-		v26.TextSize = fontSize
-		v26.TextTransparency = titleColor.Transparency
-		v26.TextColor3 = subtitleColor.Color3
-
-		v26.TextTruncate = Enum.TextTruncate.SplitWord
-		v26.TextXAlignment = Enum.TextXAlignment.Left
-		v26.RichText = richText
-		v25.Subtitle = createElement5("TextLabel", v26, {
-			UISizeConstraint = React.createElement("UISizeConstraint", {
-				MaxSize = v2:map(function(p2: number)
-					local v27 = p2 - v15
-
-					if v27 > 0 then
-						return Vector2.new(v27, 1e999)
-					end
-
-					return nil
-				end)
-			})
-		})
-
-		v25.SubtitleLinkArrow = v14
-			and React.createElement(
+						return nil
+					end)
+				})
+			}),
+			SubtitleLinkArrow = v14 and React.createElement(
 				"Frame",
 				{
 					LayoutOrder = 2,
@@ -367,9 +311,8 @@ local function CollectionHeader(p)
 						AnchorPoint = Vector2.new(0.5, 0.5)
 					})
 				}
-			)
-			or nil
-		subtitleFrame = createElement4(v16 and "TextButton" or "Frame", v23, v25) or nil
+			) or nil
+		}) or nil
 	end
 
 	v21.SubtitleFrame = subtitleFrame

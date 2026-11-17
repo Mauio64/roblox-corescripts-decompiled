@@ -12,7 +12,6 @@ local ProgressShape = require(Foundation.Enums.ProgressShape)
 
 require(Foundation.Enums.ProgressSize)
 
-local Flags = require(Foundation.Utility.Flags)
 local withDefaults = require(Foundation.Utility.withDefaults)
 
 require(Foundation.Providers.Style.Tokens)
@@ -20,29 +19,13 @@ require(Foundation.Providers.Style.Tokens)
 local v = { testId = "--foundation-progress" }
 
 local function Progress(p, ref)
-	local joined = withDefaults(p, v)
+	local v2 = withDefaults(p, v)
 
-	if not Flags.FoundationProgressBarBetaUpdate then
-		joined.ref = ref
+	if v2.shape == ProgressShape.Circle then
+		return React.createElement(ProgressCircle, Dash.join(v2, { ref = ref }))
 	end
 
-	if joined.shape == ProgressShape.Circle then
-		local createElement = React.createElement
-
-		if Flags.FoundationProgressBarBetaUpdate then
-			joined = Dash.join(joined, { ref = ref })
-		end
-
-		return createElement(ProgressCircle, joined)
-	else
-		local createElement = React.createElement
-
-		if Flags.FoundationProgressBarBetaUpdate then
-			joined = Dash.join(joined, { ref = ref })
-		end
-
-		return createElement(ProgressBar, joined)
-	end
+	return React.createElement(ProgressBar, Dash.join(v2, { ref = ref }))
 end
 
 return React.memo(React.forwardRef(Progress))

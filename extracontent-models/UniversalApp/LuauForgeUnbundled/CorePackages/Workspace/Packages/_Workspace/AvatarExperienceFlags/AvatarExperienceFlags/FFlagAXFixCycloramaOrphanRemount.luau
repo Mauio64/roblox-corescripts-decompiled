@@ -1,3 +1,0 @@
-local FFlagAXBackgroundCycloramaRendering = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagAXBackgroundCycloramaRendering")
-
-return game:DefineFastFlag("AXFixCycloramaOrphanRemount", false) and FFlagAXBackgroundCycloramaRendering

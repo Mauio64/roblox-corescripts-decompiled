@@ -6,9 +6,7 @@ require(parent.DataHydration)
 require(UserList.Common.Types)
 
 local SharedFlags = require(parent.SharedFlags)
-local FFlagUserListComposeRenderRowWithCta = SharedFlags.FFlagUserListComposeRenderRowWithCta
-local SharedFlags2 = require(parent.SharedFlags)
-local FFlagUserListSurfacePresenceWins = SharedFlags2.FFlagUserListSurfacePresenceWins
+local FFlagUserListSurfacePresenceWins = SharedFlags.FFlagUserListSurfacePresenceWins
 
 local function composeCtaRow(data, data2, p, data3)
 	local v = data2 ~= nil and data2.showLoadingPlaceholder ~= false and data2.primaryCtaMinWidth ~= nil
@@ -27,29 +25,29 @@ local function composeCtaRow(data, data2, p, data3)
 
 	local renderRow = data.renderRow
 
-	if FFlagUserListComposeRenderRowWithCta and renderRow then
-		local createRow = data.createRow
-		return renderRow(function(p2)
-			local clone = table.clone(p2)
-			clone.presence = userPresenceType
-
-			if FFlagUserListSurfacePresenceWins and p2.presence ~= nil then
-				clone.presence = p2.presence
-			end
-
-			clone.primaryCta = data3.primaryCta
-			clone.secondaryCta = data3.secondaryCta
-			clone.ctaLoading = ctaLoading
-			return createRow(clone)
-		end, data.entity, data.index or 0)
+	if not renderRow then
+		return data.createRow({
+			presence = userPresenceType,
+			primaryCta = data3.primaryCta,
+			secondaryCta = data3.secondaryCta,
+			ctaLoading = ctaLoading
+		})
 	end
 
-	return data.createRow({
-		presence = userPresenceType,
-		primaryCta = data3.primaryCta,
-		secondaryCta = data3.secondaryCta,
-		ctaLoading = ctaLoading
-	})
+	local createRow = data.createRow
+	return renderRow(function(p2)
+		local clone = table.clone(p2)
+		clone.presence = userPresenceType
+
+		if FFlagUserListSurfacePresenceWins and p2.presence ~= nil then
+			clone.presence = p2.presence
+		end
+
+		clone.primaryCta = data3.primaryCta
+		clone.secondaryCta = data3.secondaryCta
+		clone.ctaLoading = ctaLoading
+		return createRow(clone)
+	end, data.entity, data.index or 0)
 end
 
 return composeCtaRow

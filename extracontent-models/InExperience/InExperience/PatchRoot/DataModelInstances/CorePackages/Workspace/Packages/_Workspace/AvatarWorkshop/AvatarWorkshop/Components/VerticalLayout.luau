@@ -4,7 +4,10 @@ local React = require(parent.React)
 local Foundation = require(parent.Foundation)
 
 local function VerticalLayout(props)
-	return (React.createElement(Foundation.View, { tag = "col size-full-full" }, {
+	local createElement = React.createElement
+	local view = Foundation.View
+
+	local v = {
 		Header = React.createElement(Foundation.View, {
 			tag = "size-full-0 auto-y",
 			LayoutOrder = 1
@@ -30,8 +33,22 @@ local function VerticalLayout(props)
 				{ tag = "position-bottom-left anchor-bottom-left", Size = UDim2.fromScale(1, 0.5) },
 				{ BottomItem = props.bottomItemSlot }
 			)
+		}),
+		Footer = 0
+	}
+	local footer
+
+	if props.footerSlot then
+		footer = React.createElement(Foundation.View, {
+			tag = "size-full-0 auto-y",
+			LayoutOrder = 4
+		}, {
+			FooterSlot = props.footerSlot
 		})
-	}))
+	end
+
+	v.Footer = footer
+	return (createElement(view, { tag = "col size-full-full" }, v))
 end
 
 return VerticalLayout

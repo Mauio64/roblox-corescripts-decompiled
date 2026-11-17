@@ -54,25 +54,27 @@ local function useImmersiveChrome(data)
 	ref3.current = data.fireEvent or defaultFireEvent
 
 	local v2 = React.useMemo(function()
-		return immersiveChromeMachine(
-			data.config or {
+		local config = data.config
+			or {
 				hideAfterAdvances = GetFIntMomentsImmersiveHideAfterAdvances(),
 				shownDwellMs = GetFIntMomentsImmersiveShownDwellMs(),
 				hiddenCooldownMs = GetFIntMomentsImmersiveHiddenCooldownMs()
-			},
-			{
-				now = data.now or function()
-					return os.clock() * 1000
-				end,
-				setChromeVisible = function(flag: boolean, p)
-					v.setChromeVisible(flag)
-
-					if ref2.current then
-						ref3.current(flag, p, ref.current)
-					end
-				end
 			}
-		)
+
+		local now = data.now or function()
+			return os.clock() * 1000
+		end
+
+		return immersiveChromeMachine(config, {
+			now = now,
+			setChromeVisible = function(flag: boolean, p)
+				v.setChromeVisible(flag)
+
+				if ref2.current then
+					ref3.current(flag, p, ref.current)
+				end
+			end
+		})
 	end, {})
 
 	React.useEffect(function()

@@ -72,8 +72,6 @@ local FIntLuaAppGameTileVideoVisiblePercent = SharedFlags8.FIntLuaAppGameTileVid
 
 local SharedFlags9 = require(parent.SharedFlags)
 local FFlagLuaAppGameTileSelectionVideoPlayback = SharedFlags9.FFlagLuaAppGameTileSelectionVideoPlayback
-local SharedFlags10 = require(parent.SharedFlags)
-local FFlagMigrateGameInfoToStore = SharedFlags10.FFlagMigrateGameInfoToStore
 local resolveGameTileThumbnailUri
 
 if FFlagLuaAppHomeThumbnailPrefetch then
@@ -91,13 +89,9 @@ return function(props)
 	local Game = useSelector(function(p)
 		return p.Personalization[GameInfosReducer.key][universeId]
 	end)
-	local v3, v4
 
-	if FFlagMigrateGameInfoToStore then
-		v3 = GameHydrationReact.useGameInfo(universeId)
-		v4 = GameHydrationReact.useGameVotes(universeId)
-	end
-
+	local v3 = GameHydrationReact.useGameInfo(universeId)
+	local v4 = GameHydrationReact.useGameVotes(universeId)
 	local v5 = useSelector(function(p)
 		return p.GameDetails[universeId]
 	end)
@@ -117,11 +111,12 @@ return function(props)
 	local gameTileLayoutType = props.gameTileLayoutType or "Narrow"
 	local v8 = gameTileLayoutType == "Wide" or gameTileLayoutType == "Event"
 
-	local v9 = GameHydrationReact.useLargeGameIcon(universeId) or ""
+	local iconUrl = GameHydrationReact.useLargeGameIcon(universeId) or ""
+	local image
 
 	if FFlagLuaAppHomeThumbnailPrefetch then
-		v9 = resolveGameTileThumbnailUri({
-			iconUrl = v9,
+		image = resolveGameTileThumbnailUri({
+			iconUrl = iconUrl,
 			universeId = universeId,
 			placeId = props.entry.placeId,
 			useGridTile = v8,
@@ -131,37 +126,24 @@ return function(props)
 			topicId = props.topicId
 		})
 	else
-		local v10
+		local v9
 
 		if props.entry.primaryWideImageAssetId then
-			v10 = props.entry.primaryWideImageAssetId
+			v9 = props.entry.primaryWideImageAssetId
 		else
-			v10 = ItemLayoutDataParsingUtils.getWideImageAssetId(gameTileLayoutData)
+			v9 = ItemLayoutDataParsingUtils.getWideImageAssetId(gameTileLayoutData)
 		end
 
-		if not v10 then
-			if Game then
-				v10 = Game.primaryWideAssetId or nil
-			else
-				v10 = nil
-			end
-		end
+		image = formatExperienceThumbnail(v9 or Game and Game.primaryWideAssetId or nil, props.entry.placeId, true)
 
-		local v11 = formatExperienceThumbnail(v10, props.entry.placeId, true)
-
-		if v8 then
-			v9 = v11
+		if not v8 then
+			image = iconUrl
 		end
 	end
 
 	local imageAspectRatio = GameTileViewConfig.getImageAspectRatio(gameTileLayoutType)
-	local title
 
-	if FFlagMigrateGameInfoToStore then
-		title = gameTileLayoutData and gameTileLayoutData.title or v3 and v3.name or ""
-	else
-		title = gameTileLayoutData and gameTileLayoutData.title or Game and Game.name or ""
-	end
+	local title = gameTileLayoutData and gameTileLayoutData.title or v3 and v3.name or ""
 
 	local isHoverSupported = not IsVRAppBuild() and props.useHoverTile and props.impressionsTag ~= nil and true or false
 	local ref = React.useRef(nil)
@@ -189,7 +171,7 @@ return function(props)
 			videoPlaybackCoordinator:reset(VideoEndReason.TileClicked, nil, universeId, nil)
 		end
 
-		local v10 = {
+		local v9 = {
 			source = props.source,
 			index = props.index,
 			referralSource = props.referralSource,
@@ -200,7 +182,7 @@ return function(props)
 			}
 		}
 
-		props.navigateToGameDetails(universeId, v10)
+		props.navigateToGameDetails(universeId, v9)
 
 		props.reportGameDetailOpened(props.index, universeId)
 
@@ -224,13 +206,13 @@ return function(props)
 	local navigateToGameDetails = props.navigateToGameDetails
 	local referralSource = props.referralSource
 	local index = props.index
-	local v10
+	local v9
 
 	if FFlagLuaAppEmphasisGameTileVideo then
-		v10 = videoPlaybackCoordinator
+		v9 = videoPlaybackCoordinator
 	end
 
-	local v11 = useCallback(fn, {
+	local v10 = useCallback(fn, {
 		universeId,
 		source,
 		onPeekViewClosed,
@@ -243,19 +225,13 @@ return function(props)
 		referralSource,
 		index,
 		isHovered,
-		v10
+		v9
 	})
 
 	local showDescription = props.showDescription or false
-	local totalUpVotes, totalDownVotes
 
-	if FFlagMigrateGameInfoToStore then
-		totalUpVotes = v4 and v4.upVotes or 0
-		totalDownVotes = v4 and v4.downVotes or 0
-	else
-		totalUpVotes = Game and Game.totalUpVotes or 0
-		totalDownVotes = Game and Game.totalDownVotes or 0
-	end
+	local upVotes = v4 and v4.upVotes or 0
+	local downVotes = v4 and v4.downVotes or 0
 
 	local hasVerifiedBadge = v5 and v5.creator and v5.creator.hasVerifiedBadge
 	local description = v5 and v5.description or ""
@@ -265,25 +241,20 @@ return function(props)
 		licenseDescription = v5.licenseDescription or nil
 	end
 
-	local v12
+	local v11
 
 	if v5 then
-		v12 = v5.localizedFiatPrice or nil
+		v11 = v5.localizedFiatPrice or nil
 	end
 
-	local text = licenseDescription or v12
+	local text = licenseDescription or v11
 
 	local hideGameStats = props.hideGameStats or showDescription or text ~= nil
-	local name
 
-	if FFlagMigrateGameInfoToStore then
-		name = v3 and v3.creator and v3.creator.name
+	local name = v3 and v3.creator and v3.creator.name
 
-		if name == "" or not name then
-			name = v5 and v5.creator and v5.creator.name
-		end
-	else
-		name = Game and Game.creatorName ~= "" and Game.creatorName or v5 and v5.creator and v5.creator.name
+	if name == "" or not name then
+		name = v5 and v5.creator and v5.creator.name
 	end
 
 	local linesOfText = text and 2 or 3
@@ -336,23 +307,23 @@ return function(props)
 	end
 
 	local reportExperienceLaunched = props.reportExperienceLaunched
+	local v12
+
+	if FFlagLuaAppEmphasisGameTileVideo then
+		v12 = universeId
+	end
+
 	local v13
 
 	if FFlagLuaAppEmphasisGameTileVideo then
-		v13 = universeId
-	end
-
-	local v14
-
-	if FFlagLuaAppEmphasisGameTileVideo then
-		v14 = videoPlaybackCoordinator
+		v13 = videoPlaybackCoordinator
 	end
 
 	local reportExperienceLaunched2 = useCallback2(fn2, {
 		isHovered,
 		reportExperienceLaunched,
-		v13,
-		v14
+		v12,
+		v13
 	})
 
 	local extraFooterContent = React.useMemo(function()
@@ -361,7 +332,7 @@ return function(props)
 			referralSource = props.referralSource,
 			launchSource = "FeaturedSearchTile",
 			reportExperienceLaunched = reportExperienceLaunched2,
-			openGameDetails = v11,
+			openGameDetails = v10,
 			entry = props.entry,
 			launchExperienceEventContext = props.launchExperienceEventContext,
 			showButtonText = imageAspectRatio > 1,
@@ -375,7 +346,7 @@ return function(props)
 		universeId,
 		props.referralSource,
 		reportExperienceLaunched2,
-		v11,
+		v10,
 		props.entry,
 		props.launchExperienceEventContext,
 		playButtonHeight,
@@ -416,11 +387,7 @@ return function(props)
 		})
 
 		local createElement2 = React.createElement
-		local stats = {
-			totalUpVotes = totalUpVotes,
-			totalDownVotes = totalDownVotes,
-			playerCount = 0
-		}
+		local stats = { totalUpVotes = upVotes, totalDownVotes = downVotes, playerCount = 0 }
 		local playerCount
 
 		if props.playerCountStyle == GameTileConstants.PlayerCountStyleValues.Footer then
@@ -456,8 +423,8 @@ return function(props)
 		return createElement(fragment, {}, children)
 	end, {
 		name,
-		totalUpVotes,
-		totalDownVotes,
+		upVotes,
+		downVotes,
 		props.playerCountStyle,
 		props.entry.playerCount,
 		v8,
@@ -510,24 +477,24 @@ return function(props)
 
 	local state2 = nil
 	local onPlaybackChange = nil
-	local v15 = nil
+	local v14 = nil
 	local state3 = nil
-	local v16 = nil
+	local v15 = nil
 	local onSelectionGained = nil
 	local onSelectionLost = nil
 
-	local v17 = nil
-	local v18, v19
+	local v16 = nil
+	local v17, v18
 
 	if FFlagLuaAppEmphasisGameTileVideo then
-		v18 = props.videoPlaybackContext ~= nil and props.videoPlaybackContext.disablePlayback == true
-		v19 = FFlagLuaAppSuppressVideoDetectorDuringScroll
+		v17 = props.videoPlaybackContext ~= nil and props.videoPlaybackContext.disablePlayback == true
+		v18 = FFlagLuaAppSuppressVideoDetectorDuringScroll
 
-		if v19 then
+		if v18 then
 			if props.videoPlaybackContext == nil then
-				v19 = false
+				v18 = false
 			else
-				v19 = props.videoPlaybackContext.disableDetectors == true
+				v18 = props.videoPlaybackContext.disableDetectors == true
 			end
 		end
 
@@ -538,9 +505,9 @@ return function(props)
 		end, {})
 
 		if props.entry.primaryWideVideoAssetId then
-			v15 = props.entry.primaryWideVideoAssetId
+			v14 = props.entry.primaryWideVideoAssetId
 		else
-			v15 = gameTileLayoutData
+			v14 = gameTileLayoutData
 				and gameTileLayoutData.primaryMediaAsset
 				and gameTileLayoutData.primaryMediaAsset.wideVideoAssetId
 		end
@@ -548,10 +515,10 @@ return function(props)
 		if FFlagLuaAppGameTileSelectionVideoPlayback then
 			local setState3
 			state3, setState3 = React.useState(false)
-			v16 = setState3
+			v15 = setState3
 
 			onSelectionGained = React.useCallback(function(...)
-				v16(true)
+				v15(true)
 
 				if props.onSelectionGained then
 					props.onSelectionGained(...)
@@ -559,7 +526,7 @@ return function(props)
 			end, { props.onSelectionGained })
 
 			onSelectionLost = React.useCallback(function(...)
-				v16(false)
+				v15(false)
 
 				if props.onSelectionLost then
 					props.onSelectionLost(...)
@@ -568,36 +535,36 @@ return function(props)
 		end
 
 		if not FFlagLuaAppGameTileSelectionVideoPlayback and FFlagLuaAppEdpMediaGalleryVideoPreview then
-			v17 = usePreferredInput()
+			v16 = usePreferredInput()
 		end
 
 		React.useEffect(function()
-			if v18 then
+			if v17 then
 				setState2(false)
 			end
-		end, { v18 })
+		end, { v17 })
 	else
-		v18 = nil
+		v17 = nil
 	end
 
-	local v20 = FFlagLuaAppEmphasisGameTileVideo and v15 ~= nil
-	local v21 = if FFlagLuaAppEmphasisGameTileVideo then ref else ref2
+	local v19 = FFlagLuaAppEmphasisGameTileVideo and v14 ~= nil
+	local v20 = if FFlagLuaAppEmphasisGameTileVideo then ref else ref2
 	local videoPlaybackContext = props.videoPlaybackContext
-	local v22
+	local v21
 
 	if FFlagLuaAppTileVideoCandidateOnly then
-		v22 = if FFlagLuaAppEmphasisGameTileVideo then v20 else false
+		v21 = if FFlagLuaAppEmphasisGameTileVideo then v19 else false
 	end
 
 	useTagAsViewportAutoplayCandidate(
-		v21,
+		v20,
 		videoPlaybackContext,
-		v22,
+		v21,
 		nil,
 		nil,
 		nil,
 		nil,
-		FFlagLuaAppOneByTwoHoverIdleAutoplay and v20 and {
+		FFlagLuaAppOneByTwoHoverIdleAutoplay and v19 and {
 			videoKey = formatted,
 			isUserIntentModeAutoplayCandidate = false
 		} or nil
@@ -605,10 +572,10 @@ return function(props)
 	local thumbnailComponent, videoPlaybackDetector
 
 	if FFlagLuaAppEmphasisGameTileVideo then
-		if v20 then
+		if v19 then
 			thumbnailComponent = React.createElement(GameTileVideoThumbnail, {
-				video = `rbxassetid://{v15}`,
-				image = v9,
+				video = `rbxassetid://{v14}`,
+				image = image,
 				playing = state2,
 				looped = true,
 				Size = UDim2.fromScale(1, 1),
@@ -622,9 +589,9 @@ return function(props)
 			})
 		end
 
-		if v20 and not (v18 or FFlagLuaAppSuppressVideoDetectorDuringScroll and v19) then
+		if v19 and not (v17 or FFlagLuaAppSuppressVideoDetectorDuringScroll and v18) then
 			local createElement = React.createElement
-			local v23 = {
+			local v22 = {
 				videoKey = formatted,
 				itemIndex = props.index,
 				universeId = tostring(universeId),
@@ -645,22 +612,22 @@ return function(props)
 				state3 = nil
 			end
 
-			v23.isSelected = state3
+			v22.isSelected = state3
 			local autoplay
 
 			if not (FFlagLuaAppGameTileSelectionVideoPlayback or not FFlagLuaAppEdpMediaGalleryVideoPreview) then
-				autoplay = v17 == Responsive.Input.Touch
+				autoplay = v16 == Responsive.Input.Touch
 			end
 
-			v23.autoplay = autoplay
+			v22.autoplay = autoplay
 
-			v23.onPlaybackChange = onPlaybackChange
-			v23.videoAnalytics = props.videoAnalytics
-			v23.videoDwellTimeInSec = FIntLuaAppGameTileVideoDwellTimeInSec
-			v23.videoVisiblePercent = FIntLuaAppGameTileVideoVisiblePercent
-			v23.pageContext = props.appPage
-			v23.videoPlaybackContext = props.videoPlaybackContext
-			videoPlaybackDetector = createElement(GameVideoPlaybackDetector, v23)
+			v22.onPlaybackChange = onPlaybackChange
+			v22.videoAnalytics = props.videoAnalytics
+			v22.videoDwellTimeInSec = FIntLuaAppGameTileVideoDwellTimeInSec
+			v22.videoVisiblePercent = FIntLuaAppGameTileVideoVisiblePercent
+			v22.pageContext = props.appPage
+			v22.videoPlaybackContext = props.videoPlaybackContext
+			videoPlaybackDetector = createElement(GameVideoPlaybackDetector, v22)
 		end
 	end
 
@@ -674,14 +641,14 @@ return function(props)
 	end
 
 	local createElement = React.createElement
-	local v23 = {
+	local v22 = {
 		BackgroundTransparency = 1,
 		LayoutOrder = props.layoutOrder,
 		ZIndex = -props.index
 	}
 
 	local createElement2 = React.createElement
-	local v24 = {
+	local v23 = {
 		AnchorPoint = Vector2.new(0, 0),
 		Position = UDim2.fromScale(0, 0),
 		Size = props.size,
@@ -693,11 +660,11 @@ return function(props)
 	}
 
 	local createElement3 = React.createElement
-	local v25 = {
+	local v24 = {
 		forwardRef = ref,
 		SelectionOrder = props.SelectionOrder,
 		isDisabled = props.isDisabled,
-		onActivated = v11,
+		onActivated = v10,
 		onSelectionGained = 0,
 		onSelectionLost = 0,
 		image = 0,
@@ -721,46 +688,46 @@ return function(props)
 		onSelectionGained = props.onSelectionGained
 	end
 
-	v25.onSelectionGained = onSelectionGained
+	v24.onSelectionGained = onSelectionGained
 
 	if not (FFlagLuaAppEmphasisGameTileVideo and FFlagLuaAppGameTileSelectionVideoPlayback) then
 		onSelectionLost = props.onSelectionLost
 	end
 
-	v25.onSelectionLost = onSelectionLost
+	v24.onSelectionLost = onSelectionLost
 
-	v25.image = v9
+	v24.image = image
 
 	if not FFlagLuaAppEmphasisGameTileVideo then
 		thumbnailComponent = nil
 	end
 
-	v25.thumbnailComponent = thumbnailComponent
-	v25.title = title
+	v24.thumbnailComponent = thumbnailComponent
+	v24.title = title
 
-	v25.numLinesForMetadata = numLinesForMetadata
-	v25.isHovered = isHovered
-	v25.footerMetadata = footerMetadata
+	v24.numLinesForMetadata = numLinesForMetadata
+	v24.isHovered = isHovered
+	v24.footerMetadata = footerMetadata
 
-	v25.imageAspectRatio = imageAspectRatio
-	v25.isContained = isContained
+	v24.imageAspectRatio = imageAspectRatio
+	v24.isContained = isContained
 
 	if showDescription then
 		extraFooterContent = nil
 	end
 
-	v25.extraFooterContent = extraFooterContent
+	v24.extraFooterContent = extraFooterContent
 
 	if showDescription then
 		extraFooterSpace = nil
 	end
 
-	v25.extraFooterSpace = extraFooterSpace
+	v24.extraFooterSpace = extraFooterSpace
 
-	v25.reducedMotion = UserGameSettings.ReducedMotion
-	v25.thumbnailOverlay = thumbnailOverlay
-	local v26 = {
-		GameTileView = createElement3(GameTileView, v25),
+	v24.reducedMotion = UserGameSettings.ReducedMotion
+	v24.thumbnailOverlay = thumbnailOverlay
+	local v25 = {
+		GameTileView = createElement3(GameTileView, v24),
 		VideoPlaybackDetector = 0
 	}
 
@@ -768,8 +735,8 @@ return function(props)
 		videoPlaybackDetector = nil
 	end
 
-	v26.VideoPlaybackDetector = videoPlaybackDetector
-	return createElement("Frame", v23, {
-		EmphasisTileContainer = createElement2("Frame", v24, v26)
+	v25.VideoPlaybackDetector = videoPlaybackDetector
+	return createElement("Frame", v22, {
+		EmphasisTileContainer = createElement2("Frame", v23, v25)
 	})
 end

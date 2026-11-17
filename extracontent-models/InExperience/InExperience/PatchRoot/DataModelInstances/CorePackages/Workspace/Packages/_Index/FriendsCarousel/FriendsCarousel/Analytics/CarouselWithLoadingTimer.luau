@@ -34,8 +34,8 @@ local function CarouselWithLoadingTimer(p)
 		v2.start("carouselLoadingTime")
 	end, {})
 
-	local function fn(fetch: string, value: number)
-		local loadingTime = (not value or typeof(value) ~= "number" or value < 0) and 0 or value
+	local function fn(fetch: string, time: number)
+		local loadingTime = (not time or typeof(time) ~= "number" or time < 0) and 0 or time
 
 		v3.fireAnalyticsEvent(EventNames.FriendsCarouselUILoadingTime, {
 			loadingTime = loadingTime,
@@ -48,15 +48,14 @@ local function CarouselWithLoadingTimer(p)
 		if
 			ref.current[UILoadingEvents.EmptyHint]
 			or ref.current[`{UILoadingEvents.EmptyHint}{UILoadingEvents.ExperimentSuffix}`]
+			or (not fetch or ref.current[fetch])
 		then
 			return
 		end
 
-		if fetch and not ref.current[fetch] then
-			ref.current[fetch] = true
+		ref.current[fetch] = true
 
-			fn(fetch, v2.getTime("carouselLoadingTime"))
-		end
+		fn(fetch, v2.getTime("carouselLoadingTime"))
 	end
 
 	return p.renderComponent({ onSuccessfulRender = onSuccessfulRender })

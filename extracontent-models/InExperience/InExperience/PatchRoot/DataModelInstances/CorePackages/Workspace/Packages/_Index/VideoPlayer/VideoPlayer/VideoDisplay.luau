@@ -9,8 +9,6 @@ local ArgCheck = require(parent.ArgCheck)
 local VideoPlayerWrapper = require(script.Parent.VideoPlayerWrapper)
 local VideoLoadingState = require(script.Parent.VideoLoadingState)
 
-local defineFastFlag = game:DefineFastFlag("LuaAppFixStartPlaybackProgress", false)
-
 local function VideoDisplay(props)
 	local ref = React.useRef(nil)
 	local ref2 = React.useRef(nil)
@@ -30,16 +28,10 @@ local function VideoDisplay(props)
 	ref8.current = props.onAspectRatioChanged
 	local ref9 = React.useRef(nil)
 	ref9.current = props.onVideoProgressChanged
-	local ref10, ref11
 
-	if defineFastFlag then
-		ref10 = React.useRef(props.startPlaybackProgress)
-		ref10.current = props.startPlaybackProgress
-		ref11 = React.useRef(false)
-	else
-		ref10 = nil
-		ref11 = nil
-	end
+	local ref10 = React.useRef(props.startPlaybackProgress)
+	ref10.current = props.startPlaybackProgress
+	local ref11 = React.useRef(false)
 
 	local v = React.useCallback(function(p)
 		setState2(p)
@@ -134,15 +126,11 @@ local function VideoDisplay(props)
 				return
 			end
 
-			if defineFastFlag then
-				local current2 = ref10.current
+			local current2 = ref10.current
 
-				if current2 ~= nil then
-					current.TimePosition = math.clamp(current2, 0, 1) * current.TimeLength
-					ref11.current = true
-				end
-			elseif props.startPlaybackProgress ~= nil then
-				current.TimePosition = math.clamp(props.startPlaybackProgress, 0, 1) * current.TimeLength
+			if current2 ~= nil then
+				current.TimePosition = math.clamp(current2, 0, 1) * current.TimeLength
+				ref11.current = true
 			end
 
 			if ref7.current then
@@ -180,7 +168,7 @@ local function VideoDisplay(props)
 		local current = videoPlayerRef.current
 		ArgCheck.assert(current ~= nil, "VideoDisplay expects videoPlayer ref to be set before playback")
 
-		if defineFastFlag and ref11.current then
+		if ref11.current then
 			ref11.current = false
 		elseif ref5.current and props.shouldStartPlayback then
 			current.TimePosition = 0

@@ -33,19 +33,16 @@ local FFlagEnableHomepagePromptsForModalsAndBanners = SharedFlags5.FFlagEnableHo
 local SharedFlags6 = require(parent.SharedFlags)
 local FFlagPromptsHandlerEnabled = SharedFlags6.FFlagPromptsHandlerEnabled
 local SharedFlags7 = require(parent.SharedFlags)
-local FFlagLuaAppSduiStreamingChunkedResponses = SharedFlags7.FFlagLuaAppSduiStreamingChunkedResponses
-local SharedFlags8 = require(parent.SharedFlags)
-local FFlagLuaAppEnableSduiHomePage = SharedFlags8.FFlagLuaAppEnableSduiHomePage
+local FFlagLuaAppEnableSduiHomePage = SharedFlags7.FFlagLuaAppEnableSduiHomePage
 
+local SharedFlags8 = require(parent.SharedFlags)
+local FFlagSduiStreamingRefreshReplacesInputData = SharedFlags8.FFlagSduiStreamingRefreshReplacesInputData
 local SharedFlags9 = require(parent.SharedFlags)
-local FFlagSduiStreamingRefreshReplacesInputData = SharedFlags9.FFlagSduiStreamingRefreshReplacesInputData
-local FFlagSduiUseHttpClient = require(SduiSharedUtilities.Flags.FFlagSduiUseHttpClient)
+local FFlagSduiFreshInputDataSignalOnRebuild = SharedFlags9.FFlagSduiFreshInputDataSignalOnRebuild
 local SharedFlags10 = require(parent.SharedFlags)
-local FFlagSduiFreshInputDataSignalOnRebuild = SharedFlags10.FFlagSduiFreshInputDataSignalOnRebuild
+local FFlagSduiSharedLocalizedLiterals = SharedFlags10.FFlagSduiSharedLocalizedLiterals
 local SharedFlags11 = require(parent.SharedFlags)
-local FFlagSduiSharedLocalizedLiterals = SharedFlags11.FFlagSduiSharedLocalizedLiterals
-local SharedFlags12 = require(parent.SharedFlags)
-local FFlagLuaAppSduiHomePageSupport = SharedFlags12.FFlagLuaAppSduiHomePageSupport
+local FFlagLuaAppSduiHomePageSupport = SharedFlags11.FFlagLuaAppSduiHomePageSupport
 
 local Cryo = require(parent.Cryo)
 local function mergeTables(p, item)
@@ -100,28 +97,11 @@ local function handleSduiApiResponse(data)
 		and data.enableInputDataMerge
 	assert(configCacheKey, "configCacheKey must exist")
 
-	local logNetRequestStats = loadTimer.logNetRequestStats
-	local v
-
-	if FFlagSduiUseHttpClient then
-		v = response.stats or {}
-	else
-		v = response.Stats
-	end
-
-	logNetRequestStats(v)
+	loadTimer.logNetRequestStats(response.stats or {})
 
 	loadTimer.logResponseDecodeBegin()
 	local success, result = pcall(function()
-		local v2
-
-		if FFlagSduiUseHttpClient then
-			v2 = response.responseBody
-		else
-			v2 = response.Body
-		end
-
-		return (decodeResponse(v2))
+		return (decodeResponse(response.responseBody))
 	end)
 
 	loadTimer.logResponseDecodeEnd()
@@ -142,10 +122,10 @@ local function handleSduiApiResponse(data)
 
 	if parseHydrationDataFromResponse then
 		local success2, result2 = pcall(function()
-			local v2 = parseHydrationDataFromResponse(result)
+			local v = parseHydrationDataFromResponse(result)
 
-			if v2 ~= nil then
-				getSduiDataBinder().updateDataStores(v2)
+			if v ~= nil then
+				getSduiDataBinder().updateDataStores(v)
 			end
 		end)
 
@@ -158,30 +138,30 @@ local function handleSduiApiResponse(data)
 		end
 	end
 
-	local v2 = {}
-	local v3 = nil
+	local v = {}
+	local v2 = nil
 
 	if parseTemplateEntriesFromResponse then
 		local success2, result2 = pcall(function()
-			local v4, v5, v6 = parseTemplateEntriesFromResponse(
+			local v3, v4, v5 = parseTemplateEntriesFromResponse(
 				result,
 				FFlagSduiErrorPaths and true or enableTemplateCache
 			)
-			v2 = v5
+			v = v4
 
 			if FFlagSduiErrorPaths and not enableTemplateCache then
-				v3 = v6
+				v2 = v5
 			end
 
-			getSduiTemplateStore().addTemplates(v4)
+			getSduiTemplateStore().addTemplates(v3)
 
 			if enableTemplateCache then
-				getSduiTemplateStore().recordSurfaceTemplates(surfaceKey, v6)
+				getSduiTemplateStore().recordSurfaceTemplates(surfaceKey, v5)
 			end
 
-			if v4 then
-				for _, v7 in v4 do
-					pcall(recordTemplateUsage, surfaceKey, v7)
+			if v3 then
+				for _, v6 in v3 do
+					pcall(recordTemplateUsage, surfaceKey, v6)
 				end
 
 				SduiUsageRecorder.scheduleFlush()
@@ -202,7 +182,7 @@ local function handleSduiApiResponse(data)
 			return getSduiTemplateStore().getCachedRobloxComponentToTemplateId(surfaceKey)[p]
 		end
 
-		return v3 and v3[p]
+		return v2 and v2[p]
 	end
 
 	local function createErrorContextForRCT(rctPath: string?, p)
@@ -236,20 +216,20 @@ local function handleSduiApiResponse(data)
 	loadTimer.logSduiTreeBuildBegin()
 
 	local pageEntries = not parsePageEntriesFromResponse and {} or parsePageEntriesFromResponse(result)
-	local v4
+	local v3
 
 	if parseLocalizedLiteralsFromResponse then
-		v4 = parseLocalizedLiteralsFromResponse(result)
+		v3 = parseLocalizedLiteralsFromResponse(result)
 	else
-		v4 = SduiProtobufResponseHelpers.parseLocalizedLiteralsFromResponse(result)
+		v3 = SduiProtobufResponseHelpers.parseLocalizedLiteralsFromResponse(result)
 	end
 
-	if FFlagSduiSharedLocalizedLiterals and v4 then
-		getSduiTemplateStore().addLocalizedLiterals(v4)
+	if FFlagSduiSharedLocalizedLiterals and v3 then
+		getSduiTemplateStore().addLocalizedLiterals(v3)
 	end
 
 	local function resolveTemplateForRobloxComponent(name: string, p)
-		local templateForRobloxComponent = v2[name]
+		local templateForRobloxComponent = v[name]
 
 		if templateForRobloxComponent == nil then
 			templateForRobloxComponent = getSduiTemplateStore().getTemplateForRobloxComponent(surfaceKey, name)
@@ -259,123 +239,123 @@ local function handleSduiApiResponse(data)
 			return templateForRobloxComponent
 		end
 
-		local v5 = {
+		local v4 = {
 			name = name,
 			message = `Backend omitted template for {name} but it could not be resolved from the surface cache + template store`
 		}
 
 		if FFlagSduiErrorPaths then
-			addSduiErrorContextFields(v5, createErrorContextForRCT(name, p))
+			addSduiErrorContextFields(v4, createErrorContextForRCT(name, p))
 		end
 
-		SduiLogger.reportError(SduiErrors.SduiErrorType.MissingCachedTemplate, v5, surfaceKey)
+		SduiLogger.reportError(SduiErrors.SduiErrorType.MissingCachedTemplate, v4, surfaceKey)
 
 		return templateForRobloxComponent
 	end
 
-	local v5 = #pageEntries > 1
+	local v4 = #pageEntries > 1
 	local result2 = {}
-	local v6 = nil
+	local v5 = nil
 
-	for _, v7 in pageEntries do
-		local identifier = v7.identifier
-		local v8
+	for _, v6 in pageEntries do
+		local identifier = v6.identifier
+		local v7
 
 		if
-			(v5 or FFlagSduiAlwaysCacheWithIdentifier or data.cacheSingleEntryWithIdentifier)
+			(v4 or FFlagSduiAlwaysCacheWithIdentifier or data.cacheSingleEntryWithIdentifier)
 			and identifier
 			and identifier ~= ""
 		then
-			v8 = `{configCacheKey}_{identifier}`
+			v7 = `{configCacheKey}_{identifier}`
 		else
-			v8 = configCacheKey
+			v7 = configCacheKey
 		end
 
-		local componentInputData = v7.componentInputData
-		local v9 = getInputDataSignalsForRequest(v8)
-		local v10 = v9.get(false)
-		local v11 = FFlagLuaAppSduiStreamingChunkedResponses and data.enableStreamingMerge
+		local componentInputData = v6.componentInputData
+		local v8 = getInputDataSignalsForRequest(v7)
+		local v9 = v8.get(false)
+		local v10 = data.enableStreamingMerge
 		local merged, get, set
 
 		if paginateResponse then
-			if v10 then
+			if v9 then
 				if componentInputData then
-					merged = SduiInputDataMerge.merge(v9.get(false), componentInputData, mergeStrategy)
-					v9.set(merged)
+					merged = SduiInputDataMerge.merge(v8.get(false), componentInputData, mergeStrategy)
+					v8.set(merged)
 				end
 			else
 				if FFlagSduiFreshInputDataSignalOnRebuild and setInputDataSignalsForRequest then
 					get, set = Signals.createSignal(nil)
-					v9 = { get = get, set = set }
+					v8 = { get = get, set = set }
 				end
 
-				v9.set(componentInputData)
+				v8.set(componentInputData)
 			end
 		else
-			local v12
+			local v11
 
 			if FFlagLuaAppEnableSduiHomePage or FFlagSduiStreamingRefreshReplacesInputData then
-				v12 = enableInputDataMerge
+				v11 = enableInputDataMerge
 			else
-				v12 = v11
+				v11 = v10
 			end
 
-			if v12 then
-				if v10 then
+			if v11 then
+				if v9 then
 					if componentInputData then
-						merged = SduiInputDataMerge.merge(v9.get(false), componentInputData, mergeStrategy)
-						v9.set(merged)
+						merged = SduiInputDataMerge.merge(v8.get(false), componentInputData, mergeStrategy)
+						v8.set(merged)
 					end
 				else
 					if FFlagSduiFreshInputDataSignalOnRebuild and setInputDataSignalsForRequest then
 						get, set = Signals.createSignal(nil)
-						v9 = { get = get, set = set }
+						v8 = { get = get, set = set }
 					end
 
-					v9.set(componentInputData)
+					v8.set(componentInputData)
 				end
 			else
 				if FFlagSduiFreshInputDataSignalOnRebuild and setInputDataSignalsForRequest then
 					get, set = Signals.createSignal(nil)
-					v9 = { get = get, set = set }
+					v8 = { get = get, set = set }
 				end
 
-				v9.set(componentInputData)
+				v8.set(componentInputData)
 			end
 		end
 
 		if not paginateResponse then
 			if FFlagLuaAppEnableSduiHomePage or FFlagSduiStreamingRefreshReplacesInputData then
-				v11 = enableInputDataMerge
+				v10 = enableInputDataMerge
 			end
 
-			v10 = v11 and v10
+			v9 = v10 and v9
 		end
 
-		if not v10 then
-			local robloxComponentType = v7.robloxComponentType
+		if not v9 then
+			local robloxComponentType = v6.robloxComponentType
 
 			if robloxComponentType then
-				local v12
+				local v11
 
 				if enableTemplateCache then
-					local v13
+					local v12
 
 					if FFlagSduiErrorPaths then
-						v13 = v7
+						v12 = v6
 					end
 
-					v12 = resolveTemplateForRobloxComponent(robloxComponentType, v13)
+					v11 = resolveTemplateForRobloxComponent(robloxComponentType, v12)
 				else
-					v12 = v2[robloxComponentType]
+					v11 = v[robloxComponentType]
 				end
 
-				if v12 then
-					local v13 = v12
-					local v14 = robloxComponentType
-					local v15 = identifier
+				if v11 then
+					local v12 = v11
+					local v13 = robloxComponentType
+					local v14 = identifier
 					local success2, result3 = pcall(function()
-						local v16 = {
+						local v15 = {
 							appPage = surfaceKey,
 							debugName = configCacheKey,
 							getTemplateForRobloxComponent = function(p)
@@ -383,7 +363,7 @@ local function handleSduiApiResponse(data)
 									return resolveTemplateForRobloxComponent(p)
 								end
 
-								return v2[p]
+								return v[p]
 							end,
 							getTemplateIdForRCT = 0,
 							localizedLiterals = 0,
@@ -396,32 +376,38 @@ local function handleSduiApiResponse(data)
 							getTemplateIdForRCT2 = getTemplateIdForRCT
 						end
 
-						v16.getTemplateIdForRCT = getTemplateIdForRCT2
+						v15.getTemplateIdForRCT = getTemplateIdForRCT2
 						local localizedLiterals
 
 						if not FFlagSduiSharedLocalizedLiterals then
-							localizedLiterals = v4
+							localizedLiterals = v3
 						end
 
-						v16.localizedLiterals = localizedLiterals
+						v15.localizedLiterals = localizedLiterals
 						local getLocalizedLiteral2
 
 						if FFlagSduiSharedLocalizedLiterals then
 							getLocalizedLiteral2 = getLocalizedLiteral
 						end
 
-						v16.getLocalizedLiteral = getLocalizedLiteral2
+						v15.getLocalizedLiteral = getLocalizedLiteral2
 
-						v16.configKey = configCacheKey
-						local builderConfig = createBuilderConfig(v16)
+						v15.configKey = configCacheKey
+						local builderConfig = createBuilderConfig(v15)
 
 						local buildConfigForComponent = getSduiClientBindingBuilder().buildConfigForComponent
+						local v16
+
+						if FFlagLuaAppSduiHomePageSupport and v6.componentInputDataGetter then
+							v16 = v6.componentInputDataGetter
+						else
+							v16 = v8.get
+						end
+
 						local v17
 
-						if FFlagLuaAppSduiHomePageSupport and v7.componentInputDataGetter then
-							v17 = v7.componentInputDataGetter
-						else
-							v17 = v9.get
+						if FFlagSduiErrorPaths then
+							v17 = v13
 						end
 
 						local v18
@@ -430,40 +416,34 @@ local function handleSduiApiResponse(data)
 							v18 = v14
 						end
 
-						local v19
-
-						if FFlagSduiErrorPaths then
-							v19 = v15
-						end
-
-						return (buildConfigForComponent(v13, v17, builderConfig, nil, nil, nil, nil, v18, v19))
+						return (buildConfigForComponent(v12, v16, builderConfig, nil, nil, nil, nil, v17, v18))
 					end)
 
 					if success2 then
 						if FFlagSduiFreshInputDataSignalOnRebuild and setInputDataSignalsForRequest then
-							v6 = v6 == nil and {} or v6
+							v5 = v5 == nil and {} or v5
 
-							v6[v8] = v9
+							v5[v7] = v8
 						end
 
-						if result2[v8] then
-							local v16 = {
+						if result2[v7] then
+							local v15 = {
 								name = robloxComponentType,
-								message = `Existing config found for cacheKey {v8}. Need to specify identifer in page entry for multiple configs`
+								message = `Existing config found for cacheKey {v7}. Need to specify identifer in page entry for multiple configs`
 							}
 
 							if FFlagSduiErrorPaths then
-								addSduiErrorContextFields(v16, result3 and result3.errorContext)
+								addSduiErrorContextFields(v15, result3 and result3.errorContext)
 							end
 
 							SduiLogger.reportError(
 								SduiErrors.SduiErrorType.DuplicateOrMissingIdentifier,
-								v16,
+								v15,
 								surfaceKey
 							)
 						end
 
-						local v16 = {
+						local v15 = {
 							config = result3,
 							dataUpdatedTimestamp = os.clock(),
 							identifier = 0,
@@ -476,63 +456,63 @@ local function handleSduiApiResponse(data)
 							identifier = nil
 						end
 
-						v16.identifier = identifier
+						v15.identifier = identifier
 
 						if not (FFlagEnableSduiV2HomepagePrompts or FFlagPromptsHandlerEnabled) then
 							robloxComponentType = nil
 						end
 
-						v16.robloxComponentType = robloxComponentType
+						v15.robloxComponentType = robloxComponentType
 						local category
 
 						if FFlagEnableHomepagePromptsForModalsAndBanners or FFlagPromptsHandlerEnabled then
-							category = v7.category
+							category = v6.category
 						end
 
-						v16.category = category
+						v15.category = category
 
-						v16.surfacing = v7.surfacing
-						result2[v8] = v16
+						v15.surfacing = v6.surfacing
+						result2[v7] = v15
 					else
-						local v16 = { name = robloxComponentType, message = `{result3}` }
+						local v15 = { name = robloxComponentType, message = `{result3}` }
 
 						if FFlagSduiErrorPaths then
-							addSduiErrorContextFields(v16, createErrorContextForRCT(robloxComponentType, v7))
+							addSduiErrorContextFields(v15, createErrorContextForRCT(robloxComponentType, v6))
 						end
 
 						SduiLogger.reportError(
 							SduiErrors.SduiErrorType.FailedToBuildClientBindingConfig,
-							v16,
+							v15,
 							surfaceKey
 						)
 					end
 
-					if v7.title and result2[v8] then
-						result2[v8].title = v7.title
+					if v6.title and result2[v7] then
+						result2[v7].title = v6.title
 					end
 				else
 					if enableTemplateCache then
 						continue
 					end
 
-					local v13 = {
+					local v12 = {
 						name = robloxComponentType,
 						message = `Missing template for robloxComponentType {robloxComponentType}`
 					}
 
 					if FFlagSduiErrorPaths then
-						addSduiErrorContextFields(v13, createErrorContextForRCT(robloxComponentType, v7))
+						addSduiErrorContextFields(v12, createErrorContextForRCT(robloxComponentType, v6))
 					end
 
 					SduiLogger.reportError(
 						SduiErrors.SduiErrorType.FailedToMapRobloxComponentToTemplate,
-						v13,
+						v12,
 						surfaceKey
 					)
 					continue
 				end
 			else
-				local v12 = {
+				local v11 = {
 					name = configCacheKey,
 					message = "Page entry missing robloxComponentType"
 				}
@@ -540,8 +520,8 @@ local function handleSduiApiResponse(data)
 				if FFlagSduiErrorPaths then
 					local fullName
 
-					if v7 then
-						local identifier2 = v7.identifier
+					if v6 then
+						local identifier2 = v6.identifier
 
 						if identifier2 and identifier2 ~= "" then
 							fullName = `{surfaceKey}[{identifier2}]`
@@ -550,24 +530,24 @@ local function handleSduiApiResponse(data)
 						end
 					end
 
-					addSduiErrorContextFields(v12, {
+					addSduiErrorContextFields(v11, {
 						fullName = fullName,
 						rctPath = nil,
 						templateId = nil
 					})
 				end
 
-				SduiLogger.reportError(SduiErrors.SduiErrorType.FailedToAddTemplates, v12, surfaceKey)
+				SduiLogger.reportError(SduiErrors.SduiErrorType.FailedToAddTemplates, v11, surfaceKey)
 				continue
 			end
 		end
 
-		result2[v8] = result2[v8] or {}
+		result2[v7] = result2[v7] or {}
 
 		if buildNextPageUrl then
-			result2[v8].nextPageUrl = buildNextPageUrl(result) or ""
+			result2[v7].nextPageUrl = buildNextPageUrl(result) or ""
 		else
-			result2[v8].nextPageUrl = ""
+			result2[v7].nextPageUrl = ""
 		end
 
 		if not buildNextPagePostBody then
@@ -575,12 +555,12 @@ local function handleSduiApiResponse(data)
 		end
 
 		local nextPagePostBody = buildNextPagePostBody(result)
-		result2[v8].nextPagePostBody = nextPagePostBody or Cryo.None
+		result2[v7].nextPagePostBody = nextPagePostBody or Cryo.None
 	end
 
-	if FFlagSduiFreshInputDataSignalOnRebuild and setInputDataSignalsForRequest and v6 then
-		for k, v7 in v6 do
-			setInputDataSignalsForRequest(configCacheKey, k, v7)
+	if FFlagSduiFreshInputDataSignalOnRebuild and setInputDataSignalsForRequest and v5 then
+		for k, v6 in v5 do
+			setInputDataSignalsForRequest(configCacheKey, k, v6)
 		end
 	end
 
@@ -602,14 +582,14 @@ local function handleSduiApiResponse(data)
 			return resolveTemplateForRobloxComponent(p)
 		end
 
-		return v2[p]
+		return v[p]
 	end
 
 	local function getKnownTemplates()
 		local knownTemplates = {}
 
-		for _, v7 in v2 do
-			table.insert(knownTemplates, v7)
+		for _, v6 in v do
+			table.insert(knownTemplates, v6)
 		end
 
 		if not enableTemplateCache then
@@ -618,8 +598,8 @@ local function handleSduiApiResponse(data)
 
 		local sduiTemplateStore = getSduiTemplateStore()
 
-		for _, v7 in sduiTemplateStore.getCachedRobloxComponentToTemplateId(surfaceKey) do
-			local template = sduiTemplateStore.getTemplate(v7)
+		for _, v6 in sduiTemplateStore.getCachedRobloxComponentToTemplateId(surfaceKey) do
+			local template = sduiTemplateStore.getTemplate(v6)
 
 			if template ~= nil then
 				table.insert(knownTemplates, template)

@@ -618,11 +618,12 @@ local function createPeopleVoiceChatStore()
 				return playerMuteStatusIcons.MicOff
 			end
 
-			if v11 then
-				return (default:GetIcon("Unmuted" .. tostring(math.floor(0.5 + 5 * signal5(p)) * 20), "MicLight"))
+			if not v11 then
+				return playerMuteStatusIcons.MicOn
 			end
 
-			return playerMuteStatusIcons.MicOn
+			local v12 = math.floor(0.5 + 5 * signal5(p)) * 20
+			return (default:GetIcon("Unmuted" .. tostring(v12), "MicLight"))
 		end)
 	end
 

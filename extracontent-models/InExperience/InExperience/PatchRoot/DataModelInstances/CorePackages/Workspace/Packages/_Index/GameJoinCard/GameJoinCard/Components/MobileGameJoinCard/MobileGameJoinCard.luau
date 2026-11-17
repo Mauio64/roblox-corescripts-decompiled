@@ -31,6 +31,8 @@ local viewProfileSourceValues = AnalyticsConstants.viewProfileSourceValues
 local CtaType = AnalyticsConstants.CtaType
 local useJoinCardCtaLoadTime = require(script.Parent.Parent.Parent.Analytics.useJoinCardCtaLoadTime)
 
+require(parent.VideoUtils)
+
 local SharedFlags = require(parent.SharedFlags)
 local FFlagMobileGameJoinCardGamepadSupport = SharedFlags.FFlagMobileGameJoinCardGamepadSupport
 local FFlagGameJoinCardOptionalActions = SharedFlags.FFlagGameJoinCardOptionalActions
@@ -47,18 +49,32 @@ else
 end
 
 local AgeCheckUpsellCTA = require(script.Parent.Parent.AgeCheckUpsellCTA)
+local JoinCardBannerVideoContainer = require(script.Parent.JoinCardBannerVideo.JoinCardBannerVideoContainer)
 local GameJoinCardTTI = require(script.Parent.Parent.Parent.Telemetry.GameJoinCardTTI)
 local FFlagMobileGameJoinCardThumbnail = require(script.Parent.Parent.Parent.Flags.FFlagMobileGameJoinCardThumbnail)
 local defineFastFlag = game:DefineFastFlag("MobileGameJoinCardHideUserAvatar", false)
 
 local defineFastFlag2 = game:DefineFastFlag("MobileGameJoinCardShowExperienceNameOnly", false)
 local FFlagMobileGameJoinCardEDPFromTitle = require(GameJoinCard.Flags.FFlagMobileGameJoinCardEDPFromTitle)
+local FFlagMobileGameJoinCardTrapGamepadFocus = require(GameJoinCard.Flags.FFlagMobileGameJoinCardTrapGamepadFocus)
+
+local selectionGroup = FFlagMobileGameJoinCardTrapGamepadFocus
+	and {
+		SelectionBehaviorUp = Enum.SelectionBehavior.Stop,
+		SelectionBehaviorDown = Enum.SelectionBehavior.Stop,
+		SelectionBehaviorLeft = Enum.SelectionBehavior.Stop,
+		SelectionBehaviorRight = Enum.SelectionBehavior.Stop
+	}
+	or nil
+local testId = FFlagMobileGameJoinCardTrapGamepadFocus and "mobile-game-join-card-selection" or nil
 local FFlagMobileGameJoinCardEDPFromThumbnail = require(GameJoinCard.Flags.FFlagMobileGameJoinCardEDPFromThumbnail)
-local defineFastFlag3 = game:DefineFastFlag("MobileGameCardDontShowChatWith", false)
 local SharedFlags2 = require(parent.SharedFlags)
-local FFlagJoinabilityCTARefactor = SharedFlags2.FFlagJoinabilityCTARefactor
+local FFlagMobileGameJoinCardVideo = SharedFlags2.FFlagMobileGameJoinCardVideo
+local defineFastFlag3 = game:DefineFastFlag("MobileGameCardDontShowChatWith", false)
 local SharedFlags3 = require(parent.SharedFlags)
-local FFlagJoinabilityCTAContextCopy = SharedFlags3.FFlagJoinabilityCTAContextCopy
+local FFlagJoinabilityCTARefactor = SharedFlags3.FFlagJoinabilityCTARefactor
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagJoinabilityCTAContextCopy = SharedFlags4.FFlagJoinabilityCTAContextCopy
 require(GameJoinCard.Components.Actions.Types)
 local buildJoinCardActionsComponent = require(GameJoinCard.Components.Actions.buildJoinCardActionsComponent)
 local UserCtaCommon = require(parent.UserCtaCommon)
@@ -398,16 +414,18 @@ local function MobileGameJoinCard(props)
 			onActivated = 0,
 			stateLayer = 0
 		}
+		local onActivated5
 
-		if content == nil and (not FFlagGameJoinCardOptionalActions or props.onViewExperienceDetails ~= nil) then
-			if not (FFlagMobileGameJoinCardEDPFromThumbnail and state) then
-				onActivated3 = nil
-			end
-		else
-			onActivated3 = nil
+		if
+			content == nil
+			and (not FFlagGameJoinCardOptionalActions or props.onViewExperienceDetails ~= nil)
+			and FFlagMobileGameJoinCardEDPFromThumbnail
+			and state
+		then
+			onActivated5 = onActivated3
 		end
 
-		v25.onActivated = onActivated3
+		v25.onActivated = onActivated5
 
 		v25.stateLayer = content == nil
 			and (not FFlagGameJoinCardOptionalActions or props.onViewExperienceDetails ~= nil)
@@ -449,15 +467,40 @@ local function MobileGameJoinCard(props)
 		end
 
 		v24.BannerSkeleton = bannerSkeleton
+		local v26 = {
+			BannerImageCanvas = createElement8("CanvasGroup", v23, v24),
+			BannerVideo = 0
+		}
+		local bannerVideo
+
+		if FFlagMobileGameJoinCardVideo and props.bannerVideoId then
+			local createElement10 = React.createElement
+			local v27 = {
+				videoId = props.bannerVideoId,
+				videoPlaybackContext = props.bannerVideoPlaybackContext,
+				universeId = props.universeId,
+				Size = UDim2.new(1, 0, 0, 202),
+				cornerRadius = 15,
+				ZIndex = 2,
+				onActivated = 0
+			}
+
+			if not FFlagMobileGameJoinCardEDPFromThumbnail then
+				onActivated3 = nil
+			end
+
+			v27.onActivated = onActivated3
+			bannerVideo = createElement10(JoinCardBannerVideoContainer, v27)
+		end
+
+		v26.BannerVideo = bannerVideo
 		local children = {
 			BannerImageContainer = createElement6(View, {
 				tag = "size-full-0",
 				Size = size,
 				LayoutOrder = 1
 			}, {
-				BannerImageClipper = createElement7(View, v22, {
-					BannerImageCanvas = createElement8("CanvasGroup", v23, v24)
-				})
+				BannerImageClipper = createElement7(View, v22, v26)
 			}),
 			UserTileWrapper = 0,
 			CtaContext = 0,
@@ -485,7 +528,7 @@ local function MobileGameJoinCard(props)
 
 			if defineFastFlag2 or content ~= nil then
 				local createElement11 = React.createElement
-				local v26 = {
+				local v27 = {
 					tag = content == nil and "row align-x-center align-y-center size-full" or "col align-x-center align-y-center gap-small size-full",
 					onActivated = 0,
 					stateLayer = 0
@@ -502,16 +545,16 @@ local function MobileGameJoinCard(props)
 					onActivated4 = nil
 				end
 
-				v26.onActivated = onActivated4
+				v27.onActivated = onActivated4
 
-				v26.stateLayer = content == nil
+				v27.stateLayer = content == nil
 					and (not FFlagGameJoinCardOptionalActions or props.onViewExperienceDetails ~= nil)
 					and FFlagMobileGameJoinCardEDPFromTitle
 					and { affordance = StateLayerAffordance.None }
 					or nil
 
 				local createElement12 = React.createElement
-				local v27 = {
+				local v28 = {
 					tag = "shrink auto-xy text-align-x-center content-emphasis",
 					fontStyle = v.Typography.TitleMedium,
 					Text = 0,
@@ -527,10 +570,10 @@ local function MobileGameJoinCard(props)
 					text = props.experienceName
 				end
 
-				v27.Text = text
+				v28.Text = text
 
-				v27.TextTruncate = Enum.TextTruncate.AtEnd
-				local v28 = { ExperienceText = createElement12(Text, v27), Subtitle = 0 }
+				v28.TextTruncate = Enum.TextTruncate.AtEnd
+				local v29 = { ExperienceText = createElement12(Text, v28), Subtitle = 0 }
 				local subtitle
 
 				if content then
@@ -543,8 +586,8 @@ local function MobileGameJoinCard(props)
 					})
 				end
 
-				v28.Subtitle = subtitle
-				tile = createElement11(View, v26, v28)
+				v29.Subtitle = subtitle
+				tile = createElement11(View, v27, v29)
 			elseif defineFastFlag then
 				tile = React.createElement(View, {
 					tag = "col align-x-center align-y-center size-full"
@@ -559,7 +602,7 @@ local function MobileGameJoinCard(props)
 				})
 			else
 				local createElement11 = React.createElement
-				local v26 = {
+				local v27 = {
 					userId = props.userId,
 					title = props.playerName,
 					subtitle = v17.playingExperience,
@@ -574,10 +617,10 @@ local function MobileGameJoinCard(props)
 					onActivated = nil
 				end
 
-				v26.onActivated = onActivated
+				v27.onActivated = onActivated
 
-				v26.selectable = (not FFlagGameJoinCardOptionalActions or props.onViewProfile ~= nil) and nil
-				tile = createElement11(userTile, v26)
+				v27.selectable = (not FFlagGameJoinCardOptionalActions or props.onViewProfile ~= nil) and nil
+				tile = createElement11(userTile, v27)
 			end
 
 			userTileWrapper = createElement10(View, { Size = udim, ZIndex = 2, LayoutOrder = 2 }, {
@@ -591,7 +634,7 @@ local function MobileGameJoinCard(props)
 		if fFlagJoinabilityCTAContextCopy and v19 ~= nil then
 			local createElement10 = React.createElement
 
-			local v26 = {
+			local v27 = {
 				CtaContextTitle = React.createElement(Text, {
 					Text = v19.title,
 					tag = "auto-xy text-body-medium text-align-x-center content-emphasis",
@@ -609,14 +652,14 @@ local function MobileGameJoinCard(props)
 				})
 			end
 
-			v26.CtaContextSubtitle = ctaContextSubtitle
+			v27.CtaContextSubtitle = ctaContextSubtitle
 			ctaContext = createElement10(
 				View,
 				{
 					tag = "col align-x-center items-center gap-xxsmall size-full-0 auto-y",
 					LayoutOrder = 3
 				},
-				v26
+				v27
 			)
 		end
 
@@ -624,7 +667,7 @@ local function MobileGameJoinCard(props)
 
 		local createElement10 = React.createElement
 
-		local v26 = {
+		local v27 = {
 			tag = "col gap-small size-full-0 auto-y",
 			LayoutOrder = fFlagJoinabilityCTAContextCopy and v19 ~= nil and 4 or 3
 		}
@@ -635,7 +678,7 @@ local function MobileGameJoinCard(props)
 
 			if v15 then
 				local createElement11 = React.createElement
-				local v27 = {
+				local v28 = {
 					onUnlockPressed = props.onAgeCheckPressed or function() end,
 					LayoutOrder = 1,
 					focusRef = 0
@@ -645,8 +688,8 @@ local function MobileGameJoinCard(props)
 					primaryButtonFocusRef = nil
 				end
 
-				v27.focusRef = primaryButtonFocusRef
-				primaryButton = createElement11(AgeCheckUpsellCTA, v27)
+				v28.focusRef = primaryButtonFocusRef
+				primaryButton = createElement11(AgeCheckUpsellCTA, v28)
 			else
 				local createElement11 = React.createElement
 
@@ -707,12 +750,20 @@ local function MobileGameJoinCard(props)
 			v18.SecondaryButton = secondaryButton
 		end
 
-		children.Buttons = createElement10(View, v26, v18)
+		children.Buttons = createElement10(View, v27, v18)
 		state3 = createElement2(OverlayProvider, { gui = state3 }, {
 			SheetRoot = createElement3(root, v21, {
 				Content = createElement4(content2, nil, {
 					BottomPadding = bottomPadding,
-					Layout = createElement5(View, { tag = "col gap-medium size-full-0 auto-y" }, children)
+					Layout = createElement5(
+						View,
+						{
+							tag = "col gap-medium size-full-0 auto-y",
+							testId = testId,
+							selectionGroup = selectionGroup
+						},
+						children
+					)
 				})
 			})
 		})

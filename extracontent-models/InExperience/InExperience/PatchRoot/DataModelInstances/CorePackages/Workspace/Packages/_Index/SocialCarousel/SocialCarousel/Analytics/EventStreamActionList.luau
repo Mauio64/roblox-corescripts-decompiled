@@ -16,34 +16,45 @@ local FFlagSocialCarouselShareQREnabled = SharedFlags.FFlagSocialCarouselShareQR
 local FFlagLuaAppUserSeenCollectionUnifiedFields = SharedFlags.FFlagLuaAppUserSeenCollectionUnifiedFields
 
 local FFlagSocialCarouselLogNewFriendRequestsBadge = require(SocialCarousel.Flags.FFlagSocialCarouselLogNewFriendRequestsBadge)
+local FFlagSocialCarouselInGamePlayIcon = SharedFlags.FFlagSocialCarouselInGamePlayIcon
 
 local function fn(p)
 	return p
 end
 
-local EventStreamActionList = {
-	[EventNames.UserPressed] = {
-		context = Contexts.HomePage,
-		eventType = EventTypes.ButtonClick,
-		additionalInfo = {
-			btn = Constants.ANALYTICS.BTN_VALUES.OPEN_PEOPLE_LIST,
-			contentType = Constants.ANALYTICS.CONTENT_TYPE,
-			actionType = Constants.ANALYTICS.ACTION_TYPES.OPEN_PROFILE
-		},
-		formatRulesForAdditionalInfo = {
-			absolutePosition = fn,
-			positionInRow = fn,
-			recommendationContextType = formatRecommendationContextType,
-			friendId = fn,
-			friendStatus = fn,
-			isRecommendation = fn,
-			recommendationRank = fn,
-			universeId = fn,
-			presence = fn,
-			source = fn,
-			interactionUuid = fn
-		}
+local UserPressed = EventNames.UserPressed
+local v = {
+	context = Contexts.HomePage,
+	eventType = EventTypes.ButtonClick,
+	additionalInfo = {
+		btn = Constants.ANALYTICS.BTN_VALUES.OPEN_PEOPLE_LIST,
+		contentType = Constants.ANALYTICS.CONTENT_TYPE,
+		actionType = Constants.ANALYTICS.ACTION_TYPES.OPEN_PROFILE
 	},
+	formatRulesForAdditionalInfo = 0
+}
+local tileClickTarget
+
+if FFlagSocialCarouselInGamePlayIcon then
+	tileClickTarget = fn
+end
+
+v.formatRulesForAdditionalInfo = {
+	absolutePosition = fn,
+	positionInRow = fn,
+	recommendationContextType = formatRecommendationContextType,
+	friendId = fn,
+	friendStatus = fn,
+	isRecommendation = fn,
+	recommendationRank = fn,
+	universeId = fn,
+	presence = fn,
+	source = fn,
+	interactionUuid = fn,
+	tileClickTarget = tileClickTarget
+}
+local EventStreamActionList = {
+	[UserPressed] = v,
 	[EventNames.UserSeen] = {
 		context = Contexts.HomePage,
 		eventType = EventTypes.UserSeen,
@@ -131,7 +142,7 @@ local EventStreamActionList = {
 }
 
 local TilesSeenCollection = EventNames.TilesSeenCollection
-local v = {
+local v2 = {
 	context = Contexts.HomePage,
 	eventType = EventTypes.UserSeenCollection,
 	formatRulesForAdditionalInfo = 0
@@ -205,7 +216,7 @@ if not FFlagLuaAppUserSeenCollectionUnifiedFields then
 end
 
 formatRulesForAdditionalInfo.totalNumberOfItems = fn
-v.formatRulesForAdditionalInfo = formatRulesForAdditionalInfo
-EventStreamActionList[TilesSeenCollection] = v
+v2.formatRulesForAdditionalInfo = formatRulesForAdditionalInfo
+EventStreamActionList[TilesSeenCollection] = v2
 
 return EventStreamActionList

@@ -4,7 +4,6 @@ local Roact = require(CorePackages.Packages.Roact)
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local Foundation = require(CorePackages.Packages.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local t = require(CorePackages.Packages.t)
 local ArgCheck = require(CorePackages.Workspace.Packages.ArgCheck)
 
@@ -64,43 +63,25 @@ local function DropdownMenu(props)
 		setState2(v4)
 	end, { props.dropdownList, props.selectedIndex })
 
-	local createElement = Roact.createElement
-	local v4 = {
+	return Roact.createElement("Frame", {
 		Size = props.buttonSize,
 		LayoutOrder = props.layoutOrder,
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		ZIndex = 3
-	}
-
-	local createElement2 = Roact.createElement
-	local v5 = {}
-	v5.Size = UDim2.new(1, 0, 1, 0)
-	v5.Text = props.dropdownList[props.selectedIndex]
-	v5.TextColor3 = Color3.new(1, 1, 1)
-	v5.TextSize = textSize
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = captionHeader.Font
-	end
-
-	v5.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(v.Tokens.Typography.CaptionLarge.Font)
-	end
-
-	v5.FontFace = fontFace
-
-	v5.TextXAlignment = Enum.TextXAlignment.Left
-	v5.BackgroundColor3 = v2
-	v5.BackgroundTransparency = 0
-	v5.LayoutOrder = props.layoutOrder
-	v5[Roact.Event.Activated] = v3
-	return createElement("Frame", v4, {
-		SpawnButton = createElement2("TextButton", v5, {
+	}, {
+		SpawnButton = Roact.createElement("TextButton", {
+			Size = UDim2.new(1, 0, 1, 0),
+			Text = props.dropdownList[props.selectedIndex],
+			TextColor3 = Color3.new(1, 1, 1),
+			TextSize = textSize,
+			FontFace = normalizeFontFace(v.Tokens.Typography.CaptionLarge.Font),
+			TextXAlignment = Enum.TextXAlignment.Left,
+			BackgroundColor3 = v2,
+			BackgroundTransparency = 0,
+			LayoutOrder = props.layoutOrder,
+			[Roact.Event.Activated] = v3
+		}, {
 			UICorner = Roact.createElement("UICorner", { CornerRadius = UDim.new(0, 4) }),
 			UIPadding = Roact.createElement("UIPadding", { PaddingLeft = UDim.new(0, 12) }),
 			UIStroke = Roact.createElement("UIStroke", {

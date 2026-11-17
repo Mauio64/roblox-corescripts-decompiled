@@ -22,6 +22,7 @@ local useGameSortTooltipParams = require(script.useGameSortTooltipParams)
 local WaitForPropWrapper = require(script.Impressions.WaitForPropWrapper)
 local SeeAllTile = require(script.SeeAllTile)
 local GameCollectionItemBuilder = require(script.GameCollectionItemBuilder)
+local useTriggerGameTileFeedbackCallbacks = require(script.useTriggerGameTileFeedbackCallbacks)
 
 return {
 	GameCollectionGrid = require(script.GameCollectionGrid),
@@ -37,6 +38,7 @@ return {
 	useIsHoldToPlayEnabledForGames = useIsHoldToPlayEnabledForGames,
 	useNavigateToSortLinkWebView = useNavigateToSortLinkWebView,
 	useRenderGameCollectionItem = useRenderGameCollectionItem,
+	useTriggerGameTileFeedbackCallbacks = useTriggerGameTileFeedbackCallbacks,
 	["jest.config"] = script["jest.config"],
 	["jest.main.config"] = script["jest.main.config"],
 	["jest.mockDataModel.config"] = script["jest.mockDataModel.config"],

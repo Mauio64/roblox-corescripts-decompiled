@@ -466,13 +466,12 @@ local function createManageDevProductController(p, p2, data, callback, p3)
 	end
 
 	local function submitRejection(p4, p5: string?)
-		if not p4.attempted then
+		if p4.attempted then
+			data.setDevProductTool(proposalFromFlow(p4, true, false))
+			submitApproval(p4)
+		else
 			submitResult(p4, v.formatRejectionContent(p4.action, p5), false, p5)
-			return
 		end
-
-		data.setDevProductTool(proposalFromFlow(p4, true, false))
-		submitApproval(p4)
 	end
 
 	local function onApproveImpl()

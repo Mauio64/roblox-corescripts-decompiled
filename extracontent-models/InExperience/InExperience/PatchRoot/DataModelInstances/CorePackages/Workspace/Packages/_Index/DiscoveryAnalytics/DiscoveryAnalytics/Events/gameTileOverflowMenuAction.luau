@@ -8,7 +8,7 @@ local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
 local defineFastInt = game:DefineFastInt("GameTileOverflowMenuActionThrottleHundrethsPercent", 0)
 
 local SharedFlags = require(parent.SharedFlags)
-local FFlagLuaAppEnableHomepageOneByTwoTile = SharedFlags.FFlagLuaAppEnableHomepageOneByTwoTile
+local FFlagLuaAppEnableNxMRoduxApportioning = SharedFlags.FFlagLuaAppEnableNxMRoduxApportioning
 local FFlagLuaAppGameTileDirectActionTelemetry = SharedFlags.FFlagLuaAppGameTileDirectActionTelemetry
 local FFlagSduiGameTileDirectAction = SharedFlags.FFlagSduiGameTileDirectAction
 
@@ -24,7 +24,7 @@ local v = {
 }
 local contentType
 
-if FFlagLuaAppEnableHomepageOneByTwoTile then
+if FFlagLuaAppEnableNxMRoduxApportioning then
 	contentType = t.optional(t.string)
 end
 

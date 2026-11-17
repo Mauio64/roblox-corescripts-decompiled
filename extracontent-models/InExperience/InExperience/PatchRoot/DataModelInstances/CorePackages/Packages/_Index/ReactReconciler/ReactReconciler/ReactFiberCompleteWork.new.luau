@@ -584,26 +584,24 @@ return {
 							state.treeBaseDuration = child.treeBaseDuration
 						end
 					end
-				else
-					resetHydrationState()
 
-					if bit32.band(state.flags, DidCapture) == NoFlags then
-						state.memoizedState = nil
-					end
+					return nil
+				end
 
-					state.flags = bit32.bor(state.flags, Update)
-					bubbleProperties(state)
+				resetHydrationState()
 
-					if
-						enableProfilerTimer
-						and bit32.band(state.mode, ProfileMode) ~= NoMode
-						and memoizedState ~= nil
-					then
-						local child = state.child
+				if bit32.band(state.flags, DidCapture) == NoFlags then
+					state.memoizedState = nil
+				end
 
-						if child ~= nil then
-							state.treeBaseDuration -= child.treeBaseDuration
-						end
+				state.flags = bit32.bor(state.flags, Update)
+				bubbleProperties(state)
+
+				if enableProfilerTimer and bit32.band(state.mode, ProfileMode) ~= NoMode and memoizedState ~= nil then
+					local child = state.child
+
+					if child ~= nil then
+						state.treeBaseDuration -= child.treeBaseDuration
 					end
 				end
 
@@ -672,63 +670,64 @@ return {
 
 				return state
 			end
-		else
-			if state.tag == HostPortal then
-				popHostContainer(state)
-				updateHostContainer(data, state)
+		elseif state.tag == HostPortal then
+			popHostContainer(state)
+			updateHostContainer(data, state)
 
-				if data == nil then
-					preparePortalMount(state.stateNode.containerInfo)
-				end
-
-				bubbleProperties(state)
-			elseif state.tag == ContextProvider then
-				popProvider(state)
-				bubbleProperties(state)
-			elseif state.tag == IncompleteClassComponent then
-				if isContextProvider(state.type) then
-					popContext(state)
-				end
-
-				bubbleProperties(state)
-			else
-				if state.tag == SuspenseListComponent then
-					unimplemented("SuspenseListComponent") -- inferred equivalent call
-				elseif state.tag == FundamentalComponent then
-					unimplemented("FundamentalComponent") -- inferred equivalent call
-				elseif state.tag == ScopeComponent then
-					unimplemented("ScopeComponent") -- inferred equivalent call
-				elseif state.tag == Block then
-					unimplemented("Block") -- inferred equivalent call
-				elseif state.tag == OffscreenComponent or state.tag == LegacyHiddenComponent then
-					popRenderLanes(state)
-					local v = state.memoizedState ~= nil
-
-					if
-						data ~= nil
-						and (data.memoizedState ~= nil) ~= v
-						and pendingProps.mode ~= "unstable-defer-without-hiding"
-					then
-						state.flags = bit32.bor(state.flags, Update)
-					end
-
-					if
-						not v
-						or includesSomeLane(ReactFiberWorkLoopnew.subtreeRenderLanes, OffscreenLane)
-						or bit32.band(state.mode, ConcurrentMode) == NoMode
-					then
-						bubbleProperties(state)
-					end
-
-					return nil
-				end
-
-				invariant(
-					false,
-					"Unknown unit of work tag (%s). This error is likely caused by a bug in React. Please file an issue.",
-					(tostring(state.tag))
-				)
+			if data == nil then
+				preparePortalMount(state.stateNode.containerInfo)
 			end
+
+			bubbleProperties(state)
+			return nil
+		elseif state.tag == ContextProvider then
+			popProvider(state)
+			bubbleProperties(state)
+			return nil
+		elseif state.tag == IncompleteClassComponent then
+			if isContextProvider(state.type) then
+				popContext(state)
+			end
+
+			bubbleProperties(state)
+			return nil
+		else
+			if state.tag == SuspenseListComponent then
+				unimplemented("SuspenseListComponent") -- inferred equivalent call
+			elseif state.tag == FundamentalComponent then
+				unimplemented("FundamentalComponent") -- inferred equivalent call
+			elseif state.tag == ScopeComponent then
+				unimplemented("ScopeComponent") -- inferred equivalent call
+			elseif state.tag == Block then
+				unimplemented("Block") -- inferred equivalent call
+			elseif state.tag == OffscreenComponent or state.tag == LegacyHiddenComponent then
+				popRenderLanes(state)
+				local v = state.memoizedState ~= nil
+
+				if
+					data ~= nil
+					and (data.memoizedState ~= nil) ~= v
+					and pendingProps.mode ~= "unstable-defer-without-hiding"
+				then
+					state.flags = bit32.bor(state.flags, Update)
+				end
+
+				if
+					not v
+					or includesSomeLane(ReactFiberWorkLoopnew.subtreeRenderLanes, OffscreenLane)
+					or bit32.band(state.mode, ConcurrentMode) == NoMode
+				then
+					bubbleProperties(state)
+				end
+
+				return nil
+			end
+
+			invariant(
+				false,
+				"Unknown unit of work tag (%s). This error is likely caused by a bug in React. Please file an issue.",
+				(tostring(state.tag))
+			)
 
 			return nil
 		end

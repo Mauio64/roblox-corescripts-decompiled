@@ -1,6 +1,7 @@
 local parent = script.Parent.Parent
 require(parent.util.Types)
 local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local getFFlagUGCValidateAQSRequiresOnlySummary = require(parent.flags.getFFlagUGCValidateAQSRequiresOnlySummary)
 
 local validationFolders = parent.validationFolders
 local assetQualityFolders = parent.assetQualityFolders
@@ -97,7 +98,7 @@ for childName, v4 in v2 do
 	module.isAssetQualityModule = v4 == assetQualityFolders
 
 	if module.isAssetQualityModule then
-		for _, v5 in v do
+		for _, v5 in getFFlagUGCValidateAQSRequiresOnlySummary() and { ValidationEnums.SharedDataMember.aqsSummaryData } or v do
 			if not table.find(module.requiredData, v5) then
 				table.insert(module.requiredData, v5)
 			end

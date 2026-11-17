@@ -105,7 +105,11 @@ local function readName(source, p: number, line: number, p2: number, p3)
 		v2 += 1
 	end
 
-	return token.new(tokenKind2.NAME, p, v2, line, p2, p3, String.slice(body, p, v2))
+	local new = token.new
+	local name = tokenKind2.NAME
+
+	local v4 = v2
+	return new(name, p, v4, line, p2, p3, String.slice(body, p, v2))
 end
 
 local function readComment(source, p: number, line: number, p2: number, p3)

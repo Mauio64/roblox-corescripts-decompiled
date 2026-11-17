@@ -20,8 +20,6 @@ local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local RobloxAppEnums = require(parent2.RobloxAppEnums)
 local AppPage = RobloxAppEnums.AppPage
 
-local TextService = game:GetService("TextService")
-
 local VerifiedBadges = require(parent2.VerifiedBadges)
 local React = require(parent2.React)
 local Style = require(parent2.Style)
@@ -40,7 +38,6 @@ local Text = Foundation.Text
 local Enums = Foundation.Enums
 local getIconRichText = Foundation.Utility.getIconRichText
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local useTokens = Foundation.Hooks.useTokens
 
@@ -53,17 +50,10 @@ local FFlagHideDevSubsPriceIfSubscribed = SharedFlags2.FFlagHideDevSubsPriceIfSu
 local SharedFlags3 = require(parent.Parent.SharedFlags)
 local FFlagEnableDevSubsFastFollowFixes = SharedFlags3.FFlagEnableDevSubsFastFollowFixes
 
-local function generateTestmodeDisclaimer(footerText, p, p2, p3, p4)
-	local v
-
-	if FoundationFontFaceMigration then
-		v = GetTextSize(footerText, 12, p4.Typography.CaptionSmall.Font, Vector2.new(p3, 1e999), {
-			addTemporaryPadding = false
-		}).Y + 2
-	else
-		v = TextService:GetTextSize(footerText, 12, p.Footer.Font, Vector2.new(p3, 1e999)).Y + 2
-	end
-
+local function generateTestmodeDisclaimer(footerText, _, p, p2, p3)
+	local v = GetTextSize(footerText, 12, p3.Typography.CaptionSmall.Font, Vector2.new(p2, 1e999), {
+		addTemporaryPadding = false
+	}).Y + 2
 	return React.createElement("Frame", {
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.new(0.5, 0, 0, 16),
@@ -77,46 +67,38 @@ local function generateTestmodeDisclaimer(footerText, p, p2, p3, p4)
 			LayoutOrder = 1,
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1, 0, 0, v),
-			Font = if not FoundationFontFaceMigration then p.Footer.Font else nil,
-			FontFace = if FoundationFontFaceMigration then normalizeFontFace(p4.Typography.CaptionSmall.Font) else nil,
+			FontFace = normalizeFontFace(p3.Typography.CaptionSmall.Font),
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextWrapped = true,
 			Text = footerText,
 			TextSize = 12,
-			TextColor3 = p2.TextDefault.Color
+			TextColor3 = p.TextDefault.Color
 		})
 	})
 end
 
-local function generatePromptText(props, p, p2, p3, callback, value, p4)
+local function generatePromptText(props, _, p, p2, callback, value, p3)
 	return React.createElement("TextLabel", {
 		LayoutOrder = value or 2,
 		BackgroundTransparency = 1,
-		Size = UDim2.new(0, p3, 0, 0),
+		Size = UDim2.new(0, p2, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		TextXAlignment = Enum.TextXAlignment.Left,
-		Font = if not FoundationFontFaceMigration then p.Body.Font else nil,
-		FontFace = if FoundationFontFaceMigration then normalizeFontFace(p4.Typography.BodyLarge.Font) else nil,
+		FontFace = normalizeFontFace(p3.Typography.BodyLarge.Font),
 		Text = props.description,
 		TextSize = 16,
 		TextWrapped = true,
-		TextColor3 = p2.TextDefault.Color,
-		TextTransparency = p2.TextDefault.Transparency,
+		TextColor3 = p.TextDefault.Color,
+		TextTransparency = p.TextDefault.Transparency,
 		RichText = true,
 		[React.Change.AbsoluteSize] = function(data)
-			local v = if FoundationFontFaceMigration then GetTextSize(
+			callback(GetTextSize(
 				data.Text,
 				data.TextSize,
-				p4.Typography.BodyLarge.Font,
+				p3.Typography.BodyLarge.Font,
 				Vector2.new(data.AbsoluteSize.X, 1e999),
 				{ addTemporaryPadding = false }
-			).Y else TextService:GetTextSize(
-				data.Text,
-				data.TextSize,
-				data.Font,
-				Vector2.new(data.AbsoluteSize.X, 1e999)
-			).Y
-			callback(v)
+			).Y)
 		end
 	})
 end

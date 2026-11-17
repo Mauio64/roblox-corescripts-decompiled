@@ -19,7 +19,6 @@ local ParentContainerContext = require(AppChat.Contexts.ParentContainer.ParentCo
 
 local FFlagEnablePartyVoiceChangersInLua = SharedFlags.FFlagEnablePartyVoiceChangersInLua
 local FFlagAppChatIxpScreenExposure = require(AppChat.Flags.FFlagAppChatIxpScreenExposure)
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
 
 local IXPNavigationUtils = require(AppChat.Utils.IXPNavigationUtils)
 local GetTopBarStore = require(AppChat.Stores.GetTopBarStore)
@@ -177,7 +176,7 @@ function extended.render(data)
 			return createElement(SquadLobby, v)
 		end
 
-		if FFlagExpChatEnableFriendsTab and placementInExperience then
+		if placementInExperience then
 			return React.createElement(ParentContainerContext.Consumer, {
 				render = function(p2)
 					return fn2(function(p3)

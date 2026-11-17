@@ -1,3 +1,5 @@
+local Flags = require(script:FindFirstAncestor("ViewRecycler").Flags)
+local FFlagViewRecyclerReact084 = Flags.FFlagViewRecyclerReact084
 require(script.Parent.ISizeTree)
 local WeightedOrderStatisticTree = require(script.Parent.WeightedOrderStatisticTree)
 
@@ -14,10 +16,28 @@ local function prefixSumUpTo(data, p: number, estimatedItemLength: number)
 	end
 
 	if v < p then
-		return WeightedOrderStatisticTree.nodeEffectiveSum(data.left, estimatedItemLength) + (data.measuredSize or estimatedItemLength) + prefixSumUpTo(data.right, p - v, estimatedItemLength)
-	end
+		local nodeEffectiveSum = WeightedOrderStatisticTree.nodeEffectiveSum(data.left, estimatedItemLength)
+		local v2
 
-	return WeightedOrderStatisticTree.nodeEffectiveSum(data.left, estimatedItemLength) + (data.measuredSize or estimatedItemLength)
+		if FFlagViewRecyclerReact084 then
+			v2 = data.measuredSize or data.estimatedSize
+		else
+			v2 = data.measuredSize
+		end
+
+		return nodeEffectiveSum + (v2 or estimatedItemLength) + prefixSumUpTo(data.right, p - v, estimatedItemLength)
+	else
+		local nodeEffectiveSum = WeightedOrderStatisticTree.nodeEffectiveSum(data.left, estimatedItemLength)
+		local v2
+
+		if FFlagViewRecyclerReact084 then
+			v2 = data.measuredSize or data.estimatedSize
+		else
+			v2 = data.measuredSize
+		end
+
+		return nodeEffectiveSum + (v2 or estimatedItemLength)
+	end
 end
 
 local function rankAtPrefixSum(data, p: number, estimatedItemLength: number)
@@ -32,7 +52,13 @@ local function rankAtPrefixSum(data, p: number, estimatedItemLength: number)
 	end
 
 	local nodeItemCount = WeightedOrderStatisticTree.nodeItemCount(data.left)
-	local measuredSize = data.measuredSize or estimatedItemLength
+	local measuredSize
+
+	if FFlagViewRecyclerReact084 then
+		measuredSize = data.measuredSize or data.estimatedSize or estimatedItemLength
+	else
+		measuredSize = data.measuredSize or estimatedItemLength
+	end
 
 	if p < nodeEffectiveSum + measuredSize then
 		return nodeItemCount + 1
@@ -59,7 +85,13 @@ local function entryAtPrefixSum(data, p: number, estimatedItemLength: number)
 	end
 
 	local nodeItemCount = WeightedOrderStatisticTree.nodeItemCount(data.left)
-	local measuredSize = data.measuredSize or estimatedItemLength
+	local measuredSize
+
+	if FFlagViewRecyclerReact084 then
+		measuredSize = data.measuredSize or data.estimatedSize or estimatedItemLength
+	else
+		measuredSize = data.measuredSize or estimatedItemLength
+	end
 
 	if p < nodeEffectiveSum + measuredSize then
 		return nodeItemCount + 1, nodeEffectiveSum, measuredSize
@@ -78,8 +110,30 @@ function OrderStatisticTree.new(value: number?)
 	local v = nil
 	local estimatedItemLength = value or 0
 
-	local function length() -- 5 equivalent calls inferred from this helper
+	local function length() -- 6 equivalent calls inferred from this helper
 		return WeightedOrderStatisticTree.nodeItemCount(v)
+	end
+
+	local function prefixSum(p: number)
+		if p <= 1 then
+			return 0
+		end
+
+		return (prefixSumUpTo(v, p - 1, estimatedItemLength))
+	end
+
+	local function indexAtPrefixSum(p: number)
+		local v2 = length() -- inferred equivalent call
+
+		if v2 == 0 or p <= 0 then
+			return 1
+		end
+
+		if WeightedOrderStatisticTree.nodeEffectiveSum(v, estimatedItemLength) <= p then
+			return v2 + 1
+		end
+
+		return rankAtPrefixSum(v, p, estimatedItemLength)
 	end
 
 	local function getEntryAtPrefixSum(p: number)
@@ -90,72 +144,106 @@ function OrderStatisticTree.new(value: number?)
 		end
 
 		if p <= 0 then
+			if FFlagViewRecyclerReact084 then
+				return 1, 0, WeightedOrderStatisticTree.unitSizeAt(v, 1, estimatedItemLength)
+			end
+
 			return 1, 0, WeightedOrderStatisticTree.measuredAt(v, 1) or estimatedItemLength
+		else
+			local nodeEffectiveSum = WeightedOrderStatisticTree.nodeEffectiveSum(v, estimatedItemLength)
+
+			if nodeEffectiveSum <= p then
+				return v2 + 1, nodeEffectiveSum, 0
+			end
+
+			return entryAtPrefixSum(v, p, estimatedItemLength)
 		end
-
-		local nodeEffectiveSum = WeightedOrderStatisticTree.nodeEffectiveSum(v, estimatedItemLength)
-
-		if nodeEffectiveSum <= p then
-			return v2 + 1, nodeEffectiveSum, 0
-		end
-
-		return entryAtPrefixSum(v, p, estimatedItemLength)
 	end
 
-	return {
-		prefixSum = function(p: number)
-			if p <= 1 then
-				return 0
-			end
+	local function getSize(p: number) -- 2 equivalent calls inferred from this helper
+		if p < 1 or length() < p then -- inferred equivalent call
+			return 0
+		end
 
-			return (prefixSumUpTo(v, p - 1, estimatedItemLength))
-		end,
-		indexAtPrefixSum = function(p: number)
-			local v2 = length() -- inferred equivalent call
+		if FFlagViewRecyclerReact084 then
+			return WeightedOrderStatisticTree.unitSizeAt(v, p, estimatedItemLength)
+		end
 
-			if v2 == 0 or p <= 0 then
-				return 1
-			end
+		return WeightedOrderStatisticTree.measuredAt(v, p) or estimatedItemLength
+	end
 
-			if WeightedOrderStatisticTree.nodeEffectiveSum(v, estimatedItemLength) <= p then
-				return v2 + 1
-			end
+	local function fillRange(p: number, p2: number, list)
+		WeightedOrderStatisticTree.fillRangeFromNode(v, 0, 0, p, p2, estimatedItemLength, list)
 
-			return rankAtPrefixSum(v, p, estimatedItemLength)
-		end,
-		entryAtPrefixSum = getEntryAtPrefixSum,
-		getSize = function(p: number)
-			if p < 1 or length() < p then -- inferred equivalent call
-				return 0
-			end
+		for i = #list, p2 - p + 2, -1 do
+			list[i] = nil
+		end
+	end
 
-			return WeightedOrderStatisticTree.measuredAt(v, p) or estimatedItemLength
-		end,
-		fillRange = function(p: number, p2: number, list)
-			WeightedOrderStatisticTree.fillRangeFromNode(v, 0, 0, p, p2, estimatedItemLength, list)
+	local function update(p: number, p2: number?)
+		WeightedOrderStatisticTree.updateUnitAt(v, p, p2)
+	end
 
-			for i = #list, p2 - p + 2, -1 do
-				list[i] = nil
-			end
-		end,
-		update = function(p: number, p2: number?)
-			WeightedOrderStatisticTree.updateUnitAt(v, p, p2)
-		end,
+	local insert
+
+	if FFlagViewRecyclerReact084 then
+		insert = function(p: number, p2: number?, p3: number?)
+			v = WeightedOrderStatisticTree.insertUnitAt(v, p, p2, p3)
+		end
+	else
 		insert = function(p: number, p2: number?)
 			v = WeightedOrderStatisticTree.insertUnitAt(v, p, p2)
-		end,
-		remove = function(p: number)
-			v = WeightedOrderStatisticTree.removeUnitAt(v, p)
-		end,
-		buildFromArray = function(list)
-			local v2 = table.create(#list)
+		end
+	end
 
-			for k, item in list do
-				v2[k] = { itemCount = 1, measuredSize = item }
+	local function remove(p: number)
+		v = WeightedOrderStatisticTree.removeUnitAt(v, p)
+	end
+
+	local function buildFromArray(list)
+		local v2 = table.create(#list)
+
+		for k, item in list do
+			v2[k] = { itemCount = 1, measuredSize = item }
+		end
+
+		v = WeightedOrderStatisticTree.buildBalanced(v2, 1, #v2)
+	end
+
+	local setItemEstimate = nil
+	local buildFromMeasurements
+
+	if FFlagViewRecyclerReact084 then
+		setItemEstimate = function(p: number, p2: number?): boolean
+			if p < 1 or length() < p or WeightedOrderStatisticTree.estimatedAt(v, p) == p2 then -- inferred equivalent call
+				return false
 			end
 
-			v = WeightedOrderStatisticTree.buildBalanced(v2, 1, #v2)
-		end,
+			local measuredAt = WeightedOrderStatisticTree.measuredAt(v, p)
+			local size = getSize(p) -- inferred equivalent call
+			v = WeightedOrderStatisticTree.removeUnitAt(v, p)
+			v = WeightedOrderStatisticTree.insertUnitAt(v, p, measuredAt, p2)
+			return getSize(p) ~= size -- inferred equivalent call
+		end
+
+		buildFromMeasurements = function(p: number, callback, callback2)
+			local v2 = table.create(p)
+
+			for i = 1, p do
+				local v3 = { itemCount = 1, measuredSize = callback(i), estimatedSize = 0 }
+				local estimatedSize
+
+				if callback2 ~= nil then
+					estimatedSize = callback2(i)
+				end
+
+				v3.estimatedSize = estimatedSize
+				v2[i] = v3
+			end
+
+			v = WeightedOrderStatisticTree.buildBalanced(v2, 1, p)
+		end
+	else
 		buildFromMeasurements = function(p: number, callback)
 			local v2 = table.create(p)
 
@@ -164,7 +252,25 @@ function OrderStatisticTree.new(value: number?)
 			end
 
 			v = WeightedOrderStatisticTree.buildBalanced(v2, 1, p)
-		end,
+		end
+	end
+
+	if not FFlagViewRecyclerReact084 then
+		setItemEstimate = nil
+	end
+
+	return {
+		prefixSum = prefixSum,
+		indexAtPrefixSum = indexAtPrefixSum,
+		entryAtPrefixSum = getEntryAtPrefixSum,
+		getSize = getSize,
+		fillRange = fillRange,
+		update = update,
+		insert = insert,
+		remove = remove,
+		setItemEstimate = setItemEstimate,
+		buildFromArray = buildFromArray,
+		buildFromMeasurements = buildFromMeasurements,
 		toArray = function()
 			local array = table.create(length())
 			WeightedOrderStatisticTree.appendToArray(v, array, estimatedItemLength)
@@ -176,7 +282,15 @@ function OrderStatisticTree.new(value: number?)
 			if estimatedItemLength == p then
 				v2 = false
 			else
-				v2 = WeightedOrderStatisticTree.nodeMeasuredCount(v) < length() -- inferred equivalent call
+				local v3
+
+				if FFlagViewRecyclerReact084 then
+					v3 = WeightedOrderStatisticTree.nodeFixedCount
+				else
+					v3 = WeightedOrderStatisticTree.nodeMeasuredCount
+				end
+
+				v2 = v3(v) < length() -- inferred equivalent call
 			end
 
 			estimatedItemLength = p

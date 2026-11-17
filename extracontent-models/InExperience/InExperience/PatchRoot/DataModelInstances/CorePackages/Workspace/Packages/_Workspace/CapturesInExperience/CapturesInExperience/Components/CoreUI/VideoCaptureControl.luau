@@ -102,15 +102,11 @@ return function(p)
 
 		local v9 = isEligibleForMoments(v7)
 
-		if v9 then
-			if current == nil then
-				return false
-			end
-
-			return FIntMomentsInExperienceMinCaptureSeconds <= os.clock() - current
+		if not v9 then
+			return v9
 		end
 
-		return v9
+		return current ~= nil and FIntMomentsInExperienceMinCaptureSeconds <= os.clock() - current
 	end
 
 	local v9 = useCallback(function()

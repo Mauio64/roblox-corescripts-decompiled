@@ -20,8 +20,6 @@ local fetchVotes = require(script.Parent.fetchVotes)
 local fetchUserVote = require(script.Parent.fetchUserVote)
 local requestUserVoteUpdate = require(script.Parent.requestUserVoteUpdate)
 local SharedFlags = require(parent.SharedFlags)
-
-local FFlagLuaAppDataHydrationVotesStoreTrackOptimisticVotes = SharedFlags.FFlagLuaAppDataHydrationVotesStoreTrackOptimisticVotes
 local ReasonNotVoteable = VotesStoreTypes.ReasonNotVoteable
 
 local SharedFlags2 = require(parent.SharedFlags)
@@ -133,37 +131,25 @@ local function createVotesStore()
 		dataResolver2.setMutation(universeId, { userVote = userVote3 })
 
 		if v4 then
-			local v5, v6
+			local v5 = userVote == true and 1 or 0
+			local v6 = userVote == false and 1 or 0
 
-			if FFlagLuaAppDataHydrationVotesStoreTrackOptimisticVotes then
-				local v7 = userVote == true and 1 or 0
-				local v8 = userVote == false and 1 or 0
+			local v7 = userVote2 == true and 1 or 0
+			local v8 = userVote2 == false and 1 or 0
 
-				local v9 = userVote2 == true and 1 or 0
-				local v10 = userVote2 == false and 1 or 0
-
-				v5 = v9 - v7
-				v6 = v10 - v8
-			else
-				v5 = userVote2 == true and 1 or 0
-				v6 = if userVote2 == false then 1 else 0
-			end
-
-			local upVotes = v4.upVotes + v5
-			local downVotes = v4.downVotes + v6
-
-			if FFlagLuaAppDataHydrationVotesStoreTrackOptimisticVotes then
-				upVotes = math.max(0, upVotes)
-				downVotes = math.max(0, downVotes)
-			end
-
-			local v7 = {
+			local v9 = v7 - v5
+			local v10 = v8 - v6
+			local v11 = v4.upVotes + v9
+			local v12 = v4.downVotes + v10
+			local upVotes = math.max(0, v11)
+			local downVotes = math.max(0, v12)
+			local v13 = {
 				upVotes = upVotes,
 				downVotes = downVotes,
 				rating = VotesUtils.calculateRating(upVotes, downVotes)
 			}
 
-			dataCache.updateItem(universeId, v7)
+			dataCache.updateItem(universeId, v13)
 		end
 
 		local v5 = getGameInfoStore(false).applyVoteChange(universeId, userVote, userVote2)

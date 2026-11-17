@@ -9,6 +9,85 @@ local SharedFlags = require(parent.SharedFlags)
 local FFlagPlayerSearchEnableOnlineFrequents = SharedFlags.FFlagPlayerSearchEnableOnlineFrequents
 local SharedFlags2 = require(parent.SharedFlags)
 local FFlagProfileInsightsParseClassmates = SharedFlags2.FFlagProfileInsightsParseClassmates
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagProfileInsightsKeyByRankingStrategy = SharedFlags3.FFlagProfileInsightsKeyByRankingStrategy
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagTrustedFriendCandidatesSection = SharedFlags4.FFlagTrustedFriendCandidatesSection
+
+local function hasNumberValue(p: number?): boolean -- 3 equivalent calls inferred from this helper
+	return p ~= nil and p ~= -1
+end
+
+local v = {
+	mutualFriendInsight = {
+		field = "mutualFriends",
+		hasValue = function(p): boolean
+			return #p.mutualFriends > 0
+		end
+	},
+	offlineFrequentsInsight = {
+		field = "isOfflineFrequents",
+		hasValue = function(p): boolean
+			return p.isOfflineFrequents == true
+		end
+	},
+	playedTogetherInsight = FFlagPlayerSearchEnableOnlineFrequents and {
+		field = "isOfflineFrequents",
+		hasValue = function(p): boolean
+			return p.isOfflineFrequents == true
+		end
+	} or nil,
+	friendshipAgeInsight = {
+		field = "friendshipAgeUnixSeconds",
+		hasValue = function(p)
+			return hasNumberValue(p.friendshipAgeUnixSeconds) -- inferred equivalent call
+		end
+	},
+	friendRequestOriginInsight = {
+		field = "friendRequestOriginSource",
+		hasValue = function(p)
+			if FFlagTrustedFriendCandidatesSection then
+			end
+
+			return hasNumberValue(p.friendRequestOriginSource) -- inferred equivalent call
+		end
+	},
+	accountCreationDateInsight = {
+		field = "accountCreationDateUnixSeconds",
+		hasValue = function(p)
+			return hasNumberValue(p.accountCreationDateUnixSeconds) -- inferred equivalent call
+		end
+	},
+	accountLocationInsight = {
+		field = "localizedCountryName",
+		hasValue = function(p): boolean
+			local localizedCountryName = p.localizedCountryName
+			return localizedCountryName ~= nil and localizedCountryName ~= ""
+		end
+	},
+	classmatesInsight = FFlagProfileInsightsParseClassmates and {
+		field = "isClassmate",
+		hasValue = function(p): boolean
+			return p.isClassmate == true
+		end
+	} or nil
+}
+
+local function getRankedInsightKeys(profileInsights, profileInsight)
+	local fields = {}
+
+	for _, item in profileInsights do
+		for k, v2 in v do
+			if not (item[k] and v2 and table.find(fields, v2.field) == nil and v2.hasValue(profileInsight)) then
+				continue
+			end
+
+			table.insert(fields, v2.field)
+		end
+	end
+
+	return fields
+end
 
 local function createProfileInsight(targetUser: string, item)
 	local profileInsight = {
@@ -94,6 +173,10 @@ local function createProfileInsight(targetUser: string, item)
 		then
 			profileInsight.userAgeVerifiedBracket = `{accountCreationDateInsight.namespace}.{accountCreationDateInsight.verifiedAgeBandLabel}`
 		end
+	end
+
+	if FFlagProfileInsightsKeyByRankingStrategy then
+		profileInsight.rankedInsightKeys = getRankedInsightKeys(item.profileInsights, profileInsight)
 	end
 
 	return profileInsight

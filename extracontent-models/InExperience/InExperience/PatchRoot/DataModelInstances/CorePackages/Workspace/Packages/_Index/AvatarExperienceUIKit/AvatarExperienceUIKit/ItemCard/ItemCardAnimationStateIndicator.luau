@@ -3,7 +3,6 @@ local React = require(parent.React)
 local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local function ItemCardAnimationStateIndicator(props)
 	local v = useTokens()
@@ -83,42 +82,19 @@ local function ItemCardAnimationStateIndicator(props)
 	local label
 
 	if text then
-		local createElement2 = React.createElement
-		local v4 = {
+		label = React.createElement("TextLabel", {
 			BackgroundTransparency = 1,
 			Size = UDim2.fromScale(1, 0),
 			Text = text,
-			Font = 0,
-			FontFace = 0,
-			TextSize = 0,
-			TextColor3 = 0,
-			TextTruncate = 0,
-			TextXAlignment = 0,
-			TextYAlignment = 0,
+			FontFace = normalizeFontFace(v.Typography.TitleLarge.Font),
+			TextSize = v.Typography.TitleLarge.FontSize,
+			TextColor3 = v.Color.Content.Emphasis.Color3,
+			TextTruncate = Enum.TextTruncate.AtEnd,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextYAlignment = Enum.TextYAlignment.Top,
 			TextWrapped = true,
 			LayoutOrder = 2
-		}
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = v.Typography.TitleLarge.Font
-		end
-
-		v4.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(v.Typography.TitleLarge.Font)
-		end
-
-		v4.FontFace = fontFace
-
-		v4.TextSize = v.Typography.TitleLarge.FontSize
-		v4.TextColor3 = v.Color.Content.Emphasis.Color3
-		v4.TextTruncate = Enum.TextTruncate.AtEnd
-		v4.TextXAlignment = Enum.TextXAlignment.Left
-		v4.TextYAlignment = Enum.TextYAlignment.Top
-		label = createElement2("TextLabel", v4)
+		})
 	end
 
 	v3.Label = label

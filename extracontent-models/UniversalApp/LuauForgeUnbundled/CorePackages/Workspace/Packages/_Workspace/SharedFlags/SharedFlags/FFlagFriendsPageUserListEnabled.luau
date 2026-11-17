@@ -1,1 +1,0 @@
-return game:DefineFastFlag("FriendsPageUserListEnabled_v2", false)

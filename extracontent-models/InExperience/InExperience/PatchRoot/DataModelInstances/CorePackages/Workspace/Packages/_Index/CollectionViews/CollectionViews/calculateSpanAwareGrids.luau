@@ -11,7 +11,6 @@ local SpanForItemType = GameCollectionItemTypes.SpanForItemType
 
 local FFlagLuaAppEnableNxMRoduxApportioning = SharedFlags.FFlagLuaAppEnableNxMRoduxApportioning
 local FFlagLuaAppEnableNxMApportioningExtraLogging = SharedFlags.FFlagLuaAppEnableNxMApportioningExtraLogging
-local defineFastFlag = game:DefineFastFlag("LuaAppFixApportioningTileTailConflict", false)
 
 local v = {
 	[GameCollectionItemType.TwoByOneTile] = { colSpan = 2, rowSpan = 1 }
@@ -132,62 +131,84 @@ local function processOneGrid(list, nextStartIndex: number, items, itemsPerRow: 
 			end
 
 			return false
-		elseif FFlagLuaAppEnableNxMRoduxApportioning or flag or not (totalCells < nextScanPosition + colSpan) then
-			if alignmentType == "LeftPin" and currentColumn ~= 1 then
-				if FFlagLuaAppEnableNxMApportioningExtraLogging then
-					ApportioningDiagnosticTelemetry.log("SpanDeferred", {
-						reason = "left_pin_misaligned",
-						originalIndex = originalIndex,
-						colSpan = colSpan,
-						rowSpan = rowSpan,
-						alignmentType = "LeftPin",
-						currentRow = currentRow,
-						currentColumn = currentColumn,
-						nextScanPosition = nextScanPosition,
-						itemsPerRow = itemsPerRow,
-						maxRows = maxRows,
-						nxmApportioningFlagValue = FFlagLuaAppEnableNxMRoduxApportioning
-					})
-				end
+		end
 
-				return false
-			elseif alignmentType == "RightPin" and currentColumn + colSpan - 1 ~= itemsPerRow then
-				if FFlagLuaAppEnableNxMApportioningExtraLogging then
-					ApportioningDiagnosticTelemetry.log("SpanDeferred", {
-						reason = "right_pin_misaligned",
-						originalIndex = originalIndex,
-						colSpan = colSpan,
-						rowSpan = rowSpan,
-						alignmentType = "RightPin",
-						currentRow = currentRow,
-						currentColumn = currentColumn,
-						nextScanPosition = nextScanPosition,
-						itemsPerRow = itemsPerRow,
-						maxRows = maxRows,
-						nxmApportioningFlagValue = FFlagLuaAppEnableNxMRoduxApportioning
-					})
-				end
+		if not (FFlagLuaAppEnableNxMRoduxApportioning or flag) and totalCells < nextScanPosition + colSpan then
+			if FFlagLuaAppEnableNxMApportioningExtraLogging then
+				ApportioningDiagnosticTelemetry.log("SpanDeferred", {
+					reason = "totalcells_exceeded_legacy",
+					originalIndex = originalIndex,
+					colSpan = colSpan,
+					rowSpan = rowSpan,
+					alignmentType = alignmentType,
+					minRowPadding = minRowPadding,
+					nextScanPosition = nextScanPosition,
+					totalCells = totalCells,
+					itemsPerRow = itemsPerRow,
+					maxRows = maxRows,
+					nxmApportioningFlagValue = FFlagLuaAppEnableNxMRoduxApportioning
+				})
+			end
 
-				return false
-			elseif itemsPerRow < currentColumn + colSpan - 1 then
-				if FFlagLuaAppEnableNxMApportioningExtraLogging then
-					ApportioningDiagnosticTelemetry.log("SpanDeferred", {
-						reason = "horizontal_wrap",
-						originalIndex = originalIndex,
-						colSpan = colSpan,
-						rowSpan = rowSpan,
-						alignmentType = alignmentType,
-						currentRow = currentRow,
-						currentColumn = currentColumn,
-						nextScanPosition = nextScanPosition,
-						itemsPerRow = itemsPerRow,
-						maxRows = maxRows,
-						nxmApportioningFlagValue = FFlagLuaAppEnableNxMRoduxApportioning
-					})
-				end
+			return false
+		end
 
-				return false
-			elseif (FFlagLuaAppEnableNxMRoduxApportioning or flag) and maxRows < currentRow + rowSpan - 1 then
+		if alignmentType == "LeftPin" and currentColumn ~= 1 then
+			if FFlagLuaAppEnableNxMApportioningExtraLogging then
+				ApportioningDiagnosticTelemetry.log("SpanDeferred", {
+					reason = "left_pin_misaligned",
+					originalIndex = originalIndex,
+					colSpan = colSpan,
+					rowSpan = rowSpan,
+					alignmentType = "LeftPin",
+					currentRow = currentRow,
+					currentColumn = currentColumn,
+					nextScanPosition = nextScanPosition,
+					itemsPerRow = itemsPerRow,
+					maxRows = maxRows,
+					nxmApportioningFlagValue = FFlagLuaAppEnableNxMRoduxApportioning
+				})
+			end
+
+			return false
+		elseif alignmentType == "RightPin" and currentColumn + colSpan - 1 ~= itemsPerRow then
+			if FFlagLuaAppEnableNxMApportioningExtraLogging then
+				ApportioningDiagnosticTelemetry.log("SpanDeferred", {
+					reason = "right_pin_misaligned",
+					originalIndex = originalIndex,
+					colSpan = colSpan,
+					rowSpan = rowSpan,
+					alignmentType = "RightPin",
+					currentRow = currentRow,
+					currentColumn = currentColumn,
+					nextScanPosition = nextScanPosition,
+					itemsPerRow = itemsPerRow,
+					maxRows = maxRows,
+					nxmApportioningFlagValue = FFlagLuaAppEnableNxMRoduxApportioning
+				})
+			end
+
+			return false
+		elseif itemsPerRow < currentColumn + colSpan - 1 then
+			if FFlagLuaAppEnableNxMApportioningExtraLogging then
+				ApportioningDiagnosticTelemetry.log("SpanDeferred", {
+					reason = "horizontal_wrap",
+					originalIndex = originalIndex,
+					colSpan = colSpan,
+					rowSpan = rowSpan,
+					alignmentType = alignmentType,
+					currentRow = currentRow,
+					currentColumn = currentColumn,
+					nextScanPosition = nextScanPosition,
+					itemsPerRow = itemsPerRow,
+					maxRows = maxRows,
+					nxmApportioningFlagValue = FFlagLuaAppEnableNxMRoduxApportioning
+				})
+			end
+
+			return false
+		else
+			if (FFlagLuaAppEnableNxMRoduxApportioning or flag) and maxRows < currentRow + rowSpan - 1 then
 				if FFlagLuaAppEnableNxMApportioningExtraLogging then
 					ApportioningDiagnosticTelemetry.log("SpanDeferred", {
 						reason = "vertical_overflow",
@@ -205,7 +226,9 @@ local function processOneGrid(list, nextStartIndex: number, items, itemsPerRow: 
 				end
 
 				return false
-			elseif
+			end
+
+			if
 				(FFlagLuaAppEnableNxMRoduxApportioning or flag)
 				and rowSpan > 1
 				and #list - originalIndex < currentColumn - 1
@@ -228,74 +251,56 @@ local function processOneGrid(list, nextStartIndex: number, items, itemsPerRow: 
 				end
 
 				return false
-			else
-				if defineFastFlag and (FFlagLuaAppEnableNxMRoduxApportioning or flag) then
-					for i = 0, rowSpan - 1 do
-						for j = 0, colSpan - 1 do
-							local collidingRow = currentRow + i
-							local collidingCol = currentColumn + j
+			end
 
-							if v2[collidingRow] and v2[collidingRow][collidingCol] ~= nil then
-								if FFlagLuaAppEnableNxMApportioningExtraLogging then
-									ApportioningDiagnosticTelemetry.log("SpanDeferred", {
-										reason = "span_cell_collision",
-										originalIndex = originalIndex,
-										colSpan = colSpan,
-										rowSpan = rowSpan,
-										alignmentType = alignmentType,
-										currentRow = currentRow,
-										currentColumn = currentColumn,
-										collidingRow = collidingRow,
-										collidingCol = collidingCol,
-										collidingValue = v2[collidingRow][collidingCol],
-										itemsPerRow = itemsPerRow,
-										maxRows = maxRows,
-										nxmApportioningFlagValue = FFlagLuaAppEnableNxMRoduxApportioning
-									})
-								end
+			if FFlagLuaAppEnableNxMRoduxApportioning or flag then
+				for i = 0, rowSpan - 1 do
+					for j = 0, colSpan - 1 do
+						local collidingRow = currentRow + i
+						local collidingCol = currentColumn + j
 
-								return false
+						if v2[collidingRow] and v2[collidingRow][collidingCol] ~= nil then
+							if FFlagLuaAppEnableNxMApportioningExtraLogging then
+								ApportioningDiagnosticTelemetry.log("SpanDeferred", {
+									reason = "span_cell_collision",
+									originalIndex = originalIndex,
+									colSpan = colSpan,
+									rowSpan = rowSpan,
+									alignmentType = alignmentType,
+									currentRow = currentRow,
+									currentColumn = currentColumn,
+									collidingRow = collidingRow,
+									collidingCol = collidingCol,
+									collidingValue = v2[collidingRow][collidingCol],
+									itemsPerRow = itemsPerRow,
+									maxRows = maxRows,
+									nxmApportioningFlagValue = FFlagLuaAppEnableNxMRoduxApportioning
+								})
 							end
+
+							return false
 						end
 					end
 				end
+			end
 
-				if FFlagLuaAppEnableNxMRoduxApportioning or flag then
-					for i = 0, rowSpan - 1 do
-						for j = 0, colSpan - 1 do
-							writeLayoutCell(currentRow + i, currentColumn + j, -1)
-						end
+			if FFlagLuaAppEnableNxMRoduxApportioning or flag then
+				for i = 0, rowSpan - 1 do
+					for j = 0, colSpan - 1 do
+						writeLayoutCell(currentRow + i, currentColumn + j, -1)
 					end
-
-					writeLayoutCell(currentRow, currentColumn, originalIndex)
-					nextScanPosition = v3 + colSpan
-					nextAllowedRow = currentRow + rowSpan - 1 + minRowPadding
-				else
-					table.insert(placedIndices, originalIndex)
-					nextScanPosition += colSpan
-					nextAllowedRow = currentRow + minRowPadding
 				end
 
-				return true
-			end
-		else
-			if FFlagLuaAppEnableNxMApportioningExtraLogging then
-				ApportioningDiagnosticTelemetry.log("SpanDeferred", {
-					reason = "totalcells_exceeded_legacy",
-					originalIndex = originalIndex,
-					colSpan = colSpan,
-					rowSpan = rowSpan,
-					alignmentType = alignmentType,
-					minRowPadding = minRowPadding,
-					nextScanPosition = nextScanPosition,
-					totalCells = totalCells,
-					itemsPerRow = itemsPerRow,
-					maxRows = maxRows,
-					nxmApportioningFlagValue = FFlagLuaAppEnableNxMRoduxApportioning
-				})
+				writeLayoutCell(currentRow, currentColumn, originalIndex)
+				nextScanPosition = v3 + colSpan
+				nextAllowedRow = currentRow + rowSpan - 1 + minRowPadding
+			else
+				table.insert(placedIndices, originalIndex)
+				nextScanPosition += colSpan
+				nextAllowedRow = currentRow + minRowPadding
 			end
 
-			return false
+			return true
 		end
 	end
 

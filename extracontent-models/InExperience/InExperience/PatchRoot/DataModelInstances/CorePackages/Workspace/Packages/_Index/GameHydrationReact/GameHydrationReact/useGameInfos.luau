@@ -4,30 +4,22 @@ local React = require(parent.React)
 local Signals = require(parent.Signals)
 local SignalsReact = require(parent.SignalsReact)
 local DataHydration = require(parent.DataHydration)
-local SharedFlags = require(parent.SharedFlags)
-local FFlagMigrateGameInfoToStore = SharedFlags.FFlagMigrateGameInfoToStore
-local v, v2
 
-if FFlagMigrateGameInfoToStore then
-	v = Signals.createSignal(false)
-	v2 = {}
-else
-	v = nil
-	v2 = nil
-end
+local signal = Signals.createSignal(false)
+local v = {}
 
 local function useGameInfos(items)
-	local v3 = {}
+	local v2 = {}
 
 	for _, item in items do
-		table.insert(v3, (tostring(item)))
+		table.insert(v2, (tostring(item)))
 	end
 
-	table.sort(v3)
+	table.sort(v2)
 
-	local joined = table.concat(v3, ",")
+	local joined = table.concat(v2, ",")
 
-	local v4 = React.useMemo(function()
+	local v3 = React.useMemo(function()
 		if joined == "" then
 			return {}
 		end
@@ -35,12 +27,12 @@ local function useGameInfos(items)
 		return (string.split(joined, ","))
 	end, { joined })
 
-	local v5 = React.useMemo(function()
-		local gameInfos = DataHydration.Game.getGameInfoStore(false).getGameInfos(v4)
+	local v4 = React.useMemo(function()
+		local gameInfos = DataHydration.Game.getGameInfoStore(false).getGameInfos(v3)
 		return function(p)
-			if FFlagMigrateGameInfoToStore and next(gameInfos) == nil then
-				v(p)
-				return v2
+			if next(gameInfos) == nil then
+				signal(p)
+				return v
 			end
 
 			local result = {}
@@ -55,9 +47,9 @@ local function useGameInfos(items)
 
 			return result
 		end
-	end, { v4 })
+	end, { v3 })
 
-	return SignalsReact.useSignalState(v5)
+	return SignalsReact.useSignalState(v4)
 end
 
 return useGameInfos

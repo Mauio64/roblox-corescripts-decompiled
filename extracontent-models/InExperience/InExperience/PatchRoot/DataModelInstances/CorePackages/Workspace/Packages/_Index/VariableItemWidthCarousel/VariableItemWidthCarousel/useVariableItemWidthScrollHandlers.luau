@@ -57,13 +57,14 @@ function useVariableItemWidthScrollHandlers(list, p: number, callback, p2, value
 
 		if UserGameSettings.ReducedMotion then
 			instance.CanvasPosition = canvasPosition
-		else
-			ref.current = TweenService:Create(
-				instance,
-				TweenInfo.new(value or 0.75, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut),
-				{ CanvasPosition = canvasPosition }
-			):Play()
+			return
 		end
+
+		ref.current = TweenService:Create(
+			instance,
+			TweenInfo.new(value or 0.75, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut),
+			{ CanvasPosition = canvasPosition }
+		):Play()
 	end, { UserGameSettings.ReducedMotion, value })
 
 	local v3 = React.useCallback(function()

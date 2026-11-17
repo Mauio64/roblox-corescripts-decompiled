@@ -4,8 +4,6 @@ local parent = userList.Parent
 local React = require(parent.React)
 local RoactUtils = require(parent.RoactUtils)
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
-local NetworkingPresence = require(userList.Networking.NetworkingPresence)
-local FFlagUserListPresenceStoreMigration = require(userList.Flags.FFlagUserListPresenceStoreMigration)
 local Foundation = require(parent.Foundation)
 local View = Foundation.View
 local NavigationRodux = require(parent.NavigationRodux)
@@ -48,12 +46,6 @@ local function UserList(props)
 			v(NavigateDown(v2))
 		end
 	end, { props.onUserSelected, v })
-
-	React.useEffect(function()
-		if not FFlagUserListPresenceStoreMigration and #props.userIds > 0 then
-			v(NetworkingPresence.GetPresencesFromUserIds.API(props.userIds))
-		end
-	end, { props.userIds })
 
 	if #props.userIds == 0 then
 		return nil

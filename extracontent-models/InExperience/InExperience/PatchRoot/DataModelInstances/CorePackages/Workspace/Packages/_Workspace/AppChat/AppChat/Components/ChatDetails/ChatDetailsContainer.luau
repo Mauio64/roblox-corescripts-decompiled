@@ -51,7 +51,6 @@ local ChatDetailsTelemetryLayer = require(AppChat.Telemetry.Layers.ChatDetailsTe
 local ChatDetailsTelemetryEvents = require(AppChat.Components.ChatDetails.ChatDetailsTelemetryEvents)
 local ChatConversationTelemetryState = require(AppChat.Contexts.TelemetryState.ChatConversationTelemetryState)
 local ChatDetailsTelemetryState = require(AppChat.Contexts.TelemetryState.ChatDetailsTelemetryState)
-local getFFlagAppChatEnableRootedNavigation = require(AppChat.Flags.getFFlagAppChatEnableRootedNavigation)
 local FFlagAppChatUseUserProfileHydration = require(AppChat.Flags.FFlagAppChatUseUserProfileHydration)
 local useProfileNames = require(AppChat.Hooks.useProfileNames)
 local getCombinedNameFromProfileNames = require(AppChat.Users.getCombinedNameFromProfileNames)
@@ -230,7 +229,7 @@ return function(options)
 	local function onLeaveGroupCellActivated()
 		local isRooted
 
-		if getFFlagAppChatEnableRootedNavigation() and v5 then
+		if v5 then
 			isRooted = v5.getParam("isRooted", false)
 		else
 			isRooted = false

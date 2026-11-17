@@ -15,8 +15,34 @@ local getFFlagUGCValidateForwardIECRestrictedUserIds = require(parent.flags.getF
 local getFFlagUGCValidateBackendInExperienceViaCanPublish = require(parent.flags.getFFlagUGCValidateBackendInExperienceViaCanPublish)
 local getFFlagUGCValidateMakeupCategoryParity = require(parent.flags.getFFlagUGCValidateMakeupCategoryParity)
 
+local getFFlagUGCValidateRejectUnsupportedCreatorTypes = require(parent.flags.getFFlagUGCValidateRejectUnsupportedCreatorTypes)
+
 local v = { MODERATION_STATE_REVIEWING = true, Reviewing = true }
 local v2 = { MODERATION_STATE_APPROVED = true, Approved = true }
+
+local function validateConfiguredCreators(object, restrictedUserIds): boolean
+	for _, item in restrictedUserIds do
+		if item.creatorType == "Experience" then
+			object:fail(ErrorSourceStrings.Keys.ExperienceCreatorNotSupported, {
+				CreatorType = item.creatorType,
+				CreatorId = item.id
+			})
+
+			return false
+		end
+
+		if item.creatorType ~= "User" and item.creatorType ~= "Group" then
+			object:fail(ErrorSourceStrings.Keys.UnsupportedCreatorType, {
+				CreatorType = item.creatorType,
+				CreatorId = item.id
+			})
+
+			return false
+		end
+	end
+
+	return true
+end
 
 local function collectContentIdsArray(items) -- 1 equivalent call inferred from this helper
 	local contentIdsArray = {}
@@ -73,6 +99,16 @@ local function buildOwnerLookup(restrictedUserIds) -- 1 equivalent call inferred
 	return idSet
 end
 
+local function buildTypedCreatorLookup(restrictedUserIds)
+	local typedCreatorLookup = { User = {}, Group = {} }
+
+	for _, item in restrictedUserIds do
+		typedCreatorLookup[item.creatorType][tonumber(item.id)] = true
+	end
+
+	return typedCreatorLookup
+end
+
 local function runBackend(object, contentIds, backendConfigs)
 	local restrictedUserIds = backendConfigs.restrictedUserIds
 
@@ -80,48 +116,85 @@ local function runBackend(object, contentIds, backendConfigs)
 		return
 	end
 
+	local fFlagUGCValidateRejectUnsupportedCreatorTypes = getFFlagUGCValidateRejectUnsupportedCreatorTypes()
+	local v3
+
+	if fFlagUGCValidateRejectUnsupportedCreatorTypes then
+		if not validateConfiguredCreators(object, restrictedUserIds) then
+			return
+		end
+
+		v3 = buildTypedCreatorLookup(restrictedUserIds)
+	else
+		v3 = {}
+	end
+
 	local ownerLookup = buildOwnerLookup(restrictedUserIds) -- inferred equivalent call
 
 	for k, item in contentIds do
-		local v3 = item[1]
-		local assetCreationDetailsRCC, v4 = getAssetCreationDetailsRCC(k)
+		local v4 = item[1]
+		local assetCreationDetailsRCC, v5 = getAssetCreationDetailsRCC(k)
 
 		if not assetCreationDetailsRCC then
 			object:forceError("Failed to load asset")
 		end
 
-		local creator = v4.creationContext.creator
-		local v5
+		local creator = v5.creationContext.creator
+		local v6
 
-		if creator.userId then
-			v5 = creator.userId
+		if fFlagUGCValidateRejectUnsupportedCreatorTypes then
+			if creator.userId == nil then
+				if creator.groupId == nil then
+					v6 = false
+				else
+					v6 = v3.Group[tonumber(creator.groupId)] == true
+				end
+			else
+				v6 = v3.User[tonumber(creator.userId)] == true
+			end
 		else
-			v5 = creator.groupId
+			v6 = true
 		end
 
-		if not ownerLookup[tonumber(v5)] then
+		local v7
+
+		if creator.userId then
+			v7 = creator.userId
+		else
+			v7 = creator.groupId
+		end
+
+		if not (ownerLookup[tonumber(v7)] and v6) then
 			object:fail(ErrorSourceStrings.Keys.DescendantIdNotOwned, {
 				AssetId = k,
-				InstanceFullName = v3.instance:GetFullName(),
-				FieldName = v3.fieldName
+				InstanceFullName = v4.instance:GetFullName(),
+				FieldName = v4.fieldName
 			})
 		end
 
-		local moderationState = v4.moderationResult.moderationState
+		local moderationState = v5.moderationResult.moderationState
 
 		if v[moderationState] then
-			object:forceError("Failed to load asset " .. v3.instance:GetFullName() .. "." .. v3.fieldName .. " ( " .. k .. " ) that is still going through the review process. Please, wait for a notification of completion from the review process and try again.")
+			object:forceError("Failed to load asset " .. v4.instance:GetFullName() .. "." .. v4.fieldName .. " ( " .. k .. " ) that is still going through the review process. Please, wait for a notification of completion from the review process and try again.")
 		end
 
 		if not v2[moderationState] then
 			object:fail(ErrorSourceStrings.Keys.DescendantIdNotApproved, {
-				ModerationMessages = string.format("%s.%s ( %s )", v3.instance:GetFullName(), v3.fieldName, k)
+				ModerationMessages = string.format("%s.%s ( %s )", v4.instance:GetFullName(), v4.fieldName, k)
 			})
 		end
 	end
 end
 
 local function runCanPublishOwnershipCheck(object, rootInstance, contentIds, data)
+	if getFFlagUGCValidateRejectUnsupportedCreatorTypes() then
+		local restrictedUserIds = data.restrictedUserIds or {}
+
+		if not validateConfiguredCreators(object, restrictedUserIds) then
+			return
+		end
+	end
+
 	local v3 = getFFlagUGCValidateBackendInExperienceViaCanPublish()
 
 	if v3 then
@@ -136,13 +209,8 @@ local function runCanPublishOwnershipCheck(object, rootInstance, contentIds, dat
 		return
 	end
 
-	local v4 = canPublishAssets(
-		contentIds,
-		(getFFlagUGCValidateForwardIECRestrictedUserIds() or v3) and data.restrictedUserIds or {},
-		data.token,
-		data.universeId,
-		true
-	)
+	local restrictedUserIds = (getFFlagUGCValidateForwardIECRestrictedUserIds() or v3) and data.restrictedUserIds or {}
+	local v4 = canPublishAssets(contentIds, restrictedUserIds, data.token, data.universeId, true)
 
 	if v4.status == "tooManyAssets" then
 		object:fail(ErrorSourceStrings.Keys.DescendantIdsTooMany, {

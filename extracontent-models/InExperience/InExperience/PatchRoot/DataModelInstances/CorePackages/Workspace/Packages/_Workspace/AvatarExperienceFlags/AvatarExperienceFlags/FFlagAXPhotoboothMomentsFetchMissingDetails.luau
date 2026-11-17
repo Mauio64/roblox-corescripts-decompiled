@@ -1,0 +1,3 @@
+local FFlagAXInventoryDurablesExpiredFilter = require(script.Parent.FFlagAXInventoryDurablesExpiredFilter)
+
+return game:DefineFastFlag("AXPhotoboothMomentsFetchMissingDetails", false) and FFlagAXInventoryDurablesExpiredFilter

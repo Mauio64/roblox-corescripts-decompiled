@@ -3,10 +3,6 @@ local parent = ShareSheet.Parent
 
 local React = require(parent.React)
 
-require(parent.AppChat.GetConversationListStore)
-local fetchConversationListPageToSignals = require(parent.AppChat.fetchConversationListPageToSignals)
-local SharedFlags = require(parent.SharedFlags)
-local FFlagShareSheetFriendsSort = SharedFlags.FFlagShareSheetFriendsSort
 require(ShareSheet.Types)
 local ShareSheetConstants = require(ShareSheet.ShareSheetConstants)
 
@@ -27,47 +23,32 @@ end
 
 local function usePeoplePickerPagination(data)
 	local isPeoplePickerDisplayed = data.isPeoplePickerDisplayed
-	local v2, v3, v4
+	local listResult = data.listResult
+	local isFetchingNextPage = listResult.isFetchingNextPage
+	local v2 = listResult.nextPageToken ~= nil
+	local isEligibilityLoading = data.isEligibilityLoading or isFetchingNextPage
 
-	if FFlagShareSheetFriendsSort then
-		local listResult = data.listResult
-		v2 = listResult.isFetchingNextPage
-		v3 = listResult.nextPageToken ~= nil
-		v4 = listResult.nextPageToken
-	else
-		v2 = data.listStatus.isFetchingConversations == true
-		v3 = data.listStatus.oldestConversationIsFetched ~= true
-		v4 = data.listStatus.nextCursor
-	end
-
-	local isEligibilityLoading = data.isEligibilityLoading or v2
-
-	local v5 = not isEligibilityLoading
-		and v3
+	local nextPageToken = not isEligibilityLoading
+		and v2
 		and data.conversationCount < ShareSheetConstants.FIntShareSheetPeoplePickerMaxConversations
-		and v4
+		and listResult.nextPageToken
 		or ""
 
 	local ref = React.useRef(nil)
 	local ref2 = React.useRef(nil)
-	local v6 = React.useCallback(function()
-		if v5 == "" or ref.current == v5 then
+	local v3 = React.useCallback(function()
+		if nextPageToken == "" or ref.current == nextPageToken then
 			return
 		end
 
-		ref.current = v5
-
-		if FFlagShareSheetFriendsSort then
-			data.loadMore(v5)
-		else
-			fetchConversationListPageToSignals({ cursor = v5 })
-		end
-	end, { v5, data.loadMore })
+		ref.current = nextPageToken
+		data.loadMore(nextPageToken)
+	end, { nextPageToken, data.loadMore })
 
 	local ref3 = React.useRef({ contentLength = nil, scrollOffset = 0, viewportLength = nil })
 
 	local state, setState = React.useState(nil)
-	local v7 = React.useCallback(function()
+	local v4 = React.useCallback(function()
 		local current = ref2.current
 
 		if current then
@@ -86,7 +67,7 @@ local function usePeoplePickerPagination(data)
 			return isViewportNearEnd(current2.scrollOffset, current2.viewportLength, current2.contentLength) -- inferred equivalent call
 		end
 	end, {})
-	local v8 = React.useCallback(function()
+	local v5 = React.useCallback(function()
 		local current = ref3.current
 
 		if
@@ -95,13 +76,13 @@ local function usePeoplePickerPagination(data)
 			and current.contentLength ~= nil
 			and isViewportUnderfilled(current.viewportLength, current.contentLength) -- inferred equivalent call
 		then
-			v6()
+			v3()
 		end
-	end, { isPeoplePickerDisplayed, v6 })
+	end, { isPeoplePickerDisplayed, v3 })
 	local onContentLengthChanged = React.useCallback(function(contentLength: number)
 		ref3.current.contentLength = contentLength
-		v8()
-	end, { v8 })
+		v5()
+	end, { v5 })
 	local onScrollOffsetChanged = React.useCallback(function(scrollOffset: number)
 		ref3.current.scrollOffset = scrollOffset
 
@@ -109,15 +90,15 @@ local function usePeoplePickerPagination(data)
 			return
 		end
 
-		if not v7() then
+		if not v4() then
 			ref.current = nil
 		end
-	end, { isPeoplePickerDisplayed, v7 })
+	end, { isPeoplePickerDisplayed, v4 })
 	local onViewportChanged = React.useCallback(function(vector2: Vector2)
 		ref3.current.viewportLength = vector2.Y
 		setState(vector2.Y * v)
-		v8()
-	end, { v8 })
+		v5()
+	end, { v5 })
 	local scrollingFrameRef = React.useCallback(function(current)
 		ref2.current = current
 	end, {})
@@ -128,20 +109,20 @@ local function usePeoplePickerPagination(data)
 			return
 		end
 
-		local v9 = false
+		local v6 = false
 		task.defer(function()
-			if not v9 then
-				v8()
+			if not v6 then
+				v5()
 			end
 		end)
 		return function()
-			v9 = true
+			v6 = true
 		end
-	end, { isPeoplePickerDisplayed, v8 })
+	end, { isPeoplePickerDisplayed, v5 })
 	local onEndReached
 
-	if isPeoplePickerDisplayed and v5 ~= "" then
-		onEndReached = v6
+	if isPeoplePickerDisplayed and nextPageToken ~= "" then
+		onEndReached = v3
 	end
 
 	return {

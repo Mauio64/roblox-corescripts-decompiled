@@ -11,7 +11,7 @@ local GetFFlagIsSquadEnabled = SharedFlags.GetFFlagIsSquadEnabled
 local SharedFlags2 = require(parent.SharedFlags)
 local GetFFlagEnableSocialCards = SharedFlags2.GetFFlagEnableSocialCards
 
-return function(p, query: string, cursor: string?, limit: number?)
+return function(p, query: string, cursor: string?, limit: number?, placement: string?)
 	if cursor == nil or cursor == "" then
 		cursor = nil
 	end
@@ -20,6 +20,7 @@ return function(p, query: string, cursor: string?, limit: number?)
 		query = query,
 		limit = limit,
 		cursor = cursor,
+		placement = placement,
 		include_user_data = true,
 		include_participants = true,
 		include_messages = true,

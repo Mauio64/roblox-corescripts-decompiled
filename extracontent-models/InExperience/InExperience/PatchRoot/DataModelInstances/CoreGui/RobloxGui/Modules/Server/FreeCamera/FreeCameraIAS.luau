@@ -597,9 +597,9 @@ function class:Update(p, p2)
 	local v30 = p2 - p3
 	local v31 = exp(-v28 * p)
 	local v32 = p2 + (v29 * p - v30 * (v28 * p + 1)) * v31
-	local v36 = (v28 * p * (v30 * v28 - v29) + v29) * v31
+	local v37 = (v28 * p * (v30 * v28 - v29) + v29) * v31
 	self.p = v32
-	self.v = v36
+	self.v = v37
 	return v32
 end
 
@@ -1936,12 +1936,12 @@ local function StepFreecam(p)
 	local v51 = v31:Update(p, v37.Fov())
 	local v52 = v32:Update(p, v37.Roll())
 
-	local v53 = sqrt(0.7002075382097097 / tan((rad(fieldOfView2 / 2))))
+	local v56 = sqrt(0.7002075382097097 / tan((rad(fieldOfView2 / 2))))
 
-	local v54 = fieldOfView2
-	fieldOfView2 = clamp(fieldOfView2 + v51 * v2.Fov.Gain * (p / v53), 1, 120)
+	local v57 = fieldOfView2
+	fieldOfView2 = clamp(fieldOfView2 + v51 * v2.Fov.Gain * (p / v56), 1, 120)
 
-	if math.abs(fieldOfView2 - v54) > 0.01 then
+	if math.abs(fieldOfView2 - v57) > 0.01 then
 		lastTime = os.clock()
 	end
 
@@ -1949,24 +1949,24 @@ local function StepFreecam(p)
 		lastTime2 = os.clock()
 	end
 
-	local v55 = v50 * v2.Pan.Gain * (p / v53)
-	vector3 += Vector3.new(v55.X, v55.Y, v52 * v2.Roll.Gain * (p / v53))
+	local v59 = v50 * v2.Pan.Gain * (p / v56)
+	vector3 += Vector3.new(v59.X, v59.Y, v52 * v2.Roll.Gain * (p / v56))
 	local function wrapAngle(p2) -- 3 equivalent calls inferred from this helper
-		local v56 = p2 % 6.283185307179586
-		return v56 > 3.141592653589793 and v56 - 6.283185307179586 or v56
+		local v60 = p2 % 6.283185307179586
+		return v60 > 3.141592653589793 and v60 - 6.283185307179586 or v60
 	end
 
 	vector3 = Vector3.new(wrapAngle(vector3.x), wrapAngle(vector3.y), wrapAngle(vector3.z)) -- inferred equivalent call
 	local vector3_2 = Vector3.new(v49.X, v49.Y, -v49.Z)
-	local v56 = CFrame.new(v28) * CFrame.fromOrientation(vector3.x, vector3.y, vector3.z) * CFrame.new(vector3_2 * v2.Movement.Gain * p)
+	local v60 = CFrame.new(v28) * CFrame.fromOrientation(vector3.x, vector3.y, vector3.z) * CFrame.new(vector3_2 * v2.Movement.Gain * p)
 
 	if v21 and v24 and v24.Parent then
 		local playerLock = v2.PlayerLock
-		local v57 = -v49.Z * v2.Movement.Gain.Z * p
-		local v58 = v49.Y * v2.Movement.Gain.Y * p
-		v22 = clamp(v22 + v57, playerLock.MinZoom, playerLock.MaxZoom)
-		v23 = clamp(v23 + v58, -playerLock.HeightRange, playerLock.HeightRange)
-		v56 = CFrame.new(v24.Position + Vector3.new(0, v23, 0)) * CFrame.fromOrientation(vector3.x, vector3.y, vector3.z) * CFrame.new(0, 0, v22)
+		local v61 = -v49.Z * v2.Movement.Gain.Z * p
+		local v62 = v49.Y * v2.Movement.Gain.Y * p
+		v22 = clamp(v22 + v61, playerLock.MinZoom, playerLock.MaxZoom)
+		v23 = clamp(v23 + v62, -playerLock.HeightRange, playerLock.HeightRange)
+		v60 = CFrame.new(v24.Position + Vector3.new(0, v23, 0)) * CFrame.fromOrientation(vector3.x, vector3.y, vector3.z) * CFrame.new(0, 0, v22)
 	end
 
 	if v14 then
@@ -1976,9 +1976,9 @@ local function StepFreecam(p)
 
 		if v37.getModeActive() then
 			if os.clock() - lastTime2 < 2 then
-				local v57 = {}
-				v57[#v57 + 1] = string.format("X: %.0f  Y: %.0f  Z: %.0f", v28.X, v28.Y, v28.Z)
-				v57[#v57 + 1] = string.format(
+				local v61 = {}
+				v61[#v61 + 1] = string.format("X: %.0f  Y: %.0f  Z: %.0f", v28.X, v28.Y, v28.Z)
+				v61[#v61 + 1] = string.format(
 					"Pitch: %.1f°  Yaw: %.1f°  Roll: %.1f°",
 					math.deg(vector3.X),
 					math.deg(vector3.Y),
@@ -1986,18 +1986,18 @@ local function StepFreecam(p)
 				)
 
 				if os.clock() - lastTime < 2 then
-					v57[#v57 + 1] = string.format("Field of View: %.1f", fieldOfView2)
+					v61[#v61 + 1] = string.format("Field of View: %.1f", fieldOfView2)
 				end
 
 				if p > 0 then
-					local v58 = (v56.p - v28).Magnitude / p
+					local v62 = (v60.p - v28).Magnitude / p
 
-					if v58 > 0.5 then
-						v57[#v57 + 1] = string.format("Speed: %.1f", v58)
+					if v62 > 0.5 then
+						v61[#v61 + 1] = string.format("Speed: %.1f", v62)
 					end
 				end
 
-				setBubble(v11.status, table.concat(v57, "\n")) -- inferred equivalent call
+				setBubble(v11.status, table.concat(v61, "\n")) -- inferred equivalent call
 			else
 				v11.status.bubble.Visible = false
 			end
@@ -2010,13 +2010,13 @@ local function StepFreecam(p)
 
 			local activeGroupName = v37.getActiveGroupName()
 
-			for _, v57 in ipairs(v47) do
-				local v58 = v57.get()
+			for _, v61 in ipairs(v47) do
+				local v62 = v61.get()
 
-				if v58 and v58.Enabled and activeGroupName ~= v57.group then
-					setBubble(v11[v57.key], v57.fmt(v58)) -- inferred equivalent call
+				if v62 and v62.Enabled and activeGroupName ~= v61.group then
+					setBubble(v11[v61.key], v61.fmt(v62)) -- inferred equivalent call
 				else
-					v11[v57.key].bubble.Visible = false
+					v11[v61.key].bubble.Visible = false
 				end
 			end
 
@@ -2041,9 +2041,9 @@ local function StepFreecam(p)
 		end
 	end
 
-	v28 = v56.p
-	parent2.CFrame = v56
-	parent2.Focus = v56
+	v28 = v60.p
+	parent2.CFrame = v60
+	parent2.Focus = v60
 	parent2.FieldOfView = fieldOfView2
 end
 

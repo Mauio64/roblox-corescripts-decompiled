@@ -18,8 +18,6 @@ local DiscoveryTypes = require(parent.DiscoveryTypes)
 local OmniRecommendationsContentType = DiscoveryTypes.OmniRecommendationsContentType
 local GameCollectionItemTypes = DiscoveryTypes.GameCollectionItemTypes
 local GameHydrationReact = require(parent.GameHydrationReact)
-local GameInfosRodux = require(parent.GameInfosRodux)
-local useGameInfosSelector = GameInfosRodux.useGameInfosSelector
 local Navigation = require(parent.Navigation)
 local useNavigation = Navigation.useNavigation
 local RobloxAppEnums = require(parent.RobloxAppEnums)
@@ -39,6 +37,7 @@ local OneByTwoTileTelemetry = SponsoredTilesTelemetry.OneByTwoTileTelemetry
 local DiscoveryUtils = require(parent.DiscoveryUtils)
 local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
 require(SponsoredTiles.types)
+local openAdClickoutUrl = require(SponsoredTiles.openAdClickoutUrl)
 
 local VideoPlayer = require(parent.VideoPlayer)
 local VideoDisplay = VideoPlayer.VideoDisplay
@@ -84,14 +83,12 @@ local FFlagLuaAppSuppressVideoDetectorDuringScroll = SharedFlags.FFlagLuaAppSupp
 
 local FFlagLuaAppSuppressOneByTwoVideoDetectorDuringScroll = SharedFlags.FFlagLuaAppSuppressOneByTwoVideoDetectorDuringScroll
 local FFlagLuaAppSduiSponsoredOneByTwoTile = SharedFlags.FFlagLuaAppSduiSponsoredOneByTwoTile
-local FFlagMigrateGameInfoToStore = SharedFlags.FFlagMigrateGameInfoToStore
-local defineFastFlag = game:DefineFastFlag("LuaAppDefaultGameAdTileText", false)
+local FFlagLuaAppAdClickoutDeeplink = SharedFlags.FFlagLuaAppAdClickoutDeeplink
 local FFlagLuaAppOneByTwoHoverIdleAutoplay = SharedFlags.FFlagLuaAppOneByTwoHoverIdleAutoplay
 
 local FFlagLuaAppVideoAutoplayOneByTwoConcurrentPlayback = SharedFlags.FFlagLuaAppVideoAutoplayOneByTwoConcurrentPlayback
 local FFlagLuaAppEnableReportExperience = SharedFlags.FFlagLuaAppEnableReportExperience
 local FFlagLuaAppEnableOneByTwoTileFunnelTelemetry = SharedFlags.FFlagLuaAppEnableOneByTwoTileFunnelTelemetry
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local FFlagLuaAppSponsoredTileBadgeContentPadding = require(SponsoredTiles.Flags.FFlagLuaAppSponsoredTileBadgeContentPadding)
 local FFlagLuaAppAdClickoutEvent = require(SponsoredTiles.Flags.FFlagLuaAppAdClickoutEvent)
@@ -150,30 +147,18 @@ local function OneByTwoTile(props)
 
 	local headline = props.headline
 	local subtitle = props.subtitle
-	local name = nil
-	local v11 = nil
 
-	if defineFastFlag then
-		if FFlagMigrateGameInfoToStore then
-			local v12 = GameHydrationReact.useGameInfo(props.universeId or "")
+	local v11 = GameHydrationReact.useGameInfo(props.universeId or "")
+	local name, gameAgeDisplayName
 
-			if v12 then
-				name = v12.name
-				v11 = v12.gameAgeDisplayName
-			end
-		else
-			local v12 = useGameInfosSelector(props.universeId or "")
+	if v11 then
+		name = v11.name
+		gameAgeDisplayName = v11.gameAgeDisplayName
+	end
 
-			if v12 then
-				name = v12.name
-				v11 = v12.ageRecommendationDisplayName
-			end
-		end
-
-		if props.contentType == OmniRecommendationsContentType.Game then
-			headline = getTextOrDefault(headline, name) -- inferred equivalent call
-			subtitle = getTextOrDefault(subtitle, v11) -- inferred equivalent call
-		end
+	if props.contentType == OmniRecommendationsContentType.Game then
+		headline = getTextOrDefault(headline, name) -- inferred equivalent call
+		subtitle = getTextOrDefault(subtitle, gameAgeDisplayName) -- inferred equivalent call
 	end
 
 	local state, setState = React.useState(false)
@@ -605,33 +590,33 @@ local function OneByTwoTile(props)
 	local v30 = useRoactService(RoactNetworking)
 	local v31 = useRoactService(AppSessionService)
 	local v32 = useNavigation()
-	local v47 = useLocalization({ joinButtonText = "Common.VisitGame.Label.Play" })
-	local v48
-
-	if v10 then
-		v48 = props.ctaText
-	elseif props.ctaText == "" then
-		v48 = v47.joinButtonText
-	else
-		v48 = props.ctaText
-	end
-
+	local v48 = useLocalization({ joinButtonText = "Common.VisitGame.Label.Play" })
 	local v49
 
 	if v10 then
+		v49 = props.ctaText
+	elseif props.ctaText == "" then
+		v49 = v48.joinButtonText
+	else
+		v49 = props.ctaText
+	end
+
+	local v50
+
+	if v10 then
 		if props.clickoutUrl == nil or props.clickoutUrl == "" then
-			v49 = false
+			v50 = false
 		else
-			v49 = v48 ~= ""
+			v50 = v49 ~= ""
 		end
 	else
-		v49 = v10
+		v50 = v10
 	end
 
 	local launchExperienceEventContext = props.launchExperienceEventContext
 		or DiscoveryAnalytics.Constants.Context.ExperienceTile
 
-	local v50 = React.useCallback(function()
+	local v51 = React.useCallback(function()
 		if props.adId then
 			sponsoredGamesRecordClick(v30, props.adId)
 		end
@@ -647,7 +632,7 @@ local function OneByTwoTile(props)
 		end
 
 		if props.reportExperienceLaunched then
-			local v52 = {
+			local v53 = {
 				placeId = props.placeId,
 				universeId = props.universeId,
 				adId = props.adId,
@@ -666,7 +651,7 @@ local function OneByTwoTile(props)
 				p = nil
 			end
 
-			reportExperienceLaunched(v52, referralSource, "OneByTwoTile", launchExperienceEventContext, index2, p)
+			reportExperienceLaunched(v53, referralSource, "OneByTwoTile", launchExperienceEventContext, index2, p)
 		end
 	end, {
 		v31,
@@ -746,7 +731,7 @@ local function OneByTwoTile(props)
 		extraProps.disableGameLaunchSponsoredClickRecording = disableGameLaunchSponsoredClickRecording
 		navigate(featureTileAdPlayer, { extraProps = extraProps })
 	end
-	local v52 = {
+	local v53 = {
 		isHovered,
 		v32,
 		videoPlaybackCoordinator,
@@ -792,14 +777,14 @@ local function OneByTwoTile(props)
 		onOpenGameDetails = props.onOpenGameDetails
 	end
 
-	local v53
+	local v54
 
 	if FFlagLuaAppSduiSponsoredOneByTwoTile then
-		v53 = props.disableGameLaunchSponsoredClickRecording
+		v54 = props.disableGameLaunchSponsoredClickRecording
 	end
 
-	v52[17], v52[18], v52[19], v52[20], v52[21], v52[22], v52[23], v52[24], v52[25], v52[26], v52[27], v52[28], v52[29] = ctaText, placeId, placeIdOverride, launchDataOverride, referralSource, launchExperienceEventContext, index2, reportGameDetailOpened, reportExperienceLaunched, onOpenGameDetails, v53, state5, state3
-	local v54 = useCallback3(fn4, v52)
+	v53[17], v53[18], v53[19], v53[20], v53[21], v53[22], v53[23], v53[24], v53[25], v53[26], v53[27], v53[28], v53[29] = ctaText, placeId, placeIdOverride, launchDataOverride, referralSource, launchExperienceEventContext, index2, reportGameDetailOpened, reportExperienceLaunched, onOpenGameDetails, v54, state5, state3
+	local v55 = useCallback3(fn4, v53)
 
 	local useCallback4 = React.useCallback
 	local function fn5()
@@ -808,29 +793,29 @@ local function OneByTwoTile(props)
 
 		if FFlagLuaAppSduiSponsoredOneByTwoTile then
 			if not props.disableGameLaunchSponsoredClickRecording then
-				v50()
+				v51()
 			end
 		else
-			v50()
+			v51()
 		end
 	end
 
-	local v56
+	local v57
 
 	if FFlagLuaAppSduiSponsoredOneByTwoTile then
-		v56 = props.disableGameLaunchSponsoredClickRecording
+		v57 = props.disableGameLaunchSponsoredClickRecording
 	end
 
-	local onActivated = useCallback4(fn5, { v50, v56 })
+	local onActivated = useCallback4(fn5, { v51, v57 })
 
 	local useCallback5 = React.useCallback
 	local function fn6()
-		if not v49 then
+		if not v50 then
 			return
 		end
 
 		OneByTwoTileTelemetry.logOneByTwoTileCtaActivated(OneByTwoTileTelemetry.CtaType.Clickout)
-		v50()
+		v51()
 
 		if FFlagLuaAppAdClickoutEvent then
 			local adId = props.adId
@@ -844,20 +829,24 @@ local function OneByTwoTile(props)
 			end
 		end
 
-		v32.navigate(AppPage.GenericWebPage, {
-			detail = props.clickoutUrl,
-			extraProps = { showDomainAsTitle = true }
-		})
+		if FFlagLuaAppAdClickoutDeeplink then
+			openAdClickoutUrl(v32, props.clickoutUrl)
+		else
+			v32.navigate(AppPage.GenericWebPage, {
+				detail = props.clickoutUrl,
+				extraProps = { showDomainAsTitle = true }
+			})
+		end
 	end
 
 	local clickoutUrl = props.clickoutUrl
-	local v59
+	local v60
 
 	if FFlagLuaAppAdClickoutEvent then
-		v59 = props.adId
+		v60 = props.adId
 	end
 
-	local v60 = useCallback5(fn6, { v49, v32, clickoutUrl, v50, v59 })
+	local v61 = useCallback5(fn6, { v50, v32, clickoutUrl, v51, v60 })
 
 	React.useEffect(function()
 		ImpressionsTagUtility.AddTag(ref2, props.impressionsTag, props.index)
@@ -870,29 +859,29 @@ local function OneByTwoTile(props)
 
 	local logoAspectRatio = tonumber(props.logoAspectRatio)
 	local aspectRatio = not (logoAspectRatio and logoAspectRatio > 0) and 1 or logoAspectRatio
-	local v63 = if aspectRatio == 3 then v else v2
-	local v64, v65, v66, v67, size_500, v68, buttonSize, v70, v71
+	local v64 = if aspectRatio == 3 then v else v2
+	local v65, v66, v67, v68, size_500, v69, buttonSize, v71, v72
 
 	if v8 then
-		v64 = v7.Padding.Medium
-		v65 = v7.Typography.TitleLarge
-		v66 = v7.Typography.BodySmall
-		v67 = v7.Size.Size_600
+		v65 = v7.Padding.Medium
+		v66 = v7.Typography.TitleLarge
+		v67 = v7.Typography.BodySmall
+		v68 = v7.Size.Size_600
 		size_500 = v7.Size.Size_500
-		v68 = v7.Gap.XXSmall
+		v69 = v7.Gap.XXSmall
 		buttonSize = ButtonSize.Small
-		v70 = v7.Size.Size_800
-		v71 = v7.Typography.TitleSmall
+		v71 = v7.Size.Size_800
+		v72 = v7.Typography.TitleSmall
 	else
-		v64 = v7.Padding.Large
-		v65 = v7.Typography.HeadingMedium
-		v66 = v7.Typography.BodyMedium
-		v67 = v7.Size.Size_800
+		v65 = v7.Padding.Large
+		v66 = v7.Typography.HeadingMedium
+		v67 = v7.Typography.BodyMedium
+		v68 = v7.Size.Size_800
 		size_500 = v7.Size.Size_500
-		v68 = v7.Gap.XSmall
+		v69 = v7.Gap.XSmall
 		buttonSize = ButtonSize.Medium
-		v70 = v7.Size.Size_1000
-		v71 = v7.Typography.TitleMedium
+		v71 = v7.Size.Size_1000
+		v72 = v7.Typography.TitleMedium
 	end
 
 	local createElement = React.createElement
@@ -902,7 +891,7 @@ local function OneByTwoTile(props)
 		size = props.rootSize
 	end
 
-	local v73 = {
+	local v74 = {
 		Size = size,
 		LayoutOrder = props.index,
 		ZIndex = props.zIndex,
@@ -912,7 +901,7 @@ local function OneByTwoTile(props)
 	}
 
 	local createElement2 = React.createElement
-	local v77 = {
+	local v78 = {
 		ref = ref,
 		Size = props.size or UDim2.fromScale(1, 1),
 		BackgroundColor3 = v7.Color.Surface.Surface_100.Color3,
@@ -921,7 +910,7 @@ local function OneByTwoTile(props)
 		Text = "",
 		AutoButtonColor = false,
 		SelectionOrder = props.SelectionOrder,
-		[React.Event.Activated] = v54,
+		[React.Event.Activated] = v55,
 		[React.Event.TouchLongPress] = v25,
 		[React.Event.SelectionGained] = v22,
 		[React.Event.SelectionLost] = v23,
@@ -938,7 +927,7 @@ local function OneByTwoTile(props)
 	}
 
 	local createElement3 = React.createElement
-	local v78 = {
+	local v79 = {
 		video = `rbxassetid://{props.primaryVideoAssetId}`,
 		thumbnail = `rbxassetid://{props.primaryImageAssetId}`,
 		shouldStartPlayback = state4,
@@ -961,17 +950,17 @@ local function OneByTwoTile(props)
 		onVideoEnded = nil
 	end
 
-	v78.onVideoEnded = onVideoEnded
+	v79.onVideoEnded = onVideoEnded
 
-	v78.onVideoLooped = onVideoLooped
-	v78.onVideoProgressChanged = onVideoProgressChanged
+	v79.onVideoLooped = onVideoLooped
+	v79.onVideoProgressChanged = onVideoProgressChanged
 
 	if not isSponsored then
 		ref4 = nil
 	end
 
-	v78.videoPlaybackStateRef = ref4
-	children.Video = createElement3(VideoDisplay, v78)
+	v79.videoPlaybackStateRef = ref4
+	children.Video = createElement3(VideoDisplay, v79)
 
 	children.GradientOverlayBottom = React.createElement("Frame", {
 		AnchorPoint = Vector2.new(0, 1),
@@ -996,16 +985,16 @@ local function OneByTwoTile(props)
 
 	if tileBadgesByPosition then
 		local createElement4 = React.createElement
-		local v81 = { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, ZIndex = 2 }
+		local v82 = { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, ZIndex = 2 }
 
 		local createElement5 = React.createElement
 		local padding
 
 		if FFlagLuaAppSponsoredTileBadgeContentPadding then
-			padding = v64
+			padding = v65
 		end
 
-		tileBadge = createElement4("Frame", v81, {
+		tileBadge = createElement4("Frame", v82, {
 			Badge = createElement5(GameTileThumbnailBadges, {
 				tileBadgesByPosition = tileBadgesByPosition,
 				padding = padding
@@ -1021,7 +1010,7 @@ local function OneByTwoTile(props)
 			Image = `rbxassetid://{props.logoImageAssetId}`,
 			Position = UDim2.new(1, -v7.Padding.Medium, 0, v7.Padding.Medium),
 			tag = "anchor-top-right",
-			Size = UDim2.new(v63, 0, 1, 0),
+			Size = UDim2.new(v64, 0, 1, 0),
 			aspectRatio = aspectRatio,
 			ZIndex = 2
 		})
@@ -1039,7 +1028,7 @@ local function OneByTwoTile(props)
 		})
 	else
 		local createElement4 = React.createElement
-		local v82 = {
+		local v83 = {
 			hoverKey = hoverKey,
 			parentRef = ref,
 			zIndex = 4,
@@ -1065,40 +1054,40 @@ local function OneByTwoTile(props)
 			setGameHidden = props.setGameHidden
 		end
 
-		v82.setGameHidden = setGameHidden
+		v83.setGameHidden = setGameHidden
 
-		v82.isHovered = isHovered
-		v82.isSelected = state
-		v82.availableMenuItems = availableMenuItems
-		overflowMenu = createElement4(SpanTileOverflowMenu, v82)
+		v83.isHovered = isHovered
+		v83.isSelected = state
+		v83.availableMenuItems = availableMenuItems
+		overflowMenu = createElement4(SpanTileOverflowMenu, v83)
 	end
 
 	children.OverflowMenu = overflowMenu
 
 	local createElement4 = React.createElement
-	local v83 = {
-		Size = UDim2.new(1, -2 * v64, 0, 0),
+	local v84 = {
+		Size = UDim2.new(1, -2 * v65, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
-		Position = UDim2.new(0, v64, 1, -v64),
+		Position = UDim2.new(0, v65, 1, -v65),
 		AnchorPoint = Vector2.new(0, 1),
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		ZIndex = 2
 	}
 
-	local v84 = {
+	local v85 = {
 		UIListLayout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			HorizontalAlignment = Enum.HorizontalAlignment.Left,
-			Padding = UDim.new(0, v64)
+			Padding = UDim.new(0, v65)
 		}),
 		TextStack = 0,
 		CtaButton = 0
 	}
 
 	local createElement5 = React.createElement
-	local v86 = {
+	local v87 = {
 		LayoutOrder = 1,
 		Size = UDim2.new(1, 0, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
@@ -1106,12 +1095,12 @@ local function OneByTwoTile(props)
 		BorderSizePixel = 0
 	}
 
-	local v87 = {
+	local v88 = {
 		UIListLayout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			HorizontalAlignment = Enum.HorizontalAlignment.Left,
-			Padding = UDim.new(0, v68)
+			Padding = UDim.new(0, v69)
 		}),
 		Headline = 0,
 		Subtitle = 0
@@ -1119,126 +1108,61 @@ local function OneByTwoTile(props)
 	local headline2
 
 	if headline then
-		local createElement6 = React.createElement
-		local v90 = {
+		headline2 = React.createElement("TextLabel", {
 			LayoutOrder = 1,
-			Size = UDim2.new(1, 0, 0, 2 * v67),
+			Size = UDim2.new(1, 0, 0, 2 * v68),
 			BackgroundTransparency = 1,
 			Text = headline,
-			Font = 0,
-			FontFace = 0,
-			LineHeight = 0,
-			TextSize = 0,
-			TextColor3 = 0,
-			TextXAlignment = 0,
-			TextYAlignment = 0,
+			FontFace = normalizeFontFace(v66.Font),
+			LineHeight = v66.LineHeight,
+			TextSize = v66.FontSize,
+			TextColor3 = v7.LightMode.ActionOverMedia.Foreground.Color3,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextYAlignment = Enum.TextYAlignment.Bottom,
 			TextWrapped = true,
-			TextTruncate = 0
-		}
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = v65.Font
-		end
-
-		v90.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(v65.Font)
-		end
-
-		v90.FontFace = fontFace
-
-		v90.LineHeight = v65.LineHeight
-		v90.TextSize = v65.FontSize
-		v90.TextColor3 = v7.LightMode.ActionOverMedia.Foreground.Color3
-		v90.TextXAlignment = Enum.TextXAlignment.Left
-		v90.TextYAlignment = Enum.TextYAlignment.Bottom
-
-		v90.TextTruncate = Enum.TextTruncate.AtEnd
-		headline2 = createElement6("TextLabel", v90)
+			TextTruncate = Enum.TextTruncate.AtEnd
+		})
 	end
 
-	v87.Headline = headline2
+	v88.Headline = headline2
 	local subtitle2
 
 	if subtitle then
-		local createElement6 = React.createElement
-		local v91 = {
+		subtitle2 = React.createElement("TextLabel", {
 			LayoutOrder = 2,
 			Size = UDim2.new(1, 0, 0, size_500),
 			BackgroundTransparency = 1,
 			Text = subtitle,
-			Font = 0,
-			FontFace = 0,
-			LineHeight = 0,
-			TextSize = 0,
-			TextColor3 = 0,
-			TextXAlignment = 0,
-			TextYAlignment = 0,
+			FontFace = normalizeFontFace(v67.Font),
+			LineHeight = v67.LineHeight,
+			TextSize = v67.FontSize,
+			TextColor3 = v7.LightMode.ActionOverMedia.Foreground.Color3,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextYAlignment = Enum.TextYAlignment.Top,
 			TextWrapped = false,
-			TextTruncate = 0
-		}
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = v66.Font
-		end
-
-		v91.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(v66.Font)
-		end
-
-		v91.FontFace = fontFace
-
-		v91.LineHeight = v66.LineHeight
-		v91.TextSize = v66.FontSize
-		v91.TextColor3 = v7.LightMode.ActionOverMedia.Foreground.Color3
-		v91.TextXAlignment = Enum.TextXAlignment.Left
-		v91.TextYAlignment = Enum.TextYAlignment.Top
-
-		v91.TextTruncate = Enum.TextTruncate.AtEnd
-		subtitle2 = createElement6("TextLabel", v91)
+			TextTruncate = Enum.TextTruncate.AtEnd
+		})
 	end
 
-	v87.Subtitle = subtitle2
-	v84.TextStack = createElement5("Frame", v86, v87)
+	v88.Subtitle = subtitle2
+	v85.TextStack = createElement5("Frame", v87, v88)
 	local ctaButton
 
 	if v10 then
-		if v49 then
-			local createElement6 = React.createElement
-			local v92 = {}
-			v92.LayoutOrder = 2
-			v92.Size = UDim2.fromOffset(0, v70)
-			v92.AutomaticSize = Enum.AutomaticSize.X
-			v92.BackgroundColor3 = v7.Color.Extended.White.White_20.Color3
-			v92.BackgroundTransparency = v7.Color.Extended.White.White_20.Transparency
-			v92.BorderSizePixel = 0
-			v92.Text = v48
-			v92.TextColor3 = v7.LightMode.ActionOverMedia.Foreground.Color3
-			local font
-
-			if not FoundationFontFaceMigration then
-				font = v71.Font
-			end
-
-			v92.Font = font
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(v71.Font)
-			end
-
-			v92.FontFace = fontFace
-
-			v92.TextSize = v71.FontSize
-			v92[React.Event.Activated] = v60
-			ctaButton = createElement6("TextButton", v92, {
+		if v50 then
+			ctaButton = React.createElement("TextButton", {
+				LayoutOrder = 2,
+				Size = UDim2.fromOffset(0, v71),
+				AutomaticSize = Enum.AutomaticSize.X,
+				BackgroundColor3 = v7.Color.Extended.White.White_20.Color3,
+				BackgroundTransparency = v7.Color.Extended.White.White_20.Transparency,
+				BorderSizePixel = 0,
+				Text = v49,
+				TextColor3 = v7.LightMode.ActionOverMedia.Foreground.Color3,
+				FontFace = normalizeFontFace(v72.Font),
+				TextSize = v72.FontSize,
+				[React.Event.Activated] = v61
+			}, {
 				UICorner = React.createElement("UICorner", {
 					CornerRadius = UDim.new(0, v7.Radius.Medium)
 				}),
@@ -1250,7 +1174,7 @@ local function OneByTwoTile(props)
 		end
 	elseif props.universeId then
 		local createElement6 = React.createElement
-		local v91 = {
+		local v92 = {
 			LayoutOrder = 2,
 			universeId = props.universeId,
 			placeId = 0,
@@ -1273,33 +1197,33 @@ local function OneByTwoTile(props)
 			placeId2 = props.placeId
 		end
 
-		v91.placeId = placeId2
-		v91.referralSource = props.referralSource
-		v91.eventContext = launchExperienceEventContext
+		v92.placeId = placeId2
+		v92.referralSource = props.referralSource
+		v92.eventContext = launchExperienceEventContext
 
-		v91.playableText = v48
+		v92.playableText = v49
 
-		v91.buttonSize = buttonSize
+		v92.buttonSize = buttonSize
 
-		v91.onActivated = onActivated
-		v91.reportExperienceLaunched = reportExperienceLaunched2
-		v91.experienceJoinData = {
+		v92.onActivated = onActivated
+		v92.reportExperienceLaunched = reportExperienceLaunched2
+		v92.experienceJoinData = {
 			launchData = props.launchDataOverride,
 			tileType = GameCollectionItemTypes.GameCollectionItemType.OneByTwoTile,
 			nativeAdData = props.adId
 		}
-		ctaButton = createElement6(PlayButton, v91)
+		ctaButton = createElement6(PlayButton, v92)
 	end
 
-	v84.CtaButton = ctaButton
-	children.BottomStack = createElement4("Frame", v83, v84)
-	local element = createElement("Frame", v73, {
-		Container = createElement2("TextButton", v77, children)
+	v85.CtaButton = ctaButton
+	children.BottomStack = createElement4("Frame", v84, v85)
+	local element = createElement("Frame", v74, {
+		Container = createElement2("TextButton", v78, children)
 	})
-	local v91
+	local v92
 
 	if FFlagLuaAppOneByTwoHoverIdleAutoplay or FFlagLuaAppGameTileSelectionVideoPlayback then
-		v91 = getPlaybackDetectionMethod(v9, isHoverSupported)
+		v92 = getPlaybackDetectionMethod(v9, isHoverSupported)
 	end
 
 	local createElement6 = React.createElement
@@ -1313,7 +1237,7 @@ local function OneByTwoTile(props)
 			videoKey = hoverKey
 		end
 
-		local v95 = {
+		local v96 = {
 			videoKey = videoKey,
 			itemIndex = props.index,
 			itemFrameRef = ref,
@@ -1334,31 +1258,31 @@ local function OneByTwoTile(props)
 		local playbackDetectionMethod
 
 		if FFlagLuaAppGameTileSelectionVideoPlayback or FFlagLuaAppOneByTwoHoverIdleAutoplay then
-			playbackDetectionMethod = v91
+			playbackDetectionMethod = v92
 		end
 
-		v95.playbackDetectionMethod = playbackDetectionMethod
+		v96.playbackDetectionMethod = playbackDetectionMethod
 
 		if FFlagLuaAppGameTileSelectionVideoPlayback then
 			isHoverSupported = nil
 		end
 
-		v95.isHoverSupported = isHoverSupported
-		v95.autoplay = not FFlagLuaAppGameTileSelectionVideoPlayback or nil
-		v95.isHovered = isHovered
+		v96.isHoverSupported = isHoverSupported
+		v96.autoplay = not FFlagLuaAppGameTileSelectionVideoPlayback or nil
+		v96.isHovered = isHovered
 		local hasVideoPlaybackUserIntent
 
-		if FFlagLuaAppOneByTwoHoverIdleAutoplay and v91 == VideoPlaybackDetectionMethod.Hover then
+		if FFlagLuaAppOneByTwoHoverIdleAutoplay and v92 == VideoPlaybackDetectionMethod.Hover then
 			hasVideoPlaybackUserIntent = isHovered
 		end
 
-		v95.hasVideoPlaybackUserIntent = hasVideoPlaybackUserIntent
+		v96.hasVideoPlaybackUserIntent = hasVideoPlaybackUserIntent
 
-		v95.onPlaybackChange = setState4
-		v95.videoAnalytics = props.videoAnalytics
-		v95.videoDwellTimeInSec = FIntLuaAppGameTileVideoDwellTimeInSec
-		v95.videoVisiblePercent = FIntLuaAppGameTileVideoVisiblePercent
-		v95.videoPlaybackCoordinator = videoPlaybackCoordinator
+		v96.onPlaybackChange = setState4
+		v96.videoAnalytics = props.videoAnalytics
+		v96.videoDwellTimeInSec = FIntLuaAppGameTileVideoDwellTimeInSec
+		v96.videoVisiblePercent = FIntLuaAppGameTileVideoVisiblePercent
+		v96.videoPlaybackCoordinator = videoPlaybackCoordinator
 		local viewportVideoAutoplayController2
 
 		if FFlagLuaAppVideoAutoplayOneByTwoConcurrentPlayback then
@@ -1367,11 +1291,11 @@ local function OneByTwoTile(props)
 			viewportVideoAutoplayController2 = props.videoPlaybackContext.viewportVideoAutoplayController
 		end
 
-		v95.viewportVideoAutoplayController = viewportVideoAutoplayController2
+		v96.viewportVideoAutoplayController = viewportVideoAutoplayController2
 
-		v95.isVideoEligible = state5
-		v95.onPlaybackCandidate = onPlaybackCandidate
-		videoPlaybackDetector = createElement7(VideoPlaybackDetector, v95)
+		v96.isVideoEligible = state5
+		v96.onPlaybackCandidate = onPlaybackCandidate
+		videoPlaybackDetector = createElement7(VideoPlaybackDetector, v96)
 	end
 
 	return createElement6(fragment, nil, {

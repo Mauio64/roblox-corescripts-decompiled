@@ -1,0 +1,3 @@
+local SettingsTextInputFieldContainer = require(script.SettingsTextInputFieldContainer)
+
+return SettingsTextInputFieldContainer

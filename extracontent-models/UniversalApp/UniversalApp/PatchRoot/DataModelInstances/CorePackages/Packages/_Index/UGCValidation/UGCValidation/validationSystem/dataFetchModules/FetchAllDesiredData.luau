@@ -55,14 +55,17 @@ function FetchAllDesiredData:storeDesiredData(p)
 		end
 	end
 
+	local v3
+
 	if p[SharedDataMember.curveAnimations] then
-		self.curveAnimations = FetchCurveAnimations.getData(rootInstance, self.consumerConfig)
-			or FetchAllDesiredData.DATA_FETCH_FAILURE
+		local v4
+		v4, v3 = FetchCurveAnimations.getData(rootInstance, self.consumerConfig)
+		self.curveAnimations = v4 or FetchAllDesiredData.DATA_FETCH_FAILURE
 	end
 
 	if p[SharedDataMember.curveAnimComputedFrames] then
 		if self.curveAnimations and self.curveAnimations ~= FetchAllDesiredData.DATA_FETCH_FAILURE then
-			self.curveAnimComputedFrames = FetchCurveAnimComputedFrames.getData(self.curveAnimations)
+			self.curveAnimComputedFrames = FetchCurveAnimComputedFrames.getData(self.curveAnimations, v3)
 				or FetchAllDesiredData.DATA_FETCH_FAILURE
 		else
 			self.curveAnimComputedFrames = FetchAllDesiredData.DATA_FETCH_FAILURE

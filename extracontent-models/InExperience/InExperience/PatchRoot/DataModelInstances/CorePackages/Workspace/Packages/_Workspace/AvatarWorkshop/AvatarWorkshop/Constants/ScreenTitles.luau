@@ -5,6 +5,8 @@ local Screens = require(AvatarWorkshop.Navigation.Screens)
 local Inventory = Screens.Inventory
 
 return {
+	[Screens.Workshop.YourAvatars] = "Feature.AvatarWorkshop.Heading.YourAvatars",
+	[Screens.Workshop.Customize] = "Feature.AvatarWorkshop.Heading.Customize",
 	[Inventory.Root] = "Feature.Avatar.Label.Title.Inventory",
 	[Inventory.Avatars] = "Feature.Avatar.Label.Avatars",
 	[Inventory.Emotes] = "Feature.Avatar.Label.Title.Emotes",

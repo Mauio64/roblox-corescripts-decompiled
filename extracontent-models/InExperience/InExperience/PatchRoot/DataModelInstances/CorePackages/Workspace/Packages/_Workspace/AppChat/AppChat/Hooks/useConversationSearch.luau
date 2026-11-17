@@ -35,7 +35,7 @@ local function normalizeQuery(value: string?, flag: boolean)
 	return v3
 end
 
-local function useConversationSearch(p: string?, flag: boolean?)
+local function useConversationSearch(p: string?, flag: boolean?, p2: string?)
 	local v3 = flag ~= false
 	local conversationSearchDataHydration = GetConversationSearchDataHydration(false)
 	local conversationStore = GetConversationStore(false)
@@ -67,7 +67,7 @@ local function useConversationSearch(p: string?, flag: boolean?)
 			return
 		end
 
-		local page = conversationSearchDataHydration.fetchPage(state)
+		local page = conversationSearchDataHydration.fetchPage(state, nil, p2)
 
 		if page == nil then
 			setState2({ query = state, pages = {} })
@@ -79,7 +79,7 @@ local function useConversationSearch(p: string?, flag: boolean?)
 				}
 			})
 		end
-	end, { state, conversationSearchDataHydration })
+	end, { state, conversationSearchDataHydration, p2 })
 
 	local ref = React.useRef(current)
 	React.useEffect(function()
@@ -90,9 +90,9 @@ local function useConversationSearch(p: string?, flag: boolean?)
 		ref.current = current
 
 		for _, page in state2.pages do
-			conversationSearchDataHydration.fetchPage(state2.query, page.cursor)
+			conversationSearchDataHydration.fetchPage(state2.query, page.cursor, p2)
 		end
-	end, { state2, conversationSearchDataHydration, current })
+	end, { state2, conversationSearchDataHydration, current, p2 })
 
 	local loadNext = React.useCallback(function()
 		local pages = state2.pages
@@ -115,31 +115,31 @@ local function useConversationSearch(p: string?, flag: boolean?)
 			return
 		end
 
-		local page2 = conversationSearchDataHydration.fetchPage(state2.query, nextCursor)
+		local page2 = conversationSearchDataHydration.fetchPage(state2.query, nextCursor, p2)
 
 		if page2 == nil then
 			return
 		end
 
-		setState2(function(p2)
-			if p2.query ~= state2.query then
-				return p2
+		setState2(function(p3)
+			if p3.query ~= state2.query then
+				return p3
 			end
 
-			local clone = table.clone(p2.pages)
+			local clone = table.clone(p3.pages)
 			table.insert(clone, { result = page2, cursor = nextCursor })
-			return { query = p2.query, pages = clone }
+			return { query = p3.query, pages = clone }
 		end)
-	end, { state2, conversationSearchDataHydration })
+	end, { state2, conversationSearchDataHydration, p2 })
 
 	local v4 = React.useMemo(function()
-		return Signals.createComputed(function(p2)
+		return Signals.createComputed(function(p3)
 			local function collectItems(pages)
 				local matchedConversationIdSet = {}
 				local matchedConversationIds = {}
 
 				for _, item in pages do
-					local data = item.result.data(p2)
+					local data = item.result.data(p3)
 
 					if not (data ~= nil and data.matchedConversationIds ~= nil) then
 						continue
@@ -158,7 +158,7 @@ local function useConversationSearch(p: string?, flag: boolean?)
 				local conversations = {}
 
 				for _, v4 in matchedConversationIds do
-					local conversation = conversationStore.getConversation(v4, p2)
+					local conversation = conversationStore.getConversation(v4, p3)
 
 					if conversation ~= nil then
 						table.insert(conversations, conversation)
@@ -175,11 +175,11 @@ local function useConversationSearch(p: string?, flag: boolean?)
 			end
 
 			local page = pages[#pages]
-			local data = page.result.data(p2)
+			local data = page.result.data(p3)
 			local v4 = {
 				query = state2.query,
 				items = collectItems(pages),
-				status = page.result.status(p2),
+				status = page.result.status(p3),
 				nextCursor = 0
 			}
 			local nextCursor

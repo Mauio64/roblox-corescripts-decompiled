@@ -25,7 +25,6 @@ local v = game:GetEngineFeature("ExperienceServiceFollowUserIdEnabled") and FFla
 
 local useTokens = Foundation.Hooks.useTokens
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local function getStoreJoinState(p)
 	local loadingScreenStore = getLoadingScreenStore(p)
@@ -214,54 +213,27 @@ return React.memo(function(props)
 		})
 	end
 
-	local createElement3 = React.createElement
 	local v12 = {
-		AutoLocalize = true,
-		AutomaticSize = Enum.AutomaticSize.Y,
-		BackgroundTransparency = 1,
-		LayoutOrder = 2,
-		Size = UDim2.new(1, 0, 0, 0),
-		Font = 0,
-		FontFace = 0,
-		TextSize = 0,
-		TextWrapped = true,
-		TextScaled = false,
-		TextColor3 = 0,
-		TextStrokeTransparency = 1,
-		Text = 0,
-		TextXAlignment = 0,
-		TextYAlignment = 0,
-		ZIndex = 2,
-		RootLocalizationTable = 0
-	}
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = v2.Typography.TitleMedium.Font
-	end
-
-	v12.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(v2.Typography.TitleMedium.Font)
-	end
-
-	v12.FontFace = fontFace
-
-	v12.TextSize = v2.Typography.TitleMedium.FontSize
-
-	v12.TextColor3 = v2.Color.System.Contrast.Color3
-
-	v12.Text = text2
-	v12.TextXAlignment = Enum.TextXAlignment.Center
-	v12.TextYAlignment = Enum.TextYAlignment.Center
-
-	v12.RootLocalizationTable = CoreGui:FindFirstChild("CoreScriptLocalization")
-	local v13 = {
 		ServerStatusContainer = createElement2(view2, v11, {
 			QueuedDescriptionText = queuedDescriptionText,
-			ServerStatusText = createElement3("TextLabel", v12)
+			ServerStatusText = React.createElement("TextLabel", {
+				AutoLocalize = true,
+				AutomaticSize = Enum.AutomaticSize.Y,
+				BackgroundTransparency = 1,
+				LayoutOrder = 2,
+				Size = UDim2.new(1, 0, 0, 0),
+				FontFace = normalizeFontFace(v2.Typography.TitleMedium.Font),
+				TextSize = v2.Typography.TitleMedium.FontSize,
+				TextWrapped = true,
+				TextScaled = false,
+				TextColor3 = v2.Color.System.Contrast.Color3,
+				TextStrokeTransparency = 1,
+				Text = text2,
+				TextXAlignment = Enum.TextXAlignment.Center,
+				TextYAlignment = Enum.TextYAlignment.Center,
+				ZIndex = 2,
+				RootLocalizationTable = CoreGui:FindFirstChild("CoreScriptLocalization")
+			})
 		}),
 		ProgressBarContainer = 0,
 		ActionContainer = 0
@@ -281,7 +253,7 @@ return React.memo(function(props)
 		})
 	end
 
-	v13.ProgressBarContainer = progressBarContainer
+	v12.ProgressBarContainer = progressBarContainer
 	local actionContainer
 
 	if v5 == PlaceLauncherState.Queued and state and v and ExperienceService:GetFollowUserId() > 0 then
@@ -303,6 +275,6 @@ return React.memo(function(props)
 		)
 	end
 
-	v13.ActionContainer = actionContainer
-	return createElement(view, v10, v13)
+	v12.ActionContainer = actionContainer
+	return createElement(view, v10, v12)
 end)

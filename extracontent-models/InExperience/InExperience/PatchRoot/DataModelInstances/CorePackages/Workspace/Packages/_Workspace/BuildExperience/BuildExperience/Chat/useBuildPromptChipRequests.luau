@@ -12,8 +12,25 @@ local FIntBuildPromptChipEditDebounceMs = require(BuildExperience.Flags.FIntBuil
 
 local FFlagBuildExperienceFTUXChipExhaustedTelemetry = require(BuildExperience.Flags.FFlagBuildExperienceFTUXChipExhaustedTelemetry)
 
+local FFlagBuildExperienceEventContextTelemetry = require(BuildExperience.Flags.FFlagBuildExperienceEventContextTelemetry)
+
 local PROMPT_CHIPS_STATUS = promptChipsStatus.PROMPT_CHIPS_STATUS
 local v = FIntBuildPromptChipEditDebounceMs / 1000
+local function getChipClickParameters(data, value: string, p)
+	local chips = data.getChips()
+	local index = table.find(chips, p)
+	local chipClickParameters = { chipText = p.value, index = 0, chipCount = 0, hasPrompt = 0 }
+	local v2
+
+	if index ~= nil then
+		v2 = tostring(index)
+	end
+
+	chipClickParameters.index = v2
+	chipClickParameters.chipCount = tostring(#chips)
+	chipClickParameters.hasPrompt = tostring(string.find(value, "%S") ~= nil)
+	return chipClickParameters
+end
 
 local function useBuildPromptChipRequests(data, data2)
 	local isActive = data2.isActive
@@ -27,8 +44,9 @@ local function useBuildPromptChipRequests(data, data2)
 	local v2 = React.useCallback(function(p, callback)
 		local lastTime = os.clock()
 		data.requestChips(p, callback, function(p2)
+			local v2 = math.max(0, (math.round((os.clock() - lastTime) * 1000)))
 			sendBuildExperienceEvent("CHIP_LOAD", telemetryGranularity, {
-				elapsedMs = tostring((math.max(0, (math.round((os.clock() - lastTime) * 1000))))),
+				elapsedMs = tostring(v2),
 				succeeded = tostring(p2)
 			})
 		end)
@@ -121,16 +139,32 @@ local function useBuildPromptChipRequests(data, data2)
 		end)
 	end, { data, isActive, v3, v2, telemetryGranularity })
 
-	local requestChipsForSelection = React.useCallback(function(prompt: string, selectedChip, callback)
+	local useCallback = React.useCallback
+	local function fn(prompt: string, selectedChip, callback)
 		if not isActive then
 			return
 		end
 
 		v3()
 		ref2.current = nil
-		sendBuildExperienceEvent("CHIP_CLICK", telemetryGranularity)
+		local v4
+
+		if FFlagBuildExperienceEventContextTelemetry then
+			v4 = getChipClickParameters(data, prompt, selectedChip)
+		end
+
+		sendBuildExperienceEvent("CHIP_CLICK", telemetryGranularity, v4)
+
 		v2({ prompt = prompt, selectedChip = selectedChip }, callback)
-	end, { isActive, v3, v2, telemetryGranularity })
+	end
+
+	local v4
+
+	if FFlagBuildExperienceEventContextTelemetry then
+		v4 = data
+	end
+
+	local requestChipsForSelection = useCallback(fn, { isActive, v3, v2, telemetryGranularity, v4 })
 	local onChipExhausted
 
 	if FFlagBuildExperienceFTUXChipExhaustedTelemetry then

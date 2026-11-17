@@ -7,7 +7,6 @@ local encoders = require(script.Parent.encoders)
 local httpStatus = require(script.Parent.httpStatus)
 local isSuccess = httpStatus.isSuccess
 local statusCodeActions = require(script.Parent.statusCodeActions)
-local FFlagHttpClientRetryExtensions = require(script.Parent.Flags.FFlagHttpClientRetryExtensions)
 
 local v = nil
 
@@ -90,7 +89,7 @@ local function fetch(data)
 		decode = decoders.decodeJson(data.decode)
 	end
 
-	local v2 = {
+	return createRequest({
 		networkImpl = pickNetwork(data), -- inferred equivalent call
 		method = data.method,
 		url = data.url,
@@ -101,24 +100,9 @@ local function fetch(data)
 		analyticsKey = data.analyticsKey,
 		analytics = data.analytics,
 		statusCodeActions = resolveStatusCodeActions(data.statusCodeActions), -- inferred equivalent call
-		onMessage = 0,
-		priority = 0
-	}
-	local onMessage
-
-	if FFlagHttpClientRetryExtensions then
-		onMessage = data.onMessage
-	end
-
-	v2.onMessage = onMessage
-	local priority
-
-	if FFlagHttpClientRetryExtensions then
+		onMessage = data.onMessage,
 		priority = data.priority
-	end
-
-	v2.priority = priority
-	return createRequest(v2)
+	})
 end
 
 return fetch

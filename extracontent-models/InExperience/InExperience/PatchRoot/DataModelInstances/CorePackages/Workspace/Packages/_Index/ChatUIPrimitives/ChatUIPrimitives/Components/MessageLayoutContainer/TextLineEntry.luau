@@ -15,6 +15,9 @@ local TextChannelWindowPerfTracker = require(ChatUIPrimitives.Telemetry.TextChan
 local RewriteToggle = require(script.Parent.RewriteToggle)
 local TranslateHitOverlay = require(script.Parent.TranslateHitOverlay)
 local FFlagTCWTranslationSupport = require(ChatUIPrimitives.Flags.FFlagTCWTranslationSupport)
+local FFlagExpChatLazyMountRewriteToggle = require(ChatUIPrimitives.Flags.FFlagExpChatLazyMountRewriteToggle)
+local FFlagExpChatLatestUsernameWithoutRender = require(ChatUIPrimitives.Flags.FFlagExpChatLatestUsernameWithoutRender)
+local useLatestUsername = require(script.Parent.useLatestUsername)
 local SelectableUsername = require(script.Parent.SelectableUsername)
 
 local IconName = Foundation.Enums.IconName
@@ -88,18 +91,35 @@ local function TextLineEntry(props)
 	local v8 = SignalsReact.useSignalState(v4)
 
 	local ref = React.useRef(nil)
-	local v9 = SignalsReact.useSignalState(props.getLatestMessageId or signal)
-	local v10
+	local buttonRef
+
+	if FFlagExpChatLatestUsernameWithoutRender then
+		buttonRef = useLatestUsername(props.getMessageId, props.getLatestMessageId, props.reportLatestUsername)
+	else
+		buttonRef = ref
+	end
+
+	local useSignalState = SignalsReact.useSignalState
+	local v9
+
+	if FFlagExpChatLatestUsernameWithoutRender then
+		v9 = signal
+	else
+		v9 = props.getLatestMessageId or signal
+	end
+
+	local v10 = useSignalState(v9)
+	local v11
 
 	if v7 == nil then
-		v10 = false
+		v11 = false
 	else
-		v10 = v7 == v9
+		v11 = v7 == v10
 	end
 
 	local reportLatestUsername = props.reportLatestUsername
 	React.useEffect(function()
-		if reportLatestUsername == nil or not v10 then
+		if FFlagExpChatLatestUsernameWithoutRender or (reportLatestUsername == nil or not v11) then
 			return
 		end
 
@@ -107,30 +127,30 @@ local function TextLineEntry(props)
 		return function()
 			reportLatestUsername(nil)
 		end
-	end, { v10, reportLatestUsername })
-	local v11
-
-	if FFlagTCWTranslationSupport then
-		v11 = useTranslateToggle(v8, v7, props.isTranslationSettingEnabled == true)
-	end
-
+	end, { v11, reportLatestUsername })
 	local v12
 
-	if v11 == nil then
-		v12 = false
-	else
-		v12 = v11.isOffered
+	if FFlagTCWTranslationSupport then
+		v12 = useTranslateToggle(v8, v7, props.isTranslationSettingEnabled == true)
 	end
 
 	local v13
 
-	if v11 == nil then
+	if v12 == nil then
 		v13 = false
 	else
-		v13 = v11.shouldShowTranslation
+		v13 = v12.isOffered
 	end
 
-	local v14 = React.useMemo(function()
+	local v14
+
+	if v12 == nil then
+		v14 = false
+	else
+		v14 = v12.shouldShowTranslation
+	end
+
+	local v15 = React.useMemo(function()
 		if not v8 or not v8.presetId or v8.presetId == "" then
 			return ""
 		end
@@ -138,7 +158,7 @@ local function TextLineEntry(props)
 		return formatInlineIcon(IconName.LightningBolt, getPresetBoltIconAttributes(v2.Typography.BodyLarge.FontSize)) -- inferred equivalent call
 	end, { v8, v2 })
 
-	local v15 = React.useMemo(function()
+	local v16 = React.useMemo(function()
 		if not v8 or not v8.iconName or v8.iconName == "" then
 			return ""
 		end
@@ -154,38 +174,38 @@ local function TextLineEntry(props)
 			return ""
 		end
 
-		local v16
+		local v17
 
 		if FFlagTCWTranslationSupport then
-			v16 = resolveDisplayText(v8, v12 and v13)
+			v17 = resolveDisplayText(v8, v13 and v14)
 		else
-			v16 = v8.content
+			v17 = v8.content
 		end
 
 		local prefixText = v8.prefixText or ""
 
 		if v8.messageType == "user" then
-			local v17 = v12 and "     " or ""
-			local v18 = v14
+			local v18 = v13 and "     " or ""
+			local v19 = v15
 
-			if v18 == "" then
-				return `{prefixText} {v17}{v16}`
+			if v19 == "" then
+				return `{prefixText} {v18}{v17}`
 			end
 
-			return `{prefixText} {v17}{v16} {v18}`
+			return `{prefixText} {v18}{v17} {v19}`
 		end
 
 		if v8.messageType == "system-roblox" then
-			return v16
+			return v17
 		end
 
-		if v15 == "" then
-			return v3 .. v16 .. "</font>"
+		if v16 == "" then
+			return v3 .. v17 .. "</font>"
 		end
 
-		return v3 .. v15 .. " " .. v16 .. "</font>"
-	end, { v8, v14, v15, v3, v13, v12 })
-	local v16 = v8 ~= nil
+		return v3 .. v16 .. " " .. v17 .. "</font>"
+	end, { v8, v15, v16, v3, v14, v13 })
+	local v17 = v8 ~= nil
 	local onToggle = React.useCallback(function()
 		v6(not v5())
 	end, { v5, v6 })
@@ -199,20 +219,20 @@ local function TextLineEntry(props)
 	end, { props.fontFace or false })
 
 	local prefixText = v8 and v8.prefixText or ""
-	local v17
-
-	if props.selectableRows == true and v8 ~= nil and v8.messageType == "user" then
-		v17 = prefixText ~= ""
-	else
-		v17 = false
-	end
-
 	local v18
 
-	if props.selectableRows == true then
-		v18 = not v17
+	if props.selectableRows == true and v8 ~= nil and v8.messageType == "user" then
+		v18 = prefixText ~= ""
 	else
 		v18 = false
+	end
+
+	local v19
+
+	if props.selectableRows == true then
+		v19 = not v18
+	else
+		v19 = false
 	end
 
 	local fontFace = props.fontFace
@@ -235,7 +255,7 @@ local function TextLineEntry(props)
 		LayoutOrder = 1
 	})
 
-	local v19 = {
+	local children = {
 		rewriteToggle = React.createElement(RewriteToggle, {
 			messageBinding = messageBinding,
 			showOriginal = showOriginal,
@@ -243,9 +263,19 @@ local function TextLineEntry(props)
 			LayoutOrder = 2
 		})
 	}
-	local v20 = v12 and v11 ~= nil
 
-	if v17 or v20 then
+	if FFlagExpChatLazyMountRewriteToggle and (v8 == nil or v8.wasRewritten ~= true) then
+		children.rewriteToggle = nil
+		children.rewriteToggleSpacer = React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.fromScale(0, 0),
+			LayoutOrder = 2
+		})
+	end
+
+	local v20 = v13 and v12 ~= nil
+
+	if v18 or v20 then
 		local createElement = React.createElement
 		local v21 = {
 			BackgroundTransparency = 1,
@@ -255,13 +285,13 @@ local function TextLineEntry(props)
 		}
 		local usernameSelection
 
-		if v17 then
+		if v18 then
 			usernameSelection = React.createElement(SelectableUsername, {
 				prefixText = prefixText,
 				fontFace = fontFace,
 				textSize = v2.Typography.BodyLarge.FontSize,
 				selectionCursor = props.selectionCursor,
-				buttonRef = ref
+				buttonRef = buttonRef
 			})
 		end
 
@@ -272,17 +302,17 @@ local function TextLineEntry(props)
 				prefixText = prefixText,
 				fontFace = fontFace,
 				textSize = v2.Typography.BodyLarge.FontSize,
-				onActivated = v11.onToggle
+				onActivated = v12.onToggle
 			})
 		end
 
-		v19.messageRow = createElement("Frame", v21, {
+		children.messageRow = createElement("Frame", v21, {
 			label = element,
 			usernameSelection = usernameSelection,
 			translateHit = translateHit
 		})
 	else
-		v19.label = element
+		children.label = element
 	end
 
 	local createElement = React.createElement
@@ -291,27 +321,27 @@ local function TextLineEntry(props)
 		tag = "col gap-xsmall size-full-0 auto-y",
 		backgroundStyle = { Color3 = Color3.new(0, 0, 0), Transparency = 1 },
 		LayoutOrder = layoutOrder,
-		Visible = v16,
+		Visible = v17,
 		onActivated = 0,
 		stateLayer = 0,
 		selection = 0
 	}
 	local onActivated
 
-	if v18 then
+	if v19 then
 		onActivated = noop
 	end
 
 	v21.onActivated = onActivated
 	local stateLayer
 
-	if v18 then
+	if v19 then
 		stateLayer = v
 	end
 
 	v21.stateLayer = stateLayer
-	v21.selection = v18 and { Selectable = v16, SelectionImageObject = props.selectionCursor } or nil
-	return createElement(view, v21, v19)
+	v21.selection = v19 and { Selectable = v17, SelectionImageObject = props.selectionCursor } or nil
+	return createElement(view, v21, children)
 end
 
 return React.memo(TextLineEntry)

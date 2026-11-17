@@ -10,6 +10,8 @@ local PrivatePlaytesters = require(parent.DataHydration.PrivatePlaytesters)
 local getPrivatePlaytestersStore = PrivatePlaytesters.getPrivatePlaytestersStore
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
 local sendBuildExperienceEvent = require(BuildExperience.Telemetry.sendBuildExperienceEvent)
+local useBuildPageImpression = require(BuildExperience.Telemetry.useBuildPageImpression)
+local FFlagBuildExperiencePageImpressions = require(BuildExperience.Flags.FFlagBuildExperiencePageImpressions)
 require(script.Parent.PrivateInvitesManagementView)
 
 local function usePrivateInvitesManagementViewModel(data)
@@ -49,6 +51,10 @@ local function usePrivateInvitesManagementViewModel(data)
 		ref.current = true
 		sendBuildExperienceEvent("PLAYTEST_MANAGEMENT_IMPRESSION", { universeId = universeId })
 	end, { universeId })
+
+	if FFlagBuildExperiencePageImpressions then
+		useBuildPageImpression("invite-management", { universeId = universeId })
+	end
 
 	local state, setState = React.useState({})
 

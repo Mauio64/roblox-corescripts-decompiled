@@ -68,7 +68,9 @@ local FFlagSduiUserSearchTile = SharedFlags6.FFlagSduiUserSearchTile
 local SharedFlags7 = require(parent.SharedFlags)
 local FFlagPlayerSearchEnableOnlineFrequentsForAll = SharedFlags7.FFlagPlayerSearchEnableOnlineFrequentsForAll
 local SharedFlags8 = require(parent.SharedFlags)
-local FFlagUserSearchClassmatesInsight = SharedFlags8.FFlagUserSearchClassmatesInsight
+local FFlagUserSearchUsePreviousUsernameMatch = SharedFlags8.FFlagUserSearchUsePreviousUsernameMatch
+local SharedFlags9 = require(parent.SharedFlags)
+local FFlagUserSearchClassmatesInsight = SharedFlags9.FFlagUserSearchClassmatesInsight
 
 local RODUX_KEY = Constants2.RODUX_KEY
 local PresenceHelpers = require(UserSearch.Utils.PresenceHelpers)
@@ -91,43 +93,44 @@ return function(props)
 		ref = React.useRef(nil)
 	end
 
-	local ref2, setDisabledForHold
+	local setDisabledForHold, v
 
 	if FFlagUserSearchCancelTileActivationOnHoldIntent then
-		ref2 = React.useRef(false)
+		local ref2 = React.useRef(false)
 
 		setDisabledForHold = React.useCallback(function(current: boolean)
 			ref2.current = current
 		end, {})
+		v = ref2
 	else
-		ref2 = nil
+		v = nil
 	end
 
 	local user = props.user
-	local v = useStyle()
+	local v2 = useStyle()
 	local profileInsight
 
 	if FFlagSduiUserSearchTile then
-		local v2 = React.useMemo(function()
+		local v3 = React.useMemo(function()
 			local rankingStrategy = FFlagPlayerSearchEnableOnlineFrequentsForAll and "profile_info_boost" or nil
 			return ProfileInsightsStore.get().GetProfileInsight(user.id, {
 				rankingStrategy = rankingStrategy,
 				count = FFlagUserSearchClassmatesInsight and rankingStrategy and 3 or nil
 			})
 		end, { user.id })
-		profileInsight = SignalsReact.useSignalState(v2.data)
+		profileInsight = SignalsReact.useSignalState(v3.data)
 	else
 		profileInsight = props.profileInsight
 	end
 
-	local v2 = props.enablePresenceIndicator and not props.shouldUseCompactTiles
-	local size_250 = v.Tokens.Size.Size_250
+	local v3 = props.enablePresenceIndicator and not props.shouldUseCompactTiles
+	local size_250 = v2.Tokens.Size.Size_250
 
-	local v3 = useUserExperiment({ AppUserLayers.OmniSearchResultsPageUXExposureLayer }, function(p): boolean
+	local v4 = useUserExperiment({ AppUserLayers.OmniSearchResultsPageUXExposureLayer }, function(p): boolean
 		return (p[AppUserLayers.OmniSearchResultsPageUXExposureLayer] or {}).userPresenceIndicator == "showPresenceInLine"
 	end, false)
 
-	local v4 = useLastInputMode()
+	local v5 = useLastInputMode()
 	local userPresence
 
 	if FFlagUserSearchPresenceStoreMigration then
@@ -138,18 +141,38 @@ return function(props)
 		end)
 	end
 
-	local contextualInfoDisplay, contextualInfoType = useContextualInfo({
+	local v6 = {
 		userId = user.id,
-		previousUsernames = user.previousUsernames,
-		searchKeyword = props.searchParameters.searchKeyword,
-		profileInsight = profileInsight,
-		shouldUseCompactTiles = props.shouldUseCompactTiles,
-		userPresence = userPresence
-	})
-	local v5
+		previousUsernames = 0,
+		isPreviousUsernameMatch = 0,
+		searchKeyword = 0,
+		profileInsight = 0,
+		shouldUseCompactTiles = 0,
+		userPresence = 0
+	}
+	local previousUsernames
+
+	if not FFlagUserSearchUsePreviousUsernameMatch then
+		previousUsernames = user.previousUsernames
+	end
+
+	v6.previousUsernames = previousUsernames
+	local isPreviousUsernameMatch
+
+	if FFlagUserSearchUsePreviousUsernameMatch then
+		isPreviousUsernameMatch = user.isPreviousUsernameMatch
+	end
+
+	v6.isPreviousUsernameMatch = isPreviousUsernameMatch
+	v6.searchKeyword = props.searchParameters.searchKeyword
+	v6.profileInsight = profileInsight
+	v6.shouldUseCompactTiles = props.shouldUseCompactTiles
+	v6.userPresence = userPresence
+	local contextualInfoDisplay, contextualInfoType = useContextualInfo(v6)
+	local v7
 
 	if FFlagUserSearchAddFocusActionsSupport then
-		v5 = Responsive.usePreferredInput() == Responsive.Input.Directional
+		v7 = Responsive.usePreferredInput() == Responsive.Input.Directional
 	end
 
 	local function fn2(playerTileClick: string, options)
@@ -157,7 +180,7 @@ return function(props)
 			local fireAnalyticsEvent = props.fireAnalyticsEvent
 
 			local join = Cryo.Dictionary.join
-			local v6 = {
+			local v8 = {
 				playerId = user.id,
 				tilePos = props.index,
 				contextualInfoType = contextualInfoType,
@@ -173,28 +196,28 @@ return function(props)
 				positionInRow = props.positionInRow
 			end
 
-			v6.positionInRow = positionInRow
+			v8.positionInRow = positionInRow
 			local feedRowNumber
 
 			if FFlagLuaAppSearchPeopleUnifiedSchemaFields then
 				feedRowNumber = props.feedRowNumber
 			end
 
-			v6.feedRowNumber = feedRowNumber
+			v8.feedRowNumber = feedRowNumber
 			local interactionUuid
 
 			if FFlagLuaAppSearchPeopleUnifiedSchemaFields then
 				interactionUuid = HttpService:GenerateGUID(false)
 			end
 
-			v6.interactionUuid = interactionUuid
-			fireAnalyticsEvent(playerTileClick, join(v6, options or {}))
+			v8.interactionUuid = interactionUuid
+			fireAnalyticsEvent(playerTileClick, join(v8, options or {}))
 		end
 	end
 
 	local function onTileActivated()
-		if FFlagUserSearchCancelTileActivationOnHoldIntent and ref2.current then
-			ref2.current = false
+		if FFlagUserSearchCancelTileActivationOnHoldIntent and v.current then
+			v.current = false
 			return
 		end
 
@@ -209,7 +232,7 @@ return function(props)
 		fn2(EventNames.PlayerTileClick)
 	end
 
-	local v6 = {
+	local v8 = {
 		userId = user.id,
 		index = props.index,
 		contextualInfoType = contextualInfoType,
@@ -221,17 +244,17 @@ return function(props)
 	local shouldAddFocusEventName
 
 	if FFlagUserSearchAddFocusActionsSupport then
-		shouldAddFocusEventName = v5
+		shouldAddFocusEventName = v7
 	end
 
-	v6.shouldAddFocusEventName = shouldAddFocusEventName
-	local buttons = useSearchTileButtons(v6, fn2)
+	v8.shouldAddFocusEventName = shouldAddFocusEventName
+	local buttons = useSearchTileButtons(v8, fn2)
 	local relevancyInfo
 
 	if contextualInfoDisplay then
-		local v7 = {
+		local v9 = {
 			text = contextualInfoDisplay.text,
-			fontStyle = v.Font.CaptionBody,
+			fontStyle = v2.Font.CaptionBody,
 			icon = 0,
 			horizontalAlignment = 0,
 			textXAlignment = 0
@@ -242,25 +265,25 @@ return function(props)
 			icon = contextualInfoDisplay.icon
 		end
 
-		v7.icon = icon
+		v9.icon = icon
 		local horizontalAlignment
 
 		if props.shouldUseCompactTiles then
 			horizontalAlignment = Enum.HorizontalAlignment.Center
 		end
 
-		v7.horizontalAlignment = horizontalAlignment
+		v9.horizontalAlignment = horizontalAlignment
 		local textXAlignment
 
 		if props.shouldUseCompactTiles then
 			textXAlignment = Enum.TextXAlignment.Center
 		end
 
-		v7.textXAlignment = textXAlignment
-		relevancyInfo = v7 or nil
+		v9.textXAlignment = textXAlignment
+		relevancyInfo = v9 or nil
 	end
 
-	local v7 = useProfileNames({ userId = user.id })
+	local v9 = useProfileNames({ userId = user.id })
 
 	local function fn3(p, p2)
 		if not (p2 and p2.combinedName) then
@@ -268,7 +291,7 @@ return function(props)
 		end
 
 		if p and PresenceHelpers.isUserOnline(p.userPresenceType) then
-			local color = v.Theme.OnlineStatus.Color
+			local color = v2.Theme.OnlineStatus.Color
 
 			return `<font color="rgb({math.round(color.R * 255)},{math.round(color.G * 255)},{math.round(color.B * 255)})">● </font>` .. p2.combinedName
 		end
@@ -301,7 +324,7 @@ return function(props)
 		buttonRef = ref
 	end
 
-	local v8 = {
+	local v10 = {
 		buttonRef = buttonRef,
 		tileSize = props.size,
 		title = 0,
@@ -318,56 +341,59 @@ return function(props)
 	}
 	local title
 
-	if v2 or v3 or FFlagBlendedSerpUserPresenceInLineEnabled then
-		title = fn3(userPresence, v7)
+	if v3 or v4 or FFlagBlendedSerpUserPresenceInLineEnabled then
+		title = fn3(userPresence, v9)
 	else
-		title = v7 and v7.combinedName
+		title = v9 and v9.combinedName
 	end
 
-	v8.title = title
+	v10.title = title
 
-	v8.subtitle = v7 and v7.username
-	v8.thumbnail = fn(user.id, props.shouldUseCompactTiles) -- inferred equivalent call
-	v8.onActivated = onTileActivated
+	v10.subtitle = v9 and v9.username
+	v10.thumbnail = fn(user.id, props.shouldUseCompactTiles) -- inferred equivalent call
+	v10.onActivated = onTileActivated
 	local buttons2
 
 	if FFlagUserSearchAddFocusActionsSupport then
-		if not (v5 or props.shouldUseCompactTiles) then
+		if not (v7 or props.shouldUseCompactTiles) then
 			buttons2 = buttons
 		end
-	elseif not (props.shouldUseCompactTiles or v4 == "Focus") then
+	elseif not (props.shouldUseCompactTiles or v5 == "Focus") then
 		buttons2 = buttons
 	end
 
-	v8.buttons = buttons2
+	v10.buttons = buttons2
 
-	v8.relevancyInfo = relevancyInfo
+	v10.relevancyInfo = relevancyInfo
 	local horizontalAlignment
 
 	if props.shouldUseCompactTiles then
 		horizontalAlignment = Enum.HorizontalAlignment.Center
 	end
 
-	v8.horizontalAlignment = horizontalAlignment
-	v8.isCircular = props.shouldUseCompactTiles
+	v10.horizontalAlignment = horizontalAlignment
+	v10.isCircular = props.shouldUseCompactTiles
 	local thumbnailFrameSize
 
 	if props.shouldUseCompactTiles then
 		thumbnailFrameSize = UDim2.new(1, -size_250, 1, -size_250)
 	end
 
-	v8.thumbnailFrameSize = thumbnailFrameSize
+	v10.thumbnailFrameSize = thumbnailFrameSize
 	local openTypeFeatures
 
 	if GetFFlagLuaAppEnableOpenTypeSupport() then
 		openTypeFeatures = OpenTypeSupport:getUserNameStylisticAlternative()
 	end
 
-	v8.openTypeFeatures = openTypeFeatures
-	local v9 = { Tile = createElement3(PlayerTile, v8), UserTileEventHandlers = 0 }
+	v10.openTypeFeatures = openTypeFeatures
+	local v11 = {
+		Tile = createElement3(PlayerTile, v10),
+		UserTileEventHandlers = 0
+	}
 	local userTileEventHandlers
 
-	if FFlagUserSearchAddFocusActionsSupport and v5 then
+	if FFlagUserSearchAddFocusActionsSupport and v7 then
 		local createElement4 = React.createElement
 
 		if not FFlagUserSearchCancelTileActivationOnHoldIntent then
@@ -383,9 +409,9 @@ return function(props)
 		})
 	end
 
-	v9.UserTileEventHandlers = userTileEventHandlers
-	local v10 = {
-		UserTile = createElement2("Frame", { BackgroundTransparency = 1, Size = size2, ZIndex = 1 }, v9),
+	v11.UserTileEventHandlers = userTileEventHandlers
+	local v12 = {
+		UserTile = createElement2("Frame", { BackgroundTransparency = 1, Size = size2, ZIndex = 1 }, v11),
 		UserTileRoundCTAButton = 0
 	}
 	local userTileRoundCTAButton
@@ -394,7 +420,7 @@ return function(props)
 		props.shouldUseCompactTiles
 		and buttons
 		and #buttons > 0
-		and not (FFlagUserSearchAddFocusActionsSupport and v5)
+		and not (FFlagUserSearchAddFocusActionsSupport and v7)
 	then
 		if FFlagSduiUserSearchTile then
 			userTileRoundCTAButton = React.createElement(
@@ -408,9 +434,9 @@ return function(props)
 				{
 					RoundCTAButton = React.createElement("Frame", {
 						BackgroundTransparency = 1,
-						Size = UDim2.fromOffset(v.Tokens.Size.Size_900, v.Tokens.Size.Size_900),
+						Size = UDim2.fromOffset(v2.Tokens.Size.Size_900, v2.Tokens.Size.Size_900),
 						AnchorPoint = Vector2.new(1, 1),
-						Position = UDim2.new(1, -v.Tokens.Size.Size_250, 1, -v.Tokens.Size.Size_250)
+						Position = UDim2.new(1, -v2.Tokens.Size.Size_250, 1, -v2.Tokens.Size.Size_250)
 					}, {
 						RoundCTAButton = React.createElement(RoundCTAButton, {
 							searchTileButtonProps = buttons[1],
@@ -423,11 +449,11 @@ return function(props)
 			userTileRoundCTAButton = React.createElement("Frame", {
 				BackgroundTransparency = 1,
 				ZIndex = 2,
-				Size = UDim2.fromOffset(v.Tokens.Size.Size_900, v.Tokens.Size.Size_900),
+				Size = UDim2.fromOffset(v2.Tokens.Size.Size_900, v2.Tokens.Size.Size_900),
 				AnchorPoint = Vector2.new(1, 1),
 				Position = UDim2.fromOffset(
-					props.size.X.Offset - v.Tokens.Size.Size_250,
-					props.size.X.Offset - v.Tokens.Size.Size_250
+					props.size.X.Offset - v2.Tokens.Size.Size_250,
+					props.size.X.Offset - v2.Tokens.Size.Size_250
 				)
 			}, {
 				RoundCTAButton = React.createElement(RoundCTAButton, {
@@ -438,6 +464,6 @@ return function(props)
 		end
 	end
 
-	v10.UserTileRoundCTAButton = userTileRoundCTAButton
-	return createElement("Frame", { BackgroundTransparency = 1, Size = size }, v10)
+	v12.UserTileRoundCTAButton = userTileRoundCTAButton
+	return createElement("Frame", { BackgroundTransparency = 1, Size = size }, v12)
 end

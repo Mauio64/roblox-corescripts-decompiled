@@ -21,22 +21,26 @@ local InputSize = Foundation.Enums.InputSize
 
 local PlusLarge = BuilderIcons.Icon.PlusLarge
 local ChevronLargeLeft = BuilderIcons.Icon.ChevronLargeLeft
+local CirclePerson = BuilderIcons.Icon.CirclePerson
 
 local GradientBackdrop = MomentsCommon.Components.GradientBackdrop
 local FlyoutSidePanel = require(parent.FlyoutSidePanel)
 local FlyoutLeftHeader = FlyoutSidePanel.Components.FlyoutLeftHeader
 local SharedExperimentDefinition = require(parent.SharedExperimentDefinition)
 local FlyoutSidePanelIXP = SharedExperimentDefinition.FlyoutSidePanelIXP
+local CreationMenuContainer = require(Moments.Components.CreationMenuContainer)
 local NavigationMenu = require(Moments.Components.NavigationMenu)
 
 local Constants = require(Moments.Constants)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagMomentsCreateAvatarPosts = SharedFlags.FFlagMomentsCreateAvatarPosts
 local FFlagMomentsFtuxTooltipCreateCopy = require(Moments.Flags.FFlagMomentsFtuxTooltipCreateCopy)
 local FFlagMomentsFixFeedForDeviceSafeInsets = require(Moments.Flags.FFlagMomentsFixFeedForDeviceSafeInsets)
 local Display = require(parent.Display)
 local shouldUseDeviceSafeInsets = Display.shouldUseDeviceSafeInsets
 
-local SharedFlags = require(parent.SharedFlags)
-local FFlagMomentsCreationFeatureGate = SharedFlags.FFlagMomentsCreationFeatureGate
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagMomentsCreationFeatureGate = SharedFlags2.FFlagMomentsCreationFeatureGate
 
 local function renderFeedTypeChips(feedTypeChips)
 	local children = {}
@@ -77,6 +81,31 @@ local function renderAction(p: string, icon, onActivated, layoutOrder: number?)
 	})
 end
 
+local function renderCreateAction(props, layoutOrder: number)
+	if props.onCreateAvatarMomentPressed == nil then
+		return renderAction("create", PlusLarge, props.onCreateMomentButtonPressed, layoutOrder)
+	end
+
+	local createElement = React.createElement
+	local v = {
+		layoutOrder = layoutOrder,
+		testId = "--moments-menu-creation",
+		buttonTestId = "--moments-header--actions--create",
+		buttonVariant = ButtonVariant.Utility,
+		onCreateFromCaptures = props.onCreateMomentButtonPressed,
+		onCreateFromAvatar = props.onCreateAvatarMomentPressed,
+		onTriggerActivated = 0
+	}
+	local onTriggerActivated
+
+	if props.showFtuxTooltip then
+		onTriggerActivated = props.onFtuxTooltipClosed
+	end
+
+	v.onTriggerActivated = onTriggerActivated
+	return createElement(CreationMenuContainer, v)
+end
+
 local function MomentsHeaderView(props)
 	local fn
 	local fn2
@@ -88,23 +117,31 @@ local function MomentsHeaderView(props)
 		end
 
 		if props.showInteractiveButtons and props.showNavigationMenu then
-			local children = {}
+			local v = {}
 
 			if props.showCreateButton then
-				local onCreateMomentButtonPressed = props.onCreateMomentButtonPressed
-				children.CreateMomentButton = React.createElement(IconButton, {
-					LayoutOrder = 1,
-					icon = PlusLarge,
-					onActivated = onCreateMomentButtonPressed,
-					variant = ButtonVariant.Utility,
-					size = InputSize.Medium,
-					isCircular = true,
-					Selectable = true,
-					testId = "--moments-header--actions--create"
-				})
+				local createMomentButton
+
+				if FFlagMomentsCreateAvatarPosts then
+					createMomentButton = renderCreateAction(props, 1)
+				else
+					local onCreateMomentButtonPressed = props.onCreateMomentButtonPressed
+					createMomentButton = React.createElement(IconButton, {
+						LayoutOrder = 1,
+						icon = PlusLarge,
+						onActivated = onCreateMomentButtonPressed,
+						variant = ButtonVariant.Utility,
+						size = InputSize.Medium,
+						isCircular = true,
+						Selectable = true,
+						testId = "--moments-header--actions--create"
+					})
+				end
+
+				v.CreateMomentButton = createMomentButton
 			end
 
-			children.NavigationMenu = React.createElement(NavigationMenu, {
+			v.NavigationMenu = React.createElement(NavigationMenu, {
 				layoutOrder = 2,
 				buttonTestId = "--moments-header--actions--more",
 				buttonVariant = ButtonVariant.Utility,
@@ -113,11 +150,25 @@ local function MomentsHeaderView(props)
 			})
 
 			fn2 = function()
-				return React.createElement(View, { tag = "row align-y-center gap-xsmall auto-xy" }, children)
+				return React.createElement(View, { tag = "row align-y-center gap-xsmall auto-xy" }, v)
 			end
 		elseif props.showInteractiveButtons and props.showCreateButton then
 			fn2 = function()
-				return renderAction("create", PlusLarge, props.onCreateMomentButtonPressed, 1)
+				if FFlagMomentsCreateAvatarPosts then
+					return (renderCreateAction(props, 1))
+				end
+
+				local onCreateMomentButtonPressed = props.onCreateMomentButtonPressed
+				return (React.createElement(IconButton, {
+					LayoutOrder = 1,
+					icon = PlusLarge,
+					onActivated = onCreateMomentButtonPressed,
+					variant = ButtonVariant.Utility,
+					size = InputSize.Medium,
+					isCircular = true,
+					Selectable = true,
+					testId = "--moments-header--actions--create"
+				}))
 			end
 		end
 	elseif props.variant == "base" then
@@ -151,19 +202,25 @@ local function MomentsHeaderView(props)
 			local createMomentButton
 
 			if props.showCreateButton or not FFlagMomentsCreationFeatureGate then
-				local onCreateMomentButtonPressed = props.onCreateMomentButtonPressed
-				local element = React.createElement(IconButton, {
-					LayoutOrder = 1,
-					icon = PlusLarge,
-					onActivated = onCreateMomentButtonPressed,
-					variant = ButtonVariant.Utility,
-					size = InputSize.Medium,
-					isCircular = true,
-					Selectable = true,
-					testId = "--moments-header--actions--create"
-				})
+				local action
 
-				if props.showFtuxTooltip then
+				if FFlagMomentsCreateAvatarPosts then
+					action = renderCreateAction(props, 1)
+				else
+					local onCreateMomentButtonPressed = props.onCreateMomentButtonPressed
+					action = React.createElement(IconButton, {
+						LayoutOrder = 1,
+						icon = PlusLarge,
+						onActivated = onCreateMomentButtonPressed,
+						variant = ButtonVariant.Utility,
+						size = InputSize.Medium,
+						isCircular = true,
+						Selectable = true,
+						testId = "--moments-header--actions--create"
+					})
+				end
+
+				if FFlagMomentsCreateAvatarPosts or props.showFtuxTooltip then
 					local v2 = {
 						LayoutOrder = 1,
 						isOpen = props.showFtuxTooltip,
@@ -174,13 +231,13 @@ local function MomentsHeaderView(props)
 						align = Foundation.Enums.PopoverAlign.End
 					}
 
-					createMomentButton = React.createElement(Coachmark, v2, element)
+					createMomentButton = React.createElement(Coachmark, v2, action)
 				else
 					createMomentButton = React.createElement(View, {
 						LayoutOrder = 1,
 						tag = "auto-xy"
 					}, {
-						Action = element
+						Action = action
 					})
 				end
 			else
@@ -188,16 +245,44 @@ local function MomentsHeaderView(props)
 			end
 
 			fn2 = function()
-				return React.createElement(View, { tag = "row align-y-center gap-xsmall auto-xy" }, {
+				local createElement = React.createElement
+
+				local v2 = {
 					CreateMomentButton = createMomentButton,
-					NavigationMenu = React.createElement(NavigationMenu, {
+					MyMomentsButton = 0,
+					NavigationMenu = 0
+				}
+				local myMomentsButton
+
+				if props.showMyMomentsButton then
+					local onNavigateToMyMoments = props.onNavigateToMyMoments
+					myMomentsButton = React.createElement(IconButton, {
+						LayoutOrder = 2,
+						icon = CirclePerson,
+						onActivated = onNavigateToMyMoments,
+						variant = ButtonVariant.Utility,
+						size = InputSize.Medium,
+						isCircular = true,
+						Selectable = true,
+						testId = "--moments-header--actions--my-moments"
+					})
+				end
+
+				v2.MyMomentsButton = myMomentsButton
+				local navigationMenu
+
+				if not props.showMyMomentsButton then
+					navigationMenu = React.createElement(NavigationMenu, {
 						layoutOrder = 2,
 						buttonTestId = "--moments-header--actions--more",
 						buttonVariant = ButtonVariant.Utility,
 						onNavigateToTrending = props.onNavigateToTrending,
 						onNavigateToMyMoments = props.onNavigateToMyMoments
 					})
-				})
+				end
+
+				v2.NavigationMenu = navigationMenu
+				return createElement(View, { tag = "row align-y-center gap-xsmall auto-xy" }, v2)
 			end
 		end
 	elseif props.variant == "close" then

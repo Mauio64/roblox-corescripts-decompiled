@@ -10,7 +10,6 @@ local Focusable = RoactGamepad.Focusable
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local Foundation = require(CorePackages.Packages.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local withStyle = UIBlox.Style.withStyle
 local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
 local CursorKind = UIBlox.App.SelectionImage.CursorKind
@@ -104,10 +103,10 @@ function extended:renderWithProviders(props, callback)
 
 	local body = font.Body
 
-	local warningText = not self.state.isNameValid
+	local v = not self.state.isNameValid
 
 	local createElement = Roact.createElement
-	local v = {
+	local v2 = {
 		BackgroundTransparency = 1,
 		Size = self.props.Size,
 		Position = self.props.Position,
@@ -115,7 +114,7 @@ function extended:renderWithProviders(props, callback)
 	}
 
 	local createElement2 = Roact.createElement
-	local v2 = {
+	local v3 = {
 		BackgroundColor3 = theme.BackgroundMuted.Color,
 		LayoutOrder = 1,
 		Size = self.props.Size
@@ -123,48 +122,34 @@ function extended:renderWithProviders(props, callback)
 
 	local createElement3 = Roact.createElement
 	local textBox = Focusable.TextBox
-	local v3 = {}
-	v3.Text = self.state.name
-	v3.BackgroundTransparency = 1
-	v3.ClearTextOnFocus = false
-	local font2
-
-	if not FoundationFontFaceMigration then
-		font2 = body.Font
-	end
-
-	v3.Font = font2
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(props.Tokens.Typography.BodyLarge.Font)
-	end
-
-	v3.FontFace = fontFace
-
-	v3.TextSize = font.BaseSize * body.RelativeSize
-	v3.PlaceholderColor3 = theme.PlaceHolder.Color
-	v3.PlaceholderText = self.props.defaultName
-	v3.Position = UDim2.fromOffset(6, 0)
-	v3.Size = UDim2.new(1, -12, 1, 0)
-	v3.TextColor3 = theme.TextDefault.Color
-	v3.TextTruncate = Enum.TextTruncate.AtEnd
-	v3.TextWrapped = true
-	v3.TextXAlignment = Enum.TextXAlignment.Left
+	local v4 = {}
+	v4.Text = self.state.name
+	v4.BackgroundTransparency = 1
+	v4.ClearTextOnFocus = false
+	v4.FontFace = normalizeFontFace(props.Tokens.Typography.BodyLarge.Font)
+	v4.TextSize = font.BaseSize * body.RelativeSize
+	v4.PlaceholderColor3 = theme.PlaceHolder.Color
+	v4.PlaceholderText = self.props.defaultName
+	v4.Position = UDim2.fromOffset(6, 0)
+	v4.Size = UDim2.new(1, -12, 1, 0)
+	v4.TextColor3 = theme.TextDefault.Color
+	v4.TextTruncate = Enum.TextTruncate.AtEnd
+	v4.TextWrapped = true
+	v4.TextXAlignment = Enum.TextXAlignment.Left
 	local textYAlignment
 
 	if not self.props.centerText then
 		textYAlignment = Enum.TextYAlignment.Top
 	end
 
-	v3.TextYAlignment = textYAlignment
-	v3.OverlayNativeInput = true
-	v3[Roact.Change.Text] = self.onTextChanged
-	v3.SelectionImageObject = callback(CursorKind.InputFields)
-	v3.NextSelectionDown = self.props.NextSelectionDown
+	v4.TextYAlignment = textYAlignment
+	v4.OverlayNativeInput = true
+	v4[Roact.Change.Text] = self.onTextChanged
+	v4.SelectionImageObject = callback(CursorKind.InputFields)
+	v4.NextSelectionDown = self.props.NextSelectionDown
 
-	v3[Roact.Ref] = self.props.nameTextBoxRef
-	v3[Roact.Event.AncestryChanged] = self.tryFocusTextBox
+	v4[Roact.Ref] = self.props.nameTextBoxRef
+	v4[Roact.Event.AncestryChanged] = self.tryFocusTextBox
 
 	local createElement4 = Roact.createElement
 	local v5 = { PaddingLeft = UDim.new(0, 6), PaddingRight = UDim.new(0, 6), PaddingTop = 0 }
@@ -175,9 +160,9 @@ function extended:renderWithProviders(props, callback)
 	end
 
 	v5.PaddingTop = paddingTop
-	local v4 = {
-		TextBoxContainer = createElement2("Frame", v2, {
-			Textbox = createElement3(textBox, v3, {
+	return createElement("Frame", v2, {
+		TextBoxContainer = createElement2("Frame", v3, {
+			Textbox = createElement3(textBox, v4, {
 				UIPadding = createElement4("UIPadding", v5)
 			}),
 			UICorner = Roact.createElement("UICorner", { CornerRadius = UDim.new(0, 8) }),
@@ -188,12 +173,7 @@ function extended:renderWithProviders(props, callback)
 				ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			})
 		}),
-		WarningText = 0
-	}
-
-	if warningText then
-		local createElement5 = Roact.createElement
-		local v6 = {
+		WarningText = v and Roact.createElement("TextLabel", {
 			Position = UDim2.new(0, 0, 1, 0),
 			BackgroundTransparency = 1,
 			Text = self.props.invalidInputText,
@@ -203,29 +183,10 @@ function extended:renderWithProviders(props, callback)
 			Size = UDim2.new(1, 0, 0, 20),
 			TextColor3 = theme.Alert.Color,
 			TextWrapped = true,
-			Font = 0,
-			FontFace = 0,
+			FontFace = normalizeFontFace(props.Tokens.Typography.BodyLarge.Font),
 			TextSize = 12
-		}
-		local font3
-
-		if not FoundationFontFaceMigration then
-			font3 = font.Body.Font
-		end
-
-		v6.Font = font3
-		local fontFace2
-
-		if FoundationFontFaceMigration then
-			fontFace2 = normalizeFontFace(props.Tokens.Typography.BodyLarge.Font)
-		end
-
-		v6.FontFace = fontFace2
-		warningText = createElement5("TextLabel", v6)
-	end
-
-	v4.WarningText = warningText
-	return createElement("Frame", v, v4)
+		})
+	})
 end
 
 function extended:render()

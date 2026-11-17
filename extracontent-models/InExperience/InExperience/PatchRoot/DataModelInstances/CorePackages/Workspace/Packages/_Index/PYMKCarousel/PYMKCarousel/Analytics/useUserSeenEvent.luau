@@ -16,6 +16,8 @@ local FFlagMigrateFriendshipStatusesPYMK = require(parent.Flags.FFlagMigrateFrie
 local SharedFlags = require(parent2.SharedFlags)
 local FFlagLuaAppEnableSduiHomePage = SharedFlags.FFlagLuaAppEnableSduiHomePage
 local FFlagPYMKCarouselStableSelectors = require(parent.Flags.FFlagPYMKCarouselStableSelectors)
+local SharedFlags2 = require(parent2.SharedFlags)
+local FFlagPymkCarouselExtendProps = SharedFlags2.FFlagPymkCarouselExtendProps
 
 local frozen = table.freeze({})
 local v
@@ -132,7 +134,13 @@ return function(callback)
 
 						local v9
 
-						if FFlagLuaAppEnableSduiHomePage then
+						if FFlagPymkCarouselExtendProps then
+							if FFlagLuaAppEnableSduiHomePage or item.hasIncomingFriendRequest ~= nil then
+								v9 = item.hasIncomingFriendRequest
+							else
+								v9 = v3[item.id]
+							end
+						elseif FFlagLuaAppEnableSduiHomePage then
 							v9 = item.hasIncomingFriendRequest
 						else
 							v9 = v3[item.id]

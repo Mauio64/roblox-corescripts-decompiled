@@ -10,7 +10,7 @@ local Result = require(parent.Result)
 local SharedFlags = require(parent.SharedFlags)
 local FFlagEnableTopSongsSort = SharedFlags.FFlagEnableTopSongsSort
 local SharedFlags2 = require(parent.SharedFlags)
-local FFlagLuaAppEnableHomepageOneByTwoTile = SharedFlags2.FFlagLuaAppEnableHomepageOneByTwoTile
+local FFlagLuaAppEnableNxMRoduxApportioning = SharedFlags2.FFlagLuaAppEnableNxMRoduxApportioning
 
 local SharedFlags3 = require(parent.SharedFlags)
 local FFlagLuaAppEnableOneByTwoTileFunnelTelemetry = SharedFlags3.FFlagLuaAppEnableOneByTwoTileFunnelTelemetry
@@ -222,28 +222,28 @@ function TopicContentsEntryModel.fromOmniRecommendations(data, recommendationsRe
 
 		local primaryImageAssetId
 
-		if FFlagLuaAppEnableHomepageOneByTwoTile then
+		if FFlagLuaAppEnableNxMRoduxApportioning then
 			primaryImageAssetId = data.contentMetadata.PrimaryImageAssetId
 		end
 
 		v2.primaryImageAssetId = primaryImageAssetId
 		local primaryVideoAssetId
 
-		if FFlagLuaAppEnableHomepageOneByTwoTile then
+		if FFlagLuaAppEnableNxMRoduxApportioning then
 			primaryVideoAssetId = data.contentMetadata.PrimaryVideoAssetId
 		end
 
 		v2.primaryVideoAssetId = primaryVideoAssetId
 		local attributionThumbnailAssetId
 
-		if FFlagLuaAppEnableHomepageOneByTwoTile then
+		if FFlagLuaAppEnableNxMRoduxApportioning then
 			attributionThumbnailAssetId = data.contentMetadata.AttributionThumbnailAssetId
 		end
 
 		v2.attributionThumbnailAssetId = attributionThumbnailAssetId
 		local clickoutUrl
 
-		if FFlagLuaAppEnableHomepageOneByTwoTile then
+		if FFlagLuaAppEnableNxMRoduxApportioning then
 			clickoutUrl = data.contentMetadata.ClickoutUrl
 		end
 

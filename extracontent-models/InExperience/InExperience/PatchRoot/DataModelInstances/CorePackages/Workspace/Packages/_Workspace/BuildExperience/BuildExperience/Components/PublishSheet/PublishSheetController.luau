@@ -8,6 +8,8 @@ local PublishBottomSheetContainer = require(script.Parent.PublishBottomSheetCont
 local VersionHistoryContainer = require(BuildExperience.Components.VersionHistory.VersionHistoryContainer)
 local BuildOverflowMenuScreens = require(BuildExperience.Components.BuildPillMenu.BuildOverflowMenuScreens)
 local GameInfoUtils = require(BuildExperience.utils.GameInfoUtils)
+local FFlagBuildExperiencePageImpressions = require(BuildExperience.Flags.FFlagBuildExperiencePageImpressions)
+local useBuildPageImpression = require(BuildExperience.Telemetry.useBuildPageImpression)
 
 local Screens = BuildOverflowMenuScreens.Screens
 
@@ -48,6 +50,11 @@ local function PublishSheetController(props)
 		target.gameIcon,
 		target.isNewGameTarget
 	})
+
+	if FFlagBuildExperiencePageImpressions then
+		useBuildPageImpression("publish", target2, props.isOpen)
+		useBuildPageImpression("version-history", target2, state and placeId ~= nil)
+	end
 
 	local titleDescriptionReady = GameInfoUtils.isTitleDescriptionReady(gameInfo)
 	local onOpenTitleDescriptionPage = React.useCallback(function()

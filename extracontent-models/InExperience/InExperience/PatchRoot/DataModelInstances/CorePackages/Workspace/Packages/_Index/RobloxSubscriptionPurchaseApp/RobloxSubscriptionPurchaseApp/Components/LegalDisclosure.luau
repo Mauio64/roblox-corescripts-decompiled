@@ -14,6 +14,9 @@ local FFlagSupportFreeTrial = require(RobloxSubscriptionPurchaseApp.Flags.FFlagS
 local FFlagRobloxPlusDynamicFreeTrialLength = require(RobloxSubscriptionPurchaseApp.Flags.FFlagRobloxPlusDynamicFreeTrialLength)
 local FFlagEnablePlusReferralLegalDisclosure = require(RobloxSubscriptionPurchaseApp.Flags.FFlagEnablePlusReferralLegalDisclosure)
 
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSubscriptionSheetCampaignLocalizations = SharedFlags.FFlagSubscriptionSheetCampaignLocalizations
+
 local defineFastString = game:DefineFastString(
 	"RobloxSubscriptionTermsOfUseLink",
 	"https://en.help.roblox.com/hc/articles/46804865425300"
@@ -109,6 +112,18 @@ local function prepareTermsAgreementRichText(value: string)
 	return decodeInlineRichTextEntities(value:gsub("\\u{(%x+)}", fn))
 end
 
+local function fillDisclosureTemplate(textTemplate: string, ctaText: string)
+	local v = {
+		linkStart = "<a href=\"" .. defineFastString .. "\">",
+		linkEnd = "</a>",
+		ctaText = ctaText
+	}
+
+	return (textTemplate:gsub("{(%w+)}", function(p: string)
+		return v[p] or "{" .. p .. "}"
+	end))
+end
+
 local function LegalDisclosure(props)
 	local v = Foundation.Hooks.useTokens()
 
@@ -201,7 +216,18 @@ local function LegalDisclosure(props)
 	end, {})
 	local v7
 
-	if FFlagEnablePlusReferralLegalDisclosure and props.isReferral then
+	if FFlagSubscriptionSheetCampaignLocalizations and props.textTemplate then
+		local textTemplate = props.textTemplate
+		local v8
+
+		if props.ctaText and props.ctaText ~= "" then
+			v8 = props.ctaText
+		else
+			v8 = v4.subscribe
+		end
+
+		v7 = fillDisclosureTemplate(textTemplate, v8)
+	elseif FFlagEnablePlusReferralLegalDisclosure and props.isReferral then
 		v7 = v6.referralTermsAgreement
 	elseif props.shortenFreeTrialTerms then
 		v7 = v6.shortFreeTrialTermsAgreement

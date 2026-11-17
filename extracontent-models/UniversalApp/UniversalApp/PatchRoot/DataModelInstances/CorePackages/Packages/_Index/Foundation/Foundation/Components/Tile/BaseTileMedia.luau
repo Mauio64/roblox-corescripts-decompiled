@@ -3,8 +3,10 @@ local parent = Foundation.Parent
 
 local React = require(parent.React)
 
+local BaseTileMediaClipping = require(Foundation.Enums.BaseTileMediaClipping)
 local TileAspectRatio = require(Foundation.Enums.TileAspectRatio)
 require(Foundation.Components.Types)
+local getBaseTileMediaCorners = require(script.Parent.getBaseTileMediaCorners)
 local getTestIdTag = require(Foundation.Utility.getTestIdTag)
 local mapBindable = require(Foundation.Utility.mapBindable)
 local useTokens = require(Foundation.Providers.Style.useTokens)
@@ -16,7 +18,6 @@ local v = {
 }
 
 local udim = UDim2.fromScale(1, 1)
-local udim2 = UDim.new(0, 0)
 
 local function BaseTileMedia(props)
 	local v2 = useTokens()
@@ -30,7 +31,7 @@ local function BaseTileMedia(props)
 
 	local offset
 
-	if not (tileSize == nil or tileSize.X.Scale ~= 0) then
+	if not (tileSize == nil or tileSize.X.Scale ~= 0 or props.isSizeConstrained) then
 		offset = tileSize.X.Offset
 	end
 
@@ -56,12 +57,12 @@ local function BaseTileMedia(props)
 		end)
 	end
 
-	local udim3 = UDim.new(0, v2.Radius.Medium)
-	local v4 = if props.isContained then udim2 else udim3
+	local baseTileMediaCorners = getBaseTileMediaCorners(v2, props.isContained)
 
 	local createElement = React.createElement
-	local v5 = props.content == nil and "Frame" or "CanvasGroup"
-	local v6 = {
+	local v4 = props.clippingStyle == BaseTileMediaClipping.Rounded and props.content ~= nil and "CanvasGroup"
+		or "Frame"
+	local v5 = {
 		BackgroundColor3 = mapBindable(props.backgroundStyle, function(p)
 			return p.Color3
 		end),
@@ -69,17 +70,18 @@ local function BaseTileMedia(props)
 			return p.Transparency
 		end),
 		BorderSizePixel = 0,
-		ClipsDescendants = true,
+		ClipsDescendants = props.clippingStyle ~= BaseTileMediaClipping.None,
 		LayoutOrder = props.LayoutOrder,
 		Size = size,
 		[React.Tag] = getTestIdTag(props.testId)
 	}
-	local v7 = {
+
+	local v6 = {
 		Corner = React.createElement("UICorner", {
-			TopLeftRadius = udim3,
-			TopRightRadius = udim3,
-			BottomLeftRadius = v4,
-			BottomRightRadius = v4,
+			TopLeftRadius = baseTileMediaCorners.TopLeftRadius,
+			TopRightRadius = baseTileMediaCorners.TopRightRadius,
+			BottomLeftRadius = baseTileMediaCorners.BottomLeftRadius,
+			BottomRightRadius = baseTileMediaCorners.BottomRightRadius,
 			[React.Tag] = getTestIdTag(`{props.testId}--corner`)
 		}),
 		AspectRatio = 0,
@@ -95,10 +97,10 @@ local function BaseTileMedia(props)
 		})
 	end
 
-	v7.AspectRatio = aspectRatio2
+	v6.AspectRatio = aspectRatio2
 
-	v7.Content = props.content
-	return createElement(v5, v6, v7)
+	v6.Content = props.content
+	return createElement(v4, v5, v6)
 end
 
 return React.memo(BaseTileMedia)

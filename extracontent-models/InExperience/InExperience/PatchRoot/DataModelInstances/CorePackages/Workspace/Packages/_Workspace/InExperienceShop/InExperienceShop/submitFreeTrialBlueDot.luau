@@ -53,10 +53,6 @@ local v6 = nil
 local v7 = nil
 
 local function trialKind(trialAvailabilities): nil | string -- 1 equivalent call inferred from this helper
-	if next(trialAvailabilities.available) ~= nil then
-		return "available"
-	end
-
 	if FFlagEnableActiveFreeTrialBlueDot and next(trialAvailabilities.active) ~= nil then
 		return "active"
 	end
@@ -65,7 +61,11 @@ local function trialKind(trialAvailabilities): nil | string -- 1 equivalent call
 		return "redeemed"
 	end
 
-	return nil
+	if next(trialAvailabilities.available) == nil then
+		return nil
+	end
+
+	return "available"
 end
 
 local function chooseSlot(p): nil | string
@@ -223,6 +223,13 @@ return (setmetatable({
 	end,
 	reportViewed = function()
 		report({ type = "viewed" })
+	end,
+	reportActivated = function()
+		if not NotificationsOrchestrator.Flags.FFlagEnableNotificationsOrchestratorUnifiedLogging then
+			return
+		end
+
+		report({ type = "activated" })
 	end,
 	dismiss = dismiss,
 	isHamburgerBlueDotShowing = function(p)

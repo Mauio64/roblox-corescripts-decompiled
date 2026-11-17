@@ -118,11 +118,11 @@ local v2 = {
 }
 
 local function fn(value)
-	if byte(value, 1) == 92 then
-		return (sub(value, 2, #value))
+	if byte(value, 1) ~= 92 then
+		return Html5Entities.entityToString(value)
 	end
 
-	return Html5Entities.entityToString(value)
+	return (sub(value, 2, #value))
 end
 
 local function fn2(value)
@@ -182,7 +182,8 @@ local function replaceAll(callback, value: string, fn3)
 	end
 
 	if v5 ~= #value then
-		v7[count + 1] = sub(value, v5 + 1, #value)
+		local v8 = count + 1
+		v7[v8] = sub(value, v5 + 1, #value)
 	end
 
 	return table.concat(v7)
@@ -204,12 +205,20 @@ local function trim(value: string)
 	local count = #value
 	local count2 = 0
 
-	while count2 < count and byte(value, count2 + 1) <= 32 do
-		count2 += 1
+	while count2 < count do
+		if byte(value, count2 + 1) <= 32 then
+			count2 += 1
+		else
+			break
+		end
 	end
 
-	while count2 < count and byte(value, count - 1 + 1) <= 32 do
-		count -= 1
+	while count2 < count do
+		if byte(value, count - 1 + 1) <= 32 then
+			count -= 1
+		else
+			break
+		end
 	end
 
 	return (sub(value, count2 + 1, count))
@@ -242,7 +251,8 @@ local function caseFold(value: string)
 		pattern = findPattern(value, "[A-Z\128-\255]", pattern + v7) -- inferred equivalent call
 	end
 
-	v6[v4 + 1] = sub(value, v5 + 1, #value)
+	local v7 = v4 + 1
+	v6[v7] = sub(value, v5 + 1, #value)
 	return table.concat(v6)
 end
 

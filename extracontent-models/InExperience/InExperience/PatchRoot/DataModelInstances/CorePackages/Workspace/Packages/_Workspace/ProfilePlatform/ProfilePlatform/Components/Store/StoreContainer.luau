@@ -121,7 +121,9 @@ local function StoreContainer(p)
 	local assets = useProfileJsonComponent(Enums.Components.Store).assets or {}
 
 	local v6 = useSelector((React.useCallback(function(p2)
-		return v(assets, p2[Constants.RODUX_KEY].BundleDetails or {}, p2[Constants.RODUX_KEY].AssetDetails or {})
+		local bundleDetails = p2[Constants.RODUX_KEY].BundleDetails or {}
+		local assetDetails = p2[Constants.RODUX_KEY].AssetDetails or {}
+		return v(assets, bundleDetails, assetDetails)
 	end, { assets })))
 	local v7
 

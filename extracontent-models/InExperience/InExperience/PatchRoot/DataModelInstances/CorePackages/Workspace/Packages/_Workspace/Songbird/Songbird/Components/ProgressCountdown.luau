@@ -24,11 +24,11 @@ local function ProgressCountdown(p)
 	local joined = Cryo.Dictionary.join(v, p)
 
 	local v2 = useCallback(function(p2: number)
-		if joined.counterType == "Remaining" then
-			return "-" .. secondsToHHM(math.floor(joined.timeLength - p2))
+		if joined.counterType ~= "Remaining" then
+			return secondsToHHM(math.ceil(p2))
 		end
 
-		return secondsToHHM(math.ceil(p2))
+		return "-" .. secondsToHHM(math.floor(joined.timeLength - p2))
 	end, { joined.timeLength })
 
 	return React.createElement(Foundation.Text, {

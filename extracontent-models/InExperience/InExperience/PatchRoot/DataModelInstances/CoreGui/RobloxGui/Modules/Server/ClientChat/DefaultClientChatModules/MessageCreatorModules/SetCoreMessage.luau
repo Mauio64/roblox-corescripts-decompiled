@@ -6,12 +6,11 @@ local Util = require(script.Parent:WaitForChild("Util"))
 function CreateSetCoreMessageLabel(p, _)
 	local message = p.Message
 	local extraData = p.ExtraData or {}
-	local baseMessage, v = Util:CreateBaseMessage(
-		message,
-		extraData.Font or ChatSettings.DefaultFont,
-		extraData.TextSize or ChatSettings.ChatWindowTextSize,
-		extraData.Color or ChatSettings.DefaultMessageColor
-	)
+	local font = extraData.Font or ChatSettings.DefaultFont
+	local textSize = extraData.TextSize or ChatSettings.ChatWindowTextSize
+	local color = extraData.Color or ChatSettings.DefaultMessageColor
+
+	local baseMessage, v = Util:CreateBaseMessage(message, font, textSize, color)
 
 	local function GetHeightFunction(p2)
 		return Util:GetMessageHeight(v, baseMessage, p2)

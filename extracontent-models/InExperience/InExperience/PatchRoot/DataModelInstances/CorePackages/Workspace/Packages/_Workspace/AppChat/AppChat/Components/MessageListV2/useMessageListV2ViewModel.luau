@@ -234,8 +234,12 @@ local function useMessageListV2ViewModel(current)
 	React.useEffect(function()
 		if v2 then
 			ref10.current = true
-		elseif ref10.current and (current9 == ref9.current or FIntAppChatInitialMessageFetchLimit <= ref8.current) then
-			setState(true)
+		elseif ref10.current then
+			if current9 == ref9.current then
+				setState(true)
+			elseif FIntAppChatInitialMessageFetchLimit <= ref8.current then
+				setState(true)
+			end
 		end
 	end, { v2, current9 })
 

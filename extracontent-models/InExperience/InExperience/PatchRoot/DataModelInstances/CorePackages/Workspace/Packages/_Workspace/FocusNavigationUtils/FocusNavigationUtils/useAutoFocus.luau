@@ -27,7 +27,7 @@ local function fn(duration: number, list, object)
 	end
 
 	local function focus(p: number)
-		table.insert(threads, (task.delay(duration, function()
+		local thread = task.delay(duration, function()
 			if not v then
 				local selectedCoreObject = GuiService.SelectedCoreObject
 
@@ -48,7 +48,9 @@ local function fn(duration: number, list, object)
 
 				focus(p > #list and 1 or p % #list + 1)
 			end
-		end)))
+		end)
+
+		table.insert(threads, thread)
 	end
 
 	for _, item in list do

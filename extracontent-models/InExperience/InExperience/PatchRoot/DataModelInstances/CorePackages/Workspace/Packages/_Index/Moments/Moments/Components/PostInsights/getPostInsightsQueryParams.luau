@@ -8,6 +8,7 @@ require(script.Parent.metricSeriesToChartPoints)
 local frozen = table.freeze({
 	views = "MomentsLifetimeVideoViews",
 	watchTime = "MomentsLifetimeWatchTime",
+	watchTimeNoReplay = "MomentsLifetimeWatchTimeNoReplay",
 	joins = "MomentsLifetimeJoins"
 })
 
@@ -78,7 +79,7 @@ local function getPostInsightsQueryParams(data, p: number)
 		}
 	}
 
-	local function query(metric: string, granularity, lookbackSeconds: number) -- 4 equivalent calls inferred from this helper
+	local function query(metric: string, granularity, lookbackSeconds: number) -- 5 equivalent calls inferred from this helper
 		return {
 			resourceType = CreatorAnalytics.ResourceType.Creator,
 			resourceId = tostring(data.creatorId),
@@ -98,6 +99,7 @@ local function getPostInsightsQueryParams(data, p: number)
 		lifetime = {
 			views = query(frozen.views, none, 2588400), -- inferred equivalent call
 			watchTime = query(frozen.watchTime, none, 2588400), -- inferred equivalent call
+			watchTimeNoReplay = query(frozen.watchTimeNoReplay, none, 2588400), -- inferred equivalent call
 			joins = query(frozen.joins, none, 2588400) -- inferred equivalent call
 		}
 	}

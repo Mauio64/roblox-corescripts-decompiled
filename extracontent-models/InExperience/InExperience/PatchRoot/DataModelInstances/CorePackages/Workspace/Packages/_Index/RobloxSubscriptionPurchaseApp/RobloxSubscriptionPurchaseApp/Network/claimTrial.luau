@@ -38,10 +38,10 @@ return function(grantType)
 		local v4 = p and p.products and p.products[1]
 		local id = v4 and v4.productKey and v4.productKey.id
 
-		if id and id ~= "" then
-			return v3:post(v2({ productId = id, grantType = grantType }), {})
+		if not id or id == "" then
+			return Promise.reject("No eligible trial product found")
 		end
 
-		return Promise.reject("No eligible trial product found")
+		return v3:post(v2({ productId = id, grantType = grantType }), {})
 	end)
 end

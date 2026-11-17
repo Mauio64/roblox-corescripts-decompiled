@@ -40,10 +40,12 @@ local function QuickMenuControllerBar(p)
 	}
 
 	if p.chatMenuEnabled then
+		local v2 = React.useCallback(function(p2)
+			return p2.chat.visible
+		end)
+
 		table.insert(rightHints, 1, {
-			text = v:Format(useSelector((React.useCallback(function(p2)
-				return p2.chat.visible
-			end))) and "CoreScripts.TopBar.HideChat" or "CoreScripts.TopBar.ShowChat"),
+			text = v:Format(useSelector(v2) and "CoreScripts.TopBar.HideChat" or "CoreScripts.TopBar.ShowChat"),
 			keyCode = Enum.KeyCode.ButtonR1
 		})
 	end

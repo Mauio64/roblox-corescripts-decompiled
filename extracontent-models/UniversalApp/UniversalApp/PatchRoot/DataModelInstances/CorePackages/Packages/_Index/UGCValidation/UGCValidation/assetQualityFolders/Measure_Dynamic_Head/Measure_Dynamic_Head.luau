@@ -6,15 +6,25 @@ local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 local getFIntUGCValidationDynamicHeadMinimumQualityPercent = require(parent.flags.getFIntUGCValidationDynamicHeadMinimumQualityPercent)
 
 local getFFlagUGCValidateAQScoreWarnings = require(parent.flags.getFFlagUGCValidateAQScoreWarnings)
+local getFFlagUGCValidateAQDisableLegacyDynamicHead = require(parent.flags.getFFlagUGCValidateAQDisableLegacyDynamicHead)
+local getFFlagUGCValidationShadowIsDynamicHead = require(parent.flags.getFFlagUGCValidationShadowIsDynamicHead)
 
-local MeasureDynamicHead = {
-	categories = { ValidationEnums.UploadCategory.DYNAMIC_HEAD },
-	["shadowFlag"] = require(parent.flags.getFFlagUGCValidationShadowIsDynamicHead),
-	knownAqsUserErrors = {
-		INVALID_LANDMARKS = ErrorSourceStrings.Keys.DynamicHeadCageMisaligned,
-		NO_FACS = ErrorSourceStrings.Keys.DynamicHeadNOFACS,
-		MISSING_CAGE_INFO = ErrorSourceStrings.Keys.DynamicHeadMISSINGCAGE
-	}
+local MeasureDynamicHead = {}
+
+MeasureDynamicHead.categories = { ValidationEnums.UploadCategory.DYNAMIC_HEAD }
+
+function MeasureDynamicHead.fflag(): boolean
+	return not getFFlagUGCValidateAQDisableLegacyDynamicHead()
+end
+
+function MeasureDynamicHead.shadowFlag()
+	return getFFlagUGCValidationShadowIsDynamicHead() and not getFFlagUGCValidateAQDisableLegacyDynamicHead()
+end
+
+MeasureDynamicHead.knownAqsUserErrors = {
+	INVALID_LANDMARKS = ErrorSourceStrings.Keys.DynamicHeadCageMisaligned,
+	NO_FACS = ErrorSourceStrings.Keys.DynamicHeadNOFACS,
+	MISSING_CAGE_INFO = ErrorSourceStrings.Keys.DynamicHeadMISSINGCAGE
 }
 
 local v = {

@@ -1,1 +1,0 @@
-return game:DefineFastFlag("MomentsTextOverlayV2RedesignPhase1", false)

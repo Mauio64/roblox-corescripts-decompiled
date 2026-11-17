@@ -8,7 +8,6 @@ local React = require(parent.React)
 local Cryo = require(parent.Cryo)
 local UIBlox = require(parent.UIBlox)
 local Foundation = require(parent.Foundation)
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local AppCommonLib = require(parent.AppCommonLib)
 local Text = AppCommonLib.Text
 local AppCommonLib2 = require(parent.AppCommonLib)
@@ -170,9 +169,7 @@ function extended.render(data)
 		v3.cancel = cancel
 
 		v3.filterBoxContainer = withSelectionCursorProvider(function(callback)
-			local createElement2 = Roact.createElement
-			local view = Foundation.View
-			local v4 = {
+			return Roact.createElement(Foundation.View, {
 				Size = udim2,
 				LayoutOrder = 1,
 				selection = {
@@ -181,108 +178,65 @@ function extended.render(data)
 				},
 				onActivated = data.focusInputBox,
 				ref = data.containerRef
-			}
-
-			local createElement3 = Roact.createElement
-			local v5 = {
-				Size = UDim2.fromScale(1, 1),
-				Image = v.Image,
-				ImageColor3 = props.Theme.UIDefault.Color,
-				ImageTransparency = props.Theme.UIDefault.Transparency,
-				ScaleType = Enum.ScaleType.Slice,
-				SliceCenter = v.SliceCenter,
-				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
-				Selectable = false
-			}
-
-			local v6 = {
-				layout = Roact.createElement("UIListLayout", {
-					VerticalAlignment = Enum.VerticalAlignment.Center,
-					HorizontalAlignment = Enum.HorizontalAlignment.Left,
-					FillDirection = Enum.FillDirection.Horizontal,
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					Padding = UDim.new(0, 4)
-				}),
-				padding = Roact.createElement("UIPadding", {
-					PaddingLeft = UDim.new(0, 12),
-					PaddingRight = UDim.new(0, 12)
-				}),
-				filterBoxIcon = Roact.createElement(ImageSetLabel, {
+			}, {
+				filterBoxBackground = Roact.createElement(ImageSetLabel, {
+					Size = UDim2.fromScale(1, 1),
+					Image = v.Image,
+					ImageColor3 = props.Theme.UIDefault.Color,
+					ImageTransparency = props.Theme.UIDefault.Transparency,
+					ScaleType = Enum.ScaleType.Slice,
+					SliceCenter = v.SliceCenter,
 					BackgroundTransparency = 1,
-					Size = UDim2.new(0, IconSize.Small, 0, IconSize.Small),
-					Image = iconscommonsearch,
-					ImageColor3 = props.Theme.IconEmphasis.Color,
-					ImageTransparency = props.Theme.IconEmphasis.Transparency,
-					LayoutOrder = 1
-				}),
-				filterBoxContainer = 0
-			}
-
-			local createElement4 = Roact.createElement
-			local v7 = {
-				BackgroundTransparency = 1,
-				Size = UDim2.new(1, -(IconSize.Small + 4), 1, 0),
-				LayoutOrder = 2
-			}
-
-			local createElement5 = Roact.createElement
-			local v8 = {
-				initialInputText = data.props.initialInputText,
-				inputTextColor3 = props.Theme.TextEmphasis.Color,
-				inputTextFont = 0,
-				inputTextSize = 0,
-				inputTextTransparency = 0,
-				inputTextXAlignment = 0,
-				placeholderText = 0,
-				placeholderTextColor3 = 0,
-				placeholderTextTransparency = 0,
-				captureFocusOnMount = 0,
-				clearIcon = 0,
-				clearIconColor3 = 0,
-				clearIconTransparency = 0,
-				clearButtonSize = 0,
-				clearButtonDisabled = false,
-				textChangedCallback = 0,
-				onSelectCallback = 0,
-				inputBoxRef = 0,
-				clearButtonSelectionImageObject = 0
-			}
-			local inputTextFont
-
-			if FoundationFontFaceMigration then
-				inputTextFont = props.Tokens.Typography.BodyLarge.Font
-			else
-				inputTextFont = body.Font
-			end
-
-			v8.inputTextFont = inputTextFont
-
-			v8.inputTextSize = inputTextSize
-			v8.inputTextTransparency = props.Theme.TextEmphasis.Transparency
-			v8.inputTextXAlignment = Enum.TextXAlignment.Left
-
-			v8.placeholderText = data.props.searchPlaceholderText
-			v8.placeholderTextColor3 = props.Theme.TextDefault.Color
-			v8.placeholderTextTransparency = props.Theme.TextDefault.Transparency
-
-			v8.captureFocusOnMount = data.props.captureFocusOnMount
-
-			v8.clearIcon = iconsactionseditclear_small
-			v8.clearIconColor3 = props.Theme.IconEmphasis.Color
-			v8.clearIconTransparency = props.Theme.IconEmphasis.Transparency
-			v8.clearButtonSize = IconSize.Small
-
-			v8.textChangedCallback = fn
-			v8.onSelectCallback = data.props.onSelectCallback
-
-			v8.inputBoxRef = data.inputBoxRef
-			v8.clearButtonSelectionImageObject = callback(CursorKind.RoundedRect)
-			v6.filterBoxContainer = createElement4("Frame", v7, {
-				filterBox = createElement5(CallbackInputBox, v8)
-			})
-			return createElement2(view, v4, {
-				filterBoxBackground = createElement3(ImageSetLabel, v5, v6)
+					BorderSizePixel = 0,
+					Selectable = false
+				}, {
+					layout = Roact.createElement("UIListLayout", {
+						VerticalAlignment = Enum.VerticalAlignment.Center,
+						HorizontalAlignment = Enum.HorizontalAlignment.Left,
+						FillDirection = Enum.FillDirection.Horizontal,
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						Padding = UDim.new(0, 4)
+					}),
+					padding = Roact.createElement("UIPadding", {
+						PaddingLeft = UDim.new(0, 12),
+						PaddingRight = UDim.new(0, 12)
+					}),
+					filterBoxIcon = Roact.createElement(ImageSetLabel, {
+						BackgroundTransparency = 1,
+						Size = UDim2.new(0, IconSize.Small, 0, IconSize.Small),
+						Image = iconscommonsearch,
+						ImageColor3 = props.Theme.IconEmphasis.Color,
+						ImageTransparency = props.Theme.IconEmphasis.Transparency,
+						LayoutOrder = 1
+					}),
+					filterBoxContainer = Roact.createElement("Frame", {
+						BackgroundTransparency = 1,
+						Size = UDim2.new(1, -(IconSize.Small + 4), 1, 0),
+						LayoutOrder = 2
+					}, {
+						filterBox = Roact.createElement(CallbackInputBox, {
+							initialInputText = data.props.initialInputText,
+							inputTextColor3 = props.Theme.TextEmphasis.Color,
+							inputTextFont = props.Tokens.Typography.BodyLarge.Font,
+							inputTextSize = inputTextSize,
+							inputTextTransparency = props.Theme.TextEmphasis.Transparency,
+							inputTextXAlignment = Enum.TextXAlignment.Left,
+							placeholderText = data.props.searchPlaceholderText,
+							placeholderTextColor3 = props.Theme.TextDefault.Color,
+							placeholderTextTransparency = props.Theme.TextDefault.Transparency,
+							captureFocusOnMount = data.props.captureFocusOnMount,
+							clearIcon = iconsactionseditclear_small,
+							clearIconColor3 = props.Theme.IconEmphasis.Color,
+							clearIconTransparency = props.Theme.IconEmphasis.Transparency,
+							clearButtonSize = IconSize.Small,
+							clearButtonDisabled = false,
+							textChangedCallback = fn,
+							onSelectCallback = data.props.onSelectCallback,
+							inputBoxRef = data.inputBoxRef,
+							clearButtonSelectionImageObject = callback(CursorKind.RoundedRect)
+						})
+					})
+				})
 			})
 		end)
 		return createElement("Frame", focusNavigationEventHandlerRefsByRef, v3)

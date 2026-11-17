@@ -10,11 +10,9 @@ local memoize = AppCommonLib.memoize
 require(GameTile.GameTileTypes)
 
 local SharedFlags = require(parent.SharedFlags)
-local FFlagLuaAppMigrateGameTileFooterValueFixes = SharedFlags.FFlagLuaAppMigrateGameTileFooterValueFixes
+local FFlagLuaAppUnifyPlayButtonTile = SharedFlags.FFlagLuaAppUnifyPlayButtonTile
 local SharedFlags2 = require(parent.SharedFlags)
-local FFlagLuaAppUnifyPlayButtonTile = SharedFlags2.FFlagLuaAppUnifyPlayButtonTile
-local SharedFlags3 = require(parent.SharedFlags)
-local FFlagLuaAppUnifyPlayButtonTileIxp = SharedFlags3.FFlagLuaAppUnifyPlayButtonTileIxp
+local FFlagLuaAppUnifyPlayButtonTileIxp = SharedFlags2.FFlagLuaAppUnifyPlayButtonTileIxp
 
 local GameTileExperimentation = require(GameTile.GameTileExperimentation)
 
@@ -126,16 +124,10 @@ GameTileViewConfig.getElementSizes = getElementSizes
 function GameTileViewConfig.getContainmentSidePadding(p, p2, p3)
 	if p3 then
 		if p2 == "Wide" or p2 == "Event" then
-			if FFlagLuaAppMigrateGameTileFooterValueFixes then
-				return p3.Padding.Medium
-			end
-
-			return p3.Padding.Large
-		elseif FFlagLuaAppMigrateGameTileFooterValueFixes then
-			return p3.Size.Size_150
-		else
-			return p3.Padding.Small
+			return p3.Padding.Medium
 		end
+
+		return p3.Size.Size_150
 	elseif p2 == "Wide" or p2 == "Event" then
 		return p.Size.Size_300
 	else

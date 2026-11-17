@@ -1,6 +1,5 @@
 local CoreGui = game:GetService("CoreGui")
 local RunService = game:GetService("RunService")
-local TextService = game:GetService("TextService")
 local CorePackages = game:GetService("CorePackages")
 local ContextActionService = game:GetService("ContextActionService")
 local GuiService = game:GetService("GuiService")
@@ -14,8 +13,6 @@ local Button = UIBlox.App.Button.Button
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local Style = require(CorePackages.Workspace.Packages.Style)
 local GetTextSize = Style.GetTextSize
-local Foundation = require(CorePackages.Packages.Foundation)
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local CoreGuiCommon = require(CorePackages.Workspace.Packages.CoreGuiCommon)
 local withFoundationOrUIBloxStyle = CoreGuiCommon.withFoundationOrUIBloxStyle
 
@@ -68,52 +65,40 @@ end
 function extended.render(data)
 	local props = data.props
 
-	return withFoundationOrUIBloxStyle(function(p)
-		local tokens
-
-		if FoundationFontFaceMigration then
-			tokens = p
-		end
-
+	return withFoundationOrUIBloxStyle(function(tokens)
 		return {
 			Tokens = tokens,
 			Theme = {
 				Overlay = {
-					Color = p.Color.Common.Scrim.Color3,
-					Transparency = p.Color.Common.Scrim.Transparency
+					Color = tokens.Color.Common.Scrim.Color3,
+					Transparency = tokens.Color.Common.Scrim.Transparency
 				},
 				BackgroundUIDefault = {
-					Color = p.Color.Surface.Surface_300.Color3,
-					Transparency = p.Color.Surface.Surface_300.Transparency
+					Color = tokens.Color.Surface.Surface_300.Color3,
+					Transparency = tokens.Color.Surface.Surface_300.Transparency
 				},
 				Divider = {
-					Color = p.Color.Stroke.Emphasis.Color3,
-					Transparency = p.Color.Stroke.Emphasis.Transparency
+					Color = tokens.Color.Stroke.Emphasis.Color3,
+					Transparency = tokens.Color.Stroke.Emphasis.Transparency
 				}
 			},
 			Font = {
 				BaseSize = 1,
 				Body = {
-					Font = p.Typography.BodyLarge.Font,
-					RelativeSize = p.Typography.BodyLarge.FontSize
+					Font = tokens.Typography.BodyLarge.Font,
+					RelativeSize = tokens.Typography.BodyLarge.FontSize
 				}
 			}
 		}
 	end, function(props2)
-		local font = props2.Font.Body.Font
 		local v = props2.Font.Body.RelativeSize * props2.Font.BaseSize
 		local bodyText = props.bodyText
-		local v2
-
-		if FoundationFontFaceMigration then
-			v2 = GetTextSize(bodyText, v, props2.Tokens.Typography.BodyLarge.Font, Vector2.new(295, 1e999), {
+		local v2 = math.max(
+			GetTextSize(bodyText, v, props2.Tokens.Typography.BodyLarge.Font, Vector2.new(295, 1e999), {
 				addTemporaryPadding = false
-			}).Y
-		else
-			v2 = TextService:GetTextSize(bodyText, v, font, Vector2.new(295, 1e999)).Y
-		end
-
-		local v3 = math.max(v2, v * 2) + 20 + 20
+			}).Y,
+			v * 2
+		) + 20 + 20
 
 		return Roact.createElement(Roact.Portal, { target = CoreGui }, {
 			InGameMenuConfirmationDialog = Roact.createElement("ScreenGui", {
@@ -139,7 +124,7 @@ function extended.render(data)
 					ImageTransparency = props2.Theme.BackgroundUIDefault.Transparency,
 					Position = UDim2.new(0.5, 0, 0.5, 0),
 					ScaleType = Assets.Images.RoundedRect.ScaleType,
-					Size = UDim2.new(0, 335, 0, v3 + 49 + 36 + 20),
+					Size = UDim2.new(0, 335, 0, v2 + 49 + 36 + 20),
 					SliceCenter = Assets.Images.RoundedRect.SliceCenter
 				}, {
 					Padding = Roact.createElement("UIPadding", {
@@ -171,7 +156,7 @@ function extended.render(data)
 						{
 							BackgroundTransparency = 1,
 							LayoutOrder = 4,
-							Size = UDim2.new(1, 0, 0, v3)
+							Size = UDim2.new(1, 0, 0, v2)
 						},
 						{
 							BodyText = Roact.createElement(ThemedTextLabel, {
@@ -232,7 +217,8 @@ function extended.render(data)
 end
 
 function extended:updateBlur()
-	RunService:SetRobloxGuiFocused(self.props.blurBackground and self.props.visible)
+	local visible = self.props.blurBackground and self.props.visible
+	RunService:SetRobloxGuiFocused(visible)
 end
 
 function extended:bindActions()

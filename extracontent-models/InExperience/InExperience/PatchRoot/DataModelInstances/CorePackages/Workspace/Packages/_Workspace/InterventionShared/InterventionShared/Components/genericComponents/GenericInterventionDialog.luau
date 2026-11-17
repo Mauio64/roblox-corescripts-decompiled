@@ -47,9 +47,11 @@ local useInterventionPlacement = require(InterventionShared.Hooks.useInterventio
 local Localization = require(parent.Localization)
 local useLocalization = Localization.Hooks.useLocalization
 local usePreferredInput = Responsive.usePreferredInput
+local useSinkCoreShortcuts = require(InterventionShared.Hooks.useSinkCoreShortcuts)
 local useTokens = Foundation.Hooks.useTokens
 local useWebView = require(InterventionShared.Hooks.useWebView)
 
+local FFlagInterventionDialogBlockExperienceInput = require(InterventionShared.Flags.FFlagInterventionDialogBlockExperienceInput)
 local SharedFlags = require(parent.SharedFlags)
 local FFlagNavigateToSafetyDashboardForAppeals = SharedFlags.FFlagNavigateToSafetyDashboardForAppeals
 local FFlagUFRDialogContentCutoffFix = require(InterventionShared.Flags.FFlagUFRDialogContentCutoffFix)
@@ -104,6 +106,10 @@ local function GenericInterventionDialog(props)
 		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.ModerationOverlay,
 		isAutoFocusRoot = true
 	})
+
+	if FFlagInterventionDialogBlockExperienceInput then
+		useSinkCoreShortcuts(placement == Constants.InterventionPlacementType.InExperience)
+	end
 
 	useEffect(function()
 		InterventionAnalytics.sendAnalyticsEvent(InterventionAnalytics.TelemetryConfigs.DialogRendered, {

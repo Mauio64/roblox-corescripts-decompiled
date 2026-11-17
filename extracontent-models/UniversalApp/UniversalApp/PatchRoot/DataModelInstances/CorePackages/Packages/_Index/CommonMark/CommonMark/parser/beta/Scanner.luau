@@ -40,9 +40,9 @@ end
 function Scanner:peek()
 	if self._index < self._lineLength then
 		return byte(self._line:getContent(), self._index + 1)
+	else
+		return if self._lineIndex < #self._lines - 1 then 10 else 0
 	end
-
-	return if self._lineIndex < #self._lines - 1 then 10 else 0
 end
 
 function Scanner:peekCodePoint()

@@ -9,7 +9,6 @@ local defineFastInt = game:DefineFastInt("UGCValidateRenderMeshOutsideOuterCageM
 
 return {
 	categories = { ValidationEnums.UploadCategory.LAYERED_CLOTHING, ValidationEnums.UploadCategory.EYEBROW_EYELASH },
-	["fflag"] = require(parent.flags.getFFlagUGCValidateAQCageQualityLC),
 	run = function(object, p)
 		local handle = p.aqsSummaryData.Measure_Mesh_Outside_OuterCage.Handle
 		local mesh_outside_outer_cage_percent = handle and tonumber(handle.mesh_outside_outer_cage_percent)

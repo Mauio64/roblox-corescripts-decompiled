@@ -14,6 +14,7 @@ local FFlagAXSlotsDesktopRedesign = AvatarExperienceFlags.FFlagAXSlotsDesktopRed
 local FFlagAXInventoryDurablesExpiredFilter = AvatarExperienceFlags.FFlagAXInventoryDurablesExpiredFilter
 local FFlagAXCustomizeBackgrounds = AvatarExperienceFlags.FFlagAXCustomizeBackgrounds
 local FFlagAXDownrankMakeupCustomize = AvatarExperienceFlags.FFlagAXDownrankMakeupCustomize
+local FFlagAXSpawnEffects = AvatarExperienceFlags.FFlagAXSpawnEffects
 
 local Foundation = require(parent.Foundation)
 local IconName = Foundation.Enums.IconName
@@ -169,6 +170,7 @@ end
 icons.Eyebrows = eyebrows
 
 icons.Backgrounds = { name = IconName.Image, variant = IconVariant.Filled }
+icons.SpawnEffects = { name = IconName.CursorStars, variant = IconVariant.Filled }
 
 local bodyAssetTypes = {
 	Enum.AssetType.LeftLeg,
@@ -551,6 +553,16 @@ slotEditorCategories[Categories.Emotes] = {
 	index = v2[Categories.Emotes],
 	slots = {}
 }
+
+if FFlagAXSpawnEffects then
+	table.insert(slotEditorCategories[Categories.Animations].slots, 1, {
+		nameTranslationKey = "Feature.Avatar.Label.Spawn",
+		icon = icons.SpawnEffects,
+		editorSubcategory = AvatarEditorSubcategories.SpawnEffects,
+		assetTypes = { (Enum.AvatarAssetType:FromValue(97)) }
+	})
+end
+
 local inventoryFilterToAvailabilityStatus
 
 if FFlagAXInventoryDurablesExpiredFilter then

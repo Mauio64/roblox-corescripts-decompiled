@@ -1,1 +1,0 @@
-return game:DefineFastFlag("EnableTiltLoadingScreen3", false)

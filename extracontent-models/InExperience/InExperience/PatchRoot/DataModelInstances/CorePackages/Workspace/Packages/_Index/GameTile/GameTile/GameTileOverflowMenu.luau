@@ -1,4 +1,3 @@
-local HttpService = game:GetService("HttpService")
 local UserInputService = game:GetService("UserInputService")
 
 local GameTile = script:FindFirstAncestor("GameTile")
@@ -9,16 +8,13 @@ local CentralOverlay = require(parent.CentralOverlay)
 local Foundation = require(parent.Foundation)
 local Localization = require(parent.Localization)
 local Loggers = require(parent.Loggers)
-local LoggingProtocol = require(parent.LoggingProtocol)
 local React = require(parent.React)
 local Responsive = require(parent.Responsive)
 local RoactServiceTags = require(parent.RoactServiceTags)
 local RoactUtils = require(parent.RoactUtils)
 local RobloxAppEnums = require(parent.RobloxAppEnums)
 local RobloxAppHooks = require(parent.RobloxAppHooks)
-local RobloxAppToastsRodux = require(parent.RobloxAppToastsRodux)
 local SharedFlags = require(parent.SharedFlags)
-local UserSignals = require(parent.UserSignals)
 local DiscoveryAnalytics = require(parent.DiscoveryAnalytics)
 local NavigationRodux = require(parent.NavigationRodux)
 local Selectors = NavigationRodux.Selectors
@@ -33,23 +29,16 @@ local IconSize = Foundation.Enums.IconSize
 local AbuseVector = require(parent.GenericAbuseReporting.AbuseVector)
 local OpenDynamicAbuseReport = require(parent.GenericAbuseReporting.OpenDynamicAbuseReport)
 local useLocalization = Localization.Hooks.useLocalization
-local mutedError = Loggers.mutedError
 local flaggedMutedError = Loggers.flaggedMutedError
-local default = LoggingProtocol.default
 local useLastInput = Responsive.useLastInput
 local RoactNetworking = RoactServiceTags.RoactNetworking
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 local CentralOverlayType = RobloxAppEnums.CentralOverlayType
 local useRoactService = RobloxAppHooks.useRoactService
-local SetNetworkingErrorToast = RobloxAppToastsRodux.Thunks.SetNetworkingErrorToast
-local PostSendUserSignal = UserSignals.PostSendUserSignal
-local UserSignalTypes = UserSignals.UserSignalTypes
 local gameTileOverflowMenuAction = DiscoveryAnalytics.Events.gameTileOverflowMenuAction
 
-local NotInterestedUserSignalTelemetryEventConfigs = require(GameTile.NotInterestedUserSignalTelemetryEventConfigs)
 local activateGameNotInterested = require(GameTile.activateGameNotInterested)
-local sendNotInterestedFeedbackFormAnalytics = require(GameTile.sendNotInterestedFeedbackFormAnalytics)
 local useGameTileActions = require(GameTile.useGameTileActions)
 local useGameTileOverflowMenuFocusNavigation = require(GameTile.useGameTileOverflowMenuFocusNavigation)
 local GameTileConstants = require(GameTile.GameTileConstants)
@@ -69,16 +58,13 @@ else
 	getLegacyNavigationStore = nil
 end
 
-local FFlagLuaAppMakeDisclaimerOptInForFeedbackForm = SharedFlags.FFlagLuaAppMakeDisclaimerOptInForFeedbackForm
-local FFlagLuaAppNotInterestedFeedbackFormTelemetry = SharedFlags.FFlagLuaAppNotInterestedFeedbackFormTelemetry
 local FFlagLuaAppEnableReportExperience = SharedFlags.FFlagLuaAppEnableReportExperience
 local FFlagEnableNewReportFlowGameTile = SharedFlags.FFlagEnableNewReportFlowGameTile
 local FFlagAddThumbnailSelectorReport = SharedFlags.FFlagAddThumbnailSelectorReport
 local FFlagLuaAppContinueSortInstantPlay = SharedFlags.FFlagLuaAppContinueSortInstantPlay
 local FFlagLuaAppFixExplicitFeedbackConsoleTelemetry = SharedFlags.FFlagLuaAppFixExplicitFeedbackConsoleTelemetry
-local FFlagLuaAppEnableHomepageOneByTwoTile = SharedFlags.FFlagLuaAppEnableHomepageOneByTwoTile
+local FFlagLuaAppEnableNxMRoduxApportioning = SharedFlags.FFlagLuaAppEnableNxMRoduxApportioning
 local FFlagLuaAppGameTileNotInterestedDirectAction = SharedFlags.FFlagLuaAppGameTileNotInterestedDirectAction
-local FFlagLuaAppExtractNotInterestedHelper = SharedFlags.FFlagLuaAppExtractNotInterestedHelper
 
 local function GameTileOverflowMenu(props)
 	if FFlagLuaAppGameTileNotInterestedDirectAction then
@@ -115,7 +101,7 @@ local function GameTileOverflowMenu(props)
 			}
 			local contentType
 
-			if FFlagLuaAppEnableHomepageOneByTwoTile then
+			if FFlagLuaAppEnableNxMRoduxApportioning then
 				contentType = props.contentType
 			end
 
@@ -128,7 +114,7 @@ local function GameTileOverflowMenu(props)
 		local universeId = props.universeId
 		local v4
 
-		if FFlagLuaAppEnableHomepageOneByTwoTile then
+		if FFlagLuaAppEnableNxMRoduxApportioning then
 			v4 = props.contentType
 		end
 
@@ -236,197 +222,13 @@ local function GameTileOverflowMenu(props)
 			setFocusRef = useGameTileOverflowMenuFocusNavigation(menuKey, props.isSelected, props.parentRef)
 		end
 
-		local checkboxItems = React.useMemo(function()
-			return {
-				{
-					id = UserSignalTypes.NotInterestedFeedbackItem.TooRepetitive,
-					text = localizedStrings.tooRepetitive
-				},
-				{
-					id = UserSignalTypes.NotInterestedFeedbackItem.DontLikeGame,
-					text = localizedStrings.dontLikeGame
-				},
-				{
-					id = UserSignalTypes.NotInterestedFeedbackItem.DontLikeImage,
-					text = localizedStrings.dontLikeImage
-				},
-				{
-					id = UserSignalTypes.NotInterestedFeedbackItem.InappropriateContent,
-					text = localizedStrings.inappropriateContent
-				},
-				{
-					id = UserSignalTypes.NotInterestedFeedbackItem.SomethingElse,
-					text = localizedStrings.somethingElse,
-					triggersOtherTextbox = true
-				}
-			}
-		end, { localizedStrings })
-
-		local onSubmit = React.useCallback(function(p, textResponse: string)
-			local items = {}
-			local flag = false
-
-			for _, v3 in checkboxItems do
-				table.insert(items, {
-					id = v3.id,
-					selected = p[v3.id] or false
-				})
-
-				if v3.id == UserSignalTypes.NotInterestedFeedbackItem.InappropriateContent and p[v3.id] then
-					flag = true
-				end
-			end
-
-			if flag then
-				if props.placeId and props.placeId ~= "" then
-					dispatch(OpenDynamicAbuseReport({
-						abuseVector = AbuseVector.Place,
-						targetId = props.placeId,
-						onClose = function()
-							dispatch(CloseCentralOverlay())
-						end
-					}))
-				else
-					flaggedMutedError("NotInterestedReportPlaceIdMissing", "Place report opened without a place id")
-				end
-			end
-
-			if props.appPage then
-				local success, result = pcall(function()
-					local v3 = {
-						stringValue = HttpService:JSONEncode({
-							formId = UserSignalTypes.NotInterestedFeedbackFormId.NotInterestedFeedback1,
-							titleId = UserSignalTypes.NotInterestedFeedbackFormTitleId.WhyHideExperience,
-							textResponse = textResponse,
-							items = items
-						})
-					}
-
-					local v4 = { id = props.universeId, assetType = 0, signalOrigin = 0 }
-					local assetType
-
-					if props.isSponsored then
-						assetType = UserSignalTypes.AssetType.SponsoredGame
-					else
-						assetType = UserSignalTypes.AssetType.Game
-					end
-
-					v4.assetType = assetType
-
-					v4.signalOrigin = {
-						productSurface = props.appPage,
-						topicId = collectionId,
-						subIds = { collectionId }
-					}
-					PostSendUserSignal(
-						networking,
-						v3,
-						v4,
-						UserSignalTypes.SignalValueType.String,
-						UserSignalTypes.SignalType.NotInterestedFeedback
-					):catch(function(p2)
-						dispatch(SetNetworkingErrorToast(p2))
-						default:logRobloxTelemetryCounter(
-							NotInterestedUserSignalTelemetryEventConfigs.NotInterestedUserSignalFailed,
-							1
-						)
-					end)
-				end)
-
-				if not success then
-					mutedError(result)
-				end
-
-				if FFlagLuaAppNotInterestedFeedbackFormTelemetry then
-					sendNotInterestedFeedbackFormAnalytics(
-						{
-							universeId = props.universeId,
-							sortId = collectionId,
-							actionType = "NotInterestedFeedbackFormSubmitted"
-						},
-						props.appPage
-					)
-				end
-			else
-				default:logRobloxTelemetryCounter(
-					NotInterestedUserSignalTelemetryEventConfigs.NotInterestedMissingAppPage,
-					1
-				)
-
-				dispatch(SetNetworkingErrorToast())
-			end
-		end, {
-			networking,
-			checkboxItems,
-			localizedStrings,
-			props.universeId,
-			props.placeId,
-			props.appPage,
-			collectionId,
-			dispatch,
-			props.isSponsored
-		})
-		local v3, v4
-
-		if FFlagLuaAppNotInterestedFeedbackFormTelemetry then
-			v3 = React.useCallback(function(flag: boolean?)
-				if flag then
-					return
-				end
-
-				sendNotInterestedFeedbackFormAnalytics(
-					{
-						universeId = props.universeId,
-						sortId = collectionId,
-						actionType = "NotInterestedFeedbackFormClosedWithoutSubmit"
-					},
-					props.appPage
-				)
-			end, { props.appPage, props.universeId, collectionId })
-
-			v4 = React.useCallback(function()
-				sendNotInterestedFeedbackFormAnalytics(
-					{
-						universeId = props.universeId,
-						sortId = collectionId,
-						actionType = "NotInterestedFeedbackFormOpened"
-					},
-					props.appPage
-				)
-			end, { props.appPage, props.universeId, collectionId })
-		else
-			v3 = nil
-			v4 = nil
-		end
-
-		local feedbackFormProps = React.useMemo(function()
-			local v5 = {
-				dialogTitle = localizedStrings.dialogTitle,
-				dialogText = localizedStrings.dialogText,
-				checkboxListTitle = localizedStrings.checkboxListTitle,
-				checkboxItems = checkboxItems,
-				onSubmit = onSubmit,
-				onClose = 0,
-				showTermsOfUseDisclaimer = 0
-			}
-			local onClose
-
-			if FFlagLuaAppNotInterestedFeedbackFormTelemetry then
-				onClose = v3
-			end
-
-			v5.onClose = onClose
-			v5.showTermsOfUseDisclaimer = not FFlagLuaAppMakeDisclaimerOptInForFeedbackForm and nil
-			return v5
-		end, { localizedStrings, checkboxItems, onSubmit })
-
-		local v5 = {}
+		local v3 = {}
 
 		for k, _ in props.availableMenuItems do
-			table.insert(v5, k)
+			table.insert(v3, k)
 		end
 
-		local joined = table.concat(v5, ",")
+		local joined = table.concat(v3, ",")
 
 		local onMenuOpenChanged = React.useCallback(function(flag: boolean)
 			if props.onMenuOpenChanged then
@@ -436,7 +238,7 @@ local function GameTileOverflowMenu(props)
 
 		local useCallback = React.useCallback
 		local function fn(menuItem: string)
-			local v6 = {
+			local v4 = {
 				universeId = props.universeId,
 				sortId = collectionId,
 				actionType = "GameTileOverflowMenuItemActivated",
@@ -446,24 +248,24 @@ local function GameTileOverflowMenu(props)
 			}
 			local contentType
 
-			if FFlagLuaAppEnableHomepageOneByTwoTile then
+			if FFlagLuaAppEnableNxMRoduxApportioning then
 				contentType = props.contentType
 			end
 
-			v6.contentType = contentType
+			v4.contentType = contentType
 
-			gameTileOverflowMenuAction(v6, props.appPage)
+			gameTileOverflowMenuAction(v4, props.appPage)
 		end
 
 		local appPage = props.appPage
 		local universeId = props.universeId
-		local v6
+		local v4
 
-		if FFlagLuaAppEnableHomepageOneByTwoTile then
-			v6 = props.contentType
+		if FFlagLuaAppEnableNxMRoduxApportioning then
+			v4 = props.contentType
 		end
 
-		local v7 = useCallback(fn, { appPage, universeId, collectionId, joined, v6 })
+		local v5 = useCallback(fn, { appPage, universeId, collectionId, joined, v4 })
 
 		if FFlagLuaAppFixExplicitFeedbackConsoleTelemetry then
 			setFocusRef = useGameTileOverflowMenuFocusNavigation(
@@ -482,124 +284,43 @@ local function GameTileOverflowMenu(props)
 					props.onGameDetailsActivated()
 				end
 
-				v7(TileOverflowMenuItems.GameDetails)
-			end, { props.onGameDetailsActivated, v7 })
+				v5(TileOverflowMenuItems.GameDetails)
+			end, { props.onGameDetailsActivated, v5 })
 		else
 			onActivated = nil
 		end
 
-		local onActivated2
-
-		if FFlagLuaAppExtractNotInterestedHelper then
-			onActivated2 = React.useCallback(function()
-				if activateGameNotInterested({
-					appPage = props.appPage,
-					collectionId = collectionId,
-					dispatch = dispatch,
-					isSponsored = props.isSponsored,
-					localizedStrings = localizedStrings,
-					networking = networking,
-					placeId = props.placeId,
-					setGameHidden = props.setGameHidden,
-					universeId = props.universeId
-				}) then
-					v7(TileOverflowMenuItems.NotInterested)
-				end
-			end, {
-				collectionId,
-				dispatch,
-				localizedStrings,
-				networking,
-				v7,
-				props.appPage,
-				props.isSponsored,
-				props.placeId,
-				props.setGameHidden,
-				props.universeId
-			})
-		else
-			onActivated2 = React.useCallback(function()
-				if props.appPage then
-					props.setGameHidden(props.universeId, true)
-					local provideFeedbackToast = CentralOverlayType.ProvideFeedbackToast
-					local v8 = {
-						feedbackFormProps = feedbackFormProps,
-						toastIcon = IconName.CircleMinus,
-						onToastActivated = 0
-					}
-					local onToastActivated
-
-					if FFlagLuaAppNotInterestedFeedbackFormTelemetry then
-						onToastActivated = v4
-					end
-
-					v8.onToastActivated = onToastActivated
-					dispatch(SetCentralOverlay(provideFeedbackToast, v8))
-
-					local success, result = pcall(function()
-						local v9 = { id = props.universeId, assetType = 0, signalOrigin = 0 }
-						local assetType
-
-						if props.isSponsored then
-							assetType = UserSignalTypes.AssetType.SponsoredGame
-						else
-							assetType = UserSignalTypes.AssetType.Game
-						end
-
-						v9.assetType = assetType
-
-						v9.signalOrigin = {
-							productSurface = props.appPage,
-							topicId = collectionId,
-							subIds = { collectionId }
-						}
-						PostSendUserSignal(
-							networking,
-							{ boolValue = true },
-							v9,
-							UserSignalTypes.SignalValueType.Bool,
-							UserSignalTypes.SignalType.NotInterested
-						):catch(function(p)
-							props.setGameHidden(props.universeId, false)
-							dispatch(SetNetworkingErrorToast(p))
-							default:logRobloxTelemetryCounter(
-								NotInterestedUserSignalTelemetryEventConfigs.NotInterestedUserSignalFailed,
-								1
-							)
-						end)
-					end)
-
-					if not success then
-						props.setGameHidden(props.universeId, false)
-						mutedError(result)
-					end
-
-					v7(TileOverflowMenuItems.NotInterested)
-				else
-					default:logRobloxTelemetryCounter(
-						NotInterestedUserSignalTelemetryEventConfigs.NotInterestedMissingAppPage,
-						1
-					)
-
-					dispatch(SetNetworkingErrorToast())
-				end
-			end, {
-				networking,
-				props.setGameHidden,
-				dispatch,
-				feedbackFormProps,
-				props.universeId,
-				collectionId,
-				props.appPage,
-				v7,
-				props.isSponsored
-			})
-		end
+		local onActivated2 = React.useCallback(function()
+			if activateGameNotInterested({
+				appPage = props.appPage,
+				collectionId = collectionId,
+				dispatch = dispatch,
+				isSponsored = props.isSponsored,
+				localizedStrings = localizedStrings,
+				networking = networking,
+				placeId = props.placeId,
+				setGameHidden = props.setGameHidden,
+				universeId = props.universeId
+			}) then
+				v5(TileOverflowMenuItems.NotInterested)
+			end
+		end, {
+			collectionId,
+			dispatch,
+			localizedStrings,
+			networking,
+			v5,
+			props.appPage,
+			props.isSponsored,
+			props.placeId,
+			props.setGameHidden,
+			props.universeId
+		})
 
 		local useCallback2 = React.useCallback
 		local function fn2()
 			local whyThisAdModal = CentralOverlayType.WhyThisAdModal
-			local v8 = {
+			local v6 = {
 				universeId = props.universeId,
 				payerName = props.payerName,
 				sponsoredUserCohort = props.sponsoredUserCohort,
@@ -607,23 +328,23 @@ local function GameTileOverflowMenu(props)
 			}
 			local contentType
 
-			if FFlagLuaAppEnableHomepageOneByTwoTile then
+			if FFlagLuaAppEnableNxMRoduxApportioning then
 				contentType = props.contentType
 			end
 
-			v8.contentType = contentType
-			dispatch(SetCentralOverlay(whyThisAdModal, v8))
+			v6.contentType = contentType
+			dispatch(SetCentralOverlay(whyThisAdModal, v6))
 
-			v7(TileOverflowMenuItems.WhyThisAd)
+			v5(TileOverflowMenuItems.WhyThisAd)
 		end
 
 		local universeId2 = props.universeId
 		local payerName = props.payerName
 		local sponsoredUserCohort = props.sponsoredUserCohort
-		local v8
+		local v6
 
-		if FFlagLuaAppEnableHomepageOneByTwoTile then
-			v8 = props.contentType
+		if FFlagLuaAppEnableNxMRoduxApportioning then
+			v6 = props.contentType
 		end
 
 		local onActivated3 = useCallback2(fn2, {
@@ -631,8 +352,8 @@ local function GameTileOverflowMenu(props)
 			universeId2,
 			payerName,
 			sponsoredUserCohort,
-			v8,
-			v7
+			v6,
+			v5
 		})
 
 		local onActivated4 = React.useCallback(function()
@@ -649,8 +370,8 @@ local function GameTileOverflowMenu(props)
 				end
 			}))
 
-			v7(TileOverflowMenuItems.ReportAd)
-		end, { dispatch, props.adId, v7 })
+			v5(TileOverflowMenuItems.ReportAd)
+		end, { dispatch, props.adId, v5 })
 		local onActivated5
 
 		if FFlagLuaAppEnableReportExperience then
@@ -681,18 +402,18 @@ local function GameTileOverflowMenu(props)
 					end
 				}))
 
-				v7(TileOverflowMenuItems.ReportExperience)
-			end, { dispatch, props.placeId, props.universeId, v7 })
+				v5(TileOverflowMenuItems.ReportExperience)
+			end, { dispatch, props.placeId, props.universeId, v5 })
 		else
 			onActivated5 = nil
 		end
 
 		local useMemo = React.useMemo
 		local function fn3()
-			local v9 = {}
+			local v7 = {}
 
 			if FFlagLuaAppContinueSortInstantPlay and props.availableMenuItems[TileOverflowMenuItems.GameDetails] then
-				table.insert(v9, {
+				table.insert(v7, {
 					icon = "icons/actions/info",
 					id = TileOverflowMenuItems.GameDetails,
 					text = localizedStrings.gameDetails,
@@ -701,7 +422,7 @@ local function GameTileOverflowMenu(props)
 			end
 
 			if props.availableMenuItems[TileOverflowMenuItems.NotInterested] then
-				table.insert(v9, {
+				table.insert(v7, {
 					icon = "icons/actions/block",
 					id = TileOverflowMenuItems.NotInterested,
 					text = localizedStrings.notInterested,
@@ -710,7 +431,7 @@ local function GameTileOverflowMenu(props)
 			end
 
 			if props.availableMenuItems[TileOverflowMenuItems.WhyThisAd] then
-				table.insert(v9, {
+				table.insert(v7, {
 					icon = "icons/actions/info",
 					id = TileOverflowMenuItems.WhyThisAd,
 					text = localizedStrings.whyThisAd,
@@ -719,7 +440,7 @@ local function GameTileOverflowMenu(props)
 			end
 
 			if props.availableMenuItems[TileOverflowMenuItems.ReportAd] then
-				table.insert(v9, {
+				table.insert(v7, {
 					icon = IconName.Flag,
 					id = TileOverflowMenuItems.ReportAd,
 					text = localizedStrings.reportAd,
@@ -731,7 +452,7 @@ local function GameTileOverflowMenu(props)
 				FFlagLuaAppEnableReportExperience
 				and props.availableMenuItems[TileOverflowMenuItems.ReportExperience]
 			then
-				table.insert(v9, {
+				table.insert(v7, {
 					icon = IconName.Flag,
 					id = TileOverflowMenuItems.ReportExperience,
 					text = localizedStrings.reportExperience,
@@ -739,17 +460,17 @@ local function GameTileOverflowMenu(props)
 				})
 			end
 
-			return v9
+			return v7
 		end
 
-		local v9
+		local v7
 
 		if FFlagLuaAppContinueSortInstantPlay then
-			v9 = onActivated
+			v7 = onActivated
 		end
 
 		local menuItems = useMemo(fn3, {
-			v9,
+			v7,
 			onActivated2,
 			localizedStrings,
 			onActivated3,
@@ -758,12 +479,12 @@ local function GameTileOverflowMenu(props)
 			props.isSponsored,
 			props.availableMenuItems
 		})
-		local v10
+		local v8
 
 		if FFlagSignalsNavP3fGameDetails then
-			v10 = useSignalState(getLegacyNavigationStore(false).getCurrentRouteKey)
+			v8 = useSignalState(getLegacyNavigationStore(false).getCurrentRouteKey)
 		else
-			v10 = useSelector(function(p)
+			v8 = useSelector(function(p)
 				if FFlagUseNavigationSelectors then
 					return Selectors.selectCurrentRoactNavigationRoute(p).key or ""
 				end
@@ -772,13 +493,13 @@ local function GameTileOverflowMenu(props)
 			end)
 		end
 
-		local ref = React.useRef(v10)
+		local ref = React.useRef(v8)
 
 		React.useEffect(function()
-			if v10 ~= ref.current then
+			if v8 ~= ref.current then
 				overflowMenuSignalStore.closeMenu(menuKey)
 			end
-		end, { v10, menuKey })
+		end, { v8, menuKey })
 
 		React.useEffect(function()
 			local inputBeganConnection

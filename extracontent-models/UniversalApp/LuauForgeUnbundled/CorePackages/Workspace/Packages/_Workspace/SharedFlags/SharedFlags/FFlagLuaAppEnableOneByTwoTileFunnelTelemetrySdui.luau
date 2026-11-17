@@ -1,3 +1,0 @@
-local FFlagLuaAppEnableOneByTwoTileFunnelTelemetry = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagLuaAppEnableOneByTwoTileFunnelTelemetry")
-
-return game:DefineFastFlag("LuaAppEnableOneByTwoTileFunnelTelemetrySdui", false) and FFlagLuaAppEnableOneByTwoTileFunnelTelemetry

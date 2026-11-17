@@ -66,6 +66,7 @@ local function MessageRow(p)
 			showDateTime = item.showDateTime,
 			messageId = item.messageId,
 			senderTargetId = 0,
+			conversationId = 0,
 			debugElement = 0
 		}
 		local senderTargetId
@@ -75,6 +76,7 @@ local function MessageRow(p)
 		end
 
 		v2.senderTargetId = senderTargetId
+		v2.conversationId = v.conversationId
 
 		v2.debugElement = debugElement
 		return createElement(SystemMessageContainer, v2)

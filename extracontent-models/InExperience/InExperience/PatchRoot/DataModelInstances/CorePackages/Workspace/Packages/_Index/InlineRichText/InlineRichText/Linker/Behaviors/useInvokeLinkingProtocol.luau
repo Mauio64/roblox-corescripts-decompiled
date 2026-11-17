@@ -28,11 +28,12 @@ return function(_: nil)
 				print(`[OnActivated Debug] Detected URL with LinkingProtocol: {p}`)
 			end
 
-			if default:isInternalDlicEnabled() then
-				default:detectDeeplinkIntent((default:createInternalDlic(p, DeepLinkSource.LuaInternal)))
-			else
+			if not default:isInternalDlicEnabled() then
 				default:detectURL(p)
+				return
 			end
+
+			default:detectDeeplinkIntent((default:createInternalDlic(p, DeepLinkSource.LuaInternal)))
 		end)
 	end, {})
 end

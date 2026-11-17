@@ -1,0 +1,4 @@
+return game:DefineFastString(
+	"FriendsChatConversationMessagesIxpLayer",
+	"ExperienceChat.FriendsTab.ConversationPage.Messages"
+)

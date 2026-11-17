@@ -16,6 +16,7 @@ return {
 		Add = "Add",
 		Chat = "Chat",
 		Join = "Join",
+		JoinExperience = "JoinExperience",
 		Dismiss = "Dismiss",
 		Pending = "Pending",
 		View = "View",
@@ -23,5 +24,6 @@ return {
 		Invited = "Invited"
 	},
 	CtaSurfaces = { SocialTabsPage = "SocialTabsPage", FriendsLandingPage = "FriendsLandingPage" },
-	ClientCtaActions = { ViewProfile = "ViewProfile" }
+	ClientCtaActions = { ViewProfile = "ViewProfile" },
+	Joinability = { Joinable = "Joinable", NotJoinable = "NotJoinable" }
 }

@@ -1,5 +1,7 @@
 local Flags = require(script:FindFirstAncestor("ViewRecyclerRoblox").Flags)
-local FFlagViewRecyclerReact08 = Flags.FFlagViewRecyclerReact08
+local FFlagViewRecyclerReact084 = Flags.FFlagViewRecyclerReact084
+local Flags2 = require(script:FindFirstAncestor("ViewRecyclerRoblox").Flags)
+local FFlagViewRecyclerReact08 = Flags2.FFlagViewRecyclerReact08
 local ViewRecyclerRoblox = script:FindFirstAncestor("ViewRecyclerRoblox")
 local ViewRecycler = require(ViewRecyclerRoblox.Parent.ViewRecycler)
 local RunService = game:GetService("RunService")
@@ -25,6 +27,7 @@ return {
 		local v3 = 0
 		local scrollOffset = nil
 		local v4 = nil
+		local scrollOffset2 = nil
 		local v5 = nil
 		local canvasOriginOffset = 0
 		local count2 = 0
@@ -36,13 +39,15 @@ return {
 		local v8 = nil
 		local axis2 = nil
 		local v9 = nil
+		local viewportLength = nil
+		local heartbeatConnection3 = nil
 
-		local function sampleConfiguration() -- 7 equivalent calls inferred from this helper
+		local function sampleConfiguration() -- 8 equivalent calls inferred from this helper
 			configuration = data.getConfiguration()
 			return configuration
 		end
 
-		local function resolveInstance(p) -- 4 equivalent calls inferred from this helper
+		local function resolveInstance(p) -- 5 equivalent calls inferred from this helper
 			return p or data.getInstance()
 		end
 
@@ -82,11 +87,11 @@ return {
 			return true
 		end
 
-		local function observeHostOffset(kind, logicalScrollOffset: number) -- 2 equivalent calls inferred from this helper
-			data.observeScrollOffset({ kind = kind, offset = logicalScrollOffset })
+		local function observeHostOffset(kind, offset: number) -- 2 equivalent calls inferred from this helper
+			data.observeScrollOffset({ kind = kind, offset = offset })
 		end
 
-		local function getLogicalScrollOffset(p) -- 3 equivalent calls inferred from this helper
+		local function getLogicalScrollOffset(p) -- 4 equivalent calls inferred from this helper
 			return normalizeScrollOffset( -- inferred equivalent call
 				p.scrollOffset - canvasOriginOffset,
 				p.viewportLength,
@@ -94,7 +99,7 @@ return {
 			)
 		end
 
-		local function notifyLogicalScrollOffset(p: number) -- 3 equivalent calls inferred from this helper
+		local function notifyLogicalScrollOffset(p: number) -- 4 equivalent calls inferred from this helper
 			local onScrollOffsetChanged = configuration.onScrollOffsetChanged
 
 			if onScrollOffsetChanged ~= nil and p ~= v5 then
@@ -116,12 +121,17 @@ return {
 			end
 		end
 
-		local function reportHostWrite(p) -- 4 equivalent calls inferred from this helper
+		local function reportHostWrite(p) -- 5 equivalent calls inferred from this helper
 			local logicalScrollOffset = getLogicalScrollOffset(p) -- inferred equivalent call
 			observeHostOffset(ViewRecycler.ScrollObservationKind.Programmatic, logicalScrollOffset) -- inferred equivalent call
 
 			scrollOffset = p.scrollOffset
 			v4 = logicalScrollOffset
+
+			if FFlagViewRecyclerReact084 then
+				scrollOffset2 = p.scrollOffset
+				notifyLogicalScrollOffset(logicalScrollOffset) -- inferred equivalent call
+			end
 		end
 
 		local function publishCanvas()
@@ -161,16 +171,16 @@ return {
 					instance.CanvasSize = axisMap.canvasSizeFor(v10, configuration.axis)
 
 					if viewportState ~= nil then
-						local scrollOffset2 = math.clamp(
+						local scrollOffset3 = math.clamp(
 							viewportState.scrollOffset,
 							0,
 							(math.max(0, v10 - viewportState.viewportLength))
 						)
 
-						if scrollOffset2 ~= viewportState.scrollOffset then
-							setHostScrollOffset(scrollOffset2)
+						if scrollOffset3 ~= viewportState.scrollOffset then
+							setHostScrollOffset(scrollOffset3)
 							reportHostWrite({ -- inferred equivalent call
-								scrollOffset = scrollOffset2,
+								scrollOffset = scrollOffset3,
 								viewportLength = viewportState.viewportLength,
 								crossAxisLength = viewportState.crossAxisLength
 							})
@@ -190,6 +200,11 @@ return {
 			return v10
 		end
 
+		local publishViewportSize = FFlagViewRecyclerReact084 and function(p)
+			viewportLength = p.viewportLength
+			data.setViewportSize(p.viewportLength, p.crossAxisLength)
+		end or nil
+
 		local function applyProgrammaticScrollOffset(p: number)
 			if v ~= ScrollHostLifecyclePhase.Synchronized then
 				return
@@ -199,7 +214,8 @@ return {
 			assert(v10, "ScrollHost: invalid offset")
 			v3 += 1
 			setHostScrollOffset(p)
-			local viewportState = getViewportState(data.getInstance())
+
+			local viewportState = getViewportState(resolveInstance()) -- inferred equivalent call
 
 			if viewportState ~= nil then
 				reportHostWrite(viewportState) -- inferred equivalent call
@@ -224,6 +240,37 @@ return {
 				heartbeatConnection2:Disconnect()
 				heartbeatConnection2 = nil
 			end
+		end
+
+		local stopAnimationClock
+		local syncAnimationClock, stopAnimation
+
+		if FFlagViewRecyclerReact084 then
+			stopAnimationClock = function()
+				if heartbeatConnection3 ~= nil then
+					heartbeatConnection3:Disconnect()
+					heartbeatConnection3 = nil
+				end
+			end
+
+			syncAnimationClock = function(p)
+				if p.animatedScrollTarget == nil or v ~= ScrollHostLifecyclePhase.Synchronized then
+					stopAnimationClock()
+				elseif heartbeatConnection3 == nil then
+					heartbeatConnection3 = RunService.Heartbeat:Connect(function(dt)
+						data.stepAnimatedScroll(dt)
+					end)
+				end
+			end
+
+			stopAnimation = function()
+				if heartbeatConnection3 ~= nil then
+					data.stopAnimatedScroll()
+				end
+			end
+		else
+			stopAnimation = nil
+			syncAnimationClock = nil
 		end
 
 		local function markRecentHostScroll() -- 1 equivalent call inferred from this helper
@@ -317,6 +364,10 @@ return {
 		end
 
 		local function disconnectHost()
+			if FFlagViewRecyclerReact084 then
+				stopAnimation()
+			end
+
 			stopIdleObservation() -- inferred equivalent call
 			stopRecentHostScroll() -- inferred equivalent call
 
@@ -326,15 +377,41 @@ return {
 
 			table.clear(connections)
 			table.clear(v6)
+			local v10, canvasSize2
 
-			if FFlagViewRecyclerReact08 then
-				local v10 = v2
-				local canvasSize2 = canvasSize
+			if FFlagViewRecyclerReact084 then
+				v10 = v2
+				canvasSize2 = canvasSize
+			end
 
-				if v10 ~= nil and canvasSize2 ~= nil then
-					v10.CanvasSize = canvasSize2
+			local v11
+
+			if FFlagViewRecyclerReact084 then
+				if v10 == nil then
+					v11 = false
+				else
+					v11 = canvasSize2 ~= nil
 				end
+			else
+				v11 = FFlagViewRecyclerReact08
+			end
 
+			if v11 then
+				if FFlagViewRecyclerReact084 then
+					v10.CanvasSize = canvasSize2
+				else
+					local v12 = v2
+					local canvasSize3 = canvasSize
+
+					if v12 ~= nil and canvasSize3 ~= nil then
+						v12.CanvasSize = canvasSize3
+					end
+
+					canvasSize = nil
+				end
+			end
+
+			if FFlagViewRecyclerReact084 then
 				canvasSize = nil
 			end
 
@@ -342,8 +419,18 @@ return {
 			v8 = nil
 			axis2 = nil
 			v9 = nil
+
+			if FFlagViewRecyclerReact084 then
+				viewportLength = nil
+			end
+
 			scrollOffset = nil
 			v4 = nil
+
+			if FFlagViewRecyclerReact084 then
+				scrollOffset2 = nil
+			end
+
 			v5 = nil
 
 			if canvasOriginOffset == 0 then
@@ -369,36 +456,56 @@ return {
 				return
 			end
 
-			data.setViewportSize(v10.viewportLength, v10.crossAxisLength)
+			if FFlagViewRecyclerReact084 then
+				publishViewportSize(v10)
+			else
+				data.setViewportSize(v10.viewportLength, v10.crossAxisLength)
+				local v11
+
+				if not FFlagViewRecyclerReact08 then
+					v11 = getViewportState(instance)
+				end
+
+				local v12
+
+				if FFlagViewRecyclerReact08 then
+					v12 = v3 == 0
+				else
+					v12 = v11 ~= nil
+				end
+
+				if v12 then
+					if FFlagViewRecyclerReact08 then
+						local viewportState = getViewportState(instance)
+
+						if viewportState ~= nil then
+							v10 = viewportState
+						end
+
+						reportHostWrite(v10) -- inferred equivalent call
+					else
+						v10 = v11
+					end
+				end
+			end
+
 			local v11
 
-			if not FFlagViewRecyclerReact08 then
-				v11 = getViewportState(instance)
-			end
-
-			local v12
-
-			if FFlagViewRecyclerReact08 then
-				v12 = v3 == 0
+			if FFlagViewRecyclerReact084 then
+				v11 = v3 == 0
 			else
-				v12 = v11 ~= nil
+				v11 = not FFlagViewRecyclerReact08
 			end
 
-			if v12 then
-				if FFlagViewRecyclerReact08 then
+			if v11 then
+				if FFlagViewRecyclerReact084 then
 					local viewportState = getViewportState(instance)
 
 					if viewportState ~= nil then
 						v10 = viewportState
 					end
-
-					reportHostWrite(v10) -- inferred equivalent call
-				else
-					v10 = v11
 				end
-			end
 
-			if not FFlagViewRecyclerReact08 then
 				reportHostWrite(v10) -- inferred equivalent call
 			end
 
@@ -414,38 +521,78 @@ return {
 				return
 			end
 
-			local viewportState = getViewportState(instance)
+			local v10 = getViewportState(instance)
 
-			if viewportState == nil then
+			if v10 == nil then
 				return
 			end
 
-			local logicalScrollOffset = getLogicalScrollOffset(viewportState) -- inferred equivalent call
-			local v10 = v3 == 0
+			local logicalScrollOffset = getLogicalScrollOffset(v10) -- inferred equivalent call
 
-			if v10 and scrollOffset ~= nil then
-				local v11 = scrollOffset
+			if FFlagViewRecyclerReact084 then
+				scrollOffset2 = v10.scrollOffset
+			end
 
-				if math.abs(viewportState.scrollOffset - v11) < 0.5 then
-					v10 = false
+			local v11 = v3 == 0
+
+			if v11 and scrollOffset ~= nil then
+				local v12 = scrollOffset
+
+				if math.abs(v10.scrollOffset - v12) < 0.5 then
+					v11 = false
 				else
 					scrollOffset = nil
 				end
 			end
 
-			if v10 and flag == true then
+			if FFlagViewRecyclerReact084 then
+				local v12 = viewportLength
+
+				if v11 and v12 ~= nil and v10.viewportLength ~= v12 then
+					local v13 = math.max(
+						0,
+						axisMap.mainOf(instance.AbsoluteCanvasSize, configuration.axis) - v10.viewportLength
+					)
+					local v14
+
+					if v12 < v10.viewportLength then
+						v14 = math.abs(v10.scrollOffset - v13) < 0.5
+					else
+						v14 = false
+					end
+
+					local v15 = v10.scrollOffset - canvasOriginOffset
+					publishViewportSize(v10)
+					v10 = getViewportState(instance) or v10
+
+					if v14 then
+						reportHostWrite(v10) -- inferred equivalent call
+						v11 = false
+					elseif v10.scrollOffset ~= v15 + canvasOriginOffset then
+						v3 += 1
+						setHostScrollOffset(v15 + canvasOriginOffset)
+						v3 -= 1
+						v10 = getViewportState(instance) or v10
+						scrollOffset = v10.scrollOffset
+					end
+
+					logicalScrollOffset = getLogicalScrollOffset(v10) -- inferred equivalent call
+				end
+			end
+
+			if v11 and flag == true then
 				markRecentHostScroll() -- inferred equivalent call
 			end
 
-			if v10 and logicalScrollOffset ~= v4 then
+			if v11 and logicalScrollOffset ~= v4 then
 				observeHostOffset(ViewRecycler.ScrollObservationKind.User, logicalScrollOffset) -- inferred equivalent call
 				v4 = logicalScrollOffset
 			end
 
-			if v10 and canvasOriginOffset ~= 0 then
+			if v11 and canvasOriginOffset ~= 0 then
 				count2 = 0
 
-				if viewportState.scrollOffset <= 0.5 then
+				if v10.scrollOffset <= 0.5 then
 					settleCanvasOriginOffset(nil)
 				end
 			end
@@ -453,9 +600,8 @@ return {
 			notifyLogicalScrollOffset(logicalScrollOffset) -- inferred equivalent call
 		end
 
-		local function isPointerInput(input): boolean -- 1 equivalent call inferred from this helper
-			return input.UserInputType == Enum.UserInputType.Touch
-				or input.UserInputType == Enum.UserInputType.MouseButton1
+		local function isPointerInput(p): boolean -- 2 equivalent calls inferred from this helper
+			return p.UserInputType == Enum.UserInputType.Touch or p.UserInputType == Enum.UserInputType.MouseButton1
 		end
 
 		local function connectHost(instance)
@@ -470,7 +616,9 @@ return {
 				return
 			end
 
-			if FFlagViewRecyclerReact08 then
+			if FFlagViewRecyclerReact084 then
+				canvasSize = instance.CanvasSize
+			elseif FFlagViewRecyclerReact08 then
 				canvasSize = instance.CanvasSize
 			end
 
@@ -484,12 +632,50 @@ return {
 				sampleConfiguration() -- inferred equivalent call
 				synchronizeScrollOffset(instance, true)
 			end))
+			local v10
 
-			table.insert(connections, instance.InputBegan:Connect(function(input)
-				if isPointerInput(input) then -- inferred equivalent call
-					v6[input] = true
+			if FFlagViewRecyclerReact084 then
+				v10 = RunService.RenderStepped
+			else
+				v10 = instance.InputBegan
+			end
+
+			local v11
+
+			if FFlagViewRecyclerReact084 then
+				v11 = function()
+					if
+						v == ScrollHostLifecyclePhase.Synchronized
+						and axisMap.mainOf(instance.CanvasPosition, configuration.axis) ~= scrollOffset2
+					then
+						sampleConfiguration() -- inferred equivalent call
+						synchronizeScrollOffset(instance, true)
+					end
 				end
-			end))
+			else
+				v11 = function(p)
+					if isPointerInput(p) then -- inferred equivalent call
+						v6[p] = true
+					end
+				end
+			end
+
+			table.insert(connections, v10:Connect(v11))
+
+			if FFlagViewRecyclerReact084 then
+				table.insert(connections, instance.InputBegan:Connect(function(input)
+					if isPointerInput(input) then -- inferred equivalent call
+						v6[input] = true
+						stopAnimation()
+					end
+				end))
+
+				table.insert(connections, instance.InputChanged:Connect(function(input)
+					if input.UserInputType == Enum.UserInputType.MouseWheel then
+						stopAnimation()
+					end
+				end))
+			end
 
 			table.insert(connections, instance.InputEnded:Connect(function(input)
 				v6[input] = nil
@@ -571,6 +757,10 @@ return {
 				end
 			end,
 			applyRecord = function(data2, callback)
+				if FFlagViewRecyclerReact084 then
+					syncAnimationClock(data2)
+				end
+
 				if v == ScrollHostLifecyclePhase.Disconnected then
 					callback()
 					return
@@ -578,10 +768,10 @@ return {
 
 				sampleConfiguration() -- inferred equivalent call
 				local scrollCorrection = data2.scrollCorrection
-				local scrollOffset2
+				local scrollOffset3
 
 				if data2.scrollPositionChanged then
-					scrollOffset2 = data2.scrollState.scrollOffset
+					scrollOffset3 = data2.scrollState.scrollOffset
 				end
 
 				local v10
@@ -626,23 +816,23 @@ return {
 					count2 = 0
 					observeUntilIdle() -- inferred equivalent call
 
-					if scrollOffset2 ~= nil then
-						v4 = scrollOffset2
-						notifyLogicalScrollOffset(scrollOffset2) -- inferred equivalent call
+					if scrollOffset3 ~= nil then
+						v4 = scrollOffset3
+						notifyLogicalScrollOffset(scrollOffset3) -- inferred equivalent call
 					end
 				else
 					callback()
 
-					if canvasOriginOffset == 0 or scrollOffset2 == nil and v10 then
+					if canvasOriginOffset == 0 or scrollOffset3 == nil and v10 then
 						if data2.scrollPositionChanged or data2.contentLengthChanged then
 							publishCanvas()
 						end
 
-						if scrollOffset2 ~= nil then
-							applyProgrammaticScrollOffset(scrollOffset2)
+						if scrollOffset3 ~= nil then
+							applyProgrammaticScrollOffset(scrollOffset3)
 						end
 					else
-						settleCanvasOriginOffset(scrollOffset2)
+						settleCanvasOriginOffset(scrollOffset3)
 					end
 				end
 

@@ -4,8 +4,6 @@ local AnalyticsMetricChart = require(parent.AnalyticsMetricChart)
 local Foundation = require(parent.Foundation)
 local React = require(parent.React)
 
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
-
 local useMetricChartContent = require(script.Parent.useMetricChartContent)
 
 local deriveChartAxes = AnalyticsMetricChart.deriveChartAxes
@@ -16,11 +14,7 @@ local function useMetricChartViewModel(p)
 	local v3 = Foundation.Hooks.useTextSizeOffset()
 
 	local bodySmall = v2.Typography.BodySmall
-	local labelFont = bodySmall.Font
-
-	if not FoundationFontFaceMigration and typeof(labelFont) ~= "EnumItem" then
-		labelFont = Enum.Font.BuilderSans
-	end
+	local font = bodySmall.Font
 
 	local labelFontSize = bodySmall.FontSize + (v3 or 0)
 
@@ -135,7 +129,7 @@ local function useMetricChartViewModel(p)
 		maxY = v5.maxY,
 		yTicks = yTicks,
 		xAxisLabels = xAxisLabels,
-		labelFont = labelFont,
+		labelFont = font,
 		labelFontSize = labelFontSize,
 		inspectedIndex = state,
 		tooltip = tooltip,

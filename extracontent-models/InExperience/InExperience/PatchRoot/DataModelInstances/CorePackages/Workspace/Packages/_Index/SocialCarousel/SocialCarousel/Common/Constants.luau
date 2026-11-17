@@ -4,12 +4,13 @@ local parent = SocialCarousel.Parent
 local FFlagSocialCarouselUpdateVerticalSpacing = require(SocialCarousel.Flags.FFlagSocialCarouselUpdateVerticalSpacing)
 local SharedFlags = require(parent.SharedFlags)
 local FFlagSocialCarouselShareQREnabled = SharedFlags.FFlagSocialCarouselShareQREnabled
-
+local v = FFlagSocialCarouselUpdateVerticalSpacing and 38 or 45
 return {
 	LOCALIZATION = {
 		FRIENDS_LABEL = "Feature.Friends.Label.Friends",
 		FRIENDS_LABEL_WITH_COUNT = "Feature.Home.HeadingFriends",
 		ADD_FRIENDS_HEADING = "Feature.Friends.Feature.Friends.Heading.AddFriends",
+		ADD_FRIENDS_HEADING_SENTENCE_CASE = "Feature.AddFriends.Heading.AddFriends",
 		FRIENDS_HINT_TITLE = "Feature.SocialTab.Label.AddFriendHintBody",
 		FRIENDS_HINT_BODY = "Feature.Friends.Label.FindFriendsHintBody",
 		FRIENDS_HINT_BOLD = FFlagSocialCarouselShareQREnabled and "Feature.Friends.Label.FriendsHintBold" or nil,
@@ -27,6 +28,7 @@ return {
 			OPEN_ADD_FRIENDS = "OpenAddFriends",
 			OPEN_SHARE_QR = "OpenShareQR"
 		},
+		TILE_CLICK_TARGETS = { AVATAR = "avatar", PLAY_ICON = "playIcon", TILE_TEXT = "tileText" },
 		BTN_VALUES = {
 			OPEN_PEOPLE_LIST = "openPeopleList",
 			ADD_FRIENDS = "AddFriendsButton",
@@ -48,7 +50,10 @@ return {
 		},
 		CONTENT_TYPE = "User"
 	},
-	TILE_TEXT_HEIGHT = FFlagSocialCarouselUpdateVerticalSpacing and 38 or 45,
+	TILE_ICON_SCALE = 0.5,
+	ADD_FRIENDS_TITLE_OVERHANG = 1,
+	TILE_TEXT_HEIGHT = v,
+	XSMALL_TILE_TEXT_HEIGHT = v - 4,
 	TILE_TEXT_WIDTH = FFlagSocialCarouselShareQREnabled and 30 or 125,
 	RODUX_KEY = "FriendsCarousel"
 }

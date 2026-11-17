@@ -3,7 +3,6 @@ local parent = script:FindFirstAncestor("FriendsChat").Parent
 local React = require(parent.React)
 local Signals = require(parent.Signals)
 local SignalsReact = require(parent.SignalsReact)
-local SharedFlags = require(parent.SharedFlags)
 local ExpChatShared = require(parent.ExpChatShared)
 
 local InExperienceAppChatModal = require(parent.AppChat.InExperienceAppChatModal)
@@ -13,13 +12,8 @@ local GetFriendsChatNavigationStore = require(script.Parent.Parent.Stores.GetFri
 local FriendsChatTabName = require(script.Parent.Parent.FriendsChatTabName)
 
 local v = ExpChatShared.Logger:new(script.Name)
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
 
 local function FriendsTabUnreadBridge(data): nil
-	if not FFlagExpChatEnableFriendsTab then
-		return nil
-	end
-
 	local setTabUnread = data.setTabUnread
 	local selectedTabName = data.selectedTabName
 	local isChatWindowVisible = data.isChatWindowVisible

@@ -25,15 +25,11 @@ local function useAddFriendsTileSeenImpression(absolutePosition: number?)
 	local v = useNavigationFocus()
 	local ref = React.useRef(nil)
 	local ref2 = React.useRef(nil)
-	local v2
 
-	if FFlagSocialCarouselEnableNewFriendRequestsBadgeForAll then
-		v2 = true
-	else
-		v2 = RoactAppExperiment.useUserExperiment({ FStringNewFriendRequestsBadgeLayer }, function(p): boolean
+	local v2 = FFlagSocialCarouselEnableNewFriendRequestsBadgeForAll and true
+		or RoactAppExperiment.useUserExperiment({ FStringNewFriendRequestsBadgeLayer }, function(p): boolean
 			return (p[FStringNewFriendRequestsBadgeLayer] or {}).showNewFriendRequestsBadge == true
 		end)
-	end
 
 	local v3 = React.useMemo(function()
 		if FFlagAddFriendsPageHighlightUnseenTrustedRequests then

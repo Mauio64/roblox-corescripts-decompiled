@@ -7,7 +7,7 @@ local RobloxAppUIBloxConfig = require(parent.Dev.RobloxAppUIBloxConfig)
 UIBlox.init(RobloxAppUIBloxConfig)
 
 local React = require(parent.React)
-local ReactRoblox = require(parent.Dev.ReactRoblox)
+local ReactRoblox = require(parent.ReactRoblox)
 
 local RoactRodux = require(parent.RoactRodux)
 local Rodux = require(parent.Rodux)

@@ -1,5 +1,6 @@
 local parent = script:FindFirstAncestor("RobloxAppNavigation").Parent
 require(parent.Navigation)
+require(parent.Signals)
 
 local v = nil
 
@@ -18,6 +19,11 @@ local v3 = {
 		return false
 	end
 }
+
+local function get() -- 1 equivalent call inferred from this helper
+	return v or v3
+end
+
 local AppNavigationRegistry = {}
 
 function AppNavigationRegistry.register(p)
@@ -25,12 +31,26 @@ function AppNavigationRegistry.register(p)
 	v = p
 end
 
-function AppNavigationRegistry.get()
-	return v or v3
-end
+AppNavigationRegistry.get = get
 
 function AppNavigationRegistry.isRegistered(): boolean
 	return v ~= nil
+end
+
+function AppNavigationRegistry.isNavigationLocked(p)
+	local v4 = get() -- inferred equivalent call
+	local getIsPending = v4.getIsPending
+	local v5 = v4.getIsNavigating(p)
+
+	if not v5 then
+		if getIsPending == nil then
+			return false
+		end
+
+		return (getIsPending(p))
+	end
+
+	return v5
 end
 
 function AppNavigationRegistry._resetForTest()

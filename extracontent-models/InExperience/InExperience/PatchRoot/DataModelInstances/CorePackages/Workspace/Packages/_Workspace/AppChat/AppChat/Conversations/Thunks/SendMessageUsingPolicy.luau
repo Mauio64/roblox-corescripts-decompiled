@@ -3,6 +3,7 @@ local parent = AppChat.Parent
 
 local Analytics = require(parent.Analytics)
 local RequestTimeDiag = Analytics.RequestTimeDiag
+local FFlagDisableLegacyReportToDiag = require(parent.SharedFlags.FFlagDisableLegacyReportToDiag)
 local Constants = require(AppChat.Constants)
 local Promise = require(parent.Promise)
 local Http = require(parent.Http)
@@ -30,7 +31,13 @@ local function invokeSendMessage(object, p)
 end
 
 return function(object, _)
-	local v2 = RequestTimeDiag:new(Constants.PerformanceMeasurement.LUA_CHAT_SEND_MESSAGE)
+	local v2
+
+	if FFlagDisableLegacyReportToDiag then
+		v2 = nil
+	else
+		v2 = RequestTimeDiag:new(Constants.PerformanceMeasurement.LUA_CHAT_SEND_MESSAGE)
+	end
 
 	return function(p)
 		object:onBeforeSendingMessage(p)
@@ -59,7 +66,9 @@ return function(object, _)
 		end
 
 		return invokeSendMessage(object, p):andThen(function(p2)
-			v2:report()
+			if v2 then
+				v2:report()
+			end
 
 			if
 				p2

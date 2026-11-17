@@ -126,7 +126,7 @@ return function(props)
 				v(ReceivedUserInviteStatus(recipient_user_id, InviteStatus.Pending))
 			end
 
-			local function fn() -- 1 equivalent call inferred from this helper
+			local function fn()
 				return PostSendExperienceInvite(
 					networkImpl,
 					recipient_user_id,
@@ -142,7 +142,14 @@ return function(props)
 			if FFlagGameInviteSpaceSends then
 				v4 = spacedSender.send(fn)
 			else
-				v4 = fn() -- inferred equivalent call
+				v4 = PostSendExperienceInvite(
+					networkImpl,
+					recipient_user_id,
+					v3,
+					props.trigger,
+					props.inviteMessageId,
+					props.launchData
+				)
 			end
 
 			v4:andThen(function(p)

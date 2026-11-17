@@ -10,7 +10,6 @@ local getFFlagUGCValidateAQScoreWarnings = require(parent.flags.getFFlagUGCValid
 
 return {
 	categories = { ValidationEnums.UploadCategory.FULL_BODY },
-	["fflag"] = require(parent.flags.getFFlagUGCValidateAQCageQualityAvatar),
 	run = function(object, p)
 		local full_body_cage = p.aqsSummaryData.Measure_Cage_Mesh_Distance_Avatar.full_body_cage
 

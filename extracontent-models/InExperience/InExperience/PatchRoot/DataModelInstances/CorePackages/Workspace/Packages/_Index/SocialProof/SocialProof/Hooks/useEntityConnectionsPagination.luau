@@ -31,10 +31,8 @@ return function(data)
 	local state6, setState6 = useState(0)
 
 	local v3 = useSelector(function(p)
-		return getDeepValue(
-				p[Constants.RODUX_KEY].ConnectionsByEntityId or {},
-				(string.format("%s.%s.%s", connectionType, entityType, entityId))
-			)
+		local connectionsByEntityId = p[Constants.RODUX_KEY].ConnectionsByEntityId or {}
+		return getDeepValue(connectionsByEntityId, (string.format("%s.%s.%s", connectionType, entityType, entityId)))
 			or {}
 	end)
 

@@ -17,43 +17,24 @@ local Localization = InExperienceLocales.Localization
 local Localization2 = require(parent2.Localization)
 local LocalizationProvider = Localization2.LocalizationProvider
 
-local defineFastFlag = game:DefineFastFlag("LuaAppIsEnhancedVideoUniverse", false)
-
-local FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline = require(parent.FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline)
-
-local defineFastFlag2 = game:DefineFastFlag("LuaAppEnableEnhancedVideoExperienceGroupIdCheck", false)
-local v = defineFastFlag2 and 427968160 or nil
 local EnhancedVideoStore = require(parent.EnhancedVideoStore)
-local dispatchEnhancedVideoConfig
 
-if FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline then
-	dispatchEnhancedVideoConfig = require(parent.dispatchEnhancedVideoConfig)
-else
-	dispatchEnhancedVideoConfig = nil
-end
+local dispatchEnhancedVideoConfig = require(parent.dispatchEnhancedVideoConfig)
 
 local Http = require(parent2.Http)
 local internalWrapper = Http.NetworkLayers.requestInternalWrapper(nil)
 local function starterScript()
-	if defineFastFlag2 then
-		if game.CreatorType ~= Enum.CreatorType.Group or game.CreatorId ~= v then
-			return
-		end
-	elseif not defineFastFlag then
+	if game.CreatorType ~= Enum.CreatorType.Group or game.CreatorId ~= 427968160 then
 		return
 	end
 
 	local localization = Localization.new(LocalizationService.RobloxLocaleId)
 
-	if FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline then
-		EnhancedVideoStore(false).fetchInitialData(internalWrapper, game.GameId):andThen(function(p)
-			if p then
-				dispatchEnhancedVideoConfig(p)
-			end
-		end)
-	else
-		EnhancedVideoStore(false).fetchInitialData(internalWrapper, game.GameId)
-	end
+	EnhancedVideoStore(false).fetchInitialData(internalWrapper, game.GameId):andThen(function(p)
+		if p then
+			dispatchEnhancedVideoConfig(p)
+		end
+	end)
 
 	local adDisclosurePauseEvent = ReplicatedStorage:WaitForChild("AdDisclosurePauseEvent")
 

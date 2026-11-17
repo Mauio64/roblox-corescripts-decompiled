@@ -3,10 +3,10 @@ local parent = script.Parent.Parent.Parent
 local React = require(parent.React)
 local ReactOtter = require(parent.ReactOtter)
 
-local function springOptions(p, openStartOffset: number?) -- 2 equivalent calls inferred from this helper
+local function springOptions(data, openStartOffset: number?) -- 2 equivalent calls inferred from this helper
 	return {
-		dampingRatio = p.dampingRatio,
-		frequency = p.frequency,
+		dampingRatio = data.dampingRatio,
+		frequency = data.frequency,
 		startingValue = openStartOffset
 	}
 end

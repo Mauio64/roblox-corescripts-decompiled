@@ -61,7 +61,7 @@ local function activeHandle() -- 1 equivalent call inferred from this helper
 	return v4.handle
 end
 
-local function report(p) -- 3 equivalent calls inferred from this helper
+local function report(p) -- 4 equivalent calls inferred from this helper
 	local v4 = activeHandle() -- inferred equivalent call
 
 	if v4 == nil then
@@ -121,6 +121,13 @@ return (setmetatable({
 	end,
 	reportViewed = function()
 		report({ type = "viewed" }) -- inferred equivalent call
+	end,
+	reportActivated = function()
+		if not NotificationsOrchestrator.Flags.FFlagEnableNotificationsOrchestratorUnifiedLogging then
+			return
+		end
+
+		report({ type = "activated" }) -- inferred equivalent call
 	end,
 	dismiss = function()
 		report({ type = "dismissed", reason = "activated" }) -- inferred equivalent call

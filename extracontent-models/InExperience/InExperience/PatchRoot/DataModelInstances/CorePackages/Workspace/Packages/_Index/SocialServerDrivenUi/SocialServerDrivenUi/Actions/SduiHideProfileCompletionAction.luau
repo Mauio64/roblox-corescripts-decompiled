@@ -38,13 +38,14 @@ return function(p, _, p2, _)
 			},
 			p2.appPage
 		)
-	else
-		reportPromptImpression(promptType, actionParams.promptId):andThen(function()
-			fetchPrompts(createProfileCompletionPromptsConfig(), true)
-		end):catch(function()
-			p2.dependencies.dispatch(SetCurrentToastMessage({
-				toastMessage = "Feature.Toast.NetworkingError.SomethingIsWrong"
-			}))
-		end)
+		return
 	end
+
+	reportPromptImpression(promptType, actionParams.promptId):andThen(function()
+		fetchPrompts(createProfileCompletionPromptsConfig(), true)
+	end):catch(function()
+		p2.dependencies.dispatch(SetCurrentToastMessage({
+			toastMessage = "Feature.Toast.NetworkingError.SomethingIsWrong"
+		}))
+	end)
 end

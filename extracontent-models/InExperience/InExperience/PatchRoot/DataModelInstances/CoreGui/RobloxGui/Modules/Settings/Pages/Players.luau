@@ -625,7 +625,7 @@ local function Initialize()
 	local v12 = false
 	local v13 = false
 
-	local function muteButtonUpdate(instance, data)
+	local function muteButtonUpdate(instance, participant)
 		local rightSideButtons
 
 		if instance then
@@ -638,7 +638,7 @@ local function Initialize()
 
 		local muteStatusButton = rightSideButtons:FindFirstChild("MuteStatusButton")
 
-		if data == nil then
+		if participant == nil then
 			if muteStatusButton then
 				muteStatusButton:Destroy()
 			end
@@ -647,9 +647,9 @@ local function Initialize()
 			local udim3 = UDim2.fromOffset(0, 0)
 			local imageTransparency = 0
 
-			local image = data.isMuted and muteStatusIcons.MicOff or muteStatusIcons.MicOn
+			local image = participant.isMuted and muteStatusIcons.MicOff or muteStatusIcons.MicOn
 
-			if data.subscriptionFailed then
+			if participant.subscriptionFailed then
 				image = muteStatusIcons.Error
 				udim2 = UDim2.fromOffset(36, 36)
 				udim3 = UDim2.fromOffset(2, -2)
@@ -657,22 +657,20 @@ local function Initialize()
 				if defineFastFlag3 and engineFeature2 then
 					imageTransparency = 0.5
 				end
-			elseif data.isMutedLocally then
+			elseif participant.isMutedLocally then
 				image = muteStatusIcons.MicDisabled
 				imageTransparency = 0.5
-			elseif data.subscriptionCompleted then
-				if data.isSignalActive then
-					image = default:GetIcon(
-						"Unmuted" .. tostring(math.floor(0.5 + 5 * math.random()) * 20),
-						"SpeakerLight"
-					)
+			elseif participant.subscriptionCompleted then
+				if participant.isSignalActive then
+					local v14 = math.floor(0.5 + 5 * math.random()) * 20
+					image = default:GetIcon("Unmuted" .. tostring(v14), "SpeakerLight")
 				end
 			else
 				image = muteStatusIcons.Loading
 			end
 
 			if muteStatusButton then
-				local v14 = v6[data.userId] or rightSideButtons:FindFirstChild("MuteStatusImageLabel", true)
+				local v14 = v6[participant.userId] or rightSideButtons:FindFirstChild("MuteStatusImageLabel", true)
 				v14.Image = image
 				v14.Size = udim2
 				v14.ImageTransparency = imageTransparency
@@ -683,31 +681,34 @@ local function Initialize()
 					UDim2.fromOffset(Theme.ButtonHeight, Theme.ButtonHeight),
 					udim2,
 					function()
-						local participant = default.participants[tostring(data.userId)]
+						local participant2 = default.participants[tostring(participant.userId)]
 
-						if participant.subscriptionCompleted then
+						if participant2.subscriptionCompleted then
 							if v7 then
-								v7:onToggleMutePlayer(data.userId, not participant.isMutedLocally)
+								v7:onToggleMutePlayer(participant.userId, not participant2.isMutedLocally)
 							end
 
-							default:ToggleMutePlayer(data.userId, Constants.VOICE_CONTEXT_TYPE.IN_GAME_MENU)
-						elseif participant.subscriptionFailed then
+							default:ToggleMutePlayer(participant.userId, Constants.VOICE_CONTEXT_TYPE.IN_GAME_MENU)
+						elseif participant2.subscriptionFailed then
 							if defineFastFlag3 then
 								if not engineFeature2 then
-									default:SubscribeRetry(data.userId)
+									default:SubscribeRetry(participant.userId)
 								end
 							else
-								default:SubscribeRetry(data.userId)
+								default:SubscribeRetry(participant.userId)
 							end
 						end
 					end
 				)
 
-				v6[data.userId] = v14
+				v6[participant.userId] = v14
 				v14.ZIndex = 3
 				v14.Position += udim3
 				v14.ImageTransparency = imageTransparency
-				Utility:MakeFocusState(styledImageButton, "utility-focus-state" .. "-mutestatusbutton-" .. data.userId)
+				Utility:MakeFocusState(
+					styledImageButton,
+					"utility-focus-state" .. "-mutestatusbutton-" .. participant.userId
+				)
 				styledImageButton.Parent = rightSideButtons
 			end
 		end
@@ -829,11 +830,12 @@ local function Initialize()
 			return playerMuteStatusIcons.MicOff
 		end
 
-		if default.isTalking then
-			return (default:GetIcon("Unmuted" .. tostring(math.floor(0.5 + 5 * math.random()) * 20), "MicLight"))
+		if not default.isTalking then
+			return playerMuteStatusIcons.MicOn
 		end
 
-		return playerMuteStatusIcons.MicOn
+		local v17 = math.floor(0.5 + 5 * math.random()) * 20
+		return (default:GetIcon("Unmuted" .. tostring(v17), "MicLight"))
 	end
 
 	local function updateButtonPosition(p, position, size, anchorPoint) -- 3 equivalent calls inferred from this helper
@@ -2043,7 +2045,8 @@ local function Initialize()
 			v23.Name = "PlayerLabel" .. player.Name
 
 			if flag then
-				muteButtonUpdate(v23, default.participants[tostring(player.UserId)])
+				local participant = default.participants[tostring(player.UserId)]
+				muteButtonUpdate(v23, participant)
 			end
 
 			local playerImage = SocialUtil.GetPlayerImage(

@@ -22,6 +22,7 @@ local computeStickyOffset = require(AppPageShell.computeStickyOffset)
 
 local SharedFlags = require(parent.SharedFlags)
 local FFlagSduiFeedScrollBarFixes = SharedFlags.FFlagSduiFeedScrollBarFixes
+local FFlagAppPageShellScrollTelemetry = SharedFlags.FFlagAppPageShellScrollTelemetry
 
 local PageContentMode = PageConstants.PageContentMode
 
@@ -74,7 +75,17 @@ local function Page(props, ref)
 	local ref2 = React.useRef(onScrollToEnd)
 	ref2.current = onScrollToEnd
 
-	local scrollStore = React.useMemo(createPageScrollStore, {})
+	local scrollPerformanceIntervalName = props.scrollPerformanceIntervalName
+
+	local scrollStore = React.useMemo(function()
+		local v3
+
+		if FFlagAppPageShellScrollTelemetry then
+			v3 = scrollPerformanceIntervalName
+		end
+
+		return createPageScrollStore(v3)
+	end, {})
 
 	local ref3 = React.useRef(nil)
 

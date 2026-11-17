@@ -115,7 +115,8 @@ local function useCCLTouchHelpPageViewModel()
 
 	for i = 2, 7 do
 		local id = "AbilityAction" .. i
-		table.insert(slots, createAbilityControl(id, controls[id]))
+		local control = controls[id]
+		table.insert(slots, createAbilityControl(id, control))
 	end
 
 	local rightControls = { abilityControl }

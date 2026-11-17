@@ -20,8 +20,13 @@ local formatError = require(BuildExperience.utils.formatError)
 local refreshPublishEligibility = require(BuildExperience.utils.refreshPublishEligibility)
 local refreshAdCampaignEligibility = require(BuildExperience.utils.refreshAdCampaignEligibility)
 local FFlagEnableBuildAdPromotion = require(BuildExperience.Flags.FFlagEnableBuildAdPromotion)
+local FFlagBuildExperienceActionOutcomeTelemetry = require(BuildExperience.Flags.FFlagBuildExperienceActionOutcomeTelemetry)
+local ConfigurationActionTelemetry = require(BuildExperience.Telemetry.ConfigurationActionTelemetry)
 
 local Debug = CreatorAgentChat.debug
+local Action = ConfigurationActionTelemetry.Action
+local FailureReason = ConfigurationActionTelemetry.FailureReason
+local Stage = ConfigurationActionTelemetry.Stage
 
 local Icon = Foundation.Icon
 local List = Foundation.List
@@ -55,6 +60,25 @@ local function getSelectedAudience(audiences) -- 1 equivalent call inferred from
 	end
 
 	return v[UniverseConfiguration.getPrivacyTypeForAudiences(audiences)]
+end
+
+local v2 = {
+	["Private"] = PrivacyType.Private,
+	Friends = PrivacyType.FriendsOnly,
+	Public = PrivacyType.Public
+}
+
+local function getAudienceChangeParameters(configurationData, p: string) -- 3 equivalent calls inferred from this helper
+	local audiences
+
+	if configurationData ~= nil then
+		audiences = configurationData.audiences
+	end
+
+	return {
+		fromAudience = audiences == nil and "unknown" or UniverseConfiguration.getPrivacyTypeForAudiences(audiences),
+		toAudience = v2[p]
+	}
 end
 
 local function isVisibilityAudience(p): boolean
@@ -100,7 +124,7 @@ local function AudienceRow(props)
 	end
 
 	local createElement = React.createElement
-	local v2 = {
+	local v3 = {
 		LayoutOrder = props.LayoutOrder,
 		onActivated = 0,
 		tag = "size-full-0 auto-y radius-medium",
@@ -111,10 +135,10 @@ local function AudienceRow(props)
 		onActivated = nil
 	end
 
-	v2.onActivated = onActivated
+	v3.onActivated = onActivated
 
-	v2.testId = `{formatted}-button`
-	return createElement(View, v2, {
+	v3.testId = `{formatted}-button`
+	return createElement(View, v3, {
 		ListItem = React.createElement(List.Item, {
 			LayoutOrder = props.LayoutOrder,
 			title = props.title,
@@ -167,7 +191,7 @@ local function useAudienceStores()
 end
 
 local function useAudienceData(universeId: number, universeActivationStore, universeConfigurationStore, state: string?)
-	local v2 = React.useMemo(function()
+	local v3 = React.useMemo(function()
 		return universeConfigurationStore.getAndFetchConfiguration(universeId)
 	end, { universeId, universeConfigurationStore })
 	local state2, setState = React.useState(true)
@@ -192,25 +216,25 @@ local function useAudienceData(universeId: number, universeActivationStore, univ
 		end
 	end, { universeConfigurationStore, universeId })
 
-	local configurationData = SignalsReact.useSignalState(v2.data)
+	local configurationData = SignalsReact.useSignalState(v3.data)
 	local isAudiencesReady
 
-	if SignalsReact.useSignalState(v2.status) == "Ready" then
+	if SignalsReact.useSignalState(v3.status) == "Ready" then
 		isAudiencesReady = configurationData ~= nil
 	else
 		isAudiencesReady = false
 	end
 
-	local v3 = React.useMemo(function()
+	local v4 = React.useMemo(function()
 		return universeActivationStore.getAndFetchEligibility(universeId)
 	end, { universeActivationStore, universeId })
-	local v4 = SignalsReact.useSignalState(v3.status)
-	local isEligibilityResolved = v4 == "Ready" or v4 == "Failed"
+	local v5 = SignalsReact.useSignalState(v4.status)
+	local isEligibilityResolved = v5 == "Ready" or v5 == "Failed"
 
 	local contentUnrated = ContentMaturityUtils.isContentUnrated(universeId)
 	local sealBroken = ContentMaturityUtils.isSealBroken(universeId)
 	local lockReason = contentUnrated and (sealBroken and "RatingRequired" or "PublishRequired") or nil
-	local v5 = {
+	local v6 = {
 		configurationData = configurationData,
 		isAudiencesReady = isAudiencesReady,
 		isConfigurationRefreshPending = state2,
@@ -220,23 +244,35 @@ local function useAudienceData(universeId: number, universeActivationStore, univ
 		selectedAudience = 0
 	}
 	state = getSelectedAudienceFromState(state, isAudiencesReady, configurationData) -- inferred equivalent call
-	v5.selectedAudience = state
-	return v5
+	v6.selectedAudience = state
+	return v6
 end
 
-local function useQuestionnaireHandler(p: number, questionnaireStore)
+local function useQuestionnaireHandler(universeId: number, questionnaireStore)
 	local creatorHub = useLocalization({
 		creatorHub = LocalizationStrings.GAME_CONFIGURATION_CREATOR_HUB
 	}).creatorHub
-	local v2 = useOpenWebView()
+	local v3 = useOpenWebView()
 
-	local v3 = React.useCallback(function()
-		refreshPublishEligibility(p)
-	end, { questionnaireStore, p })
+	local v4 = React.useCallback(function()
+		refreshPublishEligibility(universeId)
+	end, { questionnaireStore, universeId })
 
-	return React.useCallback(function()
-		v2(GameConfigurationActions.getExperienceQuestionnaireUrl(p), creatorHub, v3)
-	end, { creatorHub, v2, v3, p })
+	return React.useCallback(function(p)
+		if FFlagBuildExperienceActionOutcomeTelemetry then
+			local sendClick = ConfigurationActionTelemetry.sendClick
+			local updateRating = Action.UpdateRating
+			local v5
+
+			if p ~= nil then
+				v5 = p.context
+			end
+
+			sendClick(updateRating, { universeId = universeId }, v5)
+		end
+
+		v3(GameConfigurationActions.getExperienceQuestionnaireUrl(universeId), creatorHub, v4)
+	end, { creatorHub, v3, v4, universeId })
 end
 
 local function cancelEligibilityRecheck(p) -- 2 equivalent calls inferred from this helper
@@ -249,12 +285,12 @@ local function cancelEligibilityRecheck(p) -- 2 equivalent calls inferred from t
 end
 
 local function useAudienceController(universeId: number)
-	local v2 = useAudienceStores()
+	local v3 = useAudienceStores()
 	local state, setState = React.useState(nil)
 	local state2, setState2 = React.useState(false)
 
 	local ref = React.useRef(nil)
-	local v3 = ref
+	local v4 = ref
 	React.useEffect(function()
 		return function()
 			cancelEligibilityRecheck(ref) -- inferred equivalent call
@@ -266,15 +302,15 @@ local function useAudienceController(universeId: number)
 		setState3(nil)
 	end, {})
 
-	local v4 = useAudienceData(universeId, v2.universeActivationStore, v2.universeConfigurationStore, state)
-	local handleQuestionnaire = useQuestionnaireHandler(universeId, v2.questionnaireStore)
+	local v5 = useAudienceData(universeId, v3.universeActivationStore, v3.universeConfigurationStore, state)
+	local handleQuestionnaire = useQuestionnaireHandler(universeId, v3.questionnaireStore)
 
-	local configurationData = v4.configurationData
-	local isAudiencesReady = v4.isAudiencesReady
-	local isConfigurationRefreshPending = v4.isConfigurationRefreshPending
-	local isEligibilityResolved = v4.isEligibilityResolved
-	local isNonPrivateLocked = v4.isNonPrivateLocked
-	local v5 = not isAudiencesReady or state2 or isConfigurationRefreshPending
+	local configurationData = v5.configurationData
+	local isAudiencesReady = v5.isAudiencesReady
+	local isConfigurationRefreshPending = v5.isConfigurationRefreshPending
+	local isEligibilityResolved = v5.isEligibilityResolved
+	local isNonPrivateLocked = v5.isNonPrivateLocked
+	local v6 = not isAudiencesReady or state2 or isConfigurationRefreshPending
 	return {
 		handleAudienceActivated = React.useCallback(function(p: string)
 			local function showLockedTooltip() -- 2 equivalent calls inferred from this helper
@@ -284,7 +320,7 @@ local function useAudienceController(universeId: number)
 			end
 
 			local function applyAudienceChange()
-				if v5 then
+				if v6 then
 					return
 				end
 
@@ -294,9 +330,19 @@ local function useAudienceController(universeId: number)
 				setState(p)
 				setState2(true)
 
-				v2.universeActivationStore.setAudiences(universeId, audiencesForValue):andThen(function(p2)
+				v3.universeActivationStore.setAudiences(universeId, audiencesForValue):andThen(function(p2)
 					GameConfigurationActions.updateCachedAudience(universeId, p2.audiences)
-					v2.universeActivationStore.activate(universeId):andThen(function()
+
+					if FFlagBuildExperienceActionOutcomeTelemetry then
+						ConfigurationActionTelemetry.sendSuccess(
+							Action.AudienceChange,
+							{ universeId = universeId },
+							nil,
+							getAudienceChangeParameters(configurationData, p) -- inferred equivalent call
+						)
+					end
+
+					v3.universeActivationStore.activate(universeId):andThen(function()
 						if FFlagEnableBuildAdPromotion then
 							refreshAdCampaignEligibility(universeId)
 						end
@@ -310,63 +356,91 @@ local function useAudienceController(universeId: number)
 					end):finally(function()
 						setState2(false)
 					end)
-				end):catch(function(p2)
+				end):catch(function(err)
 					Debug.log("warn", "AudienceConfigurationContent set audiences failed", {
-						errorMessage = formatError(p2),
+						errorMessage = formatError(err),
 						universeId = universeId
 					})
+
+					if FFlagBuildExperienceActionOutcomeTelemetry then
+						ConfigurationActionTelemetry.sendFailure(
+							Action.AudienceChange,
+							{ universeId = universeId },
+							{
+								reason = FailureReason.RequestFailed,
+								stage = Stage.SetAudience,
+								error = err
+							},
+							nil,
+							getAudienceChangeParameters(configurationData, p) -- inferred equivalent call
+						)
+					end
 
 					setState(nil)
 					setState2(false)
 				end)
 			end
 
-			local v6 = isNonPrivateLocked and p ~= "Private"
+			local v7 = isNonPrivateLocked and p ~= "Private"
 
-			if v6 then
+			if v7 then
 				showLockedTooltip() -- inferred equivalent call
 			end
 
-			if v5 then
+			if v6 then
 				return
 			end
 
-			if not v6 then
+			if not v7 then
 				setState2(true)
 			end
 
-			local v7 = v3
-			cancelEligibilityRecheck(v7) -- inferred equivalent call
+			local v8 = v4
+			cancelEligibilityRecheck(v8) -- inferred equivalent call
 
 			if p == "Private" then
 				applyAudienceChange()
 				return
 			end
 
-			if not v6 then
+			if not v7 then
 				setState(p)
 			end
 
-			local current = v2.universeActivationStore.refreshEligibility(universeId)
-			v7.current = current
+			local current = v3.universeActivationStore.refreshEligibility(universeId)
+			v8.current = current
 
 			current:catch(function(p2)
-				if v7.current == current then
+				if v8.current == current then
 					Debug.log("warn", "AudienceConfigurationContent eligibility recheck failed", {
 						errorMessage = formatError(p2),
 						universeId = universeId
 					})
 				end
 			end):finally(function()
-				if v7.current ~= current then
+				if v8.current ~= current then
 					return
 				end
 
-				v7.current = nil
+				v8.current = nil
 
 				if not ContentMaturityUtils.isContentUnrated(universeId) then
 					applyAudienceChange()
-				elseif not v6 then
+				elseif not v7 then
+					if FFlagBuildExperienceActionOutcomeTelemetry then
+						ConfigurationActionTelemetry.sendFailure(
+							Action.AudienceChange,
+							{ universeId = universeId },
+							{
+								reason = FailureReason.ContentUnrated,
+								stage = Stage.RefreshEligibility,
+								error = nil
+							},
+							nil,
+							getAudienceChangeParameters(configurationData, p) -- inferred equivalent call
+						)
+					end
+
 					setState(nil)
 					setState2(false)
 					showLockedTooltip() -- inferred equivalent call
@@ -374,32 +448,32 @@ local function useAudienceController(universeId: number)
 			end)
 		end, {
 			configurationData,
-			v3,
-			v5,
+			v4,
+			v6,
 			isEligibilityResolved,
 			isNonPrivateLocked,
-			v2.universeActivationStore,
-			v2.universeConfigurationStore,
+			v3.universeActivationStore,
+			v3.universeConfigurationStore,
 			universeId
 		}),
 		handleQuestionnaire = handleQuestionnaire,
 		isMutationPending = state2,
-		isNonPrivateLocked = v4.isNonPrivateLocked,
-		lockReason = v4.lockReason,
+		isNonPrivateLocked = v5.isNonPrivateLocked,
+		lockReason = v5.lockReason,
 		onTooltipPressedOutside = onTooltipPressedOutside,
-		selectedAudience = v4.selectedAudience,
+		selectedAudience = v5.selectedAudience,
 		tooltipTarget = state3
 	}
 end
 
 local function AudienceHeader()
-	local v2 = useLocalization({
+	local v3 = useLocalization({
 		body = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_BODY,
 		title = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_PAGE_TITLE
 	})
 
-	local body = v2.body
-	local title = v2.title
+	local body = v3.body
+	local title = v3.title
 
 	return React.createElement(View, { LayoutOrder = 1, tag = "col gap-xsmall size-full-0 auto-y" }, {
 		Title = React.createElement(Text, {
@@ -416,15 +490,15 @@ local function AudienceHeader()
 end
 
 local function AudienceList(props)
-	local v2 = useLocalization({
+	local v3 = useLocalization({
 		friends = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_FRIENDS,
 		private = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_PRIVATE,
 		public = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_PUBLIC
 	})
 
-	local friends = v2.friends
-	local private = v2.private
-	local public = v2.public
+	local friends = v3.friends
+	local private = v3.private
+	local public = v3.public
 	local onValueChanged = React.useCallback(function(p: string)
 		props.onAudienceActivated(p)
 	end, { props.onAudienceActivated })
@@ -477,32 +551,32 @@ local function AudienceList(props)
 end
 
 local function EligibilityTooltip(props)
-	local v2 = useLocalization({
+	local v3 = useLocalization({
 		notEligible = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_NOT_ELIGIBLE,
 		notEligibleDescription = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_NOT_ELIGIBLE_DESCRIPTION,
 		publishRequired = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_PUBLISH_REQUIRED,
 		publishRequiredDescription = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_PUBLISH_REQUIRED_DESCRIPTION
 	})
 
-	local notEligible = v2.notEligible
-	local text = v2.notEligibleDescription
-	local text2 = v2.publishRequired
-	local publishRequiredDescription = v2.publishRequiredDescription
-	local v3 = useTokens()
-	local v4 = useScaledValue(defineFastInt)
-	local v5 = props.lockReason == "PublishRequired"
+	local notEligible = v3.notEligible
+	local text = v3.notEligibleDescription
+	local text2 = v3.publishRequired
+	local publishRequiredDescription = v3.publishRequiredDescription
+	local v4 = useTokens()
+	local v5 = useScaledValue(defineFastInt)
+	local v6 = props.lockReason == "PublishRequired"
 
-	if not v5 then
+	if not v6 then
 		text2 = notEligible
 	end
 
-	if v5 then
+	if v6 then
 		text = publishRequiredDescription
 	end
 
 	local testId
 
-	if v5 then
+	if v6 then
 		testId = `{props.testId}-eligibility-tooltip--publish`
 	else
 		testId = `{props.testId}-eligibility-tooltip--not-eligible`
@@ -515,7 +589,7 @@ local function EligibilityTooltip(props)
 		Anchor = React.createElement(Popover.Anchor, { anchorRef = props.anchorRef }),
 		Content = React.createElement(Popover.Content, {
 			align = PopoverAlign.Center,
-			backgroundStyle = v3.Color.System.Contrast,
+			backgroundStyle = v4.Color.System.Contrast,
 			hasArrow = true,
 			onPressedOutside = props.onPressedOutside,
 			radius = Radius.Small,
@@ -524,7 +598,7 @@ local function EligibilityTooltip(props)
 		}, {
 			Layout = React.createElement(View, {
 				tag = "col gap-xsmall auto-xy padding-x-small padding-y-small",
-				sizeConstraint = { MaxSize = Vector2.new(v4, 1e999) },
+				sizeConstraint = { MaxSize = Vector2.new(v5, 1e999) },
 				testId = testId
 			}, {
 				Title = React.createElement(Text, {
@@ -578,51 +652,61 @@ end
 
 local function AudienceConfigurationContent(props)
 	local testId = props.testId or "audience-configuration-content"
-	local v2 = useAudienceController(props.universeId)
+	local v3 = useAudienceController(props.universeId)
 	local ref = React.useRef(nil)
 	local ref2 = React.useRef(nil)
-	local anchorRef = if v2.tooltipTarget == "Public" then ref2 else ref
+	local anchorRef = if v3.tooltipTarget == "Public" then ref2 else ref
 
-	local v3 = v2.isNonPrivateLocked and v2.lockReason == "RatingRequired"
+	local v4 = v3.isNonPrivateLocked and v3.lockReason == "RatingRequired"
+	local handleQuestionnaire = v3.handleQuestionnaire
+	local onActivated
+
+	if FFlagBuildExperienceActionOutcomeTelemetry then
+		onActivated = React.useCallback(function()
+			handleQuestionnaire({ context = ConfigurationActionTelemetry.Context.AudienceBanner })
+		end, { handleQuestionnaire })
+	else
+		onActivated = handleQuestionnaire
+	end
 
 	local createElement = React.createElement
-	local v4 = {
+	local v5 = {
 		LayoutOrder = props.layoutOrder,
 		tag = "col gap-medium size-full-0 auto-y padding-y-large",
 		testId = testId
 	}
 
-	local v5 = {
+	local v6 = {
 		Header = React.createElement(AudienceHeader),
 		List = React.createElement(AudienceList, {
 			friendsLockIconRef = ref,
-			isDisabled = v2.isMutationPending,
-			isNonPrivateLocked = v2.isNonPrivateLocked,
-			onAudienceActivated = v2.handleAudienceActivated,
+			isDisabled = v3.isMutationPending,
+			isNonPrivateLocked = v3.isNonPrivateLocked,
+			onAudienceActivated = v3.handleAudienceActivated,
 			publicLockIconRef = ref2,
-			selectedAudience = v2.selectedAudience,
+			selectedAudience = v3.selectedAudience,
 			testId = testId
 		}),
 		Tooltip = React.createElement(EligibilityTooltip, {
 			anchorRef = anchorRef,
-			isOpen = v2.tooltipTarget ~= nil,
-			lockReason = v2.lockReason,
-			onPressedOutside = v2.onTooltipPressedOutside,
+			isOpen = v3.tooltipTarget ~= nil,
+			lockReason = v3.lockReason,
+			onPressedOutside = v3.onTooltipPressedOutside,
 			testId = testId
 		}),
 		ContextBanner = 0
 	}
 	local contextBanner
 
-	if v3 then
+	if v4 then
 		contextBanner = React.createElement(EligibilityBanner, {
-			onActivated = v2.handleQuestionnaire,
+			onActivated = onActivated,
 			testId = testId
 		})
 	end
 
-	v5.ContextBanner = contextBanner
-	return createElement(View, v4, v5)
+	v6.ContextBanner = contextBanner
+	return createElement(View, v5, v6)
 end
 
 return AudienceConfigurationContent

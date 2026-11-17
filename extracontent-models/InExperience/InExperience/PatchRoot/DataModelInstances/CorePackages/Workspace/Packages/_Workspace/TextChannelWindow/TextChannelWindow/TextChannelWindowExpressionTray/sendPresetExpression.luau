@@ -11,6 +11,8 @@ local function sendPresetExpression(p: string, p2): boolean
 
 	if v == "NoChannel" then
 		Logger:warning("Preset not sent: no reachable channel")
+	elseif v == "DirectChat" then
+		Logger:warning("Preset not sent: direct chats do not support Quick Words")
 	end
 
 	return false

@@ -63,7 +63,8 @@ end
 
 function getPreferredInput()
 	if FFlagLuaAppResponsiveEnginePreferredInput then
-		return v4[UserInputService.PreferredInput or Enum.PreferredInput.KeyboardAndMouse] or enum.Pointer
+		local preferredInput = UserInputService.PreferredInput or Enum.PreferredInput.KeyboardAndMouse
+		return v4[preferredInput] or enum.Pointer
 	end
 
 	local platform = UserInputService:GetPlatform()

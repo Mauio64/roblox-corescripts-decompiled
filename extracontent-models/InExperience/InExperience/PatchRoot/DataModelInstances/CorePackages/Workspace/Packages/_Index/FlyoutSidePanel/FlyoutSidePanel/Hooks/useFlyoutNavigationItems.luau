@@ -22,6 +22,7 @@ local FFlagEnableArgus = SharedFlags.FFlagEnableArgus
 local FFlagArgoEnableMoments = SharedFlags.FFlagArgoEnableMoments
 local FFlagLuaAppEnableSduiHomePage = SharedFlags.FFlagLuaAppEnableSduiHomePage
 local FFlagFlyoutFilterWebViewsAndBrowserLinks = SharedFlags.FFlagFlyoutFilterWebViewsAndBrowserLinks
+local FFlagFlyoutAddAdjustScreen = require(script.Parent.Parent.Flags.FFlagFlyoutAddAdjustScreen)
 local FFlagFlyoutSidePanelTradesEntry = require(script.Parent.Parent.Flags.FFlagFlyoutSidePanelTradesEntry)
 local FFlagFlyoutHideSortDeeplinkItems = require(script.Parent.Parent.Flags.FFlagFlyoutHideSortDeeplinkItems)
 local FFlagFlyoutGateLearnPlace = SharedFlags.FFlagFlyoutGateLearnPlace
@@ -59,26 +60,32 @@ end
 local function shouldSkipLibraryItem(p: string, p2, data): boolean
 	if
 		p2 == nil
+		or FFlagFlyoutAddAdjustScreen and p == FlyoutContentSettings.ItemType.AdjustScreen and not data.supportsOverscan
 		or FFlagFlyoutHideSortDeeplinkItems and FlyoutContentSettings.itemIsGameSortDeeplink(p2)
-		or FFlagFlyoutFilterWebViewsAndBrowserLinks
+	then
+		return true
+	end
+
+	if
+		FFlagFlyoutFilterWebViewsAndBrowserLinks
 		and not data.webViewSupported
 		and FlyoutContentSettings.itemRequiresWebView(p2, data.externalBrowserAllowed)
-	then
-		return true
-	end
-
-	if
-		p == FlyoutContentSettings.ItemType.Favorites and not data.hasFavoritesData
+		or p == FlyoutContentSettings.ItemType.Favorites and not data.hasFavoritesData
 		or p == FlyoutContentSettings.ItemType.ContinuePlaying and not data.hasContinueData
-		or p == FlyoutContentSettings.ItemType.Premium and data.disablePremiumEntrypoint
 	then
 		return true
 	end
 
 	if
-		p == FlyoutContentSettings.ItemType.GiftCards and data.hideGiftCards
+		p == FlyoutContentSettings.ItemType.Premium and data.disablePremiumEntrypoint
+		or p == FlyoutContentSettings.ItemType.GiftCards and data.hideGiftCards
 		or p == FlyoutContentSettings.ItemType.Redeem and not data.redeemTileEnabled
-		or p == FlyoutContentSettings.ItemType.Trades
+	then
+		return true
+	end
+
+	if
+		p == FlyoutContentSettings.ItemType.Trades
 		and not (data.hasPaidTradingAccess or FFlagEnableTradesEntryForNonPremium)
 	then
 		return true
@@ -179,6 +186,15 @@ local function useFlyoutNavigationItems()
 	local v5 = not FFlagFlyoutGateLearnPlace or useAppPolicy(function(p)
 		return p.getLearnPlaceEnabled()
 	end)
+	local supportsOverscan
+
+	if FFlagFlyoutAddAdjustScreen then
+		supportsOverscan = useAppPolicy(function(p)
+			return p.getSupportsOverscan()
+		end)
+	else
+		supportsOverscan = false
+	end
 
 	local webViewSupported = not FFlagFlyoutFilterWebViewsAndBrowserLinks or useAppPolicy(function(p)
 		return p.getWebViewSupport()
@@ -226,7 +242,8 @@ local function useFlyoutNavigationItems()
 			hasPaidTradingAccess = hasPaidTradingAccess,
 			disableBlackbirdEntrypoints = disableBlackbirdEntrypoints,
 			webViewSupported = webViewSupported,
-			externalBrowserAllowed = externalBrowserAllowed
+			externalBrowserAllowed = externalBrowserAllowed,
+			supportsOverscan = supportsOverscan
 		}
 		local clones = {}
 		local clones2 = {}
@@ -325,14 +342,20 @@ local function useFlyoutNavigationItems()
 
 	local v12
 
-	if FFlagLuaAppFixNotificationBadgeCountsSync then
-		v12 = v2
+	if FFlagFlyoutAddAdjustScreen then
+		v12 = supportsOverscan
 	end
 
 	local v13
 
 	if FFlagLuaAppFixNotificationBadgeCountsSync then
-		v13 = v3
+		v13 = v2
+	end
+
+	local v14
+
+	if FFlagLuaAppFixNotificationBadgeCountsSync then
+		v14 = v3
 	end
 
 	return useMemo(fn, {
@@ -348,9 +371,10 @@ local function useFlyoutNavigationItems()
 		v10,
 		v7,
 		v11,
-		v6,
 		v12,
-		v13
+		v6,
+		v13,
+		v14
 	})
 end
 

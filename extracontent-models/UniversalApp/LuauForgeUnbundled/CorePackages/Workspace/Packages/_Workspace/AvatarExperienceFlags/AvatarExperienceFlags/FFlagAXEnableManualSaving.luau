@@ -1,1 +1,0 @@
-return game:DefineFastFlag("AXEnableManualSaving4", false)

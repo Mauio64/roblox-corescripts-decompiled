@@ -32,7 +32,6 @@ local SharedFlags = require(parent.SharedFlags)
 local FFlagUserSearchAddFocusActionsSupport = SharedFlags.FFlagUserSearchAddFocusActionsSupport
 local SharedFlags2 = require(parent.SharedFlags)
 local FFlagSduiUserSearchTile = SharedFlags2.FFlagSduiUserSearchTile
-local FFlagFixUserSearchAddFriendFocusAction = require(UserSearch.Flags.FFlagFixUserSearchAddFriendFocusAction)
 
 local FFlagUserSearchHideFriendActionsForBlockedUsers = require(UserSearch.Flags.FFlagUserSearchHideFriendActionsForBlockedUsers)
 local FFlagMigrateFriendshipStatusesUserSearch = require(UserSearch.Flags.FFlagMigrateFriendshipStatusesUserSearch)
@@ -189,11 +188,7 @@ return function(data, callback)
 		local focusEventName
 
 		if FFlagUserSearchAddFocusActionsSupport and data.shouldAddFocusEventName then
-			if FFlagFixUserSearchAddFriendFocusAction then
-				focusEventName = FocusNavigationEventNameEnum.HoldToAddFriend
-			else
-				focusEventName = FocusNavigationEventNameEnum.HoldToAcceptFriendRequest
-			end
+			focusEventName = FocusNavigationEventNameEnum.HoldToAddFriend
 		end
 
 		return {

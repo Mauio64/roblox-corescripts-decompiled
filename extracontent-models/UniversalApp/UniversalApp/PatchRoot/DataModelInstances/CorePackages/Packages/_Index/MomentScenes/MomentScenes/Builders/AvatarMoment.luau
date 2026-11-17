@@ -4,6 +4,7 @@ local frameCamera = require(script.Parent._Utils.frameCamera)
 local cameraPath = require(script.Parent._Utils.cameraPath)
 local avatarBackground = require(script.Parent._Utils.avatarBackground)
 local avatarRig = require(script.Parent._Utils.avatarRig)
+local applyDefaultClothing = require(script.Parent._Utils.applyDefaultClothing)
 local createPlayhead = require(script.Parent._Utils.createPlayhead)
 local addKeyLight = require(script.addKeyLight)
 local addFallbackBackdrop = require(script.addFallbackBackdrop)
@@ -103,7 +104,13 @@ local function buildAvatarMoment(options)
 		avatarBackground.pinToParent(v3, live3DScene)
 	end
 
-	local avatar = avatarRig.createAvatar(v2.humanoidDescription, v2.rigType)
+	local humanoidDescription = v2.humanoidDescription
+
+	if Flags.MomentScenesAvatarMomentDefaultClothing then
+		humanoidDescription = applyDefaultClothing(humanoidDescription)
+	end
+
+	local avatar = avatarRig.createAvatar(humanoidDescription, v2.rigType)
 	avatar.Name = "Avatar"
 	local humanoid = avatar:FindFirstChildOfClass("Humanoid")
 
@@ -115,6 +122,13 @@ local function buildAvatarMoment(options)
 
 	avatarFloorPosition.positionOnFloor(avatar, 0, CFrame.new())
 	avatar.Parent = live3DScene
+	local v4
+
+	if v2.gearAssetId == nil then
+		v4 = nil
+	else
+		v4 = avatarRig.equipGear(avatar, v2.gearAssetId, v2.rigType)
+	end
 
 	local sceneCamera = Instance.new("Camera")
 	sceneCamera.Name = "SceneCamera"
@@ -124,44 +138,38 @@ local function buildAvatarMoment(options)
 
 	local cameraPath2 = v.cameraPath or "subtle"
 	local resolved = cameraPath.resolve(cameraPath2)
-	local v4
+	local v5
 
 	if cameraPath.framingFor(cameraPath2) == "face" then
-		v4 = frameCamera.fitStandingFace
+		v5 = frameCamera.fitStandingFace
 	else
-		v4 = frameCamera.fitStandingCharacters
+		v5 = frameCamera.fitStandingCharacters
 	end
 
-	local _, v5, v6 = v4({ avatar }, sceneCamera.FieldOfView)
-	sceneCamera.Focus = CFrame.new(v5)
+	local _, v6, v7 = v5({ avatar }, sceneCamera.FieldOfView)
+	sceneCamera.Focus = CFrame.new(v6)
 
 	local emoteId = resolveEmoteId(v, v2.rigType)
-	local v7 = avatarRig.playEmote(avatar, emoteId)
-	local tracks = v7 == nil and {} or { v7 }
+	local v8 = avatarRig.playEmote(avatar, emoteId)
 
 	local function duration() -- 2 equivalent calls inferred from this helper
-		local v8 = 0
+		local v9 = v8 == nil and 0 or v8.Length
 
-		for _, v9 in tracks do
-			if v8 < v9.Length then
-				v8 = v9.Length
-			end
-		end
-
-		if v8 <= 0 then
+		if v9 <= 0 then
 			return 0
 		end
 
-		return v8 * 4
+		return v9 * 4
 	end
 
-	local v8 = {
+	local v9 = {
 		root = live3DScene,
-		tracks = tracks,
+		tracks = v8 == nil and {} or { v8 },
 		animator = 0,
 		getDuration = 0,
 		syncVisuals = 0,
-		play = 0
+		play = 0,
+		dispose = 0
 	}
 	local animator
 
@@ -169,28 +177,36 @@ local function buildAvatarMoment(options)
 		animator = humanoid:FindFirstChildOfClass("Animator")
 	end
 
-	v8.animator = animator
-	v8.getDuration = duration
-	function v8.syncVisuals(p: number)
-		local v9 = duration() -- inferred equivalent call
-		local v10 = not (v9 > 0) and 0 or p % v9 / v9
-		sceneCamera.CFrame = cameraPath.eval(v5, v6, resolved, v10)
+	v9.animator = animator
+	v9.getDuration = duration
+	function v9.syncVisuals(p: number)
+		local v10 = duration() -- inferred equivalent call
+		local v11 = not (v10 > 0) and 0 or p % v10 / v10
+		sceneCamera.CFrame = cameraPath.eval(v6, v7, resolved, v11)
 	end
-	function v8.play(callback)
+	function v9.play(callback)
 		if humanoid ~= nil then
 			humanoid.AutoRotate = false
 		end
 
 		callback()
 	end
+	function v9.dispose(callback)
+		if v4 ~= nil then
+			v4:Stop(0)
+			v4 = nil
+		end
 
-	local playhead = createPlayhead(v8)
-	local v9 = duration() > 0 -- inferred equivalent call
+		callback()
+	end
+
+	local playhead = createPlayhead(v9)
+	local v10 = duration() > 0 -- inferred equivalent call
 	return {
 		root = live3DScene,
 		camera = sceneCamera,
 		playhead = playhead,
-		capabilities = { canUserToggle = v9, hasDuration = v9 },
+		capabilities = { canUserToggle = v10, hasDuration = v10 },
 		dispose = playhead.dispose
 	}
 end

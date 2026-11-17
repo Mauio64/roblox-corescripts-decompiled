@@ -10,6 +10,13 @@ local getEngineFeatureEngineUGCValidateEmoteAnimationExport = require(parent.fla
 
 local RecreateSceneFromEditables = {}
 
+RecreateSceneFromEditables.requiredData = {
+	ValidationEnums.SharedDataMember.renderMeshesData,
+	ValidationEnums.SharedDataMember.innerCagesData,
+	ValidationEnums.SharedDataMember.outerCagesData,
+	ValidationEnums.SharedDataMember.meshTextures
+}
+
 local function createCagePart(p, p2, p3, p4: string)
 	local meshPartAsync = AssetService:CreateMeshPartAsync(Content.fromObject(p3.editable))
 	meshPartAsync.Name = `{p}_{p4}`
@@ -19,32 +26,32 @@ local function createCagePart(p, p2, p3, p4: string)
 	return meshPartAsync
 end
 
-local function copyMeshPart(part, p, data)
+local function copyMeshPart(part, p, meshTexture)
 	local meshPartAsync = AssetService:CreateMeshPartAsync(Content.fromObject(p.editable))
 
-	if data and not data.isPBR and data.Texture then
-		meshPartAsync.TextureContent = Content.fromObject(data.Texture.editable)
-	elseif data and data.isPBR then
+	if meshTexture and not meshTexture.isPBR and meshTexture.Texture then
+		meshPartAsync.TextureContent = Content.fromObject(meshTexture.Texture.editable)
+	elseif meshTexture and meshTexture.isPBR then
 		local surfaceAppearance = Instance.new("SurfaceAppearance")
 
-		if data.ColorMap then
-			surfaceAppearance.ColorMapContent = Content.fromObject(data.ColorMap.editable)
+		if meshTexture.ColorMap then
+			surfaceAppearance.ColorMapContent = Content.fromObject(meshTexture.ColorMap.editable)
 		end
 
-		if data.MetalnessMap then
-			surfaceAppearance.MetalnessMapContent = Content.fromObject(data.MetalnessMap.editable)
+		if meshTexture.MetalnessMap then
+			surfaceAppearance.MetalnessMapContent = Content.fromObject(meshTexture.MetalnessMap.editable)
 		end
 
-		if data.NormalMap then
-			surfaceAppearance.NormalMapContent = Content.fromObject(data.NormalMap.editable)
+		if meshTexture.NormalMap then
+			surfaceAppearance.NormalMapContent = Content.fromObject(meshTexture.NormalMap.editable)
 		end
 
-		if data.RoughnessMap then
-			surfaceAppearance.RoughnessMapContent = Content.fromObject(data.RoughnessMap.editable)
+		if meshTexture.RoughnessMap then
+			surfaceAppearance.RoughnessMapContent = Content.fromObject(meshTexture.RoughnessMap.editable)
 		end
 
-		if data.EmissiveMask then
-			surfaceAppearance.EmissiveMaskContent = Content.fromObject(data.EmissiveMask.editable)
+		if meshTexture.EmissiveMask then
+			surfaceAppearance.EmissiveMaskContent = Content.fromObject(meshTexture.EmissiveMask.editable)
 		end
 
 		surfaceAppearance.Parent = meshPartAsync

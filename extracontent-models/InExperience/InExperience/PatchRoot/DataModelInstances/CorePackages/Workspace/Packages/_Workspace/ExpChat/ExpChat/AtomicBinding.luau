@@ -192,15 +192,18 @@ function AtomicBinding:bindRoot(instance2)
 				assert(child.instance == nil, "unbindNodeDescend failed")
 
 				local child2 = v3:FindFirstChild(name)
-				local v5 = child2 and children[child2.Name]
 
-				if v5 then
-					if v5.instance ~= nil then
-						return
+				if child2 then
+					local child3 = children[child2.Name]
+
+					if child3 then
+						if child3.instance ~= nil then
+							return
+						end
+
+						child3.instance = child2
+						processNode(child3)
 					end
-
-					v5.instance = child2
-					processNode(v5)
 				end
 			end
 

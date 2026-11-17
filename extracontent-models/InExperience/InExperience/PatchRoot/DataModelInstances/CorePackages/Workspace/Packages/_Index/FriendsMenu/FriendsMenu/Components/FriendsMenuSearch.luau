@@ -12,7 +12,6 @@ local Foundation = require(parent.Foundation)
 local useCursor = Foundation.Hooks.useCursor
 local useTokens = Foundation.Hooks.useTokens
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local GetFFlagEnableFriendsListSearchNormalizationErrorFix = SharedFlags.GetFFlagEnableFriendsListSearchNormalizationErrorFix
 
@@ -110,50 +109,26 @@ local function fn(props, p)
 			ImageColor3 = v9.Theme.IconEmphasis.Color,
 			ImageTransparency = v9.Theme.IconEmphasis.Transparency
 		}),
-		SearchField = 0,
+		SearchField = React.createElement("TextBox", {
+			LayoutOrder = 1,
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, v6 * -1, 1, 0),
+			ClearTextOnFocus = false,
+			PlaceholderColor3 = v9.Theme.TextDefault.Color,
+			PlaceholderText = localizedStrings.searchPlaceHolder,
+			Text = searchFriendsString,
+			TextColor3 = v9.Theme.TextDefault.Color,
+			TextWrapped = true,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextSize = textSize,
+			FontFace = normalizeFontFace(v10.Typography.BodyLarge.Font),
+			ref = ref2,
+			[React.Event.Focused] = props.onFocus,
+			[React.Change.Text] = fn2,
+			SelectionImageObject = selectionImageObject
+		}),
 		ClearButton = 0
 	}
-
-	local createElement2 = React.createElement
-	local v15 = {
-		["LayoutOrder"] = nil,
-		["LayoutOrder"] = nil,
-		["LayoutOrder"] = nil,
-		["LayoutOrder"] = nil,
-		["LayoutOrder"] = nil,
-		["LayoutOrder"] = nil,
-		LayoutOrder = 1,
-		BackgroundTransparency = 1,
-		Size = UDim2.new(1, v6 * -1, 1, 0),
-		ClearTextOnFocus = false,
-		PlaceholderColor3 = v9.Theme.TextDefault.Color,
-		PlaceholderText = localizedStrings.searchPlaceHolder,
-		Text = searchFriendsString,
-		TextColor3 = v9.Theme.TextDefault.Color,
-		TextWrapped = true,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		TextSize = textSize
-	}
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = v9.Font.Body.Font
-	end
-
-	v15.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(v10.Typography.BodyLarge.Font)
-	end
-
-	v15.FontFace = fontFace
-
-	v15.ref = ref2
-	v15[React.Event.Focused] = props.onFocus
-	v15[React.Change.Text] = fn2
-	v15.SelectionImageObject = selectionImageObject
-	v14.SearchField = createElement2("TextBox", v15)
 	local clearButton
 
 	if v12 then

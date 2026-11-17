@@ -18,6 +18,7 @@ local ModalEventConstants = require(script.Parent.Analytics.ModalEventConstants)
 local PushUpsellEventName = require(script.Parent.Analytics.RobloxTelemetryConfigs.PushUpsellEventName)
 
 local PushNotificationsUpsellUtils = require(script.Parent.Util.PushNotificationsUpsellUtils)
+local mergeEventFields = require(script.Parent.Util.mergeEventFields)
 local Promise = require(parent.Promise)
 local UniversalAppPolicy = require(parent.UniversalAppPolicy)
 local getAppFeaturePolicies = UniversalAppPolicy.getAppFeaturePolicies
@@ -199,7 +200,7 @@ local function shouldShowUpsell(p: string, flag: boolean?)
 	end
 end
 
-local function openModal(p: string, flag: boolean?, value: string?)
+local function openModal(p: string, flag: boolean?, value: string?, extraEventFields)
 	if not GetFFlagEnablePushNotificationsUpsellModal() then
 		return
 	end
@@ -217,7 +218,7 @@ local function openModal(p: string, flag: boolean?, value: string?)
 			default2:logRobloxTelemetryEvent(
 				PushUpsellEventName,
 				{},
-				{ [ModalEventConstants.ActionType] = ModalEventConstants.Closed },
+				mergeEventFields({ [ModalEventConstants.ActionType] = ModalEventConstants.Closed }, extraEventFields),
 				ModalEventConstants.ModalContextPushEduUpsell
 			)
 		end
@@ -231,10 +232,10 @@ local function openModal(p: string, flag: boolean?, value: string?)
 			})
 		end
 
-		default2:logRobloxTelemetryEvent(PushUpsellEventName, {}, {
+		default2:logRobloxTelemetryEvent(PushUpsellEventName, {}, mergeEventFields({
 			[ModalEventConstants.ActionType] = ModalEventConstants.Opened,
 			[ModalEventConstants.EntryPoint] = value or ""
-		}, ModalEventConstants.ModalContextPushEduUpsell)
+		}, extraEventFields), ModalEventConstants.ModalContextPushEduUpsell)
 
 		if p == NotificationsUpsellConstants.ModalKey.PushUpsellHome then
 			PushNotificationsUpsellUtils.incrementPushUpsellPromptedCount(
@@ -252,7 +253,8 @@ local function openModal(p: string, flag: boolean?, value: string?)
 			CloseCallback = fn,
 			Props = {
 				CloseModal = fn2,
-				TranslationKeys = NotificationsUpsellConstants.TranslationKeys[p]
+				TranslationKeys = NotificationsUpsellConstants.TranslationKeys[p],
+				ExtraEventFields = extraEventFields
 			},
 			DisableBackgroundDismiss = true,
 			DisplayOrder = 2,
@@ -265,10 +267,10 @@ local function openModal(p: string, flag: boolean?, value: string?)
 			})
 		end
 
-		default2:logRobloxTelemetryEvent(PushUpsellEventName, {}, {
+		default2:logRobloxTelemetryEvent(PushUpsellEventName, {}, mergeEventFields({
 			[ModalEventConstants.ActionType] = ModalEventConstants.Opened,
 			[ModalEventConstants.EntryPoint] = value or ""
-		}, ModalEventConstants.ModalContextSysUpsell)
+		}, extraEventFields), ModalEventConstants.ModalContextSysUpsell)
 
 		if FFlagNotificationsUpsellUseRequestPushPermissionHelper then
 			requestPushNotificationPermission():andThen(function()
@@ -283,7 +285,10 @@ local function openModal(p: string, flag: boolean?, value: string?)
 				default2:logRobloxTelemetryEvent(
 					PushUpsellEventName,
 					{},
-					{ [ModalEventConstants.ActionType] = ModalEventConstants.RequestSuccess },
+					mergeEventFields(
+						{ [ModalEventConstants.ActionType] = ModalEventConstants.RequestSuccess },
+						extraEventFields
+					),
 					ModalEventConstants.ModalContextSysUpsell
 				)
 			end, function()
@@ -298,7 +303,10 @@ local function openModal(p: string, flag: boolean?, value: string?)
 				default2:logRobloxTelemetryEvent(
 					PushUpsellEventName,
 					{},
-					{ [ModalEventConstants.ActionType] = ModalEventConstants.RequestFailed },
+					mergeEventFields(
+						{ [ModalEventConstants.ActionType] = ModalEventConstants.RequestFailed },
+						extraEventFields
+					),
 					ModalEventConstants.ModalContextSysUpsell
 				)
 			end)
@@ -321,7 +329,10 @@ local function openModal(p: string, flag: boolean?, value: string?)
 				default2:logRobloxTelemetryEvent(
 					PushUpsellEventName,
 					{},
-					{ [ModalEventConstants.ActionType] = ModalEventConstants.RequestSuccess },
+					mergeEventFields(
+						{ [ModalEventConstants.ActionType] = ModalEventConstants.RequestSuccess },
+						extraEventFields
+					),
 					ModalEventConstants.ModalContextSysUpsell
 				)
 			end, function(_)
@@ -336,7 +347,10 @@ local function openModal(p: string, flag: boolean?, value: string?)
 				default2:logRobloxTelemetryEvent(
 					PushUpsellEventName,
 					{},
-					{ [ModalEventConstants.ActionType] = ModalEventConstants.RequestFailed },
+					mergeEventFields(
+						{ [ModalEventConstants.ActionType] = ModalEventConstants.RequestFailed },
+						extraEventFields
+					),
 					ModalEventConstants.ModalContextSysUpsell
 				)
 			end)

@@ -15,6 +15,9 @@ local MomentEngagementCount = require(script.Parent.MomentEngagementCount)
 local FFlagMomentsEngagementMetricsFeature = MomentsCommon.Flags.FFlagMomentsEngagementMetricsFeature
 local SharedFlags = require(parent.SharedFlags)
 local FFlagProfileMomentSceneOutfitPoster = SharedFlags.FFlagProfileMomentSceneOutfitPoster
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagMomentsPostFeedback = SharedFlags2.FFlagMomentsPostFeedback
+local PostStatusBadge = require(parent.Moments.PostStatusBadge)
 
 local View = Foundation.View
 local ControlState = Foundation.Enums.ControlState
@@ -93,7 +96,8 @@ local function MomentGridItem(props)
 		Media = createElement2(MomentMediaTile, { mediaItem = mediaItem, isActive = props.isActive }),
 		ScenePoster = 0,
 		BottomGradient = 0,
-		Engagement = 0
+		Engagement = 0,
+		StatusBadge = 0
 	}
 	local scenePoster
 
@@ -137,6 +141,16 @@ local function MomentGridItem(props)
 	end
 
 	v5.Engagement = engagement
+	local statusBadge
+
+	if FFlagMomentsPostFeedback then
+		statusBadge = React.createElement(PostStatusBadge, {
+			momentId = moment.momentId,
+			ZIndex = 5
+		})
+	end
+
+	v5.StatusBadge = statusBadge
 	return createElement(View, v4, v5)
 end
 

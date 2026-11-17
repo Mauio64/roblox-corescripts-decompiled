@@ -173,40 +173,41 @@ return function(data)
 				end
 			end
 
-			if #contents > 0 then
-				HttpService:RequestInternal({
-					Url = url,
-					Method = "POST",
-					Headers = { ["Content-Type"] = "application/json", Accept = "application/json" },
-					Body = HttpService:JSONEncode({
-						screenshot_id = state4,
-						universe_id = game.GameId,
-						contents = contents
-					})
-				}):Start(function(_, p)
-					if p.StatusCode == 200 then
-						local success, result = pcall(HttpService.JSONDecode, HttpService, p.Body)
-
-						if success and result and result.code then
-							setState12(result.code)
-							setState3(true)
-						else
-							setState13(Constants.IpErrorCodes.Unknown)
-						end
-					else
-						local v4 = Constants.IpErrorCodes.Unknown
-						local success, result = pcall(HttpService.JSONDecode, HttpService, p.Body)
-
-						if success and result and result.app_error_code and result.app_error_code ~= "" then
-							v4 = result.app_error_code
-						end
-
-						setState13(v4)
-					end
-				end)
-			else
+			if not (#contents > 0) then
 				setState13(Constants.IpErrorCodes.ClientNoAssetsExtracted)
+				return
 			end
+
+			HttpService:RequestInternal({
+				Url = url,
+				Method = "POST",
+				Headers = { ["Content-Type"] = "application/json", Accept = "application/json" },
+				Body = HttpService:JSONEncode({
+					screenshot_id = state4,
+					universe_id = game.GameId,
+					contents = contents
+				})
+			}):Start(function(_, p)
+				if p.StatusCode == 200 then
+					local success, result = pcall(HttpService.JSONDecode, HttpService, p.Body)
+
+					if success and result and result.code then
+						setState12(result.code)
+						setState3(true)
+					else
+						setState13(Constants.IpErrorCodes.Unknown)
+					end
+				else
+					local v4 = Constants.IpErrorCodes.Unknown
+					local success, result = pcall(HttpService.JSONDecode, HttpService, p.Body)
+
+					if success and result and result.app_error_code and result.app_error_code ~= "" then
+						v4 = result.app_error_code
+					end
+
+					setState13(v4)
+				end
+			end)
 		else
 			setState(false)
 			setState2(true)

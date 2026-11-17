@@ -491,7 +491,8 @@ function FetchMonetizationOptions.listShops(p: number, p2)
 end
 
 function FetchMonetizationOptions.createShop(p: number, isEnabled: boolean, p2)
-	return mutate("POST", ("%s/shops-api/v1/shops"):format((resolveBase(p2))), { -- inferred equivalent call
+	local base = resolveBase(p2) -- inferred equivalent call
+	return mutate("POST", ("%s/shops-api/v1/shops"):format(base), {
 		scope = { type = "Universe", scopeId = tostring(p) },
 		entryPoints = {
 			{ name = "InExperienceGlobalIconEnabled", isEnabled = isEnabled }

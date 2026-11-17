@@ -26,6 +26,7 @@ local FFlagShowSwitchServerButton = SharedFlags.FFlagShowSwitchServerButton
 local PioneerUtils = require(CorePackages.Workspace.Packages.PioneerUtils)
 local isPioneerLaunch = PioneerUtils.isPioneerLaunch
 local FFlagEnableSideSheetRobuxWidget = require(Chrome.Flags.FFlagEnableSideSheetRobuxWidget)
+local FFlagSideSheetUnifiedMenuOrder = SharedFlags.FFlagSideSheetUnifiedMenuOrder
 local traversal
 
 if FFlagIntegrateTraversalHistoryInSideSheet then
@@ -41,10 +42,19 @@ else
 	v = false
 end
 
-local function reorder(p, p2: string, p3: number) -- 8 equivalent calls inferred from this helper
+local function reorder(p, p2: string, p3: number) -- 28 equivalent calls inferred from this helper
 	if p[p2] ~= nil then
 		p[p2] = p3
 	end
+end
+
+local function removePioneerEntries(p) -- 2 equivalent calls inferred from this helper
+	p.connect_dropdown = nil
+	p[Constants.AVATAR_SWITCHER_ID] = nil
+	p.emotes = nil
+	p.traversal_history = nil
+	p.camera_entrypoint = nil
+	p.gallery = nil
 end
 
 local function buildMenuOrder()
@@ -81,13 +91,33 @@ local function buildMenuOrder()
 		[InExperienceSideSheet.Enums.ActionBinding.Respawn] = 190
 	}
 
-	if isPioneerLaunch() then
-		v5.connect_dropdown = nil
-		v5[Constants.AVATAR_SWITCHER_ID] = nil
-		v5.emotes = nil
-		v5.traversal_history = nil
-		v5.camera_entrypoint = nil
-		v5.gallery = nil
+	if FFlagSideSheetUnifiedMenuOrder and isSideSheetEnabled then
+		if isPioneerLaunch() then
+			removePioneerEntries(v5) -- inferred equivalent call
+			reorder(v5, "AccountUpsell", 185) -- inferred equivalent call
+		end
+
+		reorder(v5, "people", 20) -- inferred equivalent call
+		reorder(v5, "connect_dropdown", 30) -- inferred equivalent call
+		reorder(v5, "invite_friends", 40) -- inferred equivalent call
+		reorder(v5, "settings", 50) -- inferred equivalent call
+		reorder(v5, "leaderboard", 60) -- inferred equivalent call
+		reorder(v5, "emotes", 70) -- inferred equivalent call
+		reorder(v5, Constants.AVATAR_SWITCHER_ID, 80) -- inferred equivalent call
+		reorder(v5, "backpack", 90) -- inferred equivalent call
+		reorder(v5, Constants.IN_EXPERIENCE_SHOP_ID, 100) -- inferred equivalent call
+		reorder(v5, "gallery", 110) -- inferred equivalent call
+		reorder(v5, "camera_entrypoint", 120) -- inferred equivalent call
+		reorder(v5, "help", 130) -- inferred equivalent call
+		reorder(v5, "trust_and_safety", 140) -- inferred equivalent call
+		reorder(v5, "music_entrypoint", 150) -- inferred equivalent call
+		reorder(v5, "selfie_view", 160) -- inferred equivalent call
+		reorder(v5, Constants.SWITCH_SERVER_ID, 170) -- inferred equivalent call
+		reorder(v5, "traversal_history", 180) -- inferred equivalent call
+		reorder(v5, InExperienceSideSheet.Enums.ActionBinding.Leave, 190) -- inferred equivalent call
+		reorder(v5, InExperienceSideSheet.Enums.ActionBinding.Respawn, 200) -- inferred equivalent call
+	elseif isPioneerLaunch() then
+		removePioneerEntries(v5) -- inferred equivalent call
 		reorder(v5, Constants.SWITCH_SERVER_ID, 200) -- inferred equivalent call
 	elseif not isSideSheetEnabled then
 		reorder(v5, "connect_dropdown", 10) -- inferred equivalent call

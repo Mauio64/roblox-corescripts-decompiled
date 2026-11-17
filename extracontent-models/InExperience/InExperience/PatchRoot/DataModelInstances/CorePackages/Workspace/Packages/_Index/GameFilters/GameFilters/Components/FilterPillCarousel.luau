@@ -20,7 +20,6 @@ local normalizeFontFace = Foundation.Utility.normalizeFontFace
 local FilterPill = require(GameFilters.Components.FilterPill)
 local SharedFlags = require(parent.SharedFlags)
 local FFlagLuaAppUseFrameBoundsImpressions = SharedFlags.FFlagLuaAppUseFrameBoundsImpressions
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 require(GameFilters.FilterCallbackTypes)
 
@@ -41,43 +40,20 @@ return function(props)
 		local bodyMedium = v.Typography.BodyMedium
 		local muted = v.Color.Content.Muted
 
-		local createElement = React.createElement
-		local v2 = {
+		return React.createElement("TextLabel", {
 			BackgroundTransparency = 1,
 			Text = props.title,
 			Size = UDim2.new(0, 0, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.XY,
-			Font = 0,
-			FontFace = 0,
-			TextSize = 0,
-			TextTransparency = 0,
-			TextColor3 = 0,
+			FontFace = normalizeFontFace(bodyMedium.Font),
+			TextSize = bodyMedium.FontSize,
+			TextTransparency = muted.Transparency,
+			TextColor3 = muted.Color3,
 			TextWrapped = false,
-			TextTruncate = 0,
-			TextXAlignment = 0,
+			TextTruncate = Enum.TextTruncate.SplitWord,
+			TextXAlignment = Enum.TextXAlignment.Left,
 			LayoutOrder = 1
-		}
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = bodyMedium.Font
-		end
-
-		v2.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(bodyMedium.Font)
-		end
-
-		v2.FontFace = fontFace
-		v2.TextSize = bodyMedium.FontSize
-		v2.TextTransparency = muted.Transparency
-		v2.TextColor3 = muted.Color3
-
-		v2.TextTruncate = Enum.TextTruncate.SplitWord
-		v2.TextXAlignment = Enum.TextXAlignment.Left
-		return createElement("TextLabel", v2)
+		})
 	end, { props.title, v })
 
 	local title = (not props.title or props.title == "") and "" or v2

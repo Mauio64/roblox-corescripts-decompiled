@@ -45,11 +45,12 @@ function extended:willUpdate(p)
 		local v = assetInfo and assetInfo.parentBundleId ~= nil
 
 		coroutine.wrap(function()
-			if v then
-				getFavoriteForBundle((UtilityFunctions.getBundleId(assetInfo)))
-			else
+			if not v then
 				getFavoriteForAsset(assetInfo.assetId)
+				return
 			end
+
+			getFavoriteForBundle((UtilityFunctions.getBundleId(assetInfo)))
 		end)()
 		self.fetchFavoriteRetries += 1
 	end

@@ -91,27 +91,31 @@ local function removeDirectivesFromDocument(p, p2)
 		},
 		Field = {
 			enter = function(_, data)
-				if Boolean.toJSBoolean(p) and Boolean.toJSBoolean(data.directives) and Array.some(p, function(p3)
+				if not (Boolean.toJSBoolean(p) and Boolean.toJSBoolean(data.directives) and Array.some(p, function(p3)
 					return p3.remove
-				end) and data.directives and Array.some(data.directives, getDirectiveMatcher(p)) then -- inferred equivalent call
-					if data.arguments then
-						Array.forEach(data.arguments, function(p3)
-							if p3.value.kind == "Variable" then
-								table.insert(v2, { name = p3.value.name.value })
-							end
-						end)
-					end
-
-					if data.selectionSet then
-						Array.forEach(getAllFragmentSpreadsFromSelectionSet(data.selectionSet), function(p3)
-							table.insert(v3, { name = p3.name.value })
-						end)
-					end
-
-					return remove
+				end) and data.directives) then
+					return nil
 				end
 
-				return nil
+				if not Array.some(data.directives, getDirectiveMatcher(p)) then -- inferred equivalent call
+					return nil
+				end
+
+				if data.arguments then
+					Array.forEach(data.arguments, function(p3)
+						if p3.value.kind == "Variable" then
+							table.insert(v2, { name = p3.value.name.value })
+						end
+					end)
+				end
+
+				if data.selectionSet then
+					Array.forEach(getAllFragmentSpreadsFromSelectionSet(data.selectionSet), function(p3)
+						table.insert(v3, { name = p3.name.value })
+					end)
+				end
+
+				return remove
 			end
 		},
 		FragmentSpread = {

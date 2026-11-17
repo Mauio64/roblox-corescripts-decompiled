@@ -1,3 +1,8 @@
+local CorePackages = game:GetService("CorePackages")
+
+local AvatarExperienceFlags = require(CorePackages.Workspace.Packages.AvatarExperienceFlags)
+local FFlagAXSpawnEffectSaveRoundTrip = AvatarExperienceFlags.FFlagAXSpawnEffectSaveRoundTrip
+
 local v = {
 	"ClimbAnimation",
 	"Face",
@@ -41,10 +46,12 @@ return function(instance)
 
 	local children = instance:GetChildren()
 
-	for _, makeupDescription in children do
-		if makeupDescription:IsA("MakeupDescription") and makeupDescription.AssetId > 0 then
-			table.insert(result, makeupDescription.AssetId)
+	for _, instance2 in children do
+		if not ((instance2:IsA("MakeupDescription") or FFlagAXSpawnEffectSaveRoundTrip and instance2:IsA("AvatarEffectDescription")) and instance2.AssetId > 0) then
+			continue
 		end
+
+		table.insert(result, instance2.AssetId)
 	end
 
 	local emotes = instance:GetEmotes()

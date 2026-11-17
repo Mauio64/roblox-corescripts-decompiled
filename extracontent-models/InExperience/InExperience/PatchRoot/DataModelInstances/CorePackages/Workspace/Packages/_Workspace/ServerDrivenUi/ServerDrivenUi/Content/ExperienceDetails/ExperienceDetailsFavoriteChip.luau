@@ -50,8 +50,9 @@ local function ExperienceDetailsFavoriteChip(p)
 		local v5 = not v2
 
 		if rootPlaceId then
+			local userId = Players.LocalPlayer and Players.LocalPlayer.UserId
 			local v6 = {
-				uid = tostring(Players.LocalPlayer and Players.LocalPlayer.UserId),
+				uid = tostring(userId),
 				ctx = "ExperienceDetailsFavoriteChip",
 				placeId = rootPlaceId,
 				state = v5 and "on" or "off",

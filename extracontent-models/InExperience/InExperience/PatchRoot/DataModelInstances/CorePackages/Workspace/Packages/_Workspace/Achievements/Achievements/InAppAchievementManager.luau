@@ -29,6 +29,7 @@ local SharedFlags2 = require(parent.SharedFlags)
 local FFlagLuaAppDefaultHttpRetry = SharedFlags2.FFlagLuaAppDefaultHttpRetry
 
 local FFlagGateLoginStreaksByAchievementAvailability = require(Achievements.Flags.FFlagGateLoginStreaksByAchievementAvailability)
+local FFlagFixAvatarSaveAchievementListenerRace = require(Achievements.Flags.FFlagFixAvatarSaveAchievementListenerRace)
 
 local engineFeature = game:GetEngineFeature("AchievementServiceIsAchievementAvailable")
 local config = HttpRequest.config
@@ -149,14 +150,36 @@ function InAppAchievementManager:setupAchievements(callback, callback2)
 		end)
 	end
 
+	if FFlagFixAvatarSaveAchievementListenerRace and self.saveAvatarCompletedConnection then
+		self.saveAvatarCompletedConnection:Disconnect()
+		self.saveAvatarCompletedConnection = nil
+	end
+
 	if self.achievementOneNameManyFaces.hasAchieved == false then
-		self.saveAvatarCompletedConnection = self.avatarEditorService.PromptSaveAvatarCompleted:Connect(function(p)
-			if p == Enum.AvatarPromptResult.Success then
-				callback2(true)
-				self.saveAvatarCompletedConnection:Disconnect()
-				self.saveAvatarCompletedConnection = nil
-			end
-		end)
+		if FFlagFixAvatarSaveAchievementListenerRace then
+			local promptSaveAvatarCompletedConnection = nil
+			promptSaveAvatarCompletedConnection = self.avatarEditorService.PromptSaveAvatarCompleted:Connect(function(p)
+				if p == Enum.AvatarPromptResult.Success and promptSaveAvatarCompletedConnection.Connected then
+					promptSaveAvatarCompletedConnection:Disconnect()
+
+					if self.saveAvatarCompletedConnection == promptSaveAvatarCompletedConnection then
+						self.saveAvatarCompletedConnection = nil
+					end
+
+					callback2(true)
+				end
+			end)
+
+			self.saveAvatarCompletedConnection = promptSaveAvatarCompletedConnection
+		else
+			self.saveAvatarCompletedConnection = self.avatarEditorService.PromptSaveAvatarCompleted:Connect(function(p)
+				if p == Enum.AvatarPromptResult.Success then
+					callback2(true)
+					self.saveAvatarCompletedConnection:Disconnect()
+					self.saveAvatarCompletedConnection = nil
+				end
+			end)
+		end
 	end
 end
 

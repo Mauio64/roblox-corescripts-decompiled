@@ -11,7 +11,6 @@ local Foundation = require(parent3.Foundation)
 local IconSize = Foundation.Enums.IconSize
 local Loading = Foundation.Loading
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local withStyle = UIBlox.Core.Style.withStyle
 
@@ -96,8 +95,7 @@ function extended:renderAlert(p)
 	return withStyle(function(props2)
 		local theme = props2.Theme
 		local font = props2.Font
-		local createElement = Roact.createElement
-		local v3 = {
+		return Roact.createElement("Frame", {
 			BackgroundColor3 = theme.BackgroundUIContrast.Color,
 			BackgroundTransparency = self.animationProgress:map(function(p2)
 				if not props.showOverlay then
@@ -112,8 +110,7 @@ function extended:renderAlert(p)
 			end),
 			Size = UDim2.new(1, 0, 1, 0),
 			Visible = props.showOverlay
-		}
-		local children = {
+		}, {
 			StopPropagationOverlay = Roact.createElement("TextButton", {
 				Active = false,
 				BorderSizePixel = 0,
@@ -123,81 +120,47 @@ function extended:renderAlert(p)
 				Text = "",
 				ZIndex = 0
 			}),
-			MiddleContent = 0,
-			Children = 0
-		}
-
-		local createElement2 = Roact.createElement
-		local v4 = {
-			Size = UDim2.new(1, 0, 1, 0),
-			BorderSizePixel = 0,
-			BackgroundTransparency = 1,
-			ZIndex = 1
-		}
-
-		local v5 = {
-			Layout = Roact.createElement("UIListLayout", {
-				FillDirection = Enum.FillDirection.Vertical,
-				HorizontalAlignment = Enum.HorizontalAlignment.Center,
-				VerticalAlignment = Enum.VerticalAlignment.Center,
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				Padding = UDim.new(0, 20),
-				[Roact.Change.AbsoluteContentSize] = self.onListLayoutAbsoluteContentSizeChanged
-			}),
-			Spinner = v2 and Roact.createElement(Loading, {
-				size = IconSize.Large,
-				Position = UDim2.fromScale(0.5, 0.5),
-				AnchorPoint = Vector2.new(0.5, 0.5)
-			}) or nil,
-			PreText = 0
-		}
-		local preText
-
-		if loadingMessage then
-			local createElement3 = Roact.createElement
-			local v6 = {
-				LayoutOrder = 1,
-				BackgroundTransparency = 1,
-				AutomaticSize = Enum.AutomaticSize.XY,
-				TextWrapped = true,
-				Font = 0,
-				FontFace = 0,
-				Text = 0,
-				TextSize = 0,
-				TextColor3 = 0,
-				TextTransparency = 0
-			}
-			local font2
-
-			if not FoundationFontFaceMigration then
-				font2 = font.Body.Font
-			end
-
-			v6.Font = font2
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
-			end
-
-			v6.FontFace = fontFace
-
-			v6.Text = loadingMessage
-			v6.TextSize = font.BaseSize * font.Body.RelativeSize
-			v6.TextColor3 = theme.TextDefault.Color
-			v6.TextTransparency = theme.TextDefault.Transparency
-			preText = createElement3("TextLabel", v6) or nil
-		end
-
-		v5.PreText = preText
-		children.MiddleContent = createElement2("Frame", v4, v5)
-
-		children.Children = Roact.createElement(
-			"Frame",
-			{ Size = UDim2.new(1, 0, 1, 0), BorderSizePixel = 0, BackgroundTransparency = 1 },
-			self.props[Roact.Children]
-		)
-		return createElement("Frame", v3, children)
+			MiddleContent = Roact.createElement(
+				"Frame",
+				{
+					Size = UDim2.new(1, 0, 1, 0),
+					BorderSizePixel = 0,
+					BackgroundTransparency = 1,
+					ZIndex = 1
+				},
+				{
+					Layout = Roact.createElement("UIListLayout", {
+						FillDirection = Enum.FillDirection.Vertical,
+						HorizontalAlignment = Enum.HorizontalAlignment.Center,
+						VerticalAlignment = Enum.VerticalAlignment.Center,
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						Padding = UDim.new(0, 20),
+						[Roact.Change.AbsoluteContentSize] = self.onListLayoutAbsoluteContentSizeChanged
+					}),
+					Spinner = v2 and Roact.createElement(Loading, {
+						size = IconSize.Large,
+						Position = UDim2.fromScale(0.5, 0.5),
+						AnchorPoint = Vector2.new(0.5, 0.5)
+					}) or nil,
+					PreText = loadingMessage and Roact.createElement("TextLabel", {
+						LayoutOrder = 1,
+						BackgroundTransparency = 1,
+						AutomaticSize = Enum.AutomaticSize.XY,
+						TextWrapped = true,
+						FontFace = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font),
+						Text = loadingMessage,
+						TextSize = font.BaseSize * font.Body.RelativeSize,
+						TextColor3 = theme.TextDefault.Color,
+						TextTransparency = theme.TextDefault.Transparency
+					}) or nil
+				}
+			),
+			Children = Roact.createElement(
+				"Frame",
+				{ Size = UDim2.new(1, 0, 1, 0), BorderSizePixel = 0, BackgroundTransparency = 1 },
+				self.props[Roact.Children]
+			)
+		})
 	end)
 end
 

@@ -12,6 +12,7 @@ local BottomLockedScrollView = require(script.Parent.BottomLockedScrollView)
 local TextLineEntry = require(script.Parent.TextLineEntry)
 local BubbleEntry = require(script.Parent.BubbleEntry)
 require(ChatUIPrimitives.Types)
+local FFlagExpChatLatestUsernameWithoutRender = require(ChatUIPrimitives.Flags.FFlagExpChatLatestUsernameWithoutRender)
 
 local function createSlotElementFactory(p, getMessagesMap, fontFace, selectableRows: boolean?, selectionCursor, isTranslationSettingEnabled: boolean?, getLatestMessageId, onLatestUsernameChanged) -- 1 equivalent call inferred from this helper
 	return function(p2)
@@ -49,7 +50,7 @@ local function MessageLayoutContainer(props)
 		end)
 	end, { messagesSignal })
 
-	local getLatestMessageId = React.useMemo(function()
+	local v2 = React.useMemo(function()
 		if props.selectableRows then
 			return Signals.createComputed(function(p)
 				local v2 = messageIdsSignal(p)
@@ -60,51 +61,66 @@ local function MessageLayoutContainer(props)
 		return nil
 	end, { messageIdsSignal, props.selectableRows })
 
-	local getMessagesMap = useMessagesMap(messagesSignal)
-	local v2
+	if FFlagExpChatLatestUsernameWithoutRender then
+		local onLatestUsernameChanged = props.onLatestUsernameChanged
+		React.useEffect(function()
+			if v2 == nil or onLatestUsernameChanged == nil then
+				return nil
+			end
 
-	if props.layoutStyle == "bubble" then
-		v2 = BubbleEntry
-	else
-		v2 = TextLineEntry
+			return Signals.createEffect(function(p)
+				if v2(p) == nil then
+					onLatestUsernameChanged(nil)
+				end
+			end)
+		end, { v2, onLatestUsernameChanged })
 	end
 
-	local v3 = useMessagePool({
+	local getMessagesMap = useMessagesMap(messagesSignal)
+	local v3
+
+	if props.layoutStyle == "bubble" then
+		v3 = BubbleEntry
+	else
+		v3 = TextLineEntry
+	end
+
+	local v4 = useMessagePool({
 		messageIdsSignal = messageIdsSignal,
 		createSlotElement = React.useMemo(function()
 			return createSlotElementFactory( -- inferred equivalent call
-				v2,
+				v3,
 				getMessagesMap,
 				props.fontFace,
 				props.selectableRows,
 				props.selectionCursor,
 				props.isTranslationSettingEnabled,
-				getLatestMessageId,
+				v2,
 				props.onLatestUsernameChanged
 			)
 		end, {
-			v2,
+			v3,
 			getMessagesMap,
 			props.fontFace or false,
 			props.selectableRows or false,
 			props.selectionCursor or false,
 			props.isTranslationSettingEnabled or false,
-			getLatestMessageId,
+			v2,
 			props.onLatestUsernameChanged or false
 		})
 	})
 
-	local v4 = SignalsReact.useSignalState(v3)
+	local v5 = SignalsReact.useSignalState(v4)
 
 	local children = React.useMemo(function()
-		local clone = table.clone(v4)
+		local clone = table.clone(v5)
 		clone["$layout"] = React.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			Padding = UDim.new(0, 2)
 		})
 
 		return clone
-	end, { v4 })
+	end, { v5 })
 
 	return React.createElement(Foundation.View, {
 		tag = "fill padding-y-xsmall",

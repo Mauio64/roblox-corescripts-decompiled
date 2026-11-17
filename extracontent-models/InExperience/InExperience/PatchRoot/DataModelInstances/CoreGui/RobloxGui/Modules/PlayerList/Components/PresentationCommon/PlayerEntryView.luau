@@ -31,7 +31,6 @@ local ControlState = Foundation.Enums.ControlState
 local View = Foundation.View
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
 local useTokens = Foundation.Hooks.useTokens
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local EntryFrameView = PlayerList.Presentation.EntryFrameView
 local StatEntryContainer = require(parent3.Components.Container.StatEntryContainer)
@@ -268,14 +267,7 @@ local function PlayerEntryView(props)
 	local enabled = Enabled()
 	local layoutValues = useLayoutValues()
 	local v4 = useStyle()
-	local v5
-
-	if FoundationFontFaceMigration then
-		v5 = useTokens()
-	else
-		v5 = nil
-	end
-
+	local v5 = useTokens()
 	local size
 
 	if props.size then
@@ -451,17 +443,10 @@ local function PlayerEntryView(props)
 			if v6 then
 				local v13 = {
 					Font = v4.Font.CaptionHeader.Font,
-					FontFace = 0,
+					FontFace = normalizeFontFace(v5.Typography.CaptionMedium.Font),
 					Size = 0,
 					MinSize = 0
 				}
-				local fontFace
-
-				if FoundationFontFaceMigration then
-					fontFace = normalizeFontFace(v5.Typography.CaptionMedium.Font)
-				end
-
-				v13.FontFace = fontFace
 				local size2
 
 				if FFlagEnableMobilePlayerListOnConsole then
@@ -482,14 +467,12 @@ local function PlayerEntryView(props)
 				v13.MinSize = minSize
 				return v13
 			else
-				local v13 = { Font = v4.Font.CaptionBody.Font, FontFace = 0, Size = 0, MinSize = 0 }
-				local fontFace
-
-				if FoundationFontFaceMigration then
-					fontFace = normalizeFontFace(v5.Typography.BodySmall.Font)
-				end
-
-				v13.FontFace = fontFace
+				local v13 = {
+					Font = v4.Font.CaptionBody.Font,
+					FontFace = normalizeFontFace(v5.Typography.BodySmall.Font),
+					Size = 0,
+					MinSize = 0
+				}
 				local size2
 
 				if FFlagEnableMobilePlayerListOnConsole then
@@ -512,64 +495,34 @@ local function PlayerEntryView(props)
 			end
 		elseif isTenFoot then
 			if props.titlePlayerEntry then
-				local v13 = {
+				return {
 					Font = layoutValues.TitlePlayerEntryFont,
-					FontFace = 0,
-					Size = 0,
-					MinSize = 0
+					FontFace = normalizeFontFace(layoutValues.TitlePlayerEntryFont),
+					Size = layoutValues.PlayerNameTextSize,
+					MinSize = layoutValues.PlayerNameTextSize
 				}
-				local fontFace
-
-				if FoundationFontFaceMigration then
-					fontFace = normalizeFontFace(layoutValues.TitlePlayerEntryFont)
-				end
-
-				v13.FontFace = fontFace
-				v13.Size = layoutValues.PlayerNameTextSize
-				v13.MinSize = layoutValues.PlayerNameTextSize
-				return v13
-			else
-				local v13 = {
-					Font = layoutValues.PlayerEntryFont,
-					FontFace = 0,
-					Size = 0,
-					MinSize = 0
-				}
-				local fontFace
-
-				if FoundationFontFaceMigration then
-					fontFace = normalizeFontFace(layoutValues.PlayerEntryFont)
-				end
-
-				v13.FontFace = fontFace
-				v13.Size = layoutValues.PlayerNameTextSize
-				v13.MinSize = layoutValues.PlayerNameTextSize
-				return v13
 			end
+
+			return {
+				Font = layoutValues.PlayerEntryFont,
+				FontFace = normalizeFontFace(layoutValues.PlayerEntryFont),
+				Size = layoutValues.PlayerNameTextSize,
+				MinSize = layoutValues.PlayerNameTextSize
+			}
 		elseif v6 then
-			local v13 = { Font = v4.Font.CaptionHeader.Font, FontFace = 0, Size = 0, MinSize = 0 }
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(v5.Typography.CaptionMedium.Font)
-			end
-
-			v13.FontFace = fontFace
-			v13.Size = v4.Font.CaptionHeader.RelativeSize * v4.Font.BaseSize
-			v13.MinSize = v4.Font.Footer.RelativeMinSize * v4.Font.BaseSize
-			return v13
+			return {
+				Font = v4.Font.CaptionHeader.Font,
+				FontFace = normalizeFontFace(v5.Typography.CaptionMedium.Font),
+				Size = v4.Font.CaptionHeader.RelativeSize * v4.Font.BaseSize,
+				MinSize = v4.Font.Footer.RelativeMinSize * v4.Font.BaseSize
+			}
 		else
-			local v13 = { Font = v4.Font.CaptionBody.Font, FontFace = 0, Size = 0, MinSize = 0 }
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(v5.Typography.BodySmall.Font)
-			end
-
-			v13.FontFace = fontFace
-			v13.Size = v4.Font.CaptionBody.RelativeSize * v4.Font.BaseSize
-			v13.MinSize = v4.Font.Footer.RelativeMinSize * v4.Font.BaseSize
-			return v13
+			return {
+				Font = v4.Font.CaptionBody.Font,
+				FontFace = normalizeFontFace(v5.Typography.BodySmall.Font),
+				Size = v4.Font.CaptionBody.RelativeSize * v4.Font.BaseSize,
+				MinSize = v4.Font.Footer.RelativeMinSize * v4.Font.BaseSize
+			}
 		end
 	end, { isSmallTouchDevice, isTenFoot, v6, v4, layoutValues, v5 })
 

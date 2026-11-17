@@ -560,29 +560,29 @@ local function SquadLobby(props)
 		for k, v32 in pairs(v29) do
 			if v32 ~= nil and k ~= tostring(v4) then
 				local userPresenceType = v32.userPresenceType
-				local v40
+				local v41
 
 				if FFlagSquadsPresenceStoreMigration then
-					v40 = presenceType2.Online
+					v41 = presenceType2.Online
 				else
-					v40 = presenceType.Online
+					v41 = presenceType.Online
 				end
 
-				if userPresenceType == v40 then
+				if userPresenceType == v41 then
 					return true
 				end
 
 				local userPresenceType2 = v32.userPresenceType
-				local v41
+				local v42
 
 				if FFlagSquadsPresenceStoreMigration then
-					v41 = presenceType2.InGame
+					v42 = presenceType2.InGame
 				else
-					v41 = presenceType.InGame
+					v42 = presenceType.InGame
 				end
 
 				if
-					userPresenceType2 ~= v41
+					userPresenceType2 ~= v42
 					or v31.gameId == (FFlagSquadsPresenceStoreMigration and "" or nil)
 					or v32.gameId == (FFlagSquadsPresenceStoreMigration and "" or nil)
 					or v31.gameId == v32.gameId
@@ -599,16 +599,16 @@ local function SquadLobby(props)
 	local v32
 
 	if luckyRecommendationExperimentation.getLuckyRecommendationEnabled() then
-		local v39 = members ~= nil and #members >= 2
-		v32 = not props.isInExperience and v39
+		local v40 = members ~= nil and #members >= 2
+		v32 = not props.isInExperience and v40
 	else
 		v32 = false
 	end
 
-	local v39 = v2.Size.Size_1000 + v2.Padding.Medium * 2
-	local v40 = fFlagEnableSquadRegroupExperimentationSmallScreenFix and v31
+	local v40 = v2.Size.Size_1000 + v2.Padding.Medium * 2
+	local v41 = fFlagEnableSquadRegroupExperimentationSmallScreenFix and v31
 
-	local v41 = (not v31 or v40) and not v32 and 0 or v2.Gap.XXLarge + v39
+	local v42 = (not v31 or v41) and not v32 and 0 or v2.Gap.XXLarge + v40
 
 	local squadLobbyBanners = react.useMemo(function()
 		if defineFastFlag then
@@ -627,9 +627,9 @@ local function SquadLobby(props)
 	local useMemo = react.useMemo
 	local function fn2()
 		local createElement = react.createElement
-		local v45 = {
+		local v46 = {
 			Position = UDim2.fromOffset(0, state),
-			Size = UDim2.new(1, 0, 1, -(state + v41)),
+			Size = UDim2.new(1, 0, 1, -(state + v42)),
 			AutomaticCanvasSize = Enum.AutomaticSize.Y,
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
@@ -644,7 +644,7 @@ local function SquadLobby(props)
 		}
 		local frameContents
 
-		if v40 then
+		if v41 then
 			frameContents = react.createElement(
 				foundation.View,
 				{ tag = "auto-y size-full-0 bg-surface-0 col align-x-center align-y-top" },
@@ -654,7 +654,7 @@ local function SquadLobby(props)
 						{ tag = "auto-y size-full-0 bg-surface-0", LayoutOrder = 1 },
 						{
 							SquadLobbyUserGrid = react.createElement(SquadLobbyUserGrid, {
-								containerSize = state3 - Vector2.new(0, v25 + v2.Gap.Medium + v39),
+								containerSize = state3 - Vector2.new(0, v25 + v2.Gap.Medium + v40),
 								paddingBottom = UDim.new(0, 0),
 								users = state4,
 								isInExperience = props.isInExperience,
@@ -681,7 +681,7 @@ local function SquadLobby(props)
 					}),
 					SquadLobbyRegroupRow = react.createElement(
 						foundation.View,
-						{ tag = "bg-surface-0", Size = UDim2.new(1, 0, 0, v39), LayoutOrder = 3 },
+						{ tag = "bg-surface-0", Size = UDim2.new(1, 0, 0, v40), LayoutOrder = 3 },
 						{
 							Row = react.createElement(SquadLobbyRegroupRow, { localUserId = v4 })
 						}
@@ -697,7 +697,7 @@ local function SquadLobby(props)
 
 		local squadLobbyUserGrid
 
-		if not v40 then
+		if not v41 then
 			squadLobbyUserGrid = react.createElement(SquadLobbyUserGrid, {
 				containerSize = state3 - Vector2.new(0, v25),
 				paddingBottom = UDim.new(0, v25),
@@ -719,29 +719,29 @@ local function SquadLobby(props)
 			})
 		end
 
-		return createElement("ScrollingFrame", v45, {
+		return createElement("ScrollingFrame", v46, {
 			FrameContents = frameContents,
 			SquadLobbyUserGrid = squadLobbyUserGrid
 		})
 	end
 
 	local navigateToHomePage = props.navigateToHomePage
-	local v45
-
-	if v31 or v32 then
-		v45 = v41
-	end
-
 	local v46
 
-	if v40 then
-		v46 = v39
+	if v31 or v32 then
+		v46 = v42
 	end
 
 	local v47
 
-	if v40 then
-		v47 = v4
+	if v41 then
+		v47 = v40
+	end
+
+	local v48
+
+	if v41 then
+		v48 = v4
 	end
 
 	local squadLobbyUsersScrollingFrame = useMemo(fn2, {
@@ -754,18 +754,18 @@ local function SquadLobby(props)
 		navigateToHomePage,
 		v25,
 		state,
-		v45,
-		state4,
-		v40,
 		v46,
+		state4,
+		v41,
 		v47,
+		v48,
 		voiceStatus,
 		props.openSquadVoiceAbuseReport
 	})
 
 	local squadLobbyActionBar = react.useMemo(function()
 		local createElement = react.createElement
-		local v50 = {
+		local v51 = {
 			squadState = squadState,
 			anchorPoint = Vector2.new(0.5, 1),
 			hasUnreadMessages = 0,
@@ -785,16 +785,16 @@ local function SquadLobby(props)
 			hasUnreadMessages = false
 		end
 
-		v50.hasUnreadMessages = hasUnreadMessages
+		v51.hasUnreadMessages = hasUnreadMessages
 
-		v50.navigateAwayFromSquad = props.navigateAwayFromSquad
-		v50.navigateToChat = props.navigateToChat
-		v50.navigateToHomePage = props.navigateToHomePage
-		v50.toggleVoiceChatMenu = toggleVoiceChatMenu
-		v50.position = UDim2.new(0.5, 0, 1, -20)
-		v50.squadId = squadId2
-		v50.isInExperience = props.isInExperience
-		return createElement(SquadLobbyActionBar, v50)
+		v51.navigateAwayFromSquad = props.navigateAwayFromSquad
+		v51.navigateToChat = props.navigateToChat
+		v51.navigateToHomePage = props.navigateToHomePage
+		v51.toggleVoiceChatMenu = toggleVoiceChatMenu
+		v51.position = UDim2.new(0.5, 0, 1, -20)
+		v51.squadId = squadId2
+		v51.isInExperience = props.isInExperience
+		return createElement(SquadLobbyActionBar, v51)
 	end, {
 		squadId2,
 		props.isInExperience,
@@ -806,32 +806,32 @@ local function SquadLobby(props)
 	})
 
 	local squadLobbyRegroupRow = react.useMemo(function()
-		if v40 or not v31 then
+		if v41 or not v31 then
 			return nil
 		end
 
 		return react.createElement(foundation.View, {
 			tag = "anchor-bottom-center auto-none gui-object-defaults",
 			Position = UDim2.new(0.5, 0, 1, -(20 + Constants.SQUAD_LOBBY_ACTION_BAR_HEIGHT + v2.Gap.XXLarge)),
-			Size = UDim2.new(1, 0, 0, v39)
+			Size = UDim2.new(1, 0, 0, v40)
 		}, {
 			Row = react.createElement(SquadLobbyRegroupRow, { localUserId = v4 })
 		})
-	end, { v31, v4, v2, v39 })
+	end, { v31, v4, v2, v40 })
 
 	local squadLobbyLuckyRecommendationRow = react.useMemo(function()
 		if v32 then
 			return react.createElement(foundation.View, {
 				tag = "anchor-bottom-center auto-none gui-object-defaults",
 				Position = UDim2.new(0.5, 0, 1, -(20 + Constants.SQUAD_LOBBY_ACTION_BAR_HEIGHT + v2.Gap.XXLarge)),
-				Size = UDim2.new(1, 0, 0, v39)
+				Size = UDim2.new(1, 0, 0, v40)
 			}, {
 				Row = react.createElement(SquadLobbyLuckyRecommendationRow)
 			})
 		end
 
 		return nil
-	end, { v32, v2, v39 })
+	end, { v32, v2, v40 })
 
 	local squadLobbyVoiceChatMenu = react.useMemo(function()
 		if not state2 then
@@ -840,7 +840,7 @@ local function SquadLobby(props)
 
 		local createElement = react.createElement
 		local view = foundation.View
-		local v53 = {
+		local v54 = {
 			Size = UDim2.new(1, 0, 1, 0),
 			stateLayer = { affordance = stateLayerAffordance.None },
 			onActivated = function()
@@ -851,7 +851,7 @@ local function SquadLobby(props)
 
 		local createElement2 = react.createElement
 		local scrollView = foundation.ScrollView
-		local v55 = {
+		local v56 = {
 			Size = UDim2.new(1, 0, 1, 0),
 			Position = UDim2.new(0.5, 0, 0, 0),
 			AnchorPoint = Vector2.new(0.5, 0),
@@ -883,7 +883,7 @@ local function SquadLobby(props)
 
 		local createElement3 = react.createElement
 		local view2 = foundation.View
-		local v56 = {
+		local v57 = {
 			Size = UDim2.new(1, 0, 1, 0),
 			flexItem = { ItemLineAlignment = Enum.ItemLineAlignment.Center },
 			AutomaticSize = Enum.AutomaticSize.Y,
@@ -901,7 +901,7 @@ local function SquadLobby(props)
 			openSquadVoiceChangers = props.openSquadVoiceChangers
 		end
 
-		children.Menu = createElement3(view2, v56, {
+		children.Menu = createElement3(view2, v57, {
 			SquadLobbyVoiceChatMenu = createElement4(SquadLobbyVoiceChatMenu, {
 				openSquadVoiceChangers = openSquadVoiceChangers
 			})
@@ -915,7 +915,7 @@ local function SquadLobby(props)
 				setState2(false)
 			end
 		})
-		return (createElement(view, v53, { createElement2(scrollView, v55, children) }))
+		return (createElement(view, v54, { createElement2(scrollView, v56, children) }))
 	end, { v26, state2, setState2, v2 })
 
 	local userDropdownMenu = react.useMemo(function()

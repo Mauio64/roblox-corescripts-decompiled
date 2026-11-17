@@ -6,7 +6,6 @@ local React = require(parent.React)
 local UIBlox = require(parent.UIBlox)
 local Foundation = require(parent.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local Localization = require(parent.Localization)
 local useLocalization = Localization.Hooks.useLocalization
 local Responsive = require(parent.Responsive)
@@ -131,8 +130,7 @@ return function(p)
 		Size = UDim2.new(1, 0, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
-		Font = 0,
-		FontFace = 0,
+		FontFace = normalizeFontFace(v5.Tokens.Typography.TitleLarge.Font),
 		LayoutOrder = 0,
 		Text = 0,
 		TextColor3 = 0,
@@ -140,20 +138,6 @@ return function(p)
 		TextTransparency = 0,
 		TextXAlignment = 0
 	}
-	local font2
-
-	if not FoundationFontFaceMigration then
-		font2 = font.Header2.Font
-	end
-
-	v10.Font = font2
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(v5.Tokens.Typography.TitleLarge.Font)
-	end
-
-	v10.FontFace = fontFace
 	local text
 
 	if p.selectionLimit then

@@ -419,11 +419,12 @@ local function createCommentsMockNetwork(options)
 								message = "invalid author-comment DELETE path"
 							})
 						else
-							set[commentKey(v4, v5)] = true -- inferred equivalent call
-							local v6 = v[v4]
+							local v6 = commentKey(v4, v5) -- inferred equivalent call
+							set[v6] = true
+							local v7 = v[v4]
 
-							if v6 ~= nil then
-								v6[v5] = nil
+							if v7 ~= nil then
+								v7[v5] = nil
 							end
 
 							return { statusCode = 204, responseBody = nil }

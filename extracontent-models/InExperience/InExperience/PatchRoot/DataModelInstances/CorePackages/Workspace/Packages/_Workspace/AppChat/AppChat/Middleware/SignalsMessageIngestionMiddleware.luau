@@ -26,9 +26,12 @@ local MessageVisibility = Enums.MessageVisibility
 local GetFFlagEnableSocialCards = SharedFlags.GetFFlagEnableSocialCards
 
 local GetConversationMessageViewModelStore = require(AppChat.Stores.GetConversationMessageViewModelStore)
+local GetMessageReactionsStore = require(AppChat.Stores.GetMessageReactionsStore)
+local GetMessageReactionsViewModelStore = require(AppChat.Stores.GetMessageReactionsViewModelStore)
 
 local FFlagAppChatIncrementalPaginationProjection = require(AppChat.Flags.FFlagAppChatIncrementalPaginationProjection)
 local FFlagAppChatSignalsMessageStore = require(AppChat.Flags.FFlagAppChatSignalsMessageStore)
+local FFlagAppChatEnableReactions = SharedFlags.FFlagAppChatEnableReactions
 
 local function determineStatus(isSending: boolean?, failed: boolean?, moderated: boolean?, visibility: string?) -- 1 equivalent call inferred from this helper
 	if isSending then
@@ -170,6 +173,11 @@ local function clearConversationStores(data, conversationId: string)
 
 	for _, orderedId in orderedIds do
 		data.conversationMessageStore.removeMessage(orderedId)
+	end
+
+	if FFlagAppChatEnableReactions then
+		GetMessageReactionsStore(false).evictMessageReactions(orderedIds)
+		GetMessageReactionsViewModelStore(false).evictMessages(orderedIds)
 	end
 
 	data.conversationMessageViewModelStore.evictConversation(conversationId)

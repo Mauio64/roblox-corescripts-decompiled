@@ -5,7 +5,6 @@ local React = require(parent.React)
 local UIBlox = require(parent.UIBlox)
 local Foundation = require(parent.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local useStyle = UIBlox.Core.Style.useStyle
 
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
@@ -211,130 +210,81 @@ return (React.memo(function(p)
 
 		local v7 = math.max(constants.MIN_TEXTBOX_HEIGHT, (math.min(constants.MAX_TEXTBOX_HEIGHT, v6)))
 
-		local createElement = React.createElement
-		local v8 = {
+		return React.createElement("Frame", {
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1, 0, 0, v7 + 16 + 24),
 			Selectable = false
-		}
-
-		local children = {
+		}, {
 			Layout = React.createElement("UIListLayout", {
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				Padding = UDim.new(0, 16),
 				FillDirection = Enum.FillDirection.Vertical,
 				HorizontalAlignment = Enum.HorizontalAlignment.Left
 			}),
-			Intro = 0,
-			TextBoxFrame = 0
-		}
-
-		local createElement2 = React.createElement
-		local v9 = {
-			BackgroundTransparency = 1,
-			Text = v3.Intro,
-			TextWrapped = true,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			TextYAlignment = Enum.TextYAlignment.Top,
-			TextColor3 = v.Theme.TextEmphasis.Color,
-			TextTransparency = v.Theme.TextEmphasis.Transparency,
-			Font = 0,
-			FontFace = 0,
-			TextSize = 0,
-			Size = 0,
-			AutomaticSize = 0,
-			LayoutOrder = 0,
-			Selectable = false
-		}
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = body.Font
-		end
-
-		v9.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(v.Tokens.Typography.BodyLarge.Font)
-		end
-
-		v9.FontFace = fontFace
-
-		v9.TextSize = textSize
-		v9.Size = UDim2.new(1, 0, 0, 0)
-		v9.AutomaticSize = Enum.AutomaticSize.Y
-		children.Intro = createElement2("TextLabel", v9)
-
-		local createElement3 = React.createElement
-		local v10 = {
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 0, v7),
-			LayoutOrder = 1,
-			Selectable = false
-		}
-
-		local createElement4 = React.createElement
-		local v11 = {
-			Size = UDim2.new(1, 0, 1, 0),
-			BackgroundTransparency = 1,
-			Image = component_assetscircle_21,
-			ImageTransparency = v.Theme.UIMuted.Transparency,
-			ImageColor3 = v.Theme.UIMuted.Color,
-			ScaleType = Enum.ScaleType.Slice,
-			SliceCenter = Rect.new(8, 8, 9, 9),
-			Selectable = false
-		}
-
-		local v12 = {
-			Padding = React.createElement("UIPadding", {
-				PaddingTop = UDim.new(0, 12),
-				PaddingBottom = UDim.new(0, 12),
-				PaddingLeft = UDim.new(0, 12),
-				PaddingRight = UDim.new(0, 12)
+			Intro = React.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				Text = v3.Intro,
+				TextWrapped = true,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				TextYAlignment = Enum.TextYAlignment.Top,
+				TextColor3 = v.Theme.TextEmphasis.Color,
+				TextTransparency = v.Theme.TextEmphasis.Transparency,
+				FontFace = normalizeFontFace(v.Tokens.Typography.BodyLarge.Font),
+				TextSize = textSize,
+				Size = UDim2.new(1, 0, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				LayoutOrder = 0,
+				Selectable = false
 			}),
-			TextBox = 0
-		}
-
-		local createElement5 = React.createElement
-		local v13 = {}
-		v13.Size = UDim2.new(1, 0, 1, 0)
-		v13.BackgroundTransparency = 1
-		v13.Text = state2
-		v13.PlaceholderText = placeholder
-		v13.TextWrapped = true
-		v13.TextXAlignment = Enum.TextXAlignment.Left
-		v13.TextYAlignment = Enum.TextYAlignment.Top
-		v13.TextColor3 = v.Theme.TextEmphasis.Color
-		v13.TextTransparency = v.Theme.TextEmphasis.Transparency
-		v13.PlaceholderColor3 = v.Theme.TextMuted.Color
-		local font2
-
-		if not FoundationFontFaceMigration then
-			font2 = body.Font
-		end
-
-		v13.Font = font2
-		local fontFace2
-
-		if FoundationFontFaceMigration then
-			fontFace2 = normalizeFontFace(v.Tokens.Typography.BodyLarge.Font)
-		end
-
-		v13.FontFace = fontFace2
-
-		v13.TextSize = textSize
-		v13.ClearTextOnFocus = false
-		v13.MultiLine = true
-		v13.OverlayNativeInput = true
-		v13.ref = ref
-		v13[React.Change.Text] = v5
-		v13[React.Tag] = "data-testid=feedbackTextBox"
-		v12.TextBox = createElement5("TextBox", v13)
-		children.TextBoxFrame = createElement3("Frame", v10, {
-			InputBg = createElement4(ImageSetLabel, v11, v12)
+			TextBoxFrame = React.createElement(
+				"Frame",
+				{
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, 0, 0, v7),
+					LayoutOrder = 1,
+					Selectable = false
+				},
+				{
+					InputBg = React.createElement(ImageSetLabel, {
+						Size = UDim2.new(1, 0, 1, 0),
+						BackgroundTransparency = 1,
+						Image = component_assetscircle_21,
+						ImageTransparency = v.Theme.UIMuted.Transparency,
+						ImageColor3 = v.Theme.UIMuted.Color,
+						ScaleType = Enum.ScaleType.Slice,
+						SliceCenter = Rect.new(8, 8, 9, 9),
+						Selectable = false
+					}, {
+						Padding = React.createElement("UIPadding", {
+							PaddingTop = UDim.new(0, 12),
+							PaddingBottom = UDim.new(0, 12),
+							PaddingLeft = UDim.new(0, 12),
+							PaddingRight = UDim.new(0, 12)
+						}),
+						TextBox = React.createElement("TextBox", {
+							Size = UDim2.new(1, 0, 1, 0),
+							BackgroundTransparency = 1,
+							Text = state2,
+							PlaceholderText = placeholder,
+							TextWrapped = true,
+							TextXAlignment = Enum.TextXAlignment.Left,
+							TextYAlignment = Enum.TextYAlignment.Top,
+							TextColor3 = v.Theme.TextEmphasis.Color,
+							TextTransparency = v.Theme.TextEmphasis.Transparency,
+							PlaceholderColor3 = v.Theme.TextMuted.Color,
+							FontFace = normalizeFontFace(v.Tokens.Typography.BodyLarge.Font),
+							TextSize = textSize,
+							ClearTextOnFocus = false,
+							MultiLine = true,
+							OverlayNativeInput = true,
+							ref = ref,
+							[React.Change.Text] = v5,
+							[React.Tag] = "data-testid=feedbackTextBox"
+						})
+					})
+				}
+			)
 		})
-		return createElement("Frame", v8, children)
 	end, { v, state2, v5 })
 
 	local buttonStackInfo = React.useMemo(function()
@@ -365,56 +315,33 @@ return (React.memo(function(p)
 			text = string.gsub(text, "Roblox Terms of Use", "<u>Roblox Terms of Use</u>", 1)
 		end
 
-		local createElement = React.createElement
-		local v6 = {
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 0, 0),
-			AutomaticSize = Enum.AutomaticSize.Y
-		}
-		local v7 = {
-			Pad = React.createElement("UIPadding", { PaddingTop = UDim.new(0, 12) }),
-			Note = 0
-		}
-
-		local createElement2 = React.createElement
-		local v8 = {
-			BackgroundTransparency = 1,
-			Text = text,
-			RichText = true,
-			TextWrapped = true,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			TextYAlignment = Enum.TextYAlignment.Top,
-			TextSize = math.floor(v.Font.CaptionHeader.RelativeSize * v.Font.BaseSize),
-			Font = 0,
-			FontFace = 0,
-			TextColor3 = 0,
-			TextTransparency = 0,
-			Size = 0,
-			AutomaticSize = 0,
-			LayoutOrder = 1,
-			Selectable = false
-		}
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = v.Font.CaptionHeader.Font
-		end
-
-		v8.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(v.Tokens.Typography.CaptionLarge.Font)
-		end
-
-		v8.FontFace = fontFace
-
-		v8.TextColor3 = v.Theme.TextMuted.Color
-		v8.TextTransparency = v.Theme.TextMuted.Transparency
-		v8.Size = UDim2.new(1, 0, 0, 0)
-		v8.AutomaticSize = Enum.AutomaticSize.Y
-		v7.Note = createElement2("TextLabel", v8)
-		return createElement("Frame", v6, v7)
+		return React.createElement(
+			"Frame",
+			{
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y
+			},
+			{
+				Pad = React.createElement("UIPadding", { PaddingTop = UDim.new(0, 12) }),
+				Note = React.createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					Text = text,
+					RichText = true,
+					TextWrapped = true,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextYAlignment = Enum.TextYAlignment.Top,
+					TextSize = math.floor(v.Font.CaptionHeader.RelativeSize * v.Font.BaseSize),
+					FontFace = normalizeFontFace(v.Tokens.Typography.CaptionLarge.Font),
+					TextColor3 = v.Theme.TextMuted.Color,
+					TextTransparency = v.Theme.TextMuted.Transparency,
+					Size = UDim2.new(1, 0, 0, 0),
+					AutomaticSize = Enum.AutomaticSize.Y,
+					LayoutOrder = 1,
+					Selectable = false
+				})
+			}
+		)
 	end, { v, footer })
 
 	local createElement = React.createElement

@@ -13,7 +13,7 @@ local GameTileOverflowMenu = GameTile.GameTileOverflowMenu
 
 local SharedFlags = require(parent.SharedFlags)
 local FFlagLuaAppGameTileNotInterestedDirectAction = SharedFlags.FFlagLuaAppGameTileNotInterestedDirectAction
-local FFlagLuaAppEnableHomepageOneByTwoTile = SharedFlags.FFlagLuaAppEnableHomepageOneByTwoTile
+local FFlagLuaAppEnableNxMRoduxApportioning = SharedFlags.FFlagLuaAppEnableNxMRoduxApportioning
 
 local function SpanTileOverflowMenu(props)
 	local hoverKey = props.hoverKey
@@ -33,7 +33,7 @@ local function SpanTileOverflowMenu(props)
 	local function fn(flag: boolean, availableMenuItems: string?)
 		local universeId
 
-		if FFlagLuaAppEnableHomepageOneByTwoTile then
+		if FFlagLuaAppEnableNxMRoduxApportioning then
 			universeId = tostring(props.universeId or "")
 		else
 			universeId = props.universeId
@@ -48,7 +48,7 @@ local function SpanTileOverflowMenu(props)
 		}
 		local contentType
 
-		if FFlagLuaAppEnableHomepageOneByTwoTile then
+		if FFlagLuaAppEnableNxMRoduxApportioning then
 			contentType = props.contentType
 		end
 
@@ -62,7 +62,7 @@ local function SpanTileOverflowMenu(props)
 	local topicId = props.topicId
 	local v3
 
-	if FFlagLuaAppEnableHomepageOneByTwoTile then
+	if FFlagLuaAppEnableNxMRoduxApportioning then
 		v3 = props.contentType
 	end
 
@@ -131,7 +131,7 @@ local function SpanTileOverflowMenu(props)
 	}
 	local contentType
 
-	if FFlagLuaAppEnableHomepageOneByTwoTile then
+	if FFlagLuaAppEnableNxMRoduxApportioning then
 		contentType = props.contentType
 	end
 

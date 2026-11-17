@@ -16,7 +16,8 @@ function class.new(data)
 		pending_receipt_count = (data == nil or data.pending_receipt_count == nil) and 0 or data.pending_receipt_count,
 		status_tooltip = (data == nil or data.status_tooltip == nil) and "" or data.status_tooltip,
 		base_price_in_robux = (data == nil or data.base_price_in_robux == nil) and 0 or data.base_price_in_robux,
-		is_discounted = data ~= nil and data.is_discounted ~= nil and data.is_discounted
+		is_discounted = data ~= nil and data.is_discounted ~= nil and data.is_discounted,
+		is_purchasable = data ~= nil and data.is_purchasable ~= nil and data.is_purchasable
 	}
 	return (setmetatable(v2, class))
 end
@@ -70,6 +71,11 @@ function class.encode(data)
 		v2, v3 = proto.writeVarInt(v4, v5, data.is_discounted and 1 or 0)
 	end
 
+	if data.is_purchasable then
+		local v4, v5 = proto.writeTag(v2, v3, 10, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.is_purchasable and 1 or 0)
+	end
+
 	local buf = buffer.create(v3)
 	buffer.copy(buf, 0, v2, 0, v3)
 	return buf
@@ -104,6 +110,10 @@ function class.decode(buf: buffer)
 				local v5
 				v5, v2 = proto.readVarInt(buf, v2)
 				result.is_discounted = v5 ~= 0
+			elseif v3 == 10 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.is_purchasable = v5 ~= 0
 			else
 				local _
 				_, v2 = proto.readVarInt(buf, v2)
@@ -183,6 +193,10 @@ function class.jsonEncode(data)
 		v2.isDiscounted = data.is_discounted
 	end
 
+	if data.is_purchasable then
+		v2.isPurchasable = data.is_purchasable
+	end
+
 	return v2
 end
 
@@ -247,6 +261,14 @@ function class.jsonDecode(data)
 
 	if data.isDiscounted ~= nil then
 		v2.is_discounted = data.isDiscounted
+	end
+
+	if data.is_purchasable ~= nil then
+		v2.is_purchasable = data.is_purchasable
+	end
+
+	if data.isPurchasable ~= nil then
+		v2.is_purchasable = data.isPurchasable
 	end
 
 	return v2

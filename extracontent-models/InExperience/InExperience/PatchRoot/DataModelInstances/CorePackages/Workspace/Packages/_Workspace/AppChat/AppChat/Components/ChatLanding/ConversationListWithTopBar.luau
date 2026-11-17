@@ -44,45 +44,25 @@ local SocialExperiments = require(parent.SocialExperiments)
 local PartyPageCarouselExperimentation = SocialExperiments.PartyPageCarouselExperimentation
 
 local SignalsMigrationConfig = require(AppChat.Flags.SignalsMigrationConfig)
-local FFlagAppChatUseUltimateListConversationList = require(AppChat.Flags.FFlagAppChatUseUltimateListConversationList)
 local FFlagAppChatConsoleFocusFixes = require(AppChat.Flags.FFlagAppChatConsoleFocusFixes)
+local FFlagAppChatKeepConversationListScrollOnVR = require(AppChat.Flags.FFlagAppChatKeepConversationListScrollOnVR)
 local FFlagAppChatUseViewRecyclerConversationList = require(AppChat.Flags.FFlagAppChatUseViewRecyclerConversationList)
 
 local extended = Roact.PureComponent:extend("ConversationListWithTopBar")
 local shouldUseFoundationConversationRow = SignalsMigrationConfig.shouldUseFoundationConversationRow
-local v = shouldUseFoundationConversationRow and FFlagAppChatUseUltimateListConversationList
-local v2 = shouldUseFoundationConversationRow and FFlagAppChatUseViewRecyclerConversationList
+local v = shouldUseFoundationConversationRow and FFlagAppChatUseViewRecyclerConversationList
 local ConversationList = require(script.Parent.ConversationList)
 local SearchLoading = require(script.Parent.SearchLoading)
 local SearchNoResults = require(script.Parent.SearchNoResults)
 local flag = false
-local conversationListUltimate = nil
-local flag2 = false
 local conversationListViewRecycler = nil
 
-local function getConversationListUltimate()
-	if flag then
-		return conversationListUltimate
-	end
-
-	flag = true
-	local success, result = pcall(function()
-		return require(script.Parent.ConversationListUltimate)
-	end)
-
-	if success then
-		conversationListUltimate = result
-	end
-
-	return conversationListUltimate
-end
-
 local function getConversationListViewRecycler()
-	if flag2 then
+	if flag then
 		return conversationListViewRecycler
 	end
 
-	flag2 = true
+	flag = true
 	local success, result = pcall(function()
 		return require(script.Parent.ConversationListViewRecycler)
 	end)
@@ -182,7 +162,7 @@ function extended:init()
 		local id = data.id
 		local emit = p.emit
 		local conversationClicked = ChatLandingTelemetryEvents.ConversationClicked
-		local v3 = {
+		local v2 = {
 			isFiltered = self.isFiltered ~= nil,
 			conversationListCount = #self.state.filteredItemList,
 			selectedConversationId = id,
@@ -200,18 +180,18 @@ function extended:init()
 			selectedConversationModerationType = data.moderationType
 		end
 
-		v3.selectedConversationModerationType = selectedConversationModerationType
+		v2.selectedConversationModerationType = selectedConversationModerationType
 		local selectedConversationUserPendingStatus
 
 		if data then
 			selectedConversationUserPendingStatus = data.userPendingStatus
 		end
 
-		v3.selectedConversationUserPendingStatus = selectedConversationUserPendingStatus
-		v3.participantUserIds = self.formatParticipantIds(data.participants)
-		v3.osaAcknowledgementStatus = data.osaAcknowledgementStatus
-		v3.osaImpressionId = osaImpressionId
-		emit(conversationClicked, v3)
+		v2.selectedConversationUserPendingStatus = selectedConversationUserPendingStatus
+		v2.participantUserIds = self.formatParticipantIds(data.participants)
+		v2.osaAcknowledgementStatus = data.osaAcknowledgementStatus
+		v2.osaImpressionId = osaImpressionId
+		emit(conversationClicked, v2)
 
 		p.emit(ChatLandingTelemetryEvents.ConversationClickedIndexStat, {
 			statValue = self.indexOfList(self.state.filteredItemList, id) or 0
@@ -254,18 +234,18 @@ end
 function extended.render(data)
 	return withAnalytics(function(p)
 		return withTelemetry(ChatLandingTelemetryLayer.Context)(function(p2)
-			local v3 = data.props.filterText and data.props.filterText:match("%S")
-			local v4
+			local v2 = data.props.filterText and data.props.filterText:match("%S")
+			local v3
 
 			if FFlagEnableStickyShortcutBarOnAllPlatforms then
-				v4 = data.props.isShortcutBarVisible
+				v3 = data.props.isShortcutBarVisible
 			else
-				v4 = false
+				v3 = false
 			end
 
-			local v5 = {
+			local v4 = {
 				Size = UDim2.fromScale(1, 1),
-				itemList = v3 and data.state.filteredItemList or data.props.itemList,
+				itemList = v2 and data.state.filteredItemList or data.props.itemList,
 				loadNext = data.loadNext(p),
 				isDebugEnabled = data.props.isDebugEnabled,
 				isWideMode = 0,
@@ -297,86 +277,86 @@ function extended.render(data)
 				isWideMode = data.props.isWideMode
 			end
 
-			v5.isWideMode = isWideMode
+			v4.isWideMode = isWideMode
 
-			v5.filterText = data.props.filterText
-			v5.onActivated = data.onActivated
-			v5.entryHeight = data.props.entryHeight
-			v5.navigateToSquadLobby = data.props.navigateToSquadLobby
-			v5.isInExperience = data.props.isInExperience
-			v5.localUserId = data.props.localUserId
+			v4.filterText = data.props.filterText
+			v4.onActivated = data.onActivated
+			v4.entryHeight = data.props.entryHeight
+			v4.navigateToSquadLobby = data.props.navigateToSquadLobby
+			v4.isInExperience = data.props.isInExperience
+			v4.localUserId = data.props.localUserId
 			local navigateToConversationFromUserId
 
 			if PartyPageCarouselExperimentation.getPartyPageCarouselEnabled() then
 				navigateToConversationFromUserId = data.props.navigateToConversationFromUserId
 			end
 
-			v5.navigateToConversationFromUserId = navigateToConversationFromUserId
+			v4.navigateToConversationFromUserId = navigateToConversationFromUserId
 			local navigateToQuickStartSquadInviteFriends
 
 			if PartyPageCarouselExperimentation.getPartyPageCarouselEnabled() then
 				navigateToQuickStartSquadInviteFriends = data.props.navigateToQuickStartSquadInviteFriends
 			end
 
-			v5.navigateToQuickStartSquadInviteFriends = navigateToQuickStartSquadInviteFriends
+			v4.navigateToQuickStartSquadInviteFriends = navigateToQuickStartSquadInviteFriends
 
-			v5.shouldShowPhoneVerificationUpsell = data.props.shouldShowPhoneVerificationUpsell
-			v5.shouldShowUnfilteredAccessFtux = data.props.shouldShowUnfilteredAccessFtux
-			v5.shouldShowPartyUpsellFtux = data.props.shouldShowPartyUpsellFtux
-			v5.dismissUnfilteredThreadsFtux = data.props.dismissUnfilteredThreadsFtux
-			v5.showGroupsLink = data.props.showGroupsLink
+			v4.shouldShowPhoneVerificationUpsell = data.props.shouldShowPhoneVerificationUpsell
+			v4.shouldShowUnfilteredAccessFtux = data.props.shouldShowUnfilteredAccessFtux
+			v4.shouldShowPartyUpsellFtux = data.props.shouldShowPartyUpsellFtux
+			v4.dismissUnfilteredThreadsFtux = data.props.dismissUnfilteredThreadsFtux
+			v4.showGroupsLink = data.props.showGroupsLink
 			local listRef
 
 			if FFlagAppChatConsoleFocusFixes then
 				listRef = data.props.listRef
 			end
 
-			v5.listRef = listRef
+			v4.listRef = listRef
 			local canvasTopPadding
 
 			if FFlagAppIaScrollAway then
 				canvasTopPadding = data.props.canvasTopPadding
 			end
 
-			v5.canvasTopPadding = canvasTopPadding
-			v5.pageBackgroundTransparency = data.props.pageBackgroundTransparency
+			v4.canvasTopPadding = canvasTopPadding
+			v4.pageBackgroundTransparency = data.props.pageBackgroundTransparency
 			local canvasBottomPadding
 
 			if
 				FFlagAppChatConsoleFocusFixes
 				and not data.props.isInExperience
-				and not (FFlagEnableStickyShortcutBarOnAllPlatforms and v4)
+				and not (FFlagEnableStickyShortcutBarOnAllPlatforms and v3)
 			then
 				canvasBottomPadding = data.props.deviceSafePadding.bottom
 			end
 
-			v5.canvasBottomPadding = canvasBottomPadding
+			v4.canvasBottomPadding = canvasBottomPadding
 			local scrollEnabled
 
 			if FFlagAppChatConsoleFocusFixes then
 				scrollEnabled = data.props.scrollEnabled
 			end
 
-			v5.scrollEnabled = scrollEnabled
-			v5.fireConversationImpressionEvent = data.fireConversationImpressionEvent(p2)
-			v5.isPartyQuickStartEnabled = data.props.isPartyQuickStartEnabled
-			v5.fireConversationClickedEvent = data.fireClickEvent
+			v4.scrollEnabled = scrollEnabled
+			v4.fireConversationImpressionEvent = data.fireConversationImpressionEvent(p2)
+			v4.isPartyQuickStartEnabled = data.props.isPartyQuickStartEnabled
+			v4.fireConversationClickedEvent = data.fireClickEvent
 
 			if shouldUseFoundationConversationRow then
-				v5.canAccessParty = data.props.canAccessParty
+				v4.canAccessParty = data.props.canAccessParty
 			end
 
-			if v or v2 then
-				v5.isLoadingNext = data.props.conversationsIsFetching
-				v5.isLoadingPrevious = data.props.conversationsIsFetching
-				v5.oldestConversationIsFetched = data.props.oldestConversationIsFetched
+			if v then
+				v4.isLoadingNext = data.props.conversationsIsFetching
+				v4.isLoadingPrevious = data.props.conversationsIsFetching
+				v4.oldestConversationIsFetched = data.props.oldestConversationIsFetched
 			end
 
-			local v6 = ConversationList
+			local v5 = ConversationList
 
-			if v2 then
-				if not flag2 then
-					flag2 = true
+			if v then
+				if not flag then
+					flag = true
 					local success, result = pcall(function()
 						return require(script.Parent.ConversationListViewRecycler)
 					end)
@@ -386,23 +366,10 @@ function extended.render(data)
 					end
 				end
 
-				v6 = conversationListViewRecycler or ConversationList
-			elseif v then
-				if not flag then
-					flag = true
-					local success, result = pcall(function()
-						return require(script.Parent.ConversationListUltimate)
-					end)
-
-					if success then
-						conversationListUltimate = result
-					end
-				end
-
-				v6 = conversationListUltimate or ConversationList
+				v5 = conversationListViewRecycler or ConversationList
 			end
 
-			local conversationList = Roact.createElement(v6, v5)
+			local conversationList = Roact.createElement(v5, v4)
 
 			if data.props.isSearchActive and data.props.isSearchAwaitingResults and #data.props.itemList == 0 then
 				conversationList = Roact.createElement(SearchLoading, {
@@ -426,7 +393,7 @@ function extended.render(data)
 			if
 				FFlagAppChatConsoleFocusFixes
 				and not data.props.isInExperience
-				and not (FFlagEnableStickyShortcutBarOnAllPlatforms and v4)
+				and not (FFlagEnableStickyShortcutBarOnAllPlatforms and v3)
 			then
 				size = UDim2.new(1, 0, 1, data.props.deviceSafePadding.bottom)
 			else
@@ -458,10 +425,20 @@ local function ConversationListWithTopBarFunctional(p)
 	local deviceSafePadding = useSignalState(Display.GetDisplayStore().getDeviceSafePadding)
 	local state, setState = React.useState(nil)
 	local ref = React.useRef(nil)
-	local v3 = Responsive.useLastInput() == Responsive.Input.Directional
+	local v2 = Responsive.useLastInput() == Responsive.Input.Directional
+	local v3
+
+	if FFlagAppChatKeepConversationListScrollOnVR then
+		v3 = Responsive.useIsSpatial()
+	else
+		v3 = false
+	end
 
 	React.useLayoutEffect(function()
-		setState(ref.current and ref.current._listRef._scrollRef.getNativeScrollRef() and ref.current._listRef._scrollRef.getNativeScrollRef()._nativeRef)
+		local nativeRef = ref.current
+			and ref.current._listRef._scrollRef.getNativeScrollRef()
+			and ref.current._listRef._scrollRef.getNativeScrollRef()._nativeRef
+		setState(nativeRef)
 	end)
 
 	useAnimateScrollViewToSelection(state, 0.2)
@@ -476,7 +453,11 @@ local function ConversationListWithTopBarFunctional(p)
 	local clone = table.clone(p)
 	clone.deviceSafePadding = deviceSafePadding
 	clone.listRef = ref
-	clone.scrollEnabled = not v3 or state == nil or state.current == nil
+	clone.scrollEnabled = not v2 or state == nil or state.current == nil
+
+	if v3 then
+		clone.scrollEnabled = true
+	end
 
 	if not FFlagEnableStickyShortcutBarOnAllPlatforms then
 		isShortcutBarVisible = nil

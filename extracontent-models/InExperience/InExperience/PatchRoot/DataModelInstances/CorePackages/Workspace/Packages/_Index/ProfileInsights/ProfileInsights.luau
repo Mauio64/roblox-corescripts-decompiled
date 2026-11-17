@@ -1,7 +1,9 @@
+local Formatters = require(script.Formatters)
 local ProfileInsightsModel = require(script["data-hydration"].ProfileInsightsModel)
 
 local ProfileInsights = {
-	["ProfileInsightsStore"] = nil,
+	Enums = require(script.Enums),
+	Formatters = Formatters,
 	ProfileInsightsStore = require(script["data-hydration"].ProfileInsightsStore),
 	ProfileInsightsModel = ProfileInsightsModel,
 	useSignalProfileInsightsByUserId = require(script.Hooks.useSignalProfileInsightsByUserId),

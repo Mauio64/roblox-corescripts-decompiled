@@ -88,18 +88,19 @@ local function OverlayInfoFrame(props)
 	local safeAreaInsets = props.safeAreaInsets
 	local v3 = safeAreaInsets == nil and 0 or safeAreaInsets.left
 	local v4 = safeAreaInsets == nil and 0 or safeAreaInsets.right
-	local v5 = FFlagMomentsFeedAboveNavBar and 0 or v2
-	local v6 = math.max(verticalPadding, safeAreaInsets == nil and 0 or safeAreaInsets.bottom) + v5
+	local v5 = safeAreaInsets == nil and 0 or safeAreaInsets.bottom
+	local v6 = FFlagMomentsFeedAboveNavBar and 0 or v2
+	local v7 = math.max(verticalPadding, v5) + v6
 
 	if v2 > 0 then
-		v6 = v.Padding.Medium + v5
+		v7 = v.Padding.Medium + v6
 	end
 
 	local padding = {
 		top = UDim.new(0, verticalPadding),
 		left = UDim.new(0, (math.max(horizontalPadding, v3))),
 		right = UDim.new(0, (math.max(horizontalPadding, v4))),
-		bottom = UDim.new(0, v6)
+		bottom = UDim.new(0, v7)
 	}
 
 	return React.createElement(View, {

@@ -4,9 +4,7 @@ local dependencies = require(parent.dependencies)
 local react = dependencies.React
 local uiBlox = dependencies.UIBlox
 local Foundation = require(parent.Parent.Foundation)
-local useStyle = uiBlox.Core.Style.useStyle
 local useTokens = Foundation.Hooks.useTokens
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local kind = require(parent.type)
 local buttonStack = uiBlox.App.Button.ButtonStack
 local buttonType = uiBlox.App.Button.Enum.ButtonType
@@ -38,21 +36,7 @@ local function fn(buttonStyle) -- 1 equivalent call inferred from this helper
 end
 
 local function fn2(list, handleActions, notificationPayload)
-	local v = useStyle()
-	local v2
-
-	if FoundationFontFaceMigration then
-		v2 = useTokens()
-	end
-
-	local fontStyle
-
-	if FoundationFontFaceMigration then
-		fontStyle = v2.Typography.CaptionLarge
-	else
-		fontStyle = v.Font.CaptionHeader
-	end
-
+	local captionLarge = useTokens().Typography.CaptionLarge
 	local result = {}
 
 	if not list then
@@ -60,11 +44,11 @@ local function fn2(list, handleActions, notificationPayload)
 	end
 
 	for _, item in ipairs(list) do
-		local v3 = {
+		local v = {
 			buttonType = fn(item.buttonStyle), -- inferred equivalent call
 			props = {
 				text = item.label.text,
-				fontStyle = fontStyle,
+				fontStyle = captionLarge,
 				onActivated = function()
 					if handleActions and notificationPayload then
 						handleActions(item, notificationPayload)
@@ -73,7 +57,7 @@ local function fn2(list, handleActions, notificationPayload)
 			}
 		}
 
-		table.insert(result, v3)
+		table.insert(result, v)
 	end
 
 	return result

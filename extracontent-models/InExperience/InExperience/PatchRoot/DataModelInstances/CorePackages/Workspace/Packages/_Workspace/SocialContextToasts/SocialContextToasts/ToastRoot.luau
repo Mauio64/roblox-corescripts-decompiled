@@ -10,20 +10,14 @@ local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local Cryo = require(parent.Cryo)
 
 local SharedFlags = require(parent.SharedFlags)
-local GetFFlagSocialContextToastEventStream = SharedFlags.GetFFlagSocialContextToastEventStream
-
-local SharedFlags2 = require(parent.SharedFlags)
-local GetFFlagEnableReferredPlayerJoinRemoteEvent = SharedFlags2.GetFFlagEnableReferredPlayerJoinRemoteEvent
+local GetFFlagEnableReferredPlayerJoinRemoteEvent = SharedFlags.GetFFlagEnableReferredPlayerJoinRemoteEvent
 
 local function ToastRoot(p)
 	local v = useSelector(function(p2)
 		return p2.ToastContent
 	end)
-	local joined
 
-	if GetFFlagSocialContextToastEventStream() then
-		joined = Cryo.Dictionary.join(p.analyticsProps, { toastType = v.toastType })
-	end
+	local joined = Cryo.Dictionary.join(p.analyticsProps, { toastType = v.toastType })
 
 	if v.toastType == ToastTypes.None then
 		return nil

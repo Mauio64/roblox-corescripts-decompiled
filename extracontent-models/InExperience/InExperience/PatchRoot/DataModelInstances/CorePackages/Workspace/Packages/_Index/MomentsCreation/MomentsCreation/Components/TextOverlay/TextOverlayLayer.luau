@@ -492,7 +492,7 @@ local function TextOverlayLayer(props)
 		v28((ReactOtter.spring(current and 0.45 or 1, v)))
 	end, { v30, v27, v28 })
 
-	local v51 = useCallback(function(p)
+	local v52 = useCallback(function(p)
 		if not FFlagMomentsTextOverlayV2Redesign then
 			v15(p)
 			return
@@ -562,17 +562,17 @@ local function TextOverlayLayer(props)
 		activeSession.update(makeTextOverlayEditsForEditor(textOverlays, makeDefaultTextOverlayEdit(), scale))
 	end, { v5, textOverlays, controller, scale })
 
-	local v52 = useRef(false)
+	local v53 = useRef(false)
 	useEffect(function()
 		if v5 then
-			if v52.current or textBoxRef.current == nil or v6 == nil then
+			if v53.current or textBoxRef.current == nil or v6 == nil then
 				return
 			end
 
 			onActivated()
-			v52.current = true
+			v53.current = true
 		else
-			v52.current = false
+			v53.current = false
 
 			if textBoxRef.current then
 				textBoxRef.current:ReleaseFocus()
@@ -581,17 +581,17 @@ local function TextOverlayLayer(props)
 	end, { v5, v6, onActivated })
 
 	if FFlagMomentsTextOverlayModalTextFix then
-		local v53 = useRef(false)
+		local v54 = useRef(false)
 		useEffect(function()
 			local current = textBoxRef.current
 
 			if v12 then
 				if current ~= nil and current:IsFocused() then
-					v53.current = true
+					v54.current = true
 					current:ReleaseFocus()
 				end
-			elseif v53.current then
-				v53.current = false
+			elseif v54.current then
+				v54.current = false
 
 				if v5 then
 					onActivated()
@@ -622,7 +622,7 @@ local function TextOverlayLayer(props)
 		)
 		v8(UDim2.fromOffset(math.min(textSize.X * 30, itemSize.X / 2), (math.min(textSize.Y * 5, itemSize.Y / 2))))
 	end, { v5, v6, v13, keyboardHeight, itemSize })
-	local v53 = not FFlagMomentsTextOverlayV2Redesign or keyboardHeight == 0
+	local v54 = not FFlagMomentsTextOverlayV2Redesign or keyboardHeight == 0
 
 	if v5 then
 		if v6 == nil then
@@ -631,12 +631,12 @@ local function TextOverlayLayer(props)
 
 		local position = UDim2.fromScale(0.5, 0.5)
 		local fontSize = v13
-		local v56 = FFlagMomentsTextOverlayV2Redesign
+		local v57 = FFlagMomentsTextOverlayV2Redesign
 			and FFlagMomentsTextOverlayChipGrowAboveKeyboard
 			and keyboardHeight > 0
-		local v57, size
+		local v58, size
 
-		if v56 then
+		if v57 then
 			local currentCamera = workspace.CurrentCamera
 			local y
 
@@ -647,9 +647,9 @@ local function TextOverlayLayer(props)
 			end
 
 			local layerTopY = not ref.current and 0 or ref.current.AbsolutePosition.Y
-			v57 = resolveKeyboardTop(keyboardTop, y, keyboardHeight) - layerTopY -- inferred equivalent call
+			v58 = resolveKeyboardTop(keyboardTop, y, keyboardHeight) - layerTopY -- inferred equivalent call
 
-			local v60 = computeEditorChipLayout({
+			local v61 = computeEditorChipLayout({
 				text = v6.text,
 				font = v6.textOverlayStyle.font,
 				itemWidth = itemSize.X,
@@ -665,9 +665,9 @@ local function TextOverlayLayer(props)
 				overhangFraction = 0.08
 			})
 
-			fontSize = v60.fontSize
-			size = v60.size
-			position = v60.position
+			fontSize = v61.fontSize
+			size = v61.size
+			position = v61.position
 		end
 
 		local createElement = React.createElement
@@ -676,7 +676,7 @@ local function TextOverlayLayer(props)
 			onActivated2 = nil
 		end
 
-		local v59 = {
+		local v60 = {
 			onActivated = onActivated2,
 			ref = ref,
 			stateLayer = { affordance = Foundation.Enums.StateLayerAffordance.None },
@@ -691,7 +691,7 @@ local function TextOverlayLayer(props)
 			additionalScale = scale
 		end
 
-		local v61 = {
+		local v62 = {
 			additionalScale = additionalScale,
 			editable = true,
 			fitToContent = keyboardHeight == 0,
@@ -703,23 +703,23 @@ local function TextOverlayLayer(props)
 			textVisible = 0
 		}
 
-		if not v56 then
+		if not v57 then
 			size = v7
 		end
 
-		v61.size = size
-		v61.textOverlayEdit = Dash.joinDeep(v6, {
+		v62.size = size
+		v62.textOverlayEdit = Dash.joinDeep(v6, {
 			position = position,
 			rotation = 0,
 			scale = scale2,
 			textOverlayStyle = { fontSize = fontSize }
 		})
 
-		v61.onTextChanged = onTextChanged
-		v61.textBoxRef = textBoxRef
-		v61.textVisible = not v12 and nil
-		local v60 = {
-			TextOverlay = createElement2(TextOverlay, v61),
+		v62.onTextChanged = onTextChanged
+		v62.textBoxRef = textBoxRef
+		v62.textVisible = not v12 and nil
+		local v61 = {
+			TextOverlay = createElement2(TextOverlay, v62),
 			GenerateText = 0,
 			VerticalFontSizeSlider = 0,
 			BottomScrim = 0,
@@ -732,17 +732,17 @@ local function TextOverlayLayer(props)
 			generateText = React.createElement(GenerateTextButton, { controller = controller })
 		end
 
-		v60.GenerateText = generateText
+		v61.GenerateText = generateText
 		local verticalFontSizeSlider
 
-		if FFlagMomentsTextOverlayV2Redesign and v53 then
+		if FFlagMomentsTextOverlayV2Redesign and v54 then
 			verticalFontSizeSlider = React.createElement(VerticalFontSizeSlider, {
 				controller = controller,
 				mediaHeight = itemSize.Y
 			})
 		end
 
-		v60.VerticalFontSizeSlider = verticalFontSizeSlider
+		v61.VerticalFontSizeSlider = verticalFontSizeSlider
 		local bottomScrim
 
 		if FFlagMomentsTextOverlayV2Redesign then
@@ -759,7 +759,7 @@ local function TextOverlayLayer(props)
 			})
 		end
 
-		v60.BottomScrim = bottomScrim
+		v61.BottomScrim = bottomScrim
 		local topNav
 
 		if v22 then
@@ -772,17 +772,17 @@ local function TextOverlayLayer(props)
 			})
 		end
 
-		v60.TopNav = topNav
+		v61.TopNav = topNav
 		local textOverlayToolbar
 
 		if v9 then
 			local createElement3 = React.createElement
 			local size2
 
-			if v57 == nil then
+			if v58 == nil then
 				size2 = UDim2.fromScale(1, 1)
 			else
-				size2 = UDim2.new(1, 0, 0, v57 - 16)
+				size2 = UDim2.new(1, 0, 0, v58 - 16)
 			end
 
 			textOverlayToolbar = createElement3(
@@ -803,26 +803,26 @@ local function TextOverlayLayer(props)
 			})
 		end
 
-		v60.TextOverlayToolbar = textOverlayToolbar
-		return createElement(View, v59, v60)
+		v61.TextOverlayToolbar = textOverlayToolbar
+		return createElement(View, v60, v61)
 	else
 		if textOverlays == nil or #textOverlays == 0 then
 			return nil
 		end
 
-		local v54 = v3 == CreationFlowState.Preview
-		local draggable = v54 and not v29
-		local v56 = FFlagMomentsTextOverlayV2Redesign and v54
+		local v55 = v3 == CreationFlowState.Preview
+		local draggable = v55 and not v29
+		local v57 = FFlagMomentsTextOverlayV2Redesign and v55
 
-		local selected = FFlagMomentsTextOverlayV2Redesign and v54
-		local v58 = FFlagMomentsTextOverlayV2Redesign and FFlagMomentsTextOverlayDragToDeleteRefinement
+		local selected = FFlagMomentsTextOverlayV2Redesign and v55
+		local v59 = FFlagMomentsTextOverlayV2Redesign and FFlagMomentsTextOverlayDragToDeleteRefinement
 		local overlay
 
 		if GetFFlagMomentsStickerButton() then
 			local createElement = React.createElement
-			local v60 = {
-				clampToBoundsEnabled = not v58,
-				unboundedDragEnabled = v58 and true or nil,
+			local v61 = {
+				clampToBoundsEnabled = not v59,
+				unboundedDragEnabled = v59 and true or nil,
 				draggable = draggable,
 				editable = false,
 				itemResolution = itemResolution,
@@ -841,57 +841,57 @@ local function TextOverlayLayer(props)
 				zIndex = 0
 			}
 
-			if not v54 then
+			if not v55 then
 				v14 = nil
 			end
 
-			v60.onOverlayActivated = v14
+			v61.onOverlayActivated = v14
 
-			if not v54 then
+			if not v55 then
 				v31 = nil
 			end
 
-			v60.onOverlayDragBegin = v31
+			v61.onOverlayDragBegin = v31
 
-			if not v56 then
+			if not v57 then
 				v32 = nil
 			end
 
-			v60.onOverlayDragContinue = v32
+			v61.onOverlayDragContinue = v32
 
-			if not v54 then
-				v51 = nil
+			if not v55 then
+				v52 = nil
 			end
 
-			v60.onOverlayDragEnd = v51
+			v61.onOverlayDragEnd = v52
 
 			if not selected then
 				v17 = nil
 			end
 
-			v60.onOverlayRotationChanged = v17
+			v61.onOverlayRotationChanged = v17
 
 			if not selected then
 				v16 = nil
 			end
 
-			v60.onOverlayScaleChanged = v16
-			v60.overlayEdits = textOverlays
-			v60.overlayComponent = TextOverlay
-			v60.selected = selected
+			v61.onOverlayScaleChanged = v16
+			v61.overlayEdits = textOverlays
+			v61.overlayComponent = TextOverlay
+			v61.selected = selected
 
-			if not v56 then
+			if not v57 then
 				visualScale = nil
 			end
 
-			v60.visualScale = visualScale
-			v60.zIndex = props.zIndex
-			overlay = createElement(OverlayDisplay, v60)
+			v61.visualScale = visualScale
+			v61.zIndex = props.zIndex
+			overlay = createElement(OverlayDisplay, v61)
 		else
 			local createElement = React.createElement
-			local v60 = {
-				clampToBoundsEnabled = not v58,
-				unboundedDragEnabled = v58 and true or nil,
+			local v61 = {
+				clampToBoundsEnabled = not v59,
+				unboundedDragEnabled = v59 and true or nil,
 				draggable = draggable,
 				editable = false,
 				itemResolution = itemResolution,
@@ -909,54 +909,54 @@ local function TextOverlayLayer(props)
 				zIndex = 0
 			}
 
-			if not v54 then
+			if not v55 then
 				v14 = nil
 			end
 
-			v60.onTextOverlayActivated = v14
+			v61.onTextOverlayActivated = v14
 
-			if not v54 then
+			if not v55 then
 				v31 = nil
 			end
 
-			v60.onTextOverlayDragBegin = v31
+			v61.onTextOverlayDragBegin = v31
 
-			if not v56 then
+			if not v57 then
 				v32 = nil
 			end
 
-			v60.onTextOverlayDragContinue = v32
+			v61.onTextOverlayDragContinue = v32
 
-			if not v54 then
-				v51 = nil
+			if not v55 then
+				v52 = nil
 			end
 
-			v60.onTextOverlayDragEnd = v51
+			v61.onTextOverlayDragEnd = v52
 
 			if not selected then
 				v17 = nil
 			end
 
-			v60.onTextOverlayRotationChanged = v17
+			v61.onTextOverlayRotationChanged = v17
 
 			if not selected then
 				v16 = nil
 			end
 
-			v60.onTextOverlayScaleChanged = v16
-			v60.selected = selected
-			v60.textOverlayEdits = textOverlays
+			v61.onTextOverlayScaleChanged = v16
+			v61.selected = selected
+			v61.textOverlayEdits = textOverlays
 
-			if not v56 then
+			if not v57 then
 				visualScale = nil
 			end
 
-			v60.visualScale = visualScale
-			v60.zIndex = props.zIndex
-			overlay = createElement(TextOverlayDisplay, v60)
+			v61.visualScale = visualScale
+			v61.zIndex = props.zIndex
+			overlay = createElement(TextOverlayDisplay, v61)
 		end
 
-		if v56 then
+		if v57 then
 			return React.createElement(View, {
 				tag = "size-full",
 				ZIndex = props.zIndex or 1

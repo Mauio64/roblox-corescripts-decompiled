@@ -39,7 +39,11 @@ end
 
 return {
 	entityToString = function(value: string)
-		if byte(value, 1) ~= 38 or byte(value, #value) ~= 59 then
+		if byte(value, 1) ~= 38 then
+			return value
+		end
+
+		if byte(value, #value) ~= 59 then
 			return value
 		end
 
@@ -73,5 +77,7 @@ return {
 			local htmlEntity = HtmlEntities[v]
 			return if htmlEntity == nil then value else htmlEntity
 		end
+
+		return value
 	end
 }

@@ -3,16 +3,22 @@ local parent = GenericAbuseReporting.Parent
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 
+local GetHumanoidDescription = require(parent.GetHumanoidDescription)
 local Promise = require(parent.Promise)
-
-local SharedFlags = require(parent.SharedFlags)
-local FFlagEnableChatReportingTextChannelTag = SharedFlags.FFlagEnableChatReportingTextChannelTag
 
 require(GenericAbuseReporting.BeduiV2.Hooks.AbuseSheetFlow.AbuseSheetFlowTypes)
 local appendReportAnythingTags = require(GenericAbuseReporting.BeduiV2.Utils.appendReportAnythingTags)
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableChatReportingTextChannelTag = SharedFlags.FFlagEnableChatReportingTextChannelTag
+local SharedFlags2 = require(parent.SharedFlags)
+local GetFFlagGetHumanoidDescriptionUpdatesV2E = SharedFlags2.GetFFlagGetHumanoidDescriptionUpdatesV2E
 local FFlagAbuseReportForwardCustomTagFields = require(GenericAbuseReporting.Flags.FFlagAbuseReportForwardCustomTagFields)
 
+local FFlagGenericAbuseReportingAvatarHumanoidDescription = require(GenericAbuseReporting.Flags.FFlagGenericAbuseReportingAvatarHumanoidDescription)
+
 local appendReportAnythingTags2 = appendReportAnythingTags.appendReportAnythingTags
+local getHumanoidDescription = GetHumanoidDescription.getHumanoidDescription
 
 local function tag(p: string?)
 	if p then
@@ -128,6 +134,22 @@ local function buildChatReport(p, p2)
 	return chatReport
 end
 
+local function getTargetHumanoidDescription(p: number, p2)
+	if GetFFlagGetHumanoidDescriptionUpdatesV2E() and p2 then
+		local identifiedAvatar = p2.identificationResults.identifiedAvatars[p]
+
+		if
+			identifiedAvatar
+			and identifiedAvatar.humanoidDescription
+			and identifiedAvatar.humanoidDescriptionStatus == "OK"
+		then
+			return identifiedAvatar.humanoidDescription, identifiedAvatar.humanoidDescriptionStatus
+		end
+	end
+
+	return getHumanoidDescription(p)
+end
+
 local function buildAvatarReport(p, p2)
 	local localPlayer = Players.LocalPlayer
 	local tags = {
@@ -140,6 +162,31 @@ local function buildAvatarReport(p, p2)
 	}
 
 	appendReportAnythingTags2(tags, p2)
+	local targetIdStr = tonumber(p.data.targetIdStr)
+
+	if FFlagGenericAbuseReportingAvatarHumanoidDescription and targetIdStr then
+		local v, v2
+
+		if GetFFlagGetHumanoidDescriptionUpdatesV2E() and p2 then
+			local identifiedAvatar = p2.identificationResults.identifiedAvatars[targetIdStr]
+
+			if
+				identifiedAvatar
+				and identifiedAvatar.humanoidDescription
+				and identifiedAvatar.humanoidDescriptionStatus == "OK"
+			then
+				v = identifiedAvatar.humanoidDescription
+				v2 = identifiedAvatar.humanoidDescriptionStatus
+			else
+				v, v2 = getHumanoidDescription(targetIdStr)
+			end
+		else
+			v, v2 = getHumanoidDescription(targetIdStr)
+		end
+
+		tags.REPORT_TARGET_HUMANOID_DESCRIPTION = tag(HttpService:JSONEncode(v))
+		tags.REPORT_TARGET_HUMANOID_DESCRIPTION_STATUS = tag(v2)
+	end
 
 	if FFlagAbuseReportForwardCustomTagFields then
 		appendCustomTagFields(tags, p)
@@ -189,16 +236,21 @@ end
 function ReportHelper.submitChatReportWithoutMessage(p)
 	return Promise.try(function()
 		local targetIdStr = tonumber(p.data.targetIdStr)
-		Players:ReportAbuse(
-			targetIdStr and Players:GetPlayerByUserId(targetIdStr),
-			p.data.category,
-			p.data.comment or ""
-		)
+		local playerByUserId = targetIdStr and Players:GetPlayerByUserId(targetIdStr)
+		Players:ReportAbuse(playerByUserId, p.data.category, p.data.comment or "")
 		return { responseBody = {} }
 	end)
 end
 
 function ReportHelper.submitAvatarReport(p, p2)
+	if FFlagGenericAbuseReportingAvatarHumanoidDescription then
+		return Promise.try(function()
+			local avatarReport = buildAvatarReport(p, p2)
+			Players:ReportAvatarAbuse(tonumber(p.data.targetIdStr), avatarReport)
+			return { responseBody = {} }
+		end)
+	end
+
 	local avatarReport = buildAvatarReport(p, p2)
 	return Promise.try(function()
 		Players:ReportAvatarAbuse(tonumber(p.data.targetIdStr), avatarReport)

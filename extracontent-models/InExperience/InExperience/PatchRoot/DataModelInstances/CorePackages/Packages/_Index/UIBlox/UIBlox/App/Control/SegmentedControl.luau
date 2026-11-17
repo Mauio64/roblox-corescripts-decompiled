@@ -131,14 +131,10 @@ function extended.render(object)
 			local maxX = 0
 
 			for i = 1, count do
+				local tabName = object.props.tabs[i].tabName
 				maxX = math.max(
 					maxX,
-					GetTextSize(
-						object.props.tabs[i].tabName,
-						v9,
-						GetFontFromFontStyle(p.Font.Header2),
-						Vector2.new(1e999, 1e999)
-					).X
+					GetTextSize(tabName, v9, GetFontFromFontStyle(p.Font.Header2), Vector2.new(1e999, 1e999)).X
 				)
 			end
 

@@ -8,9 +8,11 @@ local InventorySorts = require(script.Enums.InventorySorts)
 local InventoryFilters = require(script.Enums.InventoryFilters)
 local InventoryItemAvailability = require(script.Enums.InventoryItemAvailability)
 local InventoryItemType = require(script.Enums.InventoryItemType)
+require(script.Enums.InventorySearchSortOption)
 local SlotType = require(script.Enums.SlotType)
 local createCategoryInventoryStore = require(script.Stores.createCategoryInventoryStore)
 local createSortAndFiltersStore = require(script.Stores.createSortAndFiltersStore)
+local createInventorySearchStore = require(script.Stores.createInventorySearchStore)
 local createAvatarEditorStores = require(script.Stores.createAvatarEditorStores)
 local createSlotBasedEditorStore = require(script.Stores.createSlotBasedEditorStore)
 local createStaleInventoryGrantStore = require(script.Stores.createStaleInventoryGrantStore)
@@ -43,6 +45,7 @@ return {
 	Stores = {
 		createCategoryInventoryStore = createCategoryInventoryStore,
 		createSortAndFiltersStore = createSortAndFiltersStore,
+		createInventorySearchStore = createInventorySearchStore,
 		createAvatarEditorStores = createAvatarEditorStores,
 		createSlotBasedEditorStore = createSlotBasedEditorStore,
 		createStaleInventoryGrantStore = createStaleInventoryGrantStore,
@@ -61,6 +64,7 @@ return {
 		SlotType = SlotType
 	},
 	Constants = require(script.Constants),
+	InventorySearchConstants = require(script.InventorySearchConstants),
 	Utils = {
 		buildStringsToLocalize = require(script.Utils.buildStringsToLocalize),
 		buildSlots = require(script.Utils.buildSlots),
@@ -68,7 +72,10 @@ return {
 		buildBodySlotViewportProps = require(script.Utils.buildBodySlotViewportProps),
 		getRemainingTimeFromExpiration = require(script.Utils.getRemainingTimeFromExpiration),
 		buildSlotCategoryTabItems = require(script.Utils.buildSlotCategoryTabItems),
-		buildSlotCategoryLocalizationKeys = require(script.Utils.buildSlotCategoryLocalizationKeys)
+		buildSlotCategoryLocalizationKeys = require(script.Utils.buildSlotCategoryLocalizationKeys),
+		buildSearchAvatarInventoryQuery = require(script.Utils.buildSearchAvatarInventoryQuery),
+		toSearchableItemCategories = require(script.Utils.toSearchableItemCategories),
+		getInventorySearchKey = require(script.Utils.getInventorySearchKey)
 	},
 	["jest.config"] = script["jest.config"]
 }

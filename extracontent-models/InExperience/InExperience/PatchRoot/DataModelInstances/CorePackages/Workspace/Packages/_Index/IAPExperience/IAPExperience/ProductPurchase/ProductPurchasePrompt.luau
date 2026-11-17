@@ -11,7 +11,6 @@ local FitTextLabel = RoactFitComponents.FitTextLabel
 local UIBlox = require(parent2.UIBlox)
 local Foundation = require(parent2.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local Images = UIBlox.App.ImageSet.Images
@@ -325,21 +324,19 @@ function extended:renderAlert(data)
 						TextColor3 = theme.TextDefault.Color
 					})
 				})
-			else
-				local createElement2 = Roact.createElement
-				local v11 = {
-					BackgroundTransparency = 1,
-					width = UDim.new(1, 0),
-					FillDirection = Enum.FillDirection.Horizontal,
-					HorizontalAlignment = Enum.HorizontalAlignment.Center,
-					VerticalAlignment = Enum.VerticalAlignment.Center,
-					contentPadding = UDim.new(0, 2),
-					[Roact.Ref] = self.footerRef,
-					[Roact.Change.AbsoluteSize] = self.changeFooterSize
-				}
+			end
 
-				local createElement3 = Roact.createElement
-				local v12 = {
+			return Roact.createElement(FitFrameVertical, {
+				BackgroundTransparency = 1,
+				width = UDim.new(1, 0),
+				FillDirection = Enum.FillDirection.Horizontal,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				contentPadding = UDim.new(0, 2),
+				[Roact.Ref] = self.footerRef,
+				[Roact.Change.AbsoluteSize] = self.changeFooterSize
+			}, {
+				RemainingBalanceText = Roact.createElement("TextLabel", {
 					LayoutOrder = 1,
 					BackgroundTransparency = 1,
 					RichText = true,
@@ -347,34 +344,12 @@ function extended:renderAlert(data)
 					Size = UDim2.fromOffset(v7, 0),
 					AutomaticSize = Enum.AutomaticSize.Y,
 					TextWrapped = true,
-					Font = 0,
-					FontFace = 0,
-					Text = 0,
-					TextSize = 0,
-					TextColor3 = 0
-				}
-				local font2
-
-				if not FoundationFontFaceMigration then
-					font2 = font.Footer.Font
-				end
-
-				v12.Font = font2
-				local fontFace
-
-				if FoundationFontFaceMigration then
-					fontFace = normalizeFontFace(props2.Tokens.Typography.CaptionSmall.Font)
-				end
-
-				v12.FontFace = fontFace
-
-				v12.Text = text
-				v12.TextSize = font.BaseSize * font.Footer.RelativeSize
-				v12.TextColor3 = theme.TextDefault.Color
-				return createElement2(FitFrameVertical, v11, {
-					RemainingBalanceText = createElement3("TextLabel", v12)
+					FontFace = normalizeFontFace(props2.Tokens.Typography.CaptionSmall.Font),
+					Text = text,
+					TextSize = font.BaseSize * font.Footer.RelativeSize,
+					TextColor3 = theme.TextDefault.Color
 				})
-			end
+			})
 		end
 
 		return createElement(InteractiveAlert, v8)

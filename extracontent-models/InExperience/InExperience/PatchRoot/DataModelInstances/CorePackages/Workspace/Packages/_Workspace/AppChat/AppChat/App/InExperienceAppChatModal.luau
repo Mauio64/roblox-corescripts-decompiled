@@ -10,7 +10,6 @@ local Foundation = require(parent.Foundation)
 local ColorMode = Foundation.Enums.ColorMode
 
 local SharedFlags = require(parent.SharedFlags)
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
 local fFlagSettingsHubIndependentBackgroundVisibility = SharedFlags.getFFlagSettingsHubIndependentBackgroundVisibility()
 local getFFlagAppChatInExperienceTabBarAdjustment = require(AppChat.Flags.getFFlagAppChatInExperienceTabBarAdjustment)
 local EnumScreens = require(AppChat.EnumScreens)
@@ -19,11 +18,6 @@ local ChatSessionRefCount = require(AppChat.Hooks.ChatSessionRefCount)
 
 local InExperienceAppChatModal = {}
 InExperienceAppChatModal.__index = InExperienceAppChatModal
-
-local function getFFlagAppChatEnableRootedNavigation() -- 2 equivalent calls inferred from this helper
-	local getFFlagAppChatEnableRootedNavigation2 = require(AppChat.Flags.getFFlagAppChatEnableRootedNavigation)
-	return getFFlagAppChatEnableRootedNavigation2()
-end
 
 local function getRootedNavigationStore() -- 2 equivalent calls inferred from this helper
 	local GetRootedNavigationStore = require(AppChat.Stores.GetRootedNavigationStore)
@@ -83,7 +77,7 @@ function InExperienceAppChatModal:initialize(topMargin: number?, settingsHub, vi
 end
 
 function InExperienceAppChatModal:setVisible(visible: boolean, p: string?)
-	if not visible and getFFlagAppChatEnableRootedNavigation() then -- inferred equivalent call
+	if not visible then
 		getRootedNavigationStore().cancelNavigation() -- inferred equivalent call
 	end
 
@@ -91,7 +85,7 @@ function InExperienceAppChatModal:setVisible(visible: boolean, p: string?)
 		return
 	end
 
-	if FFlagExpChatEnableFriendsTab and not visible and self._reserveChatSessionOnClose then
+	if not visible and self._reserveChatSessionOnClose then
 		self._reserveChatSessionOnClose = false
 
 		if ChatSessionRefCount.getReservations() == 0 then
@@ -225,33 +219,29 @@ function InExperienceAppChatModal:reserveChatSessionOnClose()
 end
 
 function InExperienceAppChatModal:openToScreen(p)
+	local rootedNavigationStore = getRootedNavigationStore() -- inferred equivalent call
+	local supportedRootedRoute = isSupportedRootedRoute(p) -- inferred equivalent call
 	local requestedRoute
 
-	if getFFlagAppChatEnableRootedNavigation() then -- inferred equivalent call
-		local rootedNavigationStore = getRootedNavigationStore() -- inferred equivalent call
-
-		if isSupportedRootedRoute(p) then -- inferred equivalent call
-			local clone = table.clone(p.params)
-			clone.rootedNavigationRequestId = rootedNavigationStore.beginNavigation()
-			requestedRoute = { screen = p.screen, params = clone }
-		else
-			rootedNavigationStore.cancelNavigation()
-			requestedRoute = p
-		end
+	if supportedRootedRoute then
+		local clone = table.clone(p.params)
+		clone.rootedNavigationRequestId = rootedNavigationStore.beginNavigation()
+		requestedRoute = { screen = p.screen, params = clone }
 	else
+		rootedNavigationStore.cancelNavigation()
 		requestedRoute = p
 	end
 
 	self.requestedRoute = requestedRoute
 	self.requestedRouteSignal:Fire(requestedRoute)
 
-	if FFlagExpChatEnableFriendsTab and p.params and p.params.rooted == true then
+	if p.params and p.params.rooted == true then
 		self:reserveChatSessionOnClose()
 	end
 
 	local v
 
-	if FFlagExpChatEnableFriendsTab and requestedRoute.params then
+	if requestedRoute.params then
 		v = requestedRoute.params.entryPoint
 	end
 

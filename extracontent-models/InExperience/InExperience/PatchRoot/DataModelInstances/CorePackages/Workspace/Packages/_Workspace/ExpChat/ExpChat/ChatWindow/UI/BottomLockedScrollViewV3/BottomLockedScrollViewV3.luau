@@ -6,7 +6,6 @@ local parent = ExpChat.Parent
 local React = require(parent.React)
 local SignalsReact = require(parent.SignalsReact)
 require(parent.Signals)
-local SharedFlags = require(parent.SharedFlags)
 
 local Config = require(ExpChat.Config)
 local advanceHistoryScroll = require(script.Parent.advanceHistoryScroll)
@@ -14,7 +13,6 @@ local advanceHistoryScroll = require(script.Parent.advanceHistoryScroll)
 local UIBlox = require(parent.UIBlox)
 local useStyle = UIBlox.Core.Style.useStyle
 local debounce = require(ExpChat.ChatWindow.Helpers.debounce)
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
 local getFFlagExpChatSendWindowScrollEvent = require(ExpChat.Flags.getFFlagExpChatSendWindowScrollEvent)
 local defineFastInt = game:DefineFastInt("ExpChatWindowScrollV3Debounce", 0)
 local FFlagExpChatLimitScrollingV2Window = require(ExpChat.Flags.FFlagExpChatLimitScrollingV2Window)
@@ -105,8 +103,7 @@ local function BottomLockedScrollViewV3(props)
 	local ref9 = React.useRef(props.selectedChannelName)
 	ref9.current = props.selectedChannelName
 
-	local useCallback = React.useCallback
-	local function fn(data)
+	local v8 = React.useCallback(function(data)
 		if ref8.current == nil then
 			local current = ref9.current
 			ref8.current = ExpChatPerfTracker.startChatWindowScrollInterval(
@@ -127,21 +124,13 @@ local function BottomLockedScrollViewV3(props)
 			v2()
 		end
 
-		if FFlagExpChatEnableFriendsTab and props.onCanvasPositionChanged then
+		if props.onCanvasPositionChanged then
 			local v8 = math.max(data.AbsoluteCanvasSize.Y - data.AbsoluteWindowSize.Y, 0)
 			props.onCanvasPositionChanged(data.CanvasPosition, v8)
 		end
-	end
+	end, { props.onCanvasPositionChanged })
 
-	local v8
-
-	if FFlagExpChatEnableFriendsTab then
-		v8 = props.onCanvasPositionChanged
-	end
-
-	local v9 = useCallback(fn, { v8 })
-
-	local v10 = React.useCallback(function(p)
+	local v9 = React.useCallback(function(p)
 		if ref2.current and not ref6.current then
 			p.CanvasPosition = Vector2.new(0, 9007199254740992)
 		end
@@ -156,11 +145,11 @@ local function BottomLockedScrollViewV3(props)
 			ref5.current = nil
 		end
 
-		local v11 = scrollResetKey and scrollToTopOnReset and not ref4.current
+		local v10 = scrollResetKey and scrollToTopOnReset and not ref4.current
 
-		local v12 = scrollResetKey and props.isChannelBarVisible and not (scrollToTopOnReset or ref4.current)
+		local v11 = scrollResetKey and props.isChannelBarVisible and not (scrollToTopOnReset or ref4.current)
 
-		if v11 then
+		if v10 then
 			ref2.current = false
 
 			if ref6.current or not ref.current then
@@ -171,7 +160,7 @@ local function BottomLockedScrollViewV3(props)
 			ref.current.CanvasPosition = Vector2.new(0, 0)
 			ref4.current = true
 			ref5.current = nil
-		elseif v12 then
+		elseif v11 then
 			ref2.current = true
 
 			if not ref6.current and ref.current then
@@ -191,14 +180,14 @@ local function BottomLockedScrollViewV3(props)
 
 		local absoluteCanvasSizeChangedConnection = current:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(function()
 			if FFlagExpChatRenderHistoricalMessages and historicalMessageCountSignal then
-				local v11 = advanceHistoryScroll(
+				local v10 = advanceHistoryScroll(
 					ref7.current,
 					current.AbsoluteCanvasSize.Y,
 					historicalMessageCountSignal(false)
 				)
 
-				if v11 > 0 and not (ref2.current or ref6.current) then
-					current.CanvasPosition += Vector2.new(0, v11)
+				if v10 > 0 and not (ref2.current or ref6.current) then
+					current.CanvasPosition += Vector2.new(0, v10)
 				end
 			end
 
@@ -219,22 +208,22 @@ local function BottomLockedScrollViewV3(props)
 	})
 	local paddingTop
 
-	if FFlagExpChatEnableFriendsTab and type(props.contentTopPadding) == "number" then
+	if type(props.contentTopPadding) == "number" then
 		paddingTop = UDim.new(0, props.contentTopPadding)
-	elseif FFlagExpChatEnableFriendsTab and props.contentTopPadding ~= nil then
+	elseif props.contentTopPadding ~= nil then
 		paddingTop = props.contentTopPadding:map(function(p: number)
 			return UDim.new(0, p)
 		end)
 	end
 
 	local createElement = React.createElement
-	local v11 = {
+	local v10 = {
 		BackgroundTransparency = 1,
 		Size = props.Size,
 		[React.Event.InputBegan] = v6,
 		[React.Event.InputEnded] = v7
 	}
-	local v12 = {
+	local v11 = {
 		padding = React.createElement("UIPadding", {
 			PaddingTop = UDim.new(0, 0),
 			PaddingBottom = UDim.new(0, 0),
@@ -245,62 +234,53 @@ local function BottomLockedScrollViewV3(props)
 	}
 
 	local createElement2 = React.createElement
-
-	local v13 = {}
-	v13.ref = ref
-	v13.AutomaticCanvasSize = Enum.AutomaticSize.Y
-	v13.BorderSizePixel = 0
-	v13.ScrollBarImageColor3 = theme.UIEmphasis.Color
-	v13.ScrollBarImageTransparency = v3:map(function(p): number
+	local v12 = {}
+	v12.ref = ref
+	v12.AutomaticCanvasSize = Enum.AutomaticSize.Y
+	v12.BorderSizePixel = 0
+	v12.ScrollBarImageColor3 = theme.UIEmphasis.Color
+	v12.ScrollBarImageTransparency = v3:map(function(p): number
 		return if p then 0 else 1
 	end)
 
-	v13.ScrollBarThickness = Config.ChatWindowScrollBarThickness
+	v12.ScrollBarThickness = Config.ChatWindowScrollBarThickness
 	local verticalScrollBarInset
 
 	if FFlagExpChatScrollbarInset then
 		verticalScrollBarInset = Enum.ScrollBarInset.Always
 	end
 
-	v13.VerticalScrollBarInset = verticalScrollBarInset
+	v12.VerticalScrollBarInset = verticalScrollBarInset
 	local scrollingDirection
 
 	if FFlagExpChatLimitScrollingV2Window then
 		scrollingDirection = Enum.ScrollingDirection.Y
 	end
 
-	v13.ScrollingDirection = scrollingDirection
-	v13.Selectable = false
-	v13.BackgroundTransparency = 1
-	v13.Size = UDim2.fromScale(1, 1)
-	v13.CanvasSize = UDim2.new()
-	v13[React.Change.CanvasPosition] = v9
+	v12.ScrollingDirection = scrollingDirection
+	v12.Selectable = false
+	v12.BackgroundTransparency = 1
+	v12.Size = UDim2.fromScale(1, 1)
+	v12.CanvasSize = UDim2.new()
+	v12[React.Change.CanvasPosition] = v8
 	local absoluteWindowSize = React.Change.AbsoluteWindowSize
 
 	if not FFlagExpChatFixWarmMountBottomLock then
-		v10 = nil
+		v9 = nil
 	end
 
-	v13[absoluteWindowSize] = v10
-	local v14
+	v12[absoluteWindowSize] = v9
+	local contentPadding
 
-	if FFlagExpChatEnableFriendsTab then
-		v14 = { contentPadding = 0, messages = 0 }
-		local contentPadding
-
-		if paddingTop ~= nil then
-			contentPadding = React.createElement("UIPadding", { PaddingTop = paddingTop })
-		end
-
-		v14.contentPadding = contentPadding
-
-		v14.messages = React.createElement(React.Fragment, nil, v5)
-	else
-		v14 = v5
+	if paddingTop ~= nil then
+		contentPadding = React.createElement("UIPadding", { PaddingTop = paddingTop })
 	end
 
-	v12.scrollView = createElement2("ScrollingFrame", v13, v14)
-	return createElement("Frame", v11, v12)
+	v11.scrollView = createElement2("ScrollingFrame", v12, {
+		contentPadding = contentPadding,
+		messages = React.createElement(React.Fragment, nil, v5)
+	})
+	return createElement("Frame", v10, v11)
 end
 
 return React.memo(BottomLockedScrollViewV3)

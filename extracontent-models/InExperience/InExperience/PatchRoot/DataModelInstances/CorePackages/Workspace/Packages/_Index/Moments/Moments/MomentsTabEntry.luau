@@ -19,6 +19,8 @@ local createMomentsStore = require(Moments.Stores.GetMomentsStore.createMomentsS
 local GetImmersiveChromeStore = require(Moments.Stores.GetImmersiveChromeStore)
 local FFlagMomentsEmojiSetsApi = require(Moments.Flags.FFlagMomentsEmojiSetsApi)
 
+local FFlagMomentsFixDeepLinkRefocusStaleNavigation = require(Moments.Flags.FFlagMomentsFixDeepLinkRefocusStaleNavigation)
+
 local FStringMomentsExperienceJoinActionTextIxpLayer = require(Moments.Flags.FStringMomentsExperienceJoinActionTextIxpLayer)
 local useMomentsTabIsVisible = require(Moments.Hooks.useMomentsTabIsVisible)
 local consumeEntrySource = require(Moments.Utils.consumeEntrySource)
@@ -44,6 +46,7 @@ local useMomentsGating = MomentsCommon.Hooks.useMomentsGating
 local canRenderNativeMoments = MomentsCommon.canRenderNativeMoments
 
 local v = {}
+local FFlagMomentsCreateAvatarPosts = SharedFlags.FFlagMomentsCreateAvatarPosts
 local FFlagMomentsAvatarLookTryOn = SharedFlags.FFlagMomentsAvatarLookTryOn
 local FFlagMomentsCommentDeepLinks = SharedFlags.FFlagMomentsCommentDeepLinks
 local ShareLinkTargetIdType = MomentsTypes.Enums.ShareLinkTargetIdType
@@ -297,23 +300,23 @@ local function getDeepLinkRequestFromNavigationState(state, p: string)
 	return nil
 end
 
-local function getDeepLinkRequest(navigation)
+local function getDeepLinkRequest(p)
 	local count = 0
 
-	while navigation ~= nil do
+	while p ~= nil do
 		local v2 = tostring(count)
-		local selected = getDeepLinkRequestFromNavigationParams(navigation, v2)
-			or getDeepLinkRequestFromNavigationState(navigation.state, v2)
+		local selected = getDeepLinkRequestFromNavigationParams(p, v2)
+			or getDeepLinkRequestFromNavigationState(p.state, v2)
 
 		if selected ~= nil then
 			return selected
 		end
 
-		if not navigation._dangerouslyGetParent then
+		if not p._dangerouslyGetParent then
 			break
 		end
 
-		navigation = navigation._dangerouslyGetParent()
+		p = p._dangerouslyGetParent()
 		count += 1
 	end
 
@@ -482,26 +485,34 @@ local function MomentsTabEntry(props)
 			v4()
 
 			local v5 = navigation.addListener(RoactNavigation.Events.DidFocus, function()
-				local deepLinkRequest2 = getDeepLinkRequest(navigation)
 				local v5
 
-				if deepLinkRequest2 == nil then
-					v5 = false
+				if FFlagMomentsFixDeepLinkRefocusStaleNavigation then
+					v5 = ref.current.navigation
 				else
-					v5 = ref5.current == deepLinkRequest2.key
+					v5 = navigation
 				end
 
-				if deepLinkRequest2 ~= nil and not v5 then
+				local deepLinkRequest2 = getDeepLinkRequest(v5)
+				local v6
+
+				if deepLinkRequest2 == nil then
+					v6 = false
+				else
+					v6 = ref5.current == deepLinkRequest2.key
+				end
+
+				if deepLinkRequest2 ~= nil and not v6 then
 					local deepLinkStore = GetDeepLinkStore()
 					local momentId2 = deepLinkRequest2.momentId
 					local targetIdType = deepLinkRequest2.targetIdType
-					local v6
+					local v7
 
 					if FFlagMomentsCommentDeepLinks then
-						v6 = deepLinkRequest2.commentsTarget
+						v7 = deepLinkRequest2.commentsTarget
 					end
 
-					seedDeepLinkedMoment(deepLinkStore, momentId2, targetIdType, v6) -- inferred equivalent call
+					seedDeepLinkedMoment(deepLinkStore, momentId2, targetIdType, v7) -- inferred equivalent call
 					ref5.current = deepLinkRequest2.key
 					RobloxAppEvents.ReloadPage:fire(AppPage.Moments)
 				end
@@ -547,11 +558,21 @@ local function MomentsTabEntry(props)
 				GetImmersiveChromeStore(false).setOverlayCovering(true)
 				openOwnMoments()
 			end or nil,
-			openMomentsFeedReport = props.openMomentsFeedReport,
+			openAvatarMomentsCreation = 0,
+			openMomentsFeedReport = 0,
 			openAvatarLookTryOn = 0,
 			openMomentCommentReport = 0,
 			openBlockUser = 0
 		}
+		local openAvatarMomentsCreation
+
+		if FFlagMomentsCreateAvatarPosts then
+			openAvatarMomentsCreation = props.openAvatarMomentsCreation
+		end
+
+		v6.openAvatarMomentsCreation = openAvatarMomentsCreation
+
+		v6.openMomentsFeedReport = props.openMomentsFeedReport
 		local openAvatarLookTryOn
 
 		if FFlagMomentsAvatarLookTryOn then
@@ -566,6 +587,12 @@ local function MomentsTabEntry(props)
 
 	local openProfile = props.openProfile
 	local openOwnMoments = props.openOwnMoments
+	local openAvatarMomentsCreation
+
+	if FFlagMomentsCreateAvatarPosts then
+		openAvatarMomentsCreation = props.openAvatarMomentsCreation
+	end
+
 	local openMomentsFeedReport = props.openMomentsFeedReport
 	local openMomentCommentReport = props.openMomentCommentReport
 	local openBlockUser = props.openBlockUser
@@ -578,6 +605,7 @@ local function MomentsTabEntry(props)
 	local v7 = useMemo(fn, {
 		openProfile,
 		openOwnMoments,
+		openAvatarMomentsCreation,
 		openMomentsFeedReport,
 		openMomentCommentReport,
 		openBlockUser,
@@ -594,11 +622,21 @@ local function MomentsTabEntry(props)
 		sessionStore = ref4.current,
 		openProfile = v7.openProfile,
 		openOwnMoments = v7.openOwnMoments,
-		openMomentsFeedReport = v7.openMomentsFeedReport,
+		openAvatarMomentsCreation = 0,
+		openMomentsFeedReport = 0,
 		openAvatarLookTryOn = 0,
 		openMomentCommentReport = 0,
 		openBlockUser = 0
 	}
+	local openAvatarMomentsCreation2
+
+	if FFlagMomentsCreateAvatarPosts then
+		openAvatarMomentsCreation2 = v7.openAvatarMomentsCreation
+	end
+
+	v8.openAvatarMomentsCreation = openAvatarMomentsCreation2
+
+	v8.openMomentsFeedReport = v7.openMomentsFeedReport
 	local openAvatarLookTryOn
 
 	if FFlagMomentsAvatarLookTryOn then

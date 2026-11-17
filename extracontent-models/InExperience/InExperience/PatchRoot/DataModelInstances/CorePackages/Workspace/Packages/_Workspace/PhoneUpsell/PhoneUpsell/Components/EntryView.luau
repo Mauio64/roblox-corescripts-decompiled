@@ -6,7 +6,6 @@ local React = require(parent.React)
 local UIBlox = require(parent.UIBlox)
 local Foundation = require(parent.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local useStyle = UIBlox.Core.Style.useStyle
 local Localization = require(parent.Localization)
@@ -78,79 +77,57 @@ local function EntryView(p)
 
 	local baseSize = v4.Font.BaseSize
 
-	local createElement = React.createElement
-	local v6 = {
-		title = v5.titleKey,
-		screenSize = v2.screenSize,
-		buttonStackProps = getButtonStackProps(
-			v5.buttonKey,
-			v2.onButtonClick,
-			v2.isButtonDisabled,
-			v5.extraButtonKey,
-			v2.onExtraButtonClick,
-			v2.isExtraButtonDisabled
-		),
-		onCloseClicked = v2.onClose
-	}
-
-	local createElement2 = React.createElement
-	local v7 = {
-		BackgroundTransparency = 1,
-		AutomaticSize = Enum.AutomaticSize.Y,
-		Size = UDim2.new(1, 0, 0, 0)
-	}
-	local v8 = {
-		ContentPadding = React.createElement("UIPadding", {
-			PaddingTop = UDim.new(0, 12),
-			PaddingBottom = UDim.new(0, 24)
-		}),
-		ListLayout = React.createElement("UIListLayout", {
-			SortOrder = Enum.SortOrder.LayoutOrder,
-			HorizontalAlignment = Enum.HorizontalAlignment.Center,
-			Padding = UDim.new(0, 6)
-		}),
-		BodyText = 0
-	}
-
-	local createElement3 = React.createElement
-	local v9 = {
-		LayoutOrder = 0,
-		BackgroundTransparency = 1,
-		Text = v5.descriptionKey,
-		TextSize = baseSize,
-		TextColor3 = v4.Theme.TextDefault.Color,
-		TextTransparency = v4.Theme.TextDefault.Transparency,
-		Font = 0,
-		FontFace = 0,
-		TextXAlignment = 0,
-		TextWrapped = true,
-		Size = 0,
-		AutomaticSize = 0,
-		RichText = true
-	}
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = v4.Font.Body.Font
-	end
-
-	v9.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(v4.Tokens.Typography.BodyLarge.Font)
-	end
-
-	v9.FontFace = fontFace
-
-	v9.TextXAlignment = Enum.TextXAlignment.Left
-
-	v9.Size = UDim2.new(0, partialPageModalMiddleContentWidth, 0, 0)
-	v9.AutomaticSize = Enum.AutomaticSize.Y
-	v8.BodyText = createElement3("TextLabel", v9)
-	return createElement(PartialPageModal, v6, {
-		Middle = createElement2("Frame", v7, v8)
-	})
+	return React.createElement(
+		PartialPageModal,
+		{
+			title = v5.titleKey,
+			screenSize = v2.screenSize,
+			buttonStackProps = getButtonStackProps(
+				v5.buttonKey,
+				v2.onButtonClick,
+				v2.isButtonDisabled,
+				v5.extraButtonKey,
+				v2.onExtraButtonClick,
+				v2.isExtraButtonDisabled
+			),
+			onCloseClicked = v2.onClose
+		},
+		{
+			Middle = React.createElement(
+				"Frame",
+				{
+					BackgroundTransparency = 1,
+					AutomaticSize = Enum.AutomaticSize.Y,
+					Size = UDim2.new(1, 0, 0, 0)
+				},
+				{
+					ContentPadding = React.createElement("UIPadding", {
+						PaddingTop = UDim.new(0, 12),
+						PaddingBottom = UDim.new(0, 24)
+					}),
+					ListLayout = React.createElement("UIListLayout", {
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						HorizontalAlignment = Enum.HorizontalAlignment.Center,
+						Padding = UDim.new(0, 6)
+					}),
+					BodyText = React.createElement("TextLabel", {
+						LayoutOrder = 0,
+						BackgroundTransparency = 1,
+						Text = v5.descriptionKey,
+						TextSize = baseSize,
+						TextColor3 = v4.Theme.TextDefault.Color,
+						TextTransparency = v4.Theme.TextDefault.Transparency,
+						FontFace = normalizeFontFace(v4.Tokens.Typography.BodyLarge.Font),
+						TextXAlignment = Enum.TextXAlignment.Left,
+						TextWrapped = true,
+						Size = UDim2.new(0, partialPageModalMiddleContentWidth, 0, 0),
+						AutomaticSize = Enum.AutomaticSize.Y,
+						RichText = true
+					})
+				}
+			)
+		}
+	)
 end
 
 return EntryView

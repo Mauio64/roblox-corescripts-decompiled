@@ -34,30 +34,30 @@ function extended:init()
 end
 
 function extended.render(p)
-	if p.state.isLoaded then
-		return renderWithCoreScriptsStyleProvider({
-			RobloxCaptureNotificationGui = Roact.createElement("ScreenGui", {
-				AutoLocalize = false,
-				DisplayOrder = 9,
-				IgnoreGuiInset = true,
-				OnTopOfCoreBlur = true,
-				ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	if not p.state.isLoaded then
+		return nil
+	end
+
+	return renderWithCoreScriptsStyleProvider({
+		RobloxCaptureNotificationGui = Roact.createElement("ScreenGui", {
+			AutoLocalize = false,
+			DisplayOrder = 9,
+			IgnoreGuiInset = true,
+			OnTopOfCoreBlur = true,
+			ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+		}, {
+			Content = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 1, 0)
 			}, {
-				Content = Roact.createElement("Frame", {
-					BackgroundTransparency = 1,
-					Size = UDim2.new(1, 0, 1, 0)
-				}, {
-					WarningToast = Roact.createElement(Toast, {
-						duration = 5,
-						show = true,
-						toastContent = p.getToastContent()
-					})
+				WarningToast = Roact.createElement(Toast, {
+					duration = 5,
+					show = true,
+					toastContent = p.getToastContent()
 				})
 			})
 		})
-	end
-
-	return nil
+	})
 end
 
 return extended

@@ -33,7 +33,6 @@ local FFlagSduiAddCollectibleItemDataHydration = SharedFlags.FFlagSduiAddCollect
 local FFlagSduiLeaderboardComponent = SharedFlags.FFlagSduiLeaderboardComponent
 local FFlagSduiDevStoreSeeAllSupport = SharedFlags.FFlagSduiDevStoreSeeAllSupport
 local FFlagSduiCapabilityBindings = SharedFlags.FFlagSduiCapabilityBindings
-local FFlagMigrateGameInfoToStore = SharedFlags.FFlagMigrateGameInfoToStore
 local FFlagSduiSupportRatingNoPercent = SharedFlags.FFlagSduiSupportRatingNoPercent
 local FFlagSduiNotificationBadgeHydration = SharedFlags.FFlagSduiNotificationBadgeHydration
 
@@ -53,11 +52,7 @@ local function updateCreatorInfoStore(creator) -- 1 equivalent call inferred fro
 end
 
 local function updateGameInfos(universe) -- 1 equivalent call inferred from this helper
-	if FFlagMigrateGameInfoToStore then
-		DataHydration.Game.getGameInfoStore(false).updateGameInfos(universe, false)
-	else
-		DataHydration.Game.getGameInfoStore(false).updateGameInfos(universe)
-	end
+	DataHydration.Game.getGameInfoStore(false).updateGameInfos(universe, false)
 end
 
 local function updateAgeRecommendations(ageRecommendation) -- 1 equivalent call inferred from this helper
@@ -227,10 +222,12 @@ local function calculateUniverseDerivedField(p: string, data, _)
 		}
 
 		return DataHydration.Game.VotesUtils.getRatingDisplayText(v, true)
-	elseif p == "refund_policy_learn_more_url" then
-		return getZendeskUrl(nil, LocalizationService.RobloxLocaleId, data and data.refund_article_id)
 	else
-		return nil
+		if p ~= "refund_policy_learn_more_url" then
+			return nil
+		end
+
+		return getZendeskUrl(nil, LocalizationService.RobloxLocaleId, data and data.refund_article_id)
 	end
 end
 
@@ -507,16 +504,6 @@ local function getDataHydrationField(p, list, p2: string, p3, flag: boolean?)
 		return nil, nil
 	end
 
-	if not FFlagMigrateGameInfoToStore and p == "universe" and #list == 2 then
-		if list[2] == "icon" then
-			return getUniverseIcon(p2, p3)
-		end
-
-		if list[2] == "largeIcon" then
-			return getUniverseIcon(p2, p3, DataHydration.Game.GameIconSize.Large)
-		end
-	end
-
 	local dataObjectSignal = getDataObjectSignal(p, list, p2, flag)
 
 	if not dataObjectSignal then
@@ -537,11 +524,11 @@ local function getDataHydrationField(p, list, p2: string, p3, flag: boolean?)
 		return v3, status
 	end
 
-	if #list == 2 then
-		return calculateDerivedFieldValue(p, list[2], data, p3), status
+	if #list ~= 2 then
+		return nil, status
 	end
 
-	return nil, status
+	return calculateDerivedFieldValue(p, list[2], data, p3), status
 end
 
 local function resolveUniverseField(p, list, p2: string, p3, flag: boolean?)
@@ -605,11 +592,6 @@ end
 local v2 = {}
 v2.badge = getDataHydrationField
 v2.creator = getDataHydrationField
-
-if not FFlagMigrateGameInfoToStore then
-	resolveUniverseField = getDataHydrationField
-end
-
 v2.universe = resolveUniverseField
 v2.ageRecommendation = getDataHydrationField
 v2.mediaAsset = getDataHydrationField
@@ -762,10 +744,7 @@ function SduiDataBinder.updateDataStores(data)
 
 	if data.universe then
 		updateGameInfos(data.universe) -- inferred equivalent call
-
-		if FFlagMigrateGameInfoToStore then
-			updateVoteCountsFromUniverses(data.universe)
-		end
+		updateVoteCountsFromUniverses(data.universe)
 	end
 
 	if data.ageRecommendation then

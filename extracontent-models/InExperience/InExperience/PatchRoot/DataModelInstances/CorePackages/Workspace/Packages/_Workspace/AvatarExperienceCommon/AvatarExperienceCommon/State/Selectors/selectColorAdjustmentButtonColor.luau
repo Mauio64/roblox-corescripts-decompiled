@@ -1,18 +1,7 @@
-local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
-
-local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
-local FFlagAXColorAdjustmentButtonShouldAccountForTryOns = AvatarExperienceFlags.FFlagAXColorAdjustmentButtonShouldAccountForTryOns
-
 local selectAvatarPreviewColors = require(script.Parent.selectAvatarPreviewColors)
 
 local function selectColorAdjustmentButtonColor(p)
-	local v
-
-	if FFlagAXColorAdjustmentButtonShouldAccountForTryOns then
-		v = selectAvatarPreviewColors(p)
-	else
-		v = p.AvatarExperience.AvatarEditor.Character.BodyColor3s
-	end
+	local v = selectAvatarPreviewColors(p)
 
 	if not v then
 		return Color3.new()

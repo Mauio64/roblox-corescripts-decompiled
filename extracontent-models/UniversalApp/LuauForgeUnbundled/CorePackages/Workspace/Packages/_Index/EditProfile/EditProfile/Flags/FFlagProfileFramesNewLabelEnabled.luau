@@ -1,2 +1,0 @@
-return game:DefineFastFlag("ProfileFramesNewLabelEnabled", false)
-	and game:GetEngineFeature("ProfileFramesNewLabelSeenStorageKey")

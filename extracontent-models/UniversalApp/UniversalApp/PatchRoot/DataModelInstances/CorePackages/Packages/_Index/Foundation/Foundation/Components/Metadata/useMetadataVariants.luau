@@ -14,11 +14,11 @@ local VariantsContext = require(Foundation.Providers.Style.VariantsContext)
 
 require(Foundation.Providers.Style.Tokens)
 
-local function variantsFactory(p)
+local function variantsFactory(data)
 	return {
 		common = {
 			container = { tag = "row align-y-center auto-xy" },
-			item = { tag = "row align-y-center gap-xsmall auto-xy" },
+			item = { tag = "row align-y-center gap-xsmall auto-xy", gap = data.Gap.XSmall },
 			truncatedItem = { tag = "row align-y-center shrink gap-xsmall auto-xy" },
 			text = { tag = "auto-xy content-default", openTypeFeatures = "zero, ss03" },
 			truncatedText = { tag = "shrink auto-xy text-truncate-split content-default" },
@@ -29,17 +29,19 @@ local function variantsFactory(p)
 				iconSize = IconSize.Small,
 				avatarSize = AvatarIconSize.Small,
 				avatarTag = "auto-xy padding-right-xxsmall",
-				style = p.Color.Content.Default
+				style = data.Color.Content.Default,
+				width = data.Size.Size_400,
+				avatarWidth = data.Size.Size_400 + data.Padding.XXSmall
 			}
 		},
 		sizes = {
 			[MetadataSize.Medium] = {
-				text = { tag = "text-body-medium", fontStyle = p.Typography.BodyMedium },
+				text = { tag = "text-body-medium", fontStyle = data.Typography.BodyMedium },
 				truncatedText = { tag = "text-body-medium" },
 				wrappedText = { tag = "text-body-medium" }
 			},
 			[MetadataSize.Small] = {
-				text = { tag = "text-body-small", fontStyle = p.Typography.BodySmall },
+				text = { tag = "text-body-small", fontStyle = data.Typography.BodySmall },
 				truncatedText = { tag = "text-body-small" },
 				wrappedText = { tag = "text-body-small" }
 			}

@@ -67,19 +67,19 @@ local function getKeyCodeContent(data)
 	return { inputType = "keyboard", content = content }
 end
 
-local function getWidthFromContent(p, p2)
-	if p.inputType == "keyboard" then
-		if type(p.content) ~= "string" then
+local function getWidthFromContent(keyCodeContent, p)
+	if keyCodeContent.inputType == "keyboard" then
+		if type(keyCodeContent.content) ~= "string" then
 			return Constants.PREFERRED_WIDTH
 		end
 
-		local baseSize = p2.BaseSize
+		local baseSize = p.BaseSize
 
-		local captionBody = p2.CaptionBody
+		local captionBody = p.CaptionBody
 		local v2 = baseSize * captionBody.RelativeSize
 
 		local fontFromFontStyle = GetFontFromFontStyle(captionBody)
-		local x = GetTextSize(p.content, v2, fontFromFontStyle, Vector2.zero).X
+		local x = GetTextSize(keyCodeContent.content, v2, fontFromFontStyle, Vector2.zero).X
 
 		if x + 2 * Constants.MIN_SIDE_PADDING > Constants.PREFERRED_WIDTH then
 			return x + 2 * Constants.SIDE_PADDING
@@ -87,17 +87,17 @@ local function getWidthFromContent(p, p2)
 
 		return Constants.PREFERRED_WIDTH
 	else
-		if p.inputType ~= "gamepad" then
-			assert(false, string.format("Unreachable: Invalid inputType value: %q", p.inputType))
+		if keyCodeContent.inputType ~= "gamepad" then
+			assert(false, string.format("Unreachable: Invalid inputType value: %q", keyCodeContent.inputType))
 			return
 		end
 
 		local v2
 
-		if typeof(p.content) == "string" then
+		if typeof(keyCodeContent.content) == "string" then
 			v2 = Constants.DEFAULT_GAMEPAD_ICON_SIZE
 		else
-			v2 = p.content.ImageRectSize
+			v2 = keyCodeContent.content.ImageRectSize
 		end
 
 		return v2.X * Constants.HEIGHT / v2.Y

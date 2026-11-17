@@ -8,7 +8,7 @@ local isPointInsideBounds = PressCaptureUtils.isPointInsideBounds
 local getInputPosition = PressCaptureUtils.getInputPosition
 local isPressInput = PressCaptureUtils.isPressInput
 
-local function disconnectGlobalInputEnded(p) -- 4 equivalent calls inferred from this helper
+local function disconnectGlobalInputEnded(p) -- 5 equivalent calls inferred from this helper
 	if p.inputEndedConnection then
 		p.inputEndedConnection:Disconnect()
 		p.inputEndedConnection = nil
@@ -27,7 +27,7 @@ local function disconnectInstanceListeners(state) -- 4 equivalent calls inferred
 	end
 end
 
-local function clearPressTracking(state) -- 5 equivalent calls inferred from this helper
+local function clearPressTracking(state) -- 6 equivalent calls inferred from this helper
 	state.isPressed = false
 	state.boundsPosition = nil
 	state.boundsSize = nil
@@ -76,18 +76,18 @@ return function(current)
 	local v = React.useCallback(function(p)
 		local current2 = ref2.current
 
-		if
-			current2.isPressed
-			and current2.boundsPosition
-			and current2.boundsSize
-			and isPointInsideBounds(getInputPosition(p), current2.boundsPosition, current2.boundsSize)
-		then
-			onActivated()
-			return
-		end
+		if current2.isPressed and current2.boundsPosition and current2.boundsSize then
+			if isPointInsideBounds(getInputPosition(p), current2.boundsPosition, current2.boundsSize) then
+				onActivated()
+				return
+			end
 
-		clearPressTracking(current2) -- inferred equivalent call
-		disconnectGlobalInputEnded(current2) -- inferred equivalent call
+			clearPressTracking(current2) -- inferred equivalent call
+			disconnectGlobalInputEnded(current2) -- inferred equivalent call
+		else
+			clearPressTracking(current2) -- inferred equivalent call
+			disconnectGlobalInputEnded(current2) -- inferred equivalent call
+		end
 	end, { onActivated })
 
 	local v2 = React.useCallback(function()

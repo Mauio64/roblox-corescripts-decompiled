@@ -61,22 +61,22 @@ local v = {
 	} or nil
 }
 
-local function markConversationAndMessagesAsRead(p, p2: string)
-	local v2 = p[p2]
+local function markConversationAndMessagesAsRead(p, conversation_id: string)
+	local v2 = p[conversation_id]
 
 	if not v2 then
-		warn("Conversation " .. p2 .. " not found when marking conversation as read")
+		warn("Conversation " .. conversation_id .. " not found when marking conversation as read")
 		return p
 	end
 
 	assert(v2, "FFlagLuauTinyControlFlowAnalysis")
 
-	local mapped = v2.messages:Map(function(p3)
-		if p3.read then
-			return p3
+	local mapped = v2.messages:Map(function(p2)
+		if p2.read then
+			return p2
 		end
 
-		return Immutable.Set(p3, "read", true)
+		return Immutable.Set(p2, "read", true)
 	end)
 
 	local v3 = Immutable.Set(v2, "messages", mapped)

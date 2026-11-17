@@ -1,6 +1,8 @@
 local ShareSheet = script:FindFirstAncestor("ShareSheet")
 local parent = ShareSheet.Parent
 
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Array = LuauPolyfill.Array
 local Foundation = require(parent.Foundation)
 local React = require(parent.React)
 local Signals = require(parent.Signals)
@@ -13,114 +15,109 @@ local View = Foundation.View
 local IconName = Foundation.Enums.IconName
 local Radius = Foundation.Enums.Radius
 
-local SharedFlags = require(parent.SharedFlags)
-local FFlagShareSheetFriendsSort = SharedFlags.FFlagShareSheetFriendsSort
-local FFlagShareSheetPeoplePickerEnabled = require(ShareSheet.Flags.FFlagShareSheetPeoplePickerEnabled)
+local FFlagShareSheetDesktopReadiness = require(ShareSheet.Flags.FFlagShareSheetDesktopReadiness)
 local Recipient = require(ShareSheet.Recipients.Recipient)
 local ShareSheetConstants = require(ShareSheet.ShareSheetConstants)
 local ShareSheetRow = require(script.Parent.ShareSheetRow)
 local ShareSheetItemContainer = require(script.Parent.ShareSheetItemContainer)
-local ConversationUtils
-
-if FFlagShareSheetPeoplePickerEnabled then
-	ConversationUtils = require(ShareSheet.Utils.ConversationUtils)
-else
-	ConversationUtils = nil
-end
+require(script.Parent.getShareSheetRowLayout)
 
 local Players = game:GetService("Players")
 
-require(ShareSheet.Types)
+local function createSkeletonItems(p)
+	local children = {}
+	local v
 
-local function getOtherParticipants(participants, localUserId: string) -- 1 equivalent call inferred from this helper
-	local otherParticipants = {}
-
-	for _, item in participants do
-		if item ~= localUserId then
-			table.insert(otherParticipants, item)
-		end
+	if FFlagShareSheetDesktopReadiness then
+		v = p.rowLayout.visibleTileCount
+	else
+		v = ShareSheetConstants.FIntShareSheetNumAvatarSkeletons
 	end
 
-	return otherParticipants
-end
+	for i = 1, v do
+		local v2
 
-local function createSkeletonItems()
-	local children = {}
+		if FFlagShareSheetDesktopReadiness then
+			v2 = p.rowLayout.getTileWidth(i)
+		end
 
-	for i = 1, ShareSheetConstants.FIntShareSheetNumAvatarSkeletons do
-		children[`Skeleton{i}`] = React.createElement(
-			View,
-			{ LayoutOrder = i, tag = "col align-x-center gap-small size-1700-0 auto-y" },
-			{
-				Avatar = React.createElement(
-					View,
-					{
-						LayoutOrder = 1,
-						tag = "size-full-1700",
-						testId = "share-sheet-avatar-skeleton-container"
-					},
-					{
-						Skeleton = React.createElement(Skeleton, {
-							radius = Radius.Circle,
-							testId = "share-sheet-avatar-skeleton"
-						})
-					}
-				),
-				Text = React.createElement(
-					View,
-					{
-						LayoutOrder = 2,
-						tag = "size-full-400",
-						testId = "share-sheet-text-skeleton-container"
-					},
-					{
-						Skeleton = React.createElement(Skeleton, {
-							radius = Radius.Medium,
-							testId = "share-sheet-text-skeleton"
-						})
-					}
-				)
-			}
-		)
+		local formatted = `Skeleton{i}`
+		local createElement = React.createElement
+		local v3 = {
+			LayoutOrder = i,
+			tag = {
+				["col align-x-center gap-small auto-y"] = true,
+				["size-1700-0"] = not FFlagShareSheetDesktopReadiness
+			},
+			Size = 0
+		}
+		local size
+
+		if FFlagShareSheetDesktopReadiness then
+			size = UDim2.fromOffset(v2, 0)
+		end
+
+		v3.Size = size
+
+		local createElement2 = React.createElement
+		local v4 = {
+			LayoutOrder = 1,
+			tag = {
+				["size-full-1700"] = not FFlagShareSheetDesktopReadiness
+			},
+			Size = 0,
+			testId = "share-sheet-avatar-skeleton-container"
+		}
+		local size2
+
+		if FFlagShareSheetDesktopReadiness then
+			size2 = UDim2.fromOffset(v2, v2)
+		end
+
+		v4.Size = size2
+		children[formatted] = createElement(View, v3, {
+			Avatar = createElement2(View, v4, {
+				Skeleton = React.createElement(Skeleton, {
+					radius = Radius.Circle,
+					testId = "share-sheet-avatar-skeleton"
+				})
+			}),
+			Text = React.createElement(
+				View,
+				{
+					LayoutOrder = 2,
+					tag = "size-full-400",
+					testId = "share-sheet-text-skeleton-container"
+				},
+				{
+					Skeleton = React.createElement(Skeleton, {
+						radius = Radius.Medium,
+						testId = "share-sheet-text-skeleton"
+					})
+				}
+			)
+		})
 	end
 
 	return children
 end
 
-local function ShareSheetConversationItem(props)
-	local conversation = props.conversation
-	local id = conversation.id
-	local onActivated = React.useCallback(function()
-		props.onConversationActivated(id)
-	end, { id, props.onConversationActivated })
-	local primaryUserId, secondUserId, label
-
-	if FFlagShareSheetPeoplePickerEnabled then
-		primaryUserId, secondUserId = ConversationUtils.getParticipantUserIds(conversation, props.localUserId)
-		label = ConversationUtils.getDisplayName(conversation)
-	else
-		local otherParticipants = getOtherParticipants(conversation.participants or {}, props.localUserId) -- inferred equivalent call
-		primaryUserId = otherParticipants[1] or props.localUserId
-
-		if #otherParticipants >= 2 then
-			secondUserId = otherParticipants[2]
-		end
-
-		label = conversation.titleForViewer
-
-		if not label or label == "" then
-			label = conversation.title or ""
-		end
+local function getRecipientsToShow(props)
+	local recipients = props.socialRowRecipients.recipients
+	local function isSelected(p): boolean -- 1 equivalent call inferred from this helper
+		return props.selectedConversationIds[p.id] == true
 	end
 
-	return React.createElement(ShareSheetItemContainer, {
-		primaryUserId = primaryUserId,
-		secondUserId = secondUserId,
-		isSelected = props.isSelected,
-		label = label,
-		onActivated = onActivated,
-		LayoutOrder = props.LayoutOrder
-	})
+	local v = props.rowLayout.maxTileCount - 1 - #Array.filter(recipients, isSelected)
+
+	return Array.filter(recipients, function(p): boolean
+		if isSelected(p) then -- inferred equivalent call
+			return true
+		end
+
+		v -= 1
+		return v >= 0
+	end)
 end
 
 local function ShareSheetRecipientItem(props)
@@ -136,81 +133,125 @@ local function ShareSheetRecipientItem(props)
 	end, { props.recipient })
 	local label = SignalsReact.useSignalState(v)
 
-	return React.createElement(ShareSheetItemContainer, {
+	local createElement = React.createElement
+	local v2 = {
 		primaryUserId = participantIds[1] or props.localUserId,
 		secondUserId = participantIds[2],
 		isSelected = props.isSelected,
 		label = label,
 		onActivated = onActivated,
-		LayoutOrder = props.LayoutOrder
-	})
+		width = 0,
+		LayoutOrder = 0
+	}
+	local width
+
+	if FFlagShareSheetDesktopReadiness then
+		width = props.width
+	end
+
+	v2.width = width
+	v2.LayoutOrder = props.LayoutOrder
+	return createElement(ShareSheetItemContainer, v2)
 end
 
 local function ShareSheetSocialRow(props)
 	local userId = tostring(Players.LocalPlayer and Players.LocalPlayer.UserId or 0)
-	local v
-
-	if FFlagShareSheetPeoplePickerEnabled then
-		v = useLocalization({ more = "CommonUI.Features.Label.More" })
-	end
+	local v = useLocalization({ more = "CommonUI.Features.Label.More" })
 
 	local children = {}
 	local v2
 
-	if FFlagShareSheetFriendsSort then
-		v2 = props.socialRowRecipients.isLoading
-	else
-		v2 = props.conversationEligibility.isLoading
-	end
+	if props.isLoading or props.socialRowRecipients.isLoading then
+		local v3
 
-	if props.isLoading or v2 then
-		children = createSkeletonItems()
+		if FFlagShareSheetDesktopReadiness then
+			v3 = props
+		end
+
+		children = createSkeletonItems(v3)
+
+		if FFlagShareSheetDesktopReadiness then
+			v2 = props.rowLayout.visibleTileCount
+		end
 	else
 		local v3
 
-		if FFlagShareSheetFriendsSort then
-			local recipients = props.socialRowRecipients.recipients
-
-			for k, recipient in recipients do
-				children[recipient.id] = React.createElement(ShareSheetRecipientItem, {
-					recipient = recipient,
-					isSelected = props.selectedConversationIds[recipient.id] == true,
-					localUserId = userId,
-					onConversationActivated = props.onConversationActivated,
-					LayoutOrder = k
-				})
-			end
-
-			v3 = #recipients
+		if FFlagShareSheetDesktopReadiness then
+			v3 = getRecipientsToShow(props)
 		else
-			local eligibleConversations = props.conversationEligibility.eligibleConversations
+			v3 = props.socialRowRecipients.recipients
+		end
 
-			for k, eligibleConversation in eligibleConversations do
-				local id = eligibleConversation.id
+		for k, recipient in v3 do
+			local id = recipient.id
+			local createElement = React.createElement
+			local v4 = {
+				recipient = recipient,
+				isSelected = props.selectedConversationIds[recipient.id] == true,
+				localUserId = userId,
+				onConversationActivated = props.onConversationActivated,
+				width = 0,
+				LayoutOrder = 0
+			}
+			local width
 
-				children[id] = React.createElement(ShareSheetConversationItem, {
-					conversation = eligibleConversation,
-					isSelected = props.selectedConversationIds[id] == true,
-					localUserId = userId,
-					onConversationActivated = props.onConversationActivated,
-					LayoutOrder = k
-				})
+			if FFlagShareSheetDesktopReadiness then
+				width = props.rowLayout.getTileWidth(k)
 			end
 
-			v3 = #eligibleConversations
+			v4.width = width
+
+			v4.LayoutOrder = k
+			children[id] = createElement(ShareSheetRecipientItem, v4)
 		end
 
-		if FFlagShareSheetPeoplePickerEnabled then
-			children.More = React.createElement(ShareSheetItemContainer, {
-				icon = IconName.ThreeDotsHorizontal,
-				label = v.more,
-				onActivated = props.onMoreActivated,
-				LayoutOrder = v3 + 1
-			})
+		if FFlagShareSheetDesktopReadiness then
+			v2 = #v3 + 1
 		end
+
+		local createElement = React.createElement
+		local v4 = {
+			icon = IconName.ThreeDotsHorizontal,
+			label = v.more,
+			onActivated = props.onMoreActivated,
+			width = 0,
+			LayoutOrder = 0
+		}
+		local width
+
+		if FFlagShareSheetDesktopReadiness then
+			width = props.rowLayout.getTileWidth(v2)
+		end
+
+		v4.width = width
+		v4.LayoutOrder = #v3 + 1
+		children.More = createElement(ShareSheetItemContainer, v4)
 	end
 
-	return React.createElement(ShareSheetRow, { LayoutOrder = props.LayoutOrder }, children)
+	local createElement = React.createElement
+	local v3 = { LayoutOrder = props.LayoutOrder, margin = 0, gap = 0, isScrollingEnabled = 0 }
+	local margin
+
+	if FFlagShareSheetDesktopReadiness then
+		margin = props.rowLayout.margin
+	end
+
+	v3.margin = margin
+	local gap
+
+	if FFlagShareSheetDesktopReadiness then
+		gap = props.rowLayout.gap
+	end
+
+	v3.gap = gap
+	local isScrollingEnabled
+
+	if FFlagShareSheetDesktopReadiness then
+		isScrollingEnabled = props.rowLayout.isScrollingEnabled(v2)
+	end
+
+	v3.isScrollingEnabled = isScrollingEnabled
+	return createElement(ShareSheetRow, v3, children)
 end
 
 return ShareSheetSocialRow

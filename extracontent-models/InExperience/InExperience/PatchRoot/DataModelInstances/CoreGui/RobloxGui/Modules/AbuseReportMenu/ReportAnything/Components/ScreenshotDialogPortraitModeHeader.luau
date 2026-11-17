@@ -3,7 +3,6 @@ local CorePackages = game:GetService("CorePackages")
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local Foundation = require(CorePackages.Packages.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local React = require(CorePackages.Packages.React)
 
 local HeaderBar = UIBlox.App.Bar.HeaderBar
@@ -36,50 +35,25 @@ end
 
 local function renderCenter(titleText) -- 1 equivalent call inferred from this helper
 	return function()
-		return withStyle(function(props)
+		return withStyle(function(p)
 			local currentCamera = game.Workspace.CurrentCamera
 
 			local v = currentCamera == nil and 300 or currentCamera.ViewportSize.X - 150
 
-			local theme = props.Theme
-			local font = props.Font
+			local theme = p.Theme
 
-			local createElement = React.createElement
-			local v2 = {
+			return React.createElement("TextLabel", {
 				Text = titleText,
-				Font = 0,
-				FontFace = 0,
-				TextColor3 = 0,
-				TextTransparency = 0,
+				FontFace = normalizeFontFace(p.Tokens.Typography.TitleLarge.Font),
+				TextColor3 = theme.TextEmphasis.Color,
+				TextTransparency = theme.TextEmphasis.Transparency,
 				TextSize = 20,
 				TextWrapped = true,
-				TextXAlignment = 0,
-				TextYAlignment = 0,
-				Size = 0,
+				TextXAlignment = Enum.TextXAlignment.Center,
+				TextYAlignment = Enum.TextYAlignment.Center,
+				Size = UDim2.new(0, v, 1, 0),
 				BackgroundTransparency = 1
-			}
-			local font2
-
-			if not FoundationFontFaceMigration then
-				font2 = font.Header2.Font
-			end
-
-			v2.Font = font2
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(props.Tokens.Typography.TitleLarge.Font)
-			end
-
-			v2.FontFace = fontFace
-
-			v2.TextColor3 = theme.TextEmphasis.Color
-			v2.TextTransparency = theme.TextEmphasis.Transparency
-
-			v2.TextXAlignment = Enum.TextXAlignment.Center
-			v2.TextYAlignment = Enum.TextYAlignment.Center
-			v2.Size = UDim2.new(0, v, 1, 0)
-			return createElement("TextLabel", v2)
+			})
 		end)
 	end
 end

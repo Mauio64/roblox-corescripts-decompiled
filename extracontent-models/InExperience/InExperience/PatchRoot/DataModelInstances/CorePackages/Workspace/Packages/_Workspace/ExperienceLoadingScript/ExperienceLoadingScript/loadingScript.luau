@@ -27,7 +27,9 @@ local SharedFlags3 = require(parent.SharedFlags)
 local FFlagTiltLoadingScreenEnterExitHold = SharedFlags3.FFlagTiltLoadingScreenEnterExitHold
 
 local SharedFlags4 = require(parent.SharedFlags)
-local FFlagEnableTiltLoadingScreen = SharedFlags4.FFlagEnableTiltLoadingScreen
+local FFlagTiltLoadingScreenDismissOnLoaded = SharedFlags4.FFlagTiltLoadingScreenDismissOnLoaded
+local SharedFlags5 = require(parent.SharedFlags)
+local FFlagEnableTiltLoadingScreen = SharedFlags5.FFlagEnableTiltLoadingScreen
 
 local CoreGui = game:GetService("CoreGui")
 
@@ -78,7 +80,7 @@ local function GenerateDevGUIBlackoutCurtain()
 	return devGUIBlackoutCurtain
 end
 
-local function mountTiltLoadingScreen(placeId, cleanUpTilt, p)
+local function mountTiltLoadingScreen(placeId, onTiltDismissComplete, p)
 	local React = require(parent.React)
 	local ReactRoblox = require(parent.ReactRoblox)
 	local ProgressLoading = require(parent.ProgressLoading)
@@ -128,8 +130,17 @@ local function mountTiltLoadingScreen(placeId, cleanUpTilt, p)
 		placeId = placeId,
 		onCancel = onCancel,
 		onDismissComplete = function()
+			if FFlagTiltLoadingScreenDismissOnLoaded then
+				onTiltDismissComplete()
+				return
+			end
+
+			if FFlagLoadingScreenMilestones and p then
+				p.complete()
+			end
+
 			unmount() -- inferred equivalent call
-			cleanUpTilt()
+			onTiltDismissComplete()
 			LoggingProtocol.default:logEventOnce("first_experience_interactive")
 		end
 	}))
@@ -142,63 +153,70 @@ local function fn(placeId, p)
 	local v2 = false
 	local v3 = false
 
-	local fn2
+	local fn2 = nil
 	local v4 = nil
-	local v5 = nil
+	local fn3 = nil
+	local v5 = false
+	local v6 = nil
 
 	local parent2 = GenerateDevGUIBlackoutCurtain()
 
-	local v6 = nil
+	local v7 = nil
 
-	local function fn3(placeId2)
+	local function fn4(placeId2)
 		local Roact = require(parent.Roact)
-		v6 = Roact
+		v7 = Roact
 		local Rodux = require(parent.Rodux)
 		local RoactRodux = require(parent.RoactRodux)
 		local store = Rodux.Store.new(LoadingScreenReducer, {}, { Rodux.thunkMiddleware })
 
-		local createElement = v6.createElement
+		local createElement = v7.createElement
 		local milestones
 
 		if FFlagLoadingScreenControlMilestones then
-			milestones = v5
+			milestones = v6
 		end
 
 		local element = createElement(LoadingScreen, { placeId = placeId2, milestones = milestones })
 
-		local element2 = v6.createElement(RoactRodux.StoreProvider, { store = store }, {
-			v6.createElement(UiModeStyleProvider, {
+		local element2 = v7.createElement(RoactRodux.StoreProvider, { store = store }, {
+			v7.createElement(UiModeStyleProvider, {
 				style = { themeName = ColorMode.Dark, fontName = Constants.FontName.Gotham }
 			}, { loadingScreenUI = element })
 		})
 
-		local element3 = v6.createElement("Folder", nil, element2)
-		local v7 = v6.mount(element3, CoreGui, "RobloxLoadingGUI")
+		local element3 = v7.createElement("Folder", nil, element2)
+		local v8 = v7.mount(element3, CoreGui, "RobloxLoadingGUI")
 
 		RunService.Heartbeat:Wait()
 		parent2.Enabled = false
-		return v7
+		return v8
 	end
 
-	local function fn4() -- 2 equivalent calls inferred from this helper
-		if v6 then
+	local function fn5()
+		if FFlagTiltLoadingScreenDismissOnLoaded and fn3 then
+			fn3()
+			fn3 = nil
+		elseif v7 then
 			waitProxy(0.6)
 
 			if v4 ~= nil then
-				if FFlagLoadingScreenControlMilestones and v5 then
-					v5.record(LoadingScreenMilestones.Milestone.ScreenHidden)
-					v5.complete()
+				if FFlagLoadingScreenControlMilestones and v6 then
+					v6.record(LoadingScreenMilestones.Milestone.ScreenHidden)
+					v6.complete()
 				end
 
-				v6.unmount(v4)
+				v7.unmount(v4)
 				v4 = nil
 			end
 		end
 	end
 
-	local function fn5(p2: number)
+	local function fn6(p2: number)
 		v = false
-		fn4() -- inferred equivalent call
+
+		fn5()
+
 		splashScreenManager.initialize(p2 / 2, game:GetFastInt("FPSAwareSplashScreenTimeout"), p2)
 		splashScreenManager.addStatusChangeListener(function(p3)
 			v = p3
@@ -213,7 +231,7 @@ local function fn(placeId, p)
 		LoadingScreen3D.Parent = parent2
 	end
 
-	local function fn6() -- 2 equivalent calls inferred from this helper
+	local function fn7() -- 2 equivalent calls inferred from this helper
 		if Players.CharacterAutoLoads then
 			local localPlayer = Players.LocalPlayer
 
@@ -230,11 +248,11 @@ local function fn(placeId, p)
 
 	local function onFinishedReplicating()
 		if Game:IsLoaded() then
-			if FFlagLoadingScreenControlMilestones and v5 then
-				v5.dismissRequested(LoadingScreenMilestones.DismissSource.NormalReady)
+			if FFlagLoadingScreenControlMilestones and v6 then
+				v6.dismissRequested(LoadingScreenMilestones.DismissSource.NormalReady)
 			end
 
-			fn6() -- inferred equivalent call
+			fn7() -- inferred equivalent call
 			v2 = true
 
 			if fn2 then
@@ -246,11 +264,11 @@ local function fn(placeId, p)
 				loadedConnection:Disconnect()
 				loadedConnection = nil
 
-				if FFlagLoadingScreenControlMilestones and v5 then
-					v5.dismissRequested(LoadingScreenMilestones.DismissSource.NormalReady)
+				if FFlagLoadingScreenControlMilestones and v6 then
+					v6.dismissRequested(LoadingScreenMilestones.DismissSource.NormalReady)
 				end
 
-				fn6() -- inferred equivalent call
+				fn7() -- inferred equivalent call
 				v2 = true
 
 				if fn2 then
@@ -260,7 +278,7 @@ local function fn(placeId, p)
 		end
 	end
 
-	local function fn7() -- 4 equivalent calls inferred from this helper
+	local function fn8() -- 4 equivalent calls inferred from this helper
 		if parent2 then
 			parent2.Enabled = false
 			parent2:Destroy()
@@ -269,17 +287,17 @@ local function fn(placeId, p)
 	end
 
 	if VRService.VREnabled or IsVRAppBuild() then
-		fn5(p)
+		fn6(p)
 	elseif FFlagEnableTiltLoadingScreen then
 		if ReplicatedFirst:IsDefaultLoadingGuiRemoved() then
-			fn7() -- inferred equivalent call
+			fn8() -- inferred equivalent call
 			ReplicatedFirst:SetDefaultLoadingGuiRemoved()
 			LoggingProtocol.default:logEventOnce("first_experience_interactive")
 			return
 		else
 			local vREnabledChangedConnection = nil
 			local flag = true
-			local function cleanUpTilt() -- 1 equivalent call inferred from this helper
+			local function cleanUpTilt() -- 3 equivalent calls inferred from this helper
 				flag = false
 
 				if vREnabledChangedConnection then
@@ -287,39 +305,67 @@ local function fn(placeId, p)
 					vREnabledChangedConnection = nil
 				end
 
-				fn7() -- inferred equivalent call
+				fn8() -- inferred equivalent call
 			end
 
-			local v7
+			local v8
 
 			if FFlagLoadingScreenMilestones then
 				local start = LoadingScreenMilestones.start
-				local v8 = {
+				local v9 = {
 					page = LoadingScreenMilestones.Page.TiltLoadingScreen,
 					holdEnabled = FFlagTiltLoadingScreenEnterExitHold,
 					reducedMotion = 0
 				}
 
 				local UserGameSettings = UserSettings():GetService("UserGameSettings")
-				v8.reducedMotion = UserGameSettings.ReducedMotion
-				v7 = start(v8)
+				v9.reducedMotion = UserGameSettings.ReducedMotion
+				v8 = start(v9)
 			else
-				v7 = nil
+				v8 = nil
 			end
 
-			local v8 = mountTiltLoadingScreen(placeId, cleanUpTilt, v7)
+			local function onTiltDismissComplete()
+				if FFlagTiltLoadingScreenDismissOnLoaded then
+					v5 = true
+
+					if fn2 then
+						fn2()
+					end
+				else
+					cleanUpTilt() -- inferred equivalent call
+				end
+			end
+			local v9 = mountTiltLoadingScreen(placeId, onTiltDismissComplete, v8)
+
+			if FFlagTiltLoadingScreenDismissOnLoaded then
+				fn3 = function()
+					if FFlagLoadingScreenMilestones and v8 then
+						v8.complete()
+					end
+
+					v9()
+					cleanUpTilt() -- inferred equivalent call
+				end
+			end
 
 			local function transitionToVR() -- 2 equivalent calls inferred from this helper
 				if not flag then
 					return
 				end
 
-				if FFlagLoadingScreenMilestones and v7 then
-					v7.abort(AbortReason.VRHandoff)
+				if FFlagLoadingScreenMilestones and v8 then
+					v8.abort(AbortReason.VRHandoff)
 				end
 
 				cleanUpTilt() -- inferred equivalent call
-				v8()
+				v9()
+
+				if FFlagTiltLoadingScreenDismissOnLoaded then
+					fn3 = nil
+					fn2 = nil
+				end
+
 				fn(placeId, p)
 			end
 
@@ -341,45 +387,51 @@ local function fn(placeId, p)
 				end
 			end
 
-			return
+			if not (FFlagTiltLoadingScreenDismissOnLoaded and flag) then
+				return
+			end
 		end
 	else
 		VRService:GetPropertyChangedSignal("VREnabled"):Connect(function()
 			if VRService.VREnabled then
-				if FFlagLoadingScreenControlMilestones and v5 then
-					v5.abort(AbortReason.VRHandoff)
+				if FFlagLoadingScreenControlMilestones and v6 then
+					v6.abort(AbortReason.VRHandoff)
 				end
 
-				fn5(p)
+				fn6(p)
 			end
 		end)
 
 		if FFlagLoadingScreenControlMilestones and not ReplicatedFirst:IsDefaultLoadingGuiRemoved() then
 			local start = LoadingScreenMilestones.start
-			local v7 = {
+			local v8 = {
 				page = LoadingScreenMilestones.Page.LoadingScreenView,
 				holdEnabled = false,
 				reducedMotion = 0
 			}
 
 			local UserGameSettings = UserSettings():GetService("UserGameSettings")
-			v7.reducedMotion = UserGameSettings.ReducedMotion
-			v5 = start(v7)
+			v8.reducedMotion = UserGameSettings.ReducedMotion
+			v6 = start(v8)
 		end
 
-		v4 = fn3(placeId)
+		v4 = fn4(placeId)
 	end
 
 	fn2 = function()
 		if VRService.VREnabled then
 			if v or settingsProxy().Rendering.QualityLevel ~= Enum.QualityLevel.Automatic then
-				fn7() -- inferred equivalent call
+				fn8() -- inferred equivalent call
 				ReplicatedFirst:SetDefaultLoadingGuiRemoved()
 				LoggingProtocol.default:logEventOnce("first_experience_interactive")
 			end
 		elseif v2 or v3 then
-			fn4() -- inferred equivalent call
-			fn7() -- inferred equivalent call
+			if FFlagTiltLoadingScreenDismissOnLoaded and fn3 and not v5 then
+				return
+			end
+
+			fn5()
+			fn8() -- inferred equivalent call
 			ReplicatedFirst:SetDefaultLoadingGuiRemoved()
 			LoggingProtocol.default:logEventOnce("first_experience_interactive")
 		end
@@ -392,8 +444,8 @@ local function fn(placeId, p)
 	end
 
 	ReplicatedFirst.RemoveDefaultLoadingGuiSignal:Connect(function()
-		if FFlagLoadingScreenControlMilestones and v5 then
-			v5.dismissRequested(LoadingScreenMilestones.DismissSource.DeveloperOverride)
+		if FFlagLoadingScreenControlMilestones and v6 then
+			v6.dismissRequested(LoadingScreenMilestones.DismissSource.DeveloperOverride)
 		end
 
 		v3 = true
@@ -404,8 +456,8 @@ local function fn(placeId, p)
 	end)
 
 	if ReplicatedFirst:IsDefaultLoadingGuiRemoved() then
-		if FFlagLoadingScreenControlMilestones and v5 then
-			v5.dismissRequested(LoadingScreenMilestones.DismissSource.DeveloperOverride)
+		if FFlagLoadingScreenControlMilestones and v6 then
+			v6.dismissRequested(LoadingScreenMilestones.DismissSource.DeveloperOverride)
 		end
 
 		v3 = true

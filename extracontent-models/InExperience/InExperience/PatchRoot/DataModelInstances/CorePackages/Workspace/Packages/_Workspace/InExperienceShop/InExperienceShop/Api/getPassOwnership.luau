@@ -14,16 +14,17 @@ return {
 					return MarketplaceService:GetPassOwnershipAsync(p, p2)
 				end)
 
-				if success then
-					callback(typeof(result) == "table" and {
-						Owned = result.Owned == true,
-						Active = result.Active == true,
-						StartTime = result.StartTime,
-						EndTime = result.EndTime
-					} or nil)
-				else
+				if not success then
 					callback2((tostring(result)))
+					return
 				end
+
+				callback(typeof(result) == "table" and {
+					Owned = result.Owned == true,
+					Active = result.Active == true,
+					StartTime = result.StartTime,
+					EndTime = result.EndTime
+				} or nil)
 			end)
 		end)
 	end

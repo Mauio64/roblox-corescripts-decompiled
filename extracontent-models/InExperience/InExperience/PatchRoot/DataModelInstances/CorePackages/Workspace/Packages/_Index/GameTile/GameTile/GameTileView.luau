@@ -14,7 +14,6 @@ local useCursor = UIBlox.App.SelectionCursor.useCursor
 local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local RightAlignedButtonWrapper = require(GameTile.Footer.RightAlignedButtonWrapper)
 local ZoomAnimatedFrame = require(GameTile.ZoomAnimatedFrame)
@@ -419,35 +418,16 @@ local function GameTileView(props)
 			Size = UDim2.new(1, -2 * v9, 0, v14),
 			BackgroundTransparency = 1,
 			Text = props.title,
-			Font = 0,
-			FontFace = 0,
-			TextSize = 0,
-			TextTransparency = 0,
-			TextColor3 = 0,
+			FontFace = normalizeFontFace(v6.Font),
+			TextSize = fontSize,
+			TextTransparency = emphasis.Transparency,
+			TextColor3 = emphasis.Color3,
 			TextWrapped = 0,
 			TextTruncate = 0,
 			TextXAlignment = 0,
 			TextYAlignment = 0,
 			LayoutOrder = 3
 		}
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = v6.Font
-		end
-
-		v25.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(v6.Font)
-		end
-
-		v25.FontFace = fontFace
-
-		v25.TextSize = fontSize
-		v25.TextTransparency = emphasis.Transparency
-		v25.TextColor3 = emphasis.Color3
 		local textWrapped
 
 		if numLinesForTitle and props.isUnifiedGameTile then

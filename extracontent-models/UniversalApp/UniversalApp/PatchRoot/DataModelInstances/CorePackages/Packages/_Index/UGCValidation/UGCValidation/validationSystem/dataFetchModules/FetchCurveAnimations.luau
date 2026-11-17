@@ -8,6 +8,7 @@ local getFFlagUGCValidateCurveAnimSingleRoot = require(parent.flags.getFFlagUGCV
 return {
 	getData = function(p, p2)
 		local result = {}
+		local result2 = {}
 
 		for _, v in getAllInstancesIsA(p, "Animation") do
 			local animationId = v.AnimationId
@@ -20,31 +21,36 @@ return {
 
 			if v2 then
 				table.insert(result, v2)
+				table.insert(result2, v)
 			else
-				local success, result2 = pcall(function()
+				local success, result3 = pcall(function()
 					return game:GetObjectsAllOrNone(animationId)
 				end)
 
-				if not success or result2 == nil then
+				if not success or result3 == nil then
 					return nil
 				end
 
 				if getFFlagUGCValidateCurveAnimSingleRoot() then
-					if #result2 ~= 1 or not result2[1]:IsA("CurveAnimation") then
+					if #result3 ~= 1 or not result3[1]:IsA("CurveAnimation") then
 						return nil
 					end
 
-					table.insert(result, result2[1])
+					table.insert(result, result3[1])
+					table.insert(result2, v)
 				else
-					for _, curveAnimation in result2 do
-						if curveAnimation:IsA("CurveAnimation") then
-							table.insert(result, curveAnimation)
+					for _, curveAnimation in result3 do
+						if not curveAnimation:IsA("CurveAnimation") then
+							continue
 						end
+
+						table.insert(result, curveAnimation)
+						table.insert(result2, v)
 					end
 				end
 			end
 		end
 
-		return result
+		return result, result2
 	end
 }

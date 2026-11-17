@@ -20,7 +20,6 @@ local FillBehavior = Foundation.Enums.FillBehavior
 local useScaledValue = Foundation.Hooks.useScaledValue
 local useTokens = Foundation.Hooks.useTokens
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local Localization = require(parent.Localization)
 local useLocalization = Localization.Hooks.useLocalization
@@ -369,84 +368,53 @@ local function TransferRobuxInputSheet(_)
 	local desktopInputRow
 
 	if v3 then
-		local createElement9 = React.createElement
-		local v20 = {
-			AutomaticSize = Enum.AutomaticSize.XY,
-			BackgroundTransparency = 1,
-			LayoutOrder = 1
-		}
-
-		local v21 = {
-			Layout = React.createElement("UIListLayout", {
-				FillDirection = Enum.FillDirection.Horizontal,
-				VerticalAlignment = Enum.VerticalAlignment.Center,
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				Padding = UDim.new(0, 4)
-			}),
-			RobuxIconWrapper = React.createElement(
-				"Frame",
-				{
-					Size = UDim2.fromOffset(
-						math.round(v2.Typography.HeadingLarge.FontSize),
-						(math.round(v2.Typography.DisplaySmall.FontSize))
-					),
+		desktopInputRow = React.createElement(
+			"Frame",
+			{ AutomaticSize = Enum.AutomaticSize.XY, BackgroundTransparency = 1, LayoutOrder = 1 },
+			{
+				Layout = React.createElement("UIListLayout", {
+					FillDirection = Enum.FillDirection.Horizontal,
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					Padding = UDim.new(0, 4)
+				}),
+				RobuxIconWrapper = React.createElement(
+					"Frame",
+					{
+						Size = UDim2.fromOffset(
+							math.round(v2.Typography.HeadingLarge.FontSize),
+							(math.round(v2.Typography.DisplaySmall.FontSize))
+						),
+						BackgroundTransparency = 1,
+						LayoutOrder = 1
+					},
+					{
+						RobuxIcon = React.createElement(Icon, {
+							name = "robux",
+							size = v2.Typography.HeadingLarge.FontSize,
+							style = v2.Color.Content.Emphasis,
+							AnchorPoint = Vector2.new(0.5, 0.5),
+							Position = UDim2.new(0.5, 0, 0.5, 4)
+						})
+					}
+				),
+				DesktopTextBox = React.createElement("TextBox", {
+					Text = not (v5 and v5 > 0) and "" or tostring(v5),
+					PlaceholderText = "0",
+					TextInputType = Enum.TextInputType.Number,
 					BackgroundTransparency = 1,
-					LayoutOrder = 1
-				},
-				{
-					RobuxIcon = React.createElement(Icon, {
-						name = "robux",
-						size = v2.Typography.HeadingLarge.FontSize,
-						style = v2.Color.Content.Emphasis,
-						AnchorPoint = Vector2.new(0.5, 0.5),
-						Position = UDim2.new(0.5, 0, 0.5, 4)
-					})
-				}
-			),
-			DesktopTextBox = 0
-		}
-
-		local createElement10 = React.createElement
-		local v22 = {
-			Text = not (v5 and v5 > 0) and "" or tostring(v5),
-			PlaceholderText = "0",
-			TextInputType = Enum.TextInputType.Number,
-			BackgroundTransparency = 1,
-			Font = 0,
-			FontFace = 0,
-			TextSize = 0,
-			TextColor3 = 0,
-			PlaceholderColor3 = 0,
-			AutomaticSize = 0,
-			Size = 0,
-			ClearTextOnFocus = false,
-			LayoutOrder = 2,
-			ref = 0
-		}
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = v2.Typography.DisplaySmall.Font
-		end
-
-		v22.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(v2.Typography.DisplaySmall.Font)
-		end
-
-		v22.FontFace = fontFace
-
-		v22.TextSize = v2.Typography.DisplaySmall.FontSize
-		v22.TextColor3 = v2.Color.Content.Emphasis.Color3
-		v22.PlaceholderColor3 = v2.Color.Content.Emphasis.Color3
-		v22.AutomaticSize = Enum.AutomaticSize.X
-		v22.Size = UDim2.fromOffset(0, (math.round(v2.Typography.DisplaySmall.FontSize)))
-
-		v22.ref = ref3
-		v21.DesktopTextBox = createElement10("TextBox", v22)
-		desktopInputRow = createElement9("Frame", v20, v21)
+					FontFace = normalizeFontFace(v2.Typography.DisplaySmall.Font),
+					TextSize = v2.Typography.DisplaySmall.FontSize,
+					TextColor3 = v2.Color.Content.Emphasis.Color3,
+					PlaceholderColor3 = v2.Color.Content.Emphasis.Color3,
+					AutomaticSize = Enum.AutomaticSize.X,
+					Size = UDim2.fromOffset(0, (math.round(v2.Typography.DisplaySmall.FontSize))),
+					ClearTextOnFocus = false,
+					LayoutOrder = 2,
+					ref = ref3
+				})
+			}
+		)
 	end
 
 	local amountTapTarget

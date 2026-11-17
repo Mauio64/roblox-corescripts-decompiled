@@ -4,11 +4,14 @@ local parent = BuildExperience.Parent
 local Foundation = require(parent.Foundation)
 local React = require(parent.React)
 
+local AnimatedChipGroupContainer = require(script.Parent.AnimatedChipGroup.AnimatedChipGroupContainer)
 require(BuildExperience.Chat.chatTypes)
 
 local FFlagBuildExperienceFTUXChipExhaustedTelemetry = require(BuildExperience.Flags.FFlagBuildExperienceFTUXChipExhaustedTelemetry)
 
 local FIntBuildExperienceFTUXChipExhaustedThresholdPx = require(BuildExperience.Flags.FIntBuildExperienceFTUXChipExhaustedThresholdPx)
+
+local FFlagBuildExperienceFTUXChipLoadInAnimation = require(BuildExperience.Flags.FFlagBuildExperienceFTUXChipLoadInAnimation)
 
 local ChipGroup = Foundation.ChipGroup
 local ChipGroupVariant = Foundation.Enums.ChipGroupVariant
@@ -78,10 +81,10 @@ end
 
 local function PromptChipGroup(props)
 	local v = useTokens()
-	local ref
+	local v2
 
 	if FFlagBuildExperienceFTUXChipExhaustedTelemetry then
-		ref = useChipExhaustionListener(props)
+		v2 = useChipExhaustionListener(props)
 	end
 
 	local chips = {}
@@ -109,7 +112,7 @@ local function PromptChipGroup(props)
 	end
 
 	local createElement = React.createElement
-	local v2 = {
+	local v3 = {
 		LayoutOrder = props.LayoutOrder,
 		tag = "col size-full-0 auto-y padding-bottom-large padding-top-small clip",
 		testId = "PromptChipGroup"
@@ -122,9 +125,14 @@ local function PromptChipGroup(props)
 			{ tag = "row gap-small size-full-0 auto-y", testId = "PromptChipGroup.Skeletons" },
 			children
 		)
+	elseif FFlagBuildExperienceFTUXChipLoadInAnimation and #chips > 0 then
+		content = React.createElement(AnimatedChipGroupContainer, {
+			chips = chips,
+			chipGroupRef = v2
+		})
 	else
 		local createElement2 = React.createElement
-		local v3 = {
+		local v4 = {
 			chips = chips,
 			size = ChipSize.Medium,
 			variant = ChipGroupVariant.Row,
@@ -133,14 +141,14 @@ local function PromptChipGroup(props)
 		}
 
 		if not FFlagBuildExperienceFTUXChipExhaustedTelemetry then
-			ref = nil
+			v2 = nil
 		end
 
-		v3.ref = ref
-		content = createElement2(ChipGroup, v3)
+		v4.ref = v2
+		content = createElement2(ChipGroup, v4)
 	end
 
-	return createElement(View, v2, { Content = content })
+	return createElement(View, v3, { Content = content })
 end
 
 return PromptChipGroup

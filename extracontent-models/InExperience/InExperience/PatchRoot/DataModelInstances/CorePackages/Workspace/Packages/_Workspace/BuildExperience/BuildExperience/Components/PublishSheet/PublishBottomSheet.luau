@@ -14,6 +14,7 @@ local PublishPreviewCard = require(BuildExperience.Components.GameConfigurations
 local PublishStatus = require(BuildExperience.Chat.PublishStatus)
 local useScrollPerformanceTracker = require(BuildExperience.Telemetry.useScrollPerformanceTracker)
 local FFlagBuildCheckGamePermissions = require(BuildExperience.Flags.FFlagBuildCheckGamePermissions)
+local FFlagBuildExperienceConfigurationRowTelemetry = require(BuildExperience.Flags.FFlagBuildExperienceConfigurationRowTelemetry)
 
 local Sheet = Foundation.Sheet
 local Text = Foundation.Text
@@ -89,13 +90,33 @@ local function PublishBottomSheet(props)
 	local createElement4 = React.createElement
 	local v3 = {
 		universeId = props.target.universeId,
-		onOpenTitleDescriptionPage = props.onOpenTitleDescriptionPage,
-		onOpenMediaSelectionPage = props.onOpenMediaSelectionPage,
-		onOpenVersionTitleDescriptionPage = props.onOpenVersionTitleDescriptionPage,
-		onOpenVersionHistory = props.onOpenVersionHistory,
+		placeId = 0,
+		sessionId = 0,
+		onOpenTitleDescriptionPage = 0,
+		onOpenMediaSelectionPage = 0,
+		onOpenVersionTitleDescriptionPage = 0,
+		onOpenVersionHistory = 0,
 		isNewGame = 0,
 		layoutOrder = 2
 	}
+	local placeId
+
+	if FFlagBuildExperienceConfigurationRowTelemetry then
+		placeId = props.target.placeId
+	end
+
+	v3.placeId = placeId
+	local sessionId
+
+	if FFlagBuildExperienceConfigurationRowTelemetry then
+		sessionId = props.target.sessionId
+	end
+
+	v3.sessionId = sessionId
+	v3.onOpenTitleDescriptionPage = props.onOpenTitleDescriptionPage
+	v3.onOpenMediaSelectionPage = props.onOpenMediaSelectionPage
+	v3.onOpenVersionTitleDescriptionPage = props.onOpenVersionTitleDescriptionPage
+	v3.onOpenVersionHistory = props.onOpenVersionHistory
 	local isNewGame
 
 	if FFlagBuildCheckGamePermissions then

@@ -7,12 +7,15 @@ local Constants = require(AppChatNetworking.Constants)
 
 local SharedFlags = require(parent.SharedFlags)
 local GetFFlagEnableSocialCards = SharedFlags.GetFFlagEnableSocialCards
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagAppChatEnableReactions = SharedFlags2.FFlagAppChatEnableReactions
 
 return RoduxNetworking.GET(script.Name, function(callback, conversation_id, cursor)
 	return callback(CHAT_PLATFORM_BASE_URL):path("v1"):path("get-conversation-messages"):queryArgs({
 		conversation_id = conversation_id,
 		cursor = cursor,
 		Constants.PageSize.GET_NEW_MESSAGES,
-		include_cards = GetFFlagEnableSocialCards() and true or false
+		include_cards = GetFFlagEnableSocialCards() and true or false,
+		include_reactions = FFlagAppChatEnableReactions and true or nil
 	}):setStatusIds({ conversation_id })
 end)

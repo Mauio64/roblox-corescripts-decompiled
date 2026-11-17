@@ -1,3 +1,5 @@
+local Flags = require(script.Flags)
+local FFlagViewRecyclerReact084 = Flags.FFlagViewRecyclerReact084
 local AutoScrollPolicy = require(script.Core.Enums.AutoScrollPolicy)
 local Axis = require(script.Core.Enums.Axis)
 local ChatPreset = require(script.Core.ViewportBehavior.ChatPreset)
@@ -9,9 +11,11 @@ local IdentityKind = require(script.Core.Enums.IdentityKind)
 local Layout = require(script.Core.Layout)
 require(script.Core.PinnedItems)
 local PinnedPosition = require(script.Core.Enums.PinnedPosition)
-require(script.Core.ViewportBehavior.ReachedThreshold)
+local ReachedThreshold = require(script.Core.ViewportBehavior.ReachedThreshold)
 local Recycling = require(script.Core.Recycling)
 local ScrollAlignment = require(script.Core.Enums.ScrollAlignment)
+
+local ScrollMotion = require(script.Core.Virtualizer.ScrollMotion)
 local ScrollObservationKind = require(script.Core.Enums.ScrollObservationKind)
 local ShallowTable = require(script.Internal.ShallowTable)
 require(script.Core.Types)
@@ -19,11 +23,23 @@ local createScope = Recycling.createScope
 local SlotBinder = require(script.Core.Recycling.SlotBinder)
 local Virtualizer = require(script.Core.Virtualizer.Virtualizer)
 
+if not FFlagViewRecyclerReact084 then
+	ReachedThreshold = nil
+end
+
+if not FFlagViewRecyclerReact084 then
+	ScrollMotion = nil
+end
+
 local frozen = table.freeze({
 	createRecyclingScope = createScope,
 	createVirtualizer = Virtualizer,
 	createSlotBinder = SlotBinder,
-	_Private = table.freeze({ ShallowTable = ShallowTable })
+	_Private = table.freeze({
+		ReachedThreshold = ReachedThreshold,
+		ShallowTable = ShallowTable,
+		ScrollMotion = ScrollMotion
+	})
 })
 
 return table.freeze({

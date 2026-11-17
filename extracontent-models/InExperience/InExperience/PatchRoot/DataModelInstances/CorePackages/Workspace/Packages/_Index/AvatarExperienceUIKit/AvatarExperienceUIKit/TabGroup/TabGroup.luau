@@ -12,10 +12,11 @@ local View = Foundation.View
 local ScrollingFrameWithIndicators = require(AvatarExperienceUIKit.ScrollingFrameWithIndicators.ScrollingFrameWithIndicators)
 local makeOtterSpringValue = require(AvatarExperienceUIKit.Utils.makeOtterSpringValue)
 local getCenterScrollOffset = require(AvatarExperienceUIKit.Utils.getCenterScrollOffset)
-
+local getRevealScrollOffset = require(AvatarExperienceUIKit.Utils.getRevealScrollOffset)
 local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
 local FFlagAXCategoryMenuVisualFixes = AvatarExperienceFlags.FFlagAXCategoryMenuVisualFixes
 local FFlagAXScrollHighlightedTabIntoView = AvatarExperienceFlags.FFlagAXScrollHighlightedTabIntoView
+local FFlagAXTabGroupScrollOnlyWhenClipped = AvatarExperienceFlags.FFlagAXTabGroupScrollOnlyWhenClipped
 
 local backgroundStyle = { Transparency = 1 }
 
@@ -39,7 +40,7 @@ local function getActiveTabSize(p: number)
 	return UDim2.new(0, p, 0, 3)
 end
 
-local function TabGroup(props, ref4)
+local function TabGroup(props, ref5)
 	local v2 = useTokens()
 	local v3, v4 = useAnimatedBinding(0)
 	local v5, v6 = useAnimatedBinding(0)
@@ -47,6 +48,13 @@ local function TabGroup(props, ref4)
 	local ref = React.useRef(nil)
 	local ref2 = React.useRef(nil)
 	local ref3 = React.useRef(nil)
+	local ref4
+
+	if FFlagAXTabGroupScrollOnlyWhenClipped then
+		ref4 = React.useRef(nil)
+	else
+		ref4 = nil
+	end
 
 	local v7 = React.useCallback(function(p: number, p2: number, flag: boolean?)
 		if not flag and (not FFlagAXCategoryMenuVisualFixes or v5:getValue() > 0) then
@@ -73,20 +81,56 @@ local function TabGroup(props, ref4)
 			return
 		end
 
-		local x = scrollingFrame.AbsoluteSize.X
+		local x
+
+		if FFlagAXTabGroupScrollOnlyWhenClipped then
+			x = scrollingFrame.AbsoluteWindowSize.X
+		else
+			x = scrollingFrame.AbsoluteSize.X
+		end
 
 		if x <= 0 then
 			return
 		end
 
 		local x2 = scrollingFrame.CanvasPosition.X
-		local v8 = current3.AbsolutePosition.X - current2.AbsolutePosition.X
-		local v9 = v8 + current3.AbsoluteSize.X
+		local v8
 
-		if v8 < x2 then
-			current.scrollToOffset(v8)
-		elseif x2 + x < v9 then
-			current.scrollToOffset(v9 - x)
+		if FFlagAXTabGroupScrollOnlyWhenClipped then
+			v8 = current3.AbsolutePosition.X - scrollingFrame.AbsolutePosition.X + x2
+		else
+			v8 = current3.AbsolutePosition.X - current2.AbsolutePosition.X
+		end
+
+		if FFlagAXTabGroupScrollOnlyWhenClipped and ref4 then
+			local x3 = current3.AbsoluteSize.X
+			local x4 = scrollingFrame.AbsoluteCanvasSize.X
+			local obscuredEdgeInset = current.getObscuredEdgeInset()
+
+			local revealScrollOffset = getRevealScrollOffset(v8, x3, x2, x, x4, obscuredEdgeInset)
+
+			if revealScrollOffset == nil then
+				local scrollTarget = current.getScrollTarget()
+
+				if
+					scrollTarget ~= nil
+					and scrollTarget == ref4.current
+					and getRevealScrollOffset(v8, x3, scrollTarget, x, x4, obscuredEdgeInset) ~= nil
+				then
+					current.setOffset(x2)
+				end
+			else
+				ref4.current = revealScrollOffset
+				current.scrollToOffset(revealScrollOffset)
+			end
+		else
+			local v9 = v8 + current3.AbsoluteSize.X
+
+			if v8 < x2 then
+				current.scrollToOffset(v8)
+			elseif x2 + x < v9 then
+				current.scrollToOffset(v9 - x)
+			end
 		end
 	end, {})
 	local v9
@@ -137,7 +181,7 @@ local function TabGroup(props, ref4)
 		if current and current2 then
 			v7(current.AbsolutePosition.X - current2.AbsolutePosition.X, current.AbsoluteSize.X)
 
-			if FFlagAXScrollHighlightedTabIntoView and v9 then
+			if FFlagAXScrollHighlightedTabIntoView and not FFlagAXTabGroupScrollOnlyWhenClipped and v9 then
 				v9(current)
 			else
 				v8()
@@ -156,7 +200,7 @@ local function TabGroup(props, ref4)
 				FFlagAXCategoryMenuVisualFixes
 			)
 
-			if FFlagAXScrollHighlightedTabIntoView and v9 then
+			if FFlagAXScrollHighlightedTabIntoView and not FFlagAXTabGroupScrollOnlyWhenClipped and v9 then
 				v9(current2)
 			else
 				v8()
@@ -238,6 +282,24 @@ local function TabGroup(props, ref4)
 					end
 
 					return nil
+				end,
+				getScrollTarget = function()
+					local current = ref3.current
+
+					if current then
+						return (current.getScrollTarget())
+					end
+
+					return nil
+				end,
+				getObscuredEdgeInset = function()
+					local current = ref3.current
+
+					if current then
+						return (current.getObscuredEdgeInset())
+					end
+
+					return 0
 				end
 			}
 		end, {})
@@ -249,9 +311,9 @@ local function TabGroup(props, ref4)
 		local isActive = props.activeTabId == item.id
 		local id = item.id
 		local createElement = React.createElement
-		local ref5 = if isActive then v10 else item.ref
+		local ref6 = if isActive then v10 else item.ref
 		children[id] = createElement(TabGroupTab, {
-			ref = ref5,
+			ref = ref6,
 			text = item.text,
 			onActivated = props.onTabActivated and function()
 				props.onTabActivated(item.id)
@@ -298,7 +360,7 @@ local function TabGroup(props, ref4)
 		LayoutOrder = props.LayoutOrder,
 		Position = props.Position,
 		ZIndex = props.ZIndex,
-		ref = ref4,
+		ref = ref5,
 		controllerRef = ref3
 	}, FFlagAXCategoryMenuVisualFixes and {
 		Content = React.createElement(

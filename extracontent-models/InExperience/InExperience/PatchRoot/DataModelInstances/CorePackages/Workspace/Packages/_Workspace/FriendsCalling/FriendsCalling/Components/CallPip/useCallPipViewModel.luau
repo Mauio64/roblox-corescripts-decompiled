@@ -28,13 +28,22 @@ local function isBeingRung(participant): boolean -- 1 equivalent call inferred f
 	return participant.status == FriendsCallingParticipantStatus.Ringing
 end
 
-local function getOtherParticipant(p)
+local function getSelfUserId() -- 2 equivalent calls inferred from this helper
 	local localPlayer = Players.LocalPlayer
-	local v2 = not localPlayer and 0 or localPlayer.UserId
+	return if localPlayer then localPlayer.UserId else 0
+end
+
+local function isRingingForSomeoneElse(p): boolean -- 1 equivalent call inferred from this helper
+	local initiatorUserId = p.initiatorUserId
+	return p.phase == FriendsCallingPhase.Ringing and initiatorUserId ~= 0 and initiatorUserId ~= getSelfUserId() -- inferred equivalent call
+end
+
+local function getOtherParticipant(p)
+	local selfUserId = getSelfUserId() -- inferred equivalent call
 	local otherParticipant = nil
 
 	for _, participant in p.participants do
-		if participant.userId == v2 then
+		if participant.userId == selfUserId then
 			continue
 		end
 
@@ -86,6 +95,7 @@ local function useCallPipViewModel()
 	local friendsCallingStore = GetFriendsCallingStore(false)
 	local v2 = useSignalState(friendsCallingStore.getWindowView)
 	local v3 = useSignalState(friendsCallingStore.getCall)
+	local expandCount = useSignalState(friendsCallingStore.getExpandCount)
 	local ref = React.useRef(nil)
 	local at
 
@@ -114,22 +124,29 @@ local function useCallPipViewModel()
 		participant = v
 	end
 
+	local enabled = v2.hasCall
+
+	if enabled then
+		enabled = v3 == nil or not isRingingForSomeoneElse(v3) -- inferred equivalent call
+	end
+
 	local callId = v3 and v3.callId or ""
 	local v4 = not v3 and "" or v3.phase.Name
 	React.useEffect(function()
 		Logger:debug(
 			"{} - pip applied: enabled={}, session={}, callId={}, phase={}, connectedAt={}",
 			script.Name,
-			tostring(v2.hasCall),
+			tostring(enabled),
 			v2.session,
 			callId,
 			v4,
 			(tostring(at))
 		)
-	end, { callId, at, v4, v2.hasCall, v2.session })
+	end, { callId, at, enabled, v4, v2.session })
 	local v5 = {
-		enabled = v2.hasCall,
+		enabled = enabled,
 		session = v2.session,
+		expandCount = expandCount,
 		connectedAt = at,
 		callId = 0,
 		participant = 0

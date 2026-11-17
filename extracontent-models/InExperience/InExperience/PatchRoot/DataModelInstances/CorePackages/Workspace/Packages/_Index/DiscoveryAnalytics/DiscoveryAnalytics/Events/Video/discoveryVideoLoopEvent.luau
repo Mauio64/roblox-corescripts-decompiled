@@ -9,7 +9,7 @@ local VideoEventInterfaceKey = require(script.Parent.VideoEventInterfaceKey)
 
 local defineFastInt = game:DefineFastInt("DiscoveryVideoLoopEventHundredthsPercent", 0)
 local SharedFlags = require(parent.SharedFlags)
-local FFlagLuaAppEnableHomepageOneByTwoTile = SharedFlags.FFlagLuaAppEnableHomepageOneByTwoTile
+local FFlagLuaAppEnableNxMRoduxApportioning = SharedFlags.FFlagLuaAppEnableNxMRoduxApportioning
 local SharedFlags2 = require(parent.SharedFlags)
 local FFlagLuaAppDiscoveryMomentVideoTelemetry = SharedFlags2.FFlagLuaAppDiscoveryMomentVideoTelemetry
 
@@ -36,7 +36,7 @@ v.isMoment = isMoment
 local v2 = strictInterface(v)
 local v3
 
-if FFlagLuaAppEnableHomepageOneByTwoTile then
+if FFlagLuaAppEnableNxMRoduxApportioning then
 	v3 = t.strictInterface({
 		videoAssetId = t.string,
 		videoPlaybackSessionId = t.string,
@@ -50,7 +50,7 @@ end
 
 local v4
 
-if FFlagLuaAppEnableHomepageOneByTwoTile then
+if FFlagLuaAppEnableNxMRoduxApportioning then
 	v4 = t.strictInterface({
 		videoAssetId = t.string,
 		videoPlaybackSessionId = t.string,
@@ -67,7 +67,7 @@ end
 local v5 = { [VideoEventInterfaceKey.DefaultGameTile] = v2 }
 local OneByTwoTileAdLink = VideoEventInterfaceKey.OneByTwoTileAdLink
 
-if not FFlagLuaAppEnableHomepageOneByTwoTile then
+if not FFlagLuaAppEnableNxMRoduxApportioning then
 	v3 = nil
 end
 
@@ -75,7 +75,7 @@ v5[OneByTwoTileAdLink] = v3
 
 local OneByTwoTileGame = VideoEventInterfaceKey.OneByTwoTileGame
 
-if not FFlagLuaAppEnableHomepageOneByTwoTile then
+if not FFlagLuaAppEnableNxMRoduxApportioning then
 	v4 = nil
 end
 

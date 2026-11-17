@@ -10,7 +10,7 @@ local Radius = require(Foundation.Enums.Radius)
 local useTokens = require(Foundation.Providers.Style.useTokens)
 local v
 
-if Flags.FoundationPopoverPluginOverlayMeasurement and Flags.FoundationPluginShadowSize then
+if Flags.FoundationPluginShadowSize then
 	v = Constants.PLUGIN_SHADOW_SIZE
 else
 	v = Constants.SHADOW_SIZE

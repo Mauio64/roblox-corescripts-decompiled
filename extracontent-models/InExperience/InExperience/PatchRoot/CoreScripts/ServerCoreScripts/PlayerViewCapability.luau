@@ -44,7 +44,8 @@ if GetFFlagPlayerViewRemoteEnabled() then
 	local v2 = {}
 
 	Players.PlayerRemoving:Connect(function(player)
-		v2[tostring(player.UserId)] = nil
+		local userId = tostring(player.UserId)
+		v2[userId] = nil
 	end)
 
 	requestDeviceCameraCFrame.OnServerEvent:Connect(function(p, value)

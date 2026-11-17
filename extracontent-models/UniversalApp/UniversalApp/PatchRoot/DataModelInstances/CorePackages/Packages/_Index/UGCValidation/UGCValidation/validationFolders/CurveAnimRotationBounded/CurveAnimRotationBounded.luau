@@ -8,53 +8,73 @@ local getFFlagUGCValidateCurveAnimRotationSpeed = require(parent.flags.getFFlagU
 local getFIntUGCValidateMaxAnimationFPS = require(parent.flags.getFIntUGCValidateMaxAnimationFPS)
 
 local getFIntUGCValidationMaxAnimationRotationSpeedPerSecond = require(parent.flags.getFIntUGCValidationMaxAnimationRotationSpeedPerSecond)
-return {
-	categories = { ValidationEnums.UploadCategory.EMOTE_ANIMATION, ValidationEnums.UploadCategory.ANIMATION },
-	requiredData = {
-		ValidationEnums.SharedDataMember.curveAnimations,
-		ValidationEnums.SharedDataMember.curveAnimComputedFrames
-	},
-	expectedFailures = {},
-	prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable },
-	run = function(object, p)
-		if not getFFlagUGCValidateCurveAnimRotationSpeed() then
-			return
-		end
+local CurveAnimRotationBounded = {}
 
-		local animFrames = p.curveAnimComputedFrames.animFrames
-		local v = 1 / getFIntUGCValidateMaxAnimationFPS()
+CurveAnimRotationBounded.categories = {
+	ValidationEnums.UploadCategory.EMOTE_ANIMATION,
+	ValidationEnums.UploadCategory.ANIMATION
+}
+CurveAnimRotationBounded.requiredData = {
+	ValidationEnums.SharedDataMember.curveAnimations,
+	ValidationEnums.SharedDataMember.curveAnimComputedFrames
+}
 
-		local fIntUGCValidationMaxAnimationRotationSpeedPerSecond = getFIntUGCValidationMaxAnimationRotationSpeedPerSecond()
-		local v2 = fIntUGCValidationMaxAnimationRotationSpeedPerSecond / getFIntUGCValidateMaxAnimationFPS()
+CurveAnimRotationBounded.expectedFailures = {}
+CurveAnimRotationBounded.prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable }
 
-		local v3 = {}
+local function validateCurveAnimClip(object, curveAnimComputedFrame)
+	local fullName = curveAnimComputedFrame.animation and curveAnimComputedFrame.animation:GetFullName()
 
-		for k, animFrame in animFrames do
-			for k2, v4 in animFrame do
-				local v5 = v3[k2]
+	if not getFFlagUGCValidateCurveAnimRotationSpeed() then
+		return
+	end
 
-				if not v5 then
-					continue
-				end
+	local animFrames = curveAnimComputedFrame.animFrames
+	local v = 1 / getFIntUGCValidateMaxAnimationFPS()
 
-				local v6 = math.deg((math.abs((v4:AngleBetween(v5)))))
+	local fIntUGCValidationMaxAnimationRotationSpeedPerSecond = getFIntUGCValidationMaxAnimationRotationSpeedPerSecond()
+	local v2 = fIntUGCValidationMaxAnimationRotationSpeedPerSecond / getFIntUGCValidateMaxAnimationFPS()
 
-				if v2 < v6 then
-					local v7 = (k - 1) * v
-					local v8 = v6 * getFIntUGCValidateMaxAnimationFPS()
+	local v3 = {}
 
-					object:fail(ErrorSourceStrings.Keys.CurveAnim_RotationTooFast, {
-						time = string.format("%.2f", v7),
-						bodyPart = k2,
-						speed = string.format("%.2f", v8),
-						maxSpeed = tostring(fIntUGCValidationMaxAnimationRotationSpeedPerSecond)
-					})
+	for k, animFrame in animFrames do
+		for k2, v4 in animFrame do
+			local v5 = v3[k2]
 
-					return
-				end
+			if not v5 then
+				continue
 			end
 
-			v3 = animFrame
+			local v6 = math.deg((math.abs((v4:AngleBetween(v5)))))
+
+			if v2 < v6 then
+				local v7 = (k - 1) * v
+				local v8 = v6 * getFIntUGCValidateMaxAnimationFPS()
+
+				local v9 = {
+					time = string.format("%.2f", v7),
+					bodyPart = k2,
+					speed = string.format("%.2f", v8),
+					maxSpeed = tostring(fIntUGCValidationMaxAnimationRotationSpeedPerSecond)
+				}
+
+				if fullName then
+					v9.animationName = fullName
+				end
+
+				object:fail(ErrorSourceStrings.Keys.CurveAnim_RotationTooFast, v9, curveAnimComputedFrame.animation)
+				return
+			end
 		end
+
+		v3 = animFrame
 	end
-}
+end
+
+function CurveAnimRotationBounded.run(p, p2)
+	for _, curveAnimComputedFrame in p2.curveAnimComputedFrames do
+		validateCurveAnimClip(p, curveAnimComputedFrame)
+	end
+end
+
+return CurveAnimRotationBounded

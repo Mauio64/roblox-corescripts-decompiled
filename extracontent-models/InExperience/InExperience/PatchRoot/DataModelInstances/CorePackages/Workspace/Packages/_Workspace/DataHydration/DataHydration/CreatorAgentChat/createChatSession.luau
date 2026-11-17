@@ -5,10 +5,13 @@ local SharedFlags = require(parent.SharedFlags)
 
 local AcpProtocol = require(script.Parent.Acp.AcpProtocol)
 local classifyRequestFailure = require(script.Parent.classifyRequestFailure)
+local chatOpenTelemetry = require(script.Parent.chatOpenTelemetry)
 local experimentOverride = require(script.Parent.experimentOverride)
 local getFundingError = require(script.Parent.getFundingError)
 local sendConfiguration = require(script.Parent.sendConfiguration)
 local FFlagBuildExperienceModelPickerData = SharedFlags.FFlagBuildExperienceModelPickerData
+local FFlagBuildExperienceChatOpenId = SharedFlags.FFlagBuildExperienceChatOpenId
+local FFlagBuildExperienceAdvancedPreviewSpecs = SharedFlags.FFlagBuildExperienceAdvancedPreviewSpecs
 local sessionHistoryMerge = require(script.Parent.sessionHistoryMerge)
 require(script.Parent.types)
 
@@ -50,6 +53,10 @@ local function createChatSession(deps, universeId: number?, placeId: number?, p:
 		end
 
 		v4 = v5
+	end
+
+	local function getSendChatOpenId() -- 1 equivalent call inferred from this helper
+		return chatOpenTelemetry.getChatOpenIdForUniverse(universeId)
 	end
 
 	local function buildMergedHistory()
@@ -359,7 +366,7 @@ local function createChatSession(deps, universeId: number?, placeId: number?, p:
 		return v10, errorCode, nil
 	end
 
-	local function createCasSession(model, callback, p2, callback2)
+	local function createCasSession(model, callback, p2, callback2, chatOpenId: string?)
 		local v9 = count
 		local function isStale()
 			if v9 == count then
@@ -433,7 +440,8 @@ local function createChatSession(deps, universeId: number?, placeId: number?, p:
 				project = { universeId = universeId, placeId = placeId },
 				experiment = 0,
 				model = 0,
-				application = "build"
+				application = "build",
+				chatOpenId = 0
 			}
 			local experiment
 
@@ -450,6 +458,12 @@ local function createChatSession(deps, universeId: number?, placeId: number?, p:
 			end
 
 			v13.model = model
+
+			if not FFlagBuildExperienceChatOpenId then
+				chatOpenId = nil
+			end
+
+			v13.chatOpenId = chatOpenId
 			local v14 = sessionNew(v13)
 
 			if not FFlagBuildExperienceModelPickerData then
@@ -498,7 +512,16 @@ local function createChatSession(deps, universeId: number?, placeId: number?, p:
 					if experimentOverride.has(v3) then
 						experimentOverride.move(v3, key)
 					elseif v10 ~= nil then
-						experimentOverride.hydrate(key, v10.specVersion)
+						local hydrate = experimentOverride.hydrate
+
+						local specVersion = v10.specVersion
+						local v16
+
+						if FFlagBuildExperienceAdvancedPreviewSpecs then
+							v16 = v10
+						end
+
+						hydrate(key, specVersion, v16)
 					end
 
 					if
@@ -566,7 +589,7 @@ local function createChatSession(deps, universeId: number?, placeId: number?, p:
 
 	local v9 = nil
 
-	local function newSetup(model, p2)
+	local function newSetup(model, p2, chatOpenId: string?)
 		local setup = {
 			generation = count,
 			model = model,
@@ -574,12 +597,19 @@ local function createChatSession(deps, universeId: number?, placeId: number?, p:
 			abandoners = 0,
 			persistent = false,
 			committed = false,
-			done = false
+			done = false,
+			chatOpenId = 0
 		}
 
 		local experiment = if p2 == nil then v4 else p2.experiment
 		setup.experiment = experiment
 		setup.abandoners = {}
+
+		if not FFlagBuildExperienceChatOpenId then
+			chatOpenId = nil
+		end
+
+		setup.chatOpenId = chatOpenId
 		return setup
 	end
 
@@ -618,157 +648,54 @@ local function createChatSession(deps, universeId: number?, placeId: number?, p:
 		return true
 	end
 
-	local function ensureCasSession(model, isCancelled, p2, flag: boolean?)
+	local function ensureCasSession(model, isCancelled, p2, flag: boolean?, p3: string?)
 		if
-			not FFlagBuildExperienceModelPickerData
-			or sessionScalarState2.getCasSessionId(false) ~= nil and sessionScalarState2.getInitialized(false)
+			FFlagBuildExperienceModelPickerData
+			and (sessionScalarState2.getCasSessionId(false) == nil or not sessionScalarState2.getInitialized(false))
 		then
-			return createCasSession(model, isCancelled, p2)
-		end
-
-		local function callerCancelled()
-			return isCancelled ~= nil and isCancelled()
-		end
-
-		local v10
-
-		if isCancelled == nil then
-			v10 = false
-		else
-			v10 = isCancelled()
-		end
-
-		if v10 then
-			return nil, nil
-		end
-
-		local v11 = v9
-
-		-- [DEDUP] synthesized from 2 duplicated terminal regions
-		local function deduplicatedTail()
-			local v12
-
-			if isCancelled == nil then
-				v12 = false
-			else
-				v12 = isCancelled()
+			local function callerCancelled()
+				return isCancelled ~= nil and isCancelled()
 			end
 
-			if v12 or v11.sessionId ~= nil and v11.sessionId ~= sessionScalarState2.getCasSessionId(false) then
+			local v10
+
+			if isCancelled == nil then
+				v10 = false
+			else
+				v10 = isCancelled()
+			end
+
+			if v10 then
 				return nil, nil
 			end
 
-			return v11.sessionId, v11.error
-		end
-
-		local v12 = v11 == nil or v11.generation ~= count
-
-		if v12 then
-			v11 = newSetup(model, p2)
-			v9 = v11
-		end
-
-		local v13
-
-		if sessionScalarState2.getCasSessionId(false) == nil and v11.model ~= nil and model ~= nil then
-			v13 = model ~= v11.model
-		else
-			v13 = false
-		end
-
-		local v14
-
-		if sessionScalarState2.getCasSessionId(false) == nil and p2 ~= nil then
-			v14 = v11.model ~= p2.tier or not sendConfiguration.sameExperiment(v11.experiment, p2.experiment)
-		else
-			v14 = false
-		end
-
-		local v15, _
-
-		if v12 or not (v13 or v14) then
-			if v13 then
-				return
-					nil,
-					{
-						stage = "session_new",
-						message = "session creation already started with a different model"
-					}
-			end
-
-			if v14 then
-				return
-					nil,
-					{
-						stage = "session_new",
-						message = "session creation already started with a different send configuration"
-					}
-			end
-
-			if flag and isCancelled ~= nil then
-				v11.abandoners[callerCancelled] = true
-			else
-				v11.persistent = true
-			end
+			local v11 = v9
+			local v12 = v11 == nil or v11.generation ~= count
 
 			if v12 then
-				task.spawn(function()
-					local success, result, v18 = pcall(createCasSession, model, nil, p2, function(): boolean
-						if canAbandon(v11) then -- inferred equivalent call
-							return true
-						end
-
-						v11.committed = true
-						return false
-					end)
-
-					local v19 = v11
-					local v20
-
-					if success then
-						v20 = result
-					end
-
-					v19.sessionId = v20
-					v11.error = not success and {
-						stage = "session_new",
-						message = tostring(result)
-					} or v18
-					v11.done = true
-
-					if v9 == v11 then
-						v9 = nil
-					end
-				end)
-			end
-
-			while not v11.done do
-				if isCancelled == nil then
-					v15 = false
-				else
-					v15 = isCancelled()
-				end
-
-				if v15 then
-					break
-				end
-
-				task.wait()
-			end
-
-			return deduplicatedTail()
-		else
-			local v16 = not v11.committed
-
-			if v16 then
-				v16 = not v11.done and canAbandon(v11) -- inferred equivalent call
-			end
-
-			if v16 then
-				v12 = true
-				v11 = newSetup(model, p2)
+				v11 = newSetup(model, p2, p3)
 				v9 = v11
+			end
+
+			local v13
+
+			if sessionScalarState2.getCasSessionId(false) == nil and v11.model ~= nil and model ~= nil then
+				v13 = model ~= v11.model
 			else
+				v13 = false
+			end
+
+			local v14
+
+			if sessionScalarState2.getCasSessionId(false) == nil and p2 ~= nil then
+				v14 = v11.model ~= p2.tier or not sendConfiguration.sameExperiment(v11.experiment, p2.experiment)
+			else
+				v14 = false
+			end
+
+			local v15, v16
+
+			if v12 or not (v13 or v14) then
 				if v13 then
 					return
 						nil,
@@ -786,85 +713,198 @@ local function createChatSession(deps, universeId: number?, placeId: number?, p:
 							message = "session creation already started with a different send configuration"
 						}
 				end
-			end
 
-			if flag and isCancelled ~= nil then
-				v11.abandoners[callerCancelled] = true
-			else
-				v11.persistent = true
-			end
+				if flag and isCancelled ~= nil then
+					v11.abandoners[callerCancelled] = true
+				else
+					v11.persistent = true
+				end
 
-			if v12 then
-				task.spawn(function()
-					local success, result, v18 = pcall(createCasSession, model, nil, p2, function(): boolean
-						if canAbandon(v11) then -- inferred equivalent call
-							return true
+				if v12 then
+					task.spawn(function()
+						local success, result, v19 = pcall(createCasSession, model, nil, p2, function(): boolean
+							if canAbandon(v11) then -- inferred equivalent call
+								return true
+							end
+
+							v11.committed = true
+							return false
+						end, v11.chatOpenId)
+						local v20 = v11
+						local v21
+
+						if success then
+							v21 = result
 						end
 
-						v11.committed = true
-						return false
+						v20.sessionId = v21
+						v11.error = not success and {
+							stage = "session_new",
+							message = tostring(result)
+						} or v19
+						v11.done = true
+
+						if v9 == v11 then
+							v9 = nil
+						end
 					end)
+				end
 
-					local v19 = v11
-					local v20
-
-					if success then
-						v20 = result
+				while not v11.done do
+					if isCancelled == nil then
+						v15 = false
+					else
+						v15 = isCancelled()
 					end
 
-					v19.sessionId = v20
-					v11.error = not success and {
-						stage = "session_new",
-						message = tostring(result)
-					} or v18
-					v11.done = true
-
-					if v9 == v11 then
-						v9 = nil
+					if v15 then
+						break
 					end
-				end)
-			end
 
-			while not v11.done do
+					task.wait()
+				end
+
 				if isCancelled == nil then
-					v15 = false
+					v16 = false
 				else
-					v15 = isCancelled()
+					v16 = isCancelled()
 				end
 
-				if v15 then
-					break
+				if v16 or v11.sessionId ~= nil and v11.sessionId ~= sessionScalarState2.getCasSessionId(false) then
+					return nil, nil
 				end
 
-				task.wait()
+				return v11.sessionId, v11.error
+			else
+				local v17 = not v11.committed
+
+				if v17 then
+					v17 = not v11.done and canAbandon(v11) -- inferred equivalent call
+				end
+
+				if v17 then
+					v12 = true
+					v11 = newSetup(model, p2, p3)
+					v9 = v11
+				else
+					if v13 then
+						return
+							nil,
+							{
+								stage = "session_new",
+								message = "session creation already started with a different model"
+							}
+					end
+
+					if v14 then
+						return
+							nil,
+							{
+								stage = "session_new",
+								message = "session creation already started with a different send configuration"
+							}
+					end
+				end
+
+				if flag and isCancelled ~= nil then
+					v11.abandoners[callerCancelled] = true
+				else
+					v11.persistent = true
+				end
+
+				if v12 then
+					task.spawn(function()
+						local success, result, v19 = pcall(createCasSession, model, nil, p2, function(): boolean
+							if canAbandon(v11) then -- inferred equivalent call
+								return true
+							end
+
+							v11.committed = true
+							return false
+						end, v11.chatOpenId)
+						local v20 = v11
+						local v21
+
+						if success then
+							v21 = result
+						end
+
+						v20.sessionId = v21
+						v11.error = not success and {
+							stage = "session_new",
+							message = tostring(result)
+						} or v19
+						v11.done = true
+
+						if v9 == v11 then
+							v9 = nil
+						end
+					end)
+				end
+
+				while not v11.done do
+					if isCancelled == nil then
+						v15 = false
+					else
+						v15 = isCancelled()
+					end
+
+					if v15 then
+						break
+					end
+
+					task.wait()
+				end
+
+				if isCancelled == nil then
+					v16 = false
+				else
+					v16 = isCancelled()
+				end
+
+				if v16 or v11.sessionId ~= nil and v11.sessionId ~= sessionScalarState2.getCasSessionId(false) then
+					return nil, nil
+				end
+
+				return v11.sessionId, v11.error
+			end
+		else
+			if not FFlagBuildExperienceChatOpenId then
+				p3 = nil
 			end
 
-			return deduplicatedTail()
+			return createCasSession(model, isCancelled, p2, nil, p3)
 		end
 	end
 
 	local function prepareSession(data)
 		local v10
 
-		if not (data == nil or data.sendConfiguration == nil) then
-			v10 = sendConfiguration.capture(data.sendConfiguration.tier, data.sendConfiguration.experiment)
+		if FFlagBuildExperienceChatOpenId then
+			v10 = getSendChatOpenId() -- inferred equivalent call
 		end
 
 		local v11
 
-		if v10 == nil then
-			if data ~= nil then
-				v11 = data.model
-			end
-		else
-			v11 = v10.tier
+		if not (data == nil or data.sendConfiguration == nil) then
+			v11 = sendConfiguration.capture(data.sendConfiguration.tier, data.sendConfiguration.experiment)
 		end
 
-		assert(v10 == nil or data == nil or data.model == nil or data.model == v11, "conflicting model tiers")
+		local v12
 
-		local v12 = count
+		if v11 == nil then
+			if data ~= nil then
+				v12 = data.model
+			end
+		else
+			v12 = v11.tier
+		end
+
+		assert(v11 == nil or data == nil or data.model == nil or data.model == v12, "conflicting model tiers")
+
+		local v13 = count
 		local function isCancelled() -- 3 equivalent calls inferred from this helper
-			if v12 == count then
+			if v13 == count then
 				if data == nil or data.isCancelled == nil then
 					return false
 				end
@@ -879,22 +919,22 @@ local function createChatSession(deps, universeId: number?, placeId: number?, p:
 			return nil, nil
 		end
 
-		if v10 == nil then
+		if v11 == nil then
 			captureSessionNewExperiment() -- inferred equivalent call
 		end
 
 		local casSessionId = sessionScalarState2.getCasSessionId(false)
 
 		if casSessionId == nil then
-			if v9 ~= nil and v9.generation == v12 and v11 ~= nil and v11 ~= v9.model then
-				local v13 = v9
-				local v14 = not v13.committed
+			if v9 ~= nil and v9.generation == v13 and v12 ~= nil and v12 ~= v9.model then
+				local v14 = v9
+				local v15 = not v14.committed
 
-				if v14 then
-					v14 = not v13.done and canAbandon(v13) -- inferred equivalent call
+				if v15 then
+					v15 = not v14.done and canAbandon(v14) -- inferred equivalent call
 				end
 
-				if not v14 then
+				if not v15 then
 					return
 						nil,
 						{
@@ -904,44 +944,44 @@ local function createChatSession(deps, universeId: number?, placeId: number?, p:
 				end
 			end
 
-			local v13
+			local v14
 
 			if data ~= nil then
-				v13 = data.isCancelled
+				v14 = data.isCancelled
 			end
 
-			return ensureCasSession(v11, v13, v10, v10 ~= nil)
+			return ensureCasSession(v12, v14, v11, v11 ~= nil, v10)
 		else
-			local casSession, v13 = ensureCasSession(nil, isCancelled, v10)
+			local casSession, v14 = ensureCasSession(nil, isCancelled, v11, nil, v10)
 
 			if isCancelled() then -- inferred equivalent call
 				return nil, nil
 			end
 
 			if casSession == nil then
-				return nil, v13
+				return nil, v14
 			end
 
-			local v14 = loadSession(casSessionId, nil, isCancelled)
+			local v15 = loadSession(casSessionId, nil, isCancelled)
 
 			if isCancelled() then -- inferred equivalent call
 				return nil, nil
 			end
 
-			if v14.status == "succeeded" then
-				noteHistorySequenceIds(historyPageUtils.getSessionLoadHistory(v14.result)) -- inferred equivalent call
+			if v15.status == "succeeded" then
+				noteHistorySequenceIds(historyPageUtils.getSessionLoadHistory(v15.result)) -- inferred equivalent call
 				return casSessionId, nil
 			else
 				local fundingReason, fundingDetails
 
 				if FFlagBuildExperienceModelPickerData then
-					fundingReason, fundingDetails = getFundingError(v14)
+					fundingReason, fundingDetails = getFundingError(v15)
 				end
 
-				local v15 = {
+				local v16 = {
 					stage = "session_load",
-					message = v14.error,
-					errorCode = v14.errorCode,
+					message = v15.error,
+					errorCode = v15.errorCode,
 					fundingReason = fundingReason,
 					fundingDetails = fundingDetails,
 					requestFailure = 0
@@ -949,11 +989,11 @@ local function createChatSession(deps, universeId: number?, placeId: number?, p:
 				local requestFailure
 
 				if FFlagBuildExperiencePromptFailureTelemetry then
-					requestFailure = classifyRequestFailure(v14)
+					requestFailure = classifyRequestFailure(v15)
 				end
 
-				v15.requestFailure = requestFailure
-				return nil, v15
+				v16.requestFailure = requestFailure
+				return nil, v16
 			end
 		end
 	end
@@ -961,6 +1001,7 @@ local function createChatSession(deps, universeId: number?, placeId: number?, p:
 	local sendPrompt2 = sendPrompt.createSendPrompt({
 		ensureInitialized = ensureInitialized,
 		ensureCasSession = ensureCasSession,
+		getSendChatOpenId = getSendChatOpenId,
 		getLatestObservedHistorySequenceId = function()
 			return sessionScalarState2.getLatestObservedHistorySequenceId(false)
 		end,

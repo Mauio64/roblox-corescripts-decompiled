@@ -54,7 +54,11 @@ function object:tryContinue(object2)
 	local fenceIndent = self._block.fenceIndent
 	local v = #content
 
-	while fenceIndent > 0 and index < v and byte(content, index + 1) == 32 do
+	while fenceIndent > 0 and index < v do
+		if byte(content, index + 1) ~= 32 then
+			break
+		end
+
 		index += 1
 		fenceIndent -= 1
 	end
@@ -76,12 +80,20 @@ local function trim(firstLine: string)
 	local count = #firstLine
 	local count2 = 0
 
-	while count2 < count and byte(firstLine, count2 + 1) <= 32 do
-		count2 += 1
+	while count2 < count do
+		if byte(firstLine, count2 + 1) <= 32 then
+			count2 += 1
+		else
+			break
+		end
 	end
 
-	while count2 < count and byte(firstLine, count - 1 + 1) <= 32 do
-		count -= 1
+	while count2 < count do
+		if byte(firstLine, count - 1 + 1) <= 32 then
+			count -= 1
+		else
+			break
+		end
 	end
 
 	return (sub(firstLine, count2 + 1, count))

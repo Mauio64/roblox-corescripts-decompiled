@@ -18,13 +18,13 @@ local SetNetworkingErrorToast = RobloxAppToastsRodux.Thunks.SetNetworkingErrorTo
 local Http2 = require(parent.Http)
 local PerformFetch = Http2.PerformFetch
 
-local function getNewGameVotes(p, value, value2)
+local function getNewGameVotes(gameVote, value, value2)
 	if value == value2 then
-		return p
+		return gameVote
 	end
 
-	local upVotes = p and p.upVotes
-	local downVotes = p and p.downVotes
+	local upVotes = gameVote and gameVote.upVotes
+	local downVotes = gameVote and gameVote.downVotes
 
 	if value2 == VoteStatus.VotedUp then
 		upVotes += 1

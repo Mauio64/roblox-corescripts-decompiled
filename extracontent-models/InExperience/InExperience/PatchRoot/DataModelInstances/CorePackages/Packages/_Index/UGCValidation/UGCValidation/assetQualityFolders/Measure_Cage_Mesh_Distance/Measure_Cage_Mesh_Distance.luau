@@ -10,7 +10,6 @@ local getFFlagUGCValidateAQScoreWarnings = require(parent.flags.getFFlagUGCValid
 
 return {
 	categories = { ValidationEnums.UploadCategory.LAYERED_CLOTHING, ValidationEnums.UploadCategory.EYEBROW_EYELASH },
-	["fflag"] = require(parent.flags.getFFlagUGCValidateAQCageQualityLC),
 	run = function(object, p)
 		local handle_OuterCage = p.aqsSummaryData.Measure_Cage_Mesh_Distance.Handle_OuterCage
 

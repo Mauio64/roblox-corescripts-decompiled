@@ -1,4 +1,0 @@
-return game:DefineFastString(
-	"AXFetchCartPricingDuringInExperienceLayerName",
-	"AvatarExperience.UA.MarketplaceView"
-)

@@ -415,12 +415,14 @@ local v2 = {
 	},
 	ListValue = {
 		leave = function(_, p)
-			return "[" .. tostring(join(p.values, ", ")) .. "]"
+			local values = p.values
+			return "[" .. tostring(join(values, ", ")) .. "]"
 		end
 	},
 	ObjectValue = {
 		leave = function(_, p)
-			return "{" .. tostring(join(p.fields, ", ")) .. "}"
+			local fields = p.fields
+			return "{" .. tostring(join(fields, ", ")) .. "}"
 		end
 	},
 	ObjectField = {

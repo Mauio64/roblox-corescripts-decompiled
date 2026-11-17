@@ -19,6 +19,7 @@ local Constants = require(Moments.Constants)
 local Constants2 = require(Moments.ExperienceDetailsSheet.Constants)
 require(Moments.ExperienceDetailsSheet.Types)
 local emitRecommendationAction = require(Moments.Analytics.emitRecommendationAction)
+local MomentsFeedType = require(Moments.Enums.MomentsFeedType)
 local MomentsSessionContext = require(Moments.Stores.GetMomentsStore.MomentsSessionContext)
 local useMomentsSession = MomentsSessionContext.useMomentsSession
 local GetMomentsPreferencesStore = require(Moments.Stores.GetMomentsPreferencesStore)
@@ -26,8 +27,21 @@ local sessionUtil = require(Moments.Analytics.sessionUtil)
 local GetToastStore = require(Moments.Stores.GetToastStore)
 local listenForTeleportFailure = require(script.Parent.listenForTeleportFailure)
 local FFlagMomentsPlayEvent = require(Moments.Flags.FFlagMomentsPlayEvent)
+local FFlagMomentsRecommendationFeedType = require(Moments.Flags.FFlagMomentsRecommendationFeedType)
 
 local v = { joining = Constants2.LocalizationKeys.joining }
+
+local function getFeedType(recommendationSource: string?) -- 1 equivalent call inferred from this helper
+	if recommendationSource == Analytics.RecommendationSource.Following then
+		return MomentsFeedType.Following
+	end
+
+	if recommendationSource == Analytics.RecommendationSource.Trending then
+		return MomentsFeedType.Trending
+	end
+
+	return nil
+end
 
 local function useJoinExperience()
 	local v2 = useLocalization(v)
@@ -74,17 +88,29 @@ local function useJoinExperience()
 
 		local v4
 
-		if data.recommendationSource == Analytics.RecommendationSource.Following then
-			v4 = HttpService:GenerateGUID(false)
-		else
-			v4 = emitRecommendationAction({
+		if
+			FFlagMomentsRecommendationFeedType
+			or data.recommendationSource ~= Analytics.RecommendationSource.Following
+		then
+			local v5 = {
 				itemId = feedItemId,
 				tracingId = tracingId,
 				momentsSessionId = momentsSessionId,
 				actionType = Constants.RecommendationActionType.Play,
 				destinationPlaceId = destinationPlaceId,
-				contentType = data.contentType
-			})
+				contentType = data.contentType,
+				feedType = 0
+			}
+			local feedType
+
+			if FFlagMomentsRecommendationFeedType then
+				feedType = getFeedType(data.recommendationSource) -- inferred equivalent call
+			end
+
+			v5.feedType = feedType
+			v4 = emitRecommendationAction(v5)
+		else
+			v4 = HttpService:GenerateGUID(false)
 		end
 
 		GetToastStore(false).triggerToast({ title = v2.joining, text = "" })

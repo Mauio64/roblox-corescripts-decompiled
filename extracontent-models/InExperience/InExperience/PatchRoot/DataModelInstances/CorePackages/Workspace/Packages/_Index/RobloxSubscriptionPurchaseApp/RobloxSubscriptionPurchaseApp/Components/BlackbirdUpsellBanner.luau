@@ -21,6 +21,7 @@ local defineFastFlag = game:DefineFastFlag("BoldBlackbirdUpsellBannerStroke", fa
 
 local SharedFlags = require(parent.SharedFlags)
 local FFlagLuaAppsEnablePromptVIPServerPurchase = SharedFlags.FFlagLuaAppsEnablePromptVIPServerPurchase
+local FFlagTTOnboardingSheet = require(RobloxSubscriptionPurchaseApp.Flags.FFlagTTOnboardingSheet)
 
 local function BlackbirdUpsellBanner(props)
 	local v = useTokens()
@@ -85,7 +86,7 @@ local function BlackbirdUpsellBanner(props)
 	}
 	local text
 
-	if FFlagLuaAppsEnablePromptVIPServerPurchase and props.bannerText then
+	if (FFlagLuaAppsEnablePromptVIPServerPurchase or FFlagTTOnboardingSheet) and props.bannerText then
 		text = props.bannerText
 	else
 		text = v2.bannerText
@@ -118,10 +119,20 @@ local function BlackbirdUpsellBanner(props)
 	local subscribeCTA
 
 	if FFlagSupportNewBadgeRobloxPlus then
-		subscribeCTA = React.createElement(RobloxPlusUpsellBannerCTA, {
+		local createElement4 = React.createElement
+		local v8 = {
 			productInfo = props.productInfo,
-			shouldShowNewBadge = v4.shouldShowNewBadge
-		})
+			shouldShowNewBadge = v4.shouldShowNewBadge,
+			ctaText = 0
+		}
+		local ctaText
+
+		if FFlagTTOnboardingSheet then
+			ctaText = props.ctaText
+		end
+
+		v8.ctaText = ctaText
+		subscribeCTA = createElement4(RobloxPlusUpsellBannerCTA, v8)
 	end
 
 	children.SubscribeCTA = subscribeCTA

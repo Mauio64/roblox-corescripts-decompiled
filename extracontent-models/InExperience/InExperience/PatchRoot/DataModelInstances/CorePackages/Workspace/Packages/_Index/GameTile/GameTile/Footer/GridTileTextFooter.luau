@@ -8,7 +8,6 @@ local useDesignTokens = Style.useDesignTokens
 local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local UIBlox = require(parent.UIBlox)
 local useTextSizeOffset = UIBlox.Core.Style.useTextSizeOffset
 
@@ -81,7 +80,6 @@ local function GridTileTextFooter(props)
 		AnchorPoint = 0,
 		BackgroundTransparency = 1,
 		TextSize = 0,
-		Font = 0,
 		FontFace = 0,
 		TextTransparency = 0,
 		TextColor3 = 0,
@@ -105,20 +103,7 @@ local function GridTileTextFooter(props)
 	v5.AnchorPoint = Vector2.new(0, 0.5)
 
 	v5.TextSize = gameTileMetadataFont.FontSize
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = gameTileMetadataFont.Font
-	end
-
-	v5.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(gameTileMetadataFont.Font)
-	end
-
-	v5.FontFace = fontFace
+	v5.FontFace = normalizeFontFace(gameTileMetadataFont.Font)
 	v5.TextTransparency = default.Transparency
 	v5.TextColor3 = default.Color3
 	v5.TextWrapped = props.TextWrapped or false

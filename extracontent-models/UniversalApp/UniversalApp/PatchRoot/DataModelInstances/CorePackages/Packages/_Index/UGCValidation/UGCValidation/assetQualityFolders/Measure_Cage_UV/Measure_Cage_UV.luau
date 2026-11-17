@@ -15,8 +15,6 @@ MeasureCageUV.categories = {
 	ValidationEnums.UploadCategory.EYEBROW_EYELASH
 }
 
-MeasureCageUV.fflag = require(parent.flags.getFFlagUGCValidateAQCageQualityLC)
-
 local v = { "Handle_InnerCage", "Handle_OuterCage" }
 
 function MeasureCageUV.run(object, p)

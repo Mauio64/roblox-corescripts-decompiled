@@ -1,3 +1,0 @@
-local FFlagAXPendingLookModerationStatus = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagAXPendingLookModerationStatus")
-
-return game:DefineFastFlag("AXBlockUnavailableMakeupLookSelection", false) and FFlagAXPendingLookModerationStatus

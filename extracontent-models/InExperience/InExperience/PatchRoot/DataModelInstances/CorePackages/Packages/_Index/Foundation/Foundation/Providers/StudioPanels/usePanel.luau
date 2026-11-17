@@ -17,15 +17,23 @@ local function usePanel(data)
 		position = data.position,
 		depth = data.depth,
 		parentPopoverId = data.parentPopoverId,
-		isFocusable = 0
+		isFocusable = 0,
+		initialSize = 0
 	}
-	local isFocusable
+	local isFocusable2
 
 	if Flags.FoundationPopoverPluginFocusable then
-		isFocusable = data.isFocusable
+		isFocusable2 = data.isFocusable
 	end
 
-	v.isFocusable = isFocusable
+	v.isFocusable = isFocusable2
+	local initialSize
+
+	if Flags.FoundationPopoverPluginPoolReclaim then
+		initialSize = data.initialSize
+	end
+
+	v.initialSize = initialSize
 	local v2 = useRefToState(v)
 
 	local ref2 = React.useRef(data.onClose)
@@ -33,86 +41,60 @@ local function usePanel(data)
 
 	local ref3 = React.useRef(data.registerPanelAsync)
 	ref3.current = data.registerPanelAsync
-	local value
 
-	if Flags.FoundationPopoverPluginOverlayMeasurement then
-		local state, setState = React.useState(false)
+	local state, setState = React.useState(false)
 
-		local v3 = React.useCallback(function()
-			setState(true)
-			ref2.current()
-		end, {})
+	local v3 = React.useCallback(function()
+		setState(true)
+		ref2.current()
+	end, {})
 
-		local v4 = ReactUtils.useAsync(function()
-			if data.isOpen and not state then
-				local current = ref3.current
-				local anchorUri = v2.current.anchorUri
-				local position = v2.current.position
+	local v4 = ReactUtils.useAsync(function()
+		if data.isOpen and not state then
+			local current = ref3.current
+			local anchorUri = v2.current.anchorUri
+			local position = v2.current.position
 
-				local depth = v2.current.depth
-				local parentPopoverId = v2.current.parentPopoverId
-				local v4
+			local depth = v2.current.depth
+			local parentPopoverId = v2.current.parentPopoverId
+			local isFocusable
 
-				if Flags.FoundationPopoverPluginFocusable then
-					v4 = v2.current.isFocusable
-				end
-
-				local v5, current2 = current(anchorUri, position, v3, depth, parentPopoverId, v4)
-
-				ref.current = current2
-				return v5
+			if Flags.FoundationPopoverPluginFocusable then
+				isFocusable = v2.current.isFocusable
 			end
 
-			if ref.current then
-				ref.current()
-				ref.current = nil
+			local v4
+
+			if Flags.FoundationPopoverPluginPoolReclaim then
+				v4 = v2.current.initialSize
 			end
 
-			return nil
-		end, { data.isOpen, v2, state })
+			local v5, current2 = current(anchorUri, position, v3, depth, parentPopoverId, isFocusable, v4)
 
-		if state or v4.status ~= "ok" then
-			value = nil
-		else
-			value = v4.value
+			ref.current = current2
+			return v5
 		end
 
-		React.useEffect(function()
-			if not data.isOpen then
-				setState(false)
-			end
-		end, { data.isOpen })
+		if ref.current then
+			ref.current()
+			ref.current = nil
+		end
+
+		return nil
+	end, { data.isOpen, v2, state })
+	local value
+
+	if state or v4.status ~= "ok" then
+		value = nil
 	else
-		local v3 = ReactUtils.useAsync(function()
-			if data.isOpen then
-				local current = ref3.current
-				local anchorUri = v2.current.anchorUri
-				local position = v2.current.position
-				local current2 = ref2.current
-				local depth = v2.current.depth
-				local parentPopoverId = v2.current.parentPopoverId
-				local v3
-
-				if Flags.FoundationPopoverPluginFocusable then
-					v3 = v2.current.isFocusable
-				end
-
-				local v4, current3 = current(anchorUri, position, current2, depth, parentPopoverId, v3)
-
-				ref.current = current3
-				return v4
-			end
-
-			if ref.current then
-				ref.current()
-				ref.current = nil
-			end
-
-			return nil
-		end, { data.isOpen, v2 })
-
-		value = if v3.status == "ok" then v3.value else nil
+		value = v4.value
 	end
+
+	React.useEffect(function()
+		if not data.isOpen then
+			setState(false)
+		end
+	end, { data.isOpen })
 
 	ReactUtils.useAsync(function(): nil
 		if not value then

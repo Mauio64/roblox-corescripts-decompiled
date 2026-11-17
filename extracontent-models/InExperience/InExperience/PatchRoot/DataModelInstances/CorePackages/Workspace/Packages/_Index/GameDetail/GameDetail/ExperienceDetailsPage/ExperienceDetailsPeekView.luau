@@ -11,7 +11,6 @@ local PeekViewTopBar = require(script.Parent.PeekViewTopBar)
 local useEdpFunctionallyReadyLogger = require(script.Parent.useEdpFunctionallyReadyLogger)
 local createExperienceDetailsPageTimer = require(script.Parent.createExperienceDetailsPageTimer)
 local useMotionJitterMetric = require(script.Parent.useMotionJitterMetric)
-local usePublishContainerWidth = require(script.Parent.usePublishContainerWidth)
 local ExperienceDetailsFallbackActionBar = require(script.Parent.Fallback.ExperienceDetailsFallbackActionBar)
 local ExperienceDetailsFallbackFeed = require(script.Parent.Fallback.ExperienceDetailsFallbackFeed)
 
@@ -62,6 +61,7 @@ local usePageScopeRef = SduiSharedUtilities.usePageScopeRef
 local SduiFeatureEntryPoint = SduiSharedUtilities.SduiFeatureEntryPoint
 local SduiPageEntryPoint = SduiSharedUtilities.SduiPageEntryPoint
 local UiStatus = SduiSharedUtilities.UiStatus
+local usePublishContainerWidth = SduiSharedUtilities.usePublishContainerWidth
 local useUiStatus = SduiSharedUtilities.useUiStatus
 local useEntrySurfacing = SduiSharedUtilities.useEntrySurfacing
 local FilterPlayWithReward = ExperienceDetailsPageScopeFields.FilterPlayWithReward
@@ -75,7 +75,6 @@ local SharedFlags = require(parent.SharedFlags)
 local FFlagSduiContainerQueries = SharedFlags.FFlagSduiContainerQueries
 local FFlagEDPTTIParityDefinitions = SharedFlags.FFlagEDPTTIParityDefinitions
 local FFlagSduiPageEntryUseSharedHooks = SharedFlags.FFlagSduiPageEntryUseSharedHooks
-local FFlagLuaAppSduiEdpHideSystemBarOnPeekViewMount = SharedFlags.FFlagLuaAppSduiEdpHideSystemBarOnPeekViewMount
 local FFlagEnableMotionJitterMetric = SharedFlags.FFlagEnableMotionJitterMetric
 local FFlagSduiEdpPersistentActionBarPlayButton = SharedFlags.FFlagSduiEdpPersistentActionBarPlayButton
 local FFlagLuaAppEdpBottomSheetPeekViewEvents = SharedFlags.FFlagLuaAppEdpBottomSheetPeekViewEvents
@@ -126,12 +125,9 @@ local function ExperienceDetailsPeekView(pageProps)
 	local v5 = useRoactService(AppEventIngestService)
 	local v6 = useRoactService(AppSessionService)
 	local v7 = useDispatch()
-
-	if FFlagLuaAppSduiEdpHideSystemBarOnPeekViewMount then
-		React.useEffect(function()
-			v7(SetTabBarVisible(false))
-		end, { v7 })
-	end
+	React.useEffect(function()
+		v7(SetTabBarVisible(false))
+	end, { v7 })
 
 	local referralSource = ExperienceDetailsPageUtils.getFromPropsOrNavigationParams(pageProps, "referralSource")
 	local experienceJoinData = ExperienceDetailsPageUtils.getFromPropsOrNavigationParams(
@@ -149,7 +145,9 @@ local function ExperienceDetailsPeekView(pageProps)
 	end, { experienceDetailsPageKey, referralSource, experienceJoinData, placeIdOverride })
 
 	local topBarHeight = useTopBarHeight()
-	local v8 = math.min(getSafeAreaSize(useScreenSize(), (useDeviceInsets())).X.Offset, 640)
+	local v8 = useScreenSize()
+	local v9 = useDeviceInsets()
+	local v10 = math.min(getSafeAreaSize(v8, v9).X.Offset, 640)
 	local ref2
 
 	if FFlagSduiContainerQueries then
@@ -162,38 +160,38 @@ local function ExperienceDetailsPeekView(pageProps)
 	end)
 
 	local onAbsoluteSizeChange = React.useCallback(function(p)
-		local v9 = p.AbsoluteSize.Y
+		local v11 = p.AbsoluteSize.Y
 
-		if v9 > 0 then
-			local v10 = v3.Padding.Medium + v3.Size.Size_1200
+		if v11 > 0 then
+			local v12 = v3.Padding.Medium + v3.Size.Size_1200
 
-			if v9 <= v10 + v3.Padding.Medium then
-				v9 = v10
+			if v11 <= v12 + v3.Padding.Medium then
+				v11 = v12
 			end
 
-			setState(v9)
+			setState(v11)
 		end
 	end, { v3 })
 
-	local v9 = useEntrySurfacing(
+	local v11 = useEntrySurfacing(
 		experienceDetailsPageKey,
 		ExperienceDetailsPageConstants.EDP_FEED_IDENTIFIER,
 		"peekView"
 	)
-	local heightOffset = v9 and v9.heightOffset or 0
-	local udim = UDim.new(0, v8 + state + heightOffset)
+	local heightOffset = v11 and v11.heightOffset or 0
+	local udim = UDim.new(0, v10 + state + heightOffset)
 
-	local v10 = useSelector(function(p)
+	local v12 = useSelector(function(p)
 		return p.GameDetailsPeekView.viewState
 	end)
 
 	local mountAsFullView = ExperienceDetailsPageUtils.getFromPropsOrNavigationParams(pageProps, "mountAsFullView")
 
 	if mountAsFullView == nil then
-		mountAsFullView = v10 == PeekViewState.Full or v10 == PeekViewState.Extended
+		mountAsFullView = v12 == PeekViewState.Full or v12 == PeekViewState.Extended
 	end
 
-	local mountAnimation = v10 == PeekViewState.Closed
+	local mountAnimation = v12 == PeekViewState.Closed
 
 	if FFlagEnableMotionJitterMetric then
 		useMotionJitterMetric(ref, ExperienceDetailsPageConstants.EDP_PEEK_VIEW_SURFACE, true, "CanvasPosition")
@@ -217,16 +215,16 @@ local function ExperienceDetailsPeekView(pageProps)
 		end
 	end, { universeId, v2 })
 
-	local v11 = useUiStatus(experienceDetailsPageKey)
+	local v13 = useUiStatus(experienceDetailsPageKey)
 	React.useEffect(function()
-		if v11 == UiStatus.Error and universeId then
+		if v13 == UiStatus.Error and universeId then
 			DataHydration.Game.getGameInfoStore(false).getAndFetchGameInfo(universeId, function(p): boolean
 				return p == nil or p.creator == nil
 			end)
 
 			DataHydration.Game.getAgeRecommendationStore(false).getAndFetchAgeRecommendation(universeId)
 		end
-	end, { v11, universeId })
+	end, { v13, universeId })
 
 	local refresh = React.useCallback(function()
 		if universeId and v2 then
@@ -235,51 +233,51 @@ local function ExperienceDetailsPeekView(pageProps)
 	end, { universeId, v2 })
 
 	local onViewStateChanged = React.useCallback(function(viewState, p)
-		local v12 = universeId or ""
+		local v14 = universeId or ""
 
 		if universeId and viewState == PeekViewState.Brief then
-			if v10 == PeekViewState.Brief then
-				local v13
+			if v12 == PeekViewState.Brief then
+				local v15
 
 				if FFlagLuaAppEdpBottomSheetPeekViewEvents then
-					v13 = ExperienceDetailsPageConstants.EDP_PEEK_VIEW_SURFACE
+					v15 = ExperienceDetailsPageConstants.EDP_PEEK_VIEW_SURFACE
 				end
 
-				gameDetailsPeekViewEvents(v5, "SwitchGame", v12, analyticsSource, tilePositionIndex, v13)
+				gameDetailsPeekViewEvents(v5, "SwitchGame", v14, analyticsSource, tilePositionIndex, v15)
 			elseif p == PeekViewState.Closed then
-				local v13
+				local v15
 
 				if FFlagLuaAppEdpBottomSheetPeekViewEvents then
-					v13 = ExperienceDetailsPageConstants.EDP_PEEK_VIEW_SURFACE
+					v15 = ExperienceDetailsPageConstants.EDP_PEEK_VIEW_SURFACE
 				end
 
-				gameDetailsPeekViewEvents(v5, "OpenPeekView", v12, analyticsSource, tilePositionIndex, v13)
+				gameDetailsPeekViewEvents(v5, "OpenPeekView", v14, analyticsSource, tilePositionIndex, v15)
 			end
 		end
 
 		v7({ type = "SetGameDetailsPeekViewState", viewState = viewState })
 
 		if universeId and viewState == PeekViewState.Full and p == PeekViewState.Brief then
-			local v13
+			local v15
 
 			if FFlagLuaAppEdpBottomSheetPeekViewEvents then
-				v13 = ExperienceDetailsPageConstants.EDP_PEEK_VIEW_SURFACE
+				v15 = ExperienceDetailsPageConstants.EDP_PEEK_VIEW_SURFACE
 			end
 
-			gameDetailsPeekViewEvents(v5, "GoToFullView", v12, analyticsSource, tilePositionIndex, v13)
+			gameDetailsPeekViewEvents(v5, "GoToFullView", v14, analyticsSource, tilePositionIndex, v15)
 		end
 
 		if viewState == PeekViewState.Closed then
 			onClose()
 		end
-	end, { v7, v5, universeId, analyticsSource, tilePositionIndex, v10, onClose })
+	end, { v7, v5, universeId, analyticsSource, tilePositionIndex, v12, onClose })
 
 	if universeId == nil then
 		return nil
 	end
 
 	local createElement = React.createElement
-	local v12 = {
+	local v14 = {
 		topBarHeight = topBarHeight,
 		bottomDockedContainerHeight = state,
 		fullViewContentHeight = UDim.new(1, -topBarHeight),
@@ -307,7 +305,7 @@ local function ExperienceDetailsPeekView(pageProps)
 		ref2 = nil
 	end
 
-	local v13 = {
+	local v15 = {
 		ref = ref2,
 		Size = UDim2.new(1, 0, 1, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
@@ -361,7 +359,7 @@ local function ExperienceDetailsPeekView(pageProps)
 		experienceJoinData = experienceJoinData,
 		placeIdOverride = placeIdOverride
 	})
-	v12.contentSlot = createElement2("Frame", v13, {
+	v14.contentSlot = createElement2("Frame", v15, {
 		Content = createElement3(SduiPageEntryPoint, children)
 	})
 	local bottomBarSlot
@@ -402,8 +400,8 @@ local function ExperienceDetailsPeekView(pageProps)
 		})
 	end
 
-	v12.bottomBarSlot = bottomBarSlot
-	return createElement(PeekViewWithTopBar, v12)
+	v14.bottomBarSlot = bottomBarSlot
+	return createElement(PeekViewWithTopBar, v14)
 end
 
 return React.memo(ExperienceDetailsPeekView)

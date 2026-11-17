@@ -52,6 +52,7 @@ local collectible_item_data = require(script.Parent.collectible_item_data)
 local leaderboard_stats_data = require(script.Parent.leaderboard_stats_data)
 
 local user_library_saved_state_data = require(script.Parent.user_library_saved_state_data)
+local vote_data = require(script.Parent.vote_data)
 
 local class = {}
 class.__index = class
@@ -95,7 +96,8 @@ function class.new(data)
 		buy_robux_subscription_product = (data == nil or data.buy_robux_subscription_product == nil) and {} or data.buy_robux_subscription_product,
 		buy_robux_pending_transfer = (data == nil or data.buy_robux_pending_transfer == nil) and {} or data.buy_robux_pending_transfer,
 		buy_robux_bonus_item = (data == nil or data.buy_robux_bonus_item == nil) and {} or data.buy_robux_bonus_item,
-		user_library_saved_state = (data == nil or data.user_library_saved_state == nil) and {} or data.user_library_saved_state
+		user_library_saved_state = (data == nil or data.user_library_saved_state == nil) and {} or data.user_library_saved_state,
+		game_pass_vote = (data == nil or data.game_pass_vote == nil) and {} or data.game_pass_vote
 	}, class))
 end
 
@@ -635,6 +637,20 @@ function class:encode()
 		end
 	end
 
+	if self.game_pass_vote ~= nil and next(self.game_pass_vote) ~= nil then
+		for k, v4 in self.game_pass_vote do
+			local buf = buffer.create(0)
+
+			local v5, v6 = proto.writeTag(buf, 0, 1, proto.wireTypes.lengthDelimited)
+			local v7, v8 = proto.writeString(v5, v6, k)
+			local encoded = v4:encode()
+			local v9, v10 = proto.writeTag(v7, v8, 2, proto.wireTypes.lengthDelimited)
+			local v11, v12 = proto.writeBuffer(v9, v10, encoded, buffer.len(encoded))
+			local v13, v14 = proto.writeTag(v2, v3, 39, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v13, v14, v11, v12)
+		end
+	end
+
 	local buf = buffer.create(v3)
 	buffer.copy(buf, 0, v2, 0, v3)
 	return buf
@@ -996,6 +1012,15 @@ function class.decode(buf: buffer)
 				local userLibrarySavedStateData = user_library_saved_state_data.UserLibrarySavedStateData.new()
 
 				v2.user_library_saved_state[decoded.key or ""] = decoded.value or userLibrarySavedStateData
+			elseif v4 == 39 then
+				local v6
+				v6, v3 = proto.readBuffer(buf, v3)
+
+				local decoded = v.HydrationContent_GamePassVoteEntry.decode(v6)
+
+				local voteData = vote_data.VoteData.new()
+
+				v2.game_pass_vote[decoded.key or ""] = decoded.value or voteData
 			else
 				local varInt, v6 = proto.readVarInt(buf, v3)
 
@@ -1388,17 +1413,27 @@ function class:jsonEncode()
 		v2.buyRobuxBonusItem = buyRobuxBonusItem
 	end
 
-	if self.user_library_saved_state == nil or next(self.user_library_saved_state) == nil then
+	if self.user_library_saved_state ~= nil and next(self.user_library_saved_state) ~= nil then
+		local userLibrarySavedState = {}
+
+		for k, v3 in self.user_library_saved_state do
+			userLibrarySavedState[k] = v3:jsonEncode()
+		end
+
+		v2.userLibrarySavedState = userLibrarySavedState
+	end
+
+	if self.game_pass_vote == nil or next(self.game_pass_vote) == nil then
 		return v2
 	end
 
-	local userLibrarySavedState = {}
+	local gamePassVote = {}
 
-	for k, v3 in self.user_library_saved_state do
-		userLibrarySavedState[k] = v3:jsonEncode()
+	for k, v3 in self.game_pass_vote do
+		gamePassVote[k] = v3:jsonEncode()
 	end
 
-	v2.userLibrarySavedState = userLibrarySavedState
+	v2.gamePassVote = gamePassVote
 
 	return v2
 end
@@ -2076,17 +2111,37 @@ function class.jsonDecode(data)
 		v2.user_library_saved_state = user_library_saved_state
 	end
 
-	if data.userLibrarySavedState == nil then
+	if data.userLibrarySavedState ~= nil then
+		local user_library_saved_state = {}
+
+		for k, v3 in data.userLibrarySavedState do
+			user_library_saved_state[k] = user_library_saved_state_data.UserLibrarySavedStateData.jsonDecode(v3)
+		end
+
+		v2.user_library_saved_state = user_library_saved_state
+	end
+
+	if data.game_pass_vote ~= nil then
+		local game_pass_vote = {}
+
+		for k, v3 in data.game_pass_vote do
+			game_pass_vote[k] = vote_data.VoteData.jsonDecode(v3)
+		end
+
+		v2.game_pass_vote = game_pass_vote
+	end
+
+	if data.gamePassVote == nil then
 		return v2
 	end
 
-	local user_library_saved_state = {}
+	local game_pass_vote = {}
 
-	for k, v3 in data.userLibrarySavedState do
-		user_library_saved_state[k] = user_library_saved_state_data.UserLibrarySavedStateData.jsonDecode(v3)
+	for k, v3 in data.gamePassVote do
+		game_pass_vote[k] = vote_data.VoteData.jsonDecode(v3)
 	end
 
-	v2.user_library_saved_state = user_library_saved_state
+	v2.game_pass_vote = game_pass_vote
 
 	return v2
 end
@@ -6431,5 +6486,119 @@ class39.descriptor = {
 v.HydrationContent_UserLibrarySavedStateEntry = class39
 
 typeRegistry.default:register(v.HydrationContent_UserLibrarySavedStateEntry)
+
+local class40 = {}
+class40.__index = class40
+
+function class40.new(p)
+	local v2 = {
+		key = (p == nil or p.key == nil) and "" or p.key,
+		value = 0
+	}
+	local v3
+
+	if not (p == nil or p.value == nil) then
+		v3 = p.value
+	end
+
+	v2.value = v3
+	return (setmetatable(v2, class40))
+end
+
+function class40:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
+
+	if self.key ~= nil and self.key ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.key)
+	end
+
+	if self.value ~= nil then
+		local encoded = self.value:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+	end
+
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
+end
+
+function class40.decode(buf: buffer)
+	local result = class40.new()
+	local v2 = 0
+
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
+
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.key = buffer.tostring(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.value = vote_data.VoteData.decode(v5)
+			else
+				local varInt, v5 = proto.readVarInt(buf, v2)
+
+				v2 = v5 + varInt
+			end
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
+		else
+			error("Unsupported wire type: " .. v4)
+		end
+	end
+
+	return result
+end
+
+function class40:jsonEncode()
+	local v2 = {}
+
+	if self.key ~= nil and self.key ~= "" then
+		v2.key = self.key
+	end
+
+	if self.value ~= nil then
+		v2.value = self.value:jsonEncode()
+	end
+
+	return v2
+end
+
+function class40.jsonDecode(p)
+	local v2 = class40.new()
+
+	if p.key ~= nil then
+		v2.key = p.key
+	end
+
+	if p.value ~= nil then
+		v2.value = vote_data.VoteData.jsonDecode(p.value)
+	end
+
+	return v2
+end
+
+class40.descriptor = {
+	name = "HydrationContent_GamePassVoteEntry",
+	fullName = "roblox.apppageplatform.shared.v1beta1.GamePassVoteEntry"
+}
+
+v.HydrationContent_GamePassVoteEntry = class40
+
+typeRegistry.default:register(v.HydrationContent_GamePassVoteEntry)
 
 return { HydrationContent = v.HydrationContent }

@@ -208,9 +208,11 @@ function prepareToHydrateHostTextInstance(p)
 		return v3
 	end
 
-	if v4.tag == HostComponent then
-		didNotMatchHydratedTextInstance(v4.type, v4.memoizedProps, v4.stateNode, stateNode, memoizedProps)
+	if v4.tag ~= HostComponent then
+		return v3
 	end
+
+	didNotMatchHydratedTextInstance(v4.type, v4.memoizedProps, v4.stateNode, stateNode, memoizedProps)
 
 	return v3
 end

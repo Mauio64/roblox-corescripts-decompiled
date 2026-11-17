@@ -211,9 +211,8 @@ local function createPrompt(instance, p, parent)
 	local uiScale = Instance.new("UIScale")
 	uiScale.Parent = frame2
 
-	table.insert(v5, TweenService:Create(uiScale, tweenInfo3, {
-		Scale = p == Enum.ProximityPromptInputType.Touch and 1.6 or 1.33
-	}))
+	local scale = p == Enum.ProximityPromptInputType.Touch and 1.6 or 1.33
+	table.insert(v5, TweenService:Create(uiScale, tweenInfo3, { Scale = scale }))
 	table.insert(v6, TweenService:Create(uiScale, tweenInfo3, { Scale = 1 }))
 
 	local actionText = Instance.new("TextLabel")

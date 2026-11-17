@@ -10,28 +10,10 @@ local ExternalContentSharingProtocol = require(parent.ExternalContentSharingProt
 local default = ExternalContentSharingProtocol.ExternalContentSharingProtocol.default
 
 require(BuildExperience.Chat.chatTypes)
-local FFlagBuildExperienceChatImageAttachments = require(BuildExperience.Flags.FFlagBuildExperienceChatImageAttachments)
-
-local SharedFlags = require(parent.SharedFlags)
-local FFlagBuildExperienceChatResourceAttachments = SharedFlags.FFlagBuildExperienceChatResourceAttachments
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
 local escapeRichText = require(BuildExperience.utils.escapeRichText)
-local ChatImagePreviewList
-
-if FFlagBuildExperienceChatImageAttachments then
-	ChatImagePreviewList = require(script.Parent.ChatImagePreviewList)
-else
-	ChatImagePreviewList = nil
-end
-
-local ChatResourceAttachmentList
-
-if FFlagBuildExperienceChatResourceAttachments then
-	ChatResourceAttachmentList = require(script.Parent.ChatResourceAttachmentList)
-else
-	ChatResourceAttachmentList = nil
-end
-
+local ChatImagePreviewList = require(script.Parent.ChatImagePreviewList)
+local ChatResourceAttachmentList = require(script.Parent.ChatResourceAttachmentList)
 local InteractionFeedback = require(parent.InteractionFeedback)
 local useTriggerFeedback = InteractionFeedback.useTriggerFeedback
 
@@ -125,17 +107,15 @@ end
 local function ChatUserMessage(p)
 	local text = p.message.text
 	local resourceAttachments = p.message.resourceAttachments or {}
-	local v2 = FFlagBuildExperienceChatImageAttachments
+	local v2
 
-	if v2 then
-		if p.message.images == nil then
-			v2 = false
-		else
-			v2 = #p.message.images > 0
-		end
+	if p.message.images == nil then
+		v2 = false
+	else
+		v2 = #p.message.images > 0
 	end
 
-	local v3 = FFlagBuildExperienceChatResourceAttachments and #resourceAttachments > 0
+	local v3 = #resourceAttachments > 0
 
 	local createElement = React.createElement
 	local v4 = { LayoutOrder = p.LayoutOrder, tag = "row gap-small size-full-0 auto-y" }

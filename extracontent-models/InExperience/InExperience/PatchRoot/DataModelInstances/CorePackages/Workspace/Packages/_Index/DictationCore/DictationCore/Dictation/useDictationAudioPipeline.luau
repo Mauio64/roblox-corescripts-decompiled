@@ -5,6 +5,8 @@ local DictationCore = script:FindFirstAncestor("DictationCore")
 local parent = DictationCore.Parent
 
 local React = require(parent.React)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagDictationAudioDeviceInputEnabled = SharedFlags.FFlagDictationAudioDeviceInputEnabled
 local FFlagDictationSendUsageType = require(DictationCore.Flags.FFlagDictationSendUsageType)
 local finishDictationInput = require(script.Parent.finishDictationInput)
 local prepareDictationInput = require(script.Parent.prepareDictationInput)
@@ -122,6 +124,13 @@ local function useDictationAudioPipeline()
 		v.container.current = folder
 
 		local audioDeviceInput = Instance.new("AudioDeviceInput")
+
+		if FFlagDictationAudioDeviceInputEnabled then
+			pcall(function()
+				audioDeviceInput.DictationEnabled = true
+			end)
+		end
+
 		audioDeviceInput.Player = localPlayer
 		audioDeviceInput.Muted = false
 		audioDeviceInput.Parent = folder

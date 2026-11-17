@@ -1,8 +1,6 @@
 local parent = script.Parent
 local SharedFlags = require(parent.SharedFlags)
 local FFlagLuaAppHomeThumbnailPrefetch = SharedFlags.FFlagLuaAppHomeThumbnailPrefetch
-local SharedFlags2 = require(parent.SharedFlags)
-local FFlagMigrateGameInfoToStore = SharedFlags2.FFlagMigrateGameInfoToStore
 
 local OpenCentralOverlayForPlacesList = require(script.OpenCentralOverlayForPlacesList)
 local GameTileConstants = require(script.GameTileConstants)
@@ -40,12 +38,7 @@ if FFlagLuaAppHomeThumbnailPrefetch then
 	resolveGameTileThumbnailUri = require(script.resolveGameTileThumbnailUri)
 end
 
-local resolveWideAssetId
-
-if FFlagMigrateGameInfoToStore then
-	resolveWideAssetId = require(script.resolveWideAssetId)
-end
-
+local resolveWideAssetId = require(script.resolveWideAssetId)
 local useNavigateToGameDetails = require(script.useNavigateToGameDetails)
 local ItemLayoutDataParsingUtils = require(script.ItemLayoutDataParsingUtils)
 local useIsHoveredTile = require(script.useIsHoveredTile)

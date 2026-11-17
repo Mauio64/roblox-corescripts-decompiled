@@ -44,9 +44,11 @@ local SharedFlags8 = require(parent.SharedFlags)
 local FFlagLuaAppTileVideoKeepPlayingOnScroll = SharedFlags8.FFlagLuaAppTileVideoKeepPlayingOnScroll
 local SharedFlags9 = require(parent.SharedFlags)
 local FFlagLuaAppVideoAutoplayFeedElection = SharedFlags9.FFlagLuaAppVideoAutoplayFeedElection
-
 local SharedFlags10 = require(parent.SharedFlags)
-local FFlagLuaAppVideoAutoplayOneByTwoConcurrentPlayback = SharedFlags10.FFlagLuaAppVideoAutoplayOneByTwoConcurrentPlayback
+local FFlagMobileGameJoinCardVideo = SharedFlags10.FFlagMobileGameJoinCardVideo
+
+local SharedFlags11 = require(parent.SharedFlags)
+local FFlagLuaAppVideoAutoplayOneByTwoConcurrentPlayback = SharedFlags11.FFlagLuaAppVideoAutoplayOneByTwoConcurrentPlayback
 local FFlagLuaAppVideoAutoplayElectOnNewCandidate = require(script.Parent.FFlagLuaAppVideoAutoplayElectOnNewCandidate)
 
 local defineFastInt = game:DefineFastInt("LuaAppVideoAutoplayMaxDistanceToWinnerLinePercent", 50)
@@ -65,10 +67,11 @@ local function winnerStateEquals(data, data2): boolean
 		and (not FFlagLuaAppOneByTwoHoverIdleAutoplay or data.isUserIntentWinner == data2.isUserIntentWinner)
 end
 
-local function shouldSuppressReelection(p: string?): boolean -- 1 equivalent call inferred from this helper
+local function shouldSuppressReelection(p: string?) -- 1 equivalent call inferred from this helper
 	return p == VideoEndReason.TileClicked
 		or p == VideoEndReason.ExperienceLaunched
 		or p == VideoEndReason.AppBackgrounded
+		or FFlagMobileGameJoinCardVideo and p == VideoEndReason.OverlayTakeover
 end
 
 local function reportCandidateOverlap(p, data, absolutePositionX: number)
@@ -648,7 +651,9 @@ end
 function ViewportVideoAutoplayController:_resetPairedPlayback(p, p2: string, p3: string?)
 	if
 		self.isResettingPairedPlayback
-		or p2 ~= VideoEndReason.TileClicked and p2 ~= VideoEndReason.ExperienceLaunched
+		or p2 ~= VideoEndReason.TileClicked
+		and p2 ~= VideoEndReason.ExperienceLaunched
+		and (not FFlagMobileGameJoinCardVideo or p2 ~= VideoEndReason.OverlayTakeover)
 	then
 		return
 	end

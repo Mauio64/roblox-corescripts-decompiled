@@ -18,11 +18,18 @@ require(InExperienceSideSheet.Common.Types)
 
 local PioneerUtils = require(parent.PioneerUtils)
 local isPioneerLaunch = PioneerUtils.isPioneerLaunch
+local SharedFlags = require(parent.SharedFlags)
+local FFlagPioneerLeaveLogsOut = SharedFlags.FFlagPioneerLeaveLogsOut
+local getPioneerLeaveCopy = require(InExperienceSideSheet.Common.getPioneerLeaveCopy)
 
 local SwitchServer = require(parent.SwitchServer)
 local GetSwitchServerStore = SwitchServer.GetSwitchServerStore
 
 local GetActionBindingsStore = require(InExperienceSideSheet.Stores.GetActionBindingsStore)
+local Flags = require(InExperienceSideSheet.Flags)
+local FFlagPioneerLogoutButtonLabel = Flags.FFlagPioneerLogoutButtonLabel
+local Flags2 = require(InExperienceSideSheet.Flags)
+local FFlagSideSheetEmphasizeLeave = Flags2.FFlagSideSheetEmphasizeLeave
 
 local ButtonWidth = Enums.ButtonWidth
 
@@ -49,21 +56,33 @@ local function createRespawnButtonConfig(sessionActionBindings, signal, setShort
 		setShortcutIcon = setShortcutIcon,
 		getOnActivated = sessionActionBindings[Enums.ActionBinding.Respawn].getOnActivated,
 		getIsEnabled = sessionActionBindings[Enums.ActionBinding.Respawn].getIsEnabled,
-		width = ButtonWidth.Full
+		width = ButtonWidth.Full,
+		testId = FFlagSideSheetEmphasizeLeave and "--in-experience-side-sheet-button-respawn" or nil
 	}
 end
 
-local function createLeaveButtonConfig(sessionActionBindings, signal, setShortcutIcon, pioneerLaunch: boolean)
+local function createLeaveButtonConfig(sessionActionBindings, signal, setShortcutIcon, pioneerLaunch: boolean, fFlagSideSheetEmphasizeLeave: boolean)
+	local label
+
+	if FFlagPioneerLogoutButtonLabel then
+		label = getPioneerLeaveCopy.getPioneerLeaveButtonKey(pioneerLaunch)
+	else
+		label = (not pioneerLaunch or FFlagPioneerLeaveLogsOut) and "CoreScripts.InGameMenu.LeaveGame"
+			or Constants.LocalizationKeys.QuitButton
+	end
+
 	local leaveButtonConfig = {
 		name = "LeaveButton",
-		label = not pioneerLaunch and "CoreScripts.InGameMenu.LeaveGame" or Constants.LocalizationKeys.QuitButton,
+		label = label,
 		keyboardIcon = IconName.SquareTextL,
 		gamepadKeyCode = Enum.KeyCode.ButtonX,
 		getShortcutIcon = signal,
 		setShortcutIcon = setShortcutIcon,
 		getOnActivated = sessionActionBindings[Enums.ActionBinding.Leave].getOnActivated,
 		getIsEnabled = sessionActionBindings[Enums.ActionBinding.Leave].getIsEnabled,
-		width = 0
+		width = 0,
+		isEmphasized = 0,
+		testId = 0
 	}
 	local width
 
@@ -74,17 +93,20 @@ local function createLeaveButtonConfig(sessionActionBindings, signal, setShortcu
 	end
 
 	leaveButtonConfig.width = width
+	leaveButtonConfig.isEmphasized = fFlagSideSheetEmphasizeLeave
+	leaveButtonConfig.testId = FFlagSideSheetEmphasizeLeave and "--in-experience-side-sheet-button-leave" or nil
 	return leaveButtonConfig
 end
 
-local function createSwitchServerButtonConfig(sessionActionBindings) -- 1 equivalent call inferred from this helper
+local function createSwitchServerButtonConfig(sessionActionBindings)
 	return {
 		name = Constants.SessionActionButtonNames.SwitchServer,
 		label = "CoreScripts.InGameMenu.PeoplePage.SwitchServer",
 		getOnActivated = sessionActionBindings[Enums.ActionBinding.SwitchServer].getOnActivated,
 		getIsEnabled = sessionActionBindings[Enums.ActionBinding.SwitchServer].getIsEnabled,
 		getIsHidden = getIsSwitchServerButtonHidden,
-		width = ButtonWidth.Half
+		width = ButtonWidth.Half,
+		testId = FFlagSideSheetEmphasizeLeave and "--in-experience-side-sheet-button-switch-server" or nil
 	}
 end
 
@@ -95,16 +117,33 @@ local function createSessionActionButtonsStore()
 	local signal, setShortcutIcon = Signals.createSignal(nil)
 	local signal2, setShortcutIcon2 = Signals.createSignal(nil)
 
-	local sessionActionButtonConfigs = { createRespawnButtonConfig(sessionActionBindings, signal2, setShortcutIcon2) }
+	local leaveButtonConfig = createLeaveButtonConfig(
+		sessionActionBindings,
+		signal,
+		setShortcutIcon,
+		pioneerLaunch,
+		FFlagSideSheetEmphasizeLeave
+	)
 
-	if pioneerLaunch then
-		table.insert(sessionActionButtonConfigs, createSwitchServerButtonConfig(sessionActionBindings)) -- inferred equivalent call
+	local respawnButtonConfig = createRespawnButtonConfig(sessionActionBindings, signal2, setShortcutIcon2)
+
+	local sessionActionButtonConfigs = {}
+
+	if FFlagSideSheetEmphasizeLeave then
+		table.insert(sessionActionButtonConfigs, leaveButtonConfig)
+	else
+		table.insert(sessionActionButtonConfigs, respawnButtonConfig)
 	end
 
-	table.insert(
-		sessionActionButtonConfigs,
-		createLeaveButtonConfig(sessionActionBindings, signal, setShortcutIcon, pioneerLaunch)
-	)
+	if pioneerLaunch then
+		table.insert(sessionActionButtonConfigs, createSwitchServerButtonConfig(sessionActionBindings))
+	end
+
+	if FFlagSideSheetEmphasizeLeave then
+		table.insert(sessionActionButtonConfigs, respawnButtonConfig)
+	else
+		table.insert(sessionActionButtonConfigs, leaveButtonConfig)
+	end
 
 	local gamepadConnectedConnection = nil
 	local effect = Signals.createEffect(function(p)

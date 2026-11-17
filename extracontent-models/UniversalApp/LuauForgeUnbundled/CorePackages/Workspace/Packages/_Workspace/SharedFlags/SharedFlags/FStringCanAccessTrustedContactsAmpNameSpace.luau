@@ -1,4 +1,0 @@
-return game:DefineFastString(
-	"CanAccessTrustedContactsAmpNameSpace",
-	"connection_graph_core/ConnectionGraphCore"
-)

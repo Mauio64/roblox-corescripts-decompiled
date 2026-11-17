@@ -12,32 +12,6 @@ local getEffectiveChatTimeoutDetails = require(AppChat.Utils.getEffectiveChatTim
 local getUserSendEligibilityStatus = require(AppChat.Utils.getUserSendEligibilityStatus)
 local toTimeoutEntry = require(AppChat.Utils.toTimeoutEntry)
 
-local FFlagAppChatEnforceTimeoutsOnUnfilteredChat = require(AppChat.Flags.FFlagAppChatEnforceTimeoutsOnUnfilteredChat)
-local SharedFlags = require(parent.SharedFlags)
-local FFlagAppChatReactiveFeatureRestrictions = SharedFlags.FFlagAppChatReactiveFeatureRestrictions
-local SharedFlags2 = require(parent.SharedFlags)
-local FFlagShareSheetFriendsSort = SharedFlags2.FFlagShareSheetFriendsSort
-
-local function isActiveTimeout(data, p: string?, p2: number)
-	local v
-
-	if data == nil or data.status ~= "active" then
-		v = false
-	else
-		v = p2 < data.endTimestamp or FFlagAppChatReactiveFeatureRestrictions and data.requiresAcknowledgement == true
-	end
-
-	if FFlagAppChatEnforceTimeoutsOnUnfilteredChat then
-		return v
-	end
-
-	return v and p ~= ConversationChannels.ModerationType.TrustedComms
-end
-
-local fn = FFlagShareSheetFriendsSort and function(p, _, p2)
-	return getEffectiveChatTimeoutDetails(nil, toTimeoutEntry(p), nil, p2).isTimedOut
-end or isActiveTimeout
-
 local function isConversationPending(conversation) -- 1 equivalent call inferred from this helper
 	return conversation.participantPendingStatus == ConversationChannels.UserPendingStatus.Pending
 		or useIsUserPending(conversation)
@@ -54,45 +28,14 @@ local function getConversationSendEligibilityStatus(data)
 		return "ineligible"
 	end
 
-	if FFlagShareSheetFriendsSort then
-		local userSendEligibilityStatus = getUserSendEligibilityStatus({
-			currentTimestamp = data.currentTimestamp,
-			isAvailable = data.isAvailable,
-			scope = data.scope
-		})
+	local userSendEligibilityStatus = getUserSendEligibilityStatus({
+		currentTimestamp = data.currentTimestamp,
+		isAvailable = data.isAvailable,
+		scope = data.scope
+	})
 
-		if userSendEligibilityStatus ~= "eligible" then
-			return userSendEligibilityStatus
-		end
-	else
-		local userStatus = data.timeoutStore.getUserStatus()
-		local status = userStatus.status(data.scope)
-
-		if status == DataHydration.DataStatus.NotReady then
-			return "loading"
-		end
-
-		if status ~= DataHydration.DataStatus.Failed then
-			local data2 = userStatus.data(data.scope)
-			local moderationType = conversation.moderationType
-			local currentTimestamp = data.currentTimestamp
-			local v
-
-			if data2 == nil or data2.status ~= "active" then
-				v = false
-			else
-				v = currentTimestamp < data2.endTimestamp
-					or FFlagAppChatReactiveFeatureRestrictions and data2.requiresAcknowledgement == true
-			end
-
-			if not FFlagAppChatEnforceTimeoutsOnUnfilteredChat and v then
-				v = moderationType ~= ConversationChannels.ModerationType.TrustedComms
-			end
-
-			if v then
-				return "ineligible"
-			end
-		end
+	if userSendEligibilityStatus ~= "eligible" then
+		return userSendEligibilityStatus
 	end
 
 	if conversation.source == "friends" then
@@ -108,7 +51,12 @@ local function getConversationSendEligibilityStatus(data)
 
 	if
 		status == DataHydration.DataStatus.Failed
-		or not fn(conversationStatus.data(data.scope), conversation.moderationType, data.currentTimestamp)
+		or not getEffectiveChatTimeoutDetails(
+			nil,
+			toTimeoutEntry(conversationStatus.data(data.scope)),
+			nil,
+			data.currentTimestamp
+		).isTimedOut
 	then
 		return "eligible"
 	end

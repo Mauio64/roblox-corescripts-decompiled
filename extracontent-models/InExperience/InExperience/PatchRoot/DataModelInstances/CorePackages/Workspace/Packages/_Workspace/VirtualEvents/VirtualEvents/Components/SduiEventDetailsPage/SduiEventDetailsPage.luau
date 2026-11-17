@@ -31,15 +31,13 @@ local SharedFlags = require(parent.SharedFlags)
 local FFlagLuaAppSduiEventDetailsLogExposure = SharedFlags.FFlagLuaAppSduiEventDetailsLogExposure
 local SharedFlags2 = require(parent.SharedFlags)
 local FFlagLuaAppSduiEventDetailsCenterSheet = SharedFlags2.FFlagLuaAppSduiEventDetailsCenterSheet
-local SharedFlags3 = require(parent.SharedFlags)
-local FFlagLuaAppSduiEventDetailsLoadingSlot = SharedFlags3.FFlagLuaAppSduiEventDetailsLoadingSlot
 
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagLuaAppSduiEventDetailsActionBarInFeed = SharedFlags3.FFlagLuaAppSduiEventDetailsActionBarInFeed
 local SharedFlags4 = require(parent.SharedFlags)
-local FFlagLuaAppSduiEventDetailsActionBarInFeed = SharedFlags4.FFlagLuaAppSduiEventDetailsActionBarInFeed
+local FStringLuaAppSduiEventDetailsIxpLayer = SharedFlags4.FStringLuaAppSduiEventDetailsIxpLayer
 local SharedFlags5 = require(parent.SharedFlags)
-local FStringLuaAppSduiEventDetailsIxpLayer = SharedFlags5.FStringLuaAppSduiEventDetailsIxpLayer
-local SharedFlags6 = require(parent.SharedFlags)
-local FFlagSduiPageEntryUseSharedHooks = SharedFlags6.FFlagSduiPageEntryUseSharedHooks
+local FFlagSduiPageEntryUseSharedHooks = SharedFlags5.FFlagSduiPageEntryUseSharedHooks
 
 local function getFromPropsOrNavigationParams(p, p2: string) -- 4 equivalent calls inferred from this helper
 	local v = p.navigation and p.navigation.getParam("extraProps")
@@ -113,92 +111,52 @@ local function SduiEventDetailsPage(p)
 		centerSheetHeight = FFlagLuaAppSduiEventDetailsCenterSheet and 1 or nil,
 		onClose = onClose
 	}
-
-	local createElement2 = React.createElement
-	local fullBleed = Foundation.Sheet.FullBleed
-
-	local createElement3 = React.createElement
 	local v7 = {
-		appPage = AppPage.EventDetails,
-		configKey = eventDetailsPageKey,
-		identifier = "event_details_sheet_full_bleed",
-		shouldDisplayLoading = FFlagLuaAppSduiEventDetailsLoadingSlot,
-		loadingSlot = 0,
-		shouldDisplayError = false,
-		Size = 0,
-		AutomaticSize = 0
-	}
-	local loadingSlot
-
-	if FFlagLuaAppSduiEventDetailsLoadingSlot then
-		loadingSlot = React.createElement(EventDetailsFullBleedSkeleton)
-	end
-
-	v7.loadingSlot = loadingSlot
-
-	v7.Size = UDim2.fromScale(1, 1)
-	v7.AutomaticSize = Enum.AutomaticSize.None
-	local children = {
-		FullBleed = createElement2(fullBleed, {
+		FullBleed = React.createElement(Foundation.Sheet.FullBleed, {
 			aspectRatio = 16 / 9
 		}, {
-			FullBleedContent = createElement3(SduiFeatureEntryPoint, v7)
+			FullBleedContent = React.createElement(SduiFeatureEntryPoint, {
+				appPage = AppPage.EventDetails,
+				configKey = eventDetailsPageKey,
+				identifier = "event_details_sheet_full_bleed",
+				loadingSlot = React.createElement(EventDetailsFullBleedSkeleton),
+				shouldDisplayError = false,
+				Size = UDim2.fromScale(1, 1),
+				AutomaticSize = Enum.AutomaticSize.None
+			})
 		}),
-		Content = 0,
+		Content = React.createElement(
+			Foundation.Sheet.Content,
+			{ scrollingFrameRef = ref },
+			React.createElement(SduiPageEntryPoint, {
+				appPage = AppPage.EventDetails,
+				configKey = eventDetailsPageKey,
+				identifier = FFlagSduiPageEntryUseSharedHooks and "event_details_feed" or eventDetailsPageKey .. "_event_details_feed",
+				pageTimer = pageTimer,
+				includeNavigationHeaderBar = false,
+				backgroundStyle = v.Color.None,
+				disableRootPadding = true,
+				scrollingFrameRef = ref,
+				snackbarPortalLayoutOrder = 2147483647,
+				loadingSlot = React.createElement(EventDetailsFeedSkeleton)
+			})
+		),
 		Actions = 0
 	}
-
-	local createElement4 = React.createElement
-	local content = Foundation.Sheet.Content
-
-	local createElement5 = React.createElement
-	local v8 = {
-		appPage = AppPage.EventDetails,
-		configKey = eventDetailsPageKey,
-		identifier = FFlagSduiPageEntryUseSharedHooks and "event_details_feed" or eventDetailsPageKey .. "_event_details_feed",
-		pageTimer = pageTimer,
-		includeNavigationHeaderBar = false,
-		backgroundStyle = v.Color.None,
-		disableRootPadding = true,
-		scrollingFrameRef = ref,
-		snackbarPortalLayoutOrder = 2147483647,
-		loadingSlot = 0
-	}
-	local loadingSlot2
-
-	if FFlagLuaAppSduiEventDetailsLoadingSlot then
-		loadingSlot2 = React.createElement(EventDetailsFeedSkeleton)
-	end
-
-	v8.loadingSlot = loadingSlot2
-	children.Content = createElement4(content, { scrollingFrameRef = ref }, createElement5(SduiPageEntryPoint, v8))
-	local actions2
+	local actions
 
 	if not FFlagLuaAppSduiEventDetailsActionBarInFeed then
-		local createElement6 = React.createElement
-		local actions = Foundation.Sheet.Actions
-
-		local createElement7 = React.createElement
-		local v9 = {
+		actions = React.createElement(Foundation.Sheet.Actions, nil, React.createElement(SduiFeatureEntryPoint, {
 			appPage = AppPage.EventDetails,
 			configKey = eventDetailsPageKey,
 			identifier = "event_details_action_bar",
-			shouldDisplayLoading = FFlagLuaAppSduiEventDetailsLoadingSlot,
-			loadingSlot = 0,
+			loadingSlot = React.createElement(EventDetailsActionBarSkeleton),
 			shouldDisplayError = false
-		}
-		local loadingSlot3
-
-		if FFlagLuaAppSduiEventDetailsLoadingSlot then
-			loadingSlot3 = React.createElement(EventDetailsActionBarSkeleton)
-		end
-
-		v9.loadingSlot = loadingSlot3
-		actions2 = createElement6(actions, nil, createElement7(SduiFeatureEntryPoint, v9))
+		}))
 	end
 
-	children.Actions = actions2
-	return createElement(root, v6, children)
+	v7.Actions = actions
+	return createElement(root, v6, v7)
 end
 
 return React.memo(SduiEventDetailsPage)

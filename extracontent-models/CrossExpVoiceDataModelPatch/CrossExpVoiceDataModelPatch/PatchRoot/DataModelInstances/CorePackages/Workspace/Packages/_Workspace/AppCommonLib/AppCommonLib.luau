@@ -9,6 +9,7 @@ local GetDefaultQualityLevel = require(script.GetDefaultQualityLevel)
 local isRunningInStudio = require(script.isRunningInStudio)
 local callOnce = require(script.callOnce)
 local memoize = require(script.memoize)
+local nextWrappedInteger = require(script.nextWrappedInteger)
 local OrderedMap = require(script.OrderedMap)
 local Text = require(script.Text)
 local Symbol = require(script.Symbol)
@@ -36,6 +37,7 @@ return {
 	Functional = Functional,
 	callOnce = callOnce,
 	memoize = memoize,
+	nextWrappedInteger = nextWrappedInteger,
 	OrderedMap = OrderedMap,
 	Text = Text,
 	Symbol = Symbol,

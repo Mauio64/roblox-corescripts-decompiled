@@ -176,6 +176,13 @@ function class.new(data)
 	end
 
 	v2.licensing = licensing
+	local original_price
+
+	if not (data == nil or data.original_price == nil) then
+		original_price = data.original_price
+	end
+
+	v2.original_price = original_price
 	return (setmetatable(v2, class))
 end
 
@@ -379,6 +386,11 @@ function class:encode()
 		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 	end
 
+	if self.original_price ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 36, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, self.original_price)
+	end
+
 	local buf = buffer.create(v3)
 	buffer.copy(buf, 0, v2, 0, v3)
 	return buf
@@ -449,6 +461,10 @@ function class.decode(buf: buffer)
 				local v5
 				v5, v2 = proto.readVarInt(buf, v2)
 				result.is_recolorable = v5 ~= 0
+			elseif v3 == 36 then
+				local original_price
+				original_price, v2 = proto.readVarIntI64(buf, v2)
+				result.original_price = original_price
 			else
 				local _
 				_, v2 = proto.readVarInt(buf, v2)
@@ -755,6 +771,10 @@ function class:jsonEncode()
 
 	if self.licensing ~= nil then
 		v2.licensing = self.licensing:jsonEncode()
+	end
+
+	if self.original_price ~= nil then
+		v2.originalPrice = self.original_price
 	end
 
 	return v2
@@ -1111,6 +1131,14 @@ function class.jsonDecode(data)
 
 	if data.licensing ~= nil then
 		v2.licensing = marketplace_catalog_item_common.MarketplaceCatalogItemLicensing.jsonDecode(data.licensing)
+	end
+
+	if data.original_price ~= nil then
+		v2.original_price = data.original_price
+	end
+
+	if data.originalPrice ~= nil then
+		v2.original_price = data.originalPrice
 	end
 
 	return v2

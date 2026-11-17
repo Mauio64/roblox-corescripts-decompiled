@@ -5,7 +5,6 @@ local UIBlox = require(parent.UIBlox)
 local withStyle = UIBlox.Style.withStyle
 local Otter = require(parent.Otter)
 local Foundation = require(parent.Foundation)
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
 
 local UIBlox2 = require(parent.UIBlox)
@@ -76,19 +75,16 @@ end
 function extended.render(data)
 	return withStyle(function(props)
 		local font = props.Font
-		local font2 = font.Footer.Font
 		local textSize = font.BaseSize * font.Footer.RelativeSize
 
-		local createElement = Roact.createElement
-		local v2 = {
+		return Roact.createElement("Frame", {
 			AnchorPoint = data.props.AnchorPoint,
 			BackgroundTransparency = 1,
 			LayoutOrder = data.props.LayoutOrder,
 			Position = data.props.Position,
 			Size = UDim2.new(1, 0, 0, data.props.height),
 			ZIndex = data.props.ZIndex
-		}
-		local v3 = {
+		}, {
 			Layout = Roact.createElement("UIListLayout", {
 				VerticalAlignment = Enum.VerticalAlignment.Center,
 				SortOrder = Enum.SortOrder.LayoutOrder,
@@ -99,80 +95,49 @@ function extended.render(data)
 				PaddingTop = UDim.new(0, 4),
 				PaddingBottom = UDim.new(0, 4)
 			}),
-			ImageContainer = 0
-		}
-
-		local createElement2 = Roact.createElement
-		local v4 = {
-			Size = UDim2.new(0.9, 0, 1, 0),
-			BackgroundColor3 = props.Theme.NavigationBar.Color,
-			BorderColor3 = props.Theme.Divider.Color,
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			ScaleType = Enum.ScaleType.Slice,
-			SliceCenter = Rect.new(8, 8, 9, 9),
-			Image = Images["component_assets/circle_17"],
-			ImageColor3 = props.Theme.BackgroundUIDefault.Color,
-			ImageTransparency = data.animationProgress:map(function(p)
-				return p
-			end),
-			Position = data.animationProgress:map(function(p)
-				return UDim2.new(0, 0, p, 0)
-			end)
-		}
-
-		local v5 = {
-			Layout = Roact.createElement("UIListLayout", {
-				VerticalAlignment = Enum.VerticalAlignment.Center,
-				HorizontalAlignment = Enum.HorizontalAlignment.Left,
-				FillDirection = Enum.FillDirection.Horizontal,
-				SortOrder = Enum.SortOrder.LayoutOrder
-			}),
-			Padding = Roact.createElement("UIPadding", {
-				PaddingLeft = UDim.new(0, 12),
-				PaddingTop = UDim.new(0, 4),
-				PaddingBottom = UDim.new(0, 4),
-				PaddingRight = UDim.new(0, 12)
-			}),
-			TextLabel = 0
-		}
-
-		local createElement3 = Roact.createElement
-		local v6 = {
-			Text = data.getDisplayText(),
-			TextSize = textSize,
-			Font = 0,
-			FontFace = 0,
-			TextColor3 = 0,
-			TextXAlignment = 0,
-			TextYAlignment = 0,
-			BackgroundTransparency = 1,
-			TextTransparency = 0
-		}
-
-		if FoundationFontFaceMigration then
-			font2 = nil
-		end
-
-		v6.Font = font2
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(props.Tokens.Typography.CaptionSmall.Font)
-		end
-
-		v6.FontFace = fontFace
-
-		v6.TextColor3 = props.Theme.TextMuted.Color
-		v6.TextXAlignment = Enum.TextXAlignment.Left
-		v6.TextYAlignment = Enum.TextYAlignment.Center
-
-		v6.TextTransparency = data.animationProgress:map(function(p)
-			return p
-		end)
-		v5.TextLabel = createElement3("TextLabel", v6)
-		v3.ImageContainer = createElement2(ImageSetLabel, v4, v5)
-		return createElement("Frame", v2, v3)
+			ImageContainer = Roact.createElement(ImageSetLabel, {
+				Size = UDim2.new(0.9, 0, 1, 0),
+				BackgroundColor3 = props.Theme.NavigationBar.Color,
+				BorderColor3 = props.Theme.Divider.Color,
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				ScaleType = Enum.ScaleType.Slice,
+				SliceCenter = Rect.new(8, 8, 9, 9),
+				Image = Images["component_assets/circle_17"],
+				ImageColor3 = props.Theme.BackgroundUIDefault.Color,
+				ImageTransparency = data.animationProgress:map(function(p)
+					return p
+				end),
+				Position = data.animationProgress:map(function(p)
+					return UDim2.new(0, 0, p, 0)
+				end)
+			}, {
+				Layout = Roact.createElement("UIListLayout", {
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					HorizontalAlignment = Enum.HorizontalAlignment.Left,
+					FillDirection = Enum.FillDirection.Horizontal,
+					SortOrder = Enum.SortOrder.LayoutOrder
+				}),
+				Padding = Roact.createElement("UIPadding", {
+					PaddingLeft = UDim.new(0, 12),
+					PaddingTop = UDim.new(0, 4),
+					PaddingBottom = UDim.new(0, 4),
+					PaddingRight = UDim.new(0, 12)
+				}),
+				TextLabel = Roact.createElement("TextLabel", {
+					Text = data.getDisplayText(),
+					TextSize = textSize,
+					FontFace = normalizeFontFace(props.Tokens.Typography.CaptionSmall.Font),
+					TextColor3 = props.Theme.TextMuted.Color,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextYAlignment = Enum.TextYAlignment.Center,
+					BackgroundTransparency = 1,
+					TextTransparency = data.animationProgress:map(function(p)
+						return p
+					end)
+				})
+			})
+		})
 	end)
 end
 

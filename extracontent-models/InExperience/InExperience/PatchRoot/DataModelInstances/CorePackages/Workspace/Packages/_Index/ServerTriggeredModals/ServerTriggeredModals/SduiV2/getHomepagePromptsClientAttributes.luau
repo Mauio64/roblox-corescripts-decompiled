@@ -6,6 +6,9 @@ local SharedFlags = require(parent.SharedFlags)
 
 local FFlagEdpGameLeavePromptsHandlerEnabled = SharedFlags.FFlagEdpGameLeavePromptsHandlerEnabled
 local FFlagSplitPaneEducationalTour = SharedFlags.FFlagSplitPaneEducationalTour
+local FFlagPlusUpsellSheetHomePrompt = require(ServerTriggeredModals.Flags.FFlagPlusUpsellSheetHomePrompt)
+local RobloxSubscriptionPurchaseApp = require(parent.RobloxSubscriptionPurchaseApp)
+local FFlagTTOnboardingSheet = RobloxSubscriptionPurchaseApp.Flags.FFlagTTOnboardingSheet
 
 local FFlagHomepagePromptsHalloween2026Theme = require(ServerTriggeredModals.Flags.FFlagHomepagePromptsHalloween2026Theme)
 local FFlagAppThemeHalloween2026 = require(parent.SharedFlags.FFlagAppThemeHalloween2026)
@@ -19,6 +22,8 @@ local RoactUtils = require(parent.RoactUtils)
 local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 local RobloxAppHooks = require(parent.RobloxAppHooks)
 local useLocalUserId = RobloxAppHooks.useLocalUserId
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local getAppFeaturePolicies = UniversalAppPolicy.getAppFeaturePolicies
 local PromptsEntryPoint = require(script.Parent.PromptsEntryPoint)
 
 local AppPage = RobloxAppEnums.AppPage
@@ -56,6 +61,14 @@ local function getExistingHomepageClientAttributes()
 		if SplitPane.isSplitPaneTourSupported() then
 			existingHomepageClientAttributes.isSplitPaneTourSupported = "true"
 		end
+	end
+
+	if
+		FFlagPlusUpsellSheetHomePrompt
+		and FFlagTTOnboardingSheet
+		and not getAppFeaturePolicies().getDisableBlackbirdEntrypoints()
+	then
+		existingHomepageClientAttributes.isPlusUpsellSheetPromptSupported = "true"
 	end
 
 	local success, item = pcall(AppStorageService.GetItem, AppStorageService, "KidsAccountHasResetToDefaultTheme")

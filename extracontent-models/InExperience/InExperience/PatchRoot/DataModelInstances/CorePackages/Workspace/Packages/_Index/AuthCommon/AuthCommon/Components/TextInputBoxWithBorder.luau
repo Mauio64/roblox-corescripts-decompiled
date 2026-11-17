@@ -6,7 +6,6 @@ local Roact = require(parent.Roact)
 local UIBlox = require(parent.UIBlox)
 local Foundation = require(parent.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local withStyle = UIBlox.Style.withStyle
 
 local PasswordBox = require(AuthCommon.Components.PasswordBox)
@@ -79,52 +78,22 @@ function extended.render(p)
 				HorizontalAlignment = Enum.HorizontalAlignment.Center,
 				Padding = UDim.new(0, v)
 			}),
-			TextBoxLabel = 0,
-			TextBox = 0,
-			ErrorText = 0
-		}
-
-		local textBoxLabel = labelText
-
-		if textBoxLabel then
-			local createElement2 = Roact.createElement
-			local v5 = {
+			TextBoxLabel = labelText and Roact.createElement("TextLabel", {
 				LayoutOrder = 1,
 				Size = UDim2.new(1, 0, 0, 0),
 				AutomaticSize = Enum.AutomaticSize.Y,
 				BackgroundTransparency = 1,
 				Text = labelText,
 				TextWrapped = true,
-				Font = 0,
-				FontFace = 0,
-				TextSize = 0,
-				TextColor3 = 0,
-				TextTransparency = 0,
-				TextXAlignment = 0
-			}
-			local font2
-
-			if not FoundationFontFaceMigration then
-				font2 = props.Font.CaptionHeader.Font
-			end
-
-			v5.Font = font2
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(props.Tokens.Typography.CaptionLarge.Font)
-			end
-
-			v5.FontFace = fontFace
-
-			v5.TextSize = props.Font.BaseSize * props.Font.CaptionHeader.RelativeSize
-			v5.TextColor3 = textColor
-			v5.TextTransparency = props.Theme.TextEmphasis.Transparency
-			v5.TextXAlignment = Enum.TextXAlignment.Left
-			textBoxLabel = createElement2("TextLabel", v5)
-		end
-
-		v4.TextBoxLabel = textBoxLabel
+				FontFace = normalizeFontFace(props.Tokens.Typography.CaptionLarge.Font),
+				TextSize = props.Font.BaseSize * props.Font.CaptionHeader.RelativeSize,
+				TextColor3 = textColor,
+				TextTransparency = props.Theme.TextEmphasis.Transparency,
+				TextXAlignment = Enum.TextXAlignment.Left
+			}),
+			TextBox = 0,
+			ErrorText = 0
+		}
 
 		local createElement2 = Roact.createElement
 		local v5 = {
@@ -193,47 +162,18 @@ function extended.render(p)
 		v6.GenericTextBox = genericTextBox
 		v4.TextBox = createElement2(AuthStatefulRoundCornerBorder, v5, v6)
 
-		local errorText2 = errorText
-
-		if errorText2 then
-			local createElement3 = Roact.createElement
-			local v7 = {
-				LayoutOrder = 3,
-				BackgroundTransparency = 1,
-				Text = errorText,
-				TextSize = props.Font.CaptionBody.RelativeSize * props.Font.BaseSize,
-				Font = 0,
-				FontFace = 0,
-				TextColor3 = 0,
-				TextXAlignment = 0,
-				AutomaticSize = 0,
-				TextWrapped = true,
-				Size = 0
-			}
-			local font2
-
-			if not FoundationFontFaceMigration then
-				font2 = props.Font.SubHeader1.Font
-			end
-
-			v7.Font = font2
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(props.Tokens.Typography.TitleLarge.Font)
-			end
-
-			v7.FontFace = fontFace
-
-			v7.TextColor3 = props.Theme.Alert.Color
-			v7.TextXAlignment = Enum.TextXAlignment.Left
-			v7.AutomaticSize = Enum.AutomaticSize.Y
-
-			v7.Size = UDim2.new(1, 0, 0, 0)
-			errorText2 = createElement3("TextLabel", v7)
-		end
-
-		v4.ErrorText = errorText2
+		v4.ErrorText = errorText and Roact.createElement("TextLabel", {
+			LayoutOrder = 3,
+			BackgroundTransparency = 1,
+			Text = errorText,
+			TextSize = props.Font.CaptionBody.RelativeSize * props.Font.BaseSize,
+			FontFace = normalizeFontFace(props.Tokens.Typography.TitleLarge.Font),
+			TextColor3 = props.Theme.Alert.Color,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			AutomaticSize = Enum.AutomaticSize.Y,
+			TextWrapped = true,
+			Size = UDim2.new(1, 0, 0, 0)
+		})
 		return createElement("Frame", v3, v4)
 	end)
 end

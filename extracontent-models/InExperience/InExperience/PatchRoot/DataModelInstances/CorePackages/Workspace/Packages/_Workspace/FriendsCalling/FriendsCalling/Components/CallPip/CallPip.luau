@@ -44,9 +44,16 @@ local function CallPipSession(props)
 	local onDragInputTarget = React.useCallback(function(p)
 		setState2(p)
 	end, {})
-	local onActivated = React.useCallback(function()
+	local v2 = React.useCallback(function()
 		setState(frozen.Expanded)
 	end, {})
+	local ref = React.useRef(props.expandCount)
+	React.useEffect(function()
+		if props.expandCount > ref.current then
+			ref.current = props.expandCount
+			v2()
+		end
+	end, { props.expandCount, v2 })
 	local onCollapse = React.useCallback(function()
 		setState(frozen.Compact)
 	end, {})
@@ -60,7 +67,7 @@ local function CallPipSession(props)
 		end
 	end, { props.callId })
 
-	local v2 = state == frozen.Expanded
+	local v3 = state == frozen.Expanded
 	local geometry = resolveGeometry({
 		deviceInsets = deviceInsets,
 		exposesTopSafeArea = host.exposesTopSafeArea,
@@ -69,7 +76,7 @@ local function CallPipSession(props)
 	})
 	local children
 
-	if v2 then
+	if v3 then
 		children = React.createElement(ExpandedCallOverlay, {
 			connectedAt = props.connectedAt,
 			participant = props.participant,
@@ -95,7 +102,7 @@ local function CallPipSession(props)
 
 	local createElement = React.createElement
 	local window = FloatingWindow.Window
-	local v3 = {
+	local v4 = {
 		behavior = FloatingWindow.Behaviors.Contained,
 		boundsInsets = 0,
 		children = 0,
@@ -111,30 +118,31 @@ local function CallPipSession(props)
 	}
 	local boundsInsets
 
-	if v2 then
+	if v3 then
 		boundsInsets = geometry.expanded.boundsInsets
 	else
 		boundsInsets = geometry.collapsed.boundsInsets
 	end
 
-	v3.boundsInsets = boundsInsets
-	v3.children = children
-	v3.displayOrder = host.displayOrder
-	v3.dragInputTarget = state2
-	v3.enabled = props.enabled
+	v4.boundsInsets = boundsInsets
+	v4.children = children
+	v4.displayOrder = host.displayOrder
+	v4.dragInputTarget = state2
+	v4.enabled = props.enabled
 
-	v3.draggable = not (v2 and isPortrait)
-	v3.initialCenter = UDim2.fromScale(0.85, 0.2)
+	v4.draggable = not (v3 and isPortrait)
+	v4.initialCenter = UDim2.fromScale(0.85, 0.2)
+	local onActivated
 
-	if v2 then
-		onActivated = nil
+	if not v3 then
+		onActivated = v2
 	end
 
-	v3.onActivated = onActivated
-	v3.screenInsets = host.screenInsets
-	local size = if v2 then geometry.expanded.size else udim
-	v3.size = size
-	return createElement(window, v3)
+	v4.onActivated = onActivated
+	v4.screenInsets = host.screenInsets
+	local size = if v3 then geometry.expanded.size else udim
+	v4.size = size
+	return createElement(window, v4)
 end
 
 local function CallPipWindow(props)
@@ -145,6 +153,7 @@ local function CallPipWindow(props)
 		callId = v.callId,
 		connectedAt = v.connectedAt,
 		enabled = v.enabled,
+		expandCount = v.expandCount,
 		host = props.host,
 		participant = v.participant,
 		isMicrophoneMuted = props.isMicrophoneMuted,

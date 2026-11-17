@@ -10,7 +10,6 @@ local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslato
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local Foundation = require(CorePackages.Packages.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local withStyle = UIBlox.Style.withStyle
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
@@ -38,6 +37,8 @@ local set = {
 }
 
 local defineFastFlag = game:DefineFastFlag("SendConsentDeniedOnCancel", false)
+
+local FFlagDisablePublishPlatformContentWithoutName = require(script.Parent.Parent.Flags.FFlagDisablePublishPlatformContentWithoutName)
 local engineFeature = game:GetEngineFeature("EnableImagePublish")
 
 local extended = Roact.PureComponent:extend("PublishAssetPromptSingleStep")
@@ -64,8 +65,16 @@ end
 function extended:init()
 	self.assetName = self:getDefaultText()
 	self.assetDescription = self:getDefaultText()
+
 	self.isNameValid = true
-	self.isDescriptionValid = true
+
+	if FFlagDisablePublishPlatformContentWithoutName then
+		self.defaultName = self.assetName
+
+		self:setState({
+			isPublishNameValid = string.match(self.assetName, "^%s*$") == nil
+		})
+	end
 
 	function self.closePrompt()
 		self.props.closePrompt()
@@ -83,38 +92,53 @@ function extended:init()
 	end
 
 	function self.confirmAndUpload()
-		if not self.isNameValid then
+		local v
+
+		if FFlagDisablePublishPlatformContentWithoutName then
+			v = self.state.isPublishNameValid
+		else
+			v = self.isNameValid
+		end
+
+		if not v then
 			return
 		end
 
-		local v = {}
-		v.assetName = self.assetName
-		v.assetDescription = self.assetDescription
+		local v2 = {}
+		v2.assetName = self.assetName
+		v2.assetDescription = self.assetDescription
 
 		ExperienceAuthService:ScopeCheckUIComplete(
 			self.props.guid,
 			self.props.scopes,
 			Enum.ScopeCheckResult.ConsentAccepted,
-			v
+			v2
 		)
 
 		self.closePrompt()
 	end
 
-	function self.onAssetNameUpdated(assetName, p)
-		if not p then
-			self.isNameValid = false
+	function self.onAssetNameUpdated(assetName, isPublishNameValid)
+		if FFlagDisablePublishPlatformContentWithoutName then
+			if isPublishNameValid then
+				self.assetName = assetName
+			end
 
-			return
+			self:setState({ isPublishNameValid = isPublishNameValid })
+		else
+			if not isPublishNameValid then
+				self.isNameValid = false
+
+				return
+			end
+
+			self.assetName = assetName
+			self.isNameValid = true
 		end
-
-		self.assetName = assetName
-		self.isNameValid = true
 	end
 
-	function self.onAssetDescriptionUpdated(assetDescription, isDescriptionValid)
+	function self.onAssetDescriptionUpdated(assetDescription)
 		self.assetDescription = assetDescription
-		self.isDescriptionValid = isDescriptionValid
 	end
 
 	self.nameTextBoxRef = Roact.createRef()
@@ -122,9 +146,8 @@ function extended:init()
 end
 
 function extended:renderMiddle(data)
-	return withStyle(function(props)
-		local font = props.Font
-		local theme = props.Theme
+	return withStyle(function(p)
+		local theme = p.Theme
 
 		local v = engineFeature
 
@@ -190,83 +213,51 @@ function extended:renderMiddle(data)
 			BackgroundTransparency = 1
 		}
 
-		local createElement5 = Roact.createElement
-		local v5 = {
-			Size = UDim2.new(1, 0, 0, 15),
-			Font = 0,
-			FontFace = 0,
-			Text = 0,
-			TextSize = 12,
-			TextColor3 = 0,
-			BackgroundTransparency = 1,
-			TextXAlignment = 0
-		}
-		local font2
-
-		if not FoundationFontFaceMigration then
-			font2 = font.Body.Font
-		end
-
-		v5.Font = font2
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(props.Tokens.Typography.BodyLarge.Font)
-		end
-
-		v5.FontFace = fontFace
-
-		v5.Text = data.name
-
-		v5.TextColor3 = theme.TextDefault.Color
-
-		v5.TextXAlignment = Enum.TextXAlignment.Left
 		local children3 = {
-			NameLabel = createElement5("TextLabel", v5),
-			NameInput = Roact.createElement(NameTextBox, {
-				Size = UDim2.new(1, 0, 0, 30),
-				Position = UDim2.new(0, 0, 0, 15),
-				onNameUpdated = self.onAssetNameUpdated,
-				nameTextBoxRef = self.nameTextBoxRef,
-				NextSelectionDown = self.descriptionTextBoxRef,
-				defaultName = self.assetName
+			NameLabel = Roact.createElement("TextLabel", {
+				Size = UDim2.new(1, 0, 0, 15),
+				FontFace = normalizeFontFace(p.Tokens.Typography.BodyLarge.Font),
+				Text = data.name,
+				TextSize = 12,
+				TextColor3 = theme.TextDefault.Color,
+				BackgroundTransparency = 1,
+				TextXAlignment = Enum.TextXAlignment.Left
 			}),
+			NameInput = 0,
 			DescriptionLabel = 0,
 			DescriptionInput = 0
 		}
 
-		local createElement6 = Roact.createElement
-		local v6 = {
+		local createElement5 = Roact.createElement
+		local v5 = {
+			Size = UDim2.new(1, 0, 0, 30),
+			Position = UDim2.new(0, 0, 0, 15),
+			onNameUpdated = self.onAssetNameUpdated,
+			nameTextBoxRef = self.nameTextBoxRef,
+			NextSelectionDown = self.descriptionTextBoxRef,
+			defaultName = 0
+		}
+		local defaultName
+
+		if FFlagDisablePublishPlatformContentWithoutName then
+			defaultName = self.defaultName
+		else
+			defaultName = self.assetName
+		end
+
+		v5.defaultName = defaultName
+		children3.NameInput = createElement5(NameTextBox, v5)
+
+		children3.DescriptionLabel = Roact.createElement("TextLabel", {
 			Size = UDim2.new(1, 0, 0, 15),
 			Position = UDim2.new(0, 0, 0, 60),
-			Font = 0,
-			FontFace = 0,
+			FontFace = normalizeFontFace(p.Tokens.Typography.BodyLarge.Font),
 			TextSize = 12,
-			Text = 0,
-			TextColor3 = 0,
+			Text = data.description,
+			TextColor3 = theme.TextDefault.Color,
 			BackgroundTransparency = 1,
-			TextXAlignment = 0
-		}
-		local font3
-
-		if not FoundationFontFaceMigration then
-			font3 = font.Body.Font
-		end
-
-		v6.Font = font3
-		local fontFace2
-
-		if FoundationFontFaceMigration then
-			fontFace2 = normalizeFontFace(props.Tokens.Typography.BodyLarge.Font)
-		end
-
-		v6.FontFace = fontFace2
-
-		v6.Text = data.description
-		v6.TextColor3 = theme.TextDefault.Color
-
-		v6.TextXAlignment = Enum.TextXAlignment.Left
-		children3.DescriptionLabel = createElement6("TextLabel", v6)
+			TextXAlignment = Enum.TextXAlignment.Left
+		})
 
 		children3.DescriptionInput = Roact.createElement(AssetDescriptionTextBox, {
 			Size = UDim2.new(1, 0, 0, 80),
@@ -279,48 +270,26 @@ function extended:renderMiddle(data)
 		children2.NameDescriptionFields = createElement4("Frame", v4, children3)
 		children.TopSection = createElement2("Frame", v2, children2)
 
-		local createElement7 = Roact.createElement
-		local v7 = {
+		children.Disclaimer = Roact.createElement("TextLabel", {
 			Size = UDim2.new(1, 0, 0, 50),
 			TextYAlignment = Enum.TextYAlignment.Center,
 			Text = data.disclaimer,
-			Font = 0,
-			FontFace = 0,
+			FontFace = normalizeFontFace(p.Tokens.Typography.BodyLarge.Font),
 			TextSize = 12,
-			TextColor3 = 0,
+			TextColor3 = theme.TextEmphasis.Color,
 			BackgroundTransparency = 1,
-			AnchorPoint = 0,
-			Position = 0,
+			AnchorPoint = Vector2.new(0, 1),
+			Position = UDim2.fromScale(0, 1),
 			TextWrapped = true
-		}
-		local font4
-
-		if not FoundationFontFaceMigration then
-			font4 = font.Body.Font
-		end
-
-		v7.Font = font4
-		local fontFace3
-
-		if FoundationFontFaceMigration then
-			fontFace3 = normalizeFontFace(props.Tokens.Typography.BodyLarge.Font)
-		end
-
-		v7.FontFace = fontFace3
-
-		v7.TextColor3 = theme.TextEmphasis.Color
-
-		v7.AnchorPoint = Vector2.new(0, 1)
-		v7.Position = UDim2.fromScale(0, 1)
-		children.Disclaimer = createElement7("TextLabel", v7)
+		})
 		return createElement(frame, middleContentRefsByRef, children)
 	end)
 end
 
-function extended:renderAlertLocalized(props)
+function extended:renderAlertLocalized(props2)
 	local createElement = Roact.createElement
 	local v = {
-		title = props.title,
+		title = props2.title,
 		buttonStackInfo = 0,
 		middleContent = 0,
 		screenSize = 0,
@@ -335,28 +304,34 @@ function extended:renderAlertLocalized(props)
 		onActivated = self.closePrompt
 	end
 
+	local props = { onActivated = onActivated, text = props2.cancel }
+
+	local v2 = { buttonType = ButtonType.PrimarySystem, props = 0, isDefaultChild = false }
+	local props3 = {
+		onActivated = self.confirmAndUpload,
+		text = props2.submit,
+		isDelayedInput = true,
+		enableInputDelayed = true,
+		delayInputSeconds = 6,
+		isDisabled = 0
+	}
+	local isDisabled
+
+	if FFlagDisablePublishPlatformContentWithoutName then
+		isDisabled = not self.state.isPublishNameValid
+	end
+
+	props3.isDisabled = isDisabled
+	v2.props = props3
 	v.buttonStackInfo = {
 		buttons = {
-			{
-				props = { onActivated = onActivated, text = props.cancel },
-				isDefaultChild = true
-			},
-			{
-				buttonType = ButtonType.PrimarySystem,
-				props = {
-					onActivated = self.confirmAndUpload,
-					text = props.submit,
-					isDelayedInput = true,
-					enableInputDelayed = true,
-					delayInputSeconds = 6
-				},
-				isDefaultChild = false
-			}
+			{ props = props, isDefaultChild = true },
+			v2
 		}
 	}
 
 	function v.middleContent()
-		return self:renderMiddle(props)
+		return self:renderMiddle(props2)
 	end
 
 	v.screenSize = self.props.screenSize

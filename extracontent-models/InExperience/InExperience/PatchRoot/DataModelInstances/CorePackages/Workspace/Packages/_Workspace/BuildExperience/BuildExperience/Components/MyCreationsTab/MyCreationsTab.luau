@@ -7,6 +7,7 @@ local Players = game:GetService("Players")
 local FFlagBuildExperienceMyCreationsCreateGameButton = require(BuildExperience.Flags.FFlagBuildExperienceMyCreationsCreateGameButton)
 local FFlagBuildExperienceMyCreationsLongPressMenu = require(BuildExperience.Flags.FFlagBuildExperienceMyCreationsLongPressMenu)
 local FFlagBuildWithGroups = require(BuildExperience.Flags.FFlagBuildWithGroups)
+local FFlagBuildExperienceEventContextTelemetry = require(BuildExperience.Flags.FFlagBuildExperienceEventContextTelemetry)
 
 local Foundation = require(parent.Foundation)
 local Localization = require(parent.Localization)
@@ -141,7 +142,7 @@ local function MyCreationsTab(props)
 	local refresh = v7.refresh
 	local loadMoreIfNeeded = v7.loadMoreIfNeeded
 
-	local onActivated = React.useCallback(function()
+	local onActivated = React.useCallback(function(p)
 		ref2.current = true
 		local onOpenChat = props.onOpenChat
 		local v8 = {
@@ -156,7 +157,10 @@ local function MyCreationsTab(props)
 		end
 
 		v8.creatorName = creatorName
-		onOpenChat(v8)
+		onOpenChat(
+			v8,
+			FFlagBuildExperienceEventContextTelemetry and (p == "auto_new_game" and "auto_new_game" or "new_game") or nil
+		)
 	end, { props.onOpenChat })
 	local v8 = v7.hasCompletedFocusedRefresh
 
@@ -170,7 +174,7 @@ local function MyCreationsTab(props)
 
 	React.useEffect(function()
 		if props.autoOpenNewGame ~= false and isFocused and v8 and not ref2.current then
-			onActivated()
+			onActivated(FFlagBuildExperienceEventContextTelemetry and "auto_new_game" or nil)
 		end
 	end, { v8, onActivated, isFocused, props.autoOpenNewGame })
 	local none

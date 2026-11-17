@@ -24,10 +24,9 @@ local function incrementImpressionCount(p: string) -- 1 equivalent call inferred
 			return AppStorageService:GetItem(v)
 		end)
 
-		AppStorageService:SetItem(
-			p,
-			(tostring((success and typeof(result) == "string" and result ~= "" and tonumber(result) or 0) + 1))
-		)
+		local v2 = (success and typeof(result) == "string" and result ~= "" and tonumber(result) or 0) + 1
+
+		AppStorageService:SetItem(p, (tostring(v2)))
 		AppStorageService:Flush()
 	end)
 end

@@ -40,13 +40,12 @@ local writeHomePageSduiPrefetchDescriptor = require(Home.writeHomePageSduiPrefet
 local writeHomePageSduiPrefetchClientCapabilities = require(Home.writeHomePageSduiPrefetchClientCapabilities)
 local PrefetchProtocol = require(parent.PrefetchProtocol)
 local prefetchProtocol = PrefetchProtocol.PrefetchProtocol
-local RecommendationsStore = require(parent.RecommendationsStore)
-local FriendRecommendations = RecommendationsStore.FriendRecommendations
+local FriendsRecommendations = require(parent.DataHydration.FriendsRecommendations)
+local FriendRecommendations = FriendsRecommendations.FriendRecommendations
 
 local SharedFlags = require(parent.SharedFlags)
 local FFlagEnableHomePageSduiPrefetch = SharedFlags.FFlagEnableHomePageSduiPrefetch
 local FFlagUseSignalsForStartup = SharedFlags.FFlagUseSignalsForStartup
-local FFlagHomeSduiOfflineCache = SharedFlags.FFlagHomeSduiOfflineCache
 local FFlagSduiAdvertiseRuntimeSupportSets = SharedFlags.FFlagSduiAdvertiseRuntimeSupportSets
 
 local FFlagHomePageSduiPrefetchExtendedClientCapabilities = SharedFlags.FFlagHomePageSduiPrefetchExtendedClientCapabilities
@@ -56,6 +55,9 @@ local FFlagLuaAppAddHasOneByTwoFieldSdui = SharedFlags.FFlagLuaAppAddHasOneByTwo
 local FFlagSduiPerSectionPoolSizing = SharedFlags.FFlagSduiPerSectionPoolSizing
 local FFlagLuaAppEnableOneByTwoTileFunnelTelemetrySdui = SharedFlags.FFlagLuaAppEnableOneByTwoTileFunnelTelemetrySdui
 local FFlagLuaAppHomeMomentVideoFallback = SharedFlags.FFlagLuaAppHomeMomentVideoFallback
+local FFlagLuaAppSduiGameTileFooterTrailingComponent = SharedFlags.FFlagLuaAppSduiGameTileFooterTrailingComponent
+local FFlagSduiUniverseItemConnectionsPlayed = SharedFlags.FFlagSduiUniverseItemConnectionsPlayed
+local FFlagSduiActiveFriendsFooterTreatment = SharedFlags.FFlagSduiActiveFriendsFooterTreatment
 
 local function resolveRequestIntent(requestIntent: string?, forceRefresh: boolean?) -- 1 equivalent call inferred from this helper
 	if typeof(requestIntent) == "string" and requestIntent ~= "" then
@@ -305,7 +307,10 @@ local function fetchHomePage(pageTimer, data)
 		enabled_capabilities = SduiCapabilities.getEnabledCapabilityNumbers({
 			"CAPABILITY_SUPPORTS_HYDRATION_CLIENT_HINTS",
 			FFlagSduiPerSectionPoolSizing and "CAPABILITY_SUPPORTS_MULTI_SIZE_POOL" or nil,
-			FFlagLuaAppHomeMomentVideoFallback and "CAPABILITY_SUPPORTS_VIDEO_PLAYER_ACCESS_CONTEXT" or nil
+			FFlagLuaAppHomeMomentVideoFallback and "CAPABILITY_SUPPORTS_VIDEO_PLAYER_ACCESS_CONTEXT" or nil,
+			FFlagSduiUniverseItemConnectionsPlayed and "CAPABILITY_SUPPORTS_UNIVERSE_ITEM_CONNECTIONS_PLAYED" or nil,
+			FFlagLuaAppSduiGameTileFooterTrailingComponent and "CAPABILITY_SUPPORTS_GAME_TILE_FOOTER_TRAILING_COMPONENT" or nil,
+			FFlagSduiActiveFriendsFooterTreatment and "CAPABILITY_SUPPORTS_GAME_TILE_ACTIVE_FRIENDS_TREATMENT" or nil
 		})
 
 		clientCapabilities2 = clientCapabilities.new({ enabled_capabilities = enabled_capabilities })
@@ -388,7 +393,7 @@ local function fetchHomePage(pageTimer, data)
 
 			setHomePageDataStatuses(RetrievalStatus.Done)
 
-			if FFlagHomeSduiOfflineCache and p2 then
+			if p2 then
 				task.defer(function()
 					local sduiHomePageCachePayload = SduiHomePageCachePayload.buildSduiHomePageCachePayload(p2)
 
@@ -407,7 +412,7 @@ local function fetchHomePage(pageTimer, data)
 				end
 			end
 		end
-		homePageRequestConfig.recoverFromError = FFlagHomeSduiOfflineCache and {
+		homePageRequestConfig.recoverFromError = {
 			getDecodedResponse = function()
 				return SduiHomePageCachePayload.deserializeSduiHomePageCache(HomeOmniFeedCache.getCachedSduiHomePageData())
 			end,
@@ -415,7 +420,7 @@ local function fetchHomePage(pageTimer, data)
 				setHomePageDataSource("Cache") -- inferred equivalent call
 				setHomePageDataStatuses(RetrievalStatus.Done)
 			end
-		} or nil
+		}
 
 		function homePageRequestConfig.refresh(p)
 			return (fetchHomePage(p, {
@@ -432,7 +437,7 @@ local function fetchHomePage(pageTimer, data)
 	end
 
 	return ifNeeded and ifNeeded:catch(function(_)
-		if not (FFlagHomeSduiOfflineCache and isServingCachedHomePage()) then -- inferred equivalent call
+		if not isServingCachedHomePage() then -- inferred equivalent call
 			setHomePageDataStatuses(RetrievalStatus.Failed)
 		end
 	end), configKey

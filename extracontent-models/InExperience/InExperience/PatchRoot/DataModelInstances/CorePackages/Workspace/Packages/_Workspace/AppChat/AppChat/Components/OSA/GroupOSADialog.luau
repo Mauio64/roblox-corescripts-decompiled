@@ -181,8 +181,10 @@ local function GroupOSADialog(p)
 	local v13 = v12 or v3
 
 	if FFlagAppChatEnableU13ChatOptIn then
-		if modalVariant then
-			modalVariant = modalVariant
+		local v14 = modalVariant
+
+		if v14 then
+			modalVariant = v14
 		elseif shouldShowU13ChatOptInForConversation(v13) then
 			modalVariant = Constants
 			modalVariant = modalVariant.OptInVariant
@@ -646,7 +648,7 @@ local function GroupOSADialog(p)
 	v32.onClose = onClose
 	v32.hasBackdrop = union.hasBackdrop
 	v32.disablePortal = union.disablePortal
-	local v44 = {
+	local v45 = {
 		DialogTitle = not v29 and React.createElement(Dialog.Title, { text = text, LayoutOrder = 1 }),
 		DialogContent = 0,
 		DialogActions = 0
@@ -659,9 +661,9 @@ local function GroupOSADialog(p)
 		v30 = v31
 	end
 
-	v44.DialogContent = createElement2(content, { LayoutOrder = 2 }, v30)
+	v45.DialogContent = createElement2(content, { LayoutOrder = 2 }, v30)
 
-	v44.DialogActions = not v29 and React.createElement(Dialog.Actions, {
+	v45.DialogActions = not v29 and React.createElement(Dialog.Actions, {
 		LayoutOrder = 3,
 		orientation = Orientation.Vertical,
 		actions = {
@@ -680,7 +682,7 @@ local function GroupOSADialog(p)
 			}
 		}
 	})
-	return createElement(root, v32, v44)
+	return createElement(root, v32, v45)
 end
 
 return GroupOSADialog

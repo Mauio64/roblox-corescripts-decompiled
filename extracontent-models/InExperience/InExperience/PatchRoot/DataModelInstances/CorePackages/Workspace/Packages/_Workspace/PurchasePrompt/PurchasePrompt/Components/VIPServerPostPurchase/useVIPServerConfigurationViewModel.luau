@@ -5,6 +5,9 @@ local ContextActionService = game:GetService("ContextActionService")
 local React = require(parent.React)
 local Localization = require(parent.Localization)
 local useLocalization = Localization.Hooks.useLocalization
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local useFocusRoot = FocusNavigationUtils.useFocusRoot
+local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
 
 local ExternalContentSharingProtocol = require(parent.ExternalContentSharingProtocol)
 local default = ExternalContentSharingProtocol.ExternalContentSharingProtocol.default
@@ -49,25 +52,40 @@ local function useVIPServerConfigurationViewModel(data)
 
 	local serverName, onServerNameChanged = React.useBinding(data.defaultServerName)
 	local state, setState = React.useState("")
-	local state2, setState2 = React.useState(false)
 
-	local state3, setState3 = React.useState({})
+	local state2, setState2 = React.useState(false)
+	local state3, setState3 = React.useState(false)
+
 	local state4, setState4 = React.useState({})
-	local state5, setState5 = React.useState(nil)
+	local state5, setState5 = React.useState({})
+	local state6, setState6 = React.useState(nil)
 
 	local linkText, v = React.useBinding("")
-	local state6, setState6 = React.useState(false)
 	local state7, setState7 = React.useState(false)
-	local ref = React.useRef(nil)
 	local state8, setState8 = React.useState(false)
+	local ref = React.useRef(nil)
 	local state9, setState9 = React.useState(false)
-	local state10, setState10 = React.useState(function()
+	local state10, setState10 = React.useState(false)
+	local state11, setState11 = React.useState(function()
 		return getOtherPlayers(data.players)
 	end)
 
 	local ref2 = React.useRef(false)
 	local ref3 = React.useRef(false)
 	local ref4 = React.useRef(true)
+
+	React.useEffect(function()
+		data.logEvent({
+			event_type = "show",
+			component = "private_server_config",
+			subscription_status = "active",
+			server_active = true,
+			friends_allowed = false,
+			price = data.price,
+			offer_type = data.offerType,
+			num_server_members = 0
+		})
+	end, {})
 
 	React.useEffect(function()
 		ref4.current = true
@@ -82,7 +100,7 @@ local function useVIPServerConfigurationViewModel(data)
 
 	React.useEffect(function()
 		local playerAddedConnection = data.players.PlayerAdded:Connect(function(player)
-			setState10(function(list)
+			setState11(function(list)
 				if table.find(list, player) then
 					return list
 				end
@@ -94,7 +112,7 @@ local function useVIPServerConfigurationViewModel(data)
 		end)
 
 		local playerRemovingConnection = data.players.PlayerRemoving:Connect(function(player)
-			setState10(function(items)
+			setState11(function(items)
 				local result = {}
 
 				for _, item in items do
@@ -116,7 +134,7 @@ local function useVIPServerConfigurationViewModel(data)
 
 	React.useEffect(function()
 		if not v3 then
-			setState4({})
+			setState5({})
 			return nil
 		end
 
@@ -124,11 +142,11 @@ local function useVIPServerConfigurationViewModel(data)
 		local thread = task.delay(0.3, function()
 			data.searchUsers(v2):andThen(function(p)
 				if flag then
-					setState4(p)
+					setState5(p)
 				end
 			end):catch(function()
 				if flag then
-					setState4({})
+					setState5({})
 				end
 			end)
 		end)
@@ -139,7 +157,7 @@ local function useVIPServerConfigurationViewModel(data)
 	end, { v2, v3, data.searchUsers })
 
 	local v4 = React.useCallback(function(p: number, p2: string?)
-		setState3(function(p3)
+		setState4(function(p3)
 			local clone = table.clone(p3)
 
 			if p2 then
@@ -156,10 +174,10 @@ local function useVIPServerConfigurationViewModel(data)
 	local players = React.useMemo(function()
 		local result = {}
 
-		for _, v5 in state10 do
+		for _, v5 in state11 do
 			local userId = v5.UserId
 			local displayName = v5.DisplayName
-			local isAdded = state3[userId] ~= nil
+			local isAdded = state4[userId] ~= nil
 			table.insert(result, {
 				userId = userId,
 				displayName = displayName,
@@ -177,7 +195,7 @@ local function useVIPServerConfigurationViewModel(data)
 		end
 
 		return result
-	end, { state10, state3, v4 })
+	end, { state11, state4, v4 })
 
 	local userId = data.players.LocalPlayer.UserId
 	local searchResults = React.useMemo(function()
@@ -187,8 +205,8 @@ local function useVIPServerConfigurationViewModel(data)
 			return result
 		end
 
-		for _, v5 in state4 do
-			if v5.userId ~= userId and state3[v5.userId] == nil then
+		for _, v5 in state5 do
+			if v5.userId ~= userId and state4[v5.userId] == nil then
 				table.insert(result, {
 					userId = v5.userId,
 					displayName = v5.displayName,
@@ -201,12 +219,12 @@ local function useVIPServerConfigurationViewModel(data)
 		end
 
 		return result
-	end, { v3, state4, state3, userId, v4 })
+	end, { v3, state5, state4, userId, v4 })
 
 	local addedPlayers = React.useMemo(function()
 		local result = {}
 
-		for k, displayName in state3 do
+		for k, displayName in state4 do
 			table.insert(result, {
 				userId = k,
 				displayName = displayName,
@@ -221,7 +239,7 @@ local function useVIPServerConfigurationViewModel(data)
 		end)
 
 		return result
-	end, { state3, v4 })
+	end, { state4, v4 })
 
 	local onGenerateLink = React.useCallback(function()
 		if ref2.current then
@@ -229,39 +247,50 @@ local function useVIPServerConfigurationViewModel(data)
 		end
 
 		ref2.current = true
-		setState6(true)
-		setState9(false)
+		setState7(true)
+		setState10(false)
+		data.logEvent({
+			event_type = "click",
+			component = "private_server_config",
+			subcomponent = "generate_private_server_link_btn",
+			action = "generate"
+		})
 
 		data.generateLink():andThen(function(p: string)
 			if ref4.current then
-				setState5(p)
+				setState6(p)
 				v(p)
-				setState6(false)
+				setState7(false)
 			end
 		end):catch(function()
 			ref2.current = false
 
 			if ref4.current then
-				setState6(false)
-				setState9(true)
+				setState7(false)
+				setState10(true)
 			end
 		end)
-	end, { data.generateLink, v })
+	end, { data.generateLink, data.logEvent, v })
 
 	local onLinkTextChanged = React.useCallback(function(p: string)
-		if state5 ~= nil and p ~= state5 then
-			v(state5)
+		if state6 ~= nil and p ~= state6 then
+			v(state6)
 		end
-	end, { state5, v })
+	end, { state6, v })
 
 	local onCopyLink = React.useCallback(function()
-		if state5 == nil then
+		if state6 == nil then
 			return
 		end
 
-		default:setClipboardText({ context = "PurchasePromptVIPServerLink", text = state5 })
+		data.logEvent({
+			event_type = "click",
+			component = "private_server_config",
+			subcomponent = "copy_private_server_link_btn"
+		})
+		default:setClipboardText({ context = "PurchasePromptVIPServerLink", text = state6 })
 
-		setState7(true)
+		setState8(true)
 
 		if ref.current then
 			task.cancel(ref.current)
@@ -269,9 +298,20 @@ local function useVIPServerConfigurationViewModel(data)
 
 		ref.current = task.delay(2, function()
 			ref.current = nil
-			setState7(false)
+			setState8(false)
 		end)
-	end, { state5 })
+	end, { state6, data.logEvent })
+
+	local onFriendsAllowedChanged = React.useCallback(function(flag: boolean)
+		data.logEvent({
+			event_type = "click",
+			component = "private_server_config",
+			subcomponent = "friends_allowed_toggle",
+			target_state = flag and "enabled" or "disabled"
+		})
+
+		setState3(flag)
+	end, { data.logEvent })
 
 	local onSave = React.useCallback(function()
 		if ref3.current then
@@ -279,15 +319,23 @@ local function useVIPServerConfigurationViewModel(data)
 		end
 
 		ref3.current = true
-		setState8(true)
-		setState9(false)
+		setState9(true)
+		setState10(false)
 
 		local name = trim(serverName:getValue()) -- inferred equivalent call
 		local usersToAdd = {}
 
-		for k in state3 do
+		for k in state4 do
 			table.insert(usersToAdd, k)
 		end
+
+		data.logEvent({
+			event_type = "click",
+			component = "private_server_config",
+			subcomponent = "cta_btn",
+			added_count = #usersToAdd,
+			friends_allowed = state3
+		})
 
 		local save = data.save
 
@@ -295,7 +343,7 @@ local function useVIPServerConfigurationViewModel(data)
 			name = nil
 		end
 
-		save({ name = name, friendsAllowed = state2, usersToAdd = usersToAdd }):andThen(function()
+		save({ name = name, friendsAllowed = state3, usersToAdd = usersToAdd }):andThen(function()
 			if ref4.current then
 				data.onSaved()
 			end
@@ -303,17 +351,58 @@ local function useVIPServerConfigurationViewModel(data)
 			ref3.current = false
 
 			if ref4.current then
-				setState8(false)
-				setState9(true)
+				setState9(false)
+				setState10(true)
 			end
 		end)
-	end, { serverName, state3, state2, data.save, data.onSaved, data.defaultServerName })
+	end, {
+		serverName,
+		state4,
+		state3,
+		data.save,
+		data.onSaved,
+		data.defaultServerName,
+		data.logEvent
+	})
+	local isSearchMenuOpen
+
+	if #searchResults > 0 then
+		isSearchMenuOpen = not state2
+	else
+		isSearchMenuOpen = false
+	end
+
+	local onSearchTextChanged = React.useCallback(function(p: string)
+		setState2(false)
+		setState(p)
+	end, {})
+
+	local onSearchMenuDismissed = React.useCallback(function()
+		setState2(true)
+	end, {})
+
+	local onDismiss = React.useCallback(function()
+		data.logEvent({
+			event_type = "click",
+			component = "private_server_config",
+			subcomponent = "cancel_btn"
+		})
+		data.onClose()
+	end, { data.onClose, data.logEvent })
 
 	local v5 = React.useCallback(function()
-		if not ref3.current then
-			data.onClose()
+		if isSearchMenuOpen then
+			setState2(true)
+		elseif not ref3.current then
+			onDismiss()
 		end
-	end, { data.onClose })
+	end, { isSearchMenuOpen, onDismiss })
+
+	local focusRootRef = useFocusRoot({
+		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.CentralOverlay,
+		isAutoFocusRoot = true,
+		isFocusable = not isSearchMenuOpen
+	})
 
 	local ref5 = React.useRef(v5)
 	ref5.current = v5
@@ -334,23 +423,27 @@ local function useVIPServerConfigurationViewModel(data)
 		serverName = serverName,
 		onServerNameChanged = onServerNameChanged,
 		searchText = state,
-		onSearchTextChanged = setState,
+		onSearchTextChanged = onSearchTextChanged,
+		isSearchMenuOpen = isSearchMenuOpen,
+		onSearchMenuDismissed = onSearchMenuDismissed,
 		searchResults = searchResults,
 		players = players,
 		addedPlayers = addedPlayers,
-		friendsAllowed = state2,
-		onFriendsAllowedChanged = setState2,
-		link = state5,
+		friendsAllowed = state3,
+		onFriendsAllowedChanged = onFriendsAllowedChanged,
+		link = state6,
 		linkText = linkText,
 		onLinkTextChanged = onLinkTextChanged,
-		isGeneratingLink = state6,
+		isGeneratingLink = state7,
 		onGenerateLink = onGenerateLink,
 		onCopyLink = onCopyLink,
-		isLinkCopied = state7,
-		hasError = state9,
-		isSaving = state8,
+		isLinkCopied = state8,
+		hasError = state10,
+		isSaving = state9,
 		onSave = onSave,
-		onCancel = v5
+		onCancel = v5,
+		onDismiss = onDismiss,
+		focusRootRef = focusRootRef
 	}
 end
 

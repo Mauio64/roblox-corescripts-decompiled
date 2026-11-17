@@ -29,7 +29,6 @@ local GameVideoPlaybackDetector = require(GameTile.Video.GameVideoPlaybackDetect
 local useHasVideoThumbnailSelector = require(GameTile.Video.useHasVideoThumbnailSelector)
 local getLayoutDataVideo = require(GameTile.getLayoutDataVideo)
 local formatExperienceIcon = require(GameTile.formatExperienceIcon)
-local formatExperienceRating = require(GameTile.formatExperienceRating)
 local formatExperienceThumbnail = require(GameTile.formatExperienceThumbnail)
 local HiddenTileContent = require(GameTile.HiddenGameTile.HiddenTileContent)
 local ItemLayoutDataParsingUtils = require(GameTile.ItemLayoutDataParsingUtils)
@@ -111,7 +110,6 @@ local SharedFlags7 = require(parent.SharedFlags)
 local FFlagLuaAppEdpMediaGalleryFullScreen = SharedFlags7.FFlagLuaAppEdpMediaGalleryFullScreen
 local SharedFlags8 = require(parent.SharedFlags)
 local FFlagLuaAppGameDetailsAttributionFix = SharedFlags8.FFlagLuaAppGameDetailsAttributionFix
-local defineFastFlag = game:DefineFastFlag("LuaAppUseRatingFormatHelper2", false)
 
 local SharedFlags9 = require(parent.SharedFlags)
 local FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix = SharedFlags9.FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix
@@ -140,7 +138,7 @@ local SharedFlags16 = require(parent.SharedFlags)
 local FFlagLuaAppTileVideoCandidateOnly = SharedFlags16.FFlagLuaAppTileVideoCandidateOnly
 local SharedFlags17 = require(parent.SharedFlags)
 local FFlagLuaAppOneByTwoHoverIdleAutoplay = SharedFlags17.FFlagLuaAppOneByTwoHoverIdleAutoplay
-local defineFastFlag2 = game:DefineFastFlag("LuaAppKeepTileBadgesDuringVideo", false)
+local defineFastFlag = game:DefineFastFlag("LuaAppKeepTileBadgesDuringVideo", false)
 local SharedFlags18 = require(parent.SharedFlags)
 local FFlagLuaAppVideoTileDisableActivation = SharedFlags18.FFlagLuaAppVideoTileDisableActivation
 local SharedFlags19 = require(parent.SharedFlags)
@@ -169,8 +167,6 @@ local SharedFlags27 = require(parent.SharedFlags)
 local FFlagLuaAppHomeThumbnailPrefetch = SharedFlags27.FFlagLuaAppHomeThumbnailPrefetch
 local SharedFlags28 = require(parent.SharedFlags)
 local FFlagLuaAppHomeMomentVideoFallback = SharedFlags28.FFlagLuaAppHomeMomentVideoFallback
-local SharedFlags29 = require(parent.SharedFlags)
-local FFlagMigrateGameInfoToStore = SharedFlags29.FFlagMigrateGameInfoToStore
 local resolveGameTileThumbnailUri
 
 if FFlagLuaAppHomeThumbnailPrefetch then
@@ -354,29 +350,7 @@ v3.hidePlayerCount = hidePlayerCount
 v3.game = t.optional(t.table)
 v3.universeId = t.string
 v3.navigationUniverseId = t.optional(t.string)
-local name2
-
-if FFlagMigrateGameInfoToStore then
-	name2 = t.optional(t.string)
-else
-	name2 = t.string
-end
-
-v3.name = name2
-local totalUpVotes2
-
-if not FFlagMigrateGameInfoToStore then
-	totalUpVotes2 = t.number
-end
-
-v3.totalUpVotes = totalUpVotes2
-local totalDownVotes2
-
-if not FFlagMigrateGameInfoToStore then
-	totalDownVotes2 = t.number
-end
-
-v3.totalDownVotes = totalDownVotes2
+v3.name = t.optional(t.string)
 v3.friendActivityTitle = t.optional(t.string)
 v3.friendVisitedString = t.optional(t.string)
 v3.imageThumbnail = t.string
@@ -389,9 +363,6 @@ if FFlagLuaAppHomeMomentVideoFallback then
 end
 
 v3.videoAccessContext = videoAccessContext
-v3.rating = t.optional(t.string)
-v3.showAgeRating = t.optional(t.boolean)
-v3.ageRatingText = t.optional(t.string)
 v3.friendVisits = t.table
 v3.hidePlayButton = t.boolean
 v3.footerLayoutData = t.optional(t.table)
@@ -497,17 +468,15 @@ function extended:init()
 		instantPlayRequested = not FFlagLuaAppContinueSortInstantPlay and nil
 	}
 
-	if FFlagMigrateGameInfoToStore then
-		self.gameInfoSubscription = GameHydrationReact.subscribeGameInfo({
-			universeId = self.props.entry.universeId,
-			onChange = function(p)
-				self:setState({
-					gameInfo = p.gameInfo or None,
-					storeVotes = p.votes or None
-				})
-			end
-		})
-	end
+	self.gameInfoSubscription = GameHydrationReact.subscribeGameInfo({
+		universeId = self.props.entry.universeId,
+		onChange = function(p)
+			self:setState({
+				gameInfo = p.gameInfo or None,
+				storeVotes = p.votes or None
+			})
+		end
+	})
 
 	function self.onMenuOpenChanged(flag: boolean, availableMenuItems: string?)
 		gameTileOverflowMenuAction({
@@ -774,21 +743,15 @@ function extended:init()
 
 	function self.onFriendFooterActivated()
 		if self.isMounted then
-			local v4
+			local gameInfo = self.state.gameInfo
+			local v4 = self.props.game
 
-			if FFlagMigrateGameInfoToStore then
-				local gameInfo = self.state.gameInfo
-				v4 = self.props.game
-
-				if not v4 then
-					if gameInfo then
-						v4 = toLegacyGameInfoModel(gameInfo)
-					else
-						v4 = nil
-					end
+			if not v4 then
+				if gameInfo then
+					v4 = toLegacyGameInfoModel(gameInfo)
+				else
+					v4 = nil
 				end
-			else
-				v4 = self.props.game
 			end
 
 			local tileSize = self.getTileSize()
@@ -944,47 +907,43 @@ function extended:renderGridTilesFooter()
 	end
 
 	local flag = false
-	local v7 = nil
+	local gameAgeDisplayName
 
-	if FFlagMigrateGameInfoToStore then
-		if not (self.props.hidePlayButton or self.props.forceHideAgeRatings) then
-			local gameInfo = self.state.gameInfo
-			local gameMinimumAge = gameInfo and gameInfo.gameMinimumAge or 0
-			v7 = gameInfo and gameInfo.gameAgeDisplayName or ""
+	if not (self.props.hidePlayButton or self.props.forceHideAgeRatings) then
+		local gameInfo = self.state.gameInfo
+		local gameMinimumAge = gameInfo and gameInfo.gameMinimumAge or 0
+		gameAgeDisplayName = gameInfo and gameInfo.gameAgeDisplayName or ""
 
-			if gameMinimumAge == 0 or v7 == "" then
-				v7 = nil
-			end
+		if gameMinimumAge == 0 or gameAgeDisplayName == "" then
+			gameAgeDisplayName = nil
 		end
-	else
-		v7 = self.props.ageRatingText
 	end
 
 	if self.props.isHovered then
-		if v7 and not self.props.hidePlayButton then
-			text = v7
+		if gameAgeDisplayName and not self.props.hidePlayButton then
+			text = gameAgeDisplayName
 			flag = true
 		end
 	else
-		local v8
+		local v7
 
 		if FFlagLuaAppGameTileSelectionVideoPlayback then
-			v8 = self.props.isSelected
+			v7 = self.props.isSelected
 		else
-			v8 = self.state.isSelected
+			v7 = self.state.isSelected
 		end
 
-		if v8 and v7 and not self.props.hidePlayButton then
-			text = v7
+		if v7 and gameAgeDisplayName and not self.props.hidePlayButton then
+			text = gameAgeDisplayName
 			flag = true
 		end
 	end
 
-	local v8 = text ~= nil
-	local v9
+	local v7 = text ~= nil
+	local v8
 
 	if FFlagLuaAppGenreRatingFooter then
-		v9 = genreText ~= nil
+		v8 = genreText ~= nil
 	end
 
 	local entry = self.props.entry
@@ -995,22 +954,15 @@ function extended:renderGridTilesFooter()
 		FFlagLuaAppMigrateGameTileFixConsoleMetadataText
 		and self.props.gameTileLayoutType == GameTileTypes.GameTileLayoutType.Narrow
 		and self.props.useExperienceTileMetadata
-		and (isShowSponsoredLabel or v8 or FFlagLuaAppGenreRatingFooter and v9)
+		and (isShowSponsoredLabel or v7 or FFlagLuaAppGenreRatingFooter and v8)
 		or self.props.compactMetadataFormat
 	then
 		useLargerFont = false
 	end
 
-	local totalUpVotes, totalDownVotes
-
-	if FFlagMigrateGameInfoToStore then
-		local storeVotes = self.state.storeVotes
-		totalUpVotes = not storeVotes and 0 or storeVotes.upVotes
-		totalDownVotes = if storeVotes then storeVotes.downVotes else 0
-	else
-		totalUpVotes = self.props.totalUpVotes
-		totalDownVotes = self.props.totalDownVotes
-	end
+	local storeVotes = self.state.storeVotes
+	local totalUpVotes = not storeVotes and 0 or storeVotes.upVotes
+	local totalDownVotes = not storeVotes and 0 or storeVotes.downVotes
 
 	local createElement = Roact.createElement
 	local playerCount
@@ -1019,7 +971,7 @@ function extended:renderGridTilesFooter()
 		playerCount = self.props.entry.playerCount
 	end
 
-	local v10 = {
+	local v9 = {
 		stats = {
 			totalUpVotes = totalUpVotes,
 			totalDownVotes = totalDownVotes,
@@ -1040,15 +992,15 @@ function extended:renderGridTilesFooter()
 		hideRating2 = self.props.hideRating
 	end
 
-	v10.hideRating = hideRating2
+	v9.hideRating = hideRating2
 	local hidePlayerCount2
 
 	if FFlagLuaAppNarrowTileHidePlayerCount then
 		hidePlayerCount2 = self.props.hidePlayerCount
 	end
 
-	v10.hidePlayerCount = hidePlayerCount2
-	local element = createElement(GameStats, v10)
+	v9.hidePlayerCount = hidePlayerCount2
+	local element = createElement(GameStats, v9)
 
 	if self.props.hideMetadata then
 		if not self.props.isHovered then
@@ -1092,7 +1044,7 @@ function extended:renderGridTilesFooter()
 		}))
 	end
 
-	if FFlagLuaAppGenreRatingFooter and v9 and not flag then
+	if FFlagLuaAppGenreRatingFooter and v8 and not flag then
 		return (React.createElement(RatingWithGenreFooter, {
 			useLargerFont = useLargerFont,
 			totalUpVotes = totalUpVotes,
@@ -1102,7 +1054,7 @@ function extended:renderGridTilesFooter()
 		}))
 	end
 
-	if v8 then
+	if v7 then
 		return (React.createElement(GridTileTextFooter, {
 			text = text,
 			useLargerFont = useLargerFont,
@@ -1170,16 +1122,9 @@ function extended:renderContent(reducedMotion, p, p2)
 
 	local imageAspectRatio = GameTileViewConfig.getImageAspectRatio(self.props.gameTileLayoutType)
 	local gridTilesFooter = self:renderGridTilesFooter()
-	local name
-
-	if not self.props.hideTitle then
-		if FFlagMigrateGameInfoToStore then
-			name = self.props.name or self.state.gameInfo and self.state.gameInfo.name or ""
-		else
-			name = self.props.name
-		end
-	end
-
+	local name = not self.props.hideTitle
+		and (self.props.name or self.state.gameInfo and self.state.gameInfo.name or "")
+		or nil
 	local v6
 
 	if v5 then
@@ -1271,7 +1216,7 @@ function extended:renderContent(reducedMotion, p, p2)
 		thumbnailComponent = createElement(GameTileVideoThumbnail, v7)
 	end
 
-	if defineFastFlag2 or not self.props.isVideoPlaying then
+	if defineFastFlag or not self.props.isVideoPlaying then
 		if self.props.tileBadges then
 			v6 = Roact.createFragment({
 				SocialFeaturePill = v6,
@@ -1680,16 +1625,11 @@ end
 function extended:willUnmount()
 	self.isMounted = false
 	ImpressionsTagUtility.RemoveTag(self.gameTileRef, self.props.impressionsTag, self.props.index)
-
-	if FFlagMigrateGameInfoToStore then
-		self.gameInfoSubscription.dispose()
-	end
+	self.gameInfoSubscription.dispose()
 end
 
 function extended.didUpdate(object, data)
-	if FFlagMigrateGameInfoToStore then
-		object.gameInfoSubscription.update(object.props.entry.universeId)
-	end
+	object.gameInfoSubscription.update(object.props.entry.universeId)
 
 	if data.impressionsTag ~= object.props.impressionsTag or data.index ~= object.props.index then
 		ImpressionsTagUtility.RemoveTag(object.gameTileRef, data.impressionsTag, data.index)
@@ -1710,14 +1650,6 @@ function extended.didUpdate(object, data)
 	end
 end
 
-local function formatRating(totalUpVotes: number, totalDownVotes: number) -- 1 equivalent call inferred from this helper
-	if totalUpVotes + totalDownVotes == 0 then
-		return "--"
-	end
-
-	return tostring((math.floor(totalUpVotes / (totalUpVotes + totalDownVotes) * 100 + 0.5))) .. "%"
-end
-
 local v4 = RoactRodux.connect(function(p, data)
 	local universeId = data.entry.universeId
 	local navigationUniverseId
@@ -1735,26 +1667,10 @@ local v4 = RoactRodux.connect(function(p, data)
 	end
 
 	local Game = p.Personalization[GameInfosReducer.key][universeId]
-	local totalUpVotes, totalDownVotes
-
-	if not FFlagMigrateGameInfoToStore then
-		totalUpVotes = Game and Game.totalUpVotes or 0
-		totalDownVotes = Game and Game.totalDownVotes or 0
-	end
-
 	local friendActivityTitle
 
 	if Game then
 		friendActivityTitle = Game.friendActivityTitle or nil
-	end
-
-	local showAgeRating = nil
-	local ageRatingText = nil
-	local minimumAge, ageRecommendationDisplayName
-
-	if not FFlagMigrateGameInfoToStore then
-		minimumAge = Game and Game.minimumAge or 0
-		ageRecommendationDisplayName = Game and Game.ageRecommendationDisplayName or ""
 	end
 
 	local hidePlayButton
@@ -1765,17 +1681,6 @@ local v4 = RoactRodux.connect(function(p, data)
 		hidePlayButton = data.playButtonStyle == GameTileConstants.PlayButtonStyleValues.Disabled
 	else
 		hidePlayButton = false
-	end
-
-	if not FFlagMigrateGameInfoToStore then
-		if hidePlayButton or data.forceHideAgeRatings then
-			showAgeRating = false
-		elseif minimumAge == 0 or ageRecommendationDisplayName == "" then
-			showAgeRating = false
-		else
-			ageRatingText = ageRecommendationDisplayName
-			showAgeRating = true
-		end
 	end
 
 	local gameTileLayoutData = getGameTileLayoutData(Game, data.topicId)
@@ -1850,16 +1755,6 @@ local v4 = RoactRodux.connect(function(p, data)
 		videoThumbnail = `rbxassetid://{v4}`
 	end
 
-	local rating
-
-	if not (FFlagMigrateGameInfoToStore or not (data.useHoverTile or data.useExperienceTileMetadata)) then
-		if defineFastFlag then
-			rating = formatExperienceRating(totalUpVotes, totalDownVotes, nil, true)
-		else
-			rating = formatRating(totalUpVotes, totalDownVotes) -- inferred equivalent call
-		end
-	end
-
 	local friendVisits = Game and Game.friendVisits or v
 	local friendVisitedString
 
@@ -1873,29 +1768,18 @@ local v4 = RoactRodux.connect(function(p, data)
 		footer = gameTileLayoutData.footer or nil
 	end
 
-	local title
-
-	if FFlagMigrateGameInfoToStore then
-		title = gameTileLayoutData and gameTileLayoutData.title
-	else
-		title = gameTileLayoutData and gameTileLayoutData.title or Game and Game.name or ""
-	end
+	local title = gameTileLayoutData and gameTileLayoutData.title
 
 	local v5 = {
 		game = Game,
 		universeId = universeId,
 		navigationUniverseId = nil,
 		name = nil,
-		totalUpVotes = nil,
-		totalDownVotes = nil,
 		imageThumbnail = nil,
 		wideThumbnail = nil,
 		videoThumbnail = nil,
 		videoAccessContext = nil,
 		friendActivityTitle = nil,
-		rating = nil,
-		showAgeRating = nil,
-		ageRatingText = nil,
 		friendVisits = nil,
 		friendVisitedString = nil,
 		hidePlayButton = nil,
@@ -1908,8 +1792,6 @@ local v4 = RoactRodux.connect(function(p, data)
 
 	v5.navigationUniverseId = navigationUniverseId
 	v5.name = title
-	v5.totalUpVotes = totalUpVotes
-	v5.totalDownVotes = totalDownVotes
 	v5.imageThumbnail = imageThumbnail
 	v5.wideThumbnail = wideThumbnail
 	v5.videoThumbnail = videoThumbnail
@@ -1920,9 +1802,6 @@ local v4 = RoactRodux.connect(function(p, data)
 
 	v5.videoAccessContext = accessContext
 	v5.friendActivityTitle = friendActivityTitle
-	v5.rating = rating
-	v5.showAgeRating = showAgeRating
-	v5.ageRatingText = ageRatingText
 	v5.friendVisits = friendVisits
 	v5.friendVisitedString = friendVisitedString
 	v5.hidePlayButton = hidePlayButton
@@ -2141,13 +2020,14 @@ local function fn3(props)
 		local onPeekViewClosed = props.onPeekViewClosed
 		local navigateToGameDetails = props.navigateToGameDetails
 		local reportGameDetailOpened = props.reportGameDetailOpened
-
+		local v13 = v11
+		local v14 = v12
 		local placeIdOverride = props.entry.placeIdOverride
 		local launchDataOverride = props.entry.launchDataOverride
-		local v13
+		local v15
 
 		if props.videoPlaybackContext then
-			v13 = props.videoPlaybackContext.videoPlaybackCoordinator
+			v15 = props.videoPlaybackContext.videoPlaybackCoordinator
 		end
 
 		onGameTileActivated = useCallback(fn4, {
@@ -2160,11 +2040,11 @@ local function fn3(props)
 			onPeekViewClosed,
 			navigateToGameDetails,
 			reportGameDetailOpened,
-			v11,
-			v12,
+			v13,
+			v14,
 			placeIdOverride,
 			launchDataOverride,
-			v13
+			v15
 		})
 	else
 		v10 = nil

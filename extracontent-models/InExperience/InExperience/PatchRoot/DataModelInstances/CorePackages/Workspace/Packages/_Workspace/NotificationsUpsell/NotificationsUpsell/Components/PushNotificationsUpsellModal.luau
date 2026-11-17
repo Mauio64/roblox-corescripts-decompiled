@@ -19,6 +19,7 @@ local sendEventDeferred = NotificationsCommon.sendEventDeferred
 local ModalEventConstants = require(script.Parent.Parent.Analytics.ModalEventConstants)
 local PushUpsellEventName = require(script.Parent.Parent.Analytics.RobloxTelemetryConfigs.PushUpsellEventName)
 local PushNotificationsUpsellUtils = require(script.Parent.Parent.Util.PushNotificationsUpsellUtils)
+local mergeEventFields = require(script.Parent.Parent.Util.mergeEventFields)
 
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
@@ -26,8 +27,8 @@ local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local SharedFlags = require(parent.SharedFlags)
 local GetFFlagLuaAppPushUpsellDeprecateOldEvents = SharedFlags.GetFFlagLuaAppPushUpsellDeprecateOldEvents
 
-return function(p)
-	local v = useLocalization(p.TranslationKeys)
+return function(props)
+	local v = useLocalization(props.TranslationKeys)
 	local onActivated = useCallback(function()
 		PushNotificationsUpsellUtils.setPushEduUpsellResponse(AppStorageService, "Deny")
 		PushNotificationsUpsellUtils.setPushEduUpsellResponseTimestamp(AppStorageService, os.time())
@@ -42,14 +43,18 @@ return function(p)
 		default2:logRobloxTelemetryEvent(
 			PushUpsellEventName,
 			{},
-			{
-				[ModalEventConstants.ActionType] = ModalEventConstants.Clicked,
-				[ModalEventConstants.Button] = ModalEventConstants.Cancel
-			},
+			mergeEventFields(
+				{
+					[ModalEventConstants.ActionType] = ModalEventConstants.Clicked,
+					[ModalEventConstants.Button] = ModalEventConstants.Cancel
+				},
+				props.ExtraEventFields
+			),
 			ModalEventConstants.ModalContextPushEduUpsell
 		)
-		p.CloseModal()
-	end, { p.CloseModal })
+
+		props.CloseModal()
+	end, { props.CloseModal, props.ExtraEventFields })
 
 	local onActivated2 = useCallback(function()
 		if not GetFFlagLuaAppPushUpsellDeprecateOldEvents() then
@@ -62,10 +67,13 @@ return function(p)
 		default2:logRobloxTelemetryEvent(
 			PushUpsellEventName,
 			{},
-			{
-				[ModalEventConstants.ActionType] = ModalEventConstants.Clicked,
-				[ModalEventConstants.Button] = ModalEventConstants.Confirm
-			},
+			mergeEventFields(
+				{
+					[ModalEventConstants.ActionType] = ModalEventConstants.Clicked,
+					[ModalEventConstants.Button] = ModalEventConstants.Confirm
+				},
+				props.ExtraEventFields
+			),
 			ModalEventConstants.ModalContextPushEduUpsell
 		)
 
@@ -75,10 +83,13 @@ return function(p)
 		default2:logRobloxTelemetryEvent(
 			PushUpsellEventName,
 			{},
-			{
-				[ModalEventConstants.ActionType] = ModalEventConstants.Opened,
-				[ModalEventConstants.EntryPoint] = "LuaPushUpsellModal"
-			},
+			mergeEventFields(
+				{
+					[ModalEventConstants.ActionType] = ModalEventConstants.Opened,
+					[ModalEventConstants.EntryPoint] = "LuaPushUpsellModal"
+				},
+				props.ExtraEventFields
+			),
 			ModalEventConstants.ModalContextSysUpsell
 		)
 
@@ -98,7 +109,10 @@ return function(p)
 			default2:logRobloxTelemetryEvent(
 				PushUpsellEventName,
 				{},
-				{ [ModalEventConstants.ActionType] = ModalEventConstants.RequestSuccess },
+				mergeEventFields(
+					{ [ModalEventConstants.ActionType] = ModalEventConstants.RequestSuccess },
+					props.ExtraEventFields
+				),
 				ModalEventConstants.ModalContextSysUpsell
 			)
 		end, function(_)
@@ -111,17 +125,20 @@ return function(p)
 			default2:logRobloxTelemetryEvent(
 				PushUpsellEventName,
 				{},
-				{ [ModalEventConstants.ActionType] = ModalEventConstants.RequestFailed },
+				mergeEventFields(
+					{ [ModalEventConstants.ActionType] = ModalEventConstants.RequestFailed },
+					props.ExtraEventFields
+				),
 				ModalEventConstants.ModalContextSysUpsell
 			)
 		end)
 
-		p.CloseModal()
-	end, { p.CloseModal, v })
+		props.CloseModal()
+	end, { props.CloseModal, props.ExtraEventFields, v })
 
 	local state, setState = useState(Vector2.new(800, 600))
-	local v2 = useCallback(function(p2)
-		setState(p2.AbsoluteSize)
+	local v2 = useCallback(function(p)
+		setState(p.AbsoluteSize)
 	end, { setState })
 
 	return React.createElement(

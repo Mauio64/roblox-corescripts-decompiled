@@ -40,7 +40,6 @@ local PaginatedFriendsCarouselIXP = require(parent.Experiments.PaginatedFriendsC
 
 local defineFastFlag = game:DefineFastFlag("EarlierFetchTimeForFriendsCarousel_v1", false)
 local defineFastFlag2 = game:DefineFastFlag("PrefetchProfileNamesOnStartup_v2", false)
-local FFlagGateContactAutoSyncByPolicy = require(parent.Flags.FFlagGateContactAutoSyncByPolicy)
 
 local SharedFlags = require(parent2.SharedFlags)
 local FIntFriendsCarouselInitialFetchSize = SharedFlags.FIntFriendsCarouselInitialFetchSize
@@ -162,11 +161,7 @@ local function Container(p): nil
 		end, { userId })
 	end
 
-	if FFlagGateContactAutoSyncByPolicy then
-		useAutoSyncContacts(isContactImporterPolicyEnabled)
-	else
-		useAutoSyncContacts()
-	end
+	useAutoSyncContacts(isContactImporterPolicyEnabled)
 
 	React.useEffect(function()
 		if userIdExists(userId) then

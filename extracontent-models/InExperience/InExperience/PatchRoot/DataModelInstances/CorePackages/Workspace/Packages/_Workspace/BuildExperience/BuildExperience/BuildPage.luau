@@ -60,9 +60,7 @@ require(script.Parent.Chat.chatTypes)
 local useSessionSummary = require(script.Parent.Chat.useSessionSummary)
 local useScrollPerformanceTracker = require(script.Parent.Telemetry.useScrollPerformanceTracker)
 
-local FFlagBuildExperienceChatSheetReversedContent = require(script.Parent.Flags.FFlagBuildExperienceChatSheetReversedContent)
-
-local v = { 0.5, 1 }
+local snapPoints = { 0.5, 1 }
 local FFlagBuildAdUpsell = require(script.Parent.Flags.FFlagBuildAdUpsell)
 local FFlagEnableBuildAdPromotion = require(script.Parent.Flags.FFlagEnableBuildAdPromotion)
 
@@ -77,6 +75,7 @@ local useManageBuildNavBarVisibility = require(script.Parent.utils.useManageBuil
 local useOnScreenKeyboardVisible = require(script.Parent.utils.useOnScreenKeyboardVisible)
 local FFlagBuildPublishNavigationSheet = require(script.Parent.Flags.FFlagBuildPublishNavigationSheet)
 local FFlagBuildExperiencePrivateInvites = require(script.Parent.Flags.FFlagBuildExperiencePrivateInvites)
+local FFlagBuildExperienceEventContextTelemetry = require(script.Parent.Flags.FFlagBuildExperienceEventContextTelemetry)
 
 local FFlagBuildExperienceMyCreationsLongPressMenu = require(script.Parent.Flags.FFlagBuildExperienceMyCreationsLongPressMenu)
 local FFlagBuildExperiencePreviewsTab = require(script.Parent.Flags.FFlagBuildExperiencePreviewsTab)
@@ -93,13 +92,17 @@ else
 end
 
 local FFlagEnableBuildTabOverride = SharedFlags.FFlagEnableBuildTabOverride
+local FFlagBuildExperienceHomeTelemetry = require(script.Parent.Flags.FFlagBuildExperienceHomeTelemetry)
 local FFlagBuildExperienceAnalytics = SharedFlags.FFlagBuildExperienceAnalytics
 local FFlagBuildExperienceHideNavBarOnSubPages = SharedFlags.FFlagBuildExperienceHideNavBarOnSubPages
 local FFlagBuildExperienceChatOpenTelemetry = require(script.Parent.Flags.FFlagBuildExperienceChatOpenTelemetry)
+local FFlagBuildExperienceChatOpenId = require(script.Parent.Flags.FFlagBuildExperienceChatOpenId)
+local FFlagBuildExperiencePageImpressions = require(script.Parent.Flags.FFlagBuildExperiencePageImpressions)
+local useBuildPageImpression = require(BuildExperience.Telemetry.useBuildPageImpression)
 local GetAdsCampaignDeepLinkStore = require(BuildExperience.Stores.GetAdsCampaignDeepLinkStore)
 local sendBuildExperienceEvent = require(BuildExperience.Telemetry.sendBuildExperienceEvent)
-local v2 = FFlagBuildAdUpsell or FFlagBuildExperienceMonetizationNativeUI
-local v3 = not FFlagEnableBuildTabOverride
+local v = FFlagBuildAdUpsell or FFlagBuildExperienceMonetizationNativeUI
+local v2 = not FFlagEnableBuildTabOverride
 local BuildEligibilityDialog = require(script.Parent.Components.BuildEligibilityDialog)
 local useBuildPageEligibility = require(script.Parent.useBuildPageEligibility)
 local PublishSheetController
@@ -113,7 +116,7 @@ end
 local TTINavigationTracking = require(parent.TTINavigationTracking)
 local useTTINavigationTracking = TTINavigationTracking.useTTINavigationTracking
 
-local v4 = {
+local v3 = {
 	BuildHome = "BuildHome",
 	BuildChat = BuildNavigationParams.BUILD_CHAT_SCREEN,
 	BuildSearch = "BuildSearch",
@@ -145,34 +148,69 @@ local function useLiveSubagentTaskState(navigation)
 	local target = BuildNavigationParams.getTarget(navigation)
 	assert(target ~= nil, "Agent pages require a build target")
 	local creatorAgentChatStore = CreatorAgentChat.getCreatorAgentChatStore()
-	local v5
+	local v4
 
 	if FFlagBuildExperienceModelPicker then
-		v5 = SignalsReact.useSignalState(localUserIdStore.getCurrentUserId)
+		v4 = SignalsReact.useSignalState(localUserIdStore.getCurrentUserId)
 	end
 
 	return useSessionSummary((React.useMemo(function()
 		return creatorAgentChatStore.getSessionForProject(target.universeId, target.placeId, target.sessionId)
-	end, { creatorAgentChatStore, target.universeId, target.placeId, target.sessionId, v5 }))).subagentTaskState or BuildNavigationParams.getSubagentTaskState(navigation)
+	end, { creatorAgentChatStore, target.universeId, target.placeId, target.sessionId, v4 }))).subagentTaskState or BuildNavigationParams.getSubagentTaskState(navigation)
 end
 
-local function useOpenBuildChat(navigation) -- 2 equivalent calls inferred from this helper
-	return React.useCallback(function(target)
+local function useOpenBuildChat(navigation, p: string?)
+	local useCallback = React.useCallback
+	local function fn(state, p2: string?)
 		if FFlagBuildExperienceModelPicker then
-			target = prepareBuildModelSelectionTarget(target)
+			state = prepareBuildModelSelectionTarget(state)
+		end
+
+		if FFlagBuildExperienceChatOpenId then
+			state = table.clone(state)
+			local HttpService = game:GetService("HttpService")
+			state.chatOpenId = HttpService:GenerateGUID(false)
 		end
 
 		if FFlagBuildExperienceChatOpenTelemetry then
-			sendBuildExperienceEvent("CHAT_OPEN", {
-				universeId = target.universeId,
-				placeId = target.placeId
-			}, {
-				isNewGame = tostring(target.isNewGameTarget == true)
-			})
+			local v4 = {
+				universeId = state.universeId,
+				placeId = state.placeId,
+				conversationId = 0,
+				chatOpenId = 0
+			}
+			local conversationId
+
+			if FFlagBuildExperienceEventContextTelemetry then
+				conversationId = state.sessionId
+			end
+
+			v4.conversationId = conversationId
+			v4.chatOpenId = state.chatOpenId
+			local v5 = {
+				isNewGame = tostring(state.isNewGameTarget == true),
+				context = 0
+			}
+			local context
+
+			if FFlagBuildExperienceEventContextTelemetry then
+				context = p2 or p
+			end
+
+			v5.context = context
+			sendBuildExperienceEvent("CHAT_OPEN", v4, v5)
 		end
 
-		navigation.navigate(v4.BuildChat, { target = target })
-	end, { navigation })
+		navigation.navigate(v3.BuildChat, { target = state })
+	end
+
+	local v4
+
+	if FFlagBuildExperienceEventContextTelemetry then
+		v4 = p
+	end
+
+	return useCallback(fn, { navigation, v4 })
 end
 
 local function useHomeConfigurationPages(navigation)
@@ -190,13 +228,13 @@ local function useHomeConfigurationPages(navigation)
 				setState(target)
 				setState2(true)
 			else
-				local v5 = BuildOverflowMenuScreens.SCREEN_BY_PAGE[p]
+				local v4 = BuildOverflowMenuScreens.SCREEN_BY_PAGE[p]
 
-				if v5 == nil then
+				if v4 == nil then
 					return
 				end
 
-				navigation.navigate(v5, { target = target })
+				navigation.navigate(v4, { target = target })
 			end
 		end, { navigation }),
 		publishSheetTarget = state,
@@ -210,12 +248,12 @@ local function BuildMonetizationScreen(p)
 	local navigation = p.navigation
 	local target = BuildNavigationParams.getTarget(navigation)
 	local state, setState = React.useState(false)
-	local v5 = target ~= nil
+	local v4 = target ~= nil
 	local onComposerActivated = React.useCallback(function()
-		if v5 then
+		if v4 then
 			setState(true)
 		end
-	end, { v5 })
+	end, { v4 })
 	local onClose = React.useCallback(function()
 		setState(false)
 	end, {})
@@ -225,15 +263,15 @@ local function BuildMonetizationScreen(p)
 			return
 		end
 
-		local v6 = navigation.addListener(RoactNavigation.Events.WillBlur, onClose)
+		local v5 = navigation.addListener(RoactNavigation.Events.WillBlur, onClose)
 		return function()
-			v6.remove()
+			v5.remove()
 		end
 	end, { state, navigation, onClose })
 
 	local createElement = React.createElement
 	local fragment = React.Fragment
-	local v6 = {
+	local v5 = {
 		Page = React.createElement(BuildOverflowMenuScreens.BuildMonetizationScreen, {
 			navigation = navigation,
 			onComposerActivated = onComposerActivated
@@ -250,43 +288,44 @@ local function BuildMonetizationScreen(p)
 			onClose = onClose,
 			placeId = target.placeId,
 			sessionId = target.sessionId,
-			snapPoints = not FFlagBuildExperienceChatSheetReversedContent and { 0.5 } or v,
+			snapPoints = snapPoints,
 			universeId = target.universeId
 		})
 	end
 
-	v6.Chat = chat
-	return createElement(fragment, nil, v6)
+	v5.Chat = chat
+	return createElement(fragment, nil, v5)
 end
 
 local function BuildHomeScreen(p)
 	local screenProps = p.screenProps or {}
 	local navigation = p.navigation
-	local v5 = useBuildPageLayout()
+	local v4 = useBuildPageLayout()
 	local isFocused = useNavigationFocus()
-	local tokens = v5.tokens
+	local tokens = v4.tokens
 	local fallbackExperienceName = useLocalization({
 		fallbackExperienceName = LocalizationStrings.BUILD_ASSISTANT_FALLBACK_NAME
 	}).fallbackExperienceName
-	local onOpenChat = useOpenBuildChat(navigation) -- inferred equivalent call
-	local v6
+
+	local onOpenChat = useOpenBuildChat(navigation, FFlagBuildExperienceEventContextTelemetry and "my_creations" or nil)
+	local v5
 
 	if FFlagBuildExperienceMyCreationsLongPressMenu then
-		v6 = useHomeConfigurationPages(navigation)
+		v5 = useHomeConfigurationPages(navigation)
 	end
 
 	local publishSheetTarget
 
-	if v6 ~= nil then
-		publishSheetTarget = v6.publishSheetTarget
+	if v5 ~= nil then
+		publishSheetTarget = v5.publishSheetTarget
 	end
 
-	local v7
+	local v6
 
 	if FFlagAppThemeHalloween2026BuildBackground then
-		v7 = useThemeBackground() ~= nil
+		v6 = useThemeBackground() ~= nil
 	else
-		v7 = false
+		v6 = false
 	end
 
 	local useEffect = React.useEffect
@@ -317,23 +356,35 @@ local function BuildHomeScreen(p)
 			end
 		end
 
-		return resumeBuildChat({
+		local v7 = {
 			universeId = screenProps.universeId,
 			sessionId = screenProps.sessionId,
 			creatorAgentChatStore = screenProps.creatorAgentChatStore,
 			configurationStore = screenProps.configurationStore,
 			fallbackExperienceName = fallbackExperienceName,
-			onOpenChat = onOpenChat
-		})
+			onOpenChat = 0
+		}
+		local onOpenChat2
+
+		if FFlagBuildExperienceEventContextTelemetry then
+			onOpenChat2 = function(p2)
+				onOpenChat(p2, "deep_link")
+			end
+		else
+			onOpenChat2 = onOpenChat
+		end
+
+		v7.onOpenChat = onOpenChat2
+		return resumeBuildChat(v7)
 	end
 
 	local universeId = screenProps.universeId
 	local sessionId = screenProps.sessionId
 	local resumeRequestId = screenProps.resumeRequestId
-	local v8
+	local v7
 
 	if FFlagBuildAdUpsell then
-		v8 = screenProps.adsCampaignIntent
+		v7 = screenProps.adsCampaignIntent
 	end
 
 	useEffect(fn, {
@@ -341,7 +392,7 @@ local function BuildHomeScreen(p)
 		universeId,
 		sessionId,
 		resumeRequestId,
-		v8,
+		v7,
 		screenProps.creatorAgentChatStore,
 		screenProps.configurationStore,
 		fallbackExperienceName
@@ -351,13 +402,18 @@ local function BuildHomeScreen(p)
 
 	local onOpenSearch = React.useCallback(function()
 		local searchQueryStore2 = searchQueryStore
+
+		if FFlagBuildExperienceHomeTelemetry then
+			sendBuildExperienceEvent("SEARCH_OPEN", {}, { context = "home_header" })
+		end
+
 		searchQueryStore2.beginSearch()
 
-		navigation.navigate(v4.BuildSearch, { searchQueryStore = searchQueryStore2 })
+		navigation.navigate(v3.BuildSearch, { searchQueryStore = searchQueryStore2 })
 	end, { navigation, searchQueryStore })
 
 	local createElement = React.createElement
-	local v9 = {
+	local v8 = {
 		LayoutOrder = 3,
 		creatorAgentChatStore = screenProps.creatorAgentChatStore,
 		configurationStore = screenProps.configurationStore,
@@ -370,27 +426,27 @@ local function BuildHomeScreen(p)
 	}
 	local onOpenConfigurationPage
 
-	if v6 ~= nil then
-		onOpenConfigurationPage = v6.onOpenConfigurationPage
+	if v5 ~= nil then
+		onOpenConfigurationPage = v5.onOpenConfigurationPage
 	end
 
-	v9.onOpenConfigurationPage = onOpenConfigurationPage
-	local v10 = createElement(MyCreationsTab, v9)
+	v8.onOpenConfigurationPage = onOpenConfigurationPage
+	local v9 = createElement(MyCreationsTab, v8)
 
 	local createElement2 = React.createElement
-	local v11 = {
+	local v10 = {
 		BackgroundColor3 = tokens.Color.Surface.Surface_0.Color3,
-		BackgroundTransparency = v7 and 1 or tokens.Color.Surface.Surface_0.Transparency,
-		includeBottomBar = v5.shouldIncludeBottomBar,
+		BackgroundTransparency = v6 and 1 or tokens.Color.Surface.Surface_0.Transparency,
+		includeBottomBar = v4.shouldIncludeBottomBar,
 		includeStatusBar = true
 	}
 
 	local createElement3 = React.createElement
 
-	local v12 = {
+	local v11 = {
 		Header = React.createElement(BuildPageHeader, {
 			LayoutOrder = 1,
-			height = v5.topBarHeight,
+			height = v4.topBarHeight,
 			searchQueryStore = searchQueryStore,
 			onOpenSearch = onOpenSearch
 		}),
@@ -400,51 +456,51 @@ local function BuildHomeScreen(p)
 	local createElement4 = React.createElement
 
 	if FFlagBuildExperiencePreviewsTab then
-		v10 = React.createElement(BuildHomeTabsContainer, {
+		v9 = React.createElement(BuildHomeTabsContainer, {
 			LayoutOrder = 3,
-			gamesContent = v10,
+			gamesContent = v9,
 			isFocused = isFocused,
 			searchStore = screenProps.searchStore,
 			searchQueryStore = searchQueryStore
 		})
 	end
 
-	v12.Content = createElement4(
+	v11.Content = createElement4(
 		View,
 		{ LayoutOrder = 2, ZIndex = 4, tag = "col align-x-center fill gap-small size-full-0" },
-		{ SearchBarContainer = nil, MyCreations = v10 }
+		{ SearchBarContainer = nil, MyCreations = v9 }
 	)
-	local v13 = {
+	local v12 = {
 		Page = createElement3(View, {
 			tag = FFlagAppThemeHalloween2026BuildBackground and {
 				["col align-x-center size-full"] = true,
-				["bg-surface-0"] = not v7
+				["bg-surface-0"] = not v6
 			} or "col align-x-center size-full bg-surface-0"
-		}, v12),
+		}, v11),
 		PublishSheet = 0
 	}
 	local publishSheet
 
 	if
 		FFlagBuildPublishNavigationSheet
-		and v6 ~= nil
+		and v5 ~= nil
 		and publishSheetTarget ~= nil
 		and publishSheetTarget.universeId ~= nil
 	then
 		publishSheet = React.createElement(PublishSheetController, {
-			isOpen = v6.isPublishSheetOpen,
+			isOpen = v5.isPublishSheetOpen,
 			target = publishSheetTarget,
-			onClose = v6.onClosePublishSheet,
-			navigateToSubPage = v6.navigateToPublishSubPage
+			onClose = v5.onClosePublishSheet,
+			navigateToSubPage = v5.navigateToPublishSubPage
 		})
 	end
 
-	v13.PublishSheet = publishSheet
-	return createElement2(FullscreenPageWithSafeArea, v11, v13)
+	v12.PublishSheet = publishSheet
+	return createElement2(FullscreenPageWithSafeArea, v10, v12)
 end
 
 local function BuildSearchResults(props)
-	local v5 = props.searchQueryStore.useDraftQuery()
+	local v4 = props.searchQueryStore.useDraftQuery()
 	local current = props.closingSnapshot.current
 	local results
 
@@ -454,15 +510,15 @@ local function BuildSearchResults(props)
 		results = current.results
 	end
 
-	local v6
+	local v5
 
 	if current == nil then
-		v6 = v5 == "" or v5 ~= results.query or results.isSettledNoResults
+		v5 = v4 == "" or v4 ~= results.query or results.isSettledNoResults
 	else
-		v6 = current.showEmptyState
+		v5 = current.showEmptyState
 	end
 
-	if v6 then
+	if v5 then
 		return React.createElement(SearchEmptyState, { testId = "SearchPage.EmptyState" })
 	end
 
@@ -483,41 +539,45 @@ end
 local function BuildSearchScreen(p)
 	local screenProps = p.screenProps or {}
 	local navigation = p.navigation
-	local v5 = useBuildPageLayout()
-	local v6 = useNavigationFocus()
-	local v7 = useOnScreenKeyboardVisible()
+	local v4 = useBuildPageLayout()
+	local v5 = useNavigationFocus()
+	local v6 = useOnScreenKeyboardVisible()
 	local searchQueryStore = navigation.getParam("searchQueryStore")
 		or screenProps.searchQueryStore
 		or GetSearchQueryStore()
-	local v8 = SignalsReact.useSignalBinding(searchQueryStore.getDraftQuery)
-	local v9 = useLocalization({ searchbarPlaceholder = "Feature.Build.Label.SearchGames" })
-	local onOpenChat = useOpenBuildChat(navigation) -- inferred equivalent call
+	local v7 = SignalsReact.useSignalBinding(searchQueryStore.getDraftQuery)
+	local v8 = useLocalization({ searchbarPlaceholder = "Feature.Build.Label.SearchGames" })
+
+	local onOpenChat = useOpenBuildChat(
+		navigation,
+		FFlagBuildExperienceEventContextTelemetry and "search_results" or nil
+	)
 	local results = useMyCreationsResults({
 		creatorAgentChatStore = screenProps.creatorAgentChatStore,
 		configurationStore = screenProps.configurationStore,
 		searchStore = screenProps.searchStore,
 		searchQueryStore = searchQueryStore,
-		isFocused = v6
+		isFocused = v5
 	})
 
 	local ref = React.useRef(nil)
 	local current = ref.current
-	local mapped = v8:map(function(p2: string)
+	local mapped = v7:map(function(p2: string)
 		local current2 = ref.current
 		return if current2 == nil then p2 else current2.query
 	end)
-	local v10
+	local v9
 
 	if current == nil then
-		v10 = results
+		v9 = results
 	else
-		v10 = current.results
+		v9 = current.results
 	end
 
 	local ref2 = React.useRef(nil)
 	useScrollPerformanceTracker("LuaApp_Build_Search_Scroll", ref2)
 	local createFooter = React.useCallback(function()
-		if v10.isLoadingMore then
+		if v9.isLoadingMore then
 			return React.createElement(ExperienceResultsLoadingSkeleton, {
 				LayoutOrder = 1,
 				index = 1,
@@ -526,7 +586,7 @@ local function BuildSearchScreen(p)
 		end
 
 		return nil
-	end, { v10.isLoadingMore })
+	end, { v9.isLoadingMore })
 	local onBack = React.useCallback(function()
 		local draftQuery = searchQueryStore.getDraftQuery()
 		local current2 = { query = draftQuery, results = results, showEmptyState = 0 }
@@ -545,25 +605,25 @@ local function BuildSearchScreen(p)
 	end, { searchQueryStore })
 
 	return React.createElement(FullscreenPageWithSafeArea, {
-		BackgroundColor3 = v5.tokens.Color.Surface.Surface_0.Color3,
-		BackgroundTransparency = v5.tokens.Color.Surface.Surface_0.Transparency,
-		includeBottomBar = v5.shouldIncludeBottomBar and not v7,
+		BackgroundColor3 = v4.tokens.Color.Surface.Surface_0.Color3,
+		BackgroundTransparency = v4.tokens.Color.Surface.Surface_0.Transparency,
+		includeBottomBar = v4.shouldIncludeBottomBar and not v6,
 		includeStatusBar = true
 	}, {
 		Page = React.createElement(SearchPageContainer, {
 			ref = ref2,
 			createFooter = createFooter,
 			onBack = onBack,
-			onCanvasPositionChangedCallback = v10.loadMoreIfNeeded,
-			onCanvasSizeChangedCallback = v10.loadMoreIfNeeded,
-			refresh = v10.refresh,
+			onCanvasPositionChangedCallback = v9.loadMoreIfNeeded,
+			onCanvasSizeChangedCallback = v9.loadMoreIfNeeded,
+			refresh = v9.refresh,
 			searchBarProps = {
 				clear = searchQueryStore.clear,
 				onFocusGained = searchQueryStore.beginSearch,
-				placeholder = v9.searchbarPlaceholder,
+				placeholder = v8.searchbarPlaceholder,
 				query = mapped,
 				setQuery = searchQueryStore.setQuery,
-				shouldFocus = v6
+				shouldFocus = v5
 			},
 			showEmptyState = false
 		}, {
@@ -587,25 +647,25 @@ local function BuildChatScreen(p)
 	end
 
 	local buildExperienceRefreshStore = GetBuildExperienceRefreshStore()
-	local v5 = useBuildPageLayout()
+	local v4 = useBuildPageLayout()
 
-	local isFocused = not v2 or useNavigationFocus()
-	local v6 = useOnScreenKeyboardVisible()
+	local isFocused = not v or useNavigationFocus()
+	local v5 = useOnScreenKeyboardVisible()
 	local state, setState = React.useState(false)
 	local state2, setState2 = React.useState(false)
 
 	if FFlagBuildExperienceModelPicker then
-		local v7 = SignalsReact.useSignalState(localUserIdStore.getCurrentUserId)
+		local v6 = SignalsReact.useSignalState(localUserIdStore.getCurrentUserId)
 
 		React.useLayoutEffect(function()
-			if target ~= nil and (tonumber(v7) or 0) > 0 then
+			if target ~= nil and (tonumber(v6) or 0) > 0 then
 				local target2 = prepareBuildModelSelectionTarget(target)
 
 				if target2 ~= target then
 					navigation.setParams({ target = target2 })
 				end
 			end
-		end, { v7, target, navigation })
+		end, { v6, target, navigation })
 		local modelSelectionDraftId
 
 		if target == nil then
@@ -647,13 +707,13 @@ local function BuildChatScreen(p)
 			return
 		end
 
-		local v7 = BuildOverflowMenuScreens.SCREEN_BY_PAGE[p2]
+		local v6 = BuildOverflowMenuScreens.SCREEN_BY_PAGE[p2]
 
-		if v7 == nil then
+		if v6 == nil then
 			return
 		end
 
-		navigation.navigate(v7, { target = target })
+		navigation.navigate(v6, { target = target })
 	end, { navigation, target })
 
 	local onOpenInvitePicker = React.useCallback(function()
@@ -692,10 +752,10 @@ local function BuildChatScreen(p)
 		end
 	end, { onOpenInviteManagement })
 	local onOpenAgentsPage = React.useCallback(function()
-		navigation.navigate(v4.BuildAgents, { target = target })
+		navigation.navigate(v3.BuildAgents, { target = target })
 	end, { navigation, target })
 	local onOpenCreatorCreditPage = React.useCallback(function()
-		navigation.navigate(v4.BuildCreatorCredit, { target = target })
+		navigation.navigate(v3.BuildCreatorCredit, { target = target })
 	end, { navigation, target })
 
 	local navigateToSubPage = React.useCallback(function(p2: string, target2)
@@ -705,7 +765,7 @@ local function BuildChatScreen(p)
 
 	if FFlagEnableBuildAdPromotion then
 		onOpenGetUsersPage = React.useCallback(function()
-			navigation.navigate(v4.BuildGetUsers, { target = target })
+			navigation.navigate(v3.BuildGetUsers, { target = target })
 		end, { navigation, target })
 	end
 
@@ -718,7 +778,7 @@ local function BuildChatScreen(p)
 
 	if target ~= nil then
 		local createElement = React.createElement
-		local v7 = {
+		local v6 = {
 			target = target,
 			onOpenLibrary = onOpenLibrary,
 			initialPrompt = initialPrompt,
@@ -733,12 +793,12 @@ local function BuildChatScreen(p)
 			isFocused = nil
 		}
 
-		if not v2 then
+		if not v then
 			isFocused = nil
 		end
 
-		v7.isFocused = isFocused
-		page = createElement(BuildChatPage, v7)
+		v6.isFocused = isFocused
+		page = createElement(BuildChatPage, v6)
 	end
 
 	local universeId
@@ -749,11 +809,11 @@ local function BuildChatScreen(p)
 
 	local createElement = React.createElement
 	local fragment = React.Fragment
-	local v7 = {
+	local v6 = {
 		Page = React.createElement(FullscreenPageWithSafeArea, {
-			BackgroundColor3 = v5.tokens.Color.Surface.Surface_0.Color3,
-			BackgroundTransparency = v5.tokens.Color.Surface.Surface_0.Transparency,
-			includeBottomBar = v5.shouldIncludeBottomBar and not v6,
+			BackgroundColor3 = v4.tokens.Color.Surface.Surface_0.Color3,
+			BackgroundTransparency = v4.tokens.Color.Surface.Surface_0.Transparency,
+			includeBottomBar = v4.shouldIncludeBottomBar and not v5,
 			includeStatusBar = true
 		}, { Page = page }),
 		Picker = 0,
@@ -769,7 +829,7 @@ local function BuildChatScreen(p)
 		})
 	end
 
-	v7.Picker = picker
+	v6.Picker = picker
 	local publishSheet
 
 	if FFlagBuildPublishNavigationSheet and target ~= nil and target.universeId ~= nil then
@@ -781,28 +841,28 @@ local function BuildChatScreen(p)
 		})
 	end
 
-	v7.PublishSheet = publishSheet
-	return createElement(fragment, nil, v7)
+	v6.PublishSheet = publishSheet
+	return createElement(fragment, nil, v6)
 end
 
 local function BuildAgentsScreen(p)
 	local navigation = p.navigation
-	local v5 = useBuildPageLayout()
-	local v6 = useLiveSubagentTaskState(navigation)
+	local v4 = useBuildPageLayout()
+	local v5 = useLiveSubagentTaskState(navigation)
 	local agents = useLocalization({ agents = LocalizationStrings.SUBAGENT_STATUS_AGENTS }).agents
 
 	local onClose = React.useCallback(function()
 		navigation.goBack()
 	end, { navigation })
 	local onAgentActivated = React.useCallback(function(p2)
-		navigation.navigate(v4.BuildAgentDetails, {
+		navigation.navigate(v3.BuildAgentDetails, {
 			target = BuildNavigationParams.getTarget(navigation),
 			subagentTaskGroupName = p2.name
 		})
 	end, { navigation })
 
 	local element = React.createElement(SubagentStatus.AgentsList, {
-		groups = v6 == nil and {} or v6.groups,
+		groups = v5 == nil and {} or v5.groups,
 		onAgentActivated = onAgentActivated,
 		testId = "BuildPage.AgentsList"
 	})
@@ -810,9 +870,9 @@ local function BuildAgentsScreen(p)
 	return React.createElement(
 		FullscreenPageWithSafeArea,
 		{
-			BackgroundColor3 = v5.tokens.Color.Surface.Surface_0.Color3,
-			BackgroundTransparency = v5.tokens.Color.Surface.Surface_0.Transparency,
-			includeBottomBar = v5.shouldIncludeBottomBar,
+			BackgroundColor3 = v4.tokens.Color.Surface.Surface_0.Color3,
+			BackgroundTransparency = v4.tokens.Color.Surface.Surface_0.Transparency,
+			includeBottomBar = v4.shouldIncludeBottomBar,
 			includeStatusBar = true
 		},
 		{
@@ -829,10 +889,10 @@ end
 
 local function BuildAgentDetailsScreen(p)
 	local navigation = p.navigation
-	local v5 = useBuildPageLayout()
-	local v6 = useLiveSubagentTaskState(navigation)
+	local v4 = useBuildPageLayout()
+	local v5 = useLiveSubagentTaskState(navigation)
 	local subagentTaskGroupName = BuildNavigationParams.getSubagentTaskGroupName(navigation)
-	local group = findGroup(v6, subagentTaskGroupName) -- inferred equivalent call
+	local group = findGroup(v5, subagentTaskGroupName) -- inferred equivalent call
 	local agents = useLocalization({ agents = LocalizationStrings.SUBAGENT_STATUS_AGENTS }).agents
 
 	local onClose = React.useCallback(function()
@@ -852,9 +912,9 @@ local function BuildAgentDetailsScreen(p)
 	return React.createElement(
 		FullscreenPageWithSafeArea,
 		{
-			BackgroundColor3 = v5.tokens.Color.Surface.Surface_0.Color3,
-			BackgroundTransparency = v5.tokens.Color.Surface.Surface_0.Transparency,
-			includeBottomBar = v5.shouldIncludeBottomBar,
+			BackgroundColor3 = v4.tokens.Color.Surface.Surface_0.Color3,
+			BackgroundTransparency = v4.tokens.Color.Surface.Surface_0.Transparency,
+			includeBottomBar = v4.shouldIncludeBottomBar,
 			includeStatusBar = true
 		},
 		{
@@ -871,7 +931,12 @@ end
 
 local function BuildCreatorCreditScreen(p)
 	local navigation = p.navigation
-	local v5 = useBuildPageLayout()
+
+	if FFlagBuildExperiencePageImpressions then
+		useBuildPageImpression("creator-credit-ai-usage", BuildNavigationParams.getTarget(navigation))
+	end
+
+	local v4 = useBuildPageLayout()
 	local pageTitle = useLocalization({ pageTitle = LocalizationStrings.CREATOR_CREDIT_PAGE_TITLE }).pageTitle
 
 	local onClose = React.useCallback(function()
@@ -883,9 +948,9 @@ local function BuildCreatorCreditScreen(p)
 	return React.createElement(
 		FullscreenPageWithSafeArea,
 		{
-			BackgroundColor3 = v5.tokens.Color.Surface.Surface_0.Color3,
-			BackgroundTransparency = v5.tokens.Color.Surface.Surface_0.Transparency,
-			includeBottomBar = v5.shouldIncludeBottomBar,
+			BackgroundColor3 = v4.tokens.Color.Surface.Surface_0.Color3,
+			BackgroundTransparency = v4.tokens.Color.Surface.Surface_0.Transparency,
+			includeBottomBar = v4.shouldIncludeBottomBar,
 			includeStatusBar = true
 		},
 		{
@@ -903,12 +968,16 @@ end
 
 local function BuildGetUsersScreen(p)
 	local navigation = p.navigation
-	local v5 = useBuildPageLayout()
+	local v4 = useBuildPageLayout()
 	local target = BuildNavigationParams.getTarget(navigation)
 	local universeId
 
 	if target ~= nil then
 		universeId = target.universeId
+	end
+
+	if FFlagBuildExperiencePageImpressions then
+		useBuildPageImpression("get-users", target)
 	end
 
 	local pageTitle = useLocalization({ pageTitle = LocalizationStrings.ADS_STATS_PAGE_TITLE }).pageTitle
@@ -917,17 +986,17 @@ local function BuildGetUsersScreen(p)
 		navigation.goBack()
 	end, { navigation })
 
-	local v6 = useAdsStatsPageViewModel(universeId)
-	local element = React.createElement(AdsStatsView, v6)
+	local v5 = useAdsStatsPageViewModel(universeId)
+	local element = React.createElement(AdsStatsView, v5)
 	local state, setState = React.useState(nil)
 
-	local disableScrolling = not (v6.isLoading or v6.isFailed or v6.hasCampaigns)
+	local disableScrolling = not (v5.isLoading or v5.isFailed or v5.hasCampaigns)
 	local footer
 
-	if not (v6.isLoading or v6.isFailed) then
+	if not (v5.isLoading or v5.isFailed) then
 		local createElement = React.createElement
 
-		local v7 = {
+		local v6 = {
 			ToastAnchor = React.createElement(View, {
 				LayoutOrder = 1,
 				ref = setState,
@@ -940,8 +1009,8 @@ local function BuildGetUsersScreen(p)
 		local createElement2 = React.createElement
 
 		local createElement3 = React.createElement
-		local v8 = {
-			text = v6.createButtonText,
+		local v7 = {
+			text = v5.createButtonText,
 			icon = 0,
 			size = 0,
 			variant = 0,
@@ -953,41 +1022,41 @@ local function BuildGetUsersScreen(p)
 		}
 		local icon
 
-		if v6.createButtonIsExternal then
+		if v5.createButtonIsExternal then
 			icon = IconName.ArrowUpRightFromSquare
 		end
 
-		v8.icon = icon
-		v8.size = InputSize.Large
-		v8.variant = ButtonVariant.Emphasis
-		v8.fillBehavior = FillBehavior.Fill
-		v8.width = UDim.new(1, 0)
-		v8.isLoading = v6.isPromotionCreatePending
-		v8.onActivated = v6.onCreatePrimary
-		v7.Actions = createElement2(
+		v7.icon = icon
+		v7.size = InputSize.Large
+		v7.variant = ButtonVariant.Emphasis
+		v7.fillBehavior = FillBehavior.Fill
+		v7.width = UDim.new(1, 0)
+		v7.isLoading = v5.isPromotionCreatePending
+		v7.onActivated = v5.onCreatePrimary
+		v6.Actions = createElement2(
 			View,
 			{
 				LayoutOrder = 2,
 				tag = "row size-full-0 auto-y padding-y-medium",
 				testId = "BuildPage.GetUsers.Actions"
 			},
-			{ Create = createElement3(Button, v8) }
+			{ Create = createElement3(Button, v7) }
 		)
 		footer = createElement(View, {
 			tag = "col size-full-0 auto-y",
 			testId = "BuildPage.GetUsers.Footer"
-		}, v7)
+		}, v6)
 	end
 
 	local createElement = React.createElement
-	local v7 = {
-		BackgroundColor3 = v5.tokens.Color.Surface.Surface_0.Color3,
-		BackgroundTransparency = v5.tokens.Color.Surface.Surface_0.Transparency,
-		includeBottomBar = v5.shouldIncludeBottomBar,
+	local v6 = {
+		BackgroundColor3 = v4.tokens.Color.Surface.Surface_0.Color3,
+		BackgroundTransparency = v4.tokens.Color.Surface.Surface_0.Transparency,
+		includeBottomBar = v4.shouldIncludeBottomBar,
 		includeStatusBar = true
 	}
 
-	local v8 = {
+	local v7 = {
 		Page = React.createElement(OverflowMenuPageShell, {
 			title = pageTitle,
 			onClose = onClose,
@@ -1005,26 +1074,26 @@ local function BuildGetUsersScreen(p)
 	}
 	local successToast
 
-	if v6.showCreateSuccessToast and state ~= nil then
+	if v5.showCreateSuccessToast and state ~= nil then
 		successToast = React.createElement(OverlayProvider, { gui = state }, {
 			Toast = React.createElement(AdCampaignCreatedToast, {
-				onClose = v6.onDismissCreateSuccessToast,
+				onClose = v5.onDismissCreateSuccessToast,
 				testId = "BuildPage.GetUsers.SuccessToast",
-				title = v6.createSuccessToastText
+				title = v5.createSuccessToastText
 			})
 		})
 	end
 
-	v8.SuccessToast = successToast
-	return createElement(FullscreenPageWithSafeArea, v7, v8)
+	v7.SuccessToast = successToast
+	return createElement(FullscreenPageWithSafeArea, v6, v7)
 end
 
-local v5 = {
+local v4 = {
 	{
-		[v4.BuildHome] = { screen = BuildHomeScreen }
+		[v3.BuildHome] = { screen = BuildHomeScreen }
 	},
 	{
-		[v4.BuildChat] = { screen = BuildChatScreen }
+		[v3.BuildChat] = { screen = BuildChatScreen }
 	},
 	{
 		[BuildOverflowMenuScreens.Screens.BuildPublish] = {
@@ -1062,80 +1131,80 @@ local v5 = {
 		}
 	},
 	{
-		[v4.BuildAgents] = { screen = BuildAgentsScreen }
+		[v3.BuildAgents] = { screen = BuildAgentsScreen }
 	},
 	{
-		[v4.BuildAgentDetails] = { screen = BuildAgentDetailsScreen }
+		[v3.BuildAgentDetails] = { screen = BuildAgentDetailsScreen }
 	},
 	{
-		[v4.BuildCreatorCredit] = { screen = BuildCreatorCreditScreen }
+		[v3.BuildCreatorCredit] = { screen = BuildCreatorCreditScreen }
 	}
 }
 
 if FFlagBuildExperienceMonetizationNativeUI then
-	local v6 = {
+	local v5 = {
 		[BuildOverflowMenuScreens.Screens.BuildMonetization] = { screen = BuildMonetizationScreen }
 	}
-	table.insert(v5, v6)
+	table.insert(v4, v5)
 end
 
 if FFlagBuildExperienceAnalytics then
-	local v6 = {
+	local v5 = {
 		[BuildOverflowMenuScreens.Screens.BuildStats] = {
 			screen = BuildOverflowMenuScreens.BuildStatsScreen
 		}
 	}
-	table.insert(v5, v6)
+	table.insert(v4, v5)
 end
 
 if FFlagEnableBuildAdPromotion then
-	local v6 = {
-		[v4.BuildGetUsers] = { screen = BuildGetUsersScreen }
+	local v5 = {
+		[v3.BuildGetUsers] = { screen = BuildGetUsersScreen }
 	}
-	table.insert(v5, v6)
+	table.insert(v4, v5)
 end
 
-local v6 = {
-	[v4.BuildSearch] = { screen = BuildSearchScreen }
+local v5 = {
+	[v3.BuildSearch] = { screen = BuildSearchScreen }
 }
-table.insert(v5, v6)
+table.insert(v4, v5)
 
-local robloxStackNavigator = RoactNavigation.createRobloxStackNavigator(v5, {
-	initialRouteName = v4.BuildHome
+local robloxStackNavigator = RoactNavigation.createRobloxStackNavigator(v4, {
+	initialRouteName = v3.BuildHome
 })
 
 local function BuildPage(p)
 	useTTINavigationTracking("NavigateTo_" .. p.navigation.state.routeName)
 
 	local param = p.navigation.getParam("extraProps", {})
-	local v7 = useBuildPageEligibility.useBuildPageEligibility(v3)
+	local v6 = useBuildPageEligibility.useBuildPageEligibility(v2)
 
 	if FFlagBuildExperienceHideNavBarOnSubPages then
-		useManageBuildNavBarVisibility(p.navigation, v4.BuildHome)
+		useManageBuildNavBarVisibility(p.navigation, v3.BuildHome)
 	end
 
-	if v7.canEnterBuild then
+	if v6.canEnterBuild then
 		return React.createElement(robloxStackNavigator, {
 			navigation = p.navigation,
 			screenProps = param
 		})
 	end
 
-	if v7.status == useBuildPageEligibility.Status.Ineligible then
+	if v6.status == useBuildPageEligibility.Status.Ineligible then
 		return React.createElement(BuildEligibilityDialog, {
 			variant = useBuildPageEligibility.Status.Ineligible,
-			onDismiss = v7.onDialogDismiss
+			onDismiss = v6.onDialogDismiss
 		})
 	end
 
-	if v7.status == useBuildPageEligibility.Status.Error then
+	if v6.status == useBuildPageEligibility.Status.Error then
 		return React.createElement(BuildEligibilityDialog, {
 			variant = useBuildPageEligibility.Status.Error,
-			onDismiss = v7.onDialogDismiss
+			onDismiss = v6.onDialogDismiss
 		})
 	end
 
-	if v7.status == useBuildPageEligibility.Status.Refreshing then
+	if v6.status == useBuildPageEligibility.Status.Refreshing then
 		return React.createElement(
 			View,
 			{

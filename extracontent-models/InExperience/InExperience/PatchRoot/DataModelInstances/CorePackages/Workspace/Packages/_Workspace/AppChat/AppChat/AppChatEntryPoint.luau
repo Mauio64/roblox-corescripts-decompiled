@@ -13,6 +13,7 @@ local getRoactChatStackNavigator = require(AppChat.getRoactChatStackNavigator)
 
 local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
+local useHeaderBarHeight = Foundation.Hooks.useHeaderBarHeight
 
 local getFFlagAppChatRemoveDynamicRequires = require(AppChat.Flags.getFFlagAppChatRemoveDynamicRequires)
 local v = not getFFlagAppChatRemoveDynamicRequires()
@@ -87,12 +88,14 @@ local EnteredChatFromEntryPoint = require(AppChat.Actions.EnteredChatFromEntryPo
 local NavigateIntoChat = require(AppChat.Actions.NavigateIntoChat)
 
 local getFFlagFixChatsBottomInsetBackgroundColor = require(AppChat.Flags.getFFlagFixChatsBottomInsetBackgroundColor)
+local FFlagAppChatFoundationHeaderBar = require(AppChat.Flags.FFlagAppChatFoundationHeaderBar)
 
 local GetOverlayStore = require(AppChat.Stores.GetOverlayStore)
 local navigateWithOsaGate = require(AppChat.Utils.navigateWithOsaGate)
 local FFlagAppChatShowOSAOnPageEntry = SharedFlags.FFlagAppChatShowOSAOnPageEntry
 local FFlagEnableHeaderBarButtonsUpdate = SharedFlags.FFlagEnableHeaderBarButtonsUpdate
 local FFlagLuaAppCompositionAppChat = SharedFlags.FFlagLuaAppCompositionAppChat
+local FFlagChatPushUpsellPromptsEnabled = SharedFlags.FFlagChatPushUpsellPromptsEnabled
 
 local FFlagAppChatUseSignalsForLastEntryPoint = require(AppChat.Flags.FFlagAppChatUseSignalsForLastEntryPoint)
 local SignalsReact = require(parent.SignalsReact)
@@ -602,11 +605,88 @@ function AppChatEntryPoint(p)
 			default = 12
 		}
 	end, { v23, placementInExperience })
+	local topBarHeight
+
+	if FFlagAppChatFoundationHeaderBar then
+		topBarHeight = useHeaderBarHeight()
+	else
+		topBarHeight = nil
+	end
+
 	local v25 = useStyle()
 
 	local setTabBarVisible = useCallback(function(p2)
 		dispatch(SetTabBarVisible(p2))
 	end, { dispatch })
+
+	if not FFlagAppChatFoundationHeaderBar then
+		local y = UserInputService.NavBarSize.Y
+		local v26
+
+		if v5 then
+			v26 = v5.Size.Size_1400
+		else
+			v26 = NAV_BAR_WITH_FACEPILE_SIZE
+		end
+
+		topBarHeight = math.max(y, v26)
+	end
+
+	local size_100
+
+	if FFlagEnableHeaderBarButtonsUpdate then
+		size_100 = v5.Size.Size_100
+	else
+		size_100 = nil
+	end
+
+	local renderChatLandingPrompts
+
+	if FFlagChatPushUpsellPromptsEnabled then
+		renderChatLandingPrompts = joined.renderChatLandingPrompts
+	else
+		renderChatLandingPrompts = nil
+	end
+
+	local function createScreenProps()
+		return {
+			navigateToLuaAppPages = joined.navigateToLuaAppPages,
+			topBarHeight = topBarHeight,
+			wideMode = joined.wideMode,
+			isInExperience = placementInExperience,
+			isVisible = joined.isVisible,
+			notificationCount = joined.notificationCount,
+			appChatOuterPadding = v24.outer,
+			appChatInnerPadding = v24.inner,
+			appChatDefaultPadding = v24.default,
+			topBarUtilityIconSideMargin = size_100,
+			showSearchRow = placementInExperience,
+			navigateToRootStack = joined.navigateToRootStack,
+			navigateToAddFriends = joined.navigateToAddFriends,
+			renderChatLandingPrompts = renderChatLandingPrompts
+		}
+	end
+
+	local screenProps
+
+	if FFlagAppChatFoundationHeaderBar then
+		screenProps = React.useMemo(createScreenProps, {
+			joined.navigateToLuaAppPages,
+			topBarHeight,
+			joined.wideMode,
+			placementInExperience,
+			joined.isVisible,
+			joined.notificationCount,
+			v24,
+			size_100,
+			placementInExperience,
+			joined.navigateToRootStack,
+			joined.navigateToAddFriends,
+			renderChatLandingPrompts
+		})
+	else
+		screenProps = createScreenProps()
+	end
 
 	local createElement = React.createElement
 	local parameters
@@ -617,62 +697,15 @@ function AppChatEntryPoint(p)
 		parameters = joined.parameters
 	end
 
-	local v26 = {
+	local element = createElement(v13, {
 		externalDispatchConnector = externalDispatchConnector,
 		parameters = parameters,
 		setActiveConversationId = setActiveConversationId,
 		setBackButtonEnabled = joined.setBackButtonEnabled,
 		setTabBarVisible = setTabBarVisible,
 		chatIsVisible = chatIsVisible,
-		screenProps = 0
-	}
-
-	local screenProps = {
-		navigateToLuaAppPages = joined.navigateToLuaAppPages,
-		topBarHeight = 0,
-		wideMode = 0,
-		isInExperience = 0,
-		isVisible = 0,
-		notificationCount = 0,
-		appChatOuterPadding = 0,
-		appChatInnerPadding = 0,
-		appChatDefaultPadding = 0,
-		topBarUtilityIconSideMargin = 0,
-		showSearchRow = 0,
-		navigateToRootStack = 0,
-		navigateToAddFriends = 0
-	}
-
-	local y = UserInputService.NavBarSize.Y
-	local v27
-
-	if v5 then
-		v27 = v5.Size.Size_1400
-	else
-		v27 = NAV_BAR_WITH_FACEPILE_SIZE
-	end
-
-	screenProps.topBarHeight = math.max(y, v27)
-
-	screenProps.wideMode = joined.wideMode
-	screenProps.isInExperience = placementInExperience
-	screenProps.isVisible = joined.isVisible
-	screenProps.notificationCount = joined.notificationCount
-	screenProps.appChatOuterPadding = v24.outer
-	screenProps.appChatInnerPadding = v24.inner
-	screenProps.appChatDefaultPadding = v24.default
-	local topBarUtilityIconSideMargin
-
-	if FFlagEnableHeaderBarButtonsUpdate then
-		topBarUtilityIconSideMargin = v5.Size.Size_100
-	end
-
-	screenProps.topBarUtilityIconSideMargin = topBarUtilityIconSideMargin
-	screenProps.showSearchRow = placementInExperience
-	screenProps.navigateToRootStack = joined.navigateToRootStack
-	screenProps.navigateToAddFriends = joined.navigateToAddFriends
-	v26.screenProps = screenProps
-	local element = createElement(v13, v26)
+		screenProps = screenProps
+	})
 
 	local element2 = React.createElement(
 		LuaAppNavigationContextProvider,
@@ -680,11 +713,11 @@ function AppChatEntryPoint(p)
 		{ navigation = element }
 	)
 
-	local v28 = React.useMemo(function()
+	local v26 = React.useMemo(function()
 		return { chatPlacement = joined.chatPlacement }
 	end, { joined.chatPlacement })
 
-	local navigation = React.createElement(ChatPlacementContext.Provider, { value = v28 }, {
+	local navigation = React.createElement(ChatPlacementContext.Provider, { value = v26 }, {
 		navigation = element2
 	})
 
@@ -721,7 +754,7 @@ function AppChatEntryPoint(p)
 		currentSquadId = nil
 	end
 
-	local v29 = React.useMemo(function()
+	local v27 = React.useMemo(function()
 		return {
 			context = "platformChat",
 			locale = locale,
@@ -768,7 +801,7 @@ function AppChatEntryPoint(p)
 	end
 
 	local element3 = createElement2(AnalyticsProvider, { localUserId = v6, entryPoint = entryPoint }, {
-		telemetry = createElement3(provider, { value = v29 }, {
+		telemetry = createElement3(provider, { value = v27 }, {
 			navigation = navigation2,
 			BottomInsetBackground = bottomInsetBackground
 		})

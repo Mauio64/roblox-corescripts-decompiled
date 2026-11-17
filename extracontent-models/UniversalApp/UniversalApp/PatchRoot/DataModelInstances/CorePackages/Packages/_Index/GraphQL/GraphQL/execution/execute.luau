@@ -206,7 +206,9 @@ buildExecutionContext = function(schema, document, rootValue, contextValue, vari
 	end
 
 	if operation then
-		local variableValues2 = getVariableValues(schema, operation.variableDefinitions or {}, variableValues or {}, {
+		local variableDefinitions = operation.variableDefinitions or {}
+
+		local variableValues2 = getVariableValues(schema, variableDefinitions, variableValues or {}, {
 			maxErrors = 50
 		})
 

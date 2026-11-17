@@ -53,6 +53,14 @@ local function createUserMomentsFeedSource(p: number, options)
 		v3 = nil
 	end
 
+	local postAssetStore
+
+	if FFlagProfileRenderAvatarMoments then
+		postAssetStore = v.postAssetStore or MomentsGetPostAssetStore(false)
+	else
+		postAssetStore = nil
+	end
+
 	local initialIndex = v.initialIndex
 
 	local userMomentsFeedSource = {
@@ -100,6 +108,8 @@ local function createUserMomentsFeedSource(p: number, options)
 				error(v6)
 			end
 
+			local v7 = FFlagProfileRenderAvatarMoments and {} or nil
+
 			if v6.commentsByFeedItemId ~= nil then
 				comments = comments or {}
 
@@ -110,52 +120,59 @@ local function createUserMomentsFeedSource(p: number, options)
 
 			GetReactionsStore(false).setBatchReactionCounts(v6.reactionsByMomentId or {})
 			GetShareCountsStore(false).setBatchShareCounts(v6.shareInfoByMomentId or {})
-			local v7
+			local v8
 
 			if FFlagMomentsRemoveDeletedFromProfile or FFlagMomentsOptimisticProfilePending then
-				v7 = GetDeletedMomentsStore(false).getDeletedIds(false)
+				v8 = GetDeletedMomentsStore(false).getDeletedIds(false)
 			end
 
 			for _, moment in v6.moments do
 				Analytics.reportMomentsFeedItemsReceived(RecommendationSource.Profile)
-				local v8
+				local v9
 
-				if v7 == nil then
-					v8 = false
+				if v8 == nil then
+					v9 = false
 				else
-					v8 = table.find(v7, moment.momentId) ~= nil
+					v9 = table.find(v8, moment.momentId) ~= nil
 				end
 
-				local v9 = shouldShowMomentInFeed(moment)
+				local v10 = shouldShowMomentInFeed(moment)
 
-				if v8 or not v9 then
-					if v8 then
+				if v9 or not v10 then
+					if v9 then
 						Analytics.reportMomentsFeedItemFiltered("deleted", RecommendationSource.Profile)
 					else
 						reportUnavailableFeedItem(moment, RecommendationSource.Profile)
 					end
 				else
-					table.insert(items, { kind = "moment", moment = moment })
+					local v11 = if v7 == nil then items else v7
+					table.insert(v11, { kind = "moment", moment = moment })
+				end
+			end
+
+			if FFlagProfileRenderAvatarMoments and v7 ~= nil then
+				if postAssetStore ~= nil then
+					v7 = hydrateAvatarMomentFeedItems(v7, postAssetStore)
+				end
+
+				for _, v9 in v7 do
+					table.insert(items, v9)
 				end
 			end
 
 			nextCursor = v6.nextCursor
-			local v8
+			local v9
 
 			if flag then
 				if initialIndex == nil or not (#items < initialIndex) then
-					v8 = false
+					v9 = false
 				else
-					v8 = nextCursor ~= nil
+					v9 = nextCursor ~= nil
 				end
 			else
-				v8 = flag
+				v9 = flag
 			end
-		until not v8
-
-		if FFlagProfileRenderAvatarMoments then
-			items = hydrateAvatarMomentFeedItems(items, v.postAssetStore or MomentsGetPostAssetStore(false))
-		end
+		until not v9
 
 		local onAccepted
 

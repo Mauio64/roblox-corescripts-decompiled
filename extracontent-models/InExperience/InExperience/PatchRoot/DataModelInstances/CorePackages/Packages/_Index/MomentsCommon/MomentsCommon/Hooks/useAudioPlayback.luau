@@ -115,7 +115,8 @@ local function useAudioPlayback(flag: boolean, asset: number?, options)
 	end, { union.playbackRegion })
 
 	useEffect(function()
-		setState3((math.min(union.playbackRegion.Max - union.playbackRegion.Min, state)))
+		local v5 = union.playbackRegion.Max - union.playbackRegion.Min
+		setState3((math.min(v5, state)))
 	end, { state, union.playbackRegion })
 
 	useEffect(function()

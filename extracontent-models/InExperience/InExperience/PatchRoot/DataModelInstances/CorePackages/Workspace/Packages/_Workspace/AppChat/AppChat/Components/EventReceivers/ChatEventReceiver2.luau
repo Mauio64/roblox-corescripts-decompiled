@@ -416,18 +416,17 @@ function ChatEventReceiver2(p)
 				end)
 			end
 		elseif data.Type == "MessageCreated" or data.Type == "SystemMessageCreated" then
-			if not FFlagAppChatPerfTracking then
+			if FFlagAppChatPerfTracking then
+				local v17 = data.Actor.Id == tostring(v6)
+
+				if not v17 and joined.activeConversationId and tostring(joined.activeConversationId) == channelId then
+					restartMessageReceiveTracking(channelId)
+				end
+
+				fn6(channelId, v17, tick()) -- inferred equivalent call
+			else
 				fn6(channelId, data.Actor.Id == tostring(v6), tick()) -- inferred equivalent call
-				return
 			end
-
-			local v17 = data.Actor.Id == tostring(v6)
-
-			if not v17 and joined.activeConversationId and tostring(joined.activeConversationId) == channelId then
-				restartMessageReceiveTracking(channelId)
-			end
-
-			fn6(channelId, v17, tick()) -- inferred equivalent call
 		elseif data.Type == "ParticipantTyping" and data.IsTyping then
 			fn8(channelId, data.Actor.Id) -- inferred equivalent call
 		end

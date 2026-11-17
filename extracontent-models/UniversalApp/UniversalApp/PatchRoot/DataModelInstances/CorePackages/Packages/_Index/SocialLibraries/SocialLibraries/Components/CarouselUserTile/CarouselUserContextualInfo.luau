@@ -10,11 +10,8 @@ local imageSetLabel = uiBlox.Core.ImageSet.ImageSetLabel
 local images = uiBlox.App.ImageSet.Images
 local iconSize = uiBlox.App.Constant.IconSize
 
-local getTextHeight = require(script.Parent.getTextHeight)
 require(script.Parent.StyleTypes)
 local Constants = require(script.Parent.Constants)
-
-local foundationFontFaceMigration = dependencies.Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local v = { maxNumberOfLines = Constants.LINES_MAX, lineWidth = Constants.TILE_SIZE }
 
@@ -73,20 +70,12 @@ return function(p)
 		local contextualText
 
 		if text then
-			local createElement2 = roact.createElement
-
-			local v4 = icon and joined.lineWidth - (iconSize.Small + 2) or joined.lineWidth
-			local v5
-
-			if foundationFontFaceMigration then
-				v5 = font.BaseSize * font2.RelativeSize
-			else
-				v5 = getTextHeight(text, font2.Font, font.BaseSize * font2.RelativeSize)
-			end
-
-			contextualText = createElement2(styledTextLabel, {
+			contextualText = roact.createElement(styledTextLabel, {
 				layoutOrder = 2,
-				size = UDim2.fromOffset(v4, v5 * joined.maxNumberOfLines),
+				size = UDim2.fromOffset(
+					icon and joined.lineWidth - (iconSize.Small + 2) or joined.lineWidth,
+					font.BaseSize * font2.RelativeSize * joined.maxNumberOfLines
+				),
 				lineHeight = 1,
 				text = text,
 				textXAlignment = Enum.TextXAlignment.Left,

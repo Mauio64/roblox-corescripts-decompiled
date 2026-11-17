@@ -11,8 +11,10 @@ local Responsive = require(parent.Responsive)
 local inputModeStore = Responsive.GetInputModeStore(false)
 local SignalsReact = require(parent.SignalsReact)
 local useSignalState = SignalsReact.useSignalState
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
 
 local FFlagAXNoCarouselsOnCatalogWithGamepad = require(AvatarExperienceCatalog.Flags.FFlagAXNoCarouselsOnCatalogWithGamepad)
+local FFlagAXHeroUnitActionButton = AvatarExperienceFlags.FFlagAXHeroUnitActionButton
 
 require(AvatarExperienceCatalog.Models.WidgetListInfo)
 
@@ -416,7 +418,8 @@ local function formatWidgetTemplateAsHeroUnit(data, p: string, p2: string?)
 		cardStyle = 0,
 		previewRows = 0,
 		previewColumns = 0,
-		availableUntil = 0
+		availableUntil = 0,
+		button = 0
 	}
 	local widgetStyle2
 
@@ -453,6 +456,13 @@ local function formatWidgetTemplateAsHeroUnit(data, p: string, p2: string?)
 	v6.previewRows = previewRows
 	v6.previewColumns = previewColumns
 	v6.availableUntil = data.availableUntil
+	local button
+
+	if FFlagAXHeroUnitActionButton then
+		button = data.button
+	end
+
+	v6.button = button
 	return v6
 end
 
@@ -699,7 +709,8 @@ local function mergeHeroUnitTemplates(data, data2)
 		cardStyle = mergeCardStyle(data.cardStyle, data2.cardStyle),
 		previewRows = Cryo.Dictionary.join(data.previewRows or {}, data2.previewRows or {}),
 		previewColumns = Cryo.Dictionary.join(data.previewColumns or {}, data2.previewColumns or {}),
-		availableUntil = 0
+		availableUntil = 0,
+		button = 0
 	}
 	local availableUntil
 
@@ -710,6 +721,17 @@ local function mergeHeroUnitTemplates(data, data2)
 	end
 
 	v6.availableUntil = availableUntil
+	local button
+
+	if FFlagAXHeroUnitActionButton then
+		if data2.button == nil then
+			button = data.button
+		else
+			button = data2.button
+		end
+	end
+
+	v6.button = button
 	return v6
 end
 

@@ -155,6 +155,7 @@ end
 function EventPropagationService.propagateEvent(p, p2, p3: string, p4, options)
 	local v = options or {}
 	local synthetic = v.synthetic or false
+	local silent = v.silent or false
 
 	local function runEventHandler(p5, p6)
 		local v2 = p3
@@ -181,7 +182,7 @@ function EventPropagationService.propagateEvent(p, p2, p3: string, p4, options)
 		return v5.cancelled
 	end
 
-	local v2 = v.silent and { p2 } or getAncestors(p2)
+	local v2 = silent and { p2 } or getAncestors(p2)
 
 	if __DEBUG_EVENT_PROPAGATION__ then
 		print(">>> capture event", p3, "for", (tostring(p2)))

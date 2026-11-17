@@ -18,11 +18,9 @@ local fetchBadgeDetailsPage = Badges.fetchBadgeDetailsPage
 local Badges2 = require(parent.Badges)
 local getIsBadgeDetailsSheetOpen = Badges2.BadgeDetailsSheetState.getIsBadgeDetailsSheetOpen
 local SharedFlags = require(parent.SharedFlags)
-local FFlagCloseBadgeSheetOnAbuseReport = SharedFlags.FFlagCloseBadgeSheetOnAbuseReport
+local FFlagEnableGroupAnnouncementReporting = SharedFlags.FFlagEnableGroupAnnouncementReporting
 local SharedFlags2 = require(parent.SharedFlags)
-local FFlagEnableGroupAnnouncementReporting = SharedFlags2.FFlagEnableGroupAnnouncementReporting
-local SharedFlags3 = require(parent.SharedFlags)
-local FFlagSignalsNavP3Dispatch = SharedFlags3.FFlagSignalsNavP3Dispatch
+local FFlagSignalsNavP3Dispatch = SharedFlags2.FFlagSignalsNavP3Dispatch
 local navigationCommands
 
 if FFlagSignalsNavP3Dispatch then
@@ -100,15 +98,12 @@ return function(p, _, p2, _)
 	end
 
 	local dispatch = p2.dependencies.dispatch
+	local v
 
-	local v = FFlagCloseBadgeSheetOnAbuseReport
-
-	if v then
-		if p2.appPage == "BadgeDetails" then
-			v = getIsBadgeDetailsSheetOpen()
-		else
-			v = false
-		end
+	if p2.appPage == "BadgeDetails" then
+		v = getIsBadgeDetailsSheetOpen()
+	else
+		v = false
 	end
 
 	if v then

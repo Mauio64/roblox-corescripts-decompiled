@@ -1,14 +1,22 @@
 local parent = script:FindFirstAncestor("VirtualCursorModular").Parent
-
 local SharedFlags = require(parent.SharedFlags)
 local FFlagLuaAppGamepadSelectionRespectsInteractable = SharedFlags.FFlagLuaAppGamepadSelectionRespectsInteractable
+local FFlagVirtualCursorInputSink = SharedFlags.FFlagVirtualCursorInputSink
 
-local function isSelectableGuiObject(instance): boolean
-	if not ((instance:IsA("GuiButton") or instance:IsA("TextBox")) and (instance.Visible and instance.Active and instance.Selectable)) then
+local function isSelectableGuiObject(instance, flag: boolean?): boolean
+	if not (instance:IsA("GuiButton") or instance:IsA("TextBox")) then
 		return false
 	end
 
-	if instance.AbsoluteSize.Magnitude == 0 then
+	local v
+
+	if FFlagVirtualCursorInputSink and flag then
+		v = instance.Interactable
+	else
+		v = instance.Active
+	end
+
+	if not (instance.Visible and v and instance.Selectable and instance.AbsoluteSize.Magnitude ~= 0) then
 		return false
 	end
 

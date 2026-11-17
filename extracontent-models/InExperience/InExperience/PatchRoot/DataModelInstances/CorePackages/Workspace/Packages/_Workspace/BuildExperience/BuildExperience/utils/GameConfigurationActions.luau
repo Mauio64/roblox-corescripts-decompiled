@@ -12,6 +12,7 @@ local UrlBuilder = require(parent.UrlBuilder)
 local urlBuilder = UrlBuilder.UrlBuilder
 local GetBuildExperienceRefreshStore = require(BuildExperience.Stores.GetBuildExperienceRefreshStore)
 local rehydrateGameMetadata = require(BuildExperience.utils.rehydrateGameMetadata)
+local FFlagBuildExperienceActionOutcomeTelemetry = require(BuildExperience.Flags.FFlagBuildExperienceActionOutcomeTelemetry)
 
 local defineFastInt = game:DefineFastInt("BuildExperienceSetAudiencesMaxRetries", 3)
 local defineFastInt2 = game:DefineFastInt("BuildExperienceSetAudiencesRetryDelayMs", 3000)
@@ -63,16 +64,25 @@ local function hasPublicAudience(audiences): boolean -- 1 equivalent call inferr
 	return audiences ~= nil and table.find(audiences, UniverseActivation.Audience.Public) ~= nil
 end
 
-local function audienceFailure(p, publishResult) -- 2 equivalent calls inferred from this helper
+local function audienceFailure(cause, publishResult)
 	local errorMessage
 
-	if typeof(p) == "table" and p.errorMessage ~= nil then
-		errorMessage = tostring(p.errorMessage)
+	if typeof(cause) == "table" and cause.errorMessage ~= nil then
+		errorMessage = tostring(cause.errorMessage)
 	else
-		errorMessage = tostring(p)
+		errorMessage = tostring(cause)
 	end
 
-	return { stage = "set_audience", errorMessage = errorMessage, publishResult = publishResult }
+	if not FFlagBuildExperienceActionOutcomeTelemetry then
+		cause = nil
+	end
+
+	return {
+		stage = "set_audience",
+		errorMessage = errorMessage,
+		publishResult = publishResult,
+		cause = cause
+	}
 end
 
 local function setAudiencesForPublish(universeActivationStore, universeId: number, audiences)
@@ -133,7 +143,7 @@ function GameConfigurationActions.publishExperience(data)
 			return setAudiencesForPublish(universeActivationStore, data.universeId, data.audiences):andThen(function()
 				return publishResult
 			end, function(p)
-				return Promise.reject(audienceFailure(p, publishResult)) -- inferred equivalent call
+				return Promise.reject(audienceFailure(p, publishResult))
 			end)
 		end)
 	else
@@ -164,7 +174,7 @@ function GameConfigurationActions.publishExperience(data)
 			return setPublicAudience():andThen(function() -- inferred equivalent call
 				return publishResult
 			end, function(p)
-				return Promise.reject(audienceFailure(p, publishResult)) -- inferred equivalent call
+				return Promise.reject(audienceFailure(p, publishResult))
 			end)
 		end)
 	end
@@ -196,6 +206,10 @@ function GameConfigurationActions.archiveGame(universeId: number)
 			error = tostring(p),
 			universeId = universeId
 		})
+
+		if FFlagBuildExperienceActionOutcomeTelemetry then
+			return Promise.reject(p)
+		end
 	end)
 end
 

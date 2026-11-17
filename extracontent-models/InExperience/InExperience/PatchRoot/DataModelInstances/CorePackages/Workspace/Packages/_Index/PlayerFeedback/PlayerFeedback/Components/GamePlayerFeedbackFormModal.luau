@@ -36,7 +36,6 @@ local NavigationRodux = require(parent.NavigationRodux)
 local NavigateDown = NavigationRodux.Thunks.NavigateDown
 local SharedFlags = require(parent.SharedFlags)
 local FFlagSignalsNavP3Dispatch = SharedFlags.FFlagSignalsNavP3Dispatch
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local navigationCommands
 
 if FFlagSignalsNavP3Dispatch then
@@ -466,7 +465,19 @@ local function GamePlayerFeedbackFormModal(props)
 			PaddingLeft = UDim.new(0, 24),
 			PaddingRight = UDim.new(0, 24)
 		}),
-		CheckboxesLabel = 0,
+		CheckboxesLabel = React.createElement("TextLabel", {
+			BackgroundTransparency = 1,
+			Text = category.label,
+			TextSize = v.Font.BaseSize,
+			TextColor3 = tokens.Color.Content.Emphasis.Color3,
+			TextTransparency = tokens.Color.Content.Emphasis.Transparency,
+			FontFace = normalizeFontFace(tokens.Typography.TitleLarge.Font),
+			TextXAlignment = Enum.TextXAlignment.Left,
+			AutomaticSize = Enum.AutomaticSize.Y,
+			TextWrapped = true,
+			Size = UDim2.new(1, 0, 0, 0),
+			LayoutOrder = 0
+		}),
 		CategoryCheckboxes = 0,
 		CommmentLabel = 0,
 		Commment = 0,
@@ -475,42 +486,6 @@ local function GamePlayerFeedbackFormModal(props)
 		DisclaimerText = 0,
 		AbuseReportPromptText = 0
 	}
-
-	local createElement3 = React.createElement
-	local v19 = {
-		BackgroundTransparency = 1,
-		Text = category.label,
-		TextSize = v.Font.BaseSize,
-		TextColor3 = tokens.Color.Content.Emphasis.Color3,
-		TextTransparency = tokens.Color.Content.Emphasis.Transparency,
-		Font = 0,
-		FontFace = 0,
-		TextXAlignment = 0,
-		AutomaticSize = 0,
-		TextWrapped = true,
-		Size = 0,
-		LayoutOrder = 0
-	}
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = tokens.Typography.TitleLarge.Font
-	end
-
-	v19.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(tokens.Typography.TitleLarge.Font)
-	end
-
-	v19.FontFace = fontFace
-
-	v19.TextXAlignment = Enum.TextXAlignment.Left
-	v19.AutomaticSize = Enum.AutomaticSize.Y
-
-	v19.Size = UDim2.new(1, 0, 0, 0)
-	children.CheckboxesLabel = createElement3("TextLabel", v19)
 	local categoryCheckboxes
 
 	if not GetFFlagEdpPlayerFeedbackCommentsOnly() then
@@ -526,61 +501,33 @@ local function GamePlayerFeedbackFormModal(props)
 	local commmentLabel
 
 	if not GetFFlagEdpPlayerFeedbackCommentsOnly() then
-		if v8 then
-			local createElement4 = React.createElement
-			local v20 = {
-				BackgroundTransparency = 1,
-				Text = comment.label,
-				TextSize = v.Font.BaseSize,
-				TextColor3 = tokens.Color.Content.Emphasis.Color3,
-				TextTransparency = tokens.Color.Content.Emphasis.Transparency,
-				Font = 0,
-				FontFace = 0,
-				TextXAlignment = 0,
-				AutomaticSize = 0,
-				TextWrapped = true,
-				Size = 0,
-				LayoutOrder = 2
-			}
-			local font2
-
-			if not FoundationFontFaceMigration then
-				font2 = tokens.Typography.TitleLarge.Font
-			end
-
-			v20.Font = font2
-			local fontFace2
-
-			if FoundationFontFaceMigration then
-				fontFace2 = normalizeFontFace(tokens.Typography.TitleLarge.Font)
-			end
-
-			v20.FontFace = fontFace2
-
-			v20.TextXAlignment = Enum.TextXAlignment.Left
-			v20.AutomaticSize = Enum.AutomaticSize.Y
-
-			v20.Size = UDim2.new(1, 0, 0, 0)
-			commmentLabel = createElement4("TextLabel", v20)
-		else
-			commmentLabel = v8
-		end
+		commmentLabel = v8 and React.createElement("TextLabel", {
+			BackgroundTransparency = 1,
+			Text = comment.label,
+			TextSize = v.Font.BaseSize,
+			TextColor3 = tokens.Color.Content.Emphasis.Color3,
+			TextTransparency = tokens.Color.Content.Emphasis.Transparency,
+			FontFace = normalizeFontFace(tokens.Typography.TitleLarge.Font),
+			TextXAlignment = Enum.TextXAlignment.Left,
+			AutomaticSize = Enum.AutomaticSize.Y,
+			TextWrapped = true,
+			Size = UDim2.new(1, 0, 0, 0),
+			LayoutOrder = 2
+		})
 	end
 
 	children.CommmentLabel = commmentLabel
 	local commment
 
 	if v8 then
-		local createElement4 = React.createElement
-		local v20 = {
+		commment = React.createElement("Frame", {
 			BorderSizePixel = 1,
 			BackgroundColor3 = tokens.Color.Surface.Surface_200.Color3,
 			BackgroundTransparency = tokens.Color.Surface.Surface_200.Transparency,
 			AutomaticSize = Enum.AutomaticSize.Y,
 			LayoutOrder = 3,
 			Size = UDim2.new(1, 0, 0, 0)
-		}
-		local v21 = {
+		}, {
 			UICorner = React.createElement("UICorner", {
 				CornerRadius = UDim.new(0, tokens.Radius.Small)
 			}),
@@ -590,49 +537,31 @@ local function GamePlayerFeedbackFormModal(props)
 				PaddingLeft = UDim.new(0, 8),
 				PaddingRight = UDim.new(0, 8)
 			}),
-			TextBox = 0
-		}
-
-		local createElement5 = React.createElement
-		local v22 = {}
-		v22.Text = state4
-		v22.PlaceholderText = comment.placeholder_text
-		v22.PlaceholderColor3 = v.Theme.TextMuted.Color
-		v22.Size = UDim2.new(1, 0, 0, 100)
-		v22.TextXAlignment = Enum.TextXAlignment.Left
-		v22.TextYAlignment = Enum.TextYAlignment.Top
-		v22.ClearTextOnFocus = false
-		v22.MultiLine = true
-		v22.TextWrapped = true
-		v22.ClipsDescendants = true
-		v22.OverlayNativeInput = true
-		v22.TextColor3 = tokens.Color.Content.Emphasis.Color3
-		v22.TextTransparency = tokens.Color.Content.Emphasis.Transparency
-		v22.BackgroundColor3 = tokens.Color.Surface.Surface_200.Color3
-		v22.BackgroundTransparency = tokens.Color.Surface.Surface_200.Transparency
-		local font2
-
-		if not FoundationFontFaceMigration then
-			font2 = tokens.Typography.BodyLarge.Font
-		end
-
-		v22.Font = font2
-		local fontFace2
-
-		if FoundationFontFaceMigration then
-			fontFace2 = normalizeFontFace(tokens.Typography.BodyLarge.Font)
-		end
-
-		v22.FontFace = fontFace2
-
-		v22.TextSize = tokens.Typography.BodyLarge.FontSize
-		v22.AutomaticSize = Enum.AutomaticSize.Y
-		v22.BorderSizePixel = 0
-		v22.ref = ref2
-		v22[React.Change.Text] = v16
-		v22[React.Event.Focused] = v12
-		v21.TextBox = createElement5("TextBox", v22)
-		commment = createElement4("Frame", v20, v21)
+			TextBox = React.createElement("TextBox", {
+				Text = state4,
+				PlaceholderText = comment.placeholder_text,
+				PlaceholderColor3 = v.Theme.TextMuted.Color,
+				Size = UDim2.new(1, 0, 0, 100),
+				TextXAlignment = Enum.TextXAlignment.Left,
+				TextYAlignment = Enum.TextYAlignment.Top,
+				ClearTextOnFocus = false,
+				MultiLine = true,
+				TextWrapped = true,
+				ClipsDescendants = true,
+				OverlayNativeInput = true,
+				TextColor3 = tokens.Color.Content.Emphasis.Color3,
+				TextTransparency = tokens.Color.Content.Emphasis.Transparency,
+				BackgroundColor3 = tokens.Color.Surface.Surface_200.Color3,
+				BackgroundTransparency = tokens.Color.Surface.Surface_200.Transparency,
+				FontFace = normalizeFontFace(tokens.Typography.BodyLarge.Font),
+				TextSize = tokens.Typography.BodyLarge.FontSize,
+				AutomaticSize = Enum.AutomaticSize.Y,
+				BorderSizePixel = 0,
+				ref = ref2,
+				[React.Change.Text] = v16,
+				[React.Event.Focused] = v12
+			})
+		})
 	else
 		commment = v8
 	end
@@ -641,42 +570,20 @@ local function GamePlayerFeedbackFormModal(props)
 	local helperText
 
 	if v8 and state6 ~= nil then
-		local createElement4 = React.createElement
-		local v20 = {
+		helperText = React.createElement("TextLabel", {
 			Text = state6,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextYAlignment = Enum.TextYAlignment.Top,
 			TextWrapped = true,
 			BackgroundTransparency = 1,
 			TextColor3 = v.Theme.Alert.Color,
-			Font = 0,
-			FontFace = 0,
-			TextSize = 0,
-			LineHeight = 0,
-			Size = 0,
-			AutomaticSize = 0,
+			FontFace = normalizeFontFace(tokens.Typography.CaptionSmall.Font),
+			TextSize = tokens.Typography.CaptionLarge.FontSize,
+			LineHeight = tokens.Typography.CaptionSmall.LineHeight,
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
 			LayoutOrder = 4
-		}
-		local font2
-
-		if not FoundationFontFaceMigration then
-			font2 = tokens.Typography.CaptionSmall.Font
-		end
-
-		v20.Font = font2
-		local fontFace2
-
-		if FoundationFontFaceMigration then
-			fontFace2 = normalizeFontFace(tokens.Typography.CaptionSmall.Font)
-		end
-
-		v20.FontFace = fontFace2
-
-		v20.TextSize = tokens.Typography.CaptionLarge.FontSize
-		v20.LineHeight = tokens.Typography.CaptionSmall.LineHeight
-		v20.Size = UDim2.new(1, 0, 0, 0)
-		v20.AutomaticSize = Enum.AutomaticSize.Y
-		helperText = createElement4("TextLabel", v20)
+		})
 	end
 
 	children.HelperText = helperText
@@ -705,47 +612,32 @@ local function GamePlayerFeedbackFormModal(props)
 		}
 	)
 
-	local createElement4 = React.createElement
-	local v20 = {}
-	v20.BackgroundTransparency = 1
-	v20.AutomaticSize = Enum.AutomaticSize.Y
-	v20.Size = UDim2.new(1, 0, 0, 0)
-	local font2
-
-	if not FoundationFontFaceMigration then
-		font2 = v.Font.CaptionHeader.Font
-	end
-
-	v20.Font = font2
-	local fontFace2
-
-	if FoundationFontFaceMigration then
-		fontFace2 = normalizeFontFace(tokens.Typography.CaptionLarge.Font)
-	end
-
-	v20.FontFace = fontFace2
-
-	v20.TextXAlignment = Enum.TextXAlignment.Left
-	v20.TextWrapped = true
-	v20.Text = metadata.disclaimer_label
-	v20[React.Event.Activated] = v15
-	v20.RichText = true
-	v20.TextSize = tokens.Typography.CaptionLarge.FontSize
-	v20.TextColor3 = v.Theme.TextMuted.Color
-	v20.TextTransparency = v.Theme.TextMuted.Transparency
-	v20.LineHeight = tokens.LineHeight.LineHeight_140
-	v20.LayoutOrder = 6
-	children.DisclaimerText = createElement4("TextButton", v20)
+	children.DisclaimerText = React.createElement("TextButton", {
+		BackgroundTransparency = 1,
+		AutomaticSize = Enum.AutomaticSize.Y,
+		Size = UDim2.new(1, 0, 0, 0),
+		FontFace = normalizeFontFace(tokens.Typography.CaptionLarge.Font),
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextWrapped = true,
+		Text = metadata.disclaimer_label,
+		[React.Event.Activated] = v15,
+		RichText = true,
+		TextSize = tokens.Typography.CaptionLarge.FontSize,
+		TextColor3 = v.Theme.TextMuted.Color,
+		TextTransparency = v.Theme.TextMuted.Transparency,
+		LineHeight = tokens.LineHeight.LineHeight_140,
+		LayoutOrder = 6
+	})
 	local abuseReportPromptText
 
 	if categoryType == "Downvote" then
-		local createElement5 = React.createElement
-		local v21 = {}
-		v21.BackgroundTransparency = 1
-		v21.AutomaticSize = Enum.AutomaticSize.XY
-		v21.TextXAlignment = Enum.TextXAlignment.Left
-		v21.TextWrapped = true
-		v21.Text = v9.abuseReportPromptText
+		local createElement3 = React.createElement
+		local v19 = {}
+		v19.BackgroundTransparency = 1
+		v19.AutomaticSize = Enum.AutomaticSize.XY
+		v19.TextXAlignment = Enum.TextXAlignment.Left
+		v19.TextWrapped = true
+		v19.Text = v9.abuseReportPromptText
 		local activated = React.Event.Activated
 
 		if FFlagEnableAbuseReportRevampFlow then
@@ -756,30 +648,16 @@ local function GamePlayerFeedbackFormModal(props)
 			v13 = v14
 		end
 
-		v21[activated] = v13
+		v19[activated] = v13
 
-		v21.RichText = true
-		v21.TextSize = tokens.Typography.CaptionLarge.FontSize
-		v21.TextColor3 = v.Theme.TextMuted.Color
-		v21.TextTransparency = v.Theme.TextMuted.Transparency
-		local font3
-
-		if not FoundationFontFaceMigration then
-			font3 = tokens.Typography.BodyLarge.Font
-		end
-
-		v21.Font = font3
-		local fontFace3
-
-		if FoundationFontFaceMigration then
-			fontFace3 = normalizeFontFace(tokens.Typography.BodyLarge.Font)
-		end
-
-		v21.FontFace = fontFace3
-
-		v21.LineHeight = tokens.LineHeight.LineHeight_140
-		v21.LayoutOrder = 7
-		abuseReportPromptText = createElement5("TextButton", v21)
+		v19.RichText = true
+		v19.TextSize = tokens.Typography.CaptionLarge.FontSize
+		v19.TextColor3 = v.Theme.TextMuted.Color
+		v19.TextTransparency = v.Theme.TextMuted.Transparency
+		v19.FontFace = normalizeFontFace(tokens.Typography.BodyLarge.Font)
+		v19.LineHeight = tokens.LineHeight.LineHeight_140
+		v19.LayoutOrder = 7
+		abuseReportPromptText = createElement3("TextButton", v19)
 	else
 		abuseReportPromptText = false
 	end

@@ -73,11 +73,12 @@ function extended:init()
 			return default:GetIcon("Unmuted0", self.props.iconStyle)
 		end
 
-		if item == Constants.VOICE_STATE.TALKING then
-			return default:GetIcon("Unmuted" .. tostring(math.floor(item2 * 5 + 0.5) * 20), self.props.iconStyle)
+		if item ~= Constants.VOICE_STATE.TALKING then
+			return default:GetIcon("Error", self.props.iconStyle)
 		end
 
-		return default:GetIcon("Error", self.props.iconStyle)
+		local v = math.floor(item2 * 5 + 0.5) * 20
+		return default:GetIcon("Unmuted" .. tostring(v), self.props.iconStyle)
 	end)
 end
 

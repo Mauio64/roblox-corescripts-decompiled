@@ -19,6 +19,8 @@ local useExperienceShareFlow = require(BuildExperience.utils.useExperienceShareF
 local useGamePermissions = require(BuildExperience.useGamePermissions)
 local FFlagBuildExperiencePrivateInvites = require(BuildExperience.Flags.FFlagBuildExperiencePrivateInvites)
 local FFlagBuildCheckGamePermissions = require(BuildExperience.Flags.FFlagBuildCheckGamePermissions)
+local FFlagBuildExperienceHomeTelemetry = require(BuildExperience.Flags.FFlagBuildExperienceHomeTelemetry)
+local sendBuildExperienceEvent = require(BuildExperience.Telemetry.sendBuildExperienceEvent)
 
 local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
 local Menu = Foundation.Menu
@@ -27,6 +29,14 @@ local InputSize = Foundation.Enums.InputSize
 local PopoverAlign = Foundation.Enums.PopoverAlign
 local PopoverSide = Foundation.Enums.PopoverSide
 local PrivacyType = UniverseConfiguration.PrivacyType
+
+local function getTelemetryGranularity(target) -- 2 equivalent calls inferred from this helper
+	return {
+		universeId = target.universeId,
+		placeId = target.placeId,
+		conversationId = target.sessionId
+	}
+end
 
 local function ExperienceRowActionsMenu(props)
 	local v = useLocalization({
@@ -56,7 +66,7 @@ local function ExperienceRowActionsMenu(props)
 
 	local v4 = useExperienceShareFlow(universeId, v3)
 
-	local v5 = useArchiveGameFlow()
+	local v5 = useArchiveGameFlow({ context = "games_list" })
 	local v6, v7
 
 	if FFlagBuildCheckGamePermissions then
@@ -121,6 +131,12 @@ local function ExperienceRowActionsMenu(props)
 			return
 		end
 
+		if FFlagBuildExperienceHomeTelemetry then
+			sendBuildExperienceEvent("MY_CREATIONS_MENU_ITEM_CLICK", getTelemetryGranularity(target), { -- inferred equivalent call
+				item = tostring(p)
+			})
+		end
+
 		if p == "publish" then
 			onOpenConfigurationPage("publish", target)
 		elseif p == "share" then
@@ -140,6 +156,14 @@ local function ExperienceRowActionsMenu(props)
 		else
 			isOpen = props.anchor ~= nil
 		end
+	end
+
+	if FFlagBuildExperienceHomeTelemetry then
+		React.useEffect(function()
+			if isOpen and target ~= nil then
+				sendBuildExperienceEvent("MY_CREATIONS_MENU_OPEN", getTelemetryGranularity(target)) -- inferred equivalent call
+			end
+		end, { isOpen, target })
 	end
 
 	local ref = useClosableFocusRoot({

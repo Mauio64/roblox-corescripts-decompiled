@@ -12,7 +12,6 @@ local withFoundationOrUIBloxStyle = CoreGuiCommon.withFoundationOrUIBloxStyle
 
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagCoreUiMigrateUIBloxToFoundation = SharedFlags.FFlagCoreUiMigrateUIBloxToFoundation
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local Images = UIBlox.App.ImageSet.Images
@@ -40,38 +39,32 @@ extended.validateProps = t.interface({
 })
 
 function extended.render(p)
-	return withFoundationOrUIBloxStyle(function(p2)
-		local tokens
-
-		if FoundationFontFaceMigration then
-			tokens = p2
-		end
-
+	return withFoundationOrUIBloxStyle(function(tokens)
 		return {
 			Tokens = tokens,
 			Theme = {
 				IconDefault = {
-					Color = p2.Color.Content.Default.Color3,
-					Transparency = p2.Color.Content.Default.Transparency
+					Color = tokens.Color.Content.Default.Color3,
+					Transparency = tokens.Color.Content.Default.Transparency
 				},
 				IconEmphasis = {
-					Color = p2.Color.Content.Emphasis.Color3,
-					Transparency = p2.Color.Content.Emphasis.Transparency
+					Color = tokens.Color.Content.Emphasis.Color3,
+					Transparency = tokens.Color.Content.Emphasis.Transparency
 				},
 				TextEmphasis = {
-					Color = p2.Color.Content.Emphasis.Color3,
-					Transparency = p2.Color.Content.Emphasis.Transparency
+					Color = tokens.Color.Content.Emphasis.Color3,
+					Transparency = tokens.Color.Content.Emphasis.Transparency
 				},
 				TextMuted = {
-					Color = p2.Color.Content.Muted.Color3,
-					Transparency = p2.Color.Content.Muted.Transparency
+					Color = tokens.Color.Content.Muted.Color3,
+					Transparency = tokens.Color.Content.Muted.Transparency
 				}
 			},
 			Font = {
 				BaseSize = 1,
 				Header2 = {
-					Font = p2.Typography.TitleLarge.Font,
-					RelativeSize = p2.Typography.TitleLarge.FontSize
+					Font = tokens.Typography.TitleLarge.Font,
+					RelativeSize = tokens.Typography.TitleLarge.FontSize
 				}
 			}
 		}
@@ -107,64 +100,42 @@ function extended.render(p)
 			})
 		end
 
-		local createElement = Roact.createElement
-		local v3 = {
-			Size = UDim2.new(1, 0, 0, p.props.height),
-			BackgroundTransparency = 1,
-			LayoutOrder = p.props.LayoutOrder
-		}
-		local children = {
-			layout = Roact.createElement("UIListLayout", {
-				VerticalAlignment = Enum.VerticalAlignment.Center,
-				HorizontalAlignment = Enum.HorizontalAlignment.Center,
-				Padding = UDim.new(0, 12),
-				FillDirection = Enum.FillDirection.Horizontal,
-				SortOrder = Enum.SortOrder.LayoutOrder
-			}),
-			image = image,
-			text = 0,
-			checkbox = 0
-		}
-
-		local createElement2 = Roact.createElement
-		local v4 = {
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1, -(p.props.height + 12) * 4, 1, 0),
-			Text = p.props.descriptionText,
-			TextColor3 = v.Color,
-			TextTransparency = v.Transparency,
-			TextSize = props.Font.Header2.RelativeSize * baseSize,
-			Font = 0,
-			FontFace = 0,
-			TextXAlignment = 0,
-			LayoutOrder = 2
-		}
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = props.Font.Header2.Font
-		end
-
-		v4.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(props.Tokens.Typography.TitleLarge.Font)
-		end
-
-		v4.FontFace = fontFace
-
-		v4.TextXAlignment = Enum.TextXAlignment.Left
-		children.text = createElement2("TextLabel", v4)
-
-		children.checkbox = Roact.createElement(Checkbox, {
-			isDisabled = p.props.actionDisabled,
-			isChecked = p.props.checkboxSelected,
-			onActivated = p.props.onCheckboxActivated,
-			label = "",
-			LayoutOrder = 3
-		})
-		return createElement("Frame", v3, children)
+		return Roact.createElement(
+			"Frame",
+			{
+				Size = UDim2.new(1, 0, 0, p.props.height),
+				BackgroundTransparency = 1,
+				LayoutOrder = p.props.LayoutOrder
+			},
+			{
+				layout = Roact.createElement("UIListLayout", {
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					HorizontalAlignment = Enum.HorizontalAlignment.Center,
+					Padding = UDim.new(0, 12),
+					FillDirection = Enum.FillDirection.Horizontal,
+					SortOrder = Enum.SortOrder.LayoutOrder
+				}),
+				image = image,
+				text = Roact.createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, -(p.props.height + 12) * 4, 1, 0),
+					Text = p.props.descriptionText,
+					TextColor3 = v.Color,
+					TextTransparency = v.Transparency,
+					TextSize = props.Font.Header2.RelativeSize * baseSize,
+					FontFace = normalizeFontFace(props.Tokens.Typography.TitleLarge.Font),
+					TextXAlignment = Enum.TextXAlignment.Left,
+					LayoutOrder = 2
+				}),
+				checkbox = Roact.createElement(Checkbox, {
+					isDisabled = p.props.actionDisabled,
+					isChecked = p.props.checkboxSelected,
+					onActivated = p.props.onCheckboxActivated,
+					label = "",
+					LayoutOrder = 3
+				})
+			}
+		)
 	end)
 end
 

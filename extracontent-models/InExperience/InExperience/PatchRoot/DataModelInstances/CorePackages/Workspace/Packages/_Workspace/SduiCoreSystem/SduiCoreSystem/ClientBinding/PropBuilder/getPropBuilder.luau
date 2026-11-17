@@ -31,13 +31,11 @@ local FFlagSduiSystemBannerComponent = SharedFlags5.FFlagSduiSystemBannerCompone
 local SharedFlags6 = require(parent.SharedFlags)
 local FFlagSduiBannerContextComponent = SharedFlags6.FFlagSduiBannerContextComponent
 local SharedFlags7 = require(parent.SharedFlags)
-local FFlagSduiParseProtoGradientFields = SharedFlags7.FFlagSduiParseProtoGradientFields
+local FFlagLuaAppSduiHomePageSupport = SharedFlags7.FFlagLuaAppSduiHomePageSupport
 local SharedFlags8 = require(parent.SharedFlags)
-local FFlagLuaAppSduiHomePageSupport = SharedFlags8.FFlagLuaAppSduiHomePageSupport
+local FFlagSduiExperimentalComponent = SharedFlags8.FFlagSduiExperimentalComponent
 local SharedFlags9 = require(parent.SharedFlags)
-local FFlagSduiExperimentalComponent = SharedFlags9.FFlagSduiExperimentalComponent
-local SharedFlags10 = require(parent.SharedFlags)
-local FFlagSduiListComponents = SharedFlags10.FFlagSduiListComponents
+local FFlagSduiListComponents = SharedFlags9.FFlagSduiListComponents
 
 local function applyParser(callback, callback2) -- 28 equivalent calls inferred from this helper
 	return function(p, p2, p3, p4, p5, p6)
@@ -79,16 +77,7 @@ v.NestedComponentListProp = buildNestedComponentListProp
 v.LazyNestedComponentListProp = buildLazyNestedComponentListProp
 v.StringArrayProp = applyParser(buildDefaultProp, SduiClientBindingParsers.parseStringArray) -- inferred equivalent call
 v.IconProp = applyParser(buildDefaultProp, SduiParsers.parseIconProp_) -- inferred equivalent call
-local v2
-
-if FFlagSduiParseProtoGradientFields then
-	v2 = SduiClientBindingParsers.parseGradient
-else
-	v2 = SduiParsers.parseGradientProp_
-end
-
-v.GradientProp = applyParser(buildDefaultProp, v2) -- inferred equivalent call
-
+v.GradientProp = applyParser(buildDefaultProp, SduiClientBindingParsers.parseGradient) -- inferred equivalent call
 v.ArrayOfStructProp = applyParser(buildDefaultProp, SduiClientBindingParsers.parseArrayOfStruct) -- inferred equivalent call
 local arrayOfFloatProp
 
@@ -254,82 +243,82 @@ v.CardStyleProp = cardStyleProp
 v.AnalyticsDataField = buildDefaultProp
 
 local AutomaticSize = Enum.AutomaticSize
-local v3 = "AUTOMATIC_SIZE_"
+local v2 = "AUTOMATIC_SIZE_"
 local function fn(p)
 	local engineEnumParser = SduiParsers.getEngineEnumParser(AutomaticSize)
-	return ProtoVariableMapper.mapProtoEngineEnumToLua(p, v3, engineEnumParser)
+	return ProtoVariableMapper.mapProtoEngineEnumToLua(p, v2, engineEnumParser)
 end
 
 v.AutomaticSizeProp = applyParser(buildDefaultProp, fn) -- inferred equivalent call
 local TextTruncate = Enum.TextTruncate
-local v4 = "TEXT_TRUNCATE_"
+local v3 = "TEXT_TRUNCATE_"
 local function fn2(p)
 	local engineEnumParser = SduiParsers.getEngineEnumParser(TextTruncate)
-	return ProtoVariableMapper.mapProtoEngineEnumToLua(p, v4, engineEnumParser)
+	return ProtoVariableMapper.mapProtoEngineEnumToLua(p, v3, engineEnumParser)
 end
 
 v.TextTruncateProp = applyParser(buildDefaultProp, fn2) -- inferred equivalent call
 local TextXAlignment = Enum.TextXAlignment
-local v5 = "TEXT_X_ALIGNMENT_"
+local v4 = "TEXT_X_ALIGNMENT_"
 local function fn3(p)
 	local engineEnumParser = SduiParsers.getEngineEnumParser(TextXAlignment)
-	return ProtoVariableMapper.mapProtoEngineEnumToLua(p, v5, engineEnumParser)
+	return ProtoVariableMapper.mapProtoEngineEnumToLua(p, v4, engineEnumParser)
 end
 
 v.TextXAlignmentProp = applyParser(buildDefaultProp, fn3) -- inferred equivalent call
 local TextYAlignment = Enum.TextYAlignment
-local v6 = "TEXT_Y_ALIGNMENT_"
+local v5 = "TEXT_Y_ALIGNMENT_"
 local function fn4(p)
 	local engineEnumParser = SduiParsers.getEngineEnumParser(TextYAlignment)
-	return ProtoVariableMapper.mapProtoEngineEnumToLua(p, v6, engineEnumParser)
+	return ProtoVariableMapper.mapProtoEngineEnumToLua(p, v5, engineEnumParser)
 end
 
 v.TextYAlignmentProp = applyParser(buildDefaultProp, fn4) -- inferred equivalent call
 local UIFlexMode = Enum.UIFlexMode
-local v7 = "UI_FLEX_MODE_"
+local v6 = "UI_FLEX_MODE_"
 local function fn5(p)
 	local engineEnumParser = SduiParsers.getEngineEnumParser(UIFlexMode)
-	return ProtoVariableMapper.mapProtoEngineEnumToLua(p, v7, engineEnumParser)
+	return ProtoVariableMapper.mapProtoEngineEnumToLua(p, v6, engineEnumParser)
 end
 
 v.UIFlexModeProp = applyParser(buildDefaultProp, fn5) -- inferred equivalent call
 local ScaleType = Enum.ScaleType
-local v8 = "SCALE_TYPE_"
+local v7 = "SCALE_TYPE_"
 local function fn6(p)
 	local engineEnumParser = SduiParsers.getEngineEnumParser(ScaleType)
-	return ProtoVariableMapper.mapProtoEngineEnumToLua(p, v8, engineEnumParser)
+	return ProtoVariableMapper.mapProtoEngineEnumToLua(p, v7, engineEnumParser)
 end
 
 v.ScaleTypeProp = applyParser(buildDefaultProp, fn6) -- inferred equivalent call
 local ResamplerMode = Enum.ResamplerMode
-local v9 = "RESAMPLER_MODE_"
+local v8 = "RESAMPLER_MODE_"
 local function fn7(p)
 	local engineEnumParser = SduiParsers.getEngineEnumParser(ResamplerMode)
-	return ProtoVariableMapper.mapProtoEngineEnumToLua(p, v9, engineEnumParser)
+	return ProtoVariableMapper.mapProtoEngineEnumToLua(p, v8, engineEnumParser)
 end
 
 v.ResamplerModeProp = applyParser(buildDefaultProp, fn7) -- inferred equivalent call
 local SizeConstraint = Enum.SizeConstraint
-local v10 = "SIZE_CONSTRAINT_"
+local v9 = "SIZE_CONSTRAINT_"
 local function fn8(p)
 	local engineEnumParser = SduiParsers.getEngineEnumParser(SizeConstraint)
-	return ProtoVariableMapper.mapProtoEngineEnumToLua(p, v10, engineEnumParser)
+	return ProtoVariableMapper.mapProtoEngineEnumToLua(p, v9, engineEnumParser)
 end
 
 v.SizeConstraintProp = applyParser(buildDefaultProp, fn8) -- inferred equivalent call
 local SelectionBehavior = Enum.SelectionBehavior
-local v11 = "SELECTION_BEHAVIOR_"
+local v10 = "SELECTION_BEHAVIOR_"
 local function fn9(p)
 	local engineEnumParser = SduiParsers.getEngineEnumParser(SelectionBehavior)
-	return ProtoVariableMapper.mapProtoEngineEnumToLua(p, v11, engineEnumParser)
+	return ProtoVariableMapper.mapProtoEngineEnumToLua(p, v10, engineEnumParser)
 end
 
 v.SelectionBehaviorProp = applyParser(buildDefaultProp, fn9) -- inferred equivalent call
 local KeyCode = Enum.KeyCode
-local v12 = "KEY_CODE_"
+local v11 = "KEY_CODE_"
 local function fn10(p)
 	local engineEnumParser = SduiParsers.getEngineEnumParser(KeyCode)
-	return ProtoVariableMapper.mapProtoEngineEnumToLua(p, v12, engineEnumParser)
+	return ProtoVariableMapper.mapProtoEngineEnumToLua(p, v11, engineEnumParser)
 end
 
 v.KeyCodeProp = applyParser(buildDefaultProp, fn10) -- inferred equivalent call

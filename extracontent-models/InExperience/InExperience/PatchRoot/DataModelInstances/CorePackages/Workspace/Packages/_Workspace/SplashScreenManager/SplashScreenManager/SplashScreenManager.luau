@@ -29,7 +29,7 @@ local v2 = true
 local v3 = false
 local v4 = {}
 
-local function callCallbacks() -- 2 equivalent calls inferred from this helper
+local function callCallbacks() -- 3 equivalent calls inferred from this helper
 	for _, v5 in v4 do
 		v5(v2)
 	end
@@ -38,7 +38,7 @@ end
 local SplashScreenManager = {}
 
 function SplashScreenManager.initialize(p: number, p2: number?, p3: number?)
-	local function fn() -- 1 equivalent call inferred from this helper
+	local function fn() -- 2 equivalent calls inferred from this helper
 		if renderSteppedConnection then
 			renderSteppedConnection:Disconnect()
 		end
@@ -78,7 +78,11 @@ function SplashScreenManager.initialize(p: number, p2: number?, p3: number?)
 
 			local v9 = v5 / #dts
 
-			if p2 and p2 < v8 or v7 <= #dts and math.floor(v9 * 100) <= math.floor(v6 * 100) then
+			if p2 and p2 < v8 then
+				v2 = true
+				callCallbacks() -- inferred equivalent call
+				fn() -- inferred equivalent call
+			elseif v7 <= #dts and math.floor(v9 * 100) <= math.floor(v6 * 100) then
 				v2 = true
 				callCallbacks() -- inferred equivalent call
 				fn() -- inferred equivalent call

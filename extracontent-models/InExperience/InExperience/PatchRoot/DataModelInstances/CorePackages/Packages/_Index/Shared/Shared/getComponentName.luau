@@ -123,9 +123,7 @@ local function getComponentName(data)
 
 		if Typeof == REACT_LAZY_TYPE then
 			local payload = data._payload
-			local init = data._init
-
-			local success, result = xpcall(init, describeError, payload)
+			local success, result = xpcall(data._init, describeError, payload)
 
 			if success then
 				return getComponentName(result)

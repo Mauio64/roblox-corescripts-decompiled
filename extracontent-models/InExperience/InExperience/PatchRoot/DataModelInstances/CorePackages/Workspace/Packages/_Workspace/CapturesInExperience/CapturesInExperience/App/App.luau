@@ -45,6 +45,7 @@ local CarouselScreen = require(parent.Components.CapturesCarousel.CarouselScreen
 local Constants = require(parent.Constants)
 local EventNames = require(parent.Analytics.EventNames)
 local getLocalUserId = require(parent.Utils.getLocalUserId)
+local GetLatestCaptureStore = require(parent.Stores.GetLatestCaptureStore)
 local getUserIdsFromString = require(parent.Utils.getUserIdsFromString)
 local installReducer = require(parent.installReducer)
 local makeCaptureSavedHandler = require(parent.Utils.makeCaptureSavedHandler)
@@ -67,6 +68,7 @@ local TakeCapture = require(parent.Thunks.TakeCapture)
 require(parent.Types)
 
 local FFlagCapturesVideoCaptureTriggerHandlerEnabled = require(parent.Flags.FFlagCapturesVideoCaptureTriggerHandlerEnabled)
+local FFlagCapturesControlsGalleryButton = require(parent.Flags.FFlagCapturesControlsGalleryButton)
 local FFlagCreateMomentsToast = require(parent.Flags.FFlagCreateMomentsToast)
 local FFlagMomentsCaptureEndIxpEnabled = require(parent.Flags.FFlagMomentsCaptureEndIxpEnabled)
 
@@ -174,6 +176,10 @@ return {
 
 		function app.openMenu()
 			app._store:dispatch(MenuOpened())
+
+			if FFlagCapturesControlsGalleryButton then
+				GetLatestCaptureStore(false).clearLatestCapture()
+			end
 		end
 
 		function app.takeCapture(p2)
@@ -362,14 +368,26 @@ return {
 			})
 		end
 
-		function app.mountCoreUI(p2, chromeEnabled: boolean?)
+		function app.mountCoreUI(p2, chromeEnabled: boolean?, openGallery)
 			if not v4 then
 				return
 			end
 
+			local v7 = {
+				chromeEnabled = chromeEnabled,
+				fireAnalyticsEvent = fireAnalyticsEvent,
+				openGallery = nil
+			}
+
+			if not FFlagCapturesControlsGalleryButton then
+				openGallery = nil
+			end
+
+			v7.openGallery = openGallery
+
 			app._coreUiHandle = wrapWithProviders(
 				p2,
-				{ chromeEnabled = chromeEnabled, fireAnalyticsEvent = fireAnalyticsEvent },
+				v7,
 				{
 					CaptureServicePrompts = React.createElement(CaptureServicePrompts),
 					CapturesCoreUI = React.createElement(CapturesCoreUI)

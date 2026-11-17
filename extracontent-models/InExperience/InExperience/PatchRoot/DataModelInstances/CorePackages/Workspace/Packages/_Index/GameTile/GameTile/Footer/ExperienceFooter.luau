@@ -8,7 +8,6 @@ local React = require(parent.React)
 local UIBlox = require(parent.UIBlox)
 local Foundation = require(parent.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local useStyle = UIBlox.Core.Style.useStyle
 local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
@@ -105,91 +104,67 @@ return function(props)
 				}
 			)
 
-			if not useExperienceTileMetadata then
-				return React.createElement("Frame", {
-					Size = props.size or udim,
-					Position = props.position,
-					AnchorPoint = props.anchorPoint,
-					LayoutOrder = props.layoutOrder,
-					BackgroundTransparency = theme.UIDefault.Transparency,
-					BackgroundColor3 = theme.UIDefault.Color,
-					AutomaticSize = props.automaticSize
-				}, {
-					UICorner = React.createElement("UICorner", { CornerRadius = UDim.new(0, 4) }),
-					SponsoredLabel = element
-				})
+			if useExperienceTileMetadata then
+				return (React.createElement(
+					"Frame",
+					{
+						Size = UDim2.fromScale(1, 1),
+						BackgroundColor3 = v.Tokens.Color.Shift.Shift_200.Color3,
+						BackgroundTransparency = v.Tokens.Color.Shift.Shift_200.Transparency,
+						BorderSizePixel = 0
+					},
+					{
+						Layout = React.createElement("UIListLayout", {
+							SortOrder = Enum.SortOrder.LayoutOrder,
+							FillDirection = Enum.FillDirection.Horizontal,
+							VerticalAlignment = Enum.VerticalAlignment.Center,
+							HorizontalAlignment = Enum.HorizontalAlignment.Center,
+							Padding = UDim.new(0, 4)
+						}),
+						Text = React.createElement("TextLabel", {
+							Size = UDim2.new(0, 0, 1, 0),
+							AutomaticSize = Enum.AutomaticSize.X,
+							BackgroundTransparency = 1,
+							BorderSizePixel = 0,
+							Text = v2.sponsoredText,
+							TextXAlignment = Enum.TextXAlignment.Center,
+							TextYAlignment = Enum.TextYAlignment.Center,
+							FontFace = normalizeFontFace(v.Tokens.Typography.CaptionLarge.Font),
+							TextSize = v.Font.BaseSize * v.Font.CaptionHeader.RelativeSize,
+							TextColor3 = v.Tokens.Color.Content.Emphasis.Color3,
+							TextTransparency = v.Tokens.Color.Content.Emphasis.Transparency,
+							LayoutOrder = 1
+						}),
+						SponsoredTooltip = React.createElement(SponsoredTooltipHover, {
+							tooltipOrientation = TooltipOrientation.Bottom,
+							onActivateTooltip = onActivateSponsoredTooltip,
+							size = UDim2.new(0, 16, 0, 16),
+							color = v.Tokens.Color.Content.Emphasis.Color3,
+							layoutOrder = 2,
+							selectable = userInputIsSelectionOnly,
+							supportTenFootUi = true
+						})
+					},
+					{
+						UICorner = React.createElement("UICorner", {
+							CornerRadius = UDim.new(0, v.Tokens.Radius.Small)
+						})
+					}
+				))
 			end
 
-			local createElement = React.createElement
-			local v3 = {
-				Size = UDim2.fromScale(1, 1),
-				BackgroundColor3 = v.Tokens.Color.Shift.Shift_200.Color3,
-				BackgroundTransparency = v.Tokens.Color.Shift.Shift_200.Transparency,
-				BorderSizePixel = 0
-			}
-
-			local children = {
-				Layout = React.createElement("UIListLayout", {
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					FillDirection = Enum.FillDirection.Horizontal,
-					VerticalAlignment = Enum.VerticalAlignment.Center,
-					HorizontalAlignment = Enum.HorizontalAlignment.Center,
-					Padding = UDim.new(0, 4)
-				}),
-				Text = 0,
-				SponsoredTooltip = 0
-			}
-
-			local createElement2 = React.createElement
-			local v4 = {
-				Size = UDim2.new(0, 0, 1, 0),
-				AutomaticSize = Enum.AutomaticSize.X,
-				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
-				Text = v2.sponsoredText,
-				TextXAlignment = Enum.TextXAlignment.Center,
-				TextYAlignment = Enum.TextYAlignment.Center,
-				Font = 0,
-				FontFace = 0,
-				TextSize = 0,
-				TextColor3 = 0,
-				TextTransparency = 0,
-				LayoutOrder = 1
-			}
-			local font2
-
-			if not FoundationFontFaceMigration then
-				font2 = v.Font.CaptionHeader.Font
-			end
-
-			v4.Font = font2
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(v.Tokens.Typography.CaptionLarge.Font)
-			end
-
-			v4.FontFace = fontFace
-
-			v4.TextSize = v.Font.BaseSize * v.Font.CaptionHeader.RelativeSize
-			v4.TextColor3 = v.Tokens.Color.Content.Emphasis.Color3
-			v4.TextTransparency = v.Tokens.Color.Content.Emphasis.Transparency
-			children.Text = createElement2("TextLabel", v4)
-
-			children.SponsoredTooltip = React.createElement(SponsoredTooltipHover, {
-				tooltipOrientation = TooltipOrientation.Bottom,
-				onActivateTooltip = onActivateSponsoredTooltip,
-				size = UDim2.new(0, 16, 0, 16),
-				color = v.Tokens.Color.Content.Emphasis.Color3,
-				layoutOrder = 2,
-				selectable = userInputIsSelectionOnly,
-				supportTenFootUi = true
+			return React.createElement("Frame", {
+				Size = props.size or udim,
+				Position = props.position,
+				AnchorPoint = props.anchorPoint,
+				LayoutOrder = props.layoutOrder,
+				BackgroundTransparency = theme.UIDefault.Transparency,
+				BackgroundColor3 = theme.UIDefault.Color,
+				AutomaticSize = props.automaticSize
+			}, {
+				UICorner = React.createElement("UICorner", { CornerRadius = UDim.new(0, 4) }),
+				SponsoredLabel = element
 			})
-			return (createElement("Frame", v3, children, {
-				UICorner = React.createElement("UICorner", {
-					CornerRadius = UDim.new(0, v.Tokens.Radius.Small)
-				})
-			}))
 		elseif coPlayFriends and next(coPlayFriends) then
 			if useExperienceTileMetadata then
 				return React.createElement(coPlayFooter, {
@@ -262,71 +237,51 @@ return function(props)
 					richText = false
 				})
 			})
-		elseif props.showFriendActivity and not useExperienceTileMetadata then
-			local font2 = font.Body.Font
-			local textSize = font.BaseSize * font.Body.RelativeSize
+		else
+			if props.showFriendActivity and not useExperienceTileMetadata then
+				local textSize = font.BaseSize * font.Body.RelativeSize
 
-			local createElement = React.createElement
-			local v3 = {
-				Size = props.size or udim,
-				TextColor3 = theme.TextMuted.Color,
-				Font = 0,
-				FontFace = 0,
-				TextXAlignment = 0,
-				TextYAlignment = 0,
-				Text = 0,
-				TextTruncate = 0,
-				TextSize = 0,
-				TextTransparency = 0,
-				BackgroundTransparency = 1
-			}
-
-			if FoundationFontFaceMigration then
-				font2 = nil
-			end
-
-			v3.Font = font2
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(v.Tokens.Typography.BodyLarge.Font)
-			end
-
-			v3.FontFace = fontFace
-
-			v3.TextXAlignment = Enum.TextXAlignment.Left
-			v3.TextYAlignment = Enum.TextYAlignment.Center
-			v3.Text = props.friendActivityTitle
-			v3.TextTruncate = Enum.TextTruncate.AtEnd
-			v3.TextSize = textSize
-			v3.TextTransparency = theme.TextMuted.Transparency
-			return createElement("TextLabel", v3)
-		elseif isPlayable == false and not requiresPurchase then
-			if useExperienceTileMetadata then
-				return React.createElement(TextFooter, { text = v2.notPlayableText })
-			end
-
-			return React.createElement("Frame", {
-				Size = props.size or udim,
-				Position = props.position,
-				AnchorPoint = props.anchorPoint,
-				LayoutOrder = props.layoutOrder,
-				BackgroundTransparency = 1,
-				AutomaticSize = props.automaticSize
-			}, {
-				UICorner = React.createElement("UICorner", { CornerRadius = UDim.new(0, 4) }),
-				PlayabilityLabel = React.createElement(StyledTextLabel, {
-					colorStyle = theme.TextMuted,
-					fontStyle = font.CaptionHeader,
-					textXAlignment = Enum.TextXAlignment.Left,
-					textYAlignment = Enum.TextYAlignment.Center,
-					size = UDim2.new(1, 0, 1, 0),
-					lineHeight = 1,
-					text = v2.notPlayableText,
-					textTruncate = Enum.TextTruncate.AtEnd,
-					richText = false
+				return React.createElement("TextLabel", {
+					Size = props.size or udim,
+					TextColor3 = theme.TextMuted.Color,
+					FontFace = normalizeFontFace(v.Tokens.Typography.BodyLarge.Font),
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextYAlignment = Enum.TextYAlignment.Center,
+					Text = props.friendActivityTitle,
+					TextTruncate = Enum.TextTruncate.AtEnd,
+					TextSize = textSize,
+					TextTransparency = theme.TextMuted.Transparency,
+					BackgroundTransparency = 1
 				})
-			})
+			end
+
+			if isPlayable == false and not requiresPurchase then
+				if useExperienceTileMetadata then
+					return React.createElement(TextFooter, { text = v2.notPlayableText })
+				end
+
+				return React.createElement("Frame", {
+					Size = props.size or udim,
+					Position = props.position,
+					AnchorPoint = props.anchorPoint,
+					LayoutOrder = props.layoutOrder,
+					BackgroundTransparency = 1,
+					AutomaticSize = props.automaticSize
+				}, {
+					UICorner = React.createElement("UICorner", { CornerRadius = UDim.new(0, 4) }),
+					PlayabilityLabel = React.createElement(StyledTextLabel, {
+						colorStyle = theme.TextMuted,
+						fontStyle = font.CaptionHeader,
+						textXAlignment = Enum.TextXAlignment.Left,
+						textYAlignment = Enum.TextYAlignment.Center,
+						size = UDim2.new(1, 0, 1, 0),
+						lineHeight = 1,
+						text = v2.notPlayableText,
+						textTruncate = Enum.TextTruncate.AtEnd,
+						richText = false
+					})
+				})
+			end
 		end
 	end
 

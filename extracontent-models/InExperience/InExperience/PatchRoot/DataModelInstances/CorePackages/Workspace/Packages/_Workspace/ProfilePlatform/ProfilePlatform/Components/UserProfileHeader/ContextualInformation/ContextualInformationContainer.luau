@@ -24,8 +24,6 @@ local ContextualPresence = require(script.Parent.ContextualPresence)
 local ContextualMutualFriends = require(script.Parent.ContextualMutualFriends)
 local ContextualPlayedTogether = require(script.Parent.ContextualPlayedTogether)
 
-local FFlagProfilePlatformEnablePlayedTogetherContextFrequentExperienceName = require(ProfilePlatform.Flags.FFlagProfilePlatformEnablePlayedTogetherContextFrequentExperienceName)
-
 local function ContextualInformationContainer(p)
 	local sourceInfo = useProfileWrapperContext().sourceInfo
 
@@ -36,10 +34,7 @@ local function ContextualInformationContainer(p)
 
 	if context == Enums.ContextualTypes.SentFromExperience then
 		v = contextDetails[context].sourceUniverseId
-	elseif
-		FFlagProfilePlatformEnablePlayedTogetherContextFrequentExperienceName
-		and context == Enums.ContextualTypes.PlayedTogether
-	then
+	elseif context == Enums.ContextualTypes.PlayedTogether then
 		v = contextDetails[context].mostFrequentUniverseId
 	else
 		v = nil
@@ -47,11 +42,7 @@ local function ContextualInformationContainer(p)
 
 	local v2 = useDispatch()
 	useEffectOnMount(function()
-		if
-			context == Enums.ContextualTypes.SentFromExperience
-			or FFlagProfilePlatformEnablePlayedTogetherContextFrequentExperienceName
-			and context == Enums.ContextualTypes.PlayedTogether
-		then
+		if context == Enums.ContextualTypes.SentFromExperience or context == Enums.ContextualTypes.PlayedTogether then
 			v2(NetworkingGames.GetExperiencesDetails.API({ v })):catch(function(_) end)
 		end
 	end)
@@ -73,10 +64,7 @@ local function ContextualInformationContainer(p)
 			mutualFriends = contextDetail.mutualFriends,
 			mutualFriendsCount = contextDetail.mutualFriendsCount
 		})
-	elseif
-		FFlagProfilePlatformEnablePlayedTogetherContextFrequentExperienceName
-		and context == Enums.ContextualTypes.PlayedTogether
-	then
+	elseif context == Enums.ContextualTypes.PlayedTogether then
 		contextualInformation2 = React.createElement(ContextualPlayedTogether, {
 			experienceName = experienceName
 		})

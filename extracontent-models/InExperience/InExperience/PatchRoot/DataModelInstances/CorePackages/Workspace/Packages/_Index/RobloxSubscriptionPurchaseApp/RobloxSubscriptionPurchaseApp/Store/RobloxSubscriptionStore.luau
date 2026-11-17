@@ -34,6 +34,7 @@ local function fn()
 	local v3 = nil
 	local v4 = nil
 	local v5 = nil
+	local membershipConfigSnapshot = nil
 
 	local function setOnFlowComplete(callback)
 		v2 = callback
@@ -55,12 +56,20 @@ local function fn()
 		end
 	end
 
-	local function setOnCtaOverride(callback)
-		v5 = callback
+	local function setOnCtaOverride(p)
+		v5 = p
 	end
 
 	local function getOnCtaOverride()
 		return v5
+	end
+
+	local function setMembershipConfigSnapshot(p)
+		membershipConfigSnapshot = p
+	end
+
+	local function getMembershipConfigSnapshot()
+		return membershipConfigSnapshot
 	end
 
 	local function setOnUnmountUI(callback)
@@ -103,7 +112,9 @@ local function fn()
 		setOnBackButtonActivated = setOnBackButtonActivated,
 		triggerOnBackButtonActivated = triggerOnBackButtonActivated,
 		setOnCtaOverride = setOnCtaOverride,
-		getOnCtaOverride = getOnCtaOverride
+		getOnCtaOverride = getOnCtaOverride,
+		setMembershipConfigSnapshot = setMembershipConfigSnapshot,
+		getMembershipConfigSnapshot = getMembershipConfigSnapshot
 	}
 end
 

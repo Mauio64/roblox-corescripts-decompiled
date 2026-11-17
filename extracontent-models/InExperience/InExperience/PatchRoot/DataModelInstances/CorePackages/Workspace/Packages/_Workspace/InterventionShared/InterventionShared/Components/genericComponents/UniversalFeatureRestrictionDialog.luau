@@ -71,17 +71,18 @@ local function UniversalFeatureRestrictionDialog(props)
 	local v4
 
 	if FFlagUFRRunUnlessFeatureRestricted then
-		v4 = useRef(false)
+		local v5 = useRef(false)
 
 		useEffect(function()
 			local onClosedCallback = props.onClosedCallback
-			v4.current = false
+			v5.current = false
 			return function()
 				if onClosedCallback then
-					onClosedCallback(v4.current)
+					onClosedCallback(v5.current)
 				end
 			end
 		end, { props.onClosedCallback })
+		v4 = v5
 	else
 		v4 = nil
 	end

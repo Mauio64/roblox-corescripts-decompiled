@@ -18,8 +18,7 @@ local function getOrCreateUserSignal(p: number) -- 3 equivalent calls inferred f
 end
 
 local function hasUserVerifiedBadge(p: number, p2)
-	local namesByUserIds = v2.fetchNamesByUserIds({ (tostring(p)) })
-	local success, result = pcall(namesByUserIds, p2)
+	local success, result = pcall(v2.fetchNamesByUserIds({ (tostring(p)) }), p2)
 
 	local v3 = not success and { status = "failed", data = {} } or result
 

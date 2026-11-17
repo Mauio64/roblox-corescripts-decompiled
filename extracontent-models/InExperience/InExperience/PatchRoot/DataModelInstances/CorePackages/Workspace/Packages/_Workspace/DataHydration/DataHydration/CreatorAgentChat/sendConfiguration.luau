@@ -1,5 +1,9 @@
+local parent = script:FindFirstAncestor("DataHydration").Parent
+
 require(script.Parent.Types.acpSession)
 require(script.Parent.Types.model)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagBuildExperienceAdvancedPreviewSpecs = SharedFlags.FFlagBuildExperienceAdvancedPreviewSpecs
 local SendConfiguration = {}
 
 function SendConfiguration.capture(tier, p)
@@ -28,7 +32,11 @@ function SendConfiguration.sameExperiment(data, data2): boolean
 		return data == data2
 	end
 
-	if data.specVersion ~= data2.specVersion or data.runId ~= data2.runId then
+	if
+		data.specVersion ~= data2.specVersion
+		or data.runId ~= data2.runId
+		or FFlagBuildExperienceAdvancedPreviewSpecs and data.specName ~= data2.specName
+	then
 		return false
 	end
 

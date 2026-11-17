@@ -13,7 +13,6 @@ local CursorKind = UIBlox.App.SelectionImage.CursorKind
 local Interactable = UIBlox.Core.Control.Interactable
 local useSelectionCursor = UIBlox.App.SelectionImage.useSelectionCursor
 local FFlagExpChatChannelTabSizingUpdate = require(ExpChat.Flags.FFlagExpChatChannelTabSizingUpdate)
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
 local FFlagExpChatUseSharedChannelTabDisplayLabel = SharedFlags.FFlagExpChatUseSharedChannelTabDisplayLabel
 local TextService
 
@@ -91,10 +90,6 @@ local function ChannelTab(p)
 	local text = joined.channelName
 
 	if FFlagExpChatUseSharedChannelTabDisplayLabel then
-		if tabType == "FriendsChat" and not FFlagExpChatEnableFriendsTab then
-			unreachable("FriendsChat")
-		end
-
 		text = ChannelTabDisplayLabel.getDisplayLabel(
 			tabType,
 			joined.channelName,
@@ -122,7 +117,7 @@ local function ChannelTab(p)
 		if string.find(joined.channelName, "RBXGlobal") then
 			text = v4.moreServers
 		end
-	elseif FFlagExpChatEnableFriendsTab and tabType == "FriendsChat" then
+	elseif tabType == "FriendsChat" then
 		text = v4.friends
 	else
 		unreachable(tabType)

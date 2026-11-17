@@ -6,6 +6,8 @@ local Foundation = require(parent.Foundation)
 local FriendsMenu = require(parent.FriendsMenu)
 local UserList = require(parent.UserList)
 local FFlagGameInviteInExpJoinCta = require(GameInvite.Flags.FFlagGameInviteInExpJoinCta)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagUserListFixedRowHeightConfig = SharedFlags.FFlagUserListFixedRowHeightConfig
 
 require(script.Parent.useGameInviteJoinCard)
 
@@ -15,7 +17,8 @@ local FriendsMenuShareGameInviteLink = FriendsMenu.FriendsMenuShareGameInviteLin
 local configs = {
 	disableRowActivation = true,
 	showTrustedFriendIndicator = false,
-	disableVirtualization = true
+	disableVirtualization = true,
+	fixedRowHeight = FFlagUserListFixedRowHeightConfig and true or nil
 }
 
 local function GameInviteJoinCardPortal(p)

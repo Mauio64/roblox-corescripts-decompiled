@@ -3,6 +3,7 @@ local parent = AppChat.Parent
 
 local Foundation = require(parent.Foundation)
 local ConversationTitleWithFacePile = require(AppChat.Components.ChatConversation.ConversationTitleWithFacePile)
+local FFlagAppChatFoundationHeaderBar = require(AppChat.Flags.FFlagAppChatFoundationHeaderBar)
 local useTokens = Foundation.Hooks.useTokens
 
 local React = require(parent.React)
@@ -34,13 +35,25 @@ local function HeaderBarTitleLeftAligned(props)
 		)
 	end
 
+	local createElement2 = React.createElement
+	local view2 = Foundation.View
+	local v4 = {
+		flexItem = { FlexMode = Enum.UIFlexMode.Fill },
+		Size = 0,
+		LayoutOrder = 2
+	}
+	local size
+
+	if FFlagAppChatFoundationHeaderBar then
+		size = UDim2.new(1, 0, 0, v.Size.Size_1000)
+	else
+		size = UDim2.new(1, 0, 1, 0)
+	end
+
+	v4.Size = size
 	local v3 = {
 		LeftFrame = leftFrame,
-		CenterFrame = React.createElement(Foundation.View, {
-			flexItem = { FlexMode = Enum.UIFlexMode.Fill },
-			Size = UDim2.new(1, 0, 1, 0),
-			LayoutOrder = 2
-		}, {
+		CenterFrame = createElement2(view2, v4, {
 			ConversationTitle = React.createElement(ConversationTitleWithFacePile, {
 				titleText = props.titleText,
 				conversationId = props.conversationId,

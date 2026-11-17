@@ -4,7 +4,6 @@ local React = require(parent.React)
 local UIBlox = require(parent.UIBlox)
 local Foundation = require(parent.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local useStyle = UIBlox.Core.Style.useStyle
 local Localization = require(parent.Localization)
 local useLocalization = Localization.Hooks.useLocalization
@@ -193,83 +192,34 @@ local function InGameVerifyPhoneView(props)
 		v10.onFocusGained = onFocusGained
 		v9.TextBox = createElement4(TextField, v10)
 
-		local errorText = err
-
-		if errorText then
-			local createElement5 = React.createElement
-			local v11 = {
-				Text = props.errorMessage,
-				TextTransparency = 0,
-				TextXAlignment = Enum.TextXAlignment.Left,
-				TextYAlignment = Enum.TextYAlignment.Top,
-				TextWrapped = true,
-				BackgroundTransparency = 1,
-				TextColor3 = tokens.Color.System.Alert.Color3,
-				Font = 0,
-				FontFace = 0,
-				TextSize = 0,
-				Size = 0,
-				AutomaticSize = 0,
-				LayoutOrder = 2
-			}
-			local font
-
-			if not FoundationFontFaceMigration then
-				font = v.Font.Body.Font
-			end
-
-			v11.Font = font
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(tokens.Typography.BodyLarge.Font)
-			end
-
-			v11.FontFace = fontFace
-
-			v11.TextSize = v.Font.BaseSize * v.Font.CaptionSmall.RelativeSize
-			v11.Size = UDim2.new(1, 0, 0, 0)
-			v11.AutomaticSize = Enum.AutomaticSize.Y
-			errorText = createElement5("TextLabel", v11)
-		end
-
-		v9.ErrorText = errorText
+		v9.ErrorText = err and React.createElement("TextLabel", {
+			Text = props.errorMessage,
+			TextTransparency = 0,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextYAlignment = Enum.TextYAlignment.Top,
+			TextWrapped = true,
+			BackgroundTransparency = 1,
+			TextColor3 = tokens.Color.System.Alert.Color3,
+			FontFace = normalizeFontFace(tokens.Typography.BodyLarge.Font),
+			TextSize = v.Font.BaseSize * v.Font.CaptionSmall.RelativeSize,
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			LayoutOrder = 2
+		})
 		v7[1] = (createElement3("Frame", v8, v9))
-		local createElement5 = React.createElement
-		local v11 = {
+		v7.BodyText = React.createElement("TextLabel", {
 			LayoutOrder = 3,
 			BackgroundTransparency = 1,
 			Text = getBodyText(v3.descriptionKey), -- inferred equivalent call
 			TextSize = v.Font.BaseSize * v.Font.CaptionHeader.RelativeSize,
 			TextColor3 = v.Theme.TextDefault.Color,
 			TextTransparency = v.Theme.TextDefault.Transparency,
-			Font = 0,
-			FontFace = 0,
-			TextXAlignment = 0,
-			AutomaticSize = 0,
+			FontFace = normalizeFontFace(tokens.Typography.BodyLarge.Font),
+			TextXAlignment = Enum.TextXAlignment.Left,
+			AutomaticSize = Enum.AutomaticSize.Y,
 			TextWrapped = true,
-			Size = 0
-		}
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = v.Font.Body.Font
-		end
-
-		v11.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(tokens.Typography.BodyLarge.Font)
-		end
-
-		v11.FontFace = fontFace
-
-		v11.TextXAlignment = Enum.TextXAlignment.Left
-		v11.AutomaticSize = Enum.AutomaticSize.Y
-
-		v11.Size = UDim2.new(1, 0, 0, 0)
-		v7.BodyText = createElement5("TextLabel", v11)
+			Size = UDim2.new(1, 0, 0, 0)
+		})
 		return createElement2("Frame", v6, v7)
 	end
 

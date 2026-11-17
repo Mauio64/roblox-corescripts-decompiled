@@ -4,12 +4,24 @@ local parent = BuildExperience.Parent
 local React = require(parent.React)
 
 local GameConfigurationActions = require(BuildExperience.utils.GameConfigurationActions)
+local ConfigurationActionTelemetry = require(BuildExperience.Telemetry.ConfigurationActionTelemetry)
+local FFlagBuildExperienceActionOutcomeTelemetry = require(BuildExperience.Flags.FFlagBuildExperienceActionOutcomeTelemetry)
 
-local function useArchiveGameFlow()
+local Action = ConfigurationActionTelemetry.Action
+local FailureReason = ConfigurationActionTelemetry.FailureReason
+
+local function useArchiveGameFlow(p)
 	local state, setState = React.useState(nil)
+	local context
 
-	local requestArchive = React.useCallback(function(p: number)
-		setState(p)
+	if FFlagBuildExperienceActionOutcomeTelemetry then
+		context = p.context
+	else
+		context = nil
+	end
+
+	local requestArchive = React.useCallback(function(p2: number)
+		setState(p2)
 	end, {})
 
 	local cancel = React.useCallback(function()
@@ -18,11 +30,30 @@ local function useArchiveGameFlow()
 
 	local confirm = React.useCallback(function()
 		if state ~= nil then
-			GameConfigurationActions.archiveGame(state)
+			local v = FFlagBuildExperienceActionOutcomeTelemetry and { universeId = state } or nil
+
+			if FFlagBuildExperienceActionOutcomeTelemetry then
+				ConfigurationActionTelemetry.sendClick(Action.ArchiveGame, v, context)
+			end
+
+			local archiveGame = GameConfigurationActions.archiveGame(state)
+
+			if FFlagBuildExperienceActionOutcomeTelemetry then
+				archiveGame:andThen(function()
+					ConfigurationActionTelemetry.sendSuccess(Action.ArchiveGame, v, context)
+				end):catch(function(err)
+					ConfigurationActionTelemetry.sendFailure(
+						Action.ArchiveGame,
+						v,
+						{ reason = FailureReason.RequestFailed, error = err },
+						context
+					)
+				end)
+			end
 		end
 
 		setState(nil)
-	end, { state })
+	end, { state, context })
 
 	return {
 		isOpen = state ~= nil,

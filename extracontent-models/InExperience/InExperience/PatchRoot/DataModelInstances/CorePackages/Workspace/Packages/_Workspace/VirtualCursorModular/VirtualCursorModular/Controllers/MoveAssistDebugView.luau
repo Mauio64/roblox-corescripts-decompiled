@@ -149,11 +149,11 @@ local function candidateColor(candidate, p: number) -- 1 equivalent call inferre
 		return color2
 	end
 
-	if candidate.state == "scored" then
-		return color7:Lerp(color8, not (p > 0) and 0 or math.clamp(candidate.influence / p, 0, 1))
+	if candidate.state ~= "scored" then
+		return color6
 	end
 
-	return color6
+	return color7:Lerp(color8, not (p > 0) and 0 or math.clamp(candidate.influence / p, 0, 1))
 end
 
 local function fmt(p: number) -- 14 equivalent calls inferred from this helper

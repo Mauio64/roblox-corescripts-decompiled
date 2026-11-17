@@ -1,4 +1,3 @@
-local TextService = game:GetService("TextService")
 local AppChat = script:FindFirstAncestor("AppChat")
 local parent = AppChat.Parent
 
@@ -22,7 +21,6 @@ local View = Foundation2.View
 local Text = Foundation2.Text
 local Divider = Foundation2.Divider
 local DividerVariant = Foundation2.Enums.DividerVariant
-local FoundationFontFaceMigration = Foundation2.Utility.Flags.FoundationFontFaceMigration
 
 local v = {
 	text = "",
@@ -52,23 +50,18 @@ function PlainText(p)
 	local text = joined.text
 	local font = joined.font or body.Font
 	local isRepliedTo = joined.isRepliedTo
-	local vector2 = Vector2.new(v4, not isRepliedTo and 1e999 or textSize * 3)
-	local v5
-
-	if FoundationFontFaceMigration then
-		v5 = GetTextSize(text, textSize, font, vector2, { addTemporaryPadding = false })
-	else
-		v5 = TextService:GetTextSize(text, textSize, font, vector2)
-	end
+	local textSize2 = GetTextSize(text, textSize, font, Vector2.new(v4, not isRepliedTo and 1e999 or textSize * 3), {
+		addTemporaryPadding = false
+	})
 
 	local isRepliedTo2 = joined.isRepliedTo
 
-	local v6 = (joined.isUnfiltered or FFlagAppChatBlueSentBubbles) and not joined.isIncoming
+	local v5 = (joined.isUnfiltered or FFlagAppChatBlueSentBubbles) and not joined.isIncoming
 	local textColor
 
 	if isRepliedTo2 then
 		textColor = v3.Theme.TextDefault.Color
-	elseif v6 then
+	elseif v5 then
 		textColor = Color3.new(1, 1, 1)
 	elseif joined.isIncoming then
 		textColor = v2.Color.Content.Emphasis.Color3
@@ -99,22 +92,9 @@ function PlainText(p)
 	end
 
 	if FFlagAppChatEnableAutotranslation and joined.translatedText then
-		local font2
-
-		if not FoundationFontFaceMigration then
-			font2 = font
-		end
-
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(font)
-		end
-
-		local v7 = {
+		local v6 = {
 			TextColor3 = textColor,
-			Font = font2,
-			FontFace = fontFace,
+			FontFace = normalizeFontFace(font),
 			TextSize = textSize,
 			TextTransparency = joined.isPending and v3.Theme.TextMuted.Transparency or 0,
 			sizeConstraint = sizeConstraint
@@ -142,7 +122,7 @@ function PlainText(p)
 				tag = "auto-xy col gap-xsmall",
 				sizeConstraint = sizeConstraint2
 			}, {
-				textContent = React.createElement(Text, Cryo.Dictionary.union(v7, {
+				textContent = React.createElement(Text, Cryo.Dictionary.union(v6, {
 					Text = text,
 					LayoutOrder = 1,
 					tag = {
@@ -156,7 +136,7 @@ function PlainText(p)
 					{ tag = "size-0 self-stretch auto-y", LayoutOrder = 2 },
 					React.createElement(Divider, { variant = DividerVariant.Default })
 				),
-				translatedTextContent = React.createElement(Text, Cryo.Dictionary.union(v7, {
+				translatedTextContent = React.createElement(Text, Cryo.Dictionary.union(v6, {
 					Text = joined.translatedText,
 					LayoutOrder = 3,
 					tag = {
@@ -169,7 +149,7 @@ function PlainText(p)
 		})
 	else
 		local createElement = React.createElement
-		local v7 = {
+		local v6 = {
 			isIncoming = joined.isIncoming,
 			hasTail = joined.hasTail,
 			isPending = joined.isPending,
@@ -189,48 +169,29 @@ function PlainText(p)
 		}
 
 		local createElement2 = React.createElement
-		local v8 = {
+		local v7 = {
 			Text = text,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			BackgroundTransparency = 1,
 			TextColor3 = textColor,
 			AutomaticSize = Enum.AutomaticSize.XY,
-			Font = 0,
-			FontFace = 0,
-			TextSize = 0,
-			Size = 0,
-			TextTransparency = 0,
-			TextYAlignment = 0,
+			FontFace = normalizeFontFace(font),
+			TextSize = textSize,
+			Size = UDim2.fromOffset(math.ceil(textSize2.X), (math.ceil(textSize2.Y))),
+			TextTransparency = joined.isPending and v3.Theme.TextMuted.Transparency or 0,
+			TextYAlignment = Enum.TextYAlignment.Top,
 			TextTruncate = 0,
 			TextWrapped = true
 		}
-		local font2
-
-		if not FoundationFontFaceMigration then
-			font2 = font
-		end
-
-		v8.Font = font2
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(font)
-		end
-
-		v8.FontFace = fontFace
-		v8.TextSize = textSize
-		v8.Size = UDim2.fromOffset(math.ceil(v5.X), (math.ceil(v5.Y)))
-		v8.TextTransparency = joined.isPending and v3.Theme.TextMuted.Transparency or 0
-		v8.TextYAlignment = Enum.TextYAlignment.Top
 		local textTruncate
 
 		if isRepliedTo then
 			textTruncate = Enum.TextTruncate.AtEnd
 		end
 
-		v8.TextTruncate = textTruncate
-		return createElement(ChatBubbleContainer, v7, {
-			textContent = createElement2("TextLabel", v8, {
+		v7.TextTruncate = textTruncate
+		return createElement(ChatBubbleContainer, v6, {
+			textContent = createElement2("TextLabel", v7, {
 				SizeConstraint = React.createElement("UISizeConstraint", {
 					MaxSize = Vector2.new(v4 or maxWidth, not isRepliedTo and 1e999 or textSize * 3)
 				})

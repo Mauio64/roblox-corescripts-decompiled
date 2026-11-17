@@ -20,7 +20,6 @@ local FitTextLabel = RoactFitComponents.FitTextLabel
 local UIBlox = require(parent3.UIBlox)
 local Foundation = require(parent3.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local Images = UIBlox.App.ImageSet.Images
@@ -524,40 +523,18 @@ function extended:renderFooterExperiment(p, text, text2)
 		HorizontalAlignment = Enum.HorizontalAlignment.Center,
 		VerticalAlignment = Enum.VerticalAlignment.Center
 	}
-
-	local createElement4 = Roact.createElement
 	local v4 = {
-		LayoutOrder = 1,
-		BackgroundTransparency = 1,
-		AutomaticSize = Enum.AutomaticSize.XY,
-		RichText = true,
-		Font = 0,
-		FontFace = 0,
-		Text = 0,
-		TextSize = 0,
-		TextColor3 = 0,
-		TextWrap = true
-	}
-	local font2
-
-	if not FoundationFontFaceMigration then
-		font2 = font.Footer.Font
-	end
-
-	v4.Font = font2
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(p.Tokens.Typography.CaptionSmall.Font)
-	end
-
-	v4.FontFace = fontFace
-
-	v4.Text = text
-	v4.TextSize = font.BaseSize * font.Footer.RelativeSize
-	v4.TextColor3 = flint
-	local v5 = {
-		BonusBefore = createElement4("TextLabel", v4),
+		BonusBefore = Roact.createElement("TextLabel", {
+			LayoutOrder = 1,
+			BackgroundTransparency = 1,
+			AutomaticSize = Enum.AutomaticSize.XY,
+			RichText = true,
+			FontFace = normalizeFontFace(p.Tokens.Typography.CaptionSmall.Font),
+			Text = text,
+			TextSize = font.BaseSize * font.Footer.RelativeSize,
+			TextColor3 = flint,
+			TextWrap = true
+		}),
 		InfoIcon = 0
 	}
 	local infoIcon
@@ -571,10 +548,10 @@ function extended:renderFooterExperiment(p, text, text2)
 		})
 	end
 
-	v5.InfoIcon = infoIcon
+	v4.InfoIcon = infoIcon
 	return createElement(FitFrameVertical, v, {
 		Banner = createElement2("ImageLabel", v2, {
-			BannerContent = createElement3(FitFrameVertical, v3, v5)
+			BannerContent = createElement3(FitFrameVertical, v3, v4)
 		})
 	})
 end

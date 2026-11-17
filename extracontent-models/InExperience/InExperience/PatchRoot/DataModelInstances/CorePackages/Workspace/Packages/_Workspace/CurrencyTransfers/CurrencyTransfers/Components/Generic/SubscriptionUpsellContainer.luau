@@ -5,6 +5,8 @@ local React = require(parent.React)
 local SharedFlags = require(parent.SharedFlags)
 local TransferLocalizationKeys = require(CurrencyTransfers.Localization.TransferLocalizationKeys)
 
+local FFlagCurrencyTransferNoFreeTransfersRemainingUpsell = require(CurrencyTransfers.Flags.FFlagCurrencyTransferNoFreeTransfersRemainingUpsell)
+
 local Localization = require(parent.Localization)
 local useLocalization = Localization.Hooks.useLocalization
 
@@ -48,6 +50,13 @@ local function SubscriptionUpsellContainer(p)
 		surfaceContext = SurfaceContext.InApp
 	end
 
+	local freeTransfersExhausted = v.getFreeTransfersExhausted(false)
+	local title = v2.UpsellSubscriptionTitle or ""
+
+	if FFlagCurrencyTransferNoFreeTransfersRemainingUpsell and freeTransfersExhausted then
+		title = v2.FreeTransfersExhaustedTitle
+	end
+
 	local transferClientSessionId = v.getTransferClientSessionId(false)
 	local analyticsContext = SharedFlags.FFlagEnableRobuxTransferFlowEventIngest and transferClientSessionId ~= "" and {
 		clientSessionId = {
@@ -57,9 +66,7 @@ local function SubscriptionUpsellContainer(p)
 	} or nil
 
 	local v3 = {
-		purchaseUIOptions = {
-			title = v2.UpsellSubscriptionTitle or ""
-		},
+		purchaseUIOptions = { title = title },
 		surfaceName = SurfaceName.RobuxTransferUpsell,
 		surfaceContext = surfaceContext,
 		analyticsContext = analyticsContext

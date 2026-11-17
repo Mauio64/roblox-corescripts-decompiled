@@ -1,1 +1,0 @@
-return game:DefineFastFlag("TrustedFriendsLinkVPC_1", false)

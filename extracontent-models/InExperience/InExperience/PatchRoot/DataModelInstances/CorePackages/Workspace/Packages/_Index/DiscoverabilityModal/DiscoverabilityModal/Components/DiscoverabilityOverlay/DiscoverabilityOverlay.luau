@@ -11,7 +11,6 @@ local uiBlox = dependencies.UIBlox
 local foundation = dependencies.Foundation
 local checkbox = foundation.Checkbox
 local normalizeFontFace = foundation.Utility.normalizeFontFace
-local foundationFontFaceMigration = foundation.Utility.Flags.FoundationFontFaceMigration
 
 local useLocalization = dependencies.Hooks.useLocalization
 
@@ -70,7 +69,7 @@ return function(props)
 		props.onActivated(v[tostring(state)])
 	end
 
-	local title, v5, header, selector, text, color
+	local title, header, selector, text, color, v5
 
 	if v2 then
 		local function onActivated3()
@@ -78,7 +77,7 @@ return function(props)
 		end
 
 		title = v4.titleTextPrefillDiscoverable
-		v5 = 12
+
 		header = react.createElement(imageSetLabel, {
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			BackgroundTransparency = 1,
@@ -89,67 +88,52 @@ return function(props)
 			LayoutOrder = 1
 		})
 
-		local createElement = react.createElement
-		local v6 = {
-			BackgroundTransparency = 1,
-			LayoutOrder = 2,
-			Size = UDim2.fromScale(1, 0),
-			AutomaticSize = Enum.AutomaticSize.Y
-		}
-		local v7 = {
-			UIListLayout = react.createElement("UIListLayout", {
-				FillDirection = Enum.FillDirection.Horizontal,
-				Padding = UDim.new(0, 8),
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				VerticalAlignment = Enum.VerticalAlignment.Center
-			}),
-			UIPadding = react.createElement("UIPadding", {
-				PaddingBottom = UDim.new(0, 12),
-				PaddingRight = UDim.new(0, 24)
-			}),
-			Checkbox = react.createElement(checkbox, {
-				label = "",
-				onActivated = onActivated3,
-				isChecked = state == 1,
-				LayoutOrder = 1
-			}),
-			CheckboxLabel = 0
-		}
-
-		local createElement2 = react.createElement
-		local onActivatedsByActivated = {}
-		onActivatedsByActivated.AutomaticSize = Enum.AutomaticSize.Y
-		onActivatedsByActivated.BackgroundTransparency = 1
-		local font2
-
-		if not foundationFontFaceMigration then
-			font2 = font.Body.Font
-		end
-
-		onActivatedsByActivated.Font = font2
-		local fontFace
-
-		if foundationFontFaceMigration then
-			fontFace = normalizeFontFace(v3.Tokens.Typography.BodyLarge.Font)
-		end
-
-		onActivatedsByActivated.FontFace = fontFace
-
-		onActivatedsByActivated.Size = UDim2.fromScale(1, 0)
-		onActivatedsByActivated.Text = v4.optInTextPrefillDiscoverable
-		onActivatedsByActivated.TextColor3 = theme.TextDefault.Color
-		onActivatedsByActivated.TextSize = font.Body.RelativeSize * font.BaseSize
-		onActivatedsByActivated.TextTransparency = theme.TextDefault.Transparency
-		onActivatedsByActivated.TextWrapped = true
-		onActivatedsByActivated.TextXAlignment = Enum.TextXAlignment.Left
-		onActivatedsByActivated.TextYAlignment = Enum.TextYAlignment.Top
-		onActivatedsByActivated.LayoutOrder = 2
-		onActivatedsByActivated[react.Event.Activated] = onActivated3
-		v7.CheckboxLabel = createElement2("TextButton", onActivatedsByActivated)
-		selector = createElement("Frame", v6, v7)
+		selector = react.createElement(
+			"Frame",
+			{
+				BackgroundTransparency = 1,
+				LayoutOrder = 2,
+				Size = UDim2.fromScale(1, 0),
+				AutomaticSize = Enum.AutomaticSize.Y
+			},
+			{
+				UIListLayout = react.createElement("UIListLayout", {
+					FillDirection = Enum.FillDirection.Horizontal,
+					Padding = UDim.new(0, 8),
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					VerticalAlignment = Enum.VerticalAlignment.Center
+				}),
+				UIPadding = react.createElement("UIPadding", {
+					PaddingBottom = UDim.new(0, 12),
+					PaddingRight = UDim.new(0, 24)
+				}),
+				Checkbox = react.createElement(checkbox, {
+					label = "",
+					onActivated = onActivated3,
+					isChecked = state == 1,
+					LayoutOrder = 1
+				}),
+				CheckboxLabel = react.createElement("TextButton", {
+					AutomaticSize = Enum.AutomaticSize.Y,
+					BackgroundTransparency = 1,
+					FontFace = normalizeFontFace(v3.Tokens.Typography.BodyLarge.Font),
+					Size = UDim2.fromScale(1, 0),
+					Text = v4.optInTextPrefillDiscoverable,
+					TextColor3 = theme.TextDefault.Color,
+					TextSize = font.Body.RelativeSize * font.BaseSize,
+					TextTransparency = theme.TextDefault.Transparency,
+					TextWrapped = true,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextYAlignment = Enum.TextYAlignment.Top,
+					LayoutOrder = 2,
+					[react.Event.Activated] = onActivated3
+				})
+			}
+		)
 
 		text = v4.infoTextPrefillDiscoverable
 		color = theme.TextLink.Color
+		v5 = 12
 	else
 		title = v4.titleText
 
@@ -193,8 +177,7 @@ return function(props)
 		v5 = 24
 	end
 
-	local createElement = react.createElement
-	local v6 = {
+	return react.createElement(partialPageModal, {
 		title = title,
 		screenSize = props.screenSize,
 		onCloseClicked = function()
@@ -211,72 +194,53 @@ return function(props)
 			marginBetween = 6,
 			forcedFillDirection = Enum.FillDirection.Vertical
 		}
-	}
-
-	local createElement2 = react.createElement
-	local v7 = {
-		AutomaticSize = Enum.AutomaticSize.Y,
-		Size = UDim2.fromScale(1, 0),
-		BackgroundTransparency = 1
-	}
-
-	local v8 = {
-		UIListLayout = react.createElement("UIListLayout", {
-			FillDirection = Enum.FillDirection.Vertical,
-			SortOrder = Enum.SortOrder.LayoutOrder,
-			Padding = UDim.new(0, 12),
-			HorizontalAlignment = Enum.HorizontalAlignment.Center
-		}),
-		UIPadding = react.createElement("UIPadding", {
-			PaddingTop = UDim.new(0, v5),
-			PaddingBottom = UDim.new(0, 36)
-		}),
-		Header = header,
-		Selector = selector,
-		Description = react.createElement(styledTextLabel, {
-			text = text,
-			fontStyle = font.CaptionBody,
-			colorStyle = theme.TextDefault,
-			size = UDim2.fromScale(1, 0),
-			automaticSize = Enum.AutomaticSize.Y,
-			textTruncate = Enum.TextTruncate.AtEnd,
-			textXAlignment = Enum.TextXAlignment.Left,
-			textYAlignment = Enum.TextYAlignment.Top,
-			layoutOrder = 3
-		}),
-		LearnMore = 0
-	}
-
-	local createElement3 = react.createElement
-	local onLearnMoreClicksByActivated = {}
-	onLearnMoreClicksByActivated.AutomaticSize = Enum.AutomaticSize.Y
-	onLearnMoreClicksByActivated.BackgroundTransparency = 1
-	local font2
-
-	if not foundationFontFaceMigration then
-		font2 = font.CaptionBody.Font
-	end
-
-	onLearnMoreClicksByActivated.Font = font2
-	local fontFace
-
-	if foundationFontFaceMigration then
-		fontFace = normalizeFontFace(v3.Tokens.Typography.BodySmall.Font)
-	end
-
-	onLearnMoreClicksByActivated.FontFace = fontFace
-
-	onLearnMoreClicksByActivated.Size = UDim2.fromScale(1, 0)
-	onLearnMoreClicksByActivated.Text = v4.learnMoreText
-	onLearnMoreClicksByActivated.TextColor3 = color
-	onLearnMoreClicksByActivated.TextSize = font.CaptionBody.RelativeSize * font.BaseSize
-	onLearnMoreClicksByActivated.TextTransparency = theme.TextEmphasis.Transparency
-	onLearnMoreClicksByActivated.TextXAlignment = Enum.TextXAlignment.Left
-	onLearnMoreClicksByActivated.TextYAlignment = Enum.TextYAlignment.Top
-	onLearnMoreClicksByActivated.LayoutOrder = 4
-	onLearnMoreClicksByActivated[react.Event.Activated] = props.onLearnMoreClick
-	v8.LearnMore = createElement3("TextButton", onLearnMoreClicksByActivated)
-	return createElement(partialPageModal, v6, {
-		ViewContainer = createElement2("Frame", v7, v8)
+	}, {
+		ViewContainer = react.createElement(
+			"Frame",
+			{
+				AutomaticSize = Enum.AutomaticSize.Y,
+				Size = UDim2.fromScale(1, 0),
+				BackgroundTransparency = 1
+			},
+			{
+				UIListLayout = react.createElement("UIListLayout", {
+					FillDirection = Enum.FillDirection.Vertical,
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					Padding = UDim.new(0, 12),
+					HorizontalAlignment = Enum.HorizontalAlignment.Center
+				}),
+				UIPadding = react.createElement("UIPadding", {
+					PaddingTop = UDim.new(0, v5),
+					PaddingBottom = UDim.new(0, 36)
+				}),
+				Header = header,
+				Selector = selector,
+				Description = react.createElement(styledTextLabel, {
+					text = text,
+					fontStyle = font.CaptionBody,
+					colorStyle = theme.TextDefault,
+					size = UDim2.fromScale(1, 0),
+					automaticSize = Enum.AutomaticSize.Y,
+					textTruncate = Enum.TextTruncate.AtEnd,
+					textXAlignment = Enum.TextXAlignment.Left,
+					textYAlignment = Enum.TextYAlignment.Top,
+					layoutOrder = 3
+				}),
+				LearnMore = react.createElement("TextButton", {
+					AutomaticSize = Enum.AutomaticSize.Y,
+					BackgroundTransparency = 1,
+					FontFace = normalizeFontFace(v3.Tokens.Typography.BodySmall.Font),
+					Size = UDim2.fromScale(1, 0),
+					Text = v4.learnMoreText,
+					TextColor3 = color,
+					TextSize = font.CaptionBody.RelativeSize * font.BaseSize,
+					TextTransparency = theme.TextEmphasis.Transparency,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextYAlignment = Enum.TextYAlignment.Top,
+					LayoutOrder = 4,
+					[react.Event.Activated] = props.onLearnMoreClick
+				})
+			}
+		)
 	})
 end

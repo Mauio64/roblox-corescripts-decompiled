@@ -32,6 +32,8 @@ local FFlagCategoryLoggingInShopPurchase = require(InExperienceShop.Flags.FFlagC
 local FFlagFixThumbnailBackgroundInExperienceShop = require(InExperienceShop.Flags.FFlagFixThumbnailBackgroundInExperienceShop)
 local FFlagEnableDiscountOnInShopTile = require(InExperienceShop.Flags.FFlagEnableDiscountOnInShopTile)
 local FFlagLuaAppEnableGamePassFreeTrials = require(InExperienceShop.Flags.FFlagLuaAppEnableGamePassFreeTrials)
+local FFlagUseOverMediaOnAllFreeTrialBadges = require(InExperienceShop.Flags.FFlagUseOverMediaOnAllFreeTrialBadges)
+local FFlagEnableFreeTrialTopBarChip = require(InExperienceShop.Flags.FFlagEnableFreeTrialTopBarChip)
 local FFlagEnableGamePassTrialUnifiedLogging = require(InExperienceShop.Flags.FFlagEnableGamePassTrialUnifiedLogging)
 local getIconRichText = Foundation.Utility.getIconRichText
 local formatPrice
@@ -50,7 +52,7 @@ local v = {
 	freeTrial = "Feature.InExperienceShop.Label.FreeTrial",
 	trial = "Feature.InExperienceShop.Label.Trial",
 	active = "Feature.InExperienceShop.Label.Active",
-	trialed = "Feature.InExperienceShop.Label.Trialed"
+	keepIt = "Feature.InExperienceShop.Label.KeepIt"
 }
 
 local function TrialBadge(p)
@@ -61,17 +63,17 @@ local function TrialBadge(p)
 	if p.freeTrialStatus == "active" then
 		text = v2.active
 	elseif p.freeTrialStatus == "redeemed" then
-		text = v2.trialed
+		text = v2.keepIt
 	else
 		text = v2.trial
 	end
 
 	local variant
 
-	if p.freeTrialStatus == "active" then
-		variant = Enums.BadgeVariant.Emphasis
-	else
+	if FFlagUseOverMediaOnAllFreeTrialBadges or p.freeTrialStatus ~= "active" then
 		variant = Enums.BadgeVariant.OverMedia
+	else
+		variant = Enums.BadgeVariant.Emphasis
 	end
 
 	return React.createElement(Badge, {
@@ -400,28 +402,34 @@ local function ShopItemTile(props)
 	end
 
 	v12.trialStatus = trialStatus2
-	local v13 = useGamePassTrialRedemption(itemId2, v12)
+	local v13
 
-	local v14 = FFlagEnableDiscountOnInShopTile
-
-	if v14 then
-		if props.userBasePriceInRobux == nil or props.price == nil then
-			v14 = false
-		else
-			v14 = props.userBasePriceInRobux > props.price
-		end
+	if FFlagEnableFreeTrialTopBarChip then
+		v13 = props.thumbnail
 	end
 
-	local v15
+	local v14 = useGamePassTrialRedemption(itemId2, v12, v13)
 
-	if v14 and formatPrice then
-		v15 = formatPrice(props.userBasePriceInRobux)
+	local v15 = FFlagEnableDiscountOnInShopTile
+
+	if v15 then
+		if props.userBasePriceInRobux == nil or props.price == nil then
+			v15 = false
+		else
+			v15 = props.userBasePriceInRobux > props.price
+		end
 	end
 
 	local v16
 
-	if v14 and formatPrice then
-		v16 = formatPrice(props.price)
+	if v15 and formatPrice then
+		v16 = formatPrice(props.userBasePriceInRobux)
+	end
+
+	local v17
+
+	if v15 and formatPrice then
+		v17 = formatPrice(props.price)
 	end
 
 	if FFlagEnableGamePassTrialUnifiedLogging and props.itemType == "GamePass" and v6 ~= "settled" then
@@ -465,7 +473,7 @@ local function ShopItemTile(props)
 	end
 
 	local createElement = React.createElement
-	local v17 = {
+	local v18 = {
 		tag = "col fill size-full-0 auto-y radius-medium clip bg-shift-200",
 		LayoutOrder = props.LayoutOrder,
 		onActivated = 0,
@@ -476,17 +484,17 @@ local function ShopItemTile(props)
 		onActivated = nil
 	end
 
-	v17.onActivated = onActivated
+	v18.onActivated = onActivated
 	local ref2
 
 	if FFlagEnableInExperienceShopUnifiedLogging then
 		ref2 = ref
 	end
 
-	v17.ref = ref2
+	v18.ref = ref2
 
 	local createElement2 = React.createElement
-	local v18 = {
+	local v19 = {
 		tag = {
 			["radius-medium bg-shift-200"] = FFlagFixThumbnailBackgroundInExperienceShop,
 			["radius-medium"] = not FFlagFixThumbnailBackgroundInExperienceShop
@@ -504,7 +512,7 @@ local function ShopItemTile(props)
 	end
 
 	local children = {
-		Media = createElement2(Image, v18, { TrialBadge = trialBadge }),
+		Media = createElement2(Image, v19, { TrialBadge = trialBadge }),
 		TileContent = 0
 	}
 
@@ -512,7 +520,7 @@ local function ShopItemTile(props)
 
 	local createElement4 = React.createElement
 
-	local v19 = {
+	local v20 = {
 		Title = React.createElement(Text, {
 			tag = "size-full-0 auto-y text-title-medium text-align-x-left text-truncate-end content-emphasis",
 			Text = props.name,
@@ -527,14 +535,14 @@ local function ShopItemTile(props)
 		freeTrialLabel = React.createElement(FreeTrialLabel, { LayoutOrder = 2 })
 	end
 
-	v19.FreeTrialLabel = freeTrialLabel
+	v20.FreeTrialLabel = freeTrialLabel
 	local metadata
 
 	if props.price and not v3 then
 		if FFlagEnableDiscountOnInShopTile then
 			local createElement5 = React.createElement
 
-			local v20 = {
+			local v21 = {
 				SalePrice = React.createElement(
 					View,
 					{ tag = "row align-y-center gap-xsmall auto-xy", LayoutOrder = 1 },
@@ -546,7 +554,7 @@ local function ShopItemTile(props)
 						}),
 						SalePriceLabel = React.createElement(Text, {
 							tag = "auto-xy text-body-medium text-truncate-end content-emphasis",
-							Text = v16 or tostring(props.price),
+							Text = v17 or tostring(props.price),
 							LayoutOrder = 2
 						})
 					}
@@ -555,20 +563,20 @@ local function ShopItemTile(props)
 			}
 			local originalPrice
 
-			if v14 and v15 then
+			if v15 and v16 then
 				originalPrice = React.createElement(Text, {
 					tag = "auto-xy text-body-small text-truncate-end content-default",
-					Text = "<s>" .. getIconRichText(Enums.IconName.Robux) .. " " .. v15 .. "</s>",
+					Text = "<s>" .. getIconRichText(Enums.IconName.Robux) .. " " .. v16 .. "</s>",
 					RichText = true,
 					LayoutOrder = 2
 				})
 			end
 
-			v20.OriginalPrice = originalPrice
+			v21.OriginalPrice = originalPrice
 			metadata = createElement5(View, {
 				tag = "row align-y-center gap-xsmall auto-xy",
 				LayoutOrder = 2
-			}, v20)
+			}, v21)
 		else
 			metadata = React.createElement(View, {
 				tag = "row align-y-center gap-xsmall auto-xy",
@@ -588,20 +596,20 @@ local function ShopItemTile(props)
 		end
 	end
 
-	v19.Metadata = metadata
+	v20.Metadata = metadata
 	children.TileContent = createElement3(
 		View,
 		{ tag = "col gap-medium size-full-0 auto-y padding-medium", LayoutOrder = 2 },
 		{
-			ContentHeader = createElement4(View, { tag = "col size-full-0 auto-y", LayoutOrder = 1 }, v19),
+			ContentHeader = createElement4(View, { tag = "col size-full-0 auto-y", LayoutOrder = 1 }, v20),
 			Footer = React.createElement(ShopItemFooter, {
 				itemId = props.itemId,
 				itemType = props.itemType,
 				isOwned = isOwned,
 				showTry = showTry,
-				isActionLoading = v13.isActionLoading,
-				isActionDisabled = v13.isActionDisabled,
-				onTryActivated = v13.onTryActivated,
+				isActionLoading = v14.isActionLoading,
+				isActionDisabled = v14.isActionDisabled,
+				onTryActivated = v14.onTryActivated,
 				price = props.price,
 				shopPageType = props.shopPageType,
 				purchaseCategoryLocation = v11,
@@ -609,7 +617,7 @@ local function ShopItemTile(props)
 			})
 		}
 	)
-	return createElement(View, v17, children)
+	return createElement(View, v18, children)
 end
 
 return React.memo(ShopItemTile)

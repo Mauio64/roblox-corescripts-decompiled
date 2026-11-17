@@ -24,7 +24,6 @@ local FFlagAppChatMomentShareCard = require(AppChat.Flags.FFlagAppChatMomentShar
 
 local IXPNavigationUtils = require(AppChat.Utils.IXPNavigationUtils)
 local GetTopBarStore = require(AppChat.Stores.GetTopBarStore)
-local getFFlagAppChatEnableRootedNavigation = require(AppChat.Flags.getFFlagAppChatEnableRootedNavigation)
 local FFlagAppChatFixBackButtonOnRotation = require(AppChat.Flags.FFlagAppChatFixBackButtonOnRotation)
 local canPopParentStack = require(AppChat.Utils.canPopParentStack)
 
@@ -113,13 +112,10 @@ function extended:init()
 	function self.navigateToChatDetails()
 		local conversationId2 = self.props.navigation.getParam and self.props.navigation.getParam("conversationId", nil)
 		Logger:info("Navigate To ChatDetails: {} from {screen}", conversationId2)
-		local v = getFFlagAppChatEnableRootedNavigation()
-			and {
-				conversationId = conversationId2,
-				isRooted = self.props.navigation.getParam("isRooted", false)
-			}
-			or { conversationId = conversationId2 }
-		navigation.navigate(EnumScreens.ChatDetails, v)
+		navigation.navigate(EnumScreens.ChatDetails, {
+			conversationId = conversationId2,
+			isRooted = self.props.navigation.getParam("isRooted", false)
+		})
 	end
 
 	local screenProps = navigation.getScreenProps("wideMode", false)

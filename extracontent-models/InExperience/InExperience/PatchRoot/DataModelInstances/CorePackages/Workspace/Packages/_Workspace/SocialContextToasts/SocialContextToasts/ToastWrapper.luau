@@ -12,9 +12,6 @@ local getLocalizedStrings = NotificationsCommon.LocalizationHelper.getLocalizedS
 local SocialContextToastAnalyticsActionTypes = require(SocialContextToasts.Enums.SocialContextToastAnalyticsActionTypes)
 local SocialContextToastEvents = require(SocialContextToasts.SocialContextToastEvents)
 
-local SharedFlags = require(parent.SharedFlags)
-local GetFFlagSocialContextToastEventStream = SharedFlags.GetFFlagSocialContextToastEventStream
-
 local vector2 = Vector2.new(48, 48)
 local vector2_2 = Vector2.new(36, 36)
 
@@ -52,33 +49,26 @@ local v = { areUsersActive = true }
 
 local function ToastWrapper(p)
 	local joined = Cryo.Dictionary.join(v, p)
-	local v2
 
-	if GetFFlagSocialContextToastEventStream() then
-		local analyticsProps = joined.analyticsProps
-		v2 = React.useCallback(function()
-			local friendId
+	local analyticsProps = joined.analyticsProps
+	local v2 = React.useCallback(function()
+		local friendId
 
-			if joined.userIdList then
-				friendId = table.concat(joined.userIdList)
-			end
+		if joined.userIdList then
+			friendId = table.concat(joined.userIdList)
+		end
 
-			SocialContextToastEvents(analyticsProps.eventIngest, {
-				toastType = analyticsProps.toastType,
-				friendId = friendId,
-				universeId = analyticsProps.gameId,
-				placeId = analyticsProps.placeId,
-				actionType = SocialContextToastAnalyticsActionTypes.ForceDismissed
-			})
-		end)
-	end
+		SocialContextToastEvents(analyticsProps.eventIngest, {
+			toastType = analyticsProps.toastType,
+			friendId = friendId,
+			universeId = analyticsProps.gameId,
+			placeId = analyticsProps.placeId,
+			actionType = SocialContextToastAnalyticsActionTypes.ForceDismissed
+		})
+	end)
 
 	if joined.onActivated == nil then
-		if GetFFlagSocialContextToastEventStream() then
-			joined.onActivated = v2
-		else
-			function joined.onActivated() end
-		end
+		joined.onActivated = v2
 	end
 
 	local v3 = useStyle()
@@ -113,11 +103,6 @@ local function ToastWrapper(p)
 	toastContent.onActivated = joined.onActivated
 	toastContent.buttonText = localizedStrings.button
 	toastContent.buttonType = joined.buttonType
-
-	if not GetFFlagSocialContextToastEventStream() then
-		v2 = nil
-	end
-
 	toastContent.onTouchSwipeUp = v2
 	return createElement(Toast, { duration = 6, toastContent = toastContent })
 end

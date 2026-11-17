@@ -41,7 +41,7 @@ local function UpsellContent(props)
 	end
 
 	local createElement2 = React.createElement
-	local v5 = {
+	local v4 = {
 		tag = v.content.tag,
 		LayoutOrder = 2,
 		testId = `{props.testId}--upsell-content--body`
@@ -70,9 +70,9 @@ local function UpsellContent(props)
 		})
 	end
 
-	local v4 = {
+	local v5 = {
 		Thumbnail = thumbnail,
-		Content = createElement2(View, v5, { Title = title, Description = description }),
+		Content = createElement2(View, v4, { Title = title, Description = description }),
 		Chevron = 0,
 		Close = 0
 	}
@@ -86,7 +86,7 @@ local function UpsellContent(props)
 		})
 	end
 
-	v4.Chevron = chevron
+	v5.Chevron = chevron
 	local close
 
 	if props.onClose and not v2 then
@@ -101,8 +101,8 @@ local function UpsellContent(props)
 		})
 	end
 
-	v4.Close = close
-	return createElement(View, v3, v4)
+	v5.Close = close
+	return createElement(View, v3, v5)
 end
 
 return UpsellContent

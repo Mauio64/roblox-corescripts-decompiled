@@ -1,3 +1,1 @@
-local FFlagLuaAppSduiStreamingChunkedResponses = require(script.Parent.FFlagLuaAppSduiStreamingChunkedResponses)
-
-return FFlagLuaAppSduiStreamingChunkedResponses and game:DefineFastFlag("LuaAppSduiStreamingFirstDataTiming", false)
+return game:DefineFastFlag("LuaAppSduiStreamingFirstDataTiming", false)

@@ -1496,54 +1496,52 @@ local function calculate_error_correction(value, p)
 	end
 
 	v9[0] = 0
-	local v10 = v9
-	local v11 = {}
+	local v10 = {}
 
 	for i = 0, #v9 do
-		v11[i] = v5[v10[i]]
+		v10[i] = v5[v9[i]]
 	end
 
 	while p <= v8 do
-		local v12 = get_generator_polynominal_adjusted(p, v8)
+		local v11 = get_generator_polynominal_adjusted(p, v8)
 
-		local v13 = v11[v8]
+		local v12 = v10[v8]
 
 		for i = v8, v8 - p, -1 do
-			if v13 == 256 then
-				v12[i] = 256
-			elseif v12[i] + v13 >= 255 then
-				v12[i] = math.fmod(v12[i] + v13, 255)
+			if v12 == 256 then
+				v11[i] = 256
+			elseif v11[i] + v12 >= 255 then
+				v11[i] = math.fmod(v11[i] + v12, 255)
 			else
-				v12[i] += v13
+				v11[i] += v12
 			end
 		end
 
 		for i = v8 - p - 1, 0, -1 do
-			v12[i] = 256
+			v11[i] = 256
 		end
 
-		local result = convert_to_int(v12) -- inferred equivalent call
-		local result2 = convert_to_int(v11) -- inferred equivalent call
-		local v14 = {}
+		local result = convert_to_int(v11) -- inferred equivalent call
+		local result2 = convert_to_int(v10) -- inferred equivalent call
+		v9 = {}
 
 		for i = v8, 0, -1 do
-			v14[i] = bit_xor(result[i], result2[i])
+			v9[i] = bit_xor(result[i], result2[i])
 		end
 
 		for i = v8, 0, -1 do
-			if i < p or v14[i] ~= 0 then
+			if i < p or v9[i] ~= 0 then
 				break
 			end
 
-			v14[i] = nil
+			v9[i] = nil
 			v8 -= 1
 		end
 
-		v9 = v14
-		v11 = {}
+		v10 = {}
 
-		for i = 0, #v14 do
-			v11[i] = v5[v14[i]]
+		for i = 0, #v9 do
+			v10[i] = v5[v9[i]]
 		end
 	end
 
@@ -3223,11 +3221,11 @@ function Qrencode.qrcode(list, p, _)
 		add_pad_data(v12, v13, (binary(v11, 4) .. v14) .. encode_data(list, v11)) -- inferred equivalent call
 	)
 
-	if math.fmod(#v15, 8) == 0 then
-		return true, get_matrix_with_lowest_penalty(v12, v13, v15 .. string.rep("0", remainder[v12]))
+	if math.fmod(#v15, 8) ~= 0 then
+		return false, string.format("Arranged data %% 8 != 0: data length = %d, mod 8 = %d", #v15, (math.fmod(#v15, 8)))
 	end
 
-	return false, string.format("Arranged data %% 8 != 0: data length = %d, mod 8 = %d", #v15, (math.fmod(#v15, 8)))
+	return true, get_matrix_with_lowest_penalty(v12, v13, v15 .. string.rep("0", remainder[v12]))
 end
 
 Qrencode.binary = binary

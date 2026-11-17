@@ -14,10 +14,13 @@ local useContextualInfo = require(parent.Components.PYMKUser.useContextualInfo)
 local useUserPresence = require(parent.Components.PYMKUser.useUserPresence)
 local useOnActivatedTile = require(parent.Components.PYMKUser.useOnActivatedTile)
 require(parent.Common.DirectRecommendationTypes)
+require(parent.Analytics.AnalyticsTypes)
 
 local FFlagPymkCarouselPresenceStoreMigration = require(parent.Flags.FFlagPymkCarouselPresenceStoreMigration)
 local SharedFlags = require(parent2.SharedFlags)
 local FFlagLuaAppEnableSduiHomePage = SharedFlags.FFlagLuaAppEnableSduiHomePage
+local SharedFlags2 = require(parent2.SharedFlags)
+local FFlagPymkCarouselExtendProps = SharedFlags2.FFlagPymkCarouselExtendProps
 
 require(parent2.UserList)
 
@@ -49,6 +52,22 @@ return function(data)
 		end
 
 		recommendation = data.recommendation or {}
+	elseif FFlagPymkCarouselExtendProps then
+		hasIncomingFriendRequest = useSelector(function(p)
+			return getDeepValue(
+				p,
+				string.format("PYMKCarousel.Friends.recommendations.hasIncomingFriendRequest.%s", id)
+			)
+		end)
+
+		recommendation = useSelector(function(p)
+			return roduxFriends.Selectors.selectRecommendationsForUserId(p)(v)[id] or {}
+		end)
+
+		if data.recommendation then
+			hasIncomingFriendRequest = data.recommendation.hasIncomingFriendRequest
+			recommendation = data.recommendation
+		end
 	else
 		hasIncomingFriendRequest = useSelector(function(p)
 			return getDeepValue(
@@ -76,7 +95,7 @@ return function(data)
 	}
 	local recommendation2
 
-	if FFlagLuaAppEnableSduiHomePage then
+	if FFlagPymkCarouselExtendProps or FFlagLuaAppEnableSduiHomePage then
 		recommendation2 = data.recommendation
 	end
 
@@ -110,7 +129,7 @@ return function(data)
 	v3.forceFetchUserPresence = forceFetchUserPresence
 	local v4 = useUserPresence(v3)
 
-	local onRowActivated = useOnActivatedTile({
+	local v5 = {
 		userId = id,
 		openProfilePeekView = data.openProfilePeekView,
 		absolutePosition = data.absolutePosition,
@@ -118,8 +137,17 @@ return function(data)
 		recommendationSessionId = data.recommendationSessionId,
 		fireAnalyticsEvent = data.fireAnalyticsEvent,
 		friendshipStatus = friendshipStatus,
-		userPresenceType = v4
-	})
+		userPresenceType = v4,
+		analyticsSurface = 0
+	}
+	local analyticsSurface
+
+	if FFlagPymkCarouselExtendProps then
+		analyticsSurface = data.analyticsSurface
+	end
+
+	v5.analyticsSurface = analyticsSurface
+	local onRowActivated = useOnActivatedTile(v5)
 
 	local row = data.createRow({
 		primaryCta = primaryCta,

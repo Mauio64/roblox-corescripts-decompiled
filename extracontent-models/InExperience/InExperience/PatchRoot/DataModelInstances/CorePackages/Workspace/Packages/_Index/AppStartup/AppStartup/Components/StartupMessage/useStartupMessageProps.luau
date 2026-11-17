@@ -147,11 +147,12 @@ local function useStartupMessageProps()
 	local onOpenUrl = React.useCallback(function(detail: string, title: string)
 		v:isURLRegistered(detail):andThen(function(p)
 			if p then
-				if v:isInternalDlicEnabled() then
-					v:detectDeeplinkIntent((v:createInternalDlic(detail, v.DeepLinkSource.LuaInternal)))
-				else
+				if not v:isInternalDlicEnabled() then
 					v:detectURL(detail)
+					return
 				end
+
+				v:detectDeeplinkIntent((v:createInternalDlic(detail, v.DeepLinkSource.LuaInternal)))
 			else
 				local v8 = {
 					name = AppPage.GenericWebPage,

@@ -3,6 +3,9 @@ local parent = InExperienceShop.Parent
 
 local Signals = require(parent.Signals)
 local NotificationsOrchestrator = require(parent.NotificationsOrchestrator)
+
+local AvatarExperienceAnalytics = require(parent.AvatarExperienceAnalytics)
+local MarketplaceUnifiedItemType = AvatarExperienceAnalytics.UnifiedEventLogEnums.MarketplaceUnifiedItemType
 local InExperienceOffers = require(parent.InExperienceOffers)
 
 local getInExperienceShopStore = require(InExperienceShop.Stores.getInExperienceShopStore)
@@ -71,7 +74,7 @@ local function hasAvailableTrial(p): boolean -- 1 equivalent call inferred from 
 	return v9 == true
 end
 
-local function hasActiveTrial(p): boolean -- 2 equivalent calls inferred from this helper
+local function hasActiveTrial(p): boolean -- 3 equivalent calls inferred from this helper
 	local _, v9 = next(p.active)
 	return v9 == true
 end
@@ -93,8 +96,8 @@ end
 
 local function selectCampaign(p)
 	if
-		FFlagEnableRedeemedFreeTrialTooltip and hasRedeemedTrialWithinWindow(p.redeemed)
-		or FFlagEnableActiveFreeTrialTooltip and hasActiveTrial(p) -- inferred equivalent call
+		FFlagEnableActiveFreeTrialTooltip and hasActiveTrial(p) -- inferred equivalent call
+		or FFlagEnableRedeemedFreeTrialTooltip and hasRedeemedTrialWithinWindow(p.redeemed)
 	then
 		return v2
 	end
@@ -132,7 +135,7 @@ local function chooseSlot(p): nil | string
 	end
 end
 
-local function submitTooltip(slotId: string, data)
+local function submitTooltip(slotId: string, data, itemId: string?)
 	local slotDisplayPayload
 
 	if slotId == "EducationTooltipOnShopIcon" then
@@ -162,13 +165,23 @@ local function submitTooltip(slotId: string, data)
 			visibility = { delayMs = data.delayMs, autoDismissAfterMs = data.durationMs }
 		},
 		source = data.source,
-		slotDisplayPayload = slotDisplayPayload
+		slotDisplayPayload = slotDisplayPayload,
+		itemId = itemId,
+		itemType = 0
 	}
+	local itemType
+
+	if itemId ~= nil then
+		itemType = MarketplaceUnifiedItemType.GAME_PASS
+	end
+
+	v9.itemType = itemType
 
 	if defineFastFlag then
 		v9.enableOnStudio = true
 	end
 
+	v9.suppressWhileInExperienceShopOpen = true
 	return NotificationsOrchestrator.submit(v9)
 end
 
@@ -282,29 +295,30 @@ local function submitFreeTrialTooltips() -- 1 equivalent call inferred from this
 	local v12 = getInExperienceShopStore(false)
 	v3 = Signals.createEffect(function(p)
 		local trialAvailabilities = v12.getTrialAvailabilities(p)
-		local v13
+		local v13, _, v14
 
-		if FFlagEnableRedeemedFreeTrialTooltip and hasRedeemedTrialWithinWindow(trialAvailabilities.redeemed) then
-			v13 = v2
-		else
-			local _, v14
-
-			if FFlagEnableActiveFreeTrialTooltip then
-				if hasActiveTrial(trialAvailabilities) then -- inferred equivalent call
-					v13 = v2
-				else
-					_, v14 = next(trialAvailabilities.available)
-
-					if v14 == true then
-						v13 = v
-					end
-				end
+		if FFlagEnableActiveFreeTrialTooltip then
+			if hasActiveTrial(trialAvailabilities) then -- inferred equivalent call
+				v13 = v2
+			elseif
+				FFlagEnableRedeemedFreeTrialTooltip
+				and hasRedeemedTrialWithinWindow(trialAvailabilities.redeemed)
+			then
+				v13 = v2
 			else
 				_, v14 = next(trialAvailabilities.available)
 
 				if v14 == true then
 					v13 = v
 				end
+			end
+		elseif FFlagEnableRedeemedFreeTrialTooltip and hasRedeemedTrialWithinWindow(trialAvailabilities.redeemed) then
+			v13 = v2
+		else
+			_, v14 = next(trialAvailabilities.available)
+
+			if v14 == true then
+				v13 = v
 			end
 		end
 
@@ -325,24 +339,28 @@ local function submitFreeTrialTooltips() -- 1 equivalent call inferred from this
 		delayMs = v13.delayMs
 		durationMs = v13.durationMs
 		action = v13.action
-		local v14
+		local v15
 
 		if v13.action == "promptGamePassPurchase" then
-			if FFlagEnableRedeemedFreeTrialTooltip and hasRedeemedTrialWithinWindow(trialAvailabilities.redeemed) then
-				v14 = firstRedeemedGamePassId(trialAvailabilities)
-			else
-				local v15
-				v14, v15 = next(trialAvailabilities.active)
+			if FFlagEnableActiveFreeTrialTooltip then
+				if hasActiveTrial(trialAvailabilities) then -- inferred equivalent call
+					local v16
+					v15, v16 = next(trialAvailabilities.active)
 
-				if v15 ~= true then
-					v14 = nil
+					if v16 ~= true then
+						v15 = nil
+					end
+				else
+					v15 = firstRedeemedGamePassId(trialAvailabilities)
 				end
+			else
+				v15 = firstRedeemedGamePassId(trialAvailabilities)
 			end
 		end
 
-		gamePassId = v14
+		gamePassId = v15
 
-		v6(submitTooltip(slotId, v13))
+		v6(submitTooltip(slotId, v13, gamePassId))
 	end)
 
 	v4 = isTrialTooltipShowing

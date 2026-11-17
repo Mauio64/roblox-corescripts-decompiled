@@ -5,8 +5,6 @@ local callbackInputBox = LuaSocialLibrariesDeps.SocialLibraries.config({}).Compo
 
 local React = require(parent.React)
 local RoactAppExperiment = require(parent.RoactAppExperiment)
-local AppCommonLib = require(parent.AppCommonLib)
-local Text = AppCommonLib.Text
 local Dash = require(parent.Dash)
 local UIBlox = require(parent.UIBlox)
 local IconSize = UIBlox.App.Constant.IconSize
@@ -27,7 +25,6 @@ local Enums = Foundation.Enums
 local Style = require(parent.Style)
 local GetTextSize = Style.GetTextSize
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local iconsactionseditclear_small = Images["icons/actions/edit/clear_small"]
 
@@ -85,13 +82,7 @@ return function(options)
 
 	local header2 = v3.Font.Header2
 	local v5 = v3.Font.BaseSize * header2.RelativeSize
-	local v6
-
-	if FoundationFontFaceMigration then
-		v6 = GetTextSize(joined.cancelText, v5, v3.Tokens.Typography.TitleLarge.Font, Vector2.new(10000, 10000)).X
-	else
-		v6 = Text.GetTextWidth(joined.cancelText, header2.Font, v5)
-	end
+	local x = GetTextSize(joined.cancelText, v5, v3.Tokens.Typography.TitleLarge.Font, Vector2.new(10000, 10000)).X
 
 	local udim = UDim.new(0, 4)
 	local udim2
@@ -99,11 +90,11 @@ return function(options)
 	if joined.isDisabled then
 		udim2 = UDim2.new(1, 0, 1, 0)
 	else
-		udim2 = UDim2.new(1, -v6 - 12, 1, 0)
+		udim2 = UDim2.new(1, -x - 12, 1, 0)
 	end
 
 	local body = v3.Font.Body
-	local v7 = v3.Font.BaseSize * body.RelativeSize
+	local v6 = v3.Font.BaseSize * body.RelativeSize
 
 	local function fn(p, p2)
 		if joined.focusChangedCallback then
@@ -120,14 +111,14 @@ return function(options)
 	end
 
 	local createElement = React.createElement
-	local v8 = {
+	local v7 = {
 		BackgroundTransparency = v4 and 1 or v3.Theme.BackgroundDefault.Transparency,
 		BackgroundColor3 = v3.Theme.BackgroundDefault.Color,
 		BorderSizePixel = 0,
 		Size = UDim2.new(1, 0, 1, 0),
 		LayoutOrder = joined.LayoutOrder
 	}
-	local v9 = {
+	local v8 = {
 		Layout = React.createElement("UIListLayout", {
 			VerticalAlignment = Enum.VerticalAlignment.Center,
 			HorizontalAlignment = Enum.HorizontalAlignment.Left,
@@ -153,10 +144,10 @@ return function(options)
 			})
 	end
 
-	v9.CancelTextButton = cancelTextButton
+	v8.CancelTextButton = cancelTextButton
 
 	local createElement2 = React.createElement
-	local v10 = {
+	local v9 = {
 		Size = udim2,
 		BackgroundColor3 = v3.Theme.UIMuted.Color,
 		BackgroundTransparency = v3.Theme.UIMuted.Transparency,
@@ -164,7 +155,7 @@ return function(options)
 		LayoutOrder = 1
 	}
 
-	local v11 = {
+	local v10 = {
 		UICorner = React.createElement("UICorner", { CornerRadius = UDim.new(0, 4) }),
 		UIStroke = React.createElement("UIStroke", {
 			Color = state or v3.Theme.Divider.Color,
@@ -190,48 +181,28 @@ return function(options)
 	}
 
 	local createElement3 = React.createElement
-	local v12 = { BackgroundTransparency = 1, Size = UDim2.new(1, -28, 1, 0), LayoutOrder = 2 }
+	local v11 = { BackgroundTransparency = 1, Size = UDim2.new(1, -28, 1, 0), LayoutOrder = 2 }
 	local filterBox
 
 	if joined.isDisabled then
-		local createElement4 = React.createElement
-		local v13 = {
+		filterBox = React.createElement("TextLabel", {
 			Text = joined.searchPlaceholderText,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextYAlignment = Enum.TextYAlignment.Center,
 			BackgroundTransparency = 1,
 			Size = UDim2.fromScale(1, 1),
-			TextSize = v7,
-			Font = 0,
-			FontFace = 0,
-			TextColor3 = 0,
-			TextTransparency = 0
-		}
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = body.Font
-		end
-
-		v13.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(v3.Tokens.Typography.BodyLarge.Font)
-		end
-
-		v13.FontFace = fontFace
-
-		v13.TextColor3 = v3.Theme.TextDefault.Color
-		v13.TextTransparency = v3.Theme.TextMuted.Transparency
-		filterBox = createElement4("TextLabel", v13)
+			TextSize = v6,
+			FontFace = normalizeFontFace(v3.Tokens.Typography.BodyLarge.Font),
+			TextColor3 = v3.Theme.TextDefault.Color,
+			TextTransparency = v3.Theme.TextMuted.Transparency
+		})
 	else
 		local createElement4 = React.createElement
-		local v13 = {
+		local v12 = {
 			initialInputText = joined.initialInputText,
 			inputTextColor3 = v3.Theme.TextEmphasis.Color,
 			inputTextFont = body.Font,
-			inputTextSize = v7,
+			inputTextSize = v6,
 			inputTextTransparency = v3.Theme.TextEmphasis.Transparency,
 			inputTextXAlignment = Enum.TextXAlignment.Left,
 			textInputType = 0,
@@ -257,36 +228,36 @@ return function(options)
 			textInputType = Enum.TextInputType.NoSuggestions
 		end
 
-		v13.textInputType = textInputType
+		v12.textInputType = textInputType
 		local returnKeyType
 
 		if FFlagDisableAutocorrectSocialUserSearch and v2 then
 			returnKeyType = Enum.ReturnKeyType.Search
 		end
 
-		v13.returnKeyType = returnKeyType
+		v12.returnKeyType = returnKeyType
 
-		v13.placeholderText = joined.searchPlaceholderText
-		v13.placeholderTextColor3 = v3.Theme.TextDefault.Color
-		v13.placeholderTextTransparency = v3.Theme.TextMuted.Transparency
+		v12.placeholderText = joined.searchPlaceholderText
+		v12.placeholderTextColor3 = v3.Theme.TextDefault.Color
+		v12.placeholderTextTransparency = v3.Theme.TextMuted.Transparency
 
-		v13.captureFocusOnMount = joined.captureFocusOnMount
+		v12.captureFocusOnMount = joined.captureFocusOnMount
 
-		v13.clearIcon = iconsactionseditclear_small
-		v13.clearIconColor3 = v3.Theme.IconEmphasis.Color
-		v13.clearIconTransparency = v3.Theme.IconEmphasis.Transparency
-		v13.clearButtonSize = IconSize.Small
+		v12.clearIcon = iconsactionseditclear_small
+		v12.clearIconColor3 = v3.Theme.IconEmphasis.Color
+		v12.clearIconTransparency = v3.Theme.IconEmphasis.Transparency
+		v12.clearButtonSize = IconSize.Small
 
-		v13.textChangedCallback = joined.textChangedCallback
-		v13.onSelectCallback = joined.onSelectCallback
-		v13.focusChangedCallback = fn
-		v13.returnPressedFromOnScreenKeyboardCallback = joined.returnPressedFromOnScreenKeyboardCallback
+		v12.textChangedCallback = joined.textChangedCallback
+		v12.onSelectCallback = joined.onSelectCallback
+		v12.focusChangedCallback = fn
+		v12.returnPressedFromOnScreenKeyboardCallback = joined.returnPressedFromOnScreenKeyboardCallback
 
-		v13.inputBoxRef = ref
-		filterBox = createElement4(callbackInputBox, v13)
+		v12.inputBoxRef = ref
+		filterBox = createElement4(callbackInputBox, v12)
 	end
 
-	v11.FilterBoxContainer = createElement3("Frame", v12, { filterBox = filterBox })
-	v9.FilterBoxBackground = createElement2(ImageSetLabel, v10, v11)
-	return createElement("Frame", v8, v9)
+	v10.FilterBoxContainer = createElement3("Frame", v11, { filterBox = filterBox })
+	v8.FilterBoxBackground = createElement2(ImageSetLabel, v9, v10)
+	return createElement("Frame", v7, v8)
 end

@@ -46,6 +46,8 @@ else
 end
 
 local leaveGame = require(RobloxGui.Modules.Settings.leaveGame)
+local PioneerUtils = require(CorePackages.Workspace.Packages.PioneerUtils)
+local FFlagPioneerLeaveLogsOut = SharedFlags.FFlagPioneerLeaveLogsOut
 
 local InExperienceSideSheet = require(CorePackages.Workspace.Packages.InExperienceSideSheet)
 local getSideSheetVisibility = InExperienceSideSheet.getSideSheetVisibility
@@ -66,7 +68,15 @@ local v = {
 
 		if SettingsHub:GetVisibility() then
 			if SettingsHub.Instance.Pages.CurrentPage == leaveGamePage then
-				if FFlagLeaveActionChromeShortcutTelemetry then
+				if FFlagPioneerLeaveLogsOut and PioneerUtils.isPioneerLaunch() then
+					leaveGame(false, {
+						leaveReason = PioneerUtils.PioneerLeaveReason.Logout,
+						inhibitAppRating = true,
+						telemetryFields = FFlagLeaveActionChromeShortcutTelemetry and {
+							used_shortcut = true
+						} or nil
+					})
+				elseif FFlagLeaveActionChromeShortcutTelemetry then
 					leaveGame(true, {
 						telemetryFields = { used_shortcut = true }
 					})

@@ -5,6 +5,7 @@ local Enums = require(EditProfile.Common.Enums)
 local EditDisplayName = require(EditProfile.Components.EditDisplayName)
 local EditBio = require(EditProfile.Components.EditBio)
 local TextKeys = require(EditProfile.Common.TextKeys)
+local FFlagEditProfileAlignBioTranslationKeys = require(EditProfile.Flags.FFlagEditProfileAlignBioTranslationKeys)
 local useRealNamesInDisplayNamesEnabled = require(EditProfile.Hooks.useRealNamesInDisplayNamesEnabled)
 local Navigation = require(parent.Navigation)
 local useNavigation = Navigation.useNavigation
@@ -12,18 +13,28 @@ local Promise = require(parent.Promise)
 local ProfilePlatformCommon = require(parent.ProfilePlatformCommon)
 local ProfileRefreshSignal = ProfilePlatformCommon.Signals.ProfileRefreshSignal
 
-local titleEntries = {
+local v = {
 	[Enums.Screens.EditDisplayName] = {
 		component = EditDisplayName,
 		titleKey = TextKeys.EditDisplayName
-	},
-	[Enums.Screens.EditBio] = { component = EditBio, titleKey = TextKeys.About }
+	}
 }
 
+local editBio = Enums.Screens.EditBio
+local titleKey
+
+if FFlagEditProfileAlignBioTranslationKeys then
+	titleKey = TextKeys.EditBio
+else
+	titleKey = TextKeys.About
+end
+
+v[editBio] = { component = EditBio, titleKey = titleKey }
+
 return function(p)
-	local v = titleEntries[p]
-	local v2 = useNavigation()
-	local v3 = useRealNamesInDisplayNamesEnabled()
+	local v2 = v[p]
+	local v3 = useNavigation()
+	local v4 = useRealNamesInDisplayNamesEnabled()
 
 	local ref = React.useRef(nil)
 	local state, setState = React.useState(false)
@@ -35,8 +46,8 @@ return function(p)
 
 	local onClose = React.useCallback(function()
 		ProfileRefreshSignal.notifyProfileRefresh()
-		v2.goBack()
-	end, { v2 })
+		v3.goBack()
+	end, { v3 })
 
 	local registerSaveHandler = React.useCallback(function(current)
 		ref.current = current
@@ -53,21 +64,21 @@ return function(p)
 			end)
 		end
 	end, { state2 })
-	local titleKey
+	local titleKey2
 
 	if p == Enums.Screens.EditDisplayName then
-		if v3 then
-			titleKey = TextKeys.EditAgedUpDisplayName
+		if v4 then
+			titleKey2 = TextKeys.EditAgedUpDisplayName
 		else
-			titleKey = TextKeys.EditDisplayName
+			titleKey2 = TextKeys.EditDisplayName
 		end
 	else
-		titleKey = v.titleKey
+		titleKey2 = v2.titleKey
 	end
 
 	return {
-		component = v.component,
-		titleKey = titleKey,
+		component = v2.component,
+		titleKey = titleKey2,
 		saveKey = TextKeys.SaveButtonText,
 		onClose = onClose,
 		onSave = onSave,

@@ -99,7 +99,8 @@ coroutine.wrap(function()
 				v[k] = v4
 			end
 		elseif #v2 == 2 then
-			v[v2[1]] = v2[2]
+			local v3 = v2[1]
+			v[v3] = v2[2]
 		end
 	end)
 end)()

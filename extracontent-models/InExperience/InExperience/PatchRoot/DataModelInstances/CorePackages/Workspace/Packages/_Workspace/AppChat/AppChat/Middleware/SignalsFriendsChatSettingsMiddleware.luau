@@ -2,9 +2,6 @@ local AppChat = script:FindFirstAncestor("AppChat")
 local parent = AppChat.Parent
 
 local AppChatNetworking = require(parent.AppChatNetworking)
-local FFlagAppChatFriendsTabIxpEnabled = require(AppChat.Flags.FFlagAppChatFriendsTabIxpEnabled)
-local SharedFlags = require(parent.SharedFlags)
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
 local FFlagAppChatUseSignalsForChatSettings = require(AppChat.Flags.FFlagAppChatUseSignalsForChatSettings)
 
 local ThirdPartyChatSettingsLoaded = require(AppChat.Actions.ThirdPartyChatSettingsLoaded)
@@ -28,10 +25,7 @@ local function SignalsFriendsChatSettingsMiddleware(callback, _)
 	return function(p)
 		local v2 = callback(p)
 
-		if
-			not (FFlagAppChatFriendsTabIxpEnabled or FFlagExpChatEnableFriendsTab)
-			or FFlagAppChatUseSignalsForChatSettings
-		then
+		if FFlagAppChatUseSignalsForChatSettings then
 			return v2
 		end
 

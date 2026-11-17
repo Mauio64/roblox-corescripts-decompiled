@@ -10,6 +10,9 @@ local useSceneOutfitMediaItem = require(script.Parent.useSceneOutfitMediaItem)
 local SceneOutfitPoster = require(script.Parent.SceneOutfitPoster)
 local SharedFlags = require(parent.SharedFlags)
 local FFlagProfileMomentSceneOutfitPoster = SharedFlags.FFlagProfileMomentSceneOutfitPoster
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagMomentsPostFeedback = SharedFlags2.FFlagMomentsPostFeedback
+local PostStatusBadge = require(parent.Moments.PostStatusBadge)
 
 local useExperienceName = require(ProfilePlatform.Hooks.useExperienceName)
 
@@ -58,7 +61,8 @@ local function MomentTile(props)
 	local v6 = {
 		Corner = React.createElement("UICorner", { CornerRadius = UDim.new(0, v.Radius.Large) }),
 		Media = 0,
-		ScenePoster = 0
+		ScenePoster = 0,
+		StatusBadge = 0
 	}
 
 	local createElement3 = React.createElement
@@ -79,6 +83,16 @@ local function MomentTile(props)
 	end
 
 	v6.ScenePoster = scenePoster
+	local statusBadge
+
+	if FFlagMomentsPostFeedback then
+		statusBadge = React.createElement(PostStatusBadge, {
+			momentId = moment.momentId,
+			ZIndex = 3
+		})
+	end
+
+	v6.StatusBadge = statusBadge
 	return createElement(View, v4, {
 		MediaContainer = createElement2("Frame", v5, v6),
 		Footer = React.createElement(

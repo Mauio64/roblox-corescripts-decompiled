@@ -6,7 +6,6 @@ local t = require(CorePackages.Packages.t)
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local Foundation = require(CorePackages.Packages.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local UserLib = require(CorePackages.Workspace.Packages.UserLib)
 local PlayerList = require(CorePackages.Workspace.Packages.PlayerList)
 
@@ -117,22 +116,14 @@ function extended.render(p)
 				PlayerName = 0,
 				PlatformName = 0
 			}
-			local displayName, createElement4, v7, v8, font, fontFace, textSize, v9, sizeConstraint
+			local displayName, createElement4, v7, v8, textSize, v9, sizeConstraint
 
 			if v then
 				local createElement5 = Roact.createElement
-				local fontStyle
-
-				if FoundationFontFaceMigration then
+				local v10 = {
 					fontStyle = Cryo.Dictionary.join(props.Font.Header2, {
 						Font = props.Tokens.Typography.TitleLarge.Font
-					})
-				else
-					fontStyle = props.Font.Header2
-				end
-
-				local v10 = {
-					fontStyle = fontStyle,
+					}),
 					colorStyle = props.Theme.TextEmphasis,
 					fluidSizing = false,
 					emoji = Emoji.Verified,
@@ -177,8 +168,7 @@ function extended.render(p)
 						LayoutOrder = 1,
 						Size = UDim2.new(1, 0, 0, size_500),
 						Text = player.DisplayName,
-						Font = 0,
-						FontFace = 0,
+						FontFace = normalizeFontFace(props.Tokens.Typography.TitleLarge.Font),
 						TextSize = 0,
 						TextColor3 = 0,
 						TextTransparency = 0,
@@ -187,18 +177,6 @@ function extended.render(p)
 						BackgroundTransparency = 1,
 						TextScaled = 0
 					}
-
-					if not FoundationFontFaceMigration then
-						font = props.Font.Header2.Font
-					end
-
-					v8.Font = font
-
-					if FoundationFontFaceMigration then
-						fontFace = normalizeFontFace(props.Tokens.Typography.TitleLarge.Font)
-					end
-
-					v8.FontFace = fontFace
 
 					if FFlagEnableMobilePlayerListOnConsole then
 						textSize = data.DropDownHeaderDisplayNameTextSize
@@ -232,8 +210,7 @@ function extended.render(p)
 					LayoutOrder = 1,
 					Size = UDim2.new(1, 0, 0, size_500),
 					Text = player.DisplayName,
-					Font = 0,
-					FontFace = 0,
+					FontFace = normalizeFontFace(props.Tokens.Typography.TitleLarge.Font),
 					TextSize = 0,
 					TextColor3 = 0,
 					TextTransparency = 0,
@@ -242,18 +219,6 @@ function extended.render(p)
 					BackgroundTransparency = 1,
 					TextScaled = 0
 				}
-
-				if not FoundationFontFaceMigration then
-					font = props.Font.Header2.Font
-				end
-
-				v8.Font = font
-
-				if FoundationFontFaceMigration then
-					fontFace = normalizeFontFace(props.Tokens.Typography.TitleLarge.Font)
-				end
-
-				v8.FontFace = fontFace
 
 				if FFlagEnableMobilePlayerListOnConsole then
 					textSize = data.DropDownHeaderDisplayNameTextSize
@@ -288,8 +253,7 @@ function extended.render(p)
 				LayoutOrder = 2,
 				Size = UDim2.new(1, 0, 0, size_500),
 				Text = "@" .. player.Name,
-				Font = 0,
-				FontFace = 0,
+				FontFace = normalizeFontFace(props.Tokens.Typography.CaptionLarge.Font),
 				TextSize = 0,
 				TextColor3 = 0,
 				TextTransparency = 0,
@@ -298,20 +262,6 @@ function extended.render(p)
 				BackgroundTransparency = 1,
 				TextScaled = 0
 			}
-			local font2
-
-			if not FoundationFontFaceMigration then
-				font2 = props.Font.CaptionHeader.Font
-			end
-
-			v10.Font = font2
-			local fontFace2
-
-			if FoundationFontFaceMigration then
-				fontFace2 = normalizeFontFace(props.Tokens.Typography.CaptionLarge.Font)
-			end
-
-			v10.FontFace = fontFace2
 			local textSize2
 
 			if FFlagEnableMobilePlayerListOnConsole then

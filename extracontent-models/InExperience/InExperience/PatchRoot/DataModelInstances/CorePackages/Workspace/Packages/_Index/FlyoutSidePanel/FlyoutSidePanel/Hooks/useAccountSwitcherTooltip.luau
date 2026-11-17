@@ -1,4 +1,5 @@
-local parent = script:FindFirstAncestor("FlyoutSidePanel").Parent
+local FlyoutSidePanel = script:FindFirstAncestor("FlyoutSidePanel")
+local parent = FlyoutSidePanel.Parent
 
 local React = require(parent.React)
 local Drawer = require(parent.Drawer)
@@ -6,16 +7,28 @@ local useDrawerVisible = Drawer.Hooks.useDrawerVisible
 local AppCommonLib = require(parent.AppCommonLib)
 local AppStorageJsonCacheUtils = AppCommonLib.Utils.AppStorageJsonCacheUtils
 
+local FFlagFixFlyoutAccountSwitcherTooltipEmptyString = require(FlyoutSidePanel.Flags.FFlagFixFlyoutAccountSwitcherTooltipEmptyString)
+
 local AppStorageService = game:GetService("AppStorageService")
 local HttpService = game:GetService("HttpService")
 
 local defineFastInt = game:DefineFastInt("FlyoutAccountSwitcherTooltipMaxShows", 1)
 
-local function readShowCount(object, flag: boolean?) -- 2 equivalent calls inferred from this helper
+local function readShowCount(object, flag: boolean?, object2)
 	local cachedJsonForKey = object:getCachedJsonForKey("FlyoutSidePanelAccountSwitcherTooltipSeen", flag)
 
 	if typeof(cachedJsonForKey) == "number" then
 		return cachedJsonForKey
+	end
+
+	if FFlagFixFlyoutAccountSwitcherTooltipEmptyString and object2 ~= nil then
+		local success, result = pcall(function()
+			return object2:GetItem("FlyoutSidePanelAccountSwitcherTooltipSeen")
+		end)
+
+		if success and result == "" then
+			return 0
+		end
 	end
 
 	return nil
@@ -48,7 +61,13 @@ local function useAccountSwitcherTooltip(p, flag: boolean, p2, p3)
 	end, { p2, v })
 	local v3 = useDrawerVisible()
 	local state, setState = React.useState(function()
-		return readShowCount(v2) -- inferred equivalent call
+		local v4
+
+		if FFlagFixFlyoutAccountSwitcherTooltipEmptyString then
+			v4 = v
+		end
+
+		return readShowCount(v2, nil, v4)
 	end)
 
 	local state2, setState2 = React.useState(false)
@@ -74,14 +93,29 @@ local function useAccountSwitcherTooltip(p, flag: boolean, p2, p3)
 		end
 	end, { v4, state, v, v2 })
 
-	React.useEffect(function()
+	local useEffect = React.useEffect
+	local function fn()
 		if not v3 then
 			setState2(false)
-			setState(readShowCount(v2, true)) -- inferred equivalent call
-		end
-	end, { v3, v2 })
+			local v5
 
-	local v5 = React.useCallback(function()
+			if FFlagFixFlyoutAccountSwitcherTooltipEmptyString then
+				v5 = v
+			end
+
+			setState(readShowCount(v2, true, v5))
+		end
+	end
+
+	local v5
+
+	if FFlagFixFlyoutAccountSwitcherTooltipEmptyString then
+		v5 = v
+	end
+
+	useEffect(fn, { v3, v2, v5 })
+
+	local v6 = React.useCallback(function()
 		setState2(true)
 	end, {})
 
@@ -94,7 +128,7 @@ local function useAccountSwitcherTooltip(p, flag: boolean, p2, p3)
 		p3.current = current
 	end
 
-	return v4, current, v5
+	return v4, current, v6
 end
 
 return useAccountSwitcherTooltip

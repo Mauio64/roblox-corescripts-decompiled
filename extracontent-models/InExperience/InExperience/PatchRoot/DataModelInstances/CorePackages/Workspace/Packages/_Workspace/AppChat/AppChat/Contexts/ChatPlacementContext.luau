@@ -1,8 +1,6 @@
 local parent = script:FindFirstAncestor("AppChat").Parent
 
 local React = require(parent.React)
-local SharedFlags = require(parent.SharedFlags)
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
 
 local enum = {
 	Unknown = "Unknown",
@@ -35,11 +33,7 @@ function ChatPlacementContext.withChatPlacementContext(callback)
 end
 
 function ChatPlacementContext.isPlacementInExperience(p): boolean
-	if FFlagExpChatEnableFriendsTab and p == enum.InExperienceFriendsTab then
-		return true
-	end
-
-	return p == enum.InExperienceDefault
+	return p == enum.InExperienceFriendsTab or p == enum.InExperienceDefault
 end
 
 return ChatPlacementContext

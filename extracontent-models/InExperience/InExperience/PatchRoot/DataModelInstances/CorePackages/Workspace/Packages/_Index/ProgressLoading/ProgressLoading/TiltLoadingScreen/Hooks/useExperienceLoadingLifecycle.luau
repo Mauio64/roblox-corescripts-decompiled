@@ -7,6 +7,8 @@ local Constants = require(script.Parent.Parent.Constants)
 local shouldHoldForExit = require(script.Parent.Parent.shouldHoldForExit)
 local SharedFlags = require(parent.SharedFlags)
 local FFlagLoadingScreenMilestones = SharedFlags.FFlagLoadingScreenMilestones
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagTiltLoadingScreenDismissOnLoaded = SharedFlags2.FFlagTiltLoadingScreenDismissOnLoaded
 local MockableProxyServices = require(parent.MockableProxyServices)
 local Players = MockableProxyServices.Players
 local MockableProxyServices2 = require(parent.MockableProxyServices)
@@ -108,12 +110,11 @@ local function useExperienceLoadingLifecycle(flag: boolean, p, current)
 							current2.record(Milestone.ScreenHidden)
 						end
 
-						ReplicatedFirst:SetDefaultLoadingGuiRemoved()
-						setState(false)
-
-						if FFlagLoadingScreenMilestones and current2 then
-							current2.complete()
+						if not FFlagTiltLoadingScreenDismissOnLoaded then
+							ReplicatedFirst:SetDefaultLoadingGuiRemoved()
 						end
+
+						setState(false)
 
 						if ref4.current then
 							ref4.current()
@@ -162,7 +163,7 @@ local function useExperienceLoadingLifecycle(flag: boolean, p, current)
 			end
 		end
 
-		local function dismiss() -- 4 equivalent calls inferred from this helper
+		local function dismiss() -- 5 equivalent calls inferred from this helper
 			if flag2 then
 				return
 			end
@@ -222,7 +223,20 @@ local function useExperienceLoadingLifecycle(flag: boolean, p, current)
 			end
 		end
 
-		table.insert(v2, ReplicatedFirst.FinishedReplicating:Connect(handleFinishedReplicating))
+		local function dismissOnLoaded() -- 1 equivalent call inferred from this helper
+			if FFlagLoadingScreenMilestones and current2 then
+				current2.dismissRequested(DismissSource.NormalReady)
+			end
+
+			dismiss() -- inferred equivalent call
+		end
+
+		if FFlagTiltLoadingScreenDismissOnLoaded then
+			table.insert(v2, Game.Loaded:Connect(dismissOnLoaded))
+		else
+			table.insert(v2, ReplicatedFirst.FinishedReplicating:Connect(handleFinishedReplicating))
+		end
+
 		table.insert(v2, ReplicatedFirst.RemoveDefaultLoadingGuiSignal:Connect(function()
 			if FFlagLoadingScreenMilestones and current2 then
 				current2.dismissRequested(DismissSource.DeveloperOverride)
@@ -231,7 +245,11 @@ local function useExperienceLoadingLifecycle(flag: boolean, p, current)
 			dismiss() -- inferred equivalent call
 		end))
 
-		if ReplicatedFirst:IsFinishedReplicating() then
+		if FFlagTiltLoadingScreenDismissOnLoaded then
+			if Game:IsLoaded() then
+				dismissOnLoaded() -- inferred equivalent call
+			end
+		elseif ReplicatedFirst:IsFinishedReplicating() then
 			if Game:IsLoaded() then
 				if not thread2 then
 					thread2 = task.spawn(function()

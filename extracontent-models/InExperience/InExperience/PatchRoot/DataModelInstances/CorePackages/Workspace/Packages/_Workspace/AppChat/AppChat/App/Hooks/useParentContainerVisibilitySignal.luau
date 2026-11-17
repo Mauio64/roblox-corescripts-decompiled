@@ -9,10 +9,6 @@ local AppChatVisible = require(AppChat.App.AppChatVisible)
 local setAppChatVisible = AppChatVisible.setAppChatVisible
 local ParentContainerContext = require(AppChat.Contexts.ParentContainer.ParentContainerContext)
 
-local SharedFlags = require(parent.SharedFlags)
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
-local FFlagAppChatDistinctUnibarEntryPoint = SharedFlags.FFlagAppChatDistinctUnibarEntryPoint
-
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 
 return function()
@@ -31,15 +27,8 @@ return function()
 			end
 
 			setAppChatVisible(true)
-			local v3
 
-			if FFlagExpChatEnableFriendsTab or FFlagAppChatDistinctUnibarEntryPoint then
-				v3 = p2 or entryPoint
-			else
-				v3 = entryPoint
-			end
-
-			v2(EnteredChatFromEntryPoint(v3))
+			v2(EnteredChatFromEntryPoint(p2 or entryPoint))
 		end)
 
 		return function()

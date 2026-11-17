@@ -18,7 +18,6 @@ local normalizeFontFace = Foundation.Utility.normalizeFontFace
 
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagCoreUiMigrateUIBloxToFoundation = SharedFlags.FFlagCoreUiMigrateUIBloxToFoundation
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local v
 
 if FFlagCoreUiMigrateUIBloxToFoundation then
@@ -98,26 +97,20 @@ if not GetFFlagIGMGamepadSelectionHistory() then
 end
 
 function extended:renderWithSelectionCursor(callback)
-	return withFoundationOrUIBloxStyle(function(p)
-		local tokens
-
-		if FoundationFontFaceMigration then
-			tokens = p
-		end
-
+	return withFoundationOrUIBloxStyle(function(tokens)
 		return {
 			Tokens = tokens,
 			Theme = {
 				TextEmphasis = {
-					Color = p.Color.Content.Emphasis.Color3,
-					Transparency = p.Color.Content.Emphasis.Transparency
+					Color = tokens.Color.Content.Emphasis.Color3,
+					Transparency = tokens.Color.Content.Emphasis.Transparency
 				}
 			},
 			Font = {
 				BaseSize = 1,
 				Header2 = {
-					Font = p.Typography.TitleLarge.Font,
-					RelativeSize = p.Typography.TitleLarge.FontSize
+					Font = tokens.Typography.TitleLarge.Font,
+					RelativeSize = tokens.Typography.TitleLarge.FontSize
 				}
 			}
 		}
@@ -176,37 +169,21 @@ function extended:renderWithSelectionCursor(callback)
 			DeveloperConsole = withLocalization({
 				text = "CoreScripts.InGameMenu.GameSettings.DeveloperConsole"
 			})(function(p)
-				local createElement2 = Roact.createElement
-				local v5 = {}
-				v5.BackgroundTransparency = 1
-				v5.Size = UDim2.new(1, 0, 0, 54)
-				v5.Text = p.text
-				v5.TextColor3 = props.Theme.TextEmphasis.Color
-				local font
-
-				if not FoundationFontFaceMigration then
-					font = props.Font.Header2.Font
-				end
-
-				v5.Font = font
-				local fontFace
-
-				if FoundationFontFaceMigration then
-					fontFace = normalizeFontFace(props.Tokens.Typography.TitleLarge.Font)
-				end
-
-				v5.FontFace = fontFace
-
-				v5.TextSize = props.Font.Header2.RelativeSize * props.Font.BaseSize
-				v5.TextXAlignment = Enum.TextXAlignment.Left
-				v5.LayoutOrder = 4
-				v5.SelectionImageObject = callback(v2.Square)
-				v5[Roact.Event.Activated] = function()
-					DevConsoleMaster:SetVisibility(true)
-					self.props.closeMenu()
-				end
-
-				return createElement2("TextButton", v5, {
+				return Roact.createElement("TextButton", {
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, 0, 0, 54),
+					Text = p.text,
+					TextColor3 = props.Theme.TextEmphasis.Color,
+					FontFace = normalizeFontFace(props.Tokens.Typography.TitleLarge.Font),
+					TextSize = props.Font.Header2.RelativeSize * props.Font.BaseSize,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					LayoutOrder = 4,
+					SelectionImageObject = callback(v2.Square),
+					[Roact.Event.Activated] = function()
+						DevConsoleMaster:SetVisibility(true)
+						self.props.closeMenu()
+					end
+				}, {
 					Padding = Roact.createElement("UIPadding", { PaddingLeft = UDim.new(0, 24) })
 				})
 			end),

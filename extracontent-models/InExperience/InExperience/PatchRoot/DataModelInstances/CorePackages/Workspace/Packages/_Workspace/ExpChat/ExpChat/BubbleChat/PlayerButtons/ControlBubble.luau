@@ -73,7 +73,8 @@ local function ControlBubble(props)
 
 		if props.voiceState and props.voiceState == "Talking" then
 			local postSimulationConnection = RunService.PostSimulation:Connect(function()
-				ref.current = ((ref.current or 0) + 1) % defineFastInt
+				local current = ref.current or 0
+				ref.current = (current + 1) % defineFastInt
 
 				if ref.current == 0 then
 					setState(math.random())

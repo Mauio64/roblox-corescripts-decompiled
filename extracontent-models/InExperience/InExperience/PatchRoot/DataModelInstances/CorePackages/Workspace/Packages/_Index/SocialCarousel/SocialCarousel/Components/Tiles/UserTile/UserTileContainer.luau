@@ -13,6 +13,8 @@ local DataHydration = require(parent.DataHydration)
 local DataStatus = DataHydration.DataStatus
 local UserProfiles = require(parent.UserProfiles)
 local SocialCommon = require(parent.SocialCommon)
+local SocialExperienceJoin = require(parent.SocialExperienceJoin)
+local useJoinUserInExperience = SocialExperienceJoin.useJoinUserInExperience
 local FriendsNetworking = require(parent.FriendsNetworking)
 local Enums = FriendsNetworking.Enums
 local FriendsCommon = require(parent.FriendsCommon)
@@ -21,9 +23,13 @@ local useGetPresenceByUserId = FriendsCommon.Hooks.useGetPresenceByUserId
 local SharedFlags = require(parent.SharedFlags)
 local FFlagSocialCarouselUseProfileStore = SharedFlags.FFlagSocialCarouselUseProfileStore
 local SharedFlags2 = require(parent.SharedFlags)
-local FFlagUserProfilePlatformProfile = SharedFlags2.FFlagUserProfilePlatformProfile
+local FFlagSocialCarouselInGameTitleMarquee = SharedFlags2.FFlagSocialCarouselInGameTitleMarquee
 local SharedFlags3 = require(parent.SharedFlags)
-local FFlagSocialCarouselBuildPresence = SharedFlags3.FFlagSocialCarouselBuildPresence
+local FFlagUserProfilePlatformProfile = SharedFlags3.FFlagUserProfilePlatformProfile
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagMobileGameJoinCardVideo = SharedFlags4.FFlagMobileGameJoinCardVideo
+local SharedFlags5 = require(parent.SharedFlags)
+local FFlagSocialCarouselBuildPresence = SharedFlags5.FFlagSocialCarouselBuildPresence
 local Signals = require(parent.Signals)
 local SignalsReact = require(parent.SignalsReact)
 local v = UserProfiles.Stores.UserProfileStore.get()
@@ -55,10 +61,12 @@ local UserTileEventHandlers = UserTile2.UserTileEventHandlers
 local FocusNavigationUtils = require(parent.FocusNavigationUtils)
 local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
 local Constants = require(SocialCarousel.Common.Constants)
+local TILE_CLICK_TARGETS = Constants.ANALYTICS.TILE_CLICK_TARGETS
 local useSocialCarouselContext = require(SocialCarousel.Contexts.useSocialCarouselContext)
 local useBuildCard = require(script.Parent.useBuildCard)
 
 local DesktopGameJoinCardContainer = GameJoinCard.DesktopGameJoinCardContainer
+local useAgeCheckCompletionLogger = GameJoinCard.Analytics.useAgeCheckUpsellAnalytics.useAgeCheckCompletionLogger
 local useGameJoinCardNavigation = GameJoinCard.useGameJoinCardNavigation
 local GameJoinCardTTI = GameJoinCard.Telemetry.GameJoinCardTTI
 
@@ -66,28 +74,50 @@ local defineFastString = game:DefineFastString(
 	"SocialCarouselVendorImagePath",
 	"rbxasset://textures/ui/Shell/Icons/PlatformLogo.png"
 )
-local SharedFlags4 = require(parent.SharedFlags)
-local FFlagEnableSplitPane = SharedFlags4.FFlagEnableSplitPane
+local SharedFlags6 = require(parent.SharedFlags)
+local FFlagEnableSplitPane = SharedFlags6.FFlagEnableSplitPane
 local FFlagSocialCarouselEnableUserSeenEvents = require(SocialCarousel.Flags.FFlagSocialCarouselEnableUserSeenEvents)
 
 local FFlagSocialCarouselUseConsolePolicyForCta = require(SocialCarousel.Flags.FFlagSocialCarouselUseConsolePolicyForCta)
 
 local FFlagSocialCarouselFixGameJoinCardDismiss = require(SocialCarousel.Flags.FFlagSocialCarouselFixGameJoinCardDismiss)
 local FFlagSocialCarouselShowPlusBadge = require(SocialCarousel.Flags.FFlagSocialCarouselShowPlusBadge)
-local SharedFlags5 = require(parent.SharedFlags)
-local FFlagEnableMobileGameJoinCard = SharedFlags5.FFlagEnableMobileGameJoinCard
-local SharedFlags6 = require(parent.SharedFlags)
-local FFlagConsoleOpenMobileGameJoinCard = SharedFlags6.FFlagConsoleOpenMobileGameJoinCard
 local SharedFlags7 = require(parent.SharedFlags)
-local FFlagConsoleOpenGameJoinCard = SharedFlags7.FFlagConsoleOpenGameJoinCard
+local FFlagSocialCarouselInGamePlayIcon = SharedFlags7.FFlagSocialCarouselInGamePlayIcon
 local SharedFlags8 = require(parent.SharedFlags)
-local FFlagShowRequestsInCarouselForAllUsers = SharedFlags8.FFlagShowRequestsInCarouselForAllUsers
+local FFlagSocialCarouselInGameTileInstantJoin = SharedFlags8.FFlagSocialCarouselInGameTileInstantJoin
 local SharedFlags9 = require(parent.SharedFlags)
-local FFlagMobileGameJoinCardTTITracking = SharedFlags9.FFlagMobileGameJoinCardTTITracking
+local FFlagSocialCarouselInGameTextInstantJoin = SharedFlags9.FFlagSocialCarouselInGameTextInstantJoin
+local DiscoveryAnalytics
+
+if FFlagSocialCarouselInGameTileInstantJoin or FFlagSocialCarouselInGameTextInstantJoin then
+	DiscoveryAnalytics = require(parent.DiscoveryAnalytics)
+else
+	DiscoveryAnalytics = nil
+end
+
+local HttpService
+
+if FFlagSocialCarouselInGameTileInstantJoin or FFlagSocialCarouselInGameTextInstantJoin then
+	HttpService = game:GetService("HttpService")
+else
+	HttpService = nil
+end
+
 local SharedFlags10 = require(parent.SharedFlags)
-local FFlagMobileGameJoinCardGamepadSupport = SharedFlags10.FFlagMobileGameJoinCardGamepadSupport
+local FFlagEnableMobileGameJoinCard = SharedFlags10.FFlagEnableMobileGameJoinCard
 local SharedFlags11 = require(parent.SharedFlags)
-local FFlagDesktopGameJoinCardGamepadSupport = SharedFlags11.FFlagDesktopGameJoinCardGamepadSupport
+local FFlagConsoleOpenMobileGameJoinCard = SharedFlags11.FFlagConsoleOpenMobileGameJoinCard
+local SharedFlags12 = require(parent.SharedFlags)
+local FFlagConsoleOpenGameJoinCard = SharedFlags12.FFlagConsoleOpenGameJoinCard
+local SharedFlags13 = require(parent.SharedFlags)
+local FFlagShowRequestsInCarouselForAllUsers = SharedFlags13.FFlagShowRequestsInCarouselForAllUsers
+local SharedFlags14 = require(parent.SharedFlags)
+local FFlagMobileGameJoinCardTTITracking = SharedFlags14.FFlagMobileGameJoinCardTTITracking
+local SharedFlags15 = require(parent.SharedFlags)
+local FFlagMobileGameJoinCardGamepadSupport = SharedFlags15.FFlagMobileGameJoinCardGamepadSupport
+local SharedFlags16 = require(parent.SharedFlags)
+local FFlagDesktopGameJoinCardGamepadSupport = SharedFlags16.FFlagDesktopGameJoinCardGamepadSupport
 
 local defineFastFlag = game:DefineFastFlag("EnableFriendCarouselInGameFriendExposureLogging_v2", false)
 
@@ -356,6 +386,14 @@ return function(props)
 		v21 = v5
 	end
 
+	local joinSheetUserIdRef
+
+	if FFlagSocialCarouselInGameTitleMarquee then
+		joinSheetUserIdRef = v8.joinSheetUserIdRef
+	else
+		joinSheetUserIdRef = nil
+	end
+
 	local v22
 
 	if FFlagShowRequestsInCarouselForAllUsers then
@@ -377,110 +415,273 @@ return function(props)
 		v22 = nil
 	end
 
-	local useCallback = React.useCallback
-	local function fn4(_)
-		if props.item.onActivated then
-			props.item.onActivated(props.item)
+	local v23 = FFlagSocialCarouselInGamePlayIcon
+
+	if v23 then
+		if props.item.onActivated == nil and props.item.tileType == Tile.Friend and props.item.presence ~= nil then
+			v23 = props.item.presence.userPresenceType == PresenceTypes.InGame
 		else
-			local v23
-
-			if props.item.presence == nil then
-				v23 = false
-			else
-				v23 = props.item.presence.userPresenceType == PresenceTypes.InGame
-			end
-
-			local v24 = v5 and v23
-
-			if FFlagShowRequestsInCarouselForAllUsers and v11 and v22 then
-				v22()
-			elseif
-				v24
-				and not (FFlagConsoleOpenMobileGameJoinCard and v7 and v23)
-				and not FFlagConsoleOpenGameJoinCard
-			then
-				v2(PlayerContextualMenu.openPlayerContextualMenu({
-					subjectUserId = props.item.id,
-					subjectPresence = subjectPresence,
-					robloxFriendshipStatus = fn(props.item),
-					friendshipOriginSourceType = Enums.FriendshipOriginSourceType.FriendRecommendations.rawValue()
-				}))
-			elseif props.item.presence and props.item.presence.userPresenceType == PresenceTypes.InGame then
-				if defineFastFlag then
-					IXPService:LogFlagLinkedUserLayerExposure(defineFastString2)
-				end
-
-				if v7 then
-					if FFlagMobileGameJoinCardTTITracking then
-						GameJoinCardTTI.trackMobileCardClickStart()
-					end
-
-					v3.navigate(AppPage.GameJoinCard, {
-						userId = props.item.id,
-						homepageCarouselAbsolutePosition = props.index
-					})
-				else
-					setState(not state)
-				end
-			elseif FFlagSocialCarouselBuildPresence and v19.isInBuild and v19.canOpen then
-				v19.onActivated()
-			elseif FFlagShowRequestsInCarouselForAllUsers and v22 then
-				v22()
-			else
-				local v25
-
-				if FFlagEnableSplitPane then
-					v25 = v3.push
-				else
-					v25 = v3.navigate
-				end
-
-				v25(AppPage.ProfilePlatform, {
-					detail = props.item.id,
-					extraProps = { source = enums.Sources.HomePageFriendsCarousel }
-				})
-			end
+			v23 = false
 		end
-
-		userPressed(v16, { absolutePosition = props.index })
-	end
-
-	local item = props.item
-	local v23
-
-	if FFlagShowRequestsInCarouselForAllUsers then
-		v23 = v11
 	end
 
 	local v24
 
-	if FFlagShowRequestsInCarouselForAllUsers then
-		v24 = v22
+	if FFlagSocialCarouselInGameTileInstantJoin or FFlagSocialCarouselInGameTextInstantJoin then
+		v24 = useJoinUserInExperience(props.item.id, {
+			isHomePageCarousel = true,
+			homepageCarouselAbsolutePosition = props.index,
+			presence = props.item.presence,
+			onAgeCheckCompletion = useAgeCheckCompletionLogger(not props.item.presence and "" or tostring(props.item.presence.universeId))
+		})
+	else
+		v24 = nil
 	end
 
+	local useCallback = React.useCallback
+	local function fn4(_, tileClickTarget: string?)
+		if
+			(FFlagSocialCarouselInGameTileInstantJoin or FFlagSocialCarouselInGameTextInstantJoin)
+			and v23
+			and not v24.isLoading
+			and (FFlagSocialCarouselInGameTileInstantJoin or tileClickTarget ~= TILE_CLICK_TARGETS.AVATAR)
+		then
+			local presence = props.item.presence
+			local placeId = (not presence or presence.placeId == nil) and "" or tostring(presence.placeId)
+			local rootPlaceId
+
+			if presence then
+				rootPlaceId = tonumber(presence.rootPlaceId)
+			end
+
+			if placeId ~= "" and rootPlaceId ~= nil then
+				DiscoveryAnalytics.Events.gamePlayIntent(
+					v8.eventIngest,
+					DiscoveryAnalytics.Constants.Context.PeopleListInHomePage,
+					{
+						placeId = placeId,
+						rootPlaceId = rootPlaceId,
+						friendId = props.item.id,
+						joinAttemptId = HttpService:GenerateGUID(false)
+					}
+				)
+			end
+
+			userPressed(v16, { absolutePosition = props.index, tileClickTarget = tileClickTarget })
+
+			v24.joinExperience()
+		else
+			if props.item.onActivated then
+				props.item.onActivated(props.item)
+			else
+				local v25
+
+				if props.item.presence == nil then
+					v25 = false
+				else
+					v25 = props.item.presence.userPresenceType == PresenceTypes.InGame
+				end
+
+				local v26 = v5 and v25
+
+				if FFlagShowRequestsInCarouselForAllUsers and v11 and v22 then
+					v22()
+				elseif
+					v26
+					and not (FFlagConsoleOpenMobileGameJoinCard and v7 and v25)
+					and not FFlagConsoleOpenGameJoinCard
+				then
+					v2(PlayerContextualMenu.openPlayerContextualMenu({
+						subjectUserId = props.item.id,
+						subjectPresence = subjectPresence,
+						robloxFriendshipStatus = fn(props.item),
+						friendshipOriginSourceType = Enums.FriendshipOriginSourceType.FriendRecommendations.rawValue()
+					}))
+				elseif props.item.presence and props.item.presence.userPresenceType == PresenceTypes.InGame then
+					if defineFastFlag then
+						IXPService:LogFlagLinkedUserLayerExposure(defineFastString2)
+					end
+
+					if v7 then
+						if FFlagMobileGameJoinCardTTITracking then
+							GameJoinCardTTI.trackMobileCardClickStart()
+						end
+
+						if joinSheetUserIdRef ~= nil then
+							joinSheetUserIdRef.current = props.item.id
+						end
+
+						local navigate = v3.navigate
+						local gameJoinCard = AppPage.GameJoinCard
+						local v27 = {
+							userId = props.item.id,
+							homepageCarouselAbsolutePosition = props.index,
+							isBannerVideoEnabled = 0,
+							videoPlaybackContext = 0
+						}
+						local isBannerVideoEnabled
+
+						if FFlagMobileGameJoinCardVideo then
+							isBannerVideoEnabled = v8.isJoinCardVideoEnabled
+						end
+
+						v27.isBannerVideoEnabled = isBannerVideoEnabled
+						local videoPlaybackContext
+
+						if FFlagMobileGameJoinCardVideo then
+							videoPlaybackContext = v8.videoPlaybackContext
+						end
+
+						v27.videoPlaybackContext = videoPlaybackContext
+						navigate(gameJoinCard, v27)
+					else
+						setState(not state)
+					end
+				elseif FFlagSocialCarouselBuildPresence and v19.isInBuild and v19.canOpen then
+					v19.onActivated()
+				elseif FFlagShowRequestsInCarouselForAllUsers and v22 then
+					v22()
+				else
+					local v27
+
+					if FFlagEnableSplitPane then
+						v27 = v3.push
+					else
+						v27 = v3.navigate
+					end
+
+					v27(AppPage.ProfilePlatform, {
+						detail = props.item.id,
+						extraProps = { source = enums.Sources.HomePageFriendsCarousel }
+					})
+				end
+			end
+
+			local v25 = { absolutePosition = props.index, tileClickTarget = 0 }
+
+			if not (FFlagSocialCarouselInGamePlayIcon and v23) then
+				tileClickTarget = nil
+			end
+
+			v25.tileClickTarget = tileClickTarget
+			userPressed(v16, v25)
+		end
+	end
+
+	local item = props.item
 	local v25
 
-	if FFlagShowRequestsInCarouselForAllUsers then
-		v25 = v3
+	if FFlagSocialCarouselInGamePlayIcon then
+		v25 = v23
 	end
 
-	local onActivated = useCallback(fn4, {
+	local joinExperience
+
+	if FFlagSocialCarouselInGameTileInstantJoin or FFlagSocialCarouselInGameTextInstantJoin then
+		joinExperience = v24.joinExperience
+	end
+
+	local isLoading
+
+	if FFlagSocialCarouselInGameTileInstantJoin or FFlagSocialCarouselInGameTextInstantJoin then
+		isLoading = v24.isLoading
+	end
+
+	local eventIngest
+
+	if FFlagSocialCarouselInGameTileInstantJoin or FFlagSocialCarouselInGameTextInstantJoin then
+		eventIngest = v8.eventIngest
+	end
+
+	local v26
+
+	if FFlagSocialCarouselInGameTitleMarquee then
+		v26 = joinSheetUserIdRef
+	end
+
+	local v27
+
+	if FFlagShowRequestsInCarouselForAllUsers then
+		v27 = v11
+	end
+
+	local v28
+
+	if FFlagShowRequestsInCarouselForAllUsers then
+		v28 = v22
+	end
+
+	local v29
+
+	if FFlagShowRequestsInCarouselForAllUsers then
+		v29 = v3
+	end
+
+	local v30 = {
 		item,
 		state,
+		v25,
+		joinExperience,
+		isLoading,
+		eventIngest,
 		v20,
 		v21,
+		v26,
 		FFlagSocialCarouselBuildPresence and v19,
-		v23,
-		v24,
-		v25,
+		v27,
+		v28,
+		v29,
 		v16,
 		v2,
 		userPressed,
-		v5,
-		props.index,
-		v7,
-		subjectPresence
-	})
+		nil,
+		nil,
+		nil,
+		nil,
+		nil,
+		nil
+	}
+
+	local index = props.index
+	local isJoinCardVideoEnabled
+
+	if FFlagMobileGameJoinCardVideo then
+		isJoinCardVideoEnabled = v8.isJoinCardVideoEnabled
+	end
+
+	local v31
+
+	if FFlagMobileGameJoinCardVideo then
+		v31 = v8.videoPlaybackContext
+	end
+
+	v30[17], v30[18], v30[19], v30[20], v30[21], v30[22] = v5, index, v7, subjectPresence, isJoinCardVideoEnabled, v31
+	local v32 = useCallback(fn4, v30)
+	local onActivated
+
+	if FFlagSocialCarouselInGamePlayIcon then
+		onActivated = React.useCallback(function()
+			v32(nil, TILE_CLICK_TARGETS.AVATAR)
+		end, { v32 })
+	else
+		onActivated = v32
+	end
+
+	local onTextActivated
+
+	if FFlagSocialCarouselInGamePlayIcon then
+		onTextActivated = React.useCallback(function()
+			v32(nil, TILE_CLICK_TARGETS.TILE_TEXT)
+		end, { v32 })
+	end
+
+	local onPlayIconActivated
+
+	if FFlagSocialCarouselInGamePlayIcon then
+		onPlayIconActivated = React.useCallback(function()
+			v32(nil, TILE_CLICK_TARGETS.PLAY_ICON)
+		end, { v32 })
+	end
 
 	local contextualText = React.useMemo(function()
 		if FFlagShowRequestsInCarouselForAllUsers and v11 then
@@ -512,15 +713,15 @@ return function(props)
 		if FFlagShowRequestsInCarouselForAllUsers and v22 then
 			v22()
 		else
-			local v26
+			local v47
 
 			if FFlagEnableSplitPane then
-				v26 = v3.push
+				v47 = v3.push
 			else
-				v26 = v3.navigate
+				v47 = v3.navigate
 			end
 
-			v26(AppPage.ProfilePlatform, {
+			v47(AppPage.ProfilePlatform, {
 				detail = props.item.id,
 				extraProps = { source = enums.Sources.HomePageFriendsCarousel }
 			})
@@ -530,11 +731,11 @@ return function(props)
 	end
 
 	local item2 = props.item
-	local index = props.index
-	local v26
+	local index2 = props.index
+	local v48
 
 	if FFlagShowRequestsInCarouselForAllUsers then
-		v26 = v22
+		v48 = v22
 	end
 
 	local navigate
@@ -543,13 +744,13 @@ return function(props)
 		navigate = v3.navigate
 	end
 
-	local v27
+	local v49
 
 	if not FFlagShowRequestsInCarouselForAllUsers then
-		v27 = v3.push
+		v49 = v3.push
 	end
 
-	local onActivated2 = useCallback2(fn5, { item2, index, v26, navigate, v27, userPressed, v16 })
+	local onActivated2 = useCallback2(fn5, { item2, index2, v48, navigate, v49, userPressed, v16 })
 
 	local buttons = React.useMemo(function()
 		return {
@@ -641,32 +842,32 @@ return function(props)
 		isConsole = v5
 	end
 
-	local v28
+	local v55
 
 	if not (FFlagConsoleOpenGameJoinCard and isConsole) then
 		if not (FFlagDesktopGameJoinCardGamepadSupport and not isConsole) then
-			v28 = state2
+			v55 = state2
 		end
 	end
 
-	local isFocused = useGameJoinCardNavigation(v28, isConsole and not FFlagConsoleOpenGameJoinCard, ref)
+	local isFocused = useGameJoinCardNavigation(v55, isConsole and not FFlagConsoleOpenGameJoinCard, ref)
 
 	local presence = props.item.presence
-	local v29 = presence and presence.userPresenceType == PresenceTypes.InGame
-	local v30
+	local v57 = presence and presence.userPresenceType == PresenceTypes.InGame
+	local v58
 
 	if state or isFocused then
-		v30 = v29 and subjectPresence ~= nil
+		v58 = v57 and subjectPresence ~= nil
 	else
-		v30 = isFocused
+		v58 = isFocused
 	end
 
-	local v31 = v29 and isConsole and v30
+	local v59 = v57 and isConsole and v58
 	React.useEffect(function()
-		if defineFastFlag and v30 then
+		if defineFastFlag and v58 then
 			IXPService:LogFlagLinkedUserLayerExposure(defineFastString2)
 		end
-	end, { v30 })
+	end, { v58 })
 
 	local createElement = React.createElement
 
@@ -676,7 +877,7 @@ return function(props)
 		v14 = nil
 	end
 
-	local v32 = {
+	local v60 = {
 		item = v14,
 		itemSize = UDim2.fromScale(1, 1),
 		onActivated = onActivated,
@@ -687,7 +888,10 @@ return function(props)
 		contextualInfoIcon = 0,
 		tileRef = 0,
 		titleIcon = 0,
-		isRobloxSubscriber = 0
+		isRobloxSubscriber = 0,
+		showPlayIcon = 0,
+		onPlayIconActivated = 0,
+		onTextActivated = 0
 	}
 	local name
 
@@ -697,48 +901,67 @@ return function(props)
 		name = v17
 	end
 
-	v32.name = name
-	v32.contextualText = contextualText
+	v60.name = name
+	v60.contextualText = contextualText
 	local overlayIcon
 
 	if FFlagShowRequestsInCarouselForAllUsers and v11 then
 		overlayIcon = Foundation.Enums.IconName.PersonPlus
 	end
 
-	v32.overlayIcon = overlayIcon
+	v60.overlayIcon = overlayIcon
 	local contextualInfo2
 
 	if FFlagSocialCarouselBuildPresence and contextualInfo then
 		contextualInfo2 = contextualInfo.text
 	end
 
-	v32.contextualInfo = contextualInfo2
+	v60.contextualInfo = contextualInfo2
 	local contextualInfoIcon
 
 	if FFlagSocialCarouselBuildPresence and contextualInfo then
 		contextualInfoIcon = contextualInfo.icon
 	end
 
-	v32.contextualInfoIcon = contextualInfoIcon
+	v60.contextualInfoIcon = contextualInfoIcon
 
-	v32.tileRef = ref
+	v60.tileRef = ref
 	local titleIcon
 
 	if props.item.tileType == Tile.Recommendation then
 		titleIcon = defineFastString
 	end
 
-	v32.titleIcon = titleIcon
+	v60.titleIcon = titleIcon
 
 	if not FFlagSocialCarouselShowPlusBadge then
 		isRobloxSubscriber = nil
 	end
 
-	v32.isRobloxSubscriber = isRobloxSubscriber
-	local element = createElement(UserTile, join(props, v32))
+	v60.isRobloxSubscriber = isRobloxSubscriber
+	local showPlayIcon
+
+	if FFlagSocialCarouselInGamePlayIcon then
+		showPlayIcon = v23
+	end
+
+	v60.showPlayIcon = showPlayIcon
+
+	if not (FFlagSocialCarouselInGamePlayIcon and v23) then
+		onPlayIconActivated = nil
+	end
+
+	v60.onPlayIconActivated = onPlayIconActivated
+
+	if not (FFlagSocialCarouselInGamePlayIcon and v23) then
+		onTextActivated = nil
+	end
+
+	v60.onTextActivated = onTextActivated
+	local element = createElement(UserTile, join(props, v60))
 
 	local createElement2 = React.createElement
-	local v56 = {
+	local v67 = {
 		Size = props.itemSize,
 		LayoutOrder = props.index,
 		BackgroundTransparency = 1,
@@ -748,7 +971,8 @@ return function(props)
 	local gameJoinCardPopover
 
 	if not (FFlagSocialCarouselBuildPresence and v19.isInBuild or not (subjectPresence and presence)) then
-		gameJoinCardPopover = React.createElement(DesktopGameJoinCardContainer, {
+		local createElement3 = React.createElement
+		local v70 = {
 			layoutOrder = 1,
 			playerName = v17 or "",
 			platformName = v18 or "",
@@ -758,14 +982,23 @@ return function(props)
 			userId = props.item.id,
 			presence = presence,
 			anchorRef = ref,
-			isOpen = v30 == true,
+			isOpen = v58 == true,
 			onClose = onClose,
 			homepageCarouselAbsolutePosition = props.index,
-			showGamepadJoinFocus = v31 == true,
+			showGamepadJoinFocus = v59 == true,
 			onCardGuiObjectChanged = onCardGuiObjectChanged,
 			isFocused = isFocused,
-			isConsole = isConsole
-		})
+			isConsole = isConsole,
+			experienceUtilities = 0
+		}
+		local experienceUtilities
+
+		if FFlagSocialCarouselInGameTileInstantJoin or FFlagSocialCarouselInGameTextInstantJoin then
+			experienceUtilities = v24
+		end
+
+		v70.experienceUtilities = experienceUtilities
+		gameJoinCardPopover = createElement3(DesktopGameJoinCardContainer, v70)
 	end
 
 	local buildJoinCardPopover
@@ -775,21 +1008,21 @@ return function(props)
 	end
 
 	local createElement3 = React.createElement
-	local v60 = { tileRef = ref, buttons = nil, onTileActivated = 0 }
+	local v71 = { tileRef = ref, buttons = nil, onTileActivated = 0 }
 	local buttons2
 
 	if v6 then
 		buttons2 = buttons
 	end
 
-	v60.buttons = buttons2
-	function v60.onTileActivated() end
+	v71.buttons = buttons2
+	function v71.onTileActivated() end
 
-	local v57 = {
+	local v68 = {
 		UserTile = element,
 		GameJoinCardPopover = gameJoinCardPopover,
 		BuildJoinCardPopover = buildJoinCardPopover,
-		TileEventHandlers = createElement3(UserTileEventHandlers, v60),
+		TileEventHandlers = createElement3(UserTileEventHandlers, v71),
 		CardEventHandlers = 0
 	}
 	local cardEventHandlers
@@ -802,6 +1035,6 @@ return function(props)
 		})
 	end
 
-	v57.CardEventHandlers = cardEventHandlers
-	return createElement2(View, v56, v57)
+	v68.CardEventHandlers = cardEventHandlers
+	return createElement2(View, v67, v68)
 end

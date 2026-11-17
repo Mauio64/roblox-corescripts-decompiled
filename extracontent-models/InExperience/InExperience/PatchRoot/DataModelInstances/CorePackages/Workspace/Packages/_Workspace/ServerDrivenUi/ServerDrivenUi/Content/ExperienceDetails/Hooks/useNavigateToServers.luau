@@ -46,11 +46,12 @@ local function useNavigateToServers(universeId: string)
 		pcall(function()
 			default:isURLRegistered(servers):andThen(function(p)
 				if p then
-					if default:isInternalDlicEnabled() then
-						default:detectDeeplinkIntent((default:createInternalDlic(servers, DeepLinkSource.LuaInternal)))
-					else
+					if not default:isInternalDlicEnabled() then
 						default:detectURL(servers)
+						return
 					end
+
+					default:detectDeeplinkIntent((default:createInternalDlic(servers, DeepLinkSource.LuaInternal)))
 				elseif v then
 					v2.navigate(AppPage.GenericWebPage, {
 						detail = servers,

@@ -16,9 +16,11 @@ local setHumanoidDescriptionColorsFromBodyColor3s = require(script.Parent.setHum
 local createHumanoidDescriptionAccessoryInfo = require(script.Parent.createHumanoidDescriptionAccessoryInfo)
 local setMakeupDescriptions = require(script.Parent.setMakeupDescriptions)
 local isMakeupAssetType = require(AvatarExperienceCommon.Utils.isMakeupAssetType)
+local isSpawnEffectAssetType = require(AvatarExperienceCommon.Utils.isSpawnEffectAssetType)
 
 local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
 local FFlagAXOutfitPageRevamp = AvatarExperienceFlags.FFlagAXOutfitPageRevamp
+local FFlagAXSpawnEffectSaveRoundTrip = AvatarExperienceFlags.FFlagAXSpawnEffectSaveRoundTrip
 
 local getHumanoidDescriptionFromStateForOutfitType = require(AvatarExperienceCommon.Utils.Humanoid.getHumanoidDescriptionFromStateForOutfitType)
 
@@ -56,7 +58,10 @@ return function(p)
 
 				if v4 then
 					values[v4] = joined
-				elseif k ~= ASSET_TYPE_NAME_TO_ID_STRING.Gear and not isMakeupAssetType(k) then
+				elseif
+					k ~= ASSET_TYPE_NAME_TO_ID_STRING.Gear
+					and not (isMakeupAssetType(k) or FFlagAXSpawnEffectSaveRoundTrip and isSpawnEffectAssetType(k))
+				then
 					mutedError(string.format(
 						"assetTypeId: %s not recognized as member of humanoidDescription",
 						(tostring(k))

@@ -11,12 +11,26 @@ require(PYMKCarousel.Common.DirectRecommendationTypes)
 
 local SharedFlags = require(parent.SharedFlags)
 local FFlagLuaAppEnableSduiHomePage = SharedFlags.FFlagLuaAppEnableSduiHomePage
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagPymkCarouselExtendProps = SharedFlags2.FFlagPymkCarouselExtendProps
 
 local function useContactsContext(items, options)
-	local v = FFlagLuaAppEnableSduiHomePage and (options or {}) or useSelector(function(p)
-		local localUserId = tostring(p.LocalUserId)
-		return roduxFriends.Selectors.selectRecommendationsForUserId(p)(localUserId) or {}
-	end, tutils.shallowEqual)
+	local v
+
+	if FFlagLuaAppEnableSduiHomePage then
+		v = options or {}
+	elseif FFlagPymkCarouselExtendProps then
+		local v2 = useSelector(function(p)
+			local localUserId = tostring(p.LocalUserId)
+			return roduxFriends.Selectors.selectRecommendationsForUserId(p)(localUserId) or {}
+		end, tutils.shallowEqual)
+		v = options or v2
+	else
+		v = useSelector(function(p)
+			local localUserId = tostring(p.LocalUserId)
+			return roduxFriends.Selectors.selectRecommendationsForUserId(p)(localUserId) or {}
+		end, tutils.shallowEqual)
+	end
 
 	return (React.useMemo(function()
 		local contacts = {}

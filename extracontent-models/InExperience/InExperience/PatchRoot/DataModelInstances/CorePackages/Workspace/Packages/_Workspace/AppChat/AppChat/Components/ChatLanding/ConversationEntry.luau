@@ -13,15 +13,12 @@ local useChatPagePadding = require(AppChat.Contexts.ChatPagePadding.useChatPageP
 local UIBlox = require(parent.UIBlox)
 local useStyle = UIBlox.Core.Style.useStyle
 local useTextSizeOffset = UIBlox.Core.Style.useTextSizeOffset
-local AppCommonLib = require(parent.AppCommonLib)
-local Text = AppCommonLib.Text
 local Cryo = require(parent.Cryo)
 
 local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
 local Style = require(parent.Style)
 local GetTextSize = Style.GetTextSize
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local getBoldTextTheme = require(script.Parent.Utils.getBoldTextTheme)
 
@@ -104,22 +101,9 @@ local function ConversationEntry(p)
 	local shortRelativeTime = joined.conversation.shortRelativeTime or ""
 	local timestampText = useRelativeTimestampBinding(joined.conversation.unixTime)
 
-	local function fn()
-		if FoundationFontFaceMigration then
-			return GetTextSize(shortRelativeTime, v9, v2.Typography.CaptionLarge.Font, Vector2.new(10000, 10000)).X
-		end
-
-		return (Text.GetTextWidth(shortRelativeTime, captionSubHeader.Font, v9))
-	end
-
-	local font = captionSubHeader.Font
-	local v10
-
-	if FoundationFontFaceMigration then
-		v10 = v2.Typography.CaptionLarge.Font
-	end
-
-	local v11 = useMemo(fn, { shortRelativeTime, font, v9, v3, v10 })
+	local v10 = useMemo(function()
+		return GetTextSize(shortRelativeTime, v9, v2.Typography.CaptionLarge.Font, Vector2.new(10000, 10000)).X
+	end, { shortRelativeTime, captionSubHeader.Font, v9, v3, v2.Typography.CaptionLarge.Font })
 	local subTitleTimestamp
 
 	if FFlagAppChatTimestampInSubtitle then
@@ -127,11 +111,11 @@ local function ConversationEntry(p)
 	end
 
 	local ref = React.useRef(nil)
-	local v12 = useNavigation()
-	local v13 = false
+	local v11 = useNavigation()
+	local v12 = false
 
-	if v12.getScreenProps then
-		v13 = v12.getScreenProps("wideMode", v13)
+	if v11.getScreenProps then
+		v12 = v11.getScreenProps("wideMode", v12)
 	end
 
 	React.useEffect(function()
@@ -140,14 +124,14 @@ local function ConversationEntry(p)
 
 	local overlayStore = GetOverlayStore(false)
 
-	local v14 = React.useCallback(function(conversationId: string)
-		v12.navigate(EnumScreens.ChatConversation, {
+	local v13 = React.useCallback(function(conversationId: string)
+		v11.navigate(EnumScreens.ChatConversation, {
 			conversationId = conversationId,
 			isNavigatedFromGroupOSAJoin = true
 		})
-	end, { v12 })
+	end, { v11 })
 
-	local v15 = React.useCallback(
+	local v14 = React.useCallback(
 		function(conversationId: string, impressionId: string?, modalVariant: string?, p2: string?, callback)
 			overlayStore.showOverlay(OverlayTypes.GroupOSADialog, {
 				conversationId = conversationId,
@@ -159,7 +143,7 @@ local function ConversationEntry(p)
 					if callback then
 						callback(conversationId)
 					else
-						v14(conversationId)
+						v13(conversationId)
 					end
 				end,
 				onDecline = function()
@@ -171,52 +155,52 @@ local function ConversationEntry(p)
 				end
 			})
 		end,
-		{ v14, v6 }
+		{ v13, v6 }
 	)
 
 	local onActivated = React.useCallback(function(p2)
+		local v15 = nil
 		local v16 = nil
-		local v17 = nil
 
 		if shouldShowU13ChatOptInForConversation(p2) then
-			v17 = Constants.OptInVariant.ChatOptInInfoCard
+			v16 = Constants.OptInVariant.ChatOptInInfoCard
 		elseif shouldShowOSAForConversation(p2) then
-			v17 = Constants.OptInVariant.OsaContextCard
+			v16 = Constants.OptInVariant.OsaContextCard
 		end
 
-		if v17 then
-			v16 = HttpService:GenerateGUID(false)
-			v15(p2.id, v16, v17, p2.conversationType)
+		if v16 then
+			v15 = HttpService:GenerateGUID(false)
+			v14(p2.id, v15, v16, p2.conversationType)
 		elseif joined.onActivated then
 			joined.onActivated(p2)
 		end
 
-		joined.fireClickEvent(p2, v4, v16)
-	end, { v15, joined.onActivated, joined.fireClickEvent, v4 })
+		joined.fireClickEvent(p2, v4, v15)
+	end, { v14, joined.onActivated, joined.fireClickEvent, v4 })
 
 	local onSquadJoinButtonActivated = joined.onSquadJoinButtonActivated
 	local onActivated2 = React.useCallback(function(p2: string)
-		local v16 = nil
+		local v15 = nil
 
 		if shouldShowOSAForConversation(conversation) then
-			v16 = Constants.OptInVariant.OsaContextCard
+			v15 = Constants.OptInVariant.OsaContextCard
 		elseif
 			FFlagAppChatEnableU13ChatOptIn
 			and shouldShowU13ChatOptInForConversation(conversation)
 			and conversation.conversationType == Conversation.Type.MULTI_USER_CONVERSATION
 		then
-			v16 = Constants.OptInVariant.ChatOptInInfoCard
+			v15 = Constants.OptInVariant.ChatOptInInfoCard
 		end
 
-		if v16 and v15 then
-			v15(p2, HttpService:GenerateGUID(false), v16, conversation.conversationType, onSquadJoinButtonActivated)
+		if v15 and v14 then
+			v14(p2, HttpService:GenerateGUID(false), v15, conversation.conversationType, onSquadJoinButtonActivated)
 		elseif onSquadJoinButtonActivated then
 			onSquadJoinButtonActivated(p2)
 		end
-	end, { v15, conversation, onSquadJoinButtonActivated })
+	end, { v14, conversation, onSquadJoinButtonActivated })
 
 	if FFlagAppChatUseActivationOnFocus then
-		useActivationOnFocus(v13, ref, function()
+		useActivationOnFocus(v12, ref, function()
 			onActivated(conversation)
 		end, function(p2)
 			return if p2 then p2.cell else nil
@@ -224,56 +208,56 @@ local function ConversationEntry(p)
 			return conversation and conversation.id
 		end, nil, conversationFocusActivationDelaySeconds)
 	else
-		local v16 = React.useContext(ReactFocusNavigation.FocusNavigationContext)
+		local v15 = React.useContext(ReactFocusNavigation.FocusNavigationContext)
 		React.useEffect(function()
-			if v13 and onActivated and v16 then
-				local v17 = v16.focusedGuiObject:subscribe(function(p2)
+			if v12 and onActivated and v15 then
+				local v16 = v15.focusedGuiObject:subscribe(function(p2)
 					if ref.current and p2 == ref.current.cell then
 						onActivated(conversation)
 					end
 				end)
 				return function()
-					v17:unsubscribe()
+					v16:unsubscribe()
 				end
 			end
 
 			return function() end
-		end, { onActivated, v13, v16 })
+		end, { onActivated, v12, v15 })
 	end
 
 	local children = joined.children or {}
 
 	local size_1900 = v2.Size.Size_1900
 
-	local v16 = useCanAccessParty()
+	local v15 = useCanAccessParty()
 
-	local v17 = not hasUnreadMessages and 0 or v2.Size.Size_200 + v2.Gap.XSmall
+	local v16 = not hasUnreadMessages and 0 or v2.Size.Size_200 + v2.Gap.XSmall
 
 	local right = v8.right
 	local childWidth
 
-	if v16 and hasGroupUp then
+	if v15 and hasGroupUp then
 		childWidth = right + size_1900
 	elseif FFlagAppChatTimestampInSubtitle then
 		childWidth = not hasUnreadMessages and 0 or v2.Gap.Medium + v2.Size.Size_200
 	else
-		childWidth = v11 + v17 + right
+		childWidth = v10 + v16 + right
 	end
 
 	local squadButton
 
-	if v16 and hasGroupUp and conversation.id then
+	if v15 and hasGroupUp and conversation.id then
 		local createElement = React.createElement
-		local v18 = { parentChannelId = conversation.id }
+		local v17 = { parentChannelId = conversation.id }
 
 		local createElement2 = React.createElement
-		local v19 = {
+		local v18 = {
 			BackgroundTransparency = 1,
 			Size = UDim2.new(0, size_1900, 1, 0),
 			LayoutOrder = 2
 		}
 
-		local v20 = {
+		local v19 = {
 			layout = React.createElement("UIListLayout", {
 				HorizontalAlignment = Enum.HorizontalAlignment.Right,
 				VerticalAlignment = Enum.VerticalAlignment.Center
@@ -283,7 +267,7 @@ local function ConversationEntry(p)
 		}
 
 		local createElement3 = React.createElement
-		local v21 = {
+		local v20 = {
 			conversationId = conversation.id,
 			isFullWidth = false,
 			isInCard = false,
@@ -301,13 +285,13 @@ local function ConversationEntry(p)
 			testId = DomLocators.chatLandingConversationEntrySquadButton(conversation.title)
 		end
 
-		v21.testId = testId
-		v20.button = createElement3(SquadJoinButton, v21)
-		squadButton = createElement(SquadComponentAccessWrapper, v18, { createElement2("Frame", v19, {}, v20) })
+		v20.testId = testId
+		v19.button = createElement3(SquadJoinButton, v20)
+		squadButton = createElement(SquadComponentAccessWrapper, v17, { createElement2("Frame", v18, {}, v19) })
 	end
 
 	local createElement = React.createElement
-	local v18 = {
+	local v17 = {
 		Size = UDim2.new(1, 0, 0, joined.entryHeight),
 		BackgroundTransparency = 1,
 		ref = ref
@@ -315,7 +299,7 @@ local function ConversationEntry(p)
 
 	local createElement2 = React.createElement
 
-	local v19 = {
+	local v18 = {
 		Size = UDim2.new(1, 0, 0, joined.entryHeight),
 		conversation = joined.conversation,
 		childWidth = childWidth,
@@ -338,23 +322,23 @@ local function ConversationEntry(p)
 		subTitleText = joined.conversation.lastMessageContent
 	end
 
-	v19.subTitleText = subTitleText
+	v18.subTitleText = subTitleText
 
-	v19.subTitleTimestamp = subTitleTimestamp
-	v19.onActivated = onActivated
-	v19.style = style
-	v19.boldTitle = boldTitle
+	v18.subTitleTimestamp = subTitleTimestamp
+	v18.onActivated = onActivated
+	v18.style = style
+	v18.boldTitle = boldTitle
 
-	v19.onSquadJoinButtonActivated = joined.onSquadJoinButtonActivated
-	v19.paddingLeft = v8.left
-	v19.paddingRight = v8.right
+	v18.onSquadJoinButtonActivated = joined.onSquadJoinButtonActivated
+	v18.paddingLeft = v8.left
+	v18.paddingRight = v8.right
 	local testId
 
 	if FFlagDebugAppChatEnableDomLocators then
 		testId = DomLocators.chatLandingConversationEntry(conversation.title)
 	end
 
-	v19.testId = testId
+	v18.testId = testId
 
 	local join = Cryo.Dictionary.join
 	local timeStamp
@@ -374,10 +358,10 @@ local function ConversationEntry(p)
 		})
 	end
 
-	return createElement("Frame", v18, {
+	return createElement("Frame", v17, {
 		cell = createElement2(
 			ConversationCell,
-			v19,
+			v18,
 			join(children, {
 				timeStamp = timeStamp,
 				unreadDot = unreadDot,

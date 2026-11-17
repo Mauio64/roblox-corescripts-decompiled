@@ -11,6 +11,8 @@ local optionallyLog = require(script.Parent.optionallyLog)
 local isEnum = require(script.Parent.Parent.Parent.Utils.isEnum)
 
 local Dash = require(parent2.Dash)
+local SharedFlags = require(parent2.SharedFlags)
+local FFlagPymkCarouselExtendProps = SharedFlags.FFlagPymkCarouselExtendProps
 
 local function fn(p, formatRulesForAdditionalInfo)
 	if p and formatRulesForAdditionalInfo then
@@ -71,7 +73,15 @@ return function(data)
 			fn3(data.eventStreamImpl, data.shouldUseSendEventDeferred), -- inferred equivalent call
 			optionallyLog(data.loggerImpl, fn2)
 		)
-		local v4 = { context = v.context, eventType = v.eventType, additionalInfo = 0 }
+		local context
+
+		if FFlagPymkCarouselExtendProps and data.context then
+			context = data.context
+		else
+			context = v.context
+		end
+
+		local v4 = { context = context, eventType = v.eventType, additionalInfo = 0 }
 		local join = llama.Dictionary.join
 
 		local additionalInfo = v.additionalInfo

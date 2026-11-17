@@ -1,7 +1,7 @@
 local frozen = table.freeze({ analytics = "Feature.Moments.Action.Analytics" })
 
 local frozen2 = table.freeze({
-	title = frozen.analytics,
+	title = "Feature.Moments.PostInsights.Stats",
 	overview = "Feature.Moments.Label.Overview",
 	engagement = "Feature.Moments.Label.Engagement",
 	totalViews = "Feature.Moments.Label.TotalViews",
@@ -21,5 +21,6 @@ return table.freeze({
 	PAGE_KEYS = frozen2,
 	TOOLTIP_KEYS = frozen3,
 	DURATION_SECONDS_KEY = "Feature.Moments.Label.DurationSeconds",
-	PERCENT_KEY = "Feature.Build.Analytics.Percent"
+	PERCENT_KEY = "Feature.Build.Analytics.Percent",
+	POSTED_ON_DATE_KEY = "Feature.Moments.Label.PostedOnDate"
 })

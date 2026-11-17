@@ -6,7 +6,6 @@ local Signals = require(parent.Signals)
 require(script.Parent.types)
 local encoders = require(script.Parent.encoders)
 local analytics = require(script.Parent.analytics)
-local FFlagHttpClientRetryExtensions = require(script.Parent.Flags.FFlagHttpClientRetryExtensions)
 
 local createSignal = Signals.createSignal
 local createResource = Resources.createResource
@@ -63,7 +62,7 @@ local function createRequest(data)
 				analytics2(data.analyticsKey, data.method, data.url, nil, v2, "failed")
 			end
 
-			local function settleResponse(p)
+			local function settleResponse(response)
 				if flag then
 					return
 				end
@@ -72,11 +71,11 @@ local function createRequest(data)
 				local v2 = (os.clock() - lastTime) * 1000
 
 				if data.statusCodeActions ~= nil then
-					local statusCodeAction = data.statusCodeActions[p.statusCode]
+					local statusCodeAction = data.statusCodeActions[response.statusCode]
 
 					if statusCodeAction ~= nil then
 						for _, callback2 in statusCodeAction do
-							local success, result = pcall(callback2, p)
+							local success, result = pcall(callback2, response)
 
 							if not success then
 								warn(`[HttpClient] {data.analyticsKey} status code action threw: {tostring(result)}`)
@@ -85,8 +84,7 @@ local function createRequest(data)
 					end
 				end
 
-				local decode = data.decode
-				local success, result, err, errorCode = pcall(decode, p)
+				local success, result, err, errorCode = pcall(data.decode, response)
 
 				if not success then
 					err = `decode error: {tostring(result)}`
@@ -95,11 +93,6 @@ local function createRequest(data)
 				end
 
 				local v3 = err == nil and "succeeded" or "failed"
-				local response
-
-				if FFlagHttpClientRetryExtensions then
-					response = p
-				end
 
 				if err == nil then
 					v({ status = "succeeded", result = result, response = response })
@@ -107,38 +100,22 @@ local function createRequest(data)
 					v({ status = "failed", error = err, errorCode = errorCode, response = response })
 				end
 
-				analytics2(data.analyticsKey, data.method, data.url, p, v2, v3)
+				analytics2(data.analyticsKey, data.method, data.url, response, v2, v3)
 			end
 
 			local success, result = pcall(function()
-				local request = data.networkImpl.request
-				local v2 = {
+				local request = data.networkImpl.request({
 					url = data.url,
 					method = data.method,
 					headers = headers,
 					body = body,
-					onMessage = 0,
-					priority = 0
-				}
-				local onMessage
-
-				if FFlagHttpClientRetryExtensions then
-					onMessage = data.onMessage
-				end
-
-				v2.onMessage = onMessage
-				local priority
-
-				if FFlagHttpClientRetryExtensions then
+					onMessage = data.onMessage,
 					priority = data.priority
-				end
-
-				v2.priority = priority
-				local v3 = request(v2, function(p, p2)
+				}, function(p, response)
 					if p then
-						settleResponse(p2)
+						settleResponse(response)
 					else
-						settleFailed(tostring(p2))
+						settleFailed(tostring(response))
 					end
 				end)
 				callback(function()
@@ -147,7 +124,7 @@ local function createRequest(data)
 					end
 
 					flag = true
-					v3()
+					request()
 				end)
 			end)
 

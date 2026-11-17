@@ -5,12 +5,13 @@ local defineFastString = game:DefineFastString(
 	"BuildExperienceLibraryImageClasses",
 	"Decal,Texture,ImageLabel,ImageButton"
 )
-local defineFastString2 = game:DefineFastString(
+local defineFastString2 = game:DefineFastString("BuildExperienceLibrarySoundClasses", "Sound")
+local defineFastString3 = game:DefineFastString(
 	"BuildExperienceLibraryRoots",
 	"Workspace,ReplicatedStorage,ReplicatedFirst,Lighting,SoundService,StarterGui,StarterPack,StarterPlayer"
 )
 
-local defineFastString3 = game:DefineFastString("BuildExperienceLibraryDescriptionAttribute", "SemanticDescription")
+local defineFastString4 = game:DefineFastString("BuildExperienceLibraryDescriptionAttribute", "SemanticDescription")
 
 local v = {
 	Decal = "Texture",
@@ -22,32 +23,35 @@ local v = {
 	Trail = "Texture"
 }
 
-local v2 = { Model = 1, Image = 2, Sound = 3 }
+local v2 = { Sound = "SoundId", AudioPlayer = "Asset" }
+
+local v3 = { Model = 1, Image = 2, Sound = 3 }
 
 local function parseList(value: string)
 	local list = {}
 
 	for k in string.gmatch(value, "[^,]+") do
-		local v3 = string.match(k, "^%s*(.-)%s*$")
+		local v4 = string.match(k, "^%s*(.-)%s*$")
 
-		if v3 == "" or table.find(list, v3) then
+		if v4 == "" or table.find(list, v4) then
 			continue
 		end
 
-		table.insert(list, v3)
+		table.insert(list, v4)
 	end
 
 	return list
 end
 
 local function createBuildLibraryStore(p)
-	local v3 = p or game
-	local v4 = parseList(defineFastString)
-	local v5 = parseList(defineFastString2)
-	local signal, v6 = Signals.createSignal({})
+	local v4 = p or game
+	local v5 = parseList(defineFastString)
+	local v6 = parseList(defineFastString2)
+	local v7 = parseList(defineFastString3)
+	local signal, v8 = Signals.createSignal({})
 	local object = setmetatable({}, { __mode = "k" })
 	local count = 0
-	local v7 = nil
+	local v9 = nil
 	local function getId(p2) -- 2 equivalent calls inferred from this helper
 		if object[p2] == nil then
 			count += 1
@@ -57,7 +61,7 @@ local function createBuildLibraryStore(p)
 		return object[p2]
 	end
 
-	local v8 = {}
+	local v10 = {}
 
 	local function sameItems(list, list2): boolean
 		if #list ~= #list2 then
@@ -67,8 +71,8 @@ local function createBuildLibraryStore(p)
 		for k, item in list2 do
 			local item2 = list[k]
 
-			for k2, v9 in item do
-				if item2[k2] ~= v9 then
+			for k2, v11 in item do
+				if item2[k2] ~= v11 then
 					return false
 				end
 			end
@@ -85,9 +89,9 @@ local function createBuildLibraryStore(p)
 
 	return {
 		refresh = function()
-			local v9 = {}
+			local v11 = {}
 			local set = {}
-			v7 = nil
+			v9 = nil
 			local function parentFolderId(child, result, serviceName: string, kind: string)
 				local parent = child.Parent
 
@@ -97,7 +101,7 @@ local function createBuildLibraryStore(p)
 
 						if not set[formatted] then
 							set[formatted] = true
-							table.insert(v9, {
+							table.insert(v11, {
 								id = formatted,
 								instance = parent,
 								displayName = parent.Name,
@@ -118,9 +122,9 @@ local function createBuildLibraryStore(p)
 				return nil
 			end
 
-			for _, serviceName in v5 do
+			for _, serviceName in v7 do
 				local success, result = pcall(function()
-					return v3:GetService(serviceName)
+					return v4:GetService(serviceName)
 				end)
 
 				if not (success and result ~= nil) then
@@ -128,15 +132,15 @@ local function createBuildLibraryStore(p)
 				end
 
 				if serviceName == "Workspace" then
-					v7 = result
+					v9 = result
 				end
 
 				local children = result:GetChildren()
-				local v10 = 1
+				local v12 = 1
 
-				while v10 <= #children do
-					local child = children[v10]
-					v10 += 1
+				while v12 <= #children do
+					local child = children[v12]
+					v12 += 1
 					local className = child.ClassName
 
 					if className ~= "Model" then
@@ -145,37 +149,45 @@ local function createBuildLibraryStore(p)
 						end
 					end
 
-					local v11
+					local v13
 
-					if table.find(v4, className) then
-						v11 = v[className]
+					if table.find(v5, className) then
+						v13 = v[className]
+					end
+
+					local v14
+
+					if table.find(v6, className) then
+						v14 = v2[className]
 					end
 
 					local kind
 
 					if className == "Model" then
 						kind = "Model"
-					elseif className == "Sound" then
-						v11 = "SoundId"
-						kind = "Sound"
-					elseif v11 == nil then
-						continue
-					else
+					elseif v14 == nil then
+						if v13 == nil then
+							continue
+						end
+
 						kind = "Image"
+					else
+						v13 = v14
+						kind = "Sound"
 					end
 
 					local soundId
 
-					if v11 ~= nil then
-						soundId = child[v11]
+					if v13 ~= nil then
+						soundId = child[v13]
 					end
 
 					if soundId == "" then
 						continue
 					end
 
-					local attribute = child:GetAttribute(defineFastString3)
-					local v12 = {
+					local attribute = child:GetAttribute(defineFastString4)
+					local v15 = {
 						id = getId(child), -- inferred equivalent call
 						instance = child,
 						displayName = child.Name,
@@ -194,46 +206,46 @@ local function createBuildLibraryStore(p)
 						attribute = nil
 					end
 
-					v12.description = attribute
+					v15.description = attribute
 					local image
 
 					if kind == "Image" then
 						image = soundId
 					end
 
-					v12.image = image
+					v15.image = image
 
 					if kind ~= "Sound" then
 						soundId = nil
 					end
 
-					v12.soundId = soundId
+					v15.soundId = soundId
 
 					if kind ~= "Model" then
 						child = nil
 					end
 
-					v12.model = child
-					table.insert(v9, v12)
+					v15.model = child
+					table.insert(v11, v15)
 				end
 			end
 
 			local displayNames = {}
 
-			for _, v10 in v9 do
-				displayNames[v10] = string.lower(v10.displayName)
+			for _, v12 in v11 do
+				displayNames[v12] = string.lower(v12.displayName)
 			end
 
-			table.sort(v9, function(a, b): boolean
+			table.sort(v11, function(a, b): boolean
 				if a.kind ~= b.kind then
-					return v2[a.kind] < v2[b.kind]
+					return v3[a.kind] < v3[b.kind]
 				end
 
-				local v10 = displayNames[a]
-				local v11 = displayNames[b]
+				local v12 = displayNames[a]
+				local v13 = displayNames[b]
 
-				if v10 ~= v11 then
-					return v10 < v11
+				if v12 ~= v13 then
+					return v12 < v13
 				end
 
 				if a.path == b.path then
@@ -243,35 +255,35 @@ local function createBuildLibraryStore(p)
 				return a.path < b.path
 			end)
 
-			if sameItems(signal(false), v9) then
+			if sameItems(signal(false), v11) then
 				return
 			end
 
-			v8 = {}
+			v10 = {}
 
-			for _, v10 in v9 do
-				v8[v10.id] = v10
+			for _, v12 in v11 do
+				v10[v12.id] = v12
 			end
 
-			v6(v9)
+			v8(v11)
 		end,
 		getItems = signal,
 		getItem = function(p2, p3: string)
 			signal(p2)
-			return v8[p3]
+			return v10[p3]
 		end,
 		resolveWorldItem = function(instance)
 			while instance ~= nil do
-				local v9 = object[instance]
+				local v11 = object[instance]
 				local selected
 
-				if v9 ~= nil then
-					selected = v8[v9]
+				if v11 ~= nil then
+					selected = v10[v11]
 				end
 
 				if selected == nil or selected.model ~= instance then
 					instance = instance.Parent
-				elseif v7 == nil or not instance:IsDescendantOf(v7) then
+				elseif v9 == nil or not instance:IsDescendantOf(v9) then
 					return nil
 				else
 					return selected

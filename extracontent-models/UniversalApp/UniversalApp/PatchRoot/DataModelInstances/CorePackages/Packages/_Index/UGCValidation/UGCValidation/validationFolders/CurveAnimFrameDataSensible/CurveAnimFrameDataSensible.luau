@@ -36,25 +36,41 @@ local function areNumbersGood(...): boolean
 	return true
 end
 
-function CurveAnimFrameDataSensible.run(object, p)
-	local curveAnimComputedFrames = p.curveAnimComputedFrames
+local function validateCurveAnimClip(object, curveAnimComputedFrame)
+	local fullName = curveAnimComputedFrame.animation and curveAnimComputedFrame.animation:GetFullName()
 
-	for _, animFrame in curveAnimComputedFrames.animFrames do
+	for _, animFrame in curveAnimComputedFrame.animFrames do
 		for _, cframe in animFrame do
 			if not areNumbersGood(cframe:GetComponents()) then
-				object:fail(ErrorSourceStrings.Keys.CurveAnim_InvalidNumericalData)
+				object:fail(
+					ErrorSourceStrings.Keys.CurveAnim_InvalidNumericalData,
+					{ animationName = fullName },
+					curveAnimComputedFrame.animation
+				)
+
 				return
 			end
 		end
 	end
 
-	for _, positionMagnitudeFrame in curveAnimComputedFrames.positionMagnitudeFrames do
+	for _, positionMagnitudeFrame in curveAnimComputedFrame.positionMagnitudeFrames do
 		for _, v in positionMagnitudeFrame do
 			if not areNumbersGood(v) then
-				object:fail(ErrorSourceStrings.Keys.CurveAnim_InvalidNumericalData)
+				object:fail(
+					ErrorSourceStrings.Keys.CurveAnim_InvalidNumericalData,
+					{ animationName = fullName },
+					curveAnimComputedFrame.animation
+				)
+
 				return
 			end
 		end
+	end
+end
+
+function CurveAnimFrameDataSensible.run(p, p2)
+	for _, curveAnimComputedFrame in p2.curveAnimComputedFrames do
+		validateCurveAnimClip(p, curveAnimComputedFrame)
 	end
 end
 

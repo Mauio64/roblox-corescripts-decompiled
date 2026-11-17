@@ -7,6 +7,7 @@ local useNavigation = Navigation.useNavigation
 local RobloxAppNavigation = require(parent.RobloxAppNavigation)
 local SharedFlags = require(parent.SharedFlags)
 local FFlagEnableOnScreenAPIIntegration = SharedFlags.FFlagEnableOnScreenAPIIntegration
+local FFlagLuaAppNavTTIMeasurementV2 = SharedFlags.FFlagLuaAppNavTTIMeasurementV2
 local useOnScreenNavigationListener
 
 if FFlagEnableOnScreenAPIIntegration then
@@ -26,6 +27,17 @@ local function useTTINavigationTracking(p: string)
 
 	local v = useNavigation()
 
+	local function endNavigation() -- 3 equivalent calls inferred from this helper
+		if not FFlagLuaAppNavTTIMeasurementV2 then
+			timeToInteractiveTracker.trackEnd(p)
+
+			return
+		end
+
+		timeToInteractiveTracker.discardOlderNavigationStarts(p)
+		timeToInteractiveTracker.trackEndAtNextFrame(p)
+	end
+
 	local function onWillFocus() -- 1 equivalent call inferred from this helper
 		local v2 = timeToInteractiveTracker.getEvents(false)[p]
 
@@ -36,10 +48,12 @@ local function useTTINavigationTracking(p: string)
 	local function onDidFocus()
 		local v2 = timeToInteractiveTracker.getEvents(false)[p]
 
-		if v2 and v2.startTime then
-			trackMilestone(p, Milestone.SurfaceMounted)
-			timeToInteractiveTracker.trackEnd(p)
+		if not (v2 and v2.startTime) then
+			return
 		end
+
+		trackMilestone(p, Milestone.SurfaceMounted)
+		endNavigation() -- inferred equivalent call
 	end
 
 	if FFlagEnableOnScreenAPIIntegration then
@@ -57,14 +71,13 @@ local function useTTINavigationTracking(p: string)
 				end
 
 				trackMilestone(p, Milestone.SurfaceMounted)
-				timeToInteractiveTracker.trackEnd(p)
+				endNavigation() -- inferred equivalent call
 			end
 		end, nil)
 	end
 
 	React.useEffect(function()
-		timeToInteractiveTracker.trackEnd(p)
-
+		endNavigation() -- inferred equivalent call
 		local v2 = v.addListener(RoactNavigation.Events.WillFocus, onWillFocus)
 		local v3 = v.addListener(RoactNavigation.Events.DidFocus, onDidFocus)
 		return function()

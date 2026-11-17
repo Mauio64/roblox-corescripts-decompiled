@@ -188,80 +188,53 @@ local v3 = {
 	}
 }
 
-local v4 = {
-	[FontName.BuilderSans] = {
-		Desktop = function()
-			return require(Foundation.Generated.StyleRules.Legacy.Typography.BuilderSans.DesktopAttribute)
-		end,
-		Console = function()
-			return require(Foundation.Generated.StyleRules.Legacy.Typography.BuilderSans.ConsoleAttribute)
-		end
-	},
-	[FontName.Cartoon] = {
-		Desktop = function()
-			return require(Foundation.Generated.StyleRules.Legacy.Typography.Cartoon.DesktopAttribute)
-		end,
-		Console = function()
-			return require(Foundation.Generated.StyleRules.Legacy.Typography.Cartoon.ConsoleAttribute)
-		end
-	}
-}
-
 local function getGeneratedRules(p, p2, p3)
-	local v5 = p or ThemeName.Default
+	local v4 = p or ThemeName.Default
 
 	local common = v.Common()
-	local v6 = (v2[v5] or v2[ThemeName.Default])[p2]()
-	local v7
+	local v5 = (v2[v4] or v2[ThemeName.Default])[p2]()
+	local v6
 
 	if p3 == Device.Console and not Flags.FoundationDisableTokenScaling then
-		v7 = v[Device.Console]()
+		v6 = v[Device.Console]()
 	else
-		v7 = v[Device.Desktop]()
+		v6 = v[Device.Desktop]()
 	end
 
-	if not (v6 and v7 and common) then
+	if not (v5 and v6 and common) then
 		return {}
 	end
 
-	local clone = table.clone(v7)
+	local clone = table.clone(v6)
 
-	for k, v8 in common do
-		clone[k] = v8
+	for k, v7 in common do
+		clone[k] = v7
 	end
 
-	for k, v8 in v6 do
-		clone[k] = v8
+	for k, v7 in v5 do
+		clone[k] = v7
 	end
 
-	local v8 = TypographyVariants[v5] or BuilderSans
-	local v9
-
-	if Flags.FoundationFontFaceMigration then
-		v9 = v3[v8] or v3[BuilderSans]
-	else
-		v9 = v4[v8] or v4[BuilderSans]
-	end
-
-	local v10
+	local v7 = v3[TypographyVariants[v4] or BuilderSans] or v3[BuilderSans]
+	local v8
 
 	if p3 == Device.Console and not Flags.FoundationDisableTokenScaling then
-		v10 = Device.Console
+		v8 = Device.Console
 	else
-		v10 = Device.Desktop
+		v8 = Device.Desktop
 	end
 
-	local v11 = v9[v10]
+	local v9 = v7[v8]
 
-	if not v11 then
+	if not v9 then
 		return clone
 	end
 
-	local v12 = v11()
+	local v10 = v9()
 
-	if v12 then
-		for k, v13 in v12 do
-			clone[k] = v13
+	if v10 then
+		for k, v11 in v10 do
+			clone[k] = v11
 		end
 	end
 

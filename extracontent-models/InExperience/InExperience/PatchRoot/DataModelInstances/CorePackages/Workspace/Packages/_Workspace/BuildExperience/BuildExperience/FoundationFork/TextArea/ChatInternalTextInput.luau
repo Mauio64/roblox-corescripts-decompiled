@@ -1,12 +1,9 @@
 local CorePackages = game:GetService("CorePackages")
 local foundation = CorePackages.Packages._Index.Foundation.Foundation
 local parent = foundation.Parent
-local parent2 = script:FindFirstAncestor("BuildExperience").Parent
 
 local React = require(parent.React)
 local ReactUtils = require(parent.ReactUtils)
-local Foundation = require(parent2.Foundation)
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local components = foundation.Components
 local Icon = require(components.Icon)
@@ -67,20 +64,7 @@ local memo = React.memo(React.forwardRef(function(props, ref)
 	v2.Selectable = false
 	v2.Active = not isBoundsChecker and nil
 	v2.Visible = not isBoundsChecker and nil
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = props.fontStyle.Font
-	end
-
-	v2.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(props.fontStyle.Font)
-	end
-
-	v2.FontFace = fontFace
+	v2.FontFace = normalizeFontFace(props.fontStyle.Font)
 	v2.TextSize = props.fontStyle.FontSize
 	v2.LineHeight = props.fontStyle.LineHeight
 	local textColor
@@ -253,36 +237,24 @@ local function InternalTextInput(p, p2)
 	end, {})
 
 	local v14 = React.useCallback(function(text: string)
-		local v14 = {
+		local v14 = measureTextLineCount({
 			text = text,
 			maxLines = v2.maxLines,
 			singleLineHeight = multiLineTextHeight,
 			layoutWidth = v13(),
-			font = 0,
-			fontSize = 0
-		}
-		local font
+			font = normalizeFontFace(fontStyle.Font),
+			fontSize = fontSize
+		})
+		local v15
 
-		if FoundationFontFaceMigration then
-			font = normalizeFontFace(fontStyle.Font)
+		if v14.boundsY and v14.boundsY > 0 then
+			v15 = math.ceil(v14.boundsY)
 		else
-			font = fontStyle.Font
+			v15 = multiLineTextHeight
 		end
 
-		v14.font = font
-
-		v14.fontSize = fontSize
-		local v15 = measureTextLineCount(v14)
-		local v16
-
-		if v15.boundsY and v15.boundsY > 0 then
-			v16 = math.ceil(v15.boundsY)
-		else
-			v16 = multiLineTextHeight
-		end
-
-		setState5((math.max(v16, v15.lineCount * multiLineTextHeight)))
-		return v15.lineCount
+		setState5((math.max(v15, v14.lineCount * multiLineTextHeight)))
+		return v14.lineCount
 	end, { fontSize, lineHeight, fontStyle.Font, v2.maxLines, v13, multiLineTextHeight })
 	local text3
 

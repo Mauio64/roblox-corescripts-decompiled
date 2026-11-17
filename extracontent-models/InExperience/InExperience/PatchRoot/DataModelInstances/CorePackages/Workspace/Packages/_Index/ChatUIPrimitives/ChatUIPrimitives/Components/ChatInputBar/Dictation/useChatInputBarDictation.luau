@@ -14,54 +14,55 @@ local function useChatInputBarDictation(data, p, onSubmit, flag: boolean, flag2:
 		v2(not flag)
 	end, { flag })
 
-	local v3 = {
-		getText = React.useCallback(function()
-			local current = p.current
-			return if current then current.Text else nil
-		end, { p }),
-		setText = React.useCallback(function(text: string)
-			local current = p.current
+	local getText = React.useCallback(function()
+		local current = p.current
+		return if current then current.Text else nil
+	end, { p })
+	local setText = React.useCallback(function(text: string)
+		local current = p.current
 
-			if current then
-				current.Text = text
-			end
-		end, { p }),
+		if current then
+			current.Text = text
+		end
+	end, { p })
+	local v3
+
+	if data then
+		v3 = data.handsFreeEnabled
+	end
+
+	local v4 = {
+		getText = getText,
+		setText = setText,
 		onSubmit = onSubmit,
 		hasText = hasText,
-		inputMode = 0,
+		inputMode = getDictationInputMode(v3),
 		onError = 0,
 		containerName = 0,
 		logger = 0
 	}
-	local v4
-
-	if data then
-		v4 = data.handsFreeEnabled
-	end
-
-	v3.inputMode = getDictationInputMode(v4)
 	local onError
 
 	if data then
 		onError = data.onError
 	end
 
-	v3.onError = onError
+	v4.onError = onError
 	local containerName
 
 	if data then
 		containerName = data.surfaceName
 	end
 
-	v3.containerName = containerName
+	v4.containerName = containerName
 	local logger
 
 	if data then
 		logger = data.logger
 	end
 
-	v3.logger = logger
-	local v5 = useDictationInputBar(v3)
+	v4.logger = logger
+	local v5 = useDictationInputBar(v4)
 
 	local getDictationState = v5.dictation.getDictationState
 	local cancel = v5.dictation.cancel

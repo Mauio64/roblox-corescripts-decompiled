@@ -13,8 +13,6 @@ local getAttachmentCFrameInPartSpace = require(parent.util.getAttachmentCFrameIn
 
 local getFStringUGCValidationAttachmentErrorLink = require(parent.flags.getFStringUGCValidationAttachmentErrorLink)
 
-local getFFlagUGCValidateAttachmentBoundsErrorMessage = require(parent.flags.getFFlagUGCValidateAttachmentBoundsErrorMessage)
-
 local AttachmentBoundsValid = {}
 
 AttachmentBoundsValid.categories = {
@@ -54,42 +52,15 @@ local function validateInMeshSpace(child, instance, bounds, p, object, flag: boo
 	for _, v3 in { "X", "Y", "Z" } do
 		if v2[v3] < min[v3] or v2[v3] > max[v3] then
 			local clampAttachmentToBounds = MeshSpaceUtils.clampAttachmentToBounds(child, p, bounds, 0.001)
-
-			local acceptableBoundsLocalSpace, v4 = MeshSpaceUtils.calculateAcceptableBoundsLocalSpace(
-				bounds,
-				p,
-				boundsDimensions,
-				boundsCenters
-			)
-
-			local position = acceptableBoundsLocalSpace.Position
-			local orientation, v5, v6 = acceptableBoundsLocalSpace.Rotation:ToOrientation()
-
-			local vector3 = Vector3.new(math.deg(orientation), math.deg(v5), (math.deg(v6)))
-
-			if not getFFlagUGCValidateAttachmentBoundsErrorMessage() then
-				object:fail(ErrorSourceStrings.Keys.AttachmentOutOfBounds, {
-					AttachmentName = child.Name,
-					PartName = instance.Name,
-					CurrentPosition = prettyPrintVector3(child.CFrame.Position, 3),
-					ClosestValidPosition = prettyPrintVector3(clampAttachmentToBounds.Position, 3),
-					BoundsPosition = prettyPrintVector3(position, 3),
-					BoundsOrientation = prettyPrintVector3(vector3, 3),
-					BoundsSize = prettyPrintVector3(v4, 3),
-					HelpLink = getFStringUGCValidationAttachmentErrorLink()
-				})
-				break
-			end
-
-			local v7
+			local v4
 
 			if flag then
-				v7 = ErrorSourceStrings.Keys.RigAttachmentOutOfBounds
+				v4 = ErrorSourceStrings.Keys.RigAttachmentOutOfBounds
 			else
-				v7 = ErrorSourceStrings.Keys.AccessoryAttachmentOutOfBounds
+				v4 = ErrorSourceStrings.Keys.AccessoryAttachmentOutOfBounds
 			end
 
-			object:fail(v7, {
+			object:fail(v4, {
 				AttachmentName = child.Name,
 				PartName = instance.Name,
 				CurrentPosition = prettyPrintVector3(child.CFrame.Position, 3),

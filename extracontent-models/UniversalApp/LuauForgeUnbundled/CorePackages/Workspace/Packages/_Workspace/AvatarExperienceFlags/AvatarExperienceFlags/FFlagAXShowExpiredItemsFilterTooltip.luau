@@ -1,3 +1,0 @@
-local FFlagAXInventoryDurablesExpiredFilter = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagAXInventoryDurablesExpiredFilter")
-
-return game:DefineFastFlag("AXShowExpiredItemsFilterTooltip", false) and FFlagAXInventoryDurablesExpiredFilter

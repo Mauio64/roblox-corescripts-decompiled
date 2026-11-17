@@ -1,3 +1,0 @@
-local FFlagMomentsFixRecommendationImpressionLifecycle = require("@game/CorePackages/Workspace/Packages/_Index/Moments/Moments/Flags/FFlagMomentsFixRecommendationImpressionLifecycle")
-
-return game:DefineFastFlag("MomentsFlushDwellBeforeNavigation", false) and FFlagMomentsFixRecommendationImpressionLifecycle

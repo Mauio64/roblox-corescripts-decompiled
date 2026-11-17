@@ -2,7 +2,6 @@ local SponsoredTiles = script:FindFirstAncestor("SponsoredTiles")
 local parent = SponsoredTiles.Parent
 local GameTile = require(parent.GameTile)
 
-local getGameTileLayoutData = GameTile.getGameTileLayoutData
 local formatExperienceThumbnail = GameTile.formatExperienceThumbnail
 local useIsHoveredTile = GameTile.useIsHoveredTile
 local useNavigateToGameDetails = GameTile.useNavigateToGameDetails
@@ -13,7 +12,6 @@ local SponsoredTilesTelemetry = require(parent.SponsoredTilesTelemetry)
 local TwoByOneGameTileTelemetry = SponsoredTilesTelemetry.TwoByOneGameTileTelemetry
 require(SponsoredTiles.types)
 local HiddenTileContent = GameTile.HiddenTileContent
-local ItemLayoutDataParsingUtils = GameTile.ItemLayoutDataParsingUtils
 local HoverTileCoordinator = GameTile.HoverTileCoordinator
 
 local React = require(parent.React)
@@ -23,10 +21,6 @@ local useTokens = Foundation.Hooks.useTokens
 local Image = Foundation.Image
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
 local Responsive = require(parent.Responsive)
-local RoactUtils = require(parent.RoactUtils)
-local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
-local GameInfosRodux = require(parent.GameInfosRodux)
-local GameInfosReducer = GameInfosRodux.GameInfosReducer
 local AppBlox = require(parent.AppBlox)
 local getOverflowMenuSignalStore = AppBlox.getOverflowMenuSignalStore
 local useOverflowMenuOpen = AppBlox.useOverflowMenuOpen
@@ -63,8 +57,6 @@ local useTagAsViewportAutoplayCandidate = VideoUtils.useTagAsViewportAutoplayCan
 local SponsoredAdViewability = require(parent.SponsoredAdViewability)
 local useTagAsSponsoredAdViewabilityCandidate = SponsoredAdViewability.useTagAsSponsoredAdViewabilityCandidate
 
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
-
 local FFlagLuaAppSponsoredTileBadgeContentPadding = require(SponsoredTiles.Flags.FFlagLuaAppSponsoredTileBadgeContentPadding)
 
 local defineFastInt = game:DefineFastInt("LuaAppTwoByOneTileSmallScreenBreakpoint", 600)
@@ -82,7 +74,6 @@ local FFlagLuaAppFeatureTileHapticsFix = SharedFlags.FFlagLuaAppFeatureTileHapti
 local FFlagLuaAppTileVideoCandidateOnly = SharedFlags.FFlagLuaAppTileVideoCandidateOnly
 local FFlagLuaAppDemoModePlayButtonTelemetry = SharedFlags.FFlagLuaAppDemoModePlayButtonTelemetry
 local FFlagLuaAppHomeThumbnailPrefetch = SharedFlags.FFlagLuaAppHomeThumbnailPrefetch
-local FFlagMigrateGameInfoToStore = SharedFlags.FFlagMigrateGameInfoToStore
 local FFlagLuaAppSduiSponsoredTwoByOneTile = SharedFlags.FFlagLuaAppSduiSponsoredTwoByOneTile
 local FFlagLuaAppEnableReportExperience = SharedFlags.FFlagLuaAppEnableReportExperience
 local resolveGameTileThumbnailUri
@@ -487,73 +478,21 @@ return function(props)
 			v57()
 		end
 	end, { isHovered, v13.onTileActivation, v32, v57, v29 })
-	local v59
-
-	if not FFlagMigrateGameInfoToStore then
-		v59 = useSelector(function(p)
-			return p.Personalization[GameInfosReducer.key][universeId]
-		end)
-	end
-
 	local image
 
 	if FFlagLuaAppHomeThumbnailPrefetch then
-		local v62 = {
+		image = resolveGameTileThumbnailUri({
 			placeId = placeId,
 			useGridTile = true,
 			isEmphasized = true,
-			perEntryWideAssetId = 0,
-			game = 0,
-			topicId = 0
-		}
-		local perEntryWideAssetId
-
-		if FFlagMigrateGameInfoToStore then
-			perEntryWideAssetId = props.wideAssetId
-		else
-			perEntryWideAssetId = props.primaryWideImageAssetId
-		end
-
-		v62.perEntryWideAssetId = perEntryWideAssetId
-		local Game
-
-		if not FFlagMigrateGameInfoToStore then
-			Game = v59
-		end
-
-		v62.game = Game
-		v62.topicId = props.topicId
-		image = resolveGameTileThumbnailUri(v62)
-	elseif FFlagMigrateGameInfoToStore then
+			perEntryWideAssetId = props.wideAssetId,
+			topicId = props.topicId
+		})
+	else
 		image = formatExperienceThumbnail(props.wideAssetId, placeId, true)
-	else
-		local gameTileLayoutData = getGameTileLayoutData(v59, props.topicId)
-		local v61
-
-		if props.primaryWideImageAssetId then
-			v61 = props.primaryWideImageAssetId
-		else
-			v61 = ItemLayoutDataParsingUtils.getWideImageAssetId(gameTileLayoutData)
-		end
-
-		if not v61 then
-			if v59 then
-				v61 = v59.primaryWideAssetId or nil
-			else
-				v61 = nil
-			end
-		end
-
-		image = formatExperienceThumbnail(v61, placeId, true)
 	end
 
-	local text
-
-	if FFlagMigrateGameInfoToStore then
-		text = props.ageRatingLabel
-	else
-		text = v59 and v59.ageRecommendationDisplayName or nil
-	end
+	local ageRatingLabel = props.ageRatingLabel
 
 	local ref3 = React.useRef(nil)
 	React.useEffect(function()
@@ -582,7 +521,7 @@ return function(props)
 			size = props.rootSize
 		end
 
-		local v64 = {
+		local v63 = {
 			Size = size,
 			LayoutOrder = props.layoutOrder,
 			ZIndex = props.zIndex,
@@ -591,7 +530,7 @@ return function(props)
 		}
 
 		local createElement2 = React.createElement
-		local v68 = {
+		local v67 = {
 			Size = props.size or UDim2.fromScale(1, 1),
 			BackgroundTransparency = 1,
 			ref = ref,
@@ -613,8 +552,8 @@ return function(props)
 			})
 		end
 
-		return createElement("Frame", v64, {
-			TwoByOneTileContainer = createElement2("TextButton", v68, {
+		return createElement("Frame", v63, {
+			TwoByOneTileContainer = createElement2("TextButton", v67, {
 				HiddenTileContent = hiddenTileContent
 			})
 		})
@@ -626,7 +565,7 @@ return function(props)
 			size = props.rootSize
 		end
 
-		local v64 = {
+		local v63 = {
 			Size = size,
 			LayoutOrder = props.layoutOrder,
 			ZIndex = props.zIndex,
@@ -635,7 +574,7 @@ return function(props)
 		}
 
 		local createElement2 = React.createElement
-		local v68 = {
+		local v67 = {
 			Size = props.size or UDim2.fromScale(1, 1),
 			BackgroundTransparency = 1,
 			Text = "",
@@ -710,7 +649,7 @@ return function(props)
 
 		if v25 then
 			local createElement3 = React.createElement
-			local v71 = { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, ZIndex = 2 }
+			local v70 = { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, ZIndex = 2 }
 
 			local createElement4 = React.createElement
 			local padding
@@ -719,7 +658,7 @@ return function(props)
 				padding = v15
 			end
 
-			v25 = createElement3("Frame", v71, {
+			v25 = createElement3("Frame", v70, {
 				Badge = createElement4(GameTileThumbnailBadges, {
 					tileBadgesByPosition = v25,
 					padding = padding
@@ -730,9 +669,9 @@ return function(props)
 		children.TileBadge = v25
 
 		local createElement3 = React.createElement
-		local v71 = { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, ZIndex = 3 }
+		local v70 = { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, ZIndex = 3 }
 
-		local children2 = {
+		local v71 = {
 			UIPadding = React.createElement("UIPadding", {
 				PaddingLeft = UDim.new(0, v15),
 				PaddingRight = UDim.new(0, v15),
@@ -746,116 +685,62 @@ return function(props)
 				Size = UDim2.new(1, 0, v24, 0),
 				aspectRatio = aspectRatio
 			}),
-			HeaderFrame = 0,
+			HeaderFrame = React.createElement("Frame", {
+				Size = UDim2.new(1, 0, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				Position = UDim2.new(0, 0, 0.47, 0),
+				AnchorPoint = Vector2.new(0, 0.5),
+				BackgroundTransparency = 1
+			}, {
+				UIListLayout = React.createElement("UIListLayout", {
+					FillDirection = Enum.FillDirection.Vertical,
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					Padding = UDim.new(0, v20)
+				}),
+				Headline = React.createElement("TextLabel", {
+					LayoutOrder = 1,
+					Size = UDim2.new(1, 0, 0, 0),
+					AutomaticSize = Enum.AutomaticSize.Y,
+					BackgroundTransparency = 1,
+					Text = props.headline or "",
+					FontFace = normalizeFontFace(v17.Font),
+					TextSize = v17.FontSize,
+					TextColor3 = color,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextYAlignment = Enum.TextYAlignment.Top,
+					TextWrapped = true
+				}),
+				Subtitle = React.createElement("TextLabel", {
+					LayoutOrder = 2,
+					Size = UDim2.new(1, 0, 0, 0),
+					AutomaticSize = Enum.AutomaticSize.Y,
+					BackgroundTransparency = 1,
+					Text = props.subtitle or "",
+					FontFace = normalizeFontFace(v18.Font),
+					TextSize = v18.FontSize,
+					TextColor3 = color,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextYAlignment = Enum.TextYAlignment.Top,
+					TextWrapped = true
+				})
+			}),
 			JoinButtonContainer = 0,
 			ViewGameDetailsButton = 0,
 			BottomRightLabel = 0
 		}
-
-		local createElement4 = React.createElement
-		local v73 = {
-			Size = UDim2.new(1, 0, 0, 0),
-			AutomaticSize = Enum.AutomaticSize.Y,
-			Position = UDim2.new(0, 0, 0.47, 0),
-			AnchorPoint = Vector2.new(0, 0.5),
-			BackgroundTransparency = 1
-		}
-
-		local children3 = {
-			UIListLayout = React.createElement("UIListLayout", {
-				FillDirection = Enum.FillDirection.Vertical,
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				Padding = UDim.new(0, v20)
-			}),
-			Headline = 0,
-			Subtitle = 0
-		}
-
-		local createElement5 = React.createElement
-		local v75 = {
-			LayoutOrder = 1,
-			Size = UDim2.new(1, 0, 0, 0),
-			AutomaticSize = Enum.AutomaticSize.Y,
-			BackgroundTransparency = 1,
-			Text = props.headline or "",
-			Font = 0,
-			FontFace = 0,
-			TextSize = 0,
-			TextColor3 = 0,
-			TextXAlignment = 0,
-			TextYAlignment = 0,
-			TextWrapped = true
-		}
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = v17.Font
-		end
-
-		v75.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(v17.Font)
-		end
-
-		v75.FontFace = fontFace
-
-		v75.TextSize = v17.FontSize
-		v75.TextColor3 = color
-		v75.TextXAlignment = Enum.TextXAlignment.Left
-		v75.TextYAlignment = Enum.TextYAlignment.Top
-		children3.Headline = createElement5("TextLabel", v75)
-
-		local createElement6 = React.createElement
-		local v79 = {
-			LayoutOrder = 2,
-			Size = UDim2.new(1, 0, 0, 0),
-			AutomaticSize = Enum.AutomaticSize.Y,
-			BackgroundTransparency = 1,
-			Text = props.subtitle or "",
-			Font = 0,
-			FontFace = 0,
-			TextSize = 0,
-			TextColor3 = 0,
-			TextXAlignment = 0,
-			TextYAlignment = 0,
-			TextWrapped = true
-		}
-		local font2
-
-		if not FoundationFontFaceMigration then
-			font2 = v18.Font
-		end
-
-		v79.Font = font2
-		local fontFace2
-
-		if FoundationFontFaceMigration then
-			fontFace2 = normalizeFontFace(v18.Font)
-		end
-
-		v79.FontFace = fontFace2
-
-		v79.TextSize = v18.FontSize
-		v79.TextColor3 = color
-		v79.TextXAlignment = Enum.TextXAlignment.Left
-		v79.TextYAlignment = Enum.TextYAlignment.Top
-		children3.Subtitle = createElement6("TextLabel", v79)
-		children2.HeaderFrame = createElement4("Frame", v73, children3)
 		local joinButtonContainer
 
 		if v13.onCtaActivation == "JoinGame" then
-			local createElement7 = React.createElement
-			local v84 = {
+			local createElement4 = React.createElement
+			local v74 = {
 				AutomaticSize = Enum.AutomaticSize.XY,
 				BackgroundTransparency = 1,
 				Position = UDim2.new(0, 0, 1, 0),
 				AnchorPoint = Vector2.new(0, 1)
 			}
 
-			local createElement8 = React.createElement
-			local v86 = {
+			local createElement5 = React.createElement
+			local v76 = {
 				universeId = universeId,
 				placeId = 0,
 				referralSource = 0,
@@ -878,57 +763,42 @@ return function(props)
 				placeId2 = placeId
 			end
 
-			v86.placeId = placeId2
-			v86.referralSource = props.appPage
+			v76.placeId = placeId2
+			v76.referralSource = props.appPage
 
-			v86.playableText = v12
+			v76.playableText = v12
 
-			v86.buttonSize = buttonSize
-			v86.width = width
+			v76.buttonSize = buttonSize
+			v76.width = width
 
-			v86.onActivated = onActivated
-			v86.reportExperienceLaunched = reportExperienceLaunched
-			v86.experienceJoinData = props.launchDataOverride and {
+			v76.onActivated = onActivated
+			v76.reportExperienceLaunched = reportExperienceLaunched
+			v76.experienceJoinData = props.launchDataOverride and {
 				launchData = props.launchDataOverride
 			} or nil
-			joinButtonContainer = createElement7("Frame", v84, {
-				JoinButton = createElement8(PlayButton, v86)
+			joinButtonContainer = createElement4("Frame", v74, {
+				JoinButton = createElement5(PlayButton, v76)
 			})
 		else
 			joinButtonContainer = false
 		end
 
-		children2.JoinButtonContainer = joinButtonContainer
+		v71.JoinButtonContainer = joinButtonContainer
 		local viewGameDetailsButton
 
 		if v13.onCtaActivation == "OpenEdp" then
-			local createElement7 = React.createElement
-			local v85 = {}
-			v85.Size = UDim2.new(width.Scale, width.Offset, 0, v21)
-			v85.Position = UDim2.new(0, 0, 1, 0)
-			v85.AnchorPoint = Vector2.new(0, 1)
-			v85.BackgroundColor3 = color3
-			v85.BackgroundTransparency = transparency
-			v85.Text = v12
-			v85.TextColor3 = v14.LightMode.ActionOverMedia.Foreground.Color3
-			local font3
-
-			if not FoundationFontFaceMigration then
-				font3 = v22.Font
-			end
-
-			v85.Font = font3
-			local fontFace3
-
-			if FoundationFontFaceMigration then
-				fontFace3 = normalizeFontFace(v22.Font)
-			end
-
-			v85.FontFace = fontFace3
-
-			v85.TextSize = v22.FontSize
-			v85[React.Event.Activated] = v56
-			viewGameDetailsButton = createElement7("TextButton", v85, {
+			viewGameDetailsButton = React.createElement("TextButton", {
+				Size = UDim2.new(width.Scale, width.Offset, 0, v21),
+				Position = UDim2.new(0, 0, 1, 0),
+				AnchorPoint = Vector2.new(0, 1),
+				BackgroundColor3 = color3,
+				BackgroundTransparency = transparency,
+				Text = v12,
+				TextColor3 = v14.LightMode.ActionOverMedia.Foreground.Color3,
+				FontFace = normalizeFontFace(v22.Font),
+				TextSize = v22.FontSize,
+				[React.Event.Activated] = v56
+			}, {
 				UICorner = React.createElement("UICorner", {
 					CornerRadius = UDim.new(0, v14.Radius.Medium)
 				})
@@ -937,45 +807,22 @@ return function(props)
 			viewGameDetailsButton = false
 		end
 
-		children2.ViewGameDetailsButton = viewGameDetailsButton
+		v71.ViewGameDetailsButton = viewGameDetailsButton
 
-		local createElement7 = React.createElement
-		local v85 = {
+		v71.BottomRightLabel = React.createElement("TextLabel", {
 			AutomaticSize = Enum.AutomaticSize.X,
 			Size = UDim2.new(0, 0, 0, v19.FontSize * v19.LineHeight),
 			BackgroundTransparency = 1,
-			Text = text,
+			Text = ageRatingLabel,
 			TextSize = v19.FontSize,
-			Font = 0,
-			FontFace = 0,
-			TextColor3 = 0,
-			TextXAlignment = 0,
-			TextTruncate = 0,
-			AnchorPoint = 0,
-			Position = 0
-		}
-		local font3
-
-		if not FoundationFontFaceMigration then
-			font3 = v19.Font
-		end
-
-		v85.Font = font3
-		local fontFace3
-
-		if FoundationFontFaceMigration then
-			fontFace3 = normalizeFontFace(v19.Font)
-		end
-
-		v85.FontFace = fontFace3
-
-		v85.TextColor3 = v14.Color.Extended.Gray.Gray_400.Color3
-		v85.TextXAlignment = Enum.TextXAlignment.Right
-		v85.TextTruncate = Enum.TextTruncate.SplitWord
-		v85.AnchorPoint = Vector2.new(1, 1)
-		v85.Position = UDim2.new(1, 0, 1, 0)
-		children2.BottomRightLabel = createElement7("TextLabel", v85)
-		children.ContentOverlay = createElement3("Frame", v71, children2)
+			FontFace = normalizeFontFace(v19.Font),
+			TextColor3 = v14.Color.Extended.Gray.Gray_400.Color3,
+			TextXAlignment = Enum.TextXAlignment.Right,
+			TextTruncate = Enum.TextTruncate.SplitWord,
+			AnchorPoint = Vector2.new(1, 1),
+			Position = UDim2.new(1, 0, 1, 0)
+		})
+		children.ContentOverlay = createElement3("Frame", v70, v71)
 		local overflowMenu
 
 		if FFlagLuaAppSduiSponsoredTwoByOneTile and props.renderOverflowMenu then
@@ -1006,8 +853,8 @@ return function(props)
 		end
 
 		children.OverflowMenu = overflowMenu
-		return createElement("Frame", v64, {
-			TwoByOneTileContainer = createElement2("TextButton", v68, children)
+		return createElement("Frame", v63, {
+			TwoByOneTileContainer = createElement2("TextButton", v67, children)
 		})
 	end
 end

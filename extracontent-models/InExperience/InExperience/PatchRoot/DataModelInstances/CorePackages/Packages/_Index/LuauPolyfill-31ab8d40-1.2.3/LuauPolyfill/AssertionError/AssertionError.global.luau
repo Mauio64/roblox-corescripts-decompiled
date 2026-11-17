@@ -47,7 +47,7 @@ local v6 = {
 	notDeepEqualUnequal = "Expected values not to be loosely deep-equal:"
 }
 
-local function copyError(p) -- 1 equivalent call inferred from this helper
+local function copyError(p)
 	local keys = Object.keys(p)
 
 	local result = {}
@@ -324,17 +324,24 @@ function object.new(data)
 			and Array.indexOf(Object.keys(expected), "stack") ~= -1
 			and InstanceOf(expected, Error)
 		then
-			local result = copyError(actual) -- inferred equivalent call
-			local keys = Object.keys(expected)
-			actual = result
-			local v8 = {}
+			local keys = Object.keys(actual)
+			local v8 = actual
+			actual = {}
 
 			for _, key in keys do
-				v8[key] = expected[key]
+				actual[key] = v8[key]
 			end
 
-			v8.message = expected.message
-			expected = v8
+			actual.message = v8.message
+			local keys2 = Object.keys(expected)
+			local v9 = expected
+			expected = {}
+
+			for _, key in keys2 do
+				expected[key] = v9[key]
+			end
+
+			expected.message = v9.message
 		end
 
 		if operator == "deepStrictEqual" or operator == "strictEqual" then

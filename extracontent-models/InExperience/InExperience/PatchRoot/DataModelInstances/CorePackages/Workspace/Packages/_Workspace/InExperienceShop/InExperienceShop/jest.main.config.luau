@@ -13,7 +13,8 @@ return {
 		"initShopGlobalIcon",
 		"useCloseOnCoreMenu",
 		"submitFreeTrialMenuBadge",
-		"submitFreeTrialTooltips"
+		"submitFreeTrialTooltips",
+		"submitFreeTrialTopBarChip"
 	},
 	setupFilesAfterEnv = {
 		JestConfigs.setupFiles.ErrorLogHandler,

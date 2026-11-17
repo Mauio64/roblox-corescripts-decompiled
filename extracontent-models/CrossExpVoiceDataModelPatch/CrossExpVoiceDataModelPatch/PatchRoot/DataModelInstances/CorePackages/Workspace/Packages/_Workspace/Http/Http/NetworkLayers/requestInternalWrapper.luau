@@ -4,6 +4,7 @@ local parent = Http.Parent
 
 local Promise = require(parent.Promise)
 local NetworkProfiler = require(Http.NetworkProfiler)
+local FFlagDisableLegacyReportToDiag = require(parent.SharedFlags.FFlagDisableLegacyReportToDiag)
 require(Http.RequestTypes)
 local StatusCodes = require(Http.StatusCodes)
 local HttpCanceller = require(Http.NetworkLayers.HttpCanceller)
@@ -114,14 +115,16 @@ function class:processResponse(data)
 		return
 	end
 
-	NetworkProfiler:track({
-		queued = data.Stats.DurationInQueue,
-		nameLookup = data.Stats.DurationNameLookup,
-		connect = data.Stats.DurationConnect,
-		sslHandshake = data.Stats.DurationSSLHandshake,
-		makeRequest = data.Stats.DurationMakeRequest,
-		receiveResponse = data.Stats.DurationReceiveResponse
-	})
+	if not FFlagDisableLegacyReportToDiag then
+		NetworkProfiler:track({
+			queued = data.Stats.DurationInQueue,
+			nameLookup = data.Stats.DurationNameLookup,
+			connect = data.Stats.DurationConnect,
+			sslHandshake = data.Stats.DurationSSLHandshake,
+			makeRequest = data.Stats.DurationMakeRequest,
+			receiveResponse = data.Stats.DurationReceiveResponse
+		})
+	end
 
 	local responseTimeMs = data.Stats.RoundTripTime * 1000
 	local responseSize = data.Body and typeof(data.Body) == "string" and #data.Body or 0

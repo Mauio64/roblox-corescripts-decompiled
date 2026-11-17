@@ -265,11 +265,8 @@ local function createSplitPaneStore()
 
 	function v12.setSupportWidth(p: number)
 		local platformScale = Display.GetDisplayStore(false).getPlatformScale(false)
-		v6((math.clamp(
-			p / (not (platformScale and platformScale > 0) and 1 or platformScale),
-			minSupportWidth,
-			maxSupportWidth
-		)))
+		local v13 = p / (not (platformScale and platformScale > 0) and 1 or platformScale)
+		v6((math.clamp(v13, minSupportWidth, maxSupportWidth)))
 	end
 
 	function v12.resetSupportWidth()

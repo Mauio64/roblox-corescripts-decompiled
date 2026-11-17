@@ -25,9 +25,6 @@ local DisplayOrderEnum = DisplayOrder.DisplayOrderEnum
 local Style = require(parent.Style)
 local StyleProviderWithDefaultTheme = Style.StyleProviderWithDefaultTheme
 
-local SharedFlags = require(parent.SharedFlags)
-local GetFFlagSocialContextToastEventStream = SharedFlags.GetFFlagSocialContextToastEventStream
-
 local function renderWithStyleProvider(p) -- 1 equivalent call inferred from this helper
 	return React.createElement(StyleProviderWithDefaultTheme, {}, p)
 end
@@ -78,11 +75,11 @@ local function SocialContextToastContainer(services, gameId, placeId)
 								placeId = placeId
 							}),
 							ToastRoot = React.createElement(ToastRoot, {
-								analyticsProps = GetFFlagSocialContextToastEventStream() and {
+								analyticsProps = {
 									eventIngest = services.eventIngest,
 									gameId = gameId,
 									placeId = placeId
-								} or nil
+								}
 							}),
 							ConfirmationModalRoot = React.createElement(ConfirmationModalRoot)
 						}

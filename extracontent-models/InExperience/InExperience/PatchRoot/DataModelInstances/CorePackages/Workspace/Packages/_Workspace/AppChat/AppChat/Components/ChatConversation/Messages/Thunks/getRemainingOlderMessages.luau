@@ -32,12 +32,12 @@ return function(callback, p: string)
 			return Promise.resolve()
 		end
 
-		if not conversation.fetchedOldestMessage then
-			return callback(p, getNewestWithNilPreviousMessageId(conversation.messages), conversation.nextCursor)
+		if conversation.fetchedOldestMessage then
+			v:info("Canceling since we have already fetched the oldest message for conversation id {}", p)
+
+			return Promise.resolve()
 		end
 
-		v:info("Canceling since we have already fetched the oldest message for conversation id {}", p)
-
-		return Promise.resolve()
+		return callback(p, getNewestWithNilPreviousMessageId(conversation.messages), conversation.nextCursor)
 	end
 end

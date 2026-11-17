@@ -5,16 +5,11 @@ local parent = GameTile.Parent
 
 local Foundation = require(parent.Foundation)
 local Localization = require(parent.Localization)
-local Loggers = require(parent.Loggers)
-local LoggingProtocol = require(parent.LoggingProtocol)
 local React = require(parent.React)
 local ReactFocusNavigation = require(parent.ReactFocusNavigation)
 local RoactServiceTags = require(parent.RoactServiceTags)
 local RoactUtils = require(parent.RoactUtils)
 local RobloxAppHooks = require(parent.RobloxAppHooks)
-local RobloxAppToastsRodux = require(parent.RobloxAppToastsRodux)
-local SharedFlags = require(parent.SharedFlags)
-local UserSignals = require(parent.UserSignals)
 
 local Button = Foundation.Button
 local ButtonVariant = Foundation.Enums.ButtonVariant
@@ -23,19 +18,12 @@ local Text = Foundation.Text
 local useTokens = Foundation.Hooks.useTokens
 local View = Foundation.View
 local useLocalization = Localization.Hooks.useLocalization
-local mutedError = Loggers.mutedError
-local default = LoggingProtocol.default
 local useFocusGuiObject = ReactFocusNavigation.useFocusGuiObject
 local RoactNetworking = RoactServiceTags.RoactNetworking
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local useRoactService = RobloxAppHooks.useRoactService
-local SetNetworkingErrorToast = RobloxAppToastsRodux.Thunks.SetNetworkingErrorToast
-local PostSendUserSignal = UserSignals.PostSendUserSignal
-local UserSignalTypes = UserSignals.UserSignalTypes
 
-local NotInterestedUserSignalTelemetryEventConfigs = require(GameTile.NotInterestedUserSignalTelemetryEventConfigs)
 local undoGameNotInterested = require(GameTile.undoGameNotInterested)
-local FFlagLuaAppExtractNotInterestedHelper = SharedFlags.FFlagLuaAppExtractNotInterestedHelper
 
 local function HiddenTileContent(props)
 	local dispatch = useDispatch()
@@ -49,30 +37,7 @@ local function HiddenTileContent(props)
 	})
 
 	local onActivated = React.useCallback(function()
-		if FFlagLuaAppExtractNotInterestedHelper then
-			local function onOptimisticUnhide()
-				if GuiService.SelectedCoreObject == ref.current then
-					task.delay(0, function()
-						if props.parentRef then
-							v2(props.parentRef.current)
-						end
-					end)
-				end
-			end
-
-			undoGameNotInterested({
-				appPage = props.appPage,
-				collectionId = props.collectionId,
-				dispatch = dispatch,
-				isSponsored = props.isSponsored,
-				networking = networking,
-				onOptimisticUnhide = onOptimisticUnhide,
-				setGameHidden = props.setGameHidden,
-				universeId = props.universeId
-			})
-		elseif props.appPage then
-			props.setGameHidden(props.universeId, false)
-
+		local function onOptimisticUnhide()
 			if GuiService.SelectedCoreObject == ref.current then
 				task.delay(0, function()
 					if props.parentRef then
@@ -80,52 +45,18 @@ local function HiddenTileContent(props)
 					end
 				end)
 			end
-
-			local success, result = pcall(function()
-				local v4 = { id = props.universeId, assetType = 0, signalOrigin = 0 }
-				local assetType
-
-				if props.isSponsored then
-					assetType = UserSignalTypes.AssetType.SponsoredGame
-				else
-					assetType = UserSignalTypes.AssetType.Game
-				end
-
-				v4.assetType = assetType
-
-				v4.signalOrigin = {
-					productSurface = props.appPage,
-					topicId = props.collectionId or "",
-					subIds = { props.collectionId or "" }
-				}
-				PostSendUserSignal(
-					networking,
-					{ boolValue = false },
-					v4,
-					UserSignalTypes.SignalValueType.Bool,
-					UserSignalTypes.SignalType.NotInterested
-				):catch(function(p)
-					props.setGameHidden(props.universeId, true)
-					dispatch(SetNetworkingErrorToast(p))
-					default:logRobloxTelemetryCounter(
-						NotInterestedUserSignalTelemetryEventConfigs.NotInterestedUserSignalFailed,
-						1
-					)
-				end)
-			end)
-
-			if not success then
-				props.setGameHidden(props.universeId, true)
-				mutedError(result)
-			end
-		else
-			default:logRobloxTelemetryCounter(
-				NotInterestedUserSignalTelemetryEventConfigs.NotInterestedMissingAppPage,
-				1
-			)
-
-			dispatch(SetNetworkingErrorToast())
 		end
+
+		undoGameNotInterested({
+			appPage = props.appPage,
+			collectionId = props.collectionId,
+			dispatch = dispatch,
+			isSponsored = props.isSponsored,
+			networking = networking,
+			onOptimisticUnhide = onOptimisticUnhide,
+			setGameHidden = props.setGameHidden,
+			universeId = props.universeId
+		})
 	end, {
 		networking,
 		v2,

@@ -2,7 +2,6 @@ local SocialLibraries = script:FindFirstAncestor("SocialLibraries")
 local dependencies = require(SocialLibraries.dependencies)
 local roact = dependencies.Roact
 local uiBlox = dependencies.UIBlox
-local foundationFontFaceMigration = dependencies.Foundation.Utility.Flags.FoundationFontFaceMigration
 local normalizeFontFace = dependencies.Foundation.Utility.normalizeFontFace
 
 local extended = roact.PureComponent:extend("AlertViewLabel")
@@ -22,23 +21,9 @@ function extended.render(p)
 		local textSize = p.props.TextSize or p2.Font.Body.RelativeSize * p2.Font.BaseSize
 		local textXAlignment = p.props.TextXAlignment
 
-		local createElement = roact.createElement
-		local font2
-
-		if not foundationFontFaceMigration then
-			font2 = font
-		end
-
-		local fontFace
-
-		if foundationFontFaceMigration then
-			fontFace = normalizeFontFace(font)
-		end
-
-		return createElement("TextLabel", {
+		return roact.createElement("TextLabel", {
 			BackgroundTransparency = backgroundTransparency,
-			Font = font2,
-			FontFace = fontFace,
+			FontFace = normalizeFontFace(font),
 			LayoutOrder = p.props.LayoutOrder,
 			Size = p.props.Size,
 			Text = text,

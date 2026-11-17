@@ -27,6 +27,13 @@ local useHandleCustomModalCallback = require(ServerTriggeredModals.useHandleCust
 
 local FFlagLuaAppSupportNonSduiTypeForServerTriggeredModals = SharedFlags.FFlagLuaAppSupportNonSduiTypeForServerTriggeredModals
 local FFlagEnableDeepLinkHistoryWithModalAPI = SharedFlags.FFlagEnableDeepLinkHistoryWithModalAPI
+local FFlagSignalsNavP3hMisc = SharedFlags.FFlagSignalsNavP3hMisc
+local withNavigationFocusIgnoringNavigation
+
+if FFlagSignalsNavP3hMisc then
+	local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+	withNavigationFocusIgnoringNavigation = RobloxAppNavigation.withNavigationFocusIgnoringNavigation
+end
 
 local defineFastInt = game:DefineFastInt("ServerTriggeredModalTrafficPercent", 0)
 local defineFastFlag = game:DefineFastFlag("LuaAppAvoidPushUpsellConflicts", false)
@@ -170,6 +177,10 @@ local function CheckForSduiModal(p): nil
 	useEffect2(fn2, { v5, v4, isFocused, v2, v9, v10, v11, v12 })
 
 	return nil
+end
+
+if FFlagSignalsNavP3hMisc then
+	return withNavigationFocusIgnoringNavigation(CheckForSduiModal)
 end
 
 local v = RoactNavigation.withNavigationFocus(CheckForSduiModal)

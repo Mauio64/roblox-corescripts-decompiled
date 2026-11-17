@@ -161,7 +161,8 @@ local function useVideoPlayback(flag: boolean, videoContent, options)
 		local current = ref.current
 
 		if current then
-			setState3((math.min(union.playbackRegion.Max - union.playbackRegion.Min, current.TimeLength)))
+			local v8 = union.playbackRegion.Max - union.playbackRegion.Min
+			setState3((math.min(v8, current.TimeLength)))
 		end
 	end, { union.playbackRegion })
 

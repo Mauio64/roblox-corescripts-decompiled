@@ -213,14 +213,14 @@ function SignUpRequests.singleSignOnSignup(p, data)
 		} or nil
 	})
 
-	if signup then
-		return ConsoleAuthRequestWrapper(p, signup(), "POST", {
-			postBody = jsonEncode,
-			maxRetryCount = 0
-		})
+	if not signup then
+		return Promise.reject(SignUpV2ErrorCodes.TokenValidationFailed)
 	end
 
-	return Promise.reject(SignUpV2ErrorCodes.TokenValidationFailed)
+	return ConsoleAuthRequestWrapper(p, signup(), "POST", {
+		postBody = jsonEncode,
+		maxRetryCount = 0
+	})
 end
 
 function SignUpRequests.expressLinkedSignup(p, locale, agreementIds)

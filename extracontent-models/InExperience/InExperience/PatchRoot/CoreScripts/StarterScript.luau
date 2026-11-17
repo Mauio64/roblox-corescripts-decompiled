@@ -73,21 +73,23 @@ local engineFeature3 = game:GetEngineFeature("EnableRobloxCommerce")
 local defineFastFlag9 = game:DefineFastFlag("EnableLinkSharingEvent", false)
 local SharedFlags9 = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagEnableShareSheet = SharedFlags9.FFlagEnableShareSheet
+local SharedFlags10 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagUseUIOverlayForCloudPlay = SharedFlags10.FFlagUseUIOverlayForCloudPlay
 local engineFeature4 = game:GetEngineFeature("PlayerFeedbackEnabled")
 
-local SharedFlags10 = require(CorePackages.Workspace.Packages.SharedFlags)
-local FFlagLuaAppInExperienceDetailsPrompt = SharedFlags10.FFlagLuaAppInExperienceDetailsPrompt
+local SharedFlags11 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagLuaAppInExperienceDetailsPrompt = SharedFlags11.FFlagLuaAppInExperienceDetailsPrompt
 local defineFastFlag10 = game:DefineFastFlag("EnableSystemScrim", false)
 local defineFastFlag11 = game:DefineFastFlag("EnableCoreUISystemV2", false)
-local SharedFlags11 = require(CorePackages.Workspace.Packages.SharedFlags)
-local FFlagEnableNewBackpack = SharedFlags11.FFlagEnableNewBackpack
+local SharedFlags12 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagEnableNewBackpack = SharedFlags12.FFlagEnableNewBackpack
 local defineFastFlag12 = game:DefineFastFlag("EnableCorescriptsProfiler", false)
 local defineFastFlag13 = game:DefineFastFlag("CoreScriptsProfilerTelemetryContext", false)
 local engineFeature5 = game:DefineFastFlag("SelfieFrontendConsoleDesktop3", false)
 	and game:GetEngineFeature("EnableSelfieQRCode")
 
-local SharedFlags12 = require(CorePackages.Workspace.Packages.SharedFlags)
-local GetEngineFeatureEnablePromptRobuxTransfer = SharedFlags12.GetEngineFeatureEnablePromptRobuxTransfer
+local SharedFlags13 = require(CorePackages.Workspace.Packages.SharedFlags)
+local GetEngineFeatureEnablePromptRobuxTransfer = SharedFlags13.GetEngineFeatureEnablePromptRobuxTransfer
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local CoreScriptsInitializer = require(CorePackages.Workspace.Packages.CoreScriptsInitializer)
 local UIBloxInGameConfig = CoreScriptsInitializer.UIBloxInGameConfig
@@ -108,30 +110,30 @@ if game:DefineFastFlag("LuaAppUseAppHttpStoreInExperience", false) then
 	HttpStore.Instance._create({})
 end
 
-local SharedFlags13 = require(CorePackages.Workspace.Packages.SharedFlags)
-local reactSchedulerIXPConfig = SharedFlags13.GetReactSchedulerIXPConfig()
+local SharedFlags14 = require(CorePackages.Workspace.Packages.SharedFlags)
+local reactSchedulerIXPConfig = SharedFlags14.GetReactSchedulerIXPConfig()
 
 if reactSchedulerIXPConfig then
 	Scheduler.unstable_setSchedulerFlags(reactSchedulerIXPConfig)
 end
 
-local SharedFlags14 = require(CorePackages.Workspace.Packages.SharedFlags)
+local SharedFlags15 = require(CorePackages.Workspace.Packages.SharedFlags)
 
-if SharedFlags14.FFlagEnableSchedulerFlagOverrides then
-	local SharedFlags15 = require(CorePackages.Workspace.Packages.SharedFlags)
-	local v = SharedFlags15.GetSchedulerFlagOverrides.getInExp()
+if SharedFlags15.FFlagEnableSchedulerFlagOverrides then
+	local SharedFlags16 = require(CorePackages.Workspace.Packages.SharedFlags)
+	local v = SharedFlags16.GetSchedulerFlagOverrides.getInExp()
 
 	if v then
 		Scheduler.unstable_setSchedulerFlags(v)
 	end
 end
 
-local SharedFlags15 = require(CorePackages.Workspace.Packages.SharedFlags)
-local FFlagEnableAEGIS2CommsFAEUpsell = SharedFlags15.FFlagEnableAEGIS2CommsFAEUpsell
-
 local SharedFlags16 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagEnableAEGIS2CommsFAEUpsell = SharedFlags16.FFlagEnableAEGIS2CommsFAEUpsell
 
-if SharedFlags16.FFlagInitializeSduiForInExperience then
+local SharedFlags17 = require(CorePackages.Workspace.Packages.SharedFlags)
+
+if SharedFlags17.FFlagInitializeSduiForInExperience then
 	local initializeSduiForInExperience = require(Modules.ServerDrivenUi.initializeSduiForInExperience)
 	initializeSduiForInExperience()
 end
@@ -178,17 +180,17 @@ if Chrome.Enabled() then
 	ExpChat.GlobalFlags.ChromeEnabled = true
 end
 
-local SharedFlags17 = require(CorePackages.Workspace.Packages.SharedFlags)
+local SharedFlags18 = require(CorePackages.Workspace.Packages.SharedFlags)
 
-if SharedFlags17.GetFFlagJoinWithoutMicPermissions() then
+if SharedFlags18.GetFFlagJoinWithoutMicPermissions() then
 	local ExpChat = require(CorePackages.Workspace.Packages.ExpChat)
 	ExpChat.GlobalFlags.JoinWithoutMicPermissions = true
 end
 
 local defineFastFlag14 = game:DefineFastFlag("InExperienceInterventionApp", false)
 
-local SharedFlags18 = require(CorePackages.Workspace.Packages.SharedFlags)
-local FFlagLuaAppEnableInExperienceDataModelStreamStarter = SharedFlags18.FFlagLuaAppEnableInExperienceDataModelStreamStarter
+local SharedFlags19 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagLuaAppEnableInExperienceDataModelStreamStarter = SharedFlags19.FFlagLuaAppEnableInExperienceDataModelStreamStarter
 
 if FFlagUseRoactGlobalConfigInCoreScripts and RunService:IsStudio() then
 	Roact.setGlobalConfig({ propValidation = true, elementTracing = true })
@@ -239,36 +241,44 @@ if not viewer then
 	coroutine.wrap(safeRequire)(Modules.TopBar)
 end
 
+local v = FFlagUseUIOverlayForCloudPlay
+	and not viewer
+	and coroutine.wrap(safeRequire)(CorePackages.Workspace.Packages.InExperienceCloudPlay)
+
+if v then
+	v.mountCloudPlayUIOverlay()
+end
+
 local isSideSheetEnabled = require(CorePackages.Workspace.Packages.InExperienceSideSheetUtils.isSideSheetEnabled)
 
 if not viewer and isSideSheetEnabled then
 	coroutine.wrap(safeRequire)(Modules.InExperienceSideSheet)
 end
 
-local SharedFlags19 = require(CorePackages.Workspace.Packages.SharedFlags)
+local SharedFlags20 = require(CorePackages.Workspace.Packages.SharedFlags)
 
-if SharedFlags19.FFlagEnableWhatsNew then
+if SharedFlags20.FFlagEnableWhatsNew then
 	coroutine.wrap(safeRequire)(Modules.InGameWhatsNew)
 end
 
-local SharedFlags20 = require(CorePackages.Workspace.Packages.SharedFlags)
+local SharedFlags21 = require(CorePackages.Workspace.Packages.SharedFlags)
 
-if SharedFlags20.FFlagAppNavMyStatsTab then
-	local v = coroutine.wrap(safeRequire)(CorePackages.Workspace.Packages.BuildExperiencePlaytestLaunch.BuildModeLaunch)
-	local v2 = coroutine.wrap(safeRequire)(CorePackages.Workspace.Packages.BuildExperience)
-	local v3 = v2 and v and v:hasBuildMode()
+if SharedFlags21.FFlagAppNavMyStatsTab then
+	local v2 = coroutine.wrap(safeRequire)(CorePackages.Workspace.Packages.BuildExperiencePlaytestLaunch.BuildModeLaunch)
+	local v3 = coroutine.wrap(safeRequire)(CorePackages.Workspace.Packages.BuildExperience)
+	local v4 = v3 and v2 and v2:hasBuildMode()
 
-	if v2 then
-		v2.mountCreatorAgentResumeToastReceiver(v3 == true)
+	if v3 then
+		v3.mountCreatorAgentResumeToastReceiver(v4 == true)
 	end
 
-	if v2 and v3 and not viewer then
+	if v3 and v4 and not viewer then
 		local StarterGui = game:GetService("StarterGui")
 		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, false)
 
-		local SharedFlags21 = require(CorePackages.Workspace.Packages.SharedFlags)
-		local fFlagBuildExperienceInGameCaptureToChat = SharedFlags21.FFlagBuildExperienceInGameCaptureToChat
-		v2.mountChatSheet(fFlagBuildExperienceInGameCaptureToChat and {
+		local SharedFlags22 = require(CorePackages.Workspace.Packages.SharedFlags)
+		local fFlagBuildExperienceInGameCaptureToChat = SharedFlags22.FFlagBuildExperienceInGameCaptureToChat
+		v3.mountChatSheet(fFlagBuildExperienceInGameCaptureToChat and {
 			takeCapture = function(p)
 				local CapturesApp = require(RobloxGui.Modules.Captures.CapturesApp)
 				CapturesApp.takeCapture(p)
@@ -277,10 +287,10 @@ if SharedFlags20.FFlagAppNavMyStatsTab then
 	end
 end
 
-local v = FFlagTopBarRefactor and coroutine.wrap(safeRequire)(CorePackages.Workspace.Packages.InExperienceOverlay)
+local v2 = FFlagTopBarRefactor and coroutine.wrap(safeRequire)(CorePackages.Workspace.Packages.InExperienceOverlay)
 
-if v then
-	v.createOverlay()
+if v2 then
+	v2.createOverlay()
 end
 
 if game:GetEngineFeature("LuobuModerationStatus") then
@@ -388,9 +398,9 @@ coroutine.wrap(safeRequire)(RobloxGui.Modules.Captures.CapturesApp)
 
 coroutine.wrap(safeRequire)(Modules.AvatarEditorPrompts)
 
-local SharedFlags21 = require(CorePackages.Workspace.Packages.SharedFlags)
+local SharedFlags22 = require(CorePackages.Workspace.Packages.SharedFlags)
 
-if SharedFlags21.FFlagVirtualCursorModularization then
+if SharedFlags22.FFlagVirtualCursorModularization then
 	coroutine.wrap(safeRequire)(CorePackages.Workspace.Packages.VirtualCursorModular)
 else
 	coroutine.wrap(safeRequire)(CorePackages.Workspace.Packages.VirtualCursor)
@@ -398,15 +408,15 @@ end
 
 ScriptContext:AddCoreScriptLocal("CoreScripts/VehicleHud", RobloxGui)
 ScriptContext:AddCoreScriptLocal("CoreScripts/InviteToGamePrompt", RobloxGui)
-local v2
+local v3
 
 if game:GetEngineFeature("TouchScreenEnabled") then
-	v2 = UserInputService.TouchScreenEnabled
+	v3 = UserInputService.TouchScreenEnabled
 else
-	v2 = UserInputService.TouchEnabled
+	v3 = UserInputService.TouchEnabled
 end
 
-if v2 then
+if v3 then
 	ScriptContext:AddCoreScriptLocal("CoreScripts/ContextActionTouch", RobloxGui)
 
 	RobloxGui:WaitForChild("ControlFrame")
@@ -430,11 +440,11 @@ coroutine.wrap(safeRequire)(RobloxGui.Modules.VR.VRAvatarGestures.VRAvatarGestur
 
 ScriptContext:AddCoreScriptLocal("CoreScripts/NetworkPause", RobloxGui)
 
-local SharedFlags22 = require(CorePackages.Workspace.Packages.SharedFlags)
+local SharedFlags23 = require(CorePackages.Workspace.Packages.SharedFlags)
 
 if
 	game:GetEngineFeature("GameplayPopOverlay")
-	and (SharedFlags22.FFlagEnableGameplayPopLatencyOverlay or SharedFlags22.FFlagEnableGameplayPopLatencyOverlayForAdmins)
+	and (SharedFlags23.FFlagEnableGameplayPopLatencyOverlay or SharedFlags23.FFlagEnableGameplayPopLatencyOverlayForAdmins)
 then
 	ScriptContext:AddCoreScriptLocal("CoreScripts/GameplayPopOverlay", RobloxGui)
 end
@@ -614,18 +624,18 @@ end
 local ReactPerfTracker = require(Modules.Common.ReactPerfTracker)
 
 if ReactPerfTracker then
-	local v3 = ReactPerfTracker.new()
+	local v4 = ReactPerfTracker.new()
 
 	task.delay(5, function()
-		v3:start()
+		v4:start()
 	end)
 end
 
-local v3 = game:DefineFastInt("ReactSchedulingTrackerStartUpDelayMs", 5000) / 1000
+local v4 = game:DefineFastInt("ReactSchedulingTrackerStartUpDelayMs", 5000) / 1000
 
 local ReactSchedulingTracker = require(Modules.Common.ReactSchedulingTracker)
 
-task.delay(v3, function()
+task.delay(v4, function()
 	ReactSchedulingTracker:start()
 end)
 

@@ -1,4 +1,0 @@
-local FFlagAppChatServerSideConversationSearch = require("@game/CorePackages/Workspace/Packages/_Workspace/AppChat/AppChat/Flags/FFlagAppChatServerSideConversationSearch")
-local FFlagFriendsChatServerSideConversationSearch = require("@game/CorePackages/Workspace/Packages/_Workspace/AppChat/AppChat/Flags/FFlagFriendsChatServerSideConversationSearch")
-
-return FFlagAppChatServerSideConversationSearch or FFlagFriendsChatServerSideConversationSearch

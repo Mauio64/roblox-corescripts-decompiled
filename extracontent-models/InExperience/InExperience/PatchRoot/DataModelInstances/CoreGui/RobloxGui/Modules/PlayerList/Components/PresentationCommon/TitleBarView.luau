@@ -7,7 +7,6 @@ local SignalsReact = require(CorePackages.Packages.SignalsReact)
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local Foundation = require(CorePackages.Packages.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local PlayerList = require(CorePackages.Workspace.Packages.PlayerList)
 require(CorePackages.Workspace.Packages.LeaderboardStore)
 
@@ -71,26 +70,11 @@ local function TitleBarView(items)
 		BackgroundTransparency = 1,
 		TextXAlignment = Enum.TextXAlignment.Left,
 		TextYAlignment = Enum.TextYAlignment.Center,
-		Font = 0,
-		FontFace = 0,
+		FontFace = normalizeFontFace(v4.Tokens.Typography.CaptionSmall.Font),
 		TextSize = 0,
 		TextTransparency = 0,
 		TextColor3 = 0
 	}
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = v4.Font.Footer.Font
-	end
-
-	v6.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(v4.Tokens.Typography.CaptionSmall.Font)
-	end
-
-	v6.FontFace = fontFace
 	local textSize
 
 	if FFlagEnableMobilePlayerListOnConsole then
@@ -129,27 +113,12 @@ local function TitleBarView(items)
 				BackgroundTransparency = 1,
 				TextXAlignment = Enum.TextXAlignment.Center,
 				TextYAlignment = Enum.TextYAlignment.Center,
-				Font = 0,
-				FontFace = 0,
+				FontFace = normalizeFontFace(v4.Tokens.Typography.CaptionSmall.Font),
 				TextSize = 0,
 				TextTransparency = 0,
 				TextColor3 = 0,
 				TextTruncate = 0
 			}
-			local font2
-
-			if not FoundationFontFaceMigration then
-				font2 = v4.Font.Footer.Font
-			end
-
-			v10.Font = font2
-			local fontFace2
-
-			if FoundationFontFaceMigration then
-				fontFace2 = normalizeFontFace(v4.Tokens.Typography.CaptionSmall.Font)
-			end
-
-			v10.FontFace = fontFace2
 			local textSize2
 
 			if FFlagEnableMobilePlayerListOnConsole then
@@ -181,27 +150,12 @@ local function TitleBarView(items)
 				BackgroundTransparency = 1,
 				TextXAlignment = Enum.TextXAlignment.Center,
 				TextYAlignment = Enum.TextYAlignment.Center,
-				Font = 0,
-				FontFace = 0,
+				FontFace = normalizeFontFace(v4.Tokens.Typography.CaptionSmall.Font),
 				TextSize = 0,
 				TextTransparency = 0,
 				TextColor3 = 0,
 				TextTruncate = 0
 			}
-			local font2
-
-			if not FoundationFontFaceMigration then
-				font2 = v4.Font.Footer.Font
-			end
-
-			v8.Font = font2
-			local fontFace2
-
-			if FoundationFontFaceMigration then
-				fontFace2 = normalizeFontFace(v4.Tokens.Typography.CaptionSmall.Font)
-			end
-
-			v8.FontFace = fontFace2
 			local textSize2
 
 			if FFlagEnableMobilePlayerListOnConsole then

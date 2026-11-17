@@ -20,33 +20,30 @@ local function setFieldPerUser(p, p2, p3, p4)
 	})
 end
 
-local function setRetrievalStatus(p, userId, done) -- 1 equivalent call inferred from this helper
-	return setFieldPerUser(p, "retrievalStatus", userId, done)
+local function setRetrievalStatus(p, userId, p2) -- 3 equivalent calls inferred from this helper
+	return setFieldPerUser(p, "retrievalStatus", userId, p2)
 end
 
-local function setRetrievalFailureResponse(p, p2, p3)
-	return setFieldPerUser(p, "retrievalFailureResponse", p2, p3)
+local function setRetrievalFailureResponse(p, userId, response) -- 1 equivalent call inferred from this helper
+	return setFieldPerUser(p, "retrievalFailureResponse", userId, response)
 end
 
 return function(p, data)
 	local v = p or { retrievalStatus = {}, retrievalFailureResponse = {} }
 
 	if data.type == FetchUserFriendsStarted.name then
-		return (setFieldPerUser(v, "retrievalStatus", data.userId, RetrievalStatus.Fetching))
-	end
-
-	if data.type == FetchUserFriendsFailed.name then
-		return (setFieldPerUser(
-			setFieldPerUser(v, "retrievalStatus", data.userId, RetrievalStatus.Failed),
-			"retrievalFailureResponse",
+		return (setRetrievalStatus(v, data.userId, RetrievalStatus.Fetching)) -- inferred equivalent call
+	elseif data.type == FetchUserFriendsFailed.name then
+		return (setRetrievalFailureResponse( -- inferred equivalent call
+			setRetrievalStatus(v, data.userId, RetrievalStatus.Failed), -- inferred equivalent call
 			data.userId,
 			data.response
 		))
-	end
+	else
+		if data.type == FetchUserFriendsCompleted.name then
+			return (setRetrievalStatus(v, data.userId, RetrievalStatus.Done)) -- inferred equivalent call
+		end
 
-	if data.type == FetchUserFriendsCompleted.name then
-		return (setRetrievalStatus(v, data.userId, RetrievalStatus.Done)) -- inferred equivalent call
+		return v
 	end
-
-	return v
 end

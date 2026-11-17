@@ -16,6 +16,9 @@ local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
 local NavigationRodux = require(parent.NavigationRodux)
 local RobloxAppEnums = require(parent.RobloxAppEnums)
 local Promise = require(parent.Promise)
+local LuauPolyfill = require(parent.LuauPolyfill)
+local setTimeout = LuauPolyfill.setTimeout
+local clearTimeout = LuauPolyfill.clearTimeout
 
 local useSelectorSignal = AvatarExperienceCommon.Hooks.useSelectorSignal
 local useSignal = AvatarExperienceCommon.Hooks.useSignal
@@ -71,6 +74,7 @@ local defineFastInt2 = game:DefineFastInt("AXMaxUndoRedoHistory", 20)
 local FFlagAXEnableManualSavingBlockingPrompt = AvatarExperienceFlags.FFlagAXEnableManualSavingBlockingPrompt
 local FFlagAXBackgroundsPersistence = AvatarExperienceFlags.FFlagAXBackgroundsPersistence
 local FFlagAXTimeoutAcknowledgementGating = AvatarExperienceFlags.FFlagAXTimeoutAcknowledgementGating
+local FFlagAXMomentsLookTryOnDelayAutoSave = AvatarExperienceFlags.FFlagAXMomentsLookTryOnDelayAutoSave
 
 local v = {
 	toastMessage = "Feature.Avatar.Message.SaveThrottled",
@@ -122,20 +126,28 @@ local function useAvatarSaveContextProviderValue()
 	local v13, v14 = useSignal(nil)
 	local v15, v16 = useSignal(0)
 	local v17, v18 = useSignal(false)
+	local v19, v20
+
+	if FFlagAXMomentsLookTryOnDelayAutoSave then
+		v19, v20 = useSignal(nil)
+	else
+		v19 = nil
+		v20 = nil
+	end
 
 	React.useEffect(function()
 		return Signals.createEffect(function(p)
-			local v19 = v9(p)
-			local v20 = v8(p)
-			local v21 = getHistorySignal(false)
+			local v21 = v9(p)
+			local v22 = v8(p)
+			local v23 = getHistorySignal(false)
 
-			local v22 = v20.equipped.BodyPartRangeIds and tutils.fieldCount(v20.equipped.BodyPartRangeIds) > 0
+			local v24 = v22.equipped.BodyPartRangeIds and tutils.fieldCount(v22.equipped.BodyPartRangeIds) > 0
 
-			if v19 and v22 and #v21 == 0 then
-				v10({ v20 })
+			if v21 and v24 and #v23 == 0 then
+				v10({ v22 })
 				v11(1)
 
-				v12(v20)
+				v12(v22)
 				v14(nil)
 				v16(0)
 			end
@@ -144,61 +156,61 @@ local function useAvatarSaveContextProviderValue()
 
 	React.useEffect(function()
 		return Signals.createEffect(function(p)
-			local v19 = v8(p)
-			local v20 = getHistorySignal(false)
-			local v21 = getCurrentHistoryIndexSignal(false)
-			local v22 = v20[v21] or v19
+			local v21 = v8(p)
+			local v22 = getHistorySignal(false)
+			local v23 = getCurrentHistoryIndexSignal(false)
+			local v24 = v22[v23] or v21
 
-			if shouldInsertNewHistoryEntry(v22, v19) and #v20 > 0 then
-				local slice = Dash.slice(v20, 1, v21)
-				table.insert(slice, v19)
-				local v23 = v21 + 1
+			if shouldInsertNewHistoryEntry(v24, v21) and #v22 > 0 then
+				local slice = Dash.slice(v22, 1, v23)
+				table.insert(slice, v21)
+				local v25 = v23 + 1
 
 				if defineFastInt2 < #slice then
 					table.remove(slice, 1)
-					v23 -= 1
+					v25 -= 1
 				end
 
 				v10(slice)
-				v11(v23)
-			elseif shouldReplaceLastHistoryEntry(v22, v19) and #v20 > 0 then
-				local slice = Dash.slice(v20)
-				slice[v21] = v19
+				v11(v25)
+			elseif shouldReplaceLastHistoryEntry(v24, v21) and #v22 > 0 then
+				local slice = Dash.slice(v22)
+				slice[v23] = v21
 				v10(slice)
-				v11(v21)
+				v11(v23)
 			end
 		end)
 	end, {})
 
 	local updateHistoryIndexAndGetCharacterData = React.useCallback(function(p: number)
-		local v19 = getHistorySignal(false)
+		local v21 = getHistorySignal(false)
 
-		if p < 1 or #v19 < p then
+		if p < 1 or #v21 < p then
 			return nil
 		end
 
 		v11(p)
-		return v19[p]
+		return v21[p]
 	end, { getHistorySignal, v11 })
 
-	local v19 = React.useCallback(function(p)
-		local v19 = getHistorySignal(false)
-		local v20 = getCurrentHistoryIndexSignal(false)
-		local v21 = v19[v20]
-
-		if not v21 then
-			return nil
-		end
-
-		local v22, v23 = removeInvalidAssetsFromCharacterData(v21, p)
+	local v21 = React.useCallback(function(p)
+		local v21 = getHistorySignal(false)
+		local v22 = getCurrentHistoryIndexSignal(false)
+		local v23 = v21[v22]
 
 		if not v23 then
 			return nil
 		end
 
-		v19[v20] = v22
-		v10(v19)
-		return v22
+		local v24, v25 = removeInvalidAssetsFromCharacterData(v23, p)
+
+		if not v25 then
+			return nil
+		end
+
+		v21[v22] = v24
+		v10(v21)
+		return v24
 	end, { getHistorySignal, v10, v11 })
 
 	local timeoutStatusStore = AvatarExperienceCommon.Stores.getTimeoutStatusStore()
@@ -208,34 +220,34 @@ local function useAvatarSaveContextProviderValue()
 			return SaveStatusEnum.TimedOut
 		end
 
-		local v20 = getHistorySignal(p)
-		local v21 = getCurrentHistoryIndexSignal(p)
-		local v22 = getLastSuccessfullySavedStateSignal(p)
-		local v23 = v13(p)
-		local v24 = v20[v21]
+		local v22 = getHistorySignal(p)
+		local v23 = getCurrentHistoryIndexSignal(p)
+		local v24 = getLastSuccessfullySavedStateSignal(p)
+		local v25 = v13(p)
+		local v26 = v22[v23]
 
-		if not (v24 and v22) then
+		if not (v26 and v24) then
 			return SaveStatusEnum.NoData
 		end
 
-		if v23 then
+		if v25 then
 			return SaveStatusEnum.Saving
 		end
 
-		if v22 and not checkHasChangesToSave(v24, v22) then
+		if v24 and not checkHasChangesToSave(v26, v24) then
 			return SaveStatusEnum.AlreadySaved
 		end
 
-		if checkCharacterDataHasTryOnItems(v24) then
+		if checkCharacterDataHasTryOnItems(v26) then
 			return SaveStatusEnum.HasTryOns
 		end
 
 		return SaveStatusEnum.Eligible
 	end)
 
-	local v20 = React.useCallback(function(p, p2, p3, _, p4)
-		local v20 = SaveStatusEnum.Success
-		local v21
+	local v22 = React.useCallback(function(p, p2, p3, _, p4)
+		local v22 = SaveStatusEnum.Success
+		local v23
 
 		if p4.Assets then
 			local invalidAssetIdsToAssetTypeIdMap = getInvalidAssetIdsToAssetTypeIdMap(
@@ -243,7 +255,7 @@ local function useAvatarSaveContextProviderValue()
 				getAssetIdToAssetTypeIdFromHumanoidDescription(p2)
 			)
 
-			v21 = v19(invalidAssetIdsToAssetTypeIdMap)
+			v23 = v21(invalidAssetIdsToAssetTypeIdMap)
 
 			p3 = removeInvalidAssetsFromCharacterData(p3, invalidAssetIdsToAssetTypeIdMap)
 		end
@@ -251,24 +263,24 @@ local function useAvatarSaveContextProviderValue()
 		v12(p3)
 		v14(nil)
 
-		if v21 ~= nil then
-			v20 = SaveStatusEnum.SuccessWithInvalidAssets
+		if v23 ~= nil then
+			v22 = SaveStatusEnum.SuccessWithInvalidAssets
 		end
 
-		if v20 == SaveStatusEnum.Success then
+		if v22 == SaveStatusEnum.Success then
 			v6(SetCurrentToastMessage(v3))
-		elseif v20 == SaveStatusEnum.SuccessWithInvalidAssets then
+		elseif v22 == SaveStatusEnum.SuccessWithInvalidAssets then
 			v6(SetCurrentToastMessage(v2))
 		end
 
-		if v21 then
-			v6(CharacterHistoryStateChangeButtonActivated(v21))
+		if v23 then
+			v6(CharacterHistoryStateChangeButtonActivated(v23))
 		end
 
-		return v20
-	end, { getHistorySignal, getCurrentHistoryIndexSignal, v12, v14, v19 })
+		return v22
+	end, { getHistorySignal, getCurrentHistoryIndexSignal, v12, v14, v21 })
 
-	local v21 = React.useCallback(function(p)
+	local v23 = React.useCallback(function(p)
 		v14(nil)
 
 		if p == SaveStatusEnum.Throttled then
@@ -287,122 +299,122 @@ local function useAvatarSaveContextProviderValue()
 				then
 					AvatarExperienceCommon.Utils.showAvatarChangeFeatureRestriction()
 				else
-					v21(SaveStatusEnum.TimedOut)
+					v23(SaveStatusEnum.TimedOut)
 				end
 			else
-				local v22 = getHistorySignal(false)
-				local v23 = getCurrentHistoryIndexSignal(false)
-				local v24 = getLastSuccessfullySavedStateSignal(false)
-				local v25 = v22[v23]
+				local v24 = getHistorySignal(false)
+				local v25 = getCurrentHistoryIndexSignal(false)
+				local v26 = getLastSuccessfullySavedStateSignal(false)
+				local v27 = v24[v25]
 
-				if v25 and v24 then
-					local v26 = v15(false)
+				if v27 and v26 then
+					local v28 = v15(false)
 
-					if v26 > 0 and os.time() - v26 < defineFastInt then
-						v21(SaveStatusEnum.Throttled)
+					if v28 > 0 and os.time() - v28 < defineFastInt then
+						v23(SaveStatusEnum.Throttled)
 						return
 					end
 
-					v14(v25)
+					v14(v27)
 					v16(os.time())
-					local humanoidDescriptionForCharacterData = buildHumanoidDescriptionForCharacterData(v25) -- inferred equivalent call
-					local v27 = Enum.HumanoidRigType[v25.equipped.AvatarType]
-					local saveDict = getSaveDict(v25, v24)
+					local humanoidDescriptionForCharacterData = buildHumanoidDescriptionForCharacterData(v27) -- inferred equivalent call
+					local v29 = Enum.HumanoidRigType[v27.equipped.AvatarType]
+					local saveDict = getSaveDict(v27, v26)
 					local backgroundAssetId
 
 					if FFlagAXBackgroundsPersistence then
-						backgroundAssetId = v25.equipped.BackgroundAssetId
+						backgroundAssetId = v27.equipped.BackgroundAssetId
 					end
 
-					local v28
+					local v30
 
 					if saveDict.Background == true then
-						v28 = backgroundAssetId ~= nil
+						v30 = backgroundAssetId ~= nil
 					else
-						v28 = false
+						v30 = false
 					end
 
-					local v29 = AvatarExperienceFlags.FFlagAXProfileConfigurationMultiFieldApply
+					local v31 = AvatarExperienceFlags.FFlagAXProfileConfigurationMultiFieldApply
 						and { BackgroundAssetId = backgroundAssetId }
 						or backgroundAssetId
 
-					local v30 = false
+					local v32 = false
 
 					if FFlagAXBackgroundsPersistence then
 						saveDict = Cryo.Dictionary.join(saveDict, { Background = Cryo.None })
 
 						for _, save in saveDict do
 							if save then
-								v30 = true
+								v32 = true
 								break
 							end
 						end
 					end
 
-					if v28 and not v30 then
-						saveProfileConfiguration(v29):andThen(function()
+					if v30 and not v32 then
+						saveProfileConfiguration(v31):andThen(function()
 							v18(false)
-							v20(
+							v22(
 								humanoidDescriptionForCharacterData,
 								humanoidDescriptionForCharacterData,
-								v25,
-								v24,
+								v27,
+								v26,
 								saveDict
 							)
 
 							callback()
 						end):catch(function()
 							v18(false)
-							v21(SaveStatusEnum.Failure)
+							v23(SaveStatusEnum.Failure)
 							callback2()
 						end)
 						return
 					end
 
-					local v31
+					local v39
 
-					if v28 then
-						v31 = saveProfileConfiguration(v29)
+					if v30 then
+						v39 = saveProfileConfiguration(v31)
 					else
-						v31 = nil
+						v39 = nil
 					end
 
 					saveAvatar(
 						humanoidDescriptionForCharacterData,
-						v27,
+						v29,
 						saveDict,
-						(getGearAssetIdFromEquippedAssets(v25.equipped.EquippedAssets))
+						(getGearAssetIdFromEquippedAssets(v27.equipped.EquippedAssets))
 					):andThen(function(p)
 						v18(false)
 
 						local function finishSuccess(p2) -- 3 equivalent calls inferred from this helper
-							v20(
+							v22(
 								humanoidDescriptionForCharacterData,
 								p.humanoidDescriptionWithValidAssets,
 								p2,
-								v24,
+								v26,
 								saveDict
 							)
 
 							callback()
 						end
 
-						if v31 then
-							v31:andThen(function()
-								finishSuccess(v25) -- inferred equivalent call
+						if v39 then
+							v39:andThen(function()
+								finishSuccess(v27) -- inferred equivalent call
 							end, function()
 								local join = Cryo.Dictionary.join
 								local join2 = Cryo.Dictionary.join
-								local equipped = v25.equipped
+								local equipped = v27.equipped
 								local backgroundAssetId2
 
-								if v24.equipped.BackgroundAssetId == nil then
+								if v26.equipped.BackgroundAssetId == nil then
 									backgroundAssetId2 = Cryo.None
 								else
-									backgroundAssetId2 = v24.equipped.BackgroundAssetId
+									backgroundAssetId2 = v26.equipped.BackgroundAssetId
 								end
 
-								finishSuccess(join(v25, { -- inferred equivalent call
+								finishSuccess(join(v27, { -- inferred equivalent call
 									equipped = join2(equipped, {
 										BackgroundAssetId = backgroundAssetId2
 									})
@@ -411,7 +423,7 @@ local function useAvatarSaveContextProviderValue()
 							return
 						end
 
-						finishSuccess(v25) -- inferred equivalent call
+						finishSuccess(v27) -- inferred equivalent call
 					end):catch(function(_)
 						v18(false)
 
@@ -419,7 +431,7 @@ local function useAvatarSaveContextProviderValue()
 							timeoutStatusStore.fetchStatus()
 						end
 
-						v21(SaveStatusEnum.Failure)
+						v23(SaveStatusEnum.Failure)
 						callback2()
 					end)
 				end
@@ -432,13 +444,13 @@ local function useAvatarSaveContextProviderValue()
 		v12,
 		v14,
 		v16,
-		v19,
 		v21,
+		v23,
 		v18
 	})
 
 	if FFlagAXEnableManualSavingBlockingPrompt then
-		local v22 = React.useCallback(function(name: string)
+		local v24 = React.useCallback(function(name: string)
 			return function()
 				trySaveAvatar():finally(function()
 					if FFlagSignalsNavP3Dispatch then
@@ -455,7 +467,7 @@ local function useAvatarSaveContextProviderValue()
 			end
 		end, { trySaveAvatar, v6 })
 
-		local v23 = React.useCallback(function(name: string)
+		local v25 = React.useCallback(function(name: string)
 			return function()
 				task.spawn(function()
 					v6(CharacterHistoryStateChangeButtonActivated((getLastSuccessfullySavedStateSignal(false))))
@@ -476,7 +488,7 @@ local function useAvatarSaveContextProviderValue()
 			end
 		end, { v6, getLastSuccessfullySavedStateSignal })
 
-		local v24 = React.useCallback(function(options, p)
+		local v26 = React.useCallback(function(options, p)
 			local routeName = (options or {}).routeName
 			local params = (options or {}).params
 
@@ -510,8 +522,8 @@ local function useAvatarSaveContextProviderValue()
 					key = AvatarScreen.SaveAvatarOnLeaveAvatarExperiencePrompt,
 					routeName = AvatarScreen.SaveAvatarOnLeaveAvatarExperiencePrompt,
 					params = {
-						saveAndContinue = v22(routeName),
-						continueWithoutSave = v23(routeName)
+						saveAndContinue = v24(routeName),
+						continueWithoutSave = v25(routeName)
 					}
 				}
 			})
@@ -520,33 +532,99 @@ local function useAvatarSaveContextProviderValue()
 				routes = joined,
 				index = #joined
 			})
-		end, { getSaveEligibilityStatusSignal, v22, v23 })
+		end, { getSaveEligibilityStatusSignal, v24, v25 })
 
 		React.useEffect(function()
 			v7.dispatch(RegisterCustomGetStateForAction(
 				CustomGetStateForAction.HandlerId.BlockAXExitOnUnsavedChanges,
-				v24
+				v26
 			))
-		end, { v7, v24 })
+		end, { v7, v26 })
+	end
+
+	local v24, v25
+
+	if FFlagAXMomentsLookTryOnDelayAutoSave then
+		local ref = React.useRef(nil)
+
+		local v26 = React.useCallback(function(p: number?)
+			if ref.current ~= nil then
+				clearTimeout(ref.current)
+				ref.current = nil
+			end
+
+			if p == nil then
+				return
+			end
+
+			ref.current = setTimeout(function()
+				ref.current = nil
+				local v26 = getSaveEligibilityStatusSignal(false)
+
+				if v26 == SaveStatusEnum.Eligible or v26 == SaveStatusEnum.HasTryOns then
+					trySaveAvatar()
+				end
+			end, p)
+		end, { trySaveAvatar, getSaveEligibilityStatusSignal })
+
+		React.useEffect(function()
+			return function()
+				v26(nil)
+			end
+		end, {})
+		v24 = v26
+		v25 = ref
+	else
+		v25 = nil
+		v24 = nil
 	end
 
 	React.useEffect(function()
 		return Signals.createEffect(function(p)
-			local v22 = getHistorySignal(p)
+			local v26 = getHistorySignal(p)
 
-			if v22[#v22] and v17(false) then
-				local v23 = getSaveEligibilityStatusSignal(false)
+			if v26[#v26] and v17(false) then
+				local v27 = getSaveEligibilityStatusSignal(false)
 
-				if v23 == SaveStatusEnum.Eligible or v23 == SaveStatusEnum.HasTryOns then
-					trySaveAvatar()
+				if v27 == SaveStatusEnum.Eligible or v27 == SaveStatusEnum.HasTryOns then
+					if FFlagAXMomentsLookTryOnDelayAutoSave and v25 and v24 and v19 and v19(false) ~= nil then
+						if v25.current == nil then
+							v24(v19(false))
+						end
+					else
+						trySaveAvatar()
+					end
 				end
 			end
 		end)
 	end, {})
 
-	local autoSaveNextNewSaveData = React.useCallback(function()
+	local useCallback = React.useCallback
+	local function fn(p: number?)
+		if FFlagAXMomentsLookTryOnDelayAutoSave and v20 then
+			v20(p)
+
+			if v25 and v25.current ~= nil and v24 then
+				v24(p)
+			end
+		end
+
 		v18(true)
-	end, { v18 })
+	end
+
+	local v26
+
+	if FFlagAXMomentsLookTryOnDelayAutoSave then
+		v26 = v20
+	end
+
+	local v27
+
+	if FFlagAXMomentsLookTryOnDelayAutoSave then
+		v27 = v24
+	end
+
+	local autoSaveNextNewSaveData = useCallback(fn, { v18, v26, v27 })
 
 	return React.useMemo(function()
 		return {

@@ -5,6 +5,7 @@ local LocalizationService = game:GetService("LocalizationService")
 
 local React = require(parent.React)
 local ReactRoblox = require(parent.ReactRoblox)
+local SignalsReact = require(parent.SignalsReact)
 local Style = require(parent.Style)
 local RoactRodux = require(parent.RoactRodux)
 local Rodux = require(parent.Rodux)
@@ -27,6 +28,9 @@ local ProviderContainer = RoactUtils2.Components.ProviderContainer
 
 local RobloxSubscriptionContainer = require(RobloxSubscriptionPurchaseApp.Components.RobloxSubscriptionContainer)
 local RobloxSubscriptionStore = require(RobloxSubscriptionPurchaseApp.Store.RobloxSubscriptionStore)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSubscriptionPurchaseFollowsAppTheme = SharedFlags.FFlagSubscriptionPurchaseFollowsAppTheme
+local FFlagAppClassicThemeGreenButtonColors = Style.FFlagAppClassicThemeGreenButtonColors
 
 local v = nil
 
@@ -41,6 +45,11 @@ end
 
 local function ThemedOverlay(p)
 	local v3 = useSelectedTheme()
+	local themeName
+
+	if FFlagSubscriptionPurchaseFollowsAppTheme then
+		themeName = SignalsReact.useSignalState(Style.AppFoundationThemeName.getAppFoundationThemeName)
+	end
 
 	local store = React.useMemo(function()
 		return Rodux.Store.new(Rodux.combineReducers({}), nil, v2)
@@ -76,8 +85,14 @@ local function ThemedOverlay(p)
 	end, { v3, store })
 
 	local colorMode = v3 == "light" and "Light" or "Dark"
+	local tokenOverrides
+
+	if FFlagSubscriptionPurchaseFollowsAppTheme and FFlagAppClassicThemeGreenButtonColors then
+		tokenOverrides = Style.getClassicThemeTokenOverrides(themeName, colorMode)
+	end
 
 	local createElement = React.createElement
+
 	local createElement2 = React.createElement
 	local createElement3 = React.createElement
 	local title
@@ -92,15 +107,19 @@ local function ThemedOverlay(p)
 		message = p.params.message or nil
 	end
 
-	return createElement(FoundationProvider, { colorMode = colorMode }, {
-		Providers = createElement2(ProviderContainer, { providers = providers }, {
-			Sheet = createElement3(RobloxSubscriptionContainer, {
-				title = title,
-				message = message,
-				onClose = p.onClose
+	return createElement(
+		FoundationProvider,
+		{ colorMode = colorMode, themeName = themeName, tokenOverrides = tokenOverrides },
+		{
+			Providers = createElement2(ProviderContainer, { providers = providers }, {
+				Sheet = createElement3(RobloxSubscriptionContainer, {
+					title = title,
+					message = message,
+					onClose = p.onClose
+				})
 			})
-		})
-	})
+		}
+	)
 end
 
 return {

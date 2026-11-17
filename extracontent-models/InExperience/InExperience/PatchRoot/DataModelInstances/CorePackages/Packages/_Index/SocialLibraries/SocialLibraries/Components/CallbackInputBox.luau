@@ -3,7 +3,6 @@ local dependencies = require(SocialLibraries.dependencies)
 
 local roact = dependencies.Roact
 local imageSetLabel = dependencies.UIBlox.Core.ImageSet.ImageSetLabel
-local foundationFontFaceMigration = dependencies.Foundation.Utility.Flags.FoundationFontFaceMigration
 local normalizeFontFace = dependencies.Foundation.Utility.normalizeFontFace
 
 local extended = roact.PureComponent:extend("CallbackInputBox")
@@ -70,170 +69,137 @@ function extended:render()
 		textTransparency = placeholderTextTransparency
 	end
 
-	local createElement = roact.createElement
-	local v = { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 1, 0) }
-	local v2 = {
+	return roact.createElement("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 1, 0) }, {
 		layout = roact.createElement("UIListLayout", {
 			VerticalAlignment = Enum.VerticalAlignment.Center,
 			HorizontalAlignment = Enum.HorizontalAlignment.Left,
 			FillDirection = Enum.FillDirection.Horizontal,
 			SortOrder = Enum.SortOrder.LayoutOrder
 		}),
-		inputBox = 0
-	}
+		inputBox = roact.createElement(
+			"Frame",
+			{ BackgroundTransparency = 1, Size = UDim2.new(1, 0, 1, 0), LayoutOrder = 1 },
+			{
+				layout = roact.createElement("UIListLayout", {
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					HorizontalAlignment = Enum.HorizontalAlignment.Left,
+					FillDirection = Enum.FillDirection.Horizontal,
+					SortOrder = Enum.SortOrder.LayoutOrder
+				}),
+				inputTextBox = roact.createElement("TextBox", {
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, -self.props.clearButtonSize, 1, 0),
+					Position = UDim2.new(0, 0, 0, 0),
+					TextColor3 = self.props.inputTextColor3,
+					TextSize = self.props.inputTextSize,
+					TextTransparency = textTransparency,
+					FontFace = normalizeFontFace(self.props.inputTextFont),
+					PlaceholderText = self.props.placeholderText,
+					PlaceholderColor3 = self.props.placeholderTextColor3,
+					TextXAlignment = self.props.inputTextXAlignment,
+					TextYAlignment = self.props.inputTextYAlignment,
+					OverlayNativeInput = true,
+					ClearTextOnFocus = false,
+					ClipsDescendants = self.props.clipsDescendants,
+					LayoutOrder = 1,
+					ManualFocusRelease = self.props.manualFocusRelease,
+					MultiLine = self.props.multiLine,
+					TextWrapped = self.props.textWrapped,
+					TextInputType = self.props.textInputType,
+					ReturnKeyType = self.props.returnKeyType,
+					SelectionImageObject = self.props.inputBoxSelectionImageObject,
+					[roact.Event.ReturnPressedFromOnScreenKeyboard] = self.props.returnPressedFromOnScreenKeyboardCallback,
+					[roact.Event.TouchTap] = self.focusTextbox,
+					[roact.Event.Focused] = function(p)
+						if self.inputBoxRef.current and self.inputBoxRef.current.Text ~= "" then
+							if self.clearRef.current and not self.props.clearButtonDisabled then
+								self.clearRef.current.Visible = true
+							end
 
-	local createElement2 = roact.createElement
-	local v3 = { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 1, 0), LayoutOrder = 1 }
+							p.TextColor3 = self.props.inputTextColor3
+							p.TextTransparency = inputTextTransparency
+						else
+							p.TextColor3 = self.props.placeholderTextColor3
+							p.TextTransparency = placeholderTextTransparency
+						end
 
-	local children = {
-		layout = roact.createElement("UIListLayout", {
-			VerticalAlignment = Enum.VerticalAlignment.Center,
-			HorizontalAlignment = Enum.HorizontalAlignment.Left,
-			FillDirection = Enum.FillDirection.Horizontal,
-			SortOrder = Enum.SortOrder.LayoutOrder
-		}),
-		inputTextBox = 0,
-		Clear = 0
-	}
+						self.props.focusChangedCallback(true)
+					end,
+					[roact.Event.FocusLost] = function(p, p2)
+						if self.inputBoxRef.current and self.inputBoxRef.current.Text == "" then
+							p.TextColor3 = self.props.placeholderTextColor3
+							p.TextTransparency = placeholderTextTransparency
+						end
 
-	local createElement3 = roact.createElement
-	local v4 = {}
-	v4.BackgroundTransparency = 1
-	v4.Size = UDim2.new(1, -self.props.clearButtonSize, 1, 0)
-	v4.Position = UDim2.new(0, 0, 0, 0)
+						self.props.focusChangedCallback(false, p2)
+					end,
+					[roact.Change.Text] = function(p)
+						if p.Text ~= "" or self.textChangedEventUnlocked then
+							if p.Text == "" then
+								if self.clearRef.current then
+									self.clearRef.current.Visible = false
+								end
 
-	v4.TextColor3 = self.props.inputTextColor3
-	v4.TextSize = self.props.inputTextSize
-	v4.TextTransparency = textTransparency
-	local font
+								p.TextColor3 = self.props.placeholderTextColor3
+								p.TextTransparency = placeholderTextTransparency
+							else
+								if self.clearRef.current and not self.props.clearButtonDisabled then
+									self.clearRef.current.Visible = true
+								end
 
-	if not foundationFontFaceMigration then
-		font = self.props.inputTextFont
-	end
+								p.TextColor3 = self.props.inputTextColor3
+								p.TextTransparency = inputTextTransparency
+							end
 
-	v4.Font = font
-	local fontFace
+							self.inputText = p.Text
 
-	if foundationFontFaceMigration then
-		fontFace = normalizeFontFace(self.props.inputTextFont)
-	end
+							if self.props.textChangedCallback then
+								self.props.textChangedCallback(p.Text)
+							end
+						end
 
-	v4.FontFace = fontFace
+						self.textChangedEventUnlocked = true
+					end,
+					[roact.Ref] = self.inputBoxRef,
+					[roact.Change.AbsoluteSize] = self.props[roact.Change.AbsoluteSize]
+				}),
+				Clear = roact.createElement("ImageButton", {
+					BackgroundTransparency = 1,
+					Size = UDim2.new(0, self.props.clearButtonSize, 0, self.props.clearButtonSize),
+					AutoButtonColor = false,
+					LayoutOrder = 2,
+					Visible = not self.props.clearButtonDisabled,
+					SelectionImageObject = self.props.clearButtonSelectionImageObject,
+					Selectable = self.clearRef.current and self.clearRef.current.Visible == true,
+					[roact.Event.Activated] = function()
+						if self.inputBoxRef.current then
+							self.inputBoxRef.current.Text = ""
+						end
 
-	v4.PlaceholderText = self.props.placeholderText
-	v4.PlaceholderColor3 = self.props.placeholderTextColor3
+						self.inputText = ""
 
-	v4.TextXAlignment = self.props.inputTextXAlignment
-	v4.TextYAlignment = self.props.inputTextYAlignment
-	v4.OverlayNativeInput = true
-	v4.ClearTextOnFocus = false
-	v4.ClipsDescendants = self.props.clipsDescendants
-	v4.LayoutOrder = 1
-
-	v4.ManualFocusRelease = self.props.manualFocusRelease
-	v4.MultiLine = self.props.multiLine
-	v4.TextWrapped = self.props.textWrapped
-	v4.TextInputType = self.props.textInputType
-	v4.ReturnKeyType = self.props.returnKeyType
-	v4.SelectionImageObject = self.props.inputBoxSelectionImageObject
-
-	v4[roact.Event.ReturnPressedFromOnScreenKeyboard] = self.props.returnPressedFromOnScreenKeyboardCallback
-
-	v4[roact.Event.TouchTap] = self.focusTextbox
-
-	v4[roact.Event.Focused] = function(p)
-		if self.inputBoxRef.current and self.inputBoxRef.current.Text ~= "" then
-			if self.clearRef.current and not self.props.clearButtonDisabled then
-				self.clearRef.current.Visible = true
-			end
-
-			p.TextColor3 = self.props.inputTextColor3
-			p.TextTransparency = inputTextTransparency
-		else
-			p.TextColor3 = self.props.placeholderTextColor3
-			p.TextTransparency = placeholderTextTransparency
-		end
-
-		self.props.focusChangedCallback(true)
-	end
-
-	v4[roact.Event.FocusLost] = function(p, p2)
-		if self.inputBoxRef.current and self.inputBoxRef.current.Text == "" then
-			p.TextColor3 = self.props.placeholderTextColor3
-			p.TextTransparency = placeholderTextTransparency
-		end
-
-		self.props.focusChangedCallback(false, p2)
-	end
-
-	v4[roact.Change.Text] = function(p)
-		if p.Text ~= "" or self.textChangedEventUnlocked then
-			if p.Text == "" then
-				if self.clearRef.current then
-					self.clearRef.current.Visible = false
-				end
-
-				p.TextColor3 = self.props.placeholderTextColor3
-				p.TextTransparency = placeholderTextTransparency
-			else
-				if self.clearRef.current and not self.props.clearButtonDisabled then
-					self.clearRef.current.Visible = true
-				end
-
-				p.TextColor3 = self.props.inputTextColor3
-				p.TextTransparency = inputTextTransparency
-			end
-
-			self.inputText = p.Text
-
-			if self.props.textChangedCallback then
-				self.props.textChangedCallback(p.Text)
-			end
-		end
-
-		self.textChangedEventUnlocked = true
-	end
-
-	v4[roact.Ref] = self.inputBoxRef
-	v4[roact.Change.AbsoluteSize] = self.props[roact.Change.AbsoluteSize]
-	children.inputTextBox = createElement3("TextBox", v4)
-
-	children.Clear = roact.createElement("ImageButton", {
-		BackgroundTransparency = 1,
-		Size = UDim2.new(0, self.props.clearButtonSize, 0, self.props.clearButtonSize),
-		AutoButtonColor = false,
-		LayoutOrder = 2,
-		Visible = not self.props.clearButtonDisabled,
-		SelectionImageObject = self.props.clearButtonSelectionImageObject,
-		Selectable = self.clearRef.current and self.clearRef.current.Visible == true,
-		[roact.Event.Activated] = function()
-			if self.inputBoxRef.current then
-				self.inputBoxRef.current.Text = ""
-			end
-
-			self.inputText = ""
-
-			if self.clearRef.current then
-				self.clearRef.current.Visible = false
-			end
-		end
-	}, {
-		layout = roact.createElement("UIListLayout", {
-			VerticalAlignment = "Center",
-			HorizontalAlignment = "Center"
-		}),
-		Icon = roact.createElement(imageSetLabel, {
-			BackgroundTransparency = 1,
-			Size = UDim2.new(0, self.props.clearButtonSize, 0, self.props.clearButtonSize),
-			Image = self.props.clearIcon,
-			ImageColor3 = self.props.clearIconColor3,
-			ImageTransparency = self.props.clearIconTransparency,
-			Visible = self.props.showCancelIconOnLoad,
-			[roact.Ref] = self.clearRef
-		})
+						if self.clearRef.current then
+							self.clearRef.current.Visible = false
+						end
+					end
+				}, {
+					layout = roact.createElement("UIListLayout", {
+						VerticalAlignment = "Center",
+						HorizontalAlignment = "Center"
+					}),
+					Icon = roact.createElement(imageSetLabel, {
+						BackgroundTransparency = 1,
+						Size = UDim2.new(0, self.props.clearButtonSize, 0, self.props.clearButtonSize),
+						Image = self.props.clearIcon,
+						ImageColor3 = self.props.clearIconColor3,
+						ImageTransparency = self.props.clearIconTransparency,
+						Visible = self.props.showCancelIconOnLoad,
+						[roact.Ref] = self.clearRef
+					})
+				})
+			}
+		)
 	})
-	v2.inputBox = createElement2("Frame", v3, children)
-	return createElement("Frame", v, v2)
 end
 
 function extended.didMount(data)

@@ -17,6 +17,8 @@ local Text = Foundation.Text
 local View = Foundation.View
 
 local Enums = require(InExperienceSideSheet.Common.Enums)
+local Flags = require(InExperienceSideSheet.Flags)
+local FFlagSideSheetEmphasizeLeave = Flags.FFlagSideSheetEmphasizeLeave
 
 local ButtonWidth = Enums.ButtonWidth
 
@@ -29,9 +31,9 @@ end
 local function ShortcutButton(props)
 	local v = useTokens()
 
-	local v2 = useLocalization({ label = props.label })
+	local label = useLocalization({ label = props.label }).label
 
-	local v3 = SignalsReact.useSignalState(props.getIsEnabled)
+	local v2 = SignalsReact.useSignalState(props.getIsEnabled)
 
 	local name = SignalsReact.useSignalState(props.getShortcutIcon or signal)
 
@@ -40,45 +42,66 @@ local function ShortcutButton(props)
 	end, { props.getOnActivated })
 
 	local size = IconSize.Medium
-	local v4 = v.Gap.XSmall
+	local v3 = v.Gap.XSmall
 
 	if isBuilderIcon(name) then
 		size = IconSize.XLarge
-		v4 = v.Gap.Small
+		v3 = v.Gap.Small
 	end
 
-	local background = v.Color.ActionStandard.Background
-	local foreground = v.Color.ActionStandard.Foreground
+	local v4 = FFlagSideSheetEmphasizeLeave and props.isEmphasized == true
+	local background
+
+	if v4 then
+		background = v.Color.ActionSoftEmphasis.Background
+	else
+		background = v.Color.ActionStandard.Background
+	end
+
+	local foreground
+
+	if v4 then
+		foreground = v.Color.ActionSoftEmphasis.Foreground
+	else
+		foreground = v.Color.ActionStandard.Foreground
+	end
 
 	local sizefull = (props.width or ButtonWidth.Full) == ButtonWidth.Full
 
 	local createElement = React.createElement
 	local v5 = {
 		tag = {
-			["row align-x-center align-y-center gap-small radius-medium bg-action-standard"] = true,
+			["row align-x-center align-y-center gap-small radius-medium"] = true,
+			["bg-action-standard"] = not v4,
 			["size-full-1000"] = sizefull,
 			["fill size-0-1000"] = not sizefull
 		},
-		layout = { FillDirection = Enum.FillDirection.Horizontal, Padding = UDim.new(0, v4) },
-		isDisabled = not v3,
+		layout = { FillDirection = Enum.FillDirection.Horizontal, Padding = UDim.new(0, v3) },
+		isDisabled = not v2,
 		backgroundStyle = 0,
 		onActivated = 0,
+		testId = 0,
 		LayoutOrder = 0
 	}
+	local backgroundStyle
 
-	local backgroundStyle = { Color3 = background.Color3, Transparency = 0 }
-	local transparency
-
-	if v3 then
-		transparency = background.Transparency
+	if v2 then
+		backgroundStyle = background
 	else
-		transparency = fn(background.Transparency) -- inferred equivalent call
+		backgroundStyle = { Color3 = background.Color3, Transparency = 0 }
+		backgroundStyle.Transparency = fn(background.Transparency) -- inferred equivalent call
 	end
 
-	backgroundStyle.Transparency = transparency
 	v5.backgroundStyle = backgroundStyle
 
 	v5.onActivated = onActivated
+	local testId
+
+	if FFlagSideSheetEmphasizeLeave then
+		testId = props.testId
+	end
+
+	v5.testId = testId
 	v5.LayoutOrder = props.layoutOrder
 	local shortcutIcon
 
@@ -89,12 +112,12 @@ local function ShortcutButton(props)
 	return createElement(View, v5, {
 		ShortcutIcon = shortcutIcon,
 		Text = React.createElement(Text, {
-			tag = "auto-x text-label-medium content-action-standard",
-			Text = v2.label,
-			textStyle = {
-				Color3 = foreground.Color3,
-				Transparency = not v3 and 0.5 or foreground.Transparency
+			tag = {
+				["auto-x text-label-medium"] = true,
+				["content-action-standard"] = not v4
 			},
+			Text = label,
+			textStyle = not v2 and { Color3 = foreground.Color3, Transparency = 0.5 } or foreground,
 			LayoutOrder = 2
 		})
 	})

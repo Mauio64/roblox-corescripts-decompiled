@@ -98,8 +98,7 @@ local function PillGroup(props)
 			if v8 then
 				v9 = Cryo.List.removeValue(selectedPills, text)
 			else
-				local v10 = { text }
-				v9 = Cryo.List.join(selectedPills, v10)
+				v9 = Cryo.List.join(selectedPills, { text })
 			end
 
 			local current = not v8 and ref.current

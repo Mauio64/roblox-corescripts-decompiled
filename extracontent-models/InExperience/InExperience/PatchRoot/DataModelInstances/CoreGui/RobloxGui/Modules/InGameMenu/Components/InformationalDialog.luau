@@ -1,6 +1,5 @@
 local CoreGui = game:GetService("CoreGui")
 local RunService = game:GetService("RunService")
-local TextService = game:GetService("TextService")
 local CorePackages = game:GetService("CorePackages")
 local ContextActionService = game:GetService("ContextActionService")
 local GuiService = game:GetService("GuiService")
@@ -25,10 +24,8 @@ local ThemedTextLabel = require(script.Parent.ThemedTextLabel)
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 
 local FocusHandler = require(script.Parent.Connection.FocusHandler)
-local Foundation = require(CorePackages.Packages.Foundation)
 local Style = require(CorePackages.Workspace.Packages.Style)
 local GetTextSize = Style.GetTextSize
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local extended = Roact.PureComponent:extend("InformationalDialog")
 
@@ -69,28 +66,13 @@ function extended.render(object)
 	local props = object.props
 
 	return withStyle(function(props2)
-		local font = props2.Font.Body.Font
 		local v = props2.Font.Body.RelativeSize * props2.Font.BaseSize
-		local bodyText = props.bodyText
-		local y
-
-		if FoundationFontFaceMigration then
-			y = GetTextSize(bodyText, v, props2.Tokens.Typography.BodyLarge.Font, Vector2.new(295, 1e999), {
-				addTemporaryPadding = false
-			}).Y
-		else
-			y = TextService:GetTextSize(bodyText, v, font, Vector2.new(295, 1e999)).Y
-		end
-
-		local y2
-
-		if FoundationFontFaceMigration then
-			y2 = GetTextSize(props.subBodyText, v, props2.Tokens.Typography.BodyLarge.Font, Vector2.new(295, 1e999), {
-				addTemporaryPadding = false
-			}).Y
-		else
-			y2 = TextService:GetTextSize(props.subBodyText, v, font, Vector2.new(295, 1e999)).Y
-		end
+		local y = GetTextSize(props.bodyText, v, props2.Tokens.Typography.BodyLarge.Font, Vector2.new(295, 1e999), {
+			addTemporaryPadding = false
+		}).Y
+		local y2 = GetTextSize(props.subBodyText, v, props2.Tokens.Typography.BodyLarge.Font, Vector2.new(295, 1e999), {
+			addTemporaryPadding = false
+		}).Y
 
 		local v2 = math.max(y, v * 2) + 20
 		local v3 = math.max(y2, v * 2) + 20
@@ -252,7 +234,8 @@ function extended.render(object)
 end
 
 function extended:updateBlur()
-	RunService:SetRobloxGuiFocused(self.props.blurBackground and self.props.visible)
+	local visible = self.props.blurBackground and self.props.visible
+	RunService:SetRobloxGuiFocused(visible)
 end
 
 function extended:bindActions()

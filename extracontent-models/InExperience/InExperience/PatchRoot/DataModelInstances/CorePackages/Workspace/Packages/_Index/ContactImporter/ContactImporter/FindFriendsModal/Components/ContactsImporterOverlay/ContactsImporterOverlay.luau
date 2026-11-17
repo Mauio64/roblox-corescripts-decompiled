@@ -15,10 +15,8 @@ local styledTextLabel = uiBlox.App.Text.StyledTextLabel
 local withStyle = uiBlox.Style.withStyle
 local TextKeys = require(parent.Common.TextKeys)
 local dash = dependencies.Dash
-local foundation = dependencies.Foundation
-local normalizeFontFace = foundation.Utility.normalizeFontFace
-local foundationFontFaceMigration = dependencies.FFlagFontFaceSocialFriends
-	and foundation.Utility.Flags.FoundationFontFaceMigration
+local normalizeFontFace = dependencies.Foundation.Utility.normalizeFontFace
+local fFlagFontFaceSocialFriends = dependencies.FFlagFontFaceSocialFriends
 
 local extended = roact.PureComponent:extend("ContactsImporterOverlay")
 
@@ -146,14 +144,14 @@ function extended.render(p)
 			onLearnMoreClicksByActivated.BackgroundTransparency = 1
 			local font2
 
-			if not foundationFontFaceMigration then
+			if not fFlagFontFaceSocialFriends then
 				font2 = props.Font.CaptionBody.Font
 			end
 
 			onLearnMoreClicksByActivated.Font = font2
 			local fontFace
 
-			if foundationFontFaceMigration then
+			if fFlagFontFaceSocialFriends then
 				fontFace = normalizeFontFace(props.Tokens.Typography.BodySmall.Font)
 			end
 

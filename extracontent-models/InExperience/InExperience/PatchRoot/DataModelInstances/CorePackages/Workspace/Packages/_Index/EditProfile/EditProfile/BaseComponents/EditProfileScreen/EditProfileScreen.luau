@@ -11,15 +11,17 @@ local Localization = require(parent.Localization)
 local useLocalization = Localization.Hooks.useLocalization
 local SharedFlags = require(parent.SharedFlags)
 local FFlagAXEnableProfileTab = SharedFlags.FFlagAXEnableProfileTab
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagSplitPaneFullBleedEditProfile = SharedFlags2.FFlagSplitPaneFullBleedEditProfile
 
 return function(props)
 	local v = useProfileCardWidth()
 	local v2 = useLocalization({ title = props.titleKey })
 
-	local sizefullfull = FFlagAXEnableProfileTab and props.fullBleed == true
+	local sizefullfull = (FFlagAXEnableProfileTab or FFlagSplitPaneFullBleedEditProfile) and props.fullBleed == true
 	local createElement = React.createElement
 	local v3 = {
-		tag = FFlagAXEnableProfileTab and {
+		tag = (FFlagAXEnableProfileTab or FFlagSplitPaneFullBleedEditProfile) and {
 			["col items-start bg-surface-0"] = true,
 			["position-top-right anchor-top-right"] = not sizefullfull,
 			["size-full-full"] = sizefullfull

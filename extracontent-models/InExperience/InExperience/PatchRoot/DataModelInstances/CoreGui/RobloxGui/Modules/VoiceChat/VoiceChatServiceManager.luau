@@ -36,6 +36,7 @@ local createVoiceRestrictionController_DEPRECATED = require(CorePackages.Workspa
 local showLegacyVoiceRestriction = require(script.Parent.Helpers.showLegacyVoiceRestriction)
 local showUFRVoiceRestriction = require(script.Parent.Helpers.showUFRVoiceRestriction)
 local getActiveInterventionTimeoutEnd = require(script.Parent.Helpers.getActiveInterventionTimeoutEnd)
+local getServerNow = require(script.Parent.Helpers.getServerNow)
 
 local InterventionShared = require(CorePackages.Workspace.Packages.InterventionShared)
 local voiceInterventionReceivedSignal = InterventionShared.Signals.voiceInterventionReceivedSignal
@@ -127,6 +128,7 @@ local FFlagEnableRetryForLinkingProtocolFetch = SharedFlags13.FFlagEnableRetryFo
 local defineFastFlag10 = game:DefineFastFlag("ShowJoinVoiceWhenDisconnectedV3", false)
 local defineFastFlag11 = game:DefineFastFlag("EnableVoiceRewarmReArmV2", false)
 local FFlagVoiceRewarmGrafanaMetrics = require(script.Parent.Flags.FFlagVoiceRewarmGrafanaMetrics)
+local defineFastFlag12 = game:DefineFastFlag("VoiceConnectDisconnectGrafanaMetrics", false)
 
 local FFlagVoiceVolumeControlsEnableVoiceChatVolumeSlider = require(RobloxGui.Modules.Settings.Flags.FFlagVoiceVolumeControlsEnableVoiceChatVolumeSlider)
 
@@ -134,8 +136,8 @@ local FFlagVoiceVolumeControlsEnableNotAudibleVoiceChatVolumeToast = require(scr
 
 local SharedFlags14 = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagVoiceRewarmTelemetry = SharedFlags14.FFlagVoiceRewarmTelemetry
-local defineFastFlag12 = game:DefineFastFlag("GuardVoiceInExpUpsellVariant", false)
-local defineFastFlag13 = game:DefineFastFlag("AlwaysSetJoinVoiceButtonContext", false)
+local defineFastFlag13 = game:DefineFastFlag("GuardVoiceInExpUpsellVariant", false)
+local defineFastFlag14 = game:DefineFastFlag("AlwaysSetJoinVoiceButtonContext", false)
 
 local _ = {
 	FAE_UPSELL = "FaeUpsell",
@@ -451,6 +453,16 @@ local function bind(p, p2) -- 8 equivalent calls inferred from this helper
 	end
 end
 
+local function getEnumName(items, p: number?) -- 5 equivalent calls inferred from this helper
+	for k, item in items do
+		if item == p then
+			return k
+		end
+	end
+
+	return nil
+end
+
 function VoiceChatServiceManager.new(coreVoiceManager, service, httpRbxApiService, permissionsService, blockStatusChanged, p, notificationService, p2, avatarChatService, captureService)
 	local object = setmetatable({
 		service = service,
@@ -478,7 +490,7 @@ function VoiceChatServiceManager.new(coreVoiceManager, service, httpRbxApiServic
 			v4 = createVoiceRestrictionController_DEPRECATED
 		end
 
-		rawset(object, "voiceRestrictionController", v4({
+		local v5 = {
 			getSettings = function()
 				return GetUserSettings(bind(object, "GetRequest")) or nil -- inferred equivalent call
 			end,
@@ -510,8 +522,17 @@ function VoiceChatServiceManager.new(coreVoiceManager, service, httpRbxApiServic
 					settings = settings,
 					onAcknowledgementSuccess = onAcknowledgementSuccess
 				})
-			end
-		}))
+			end,
+			getNow = 0
+		}
+		local getNow
+
+		if FFlagReactiveVoiceRestrictionsUFR then
+			getNow = getServerNow
+		end
+
+		v5.getNow = getNow
+		rawset(object, "voiceRestrictionController", v4(v5))
 	end
 
 	if FFlagProactiveVoiceRestrictionsUFR and FFlagReactiveVoiceRestrictionsUFR then
@@ -597,6 +618,13 @@ function VoiceChatServiceManager.new(coreVoiceManager, service, httpRbxApiServic
 	object.coreVoiceManager:subscribe("OnUserAndPlaceCanUseVoiceResolved", function(p3, p4)
 		object:_onUserAndPlaceCanUseVoiceResolved(p3, p4)
 	end)
+
+	if FFlagReactiveVoiceRestrictionsUFR then
+		object.coreVoiceManager:subscribe("OnJoinAgeVerificationOverlayFetched", function(p3)
+			object:_onJoinAgeVerificationOverlayFetched(p3)
+		end)
+	end
+
 	object.coreVoiceManager:subscribe("OnRequestMicPermissionResolved", function()
 		if not GetFFlagEnableUniveralVoiceToasts() then
 			return
@@ -694,6 +722,14 @@ function VoiceChatServiceManager.new(coreVoiceManager, service, httpRbxApiServic
 			connectDisconnectAnalyticsData.connectionSource = Constants2.VOICE_CONNECTION_SOURCE.AUTO_CONNECT
 			object.pendingConnectionSource = nil
 			object.Analytics:reportConnectDisconnectEvents("voiceConnectEvent", connectDisconnectAnalyticsData)
+
+			if defineFastFlag12 then
+				object.Analytics:reportVoiceConnected(getEnumName( -- inferred equivalent call
+					Constants2.VOICE_CONNECTION_SOURCE,
+					connectDisconnectAnalyticsData.connectionSource
+				))
+			end
+
 			object.voiceConnectEventReportedForActiveSession = true
 			flag = false
 			eventConnection:Disconnect()
@@ -706,6 +742,14 @@ function VoiceChatServiceManager.new(coreVoiceManager, service, httpRbxApiServic
 			connectDisconnectAnalyticsData.disconnectReason = object.pendingDisconnectReason
 				or Constants2.VOICE_DISCONNECT_REASON.SYSTEM
 			object.Analytics:reportConnectDisconnectEvents("voiceDisconnectReasonEvent", connectDisconnectAnalyticsData)
+
+			if defineFastFlag12 then
+				object.Analytics:reportVoiceDisconnected(getEnumName( -- inferred equivalent call
+					Constants2.VOICE_DISCONNECT_REASON,
+					connectDisconnectAnalyticsData.disconnectReason
+				))
+			end
+
 			object.pendingDisconnectReason = nil
 		end
 
@@ -848,6 +892,14 @@ function VoiceChatServiceManager.new(coreVoiceManager, service, httpRbxApiServic
 			connectDisconnectAnalyticsData.connectionSource = object.pendingConnectionSource
 			object.pendingConnectionSource = nil
 			object.Analytics:reportConnectDisconnectEvents("voiceConnectEvent", connectDisconnectAnalyticsData)
+
+			if defineFastFlag12 then
+				object.Analytics:reportVoiceConnected(getEnumName( -- inferred equivalent call
+					Constants2.VOICE_CONNECTION_SOURCE,
+					connectDisconnectAnalyticsData.connectionSource
+				))
+			end
+
 			object.voiceConnectEventReportedForActiveSession = true
 			flag = false
 			eventConnection:Disconnect()
@@ -1166,6 +1218,30 @@ function VoiceChatServiceManager:_onUserAndPlaceCanUseVoiceResolved(data, p)
 	end
 end
 
+function VoiceChatServiceManager:_onJoinAgeVerificationOverlayFetched(p)
+	local voiceSettings
+
+	if type(p) == "table" then
+		voiceSettings = p.voiceSettings
+	end
+
+	if
+		not voiceSettings
+		or voiceSettings.isBanned
+		or voiceSettings.banReason ~= BAN_REASON.UFR_UNACKNOWLEDGED_EXPIRED
+	then
+		return
+	end
+
+	if FFlagProactiveVoiceRestrictionsUFRIXPExposure then
+		IXPServiceWrapper:LogFlagLinkedUserLayerExposure(AppUserLayers.VoiceUserIDLayer)
+	end
+
+	if FFlagProactiveVoiceRestrictionsUFR then
+		self.voiceRestrictionController.showPendingAcknowledgement(voiceSettings)
+	end
+end
+
 function VoiceChatServiceManager:ChangeVoiceJoinProgress(p)
 	return self.coreVoiceManager:ChangeVoiceJoinProgress(p)
 end
@@ -1197,7 +1273,7 @@ end
 function VoiceChatServiceManager:ShowInExperienceVoiceUpsell(p: string)
 	local ageVerificationOverlay = self:FetchAgeVerificationOverlay()
 
-	if defineFastFlag12 and type(ageVerificationOverlay) ~= "table" then
+	if defineFastFlag13 and type(ageVerificationOverlay) ~= "table" then
 		return
 	end
 
@@ -1340,7 +1416,7 @@ function VoiceChatServiceManager:_onUFRInterventionReceived(p)
 		return
 	end
 
-	local activeInterventionTimeoutEnd, v4 = getActiveInterventionTimeoutEnd(p, DateTime.now().UnixTimestamp)
+	local activeInterventionTimeoutEnd, v4 = getActiveInterventionTimeoutEnd(p, getServerNow())
 
 	if not activeInterventionTimeoutEnd then
 		return
@@ -1982,7 +2058,7 @@ function VoiceChatServiceManager:JoinVoice(object)
 	local ageVerificationOverlay = self:FetchAgeVerificationOverlay()
 	local showVoiceInExperienceUpsellVariant
 
-	if defineFastFlag12 then
+	if defineFastFlag13 then
 		if type(ageVerificationOverlay) == "table" then
 			showVoiceInExperienceUpsellVariant = ageVerificationOverlay.showVoiceInExperienceUpsellVariant
 		end
@@ -2171,7 +2247,7 @@ function VoiceChatServiceManager:ShouldShowJoinVoice()
 	end
 
 	if self:EligibleForAgeCheckToast() then
-		if defineFastFlag13 then
+		if defineFastFlag14 then
 			self.joinVoiceButtonContext = "AgeCheckToast"
 		end
 
@@ -2187,14 +2263,14 @@ function VoiceChatServiceManager:ShouldShowJoinVoice()
 			and not self:UserVoiceEnabled()
 			and self:FetchPhoneVerificationUpsell(Constants2.IN_EXP_PHONE_UPSELL_IXP_LAYER) == Constants2.PHONE_UPSELL_VALUE_PROP.VoiceChat
 		then
-			if defineFastFlag13 then
+			if defineFastFlag14 then
 				self.joinVoiceButtonContext = "PhoneUpsell"
 			end
 
 			return true
 		end
 
-		if defineFastFlag13 and userInInExperienceUpsellTreatment and v4 then
+		if defineFastFlag14 and userInInExperienceUpsellTreatment and v4 then
 			self.joinVoiceButtonContext = "InExpUpsell"
 		end
 
@@ -2371,6 +2447,14 @@ function VoiceChatServiceManager:RejoinPreviousChannel()
 			connectDisconnectAnalyticsData.connectionSource = self.pendingConnectionSource
 			self.pendingConnectionSource = nil
 			self.Analytics:reportConnectDisconnectEvents("voiceConnectEvent", connectDisconnectAnalyticsData)
+
+			if defineFastFlag12 then
+				self.Analytics:reportVoiceConnected(getEnumName( -- inferred equivalent call
+					Constants2.VOICE_CONNECTION_SOURCE,
+					connectDisconnectAnalyticsData.connectionSource
+				))
+			end
+
 			self.voiceConnectEventReportedForActiveSession = true
 		elseif previousGroupId and previousGroupId ~= "" then
 			self.service:Leave()
@@ -2384,6 +2468,14 @@ function VoiceChatServiceManager:RejoinPreviousChannel()
 			connectDisconnectAnalyticsData.connectionSource = self.pendingConnectionSource
 			self.pendingConnectionSource = nil
 			self.Analytics:reportConnectDisconnectEvents("voiceConnectEvent", connectDisconnectAnalyticsData)
+
+			if defineFastFlag12 then
+				self.Analytics:reportVoiceConnected(getEnumName( -- inferred equivalent call
+					Constants2.VOICE_CONNECTION_SOURCE,
+					connectDisconnectAnalyticsData.connectionSource
+				))
+			end
+
 			self.voiceConnectEventReportedForActiveSession = true
 		end
 	end)

@@ -3,5 +3,6 @@ require(RobloxSubscriptionPurchaseApp.Enums.RobloxSubscriptionFlowCompleteReason
 require(RobloxSubscriptionPurchaseApp.Enums.SurfaceContext)
 require(RobloxSubscriptionPurchaseApp.Enums.SurfaceName)
 require(RobloxSubscriptionPurchaseApp.Enums.PurchaseClientSessionIdType)
+require(RobloxSubscriptionPurchaseApp.Enums.RobloxPlusSheetKind)
 
 return {}

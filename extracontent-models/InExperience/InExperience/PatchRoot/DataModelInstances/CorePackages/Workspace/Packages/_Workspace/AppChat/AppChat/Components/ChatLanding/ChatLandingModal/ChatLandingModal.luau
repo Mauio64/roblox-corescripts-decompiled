@@ -16,7 +16,6 @@ local useChatPagePadding = require(AppChat.Contexts.ChatPagePadding.useChatPageP
 local AppChatNetworking = require(parent.AppChatNetworking)
 local Foundation = require(parent.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local FFlagAppChatLandingModalThemedBackground = require(AppChat.Flags.FFlagAppChatLandingModalThemedBackground)
 
 local iconsactionsfavoriteOn = UIBlox.App.ImageSet.Images["icons/actions/favoriteOn"]
@@ -25,77 +24,37 @@ local x = Foundation.Enums.IconName.X
 local v2 = {
 	[AppChatNetworking.Constants.ModalContentType.Link] = function(p)
 		local v2 = useStyle()
-		local createElement = React.createElement
-		local onActivatedsByActivated = {}
-		onActivatedsByActivated.Size = UDim2.new(1, 0, 0, 0)
-		onActivatedsByActivated.LayoutOrder = p.layoutOrder
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = v2.Font.Body.Font
-		end
-
-		onActivatedsByActivated.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(v2.Tokens.Typography.BodyLarge.Font)
-		end
-
-		onActivatedsByActivated.FontFace = fontFace
-
-		onActivatedsByActivated.BorderSizePixel = 0
-		onActivatedsByActivated.Text = `<u>{p.content.text}</u>`
-		onActivatedsByActivated.RichText = true
-		onActivatedsByActivated.TextColor3 = v2.Theme.TextDefault.Color
-		onActivatedsByActivated.TextSize = v2.Font.CaptionBody.RelativeSize * v2.Font.BaseSize
-		onActivatedsByActivated.TextWrapped = true
-		onActivatedsByActivated.TextXAlignment = Enum.TextXAlignment.Left
-		onActivatedsByActivated.BackgroundTransparency = 1
-		onActivatedsByActivated.AutomaticSize = Enum.AutomaticSize.Y
-		onActivatedsByActivated[React.Event.Activated] = p.content.onActivated
-		return createElement("TextButton", onActivatedsByActivated)
+		return React.createElement("TextButton", {
+			Size = UDim2.new(1, 0, 0, 0),
+			LayoutOrder = p.layoutOrder,
+			FontFace = normalizeFontFace(v2.Tokens.Typography.BodyLarge.Font),
+			BorderSizePixel = 0,
+			Text = `<u>{p.content.text}</u>`,
+			RichText = true,
+			TextColor3 = v2.Theme.TextDefault.Color,
+			TextSize = v2.Font.CaptionBody.RelativeSize * v2.Font.BaseSize,
+			TextWrapped = true,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			BackgroundTransparency = 1,
+			AutomaticSize = Enum.AutomaticSize.Y,
+			[React.Event.Activated] = p.content.onActivated
+		})
 	end,
 	[AppChatNetworking.Constants.ModalContentType.Text] = function(p)
 		local v2 = useStyle()
-		local createElement = React.createElement
-		local v3 = {
+		return React.createElement("TextLabel", {
 			Size = UDim2.new(1, 0, 0, 0),
 			LayoutOrder = p.layoutOrder,
-			Font = 0,
-			FontFace = 0,
+			FontFace = normalizeFontFace(v2.Tokens.Typography.BodyLarge.Font),
 			BorderSizePixel = 0,
-			Text = 0,
-			TextColor3 = 0,
-			TextSize = 0,
+			Text = p.content.text,
+			TextColor3 = v2.Theme.TextDefault.Color,
+			TextSize = v2.Font.CaptionBody.RelativeSize * v2.Font.BaseSize,
 			TextWrapped = true,
-			TextXAlignment = 0,
+			TextXAlignment = Enum.TextXAlignment.Left,
 			BackgroundTransparency = 1,
-			AutomaticSize = 0
-		}
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = v2.Font.Body.Font
-		end
-
-		v3.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(v2.Tokens.Typography.BodyLarge.Font)
-		end
-
-		v3.FontFace = fontFace
-
-		v3.Text = p.content.text
-		v3.TextColor3 = v2.Theme.TextDefault.Color
-		v3.TextSize = v2.Font.CaptionBody.RelativeSize * v2.Font.BaseSize
-
-		v3.TextXAlignment = Enum.TextXAlignment.Left
-
-		v3.AutomaticSize = Enum.AutomaticSize.Y
-		return createElement("TextLabel", v3)
+			AutomaticSize = Enum.AutomaticSize.Y
+		})
 	end
 }
 
@@ -277,86 +236,36 @@ return React.forwardRef(function(p, ref)
 
 	v16.TitleLabelWithIcon = titleLabelWithIcon
 
-	local createElement6 = React.createElement
-	local v17 = {
+	v16.TitleTextLabel = React.createElement("TextLabel", {
 		Size = UDim2.new(1, 0, 0, 0),
 		LayoutOrder = 2,
-		Font = 0,
-		FontFace = 0,
+		FontFace = normalizeFontFace(v6.Typography.HeadingLarge.Font),
 		BorderSizePixel = 0,
-		Text = 0,
-		TextColor3 = 0,
-		TextSize = 0,
+		Text = joined.titleText,
+		TextColor3 = style.Theme.TextEmphasis.Color,
+		TextSize = style.Font.Header2.RelativeSize * style.Font.BaseSize,
 		TextWrapped = true,
-		TextXAlignment = 0,
+		TextXAlignment = Enum.TextXAlignment.Left,
 		BackgroundTransparency = 1,
-		AutomaticSize = 0
-	}
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = style.Font.Title.Font
-	end
-
-	v17.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(v6.Typography.HeadingLarge.Font)
-	end
-
-	v17.FontFace = fontFace
-
-	v17.Text = joined.titleText
-	v17.TextColor3 = style.Theme.TextEmphasis.Color
-	v17.TextSize = style.Font.Header2.RelativeSize * style.Font.BaseSize
-
-	v17.TextXAlignment = Enum.TextXAlignment.Left
-
-	v17.AutomaticSize = Enum.AutomaticSize.Y
-	v16.TitleTextLabel = createElement6("TextLabel", v17, {
+		AutomaticSize = Enum.AutomaticSize.Y
+	}, {
 		UIFlexItem = React.createElement("UIFlexItem", { FlexMode = Enum.UIFlexMode.Fill })
 	})
 	children2.LabelAndTextFrame = createElement5("Frame", v15, v16)
 
-	local createElement7 = React.createElement
-	local v18 = {
+	children2.BodyTextLabel = React.createElement("TextLabel", {
 		Size = UDim2.new(1, 0, 0, 0),
 		LayoutOrder = 2,
-		Font = 0,
-		FontFace = 0,
+		FontFace = normalizeFontFace(v6.Typography.BodyLarge.Font),
 		BorderSizePixel = 0,
-		Text = 0,
-		TextColor3 = 0,
-		TextSize = 0,
+		Text = joined.bodyText,
+		TextColor3 = style.Theme.TextDefault.Color,
+		TextSize = style.Font.CaptionBody.RelativeSize * style.Font.BaseSize,
 		TextWrapped = true,
-		TextXAlignment = 0,
+		TextXAlignment = Enum.TextXAlignment.Left,
 		BackgroundTransparency = 1,
-		AutomaticSize = 0
-	}
-	local font2
-
-	if not FoundationFontFaceMigration then
-		font2 = style.Font.Body.Font
-	end
-
-	v18.Font = font2
-	local fontFace2
-
-	if FoundationFontFaceMigration then
-		fontFace2 = normalizeFontFace(v6.Typography.BodyLarge.Font)
-	end
-
-	v18.FontFace = fontFace2
-
-	v18.Text = joined.bodyText
-	v18.TextColor3 = style.Theme.TextDefault.Color
-	v18.TextSize = style.Font.CaptionBody.RelativeSize * style.Font.BaseSize
-
-	v18.TextXAlignment = Enum.TextXAlignment.Left
-
-	v18.AutomaticSize = Enum.AutomaticSize.Y
-	children2.BodyTextLabel = createElement7("TextLabel", v18)
+		AutomaticSize = Enum.AutomaticSize.Y
+	})
 	local additionalContent
 
 	if v8 then

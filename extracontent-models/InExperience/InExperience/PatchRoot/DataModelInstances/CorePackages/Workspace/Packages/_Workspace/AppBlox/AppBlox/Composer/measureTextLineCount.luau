@@ -1,11 +1,7 @@
 local AppBlox = script:FindFirstAncestor("AppBlox")
 local Style = require(AppBlox.Parent.Style)
-local Foundation = require(AppBlox.Parent.Foundation)
 local getVisibleLineCount = require(script.Parent.getVisibleLineCount)
 local composerDebug = require(script.Parent.composerDebug)
-
-local TextService = game:GetService("TextService")
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local function measureTextLineCount(data)
 	local visibleLineCount = getVisibleLineCount(data.text, data.maxLines)
@@ -36,27 +32,13 @@ local function measureTextLineCount(data)
 	local lineCount
 
 	if layoutWidth > 0 then
-		local y
+		local y = Style.GetTextSize("M", data.fontSize, data.font, Vector2.new(layoutWidth, 100000), {
+			addTemporaryPadding = false
+		}).Y
 
-		if FoundationFontFaceMigration then
-			y = Style.GetTextSize("M", data.fontSize, data.font, Vector2.new(layoutWidth, 100000), {
-				addTemporaryPadding = false
-			}).Y
-		else
-			y = TextService:GetTextSize("M", data.fontSize, data.font, Vector2.new(layoutWidth, 100000)).Y
-		end
-
-		local v
-
-		if FoundationFontFaceMigration then
-			v = Style.GetTextSize(data.text, data.fontSize, data.font, Vector2.new(layoutWidth, 100000), {
-				addTemporaryPadding = false
-			})
-		else
-			v = TextService:GetTextSize(data.text, data.fontSize, data.font, Vector2.new(layoutWidth, 100000))
-		end
-
-		boundsY = v.Y
+		boundsY = Style.GetTextSize(data.text, data.fontSize, data.font, Vector2.new(layoutWidth, 100000), {
+			addTemporaryPadding = false
+		}).Y
 
 		if boundsY > 0 and y > 0 then
 			wrappedLineCount = math.ceil(boundsY / y)

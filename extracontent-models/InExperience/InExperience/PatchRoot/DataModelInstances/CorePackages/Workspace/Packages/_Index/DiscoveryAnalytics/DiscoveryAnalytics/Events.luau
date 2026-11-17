@@ -27,6 +27,8 @@ Events.gameConnectionsPlayedChipClicked = gameConnectionsPlayedChipClicked
 
 Events.gameTileOverflowMenuAction = require(script.gameTileOverflowMenuAction)
 
+Events.sendGameDwellEvent = require(script.sendGameDwellEvent)
+
 Events.discoveryVideoEndEvent = require(script.Video.discoveryVideoEndEvent)
 Events.discoveryVideoLoadEvent = require(script.Video.discoveryVideoLoadEvent)
 Events.discoveryVideoLoopEvent = require(script.Video.discoveryVideoLoopEvent)

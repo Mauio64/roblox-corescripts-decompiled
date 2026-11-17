@@ -7,8 +7,8 @@ local Signals = require(parent.Signals)
 local SignalsReact = require(parent.SignalsReact)
 local SduiCoreSystem = require(parent.SduiCoreSystem)
 local PYMKCarousel = require(parent.PYMKCarousel)
-local RecommendationsStore = require(parent.RecommendationsStore)
-local FriendRecommendations = RecommendationsStore.FriendRecommendations
+local FriendsRecommendations = require(parent.DataHydration.FriendsRecommendations)
+local FriendRecommendations = FriendsRecommendations.FriendRecommendations
 
 local RobloxAppEnums = require(parent.RobloxAppEnums)
 local AppPage = RobloxAppEnums.AppPage
@@ -18,14 +18,16 @@ local PymkNavigationBridge = require(SocialServerDrivenUi.System.PymkNavigationB
 local normalizeDirectRecommendations = require(SocialServerDrivenUi.Common.normalizeDirectRecommendations)
 
 local FFlagCreateConnectionsHub = SharedFlags.FFlagCreateConnectionsHub
+local FFlagLuaAppEnableSduiHomePage = SharedFlags.FFlagLuaAppEnableSduiHomePage
+local FFlagPymkCarouselExtendProps = SharedFlags.FFlagPymkCarouselExtendProps
 
 local v = {}
 
-local function readRecommendationHydration(items, store, p)
+local function readRecommendationHydration(items, p, p2)
 	local recommendationHydration = {}
 
 	for _, item in items do
-		local data = store.getFriendRecommendation(item.id).data(p)
+		local data = p.getFriendRecommendation(item.id).data(p2)
 
 		if data then
 			recommendationHydration[item.id] = data
@@ -41,14 +43,20 @@ local function SduiPymkCarousel(props)
 	local dependencies = props.sduiContext.dependencies
 	local sortIndex = tonumber(SduiCoreSystem.findAnalyticsField("collectionPosition", analyticsData, -1)) or -1
 	local startRow = props.startRow or -1
-	local store = FriendRecommendations.getStore()
+	local v2
 
-	local v2 = React.useMemo(function()
+	if FFlagPymkCarouselExtendProps then
+		v2 = FriendRecommendations.getStore(props.sduiContext.configKey)
+	else
+		v2 = FriendRecommendations.getStore()
+	end
+
+	local v3 = React.useMemo(function()
 		return Signals.createComputed(function(p)
-			return normalizeDirectRecommendations(items, readRecommendationHydration(items, store, p))
+			return normalizeDirectRecommendations(items, readRecommendationHydration(items, v2, p))
 		end)
-	end, { items, store })
-	local recommendations = SignalsReact.useSignalState(v2)
+	end, { items, v2 })
+	local recommendations = SignalsReact.useSignalState(v3)
 
 	local sortAnalyticsData = React.useMemo(function()
 		return {
@@ -75,21 +83,61 @@ local function SduiPymkCarousel(props)
 		end
 	end, { dependencies.getNavigation })
 
-	return React.createElement(PYMKCarousel.PYMKCarouselEntryPoint, {
+	local createElement = React.createElement
+	local pymkCarouselEntryPoint = PYMKCarousel.PYMKCarouselEntryPoint
+	local v4 = {
 		key = props.recommendationRequestId,
 		carouselTitle = props.title or "",
-		recommendations = recommendations,
-		recommendationSessionId = props.recommendationRequestId,
-		openProfilePeekView = openProfilePeekView,
-		showToast = showToast,
-		goToAddFriendsPage = goToAddFriendsPage,
-		pageContext = props.sduiContext.appPage,
-		scrollViewPositionChangedSignal = props.scrollViewPositionChangedSignal,
-		sortAnalyticsData = sortAnalyticsData,
-		diagService = dependencies.appAnalytics.Diag,
-		eventIngestService = dependencies.eventIngest,
-		appCompositionEnabled = props.sduiContext.appCompositionEnabled
-	})
+		recommendations = 0,
+		recommendationSessionId = 0,
+		openProfilePeekView = 0,
+		showToast = 0,
+		goToAddFriendsPage = 0,
+		pageContext = 0,
+		scrollViewPositionChangedSignal = 0,
+		sortAnalyticsData = 0,
+		diagService = 0,
+		eventIngestService = 0,
+		appCompositionEnabled = 0,
+		onRecommendationsShown = 0,
+		analyticsSurface = 0
+	}
+
+	if
+		FFlagPymkCarouselExtendProps
+		and not FFlagLuaAppEnableSduiHomePage
+		and props.sduiContext.appPage == AppPage.Home
+	then
+		recommendations = nil
+	end
+
+	v4.recommendations = recommendations
+
+	v4.recommendationSessionId = props.recommendationRequestId
+	v4.openProfilePeekView = openProfilePeekView
+	v4.showToast = showToast
+	v4.goToAddFriendsPage = goToAddFriendsPage
+	v4.pageContext = props.sduiContext.appPage
+	v4.scrollViewPositionChangedSignal = props.scrollViewPositionChangedSignal
+	v4.sortAnalyticsData = sortAnalyticsData
+	v4.diagService = dependencies.appAnalytics.Diag
+	v4.eventIngestService = dependencies.eventIngest
+	v4.appCompositionEnabled = props.sduiContext.appCompositionEnabled
+	local onRecommendationsShown
+
+	if FFlagPymkCarouselExtendProps then
+		onRecommendationsShown = props.onRecommendationsShown
+	end
+
+	v4.onRecommendationsShown = onRecommendationsShown
+	local analyticsSurface
+
+	if FFlagPymkCarouselExtendProps then
+		analyticsSurface = props.analyticsSurface
+	end
+
+	v4.analyticsSurface = analyticsSurface
+	return createElement(pymkCarouselEntryPoint, v4)
 end
 
 return SduiPymkCarousel

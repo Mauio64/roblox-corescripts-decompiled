@@ -1,1 +1,0 @@
-return { Analytics = require("@game/CorePackages/Workspace/Packages/_Workspace/AuthCommon/Analytics"), SharedFlags = require("@game/CorePackages/Workspace/Packages/_Workspace/AuthCommon/SharedFlags") }

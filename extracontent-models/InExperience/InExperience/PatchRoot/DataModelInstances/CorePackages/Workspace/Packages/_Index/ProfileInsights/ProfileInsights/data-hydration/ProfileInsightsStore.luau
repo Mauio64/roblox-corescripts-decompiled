@@ -138,13 +138,15 @@ return createComputed(function(_)
 
 			local signal, v3 = createSignal(createFetchResult("fetching", v[cacheKey])) -- inferred equivalent call
 			makeHttpCall(userIds, count, rankingStrategy, function(p, p2)
-				if p and p2.userInsights then
-					v[cacheKey].setProfileInsights(ProfileInsightsModel.createProfileInsightsList(p2.userInsights))
-
-					v3(createFetchResult("success", v[cacheKey])) -- inferred equivalent call
-				else
+				if not (p and p2.userInsights) then
 					v3(createFetchResult("failed", v[cacheKey])) -- inferred equivalent call
+
+					return
 				end
+
+				v[cacheKey].setProfileInsights(ProfileInsightsModel.createProfileInsightsList(p2.userInsights))
+
+				v3(createFetchResult("success", v[cacheKey])) -- inferred equivalent call
 			end)
 			return signal
 		end,

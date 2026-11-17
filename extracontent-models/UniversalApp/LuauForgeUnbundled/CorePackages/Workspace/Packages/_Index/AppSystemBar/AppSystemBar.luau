@@ -1,1 +1,0 @@
-return { Enum = require("@game/CorePackages/Workspace/Packages/_Index/AppSystemBar/AppSystemBar/Enum"), Constants = require("@game/CorePackages/Workspace/Packages/_Index/AppSystemBar/AppSystemBar/Constants") }

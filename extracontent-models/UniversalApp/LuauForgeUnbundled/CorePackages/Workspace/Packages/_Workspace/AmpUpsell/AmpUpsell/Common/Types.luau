@@ -1,3 +1,0 @@
-require("@game/CorePackages/Workspace/Packages/_Workspace/AmpUpsell/AmpUpsell/Common/Enums")
-
-return {}

@@ -7295,11 +7295,39 @@ do
 					v6 = data.display_name
 				end
 
+				local v7
+
+				if not (data == nil or data.is_previous_username_match == nil) then
+					v7 = data.is_previous_username_match
+				end
+
+				local v8
+
+				if not (data == nil or data.image == nil) then
+					v8 = data.image
+				end
+
+				local v9
+
+				if not (data == nil or data.on_activated == nil) then
+					v9 = data.on_activated
+				end
+
+				local v10
+
+				if not (data == nil or data.source == nil) then
+					v10 = data.source
+				end
+
 				return (setmetatable({
 					user_id = v3,
 					previous_usernames = v4,
 					name = v5,
-					display_name = v6
+					display_name = v6,
+					is_previous_username_match = v7,
+					image = v8,
+					on_activated = v9,
+					source = v10
 				}, class41))
 			end
 
@@ -7328,6 +7356,30 @@ do
 				if self.display_name ~= nil then
 					local encoded = self.display_name:encode()
 					local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.is_previous_username_match ~= nil then
+					local encoded = self.is_previous_username_match:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.image ~= nil then
+					local encoded = self.image:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 6, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.on_activated ~= nil then
+					local encoded = self.on_activated:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 7, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.source ~= nil then
+					local encoded = self.source:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 8, proto.wireTypes.lengthDelimited)
 					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 				end
 
@@ -7364,6 +7416,22 @@ do
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
 							result.display_name = prop_types.StringProp.decode(v5)
+						elseif v3 == 5 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.is_previous_username_match = prop_types.BoolProp.decode(v5)
+						elseif v3 == 6 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.image = prop_types.ImageStringProp.decode(v5)
+						elseif v3 == 7 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.on_activated = actions.ActionProp.decode(v5)
+						elseif v3 == 8 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.source = prop_types.StringProp.decode(v5)
 						else
 							local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -7402,6 +7470,22 @@ do
 					v2.displayName = self.display_name:jsonEncode()
 				end
 
+				if self.is_previous_username_match ~= nil then
+					v2.isPreviousUsernameMatch = self.is_previous_username_match:jsonEncode()
+				end
+
+				if self.image ~= nil then
+					v2.image = self.image:jsonEncode()
+				end
+
+				if self.on_activated ~= nil then
+					v2.onActivated = self.on_activated:jsonEncode()
+				end
+
+				if self.source ~= nil then
+					v2.source = self.source:jsonEncode()
+				end
+
 				return v2
 			end
 
@@ -7434,6 +7518,30 @@ do
 
 				if data.displayName ~= nil then
 					v2.display_name = prop_types.StringProp.jsonDecode(data.displayName)
+				end
+
+				if data.is_previous_username_match ~= nil then
+					v2.is_previous_username_match = prop_types.BoolProp.jsonDecode(data.is_previous_username_match)
+				end
+
+				if data.isPreviousUsernameMatch ~= nil then
+					v2.is_previous_username_match = prop_types.BoolProp.jsonDecode(data.isPreviousUsernameMatch)
+				end
+
+				if data.image ~= nil then
+					v2.image = prop_types.ImageStringProp.jsonDecode(data.image)
+				end
+
+				if data.on_activated ~= nil then
+					v2.on_activated = actions.ActionProp.jsonDecode(data.on_activated)
+				end
+
+				if data.onActivated ~= nil then
+					v2.on_activated = actions.ActionProp.jsonDecode(data.onActivated)
+				end
+
+				if data.source ~= nil then
+					v2.source = prop_types.StringProp.jsonDecode(data.source)
 				end
 
 				return v2
@@ -8544,6 +8652,18 @@ do
 					v45 = data.use_footer_component_as_default
 				end
 
+				local v46
+
+				if not (data == nil or data.footer_trailing_component == nil) then
+					v46 = data.footer_trailing_component
+				end
+
+				local v47
+
+				if not (data == nil or data.active_friends_footer_component == nil) then
+					v47 = data.active_friends_footer_component
+				end
+
 				return (setmetatable({
 					image_aspect_ratio = v3,
 					title_text = v4,
@@ -8587,7 +8707,9 @@ do
 					hidden_state_component = v42,
 					metadata_font_style = v43,
 					direct_action_component = v44,
-					use_footer_component_as_default = v45
+					use_footer_component_as_default = v45,
+					footer_trailing_component = v46,
+					active_friends_footer_component = v47
 				}, class47))
 			end
 
@@ -8853,6 +8975,18 @@ do
 					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 				end
 
+				if self.footer_trailing_component ~= nil then
+					local encoded = self.footer_trailing_component:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 117, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.active_friends_footer_component ~= nil then
+					local encoded = self.active_friends_footer_component:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 118, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
 				local buf = buffer.create(v3)
 				buffer.copy(buf, 0, v2, 0, v3)
 				return buf
@@ -9042,6 +9176,14 @@ do
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
 							result.use_footer_component_as_default = prop_types.BoolProp.decode(v5)
+						elseif v3 == 117 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.footer_trailing_component = v.NestedComponentProp.decode(v5)
+						elseif v3 == 118 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.active_friends_footer_component = v.NestedComponentProp.decode(v5)
 						else
 							local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -9234,6 +9376,14 @@ do
 
 				if self.use_footer_component_as_default ~= nil then
 					v2.useFooterComponentAsDefault = self.use_footer_component_as_default:jsonEncode()
+				end
+
+				if self.footer_trailing_component ~= nil then
+					v2.footerTrailingComponent = self.footer_trailing_component:jsonEncode()
+				end
+
+				if self.active_friends_footer_component ~= nil then
+					v2.activeFriendsFooterComponent = self.active_friends_footer_component:jsonEncode()
 				end
 
 				return v2
@@ -9580,6 +9730,22 @@ do
 
 				if data.useFooterComponentAsDefault ~= nil then
 					v2.use_footer_component_as_default = prop_types.BoolProp.jsonDecode(data.useFooterComponentAsDefault)
+				end
+
+				if data.footer_trailing_component ~= nil then
+					v2.footer_trailing_component = v.NestedComponentProp.jsonDecode(data.footer_trailing_component)
+				end
+
+				if data.footerTrailingComponent ~= nil then
+					v2.footer_trailing_component = v.NestedComponentProp.jsonDecode(data.footerTrailingComponent)
+				end
+
+				if data.active_friends_footer_component ~= nil then
+					v2.active_friends_footer_component = v.NestedComponentProp.jsonDecode(data.active_friends_footer_component)
+				end
+
+				if data.activeFriendsFooterComponent ~= nil then
+					v2.active_friends_footer_component = v.NestedComponentProp.jsonDecode(data.activeFriendsFooterComponent)
 				end
 
 				return v2
@@ -23593,6 +23759,54 @@ do
 					v13 = data.on_activated
 				end
 
+				local v14
+
+				if not (data == nil or data.show_presence_dot == nil) then
+					v14 = data.show_presence_dot
+				end
+
+				local v15
+
+				if not (data == nil or data.text_format_one == nil) then
+					v15 = data.text_format_one
+				end
+
+				local v16
+
+				if not (data == nil or data.text_format_two == nil) then
+					v16 = data.text_format_two
+				end
+
+				local v17
+
+				if not (data == nil or data.text_format_many == nil) then
+					v17 = data.text_format_many
+				end
+
+				local v18
+
+				if not (data == nil or data.place_id == nil) then
+					v18 = data.place_id
+				end
+
+				local v19
+
+				if not (data == nil or data.hide_border == nil) then
+					v19 = data.hide_border
+				end
+
+				local v20
+
+				if not (data == nil or data.test_id == nil) then
+					v20 = data.test_id
+				end
+
+				local v21
+
+				if not (data == nil or data.text_icon_gap == nil) then
+					v21 = data.text_icon_gap
+				end
+
 				return (setmetatable({
 					anchor_point = v3,
 					background_color3 = v4,
@@ -23604,7 +23818,15 @@ do
 					universe_id = v10,
 					icon_width = v11,
 					max_avatars = v12,
-					on_activated = v13
+					on_activated = v13,
+					show_presence_dot = v14,
+					text_format_one = v15,
+					text_format_two = v16,
+					text_format_many = v17,
+					place_id = v18,
+					hide_border = v19,
+					test_id = v20,
+					text_icon_gap = v21
 				}, class93))
 			end
 
@@ -23678,6 +23900,54 @@ do
 					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 				end
 
+				if self.show_presence_dot ~= nil then
+					local encoded = self.show_presence_dot:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 12, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.text_format_one ~= nil then
+					local encoded = self.text_format_one:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 13, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.text_format_two ~= nil then
+					local encoded = self.text_format_two:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 14, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.text_format_many ~= nil then
+					local encoded = self.text_format_many:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 15, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.place_id ~= nil then
+					local encoded = self.place_id:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 16, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.hide_border ~= nil then
+					local encoded = self.hide_border:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 17, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.test_id ~= nil then
+					local encoded = self.test_id:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 18, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.text_icon_gap ~= nil then
+					local encoded = self.text_icon_gap:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 19, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
 				local buf = buffer.create(v3)
 				buffer.copy(buf, 0, v2, 0, v3)
 				return buf
@@ -23739,6 +24009,38 @@ do
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
 							result.on_activated = actions.ActionProp.decode(v5)
+						elseif v3 == 12 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.show_presence_dot = prop_types.BoolProp.decode(v5)
+						elseif v3 == 13 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.text_format_one = prop_types.StringProp.decode(v5)
+						elseif v3 == 14 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.text_format_two = prop_types.StringProp.decode(v5)
+						elseif v3 == 15 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.text_format_many = prop_types.StringProp.decode(v5)
+						elseif v3 == 16 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.place_id = prop_types.StringProp.decode(v5)
+						elseif v3 == 17 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.hide_border = prop_types.BoolProp.decode(v5)
+						elseif v3 == 18 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.test_id = prop_types.StringProp.decode(v5)
+						elseif v3 == 19 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.text_icon_gap = prop_types.FloatProp.decode(v5)
 						else
 							local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -23803,6 +24105,38 @@ do
 
 				if self.on_activated ~= nil then
 					v2.onActivated = self.on_activated:jsonEncode()
+				end
+
+				if self.show_presence_dot ~= nil then
+					v2.showPresenceDot = self.show_presence_dot:jsonEncode()
+				end
+
+				if self.text_format_one ~= nil then
+					v2.textFormatOne = self.text_format_one:jsonEncode()
+				end
+
+				if self.text_format_two ~= nil then
+					v2.textFormatTwo = self.text_format_two:jsonEncode()
+				end
+
+				if self.text_format_many ~= nil then
+					v2.textFormatMany = self.text_format_many:jsonEncode()
+				end
+
+				if self.place_id ~= nil then
+					v2.placeId = self.place_id:jsonEncode()
+				end
+
+				if self.hide_border ~= nil then
+					v2.hideBorder = self.hide_border:jsonEncode()
+				end
+
+				if self.test_id ~= nil then
+					v2.testId = self.test_id:jsonEncode()
+				end
+
+				if self.text_icon_gap ~= nil then
+					v2.textIconGap = self.text_icon_gap:jsonEncode()
 				end
 
 				return v2
@@ -23889,6 +24223,70 @@ do
 
 				if data.onActivated ~= nil then
 					v2.on_activated = actions.ActionProp.jsonDecode(data.onActivated)
+				end
+
+				if data.show_presence_dot ~= nil then
+					v2.show_presence_dot = prop_types.BoolProp.jsonDecode(data.show_presence_dot)
+				end
+
+				if data.showPresenceDot ~= nil then
+					v2.show_presence_dot = prop_types.BoolProp.jsonDecode(data.showPresenceDot)
+				end
+
+				if data.text_format_one ~= nil then
+					v2.text_format_one = prop_types.StringProp.jsonDecode(data.text_format_one)
+				end
+
+				if data.textFormatOne ~= nil then
+					v2.text_format_one = prop_types.StringProp.jsonDecode(data.textFormatOne)
+				end
+
+				if data.text_format_two ~= nil then
+					v2.text_format_two = prop_types.StringProp.jsonDecode(data.text_format_two)
+				end
+
+				if data.textFormatTwo ~= nil then
+					v2.text_format_two = prop_types.StringProp.jsonDecode(data.textFormatTwo)
+				end
+
+				if data.text_format_many ~= nil then
+					v2.text_format_many = prop_types.StringProp.jsonDecode(data.text_format_many)
+				end
+
+				if data.textFormatMany ~= nil then
+					v2.text_format_many = prop_types.StringProp.jsonDecode(data.textFormatMany)
+				end
+
+				if data.place_id ~= nil then
+					v2.place_id = prop_types.StringProp.jsonDecode(data.place_id)
+				end
+
+				if data.placeId ~= nil then
+					v2.place_id = prop_types.StringProp.jsonDecode(data.placeId)
+				end
+
+				if data.hide_border ~= nil then
+					v2.hide_border = prop_types.BoolProp.jsonDecode(data.hide_border)
+				end
+
+				if data.hideBorder ~= nil then
+					v2.hide_border = prop_types.BoolProp.jsonDecode(data.hideBorder)
+				end
+
+				if data.test_id ~= nil then
+					v2.test_id = prop_types.StringProp.jsonDecode(data.test_id)
+				end
+
+				if data.testId ~= nil then
+					v2.test_id = prop_types.StringProp.jsonDecode(data.testId)
+				end
+
+				if data.text_icon_gap ~= nil then
+					v2.text_icon_gap = prop_types.FloatProp.jsonDecode(data.text_icon_gap)
+				end
+
+				if data.textIconGap ~= nil then
+					v2.text_icon_gap = prop_types.FloatProp.jsonDecode(data.textIconGap)
 				end
 
 				return v2
@@ -24201,6 +24599,12 @@ do
 					v31 = data.gradient_height_percent
 				end
 
+				local v32
+
+				if not (data == nil or data.overflow_menu_component == nil) then
+					v32 = data.overflow_menu_component
+				end
+
 				return (setmetatable({
 					background_component = v3,
 					bottom_row_component = v4,
@@ -24230,7 +24634,8 @@ do
 					min_card_height = v28,
 					content_padding = v29,
 					gradient_width_percent = v30,
-					gradient_height_percent = v31
+					gradient_height_percent = v31,
+					overflow_menu_component = v32
 				}, class95))
 			end
 
@@ -24412,6 +24817,12 @@ do
 					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 				end
 
+				if self.overflow_menu_component ~= nil then
+					local encoded = self.overflow_menu_component:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 30, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
 				local buf = buffer.create(v3)
 				buffer.copy(buf, 0, v2, 0, v3)
 				return buf
@@ -24545,6 +24956,10 @@ do
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
 							result.gradient_height_percent = prop_types.FloatProp.decode(v5)
+						elseif v3 == 30 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.overflow_menu_component = v.LazyNestedComponentProp.decode(v5)
 						else
 							local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -24681,6 +25096,10 @@ do
 
 				if self.gradient_height_percent ~= nil then
 					v2.gradientHeightPercent = self.gradient_height_percent:jsonEncode()
+				end
+
+				if self.overflow_menu_component ~= nil then
+					v2.overflowMenuComponent = self.overflow_menu_component:jsonEncode()
 				end
 
 				return v2
@@ -24907,6 +25326,14 @@ do
 
 				if data.gradientHeightPercent ~= nil then
 					v2.gradient_height_percent = prop_types.FloatProp.jsonDecode(data.gradientHeightPercent)
+				end
+
+				if data.overflow_menu_component ~= nil then
+					v2.overflow_menu_component = v.LazyNestedComponentProp.jsonDecode(data.overflow_menu_component)
+				end
+
+				if data.overflowMenuComponent ~= nil then
+					v2.overflow_menu_component = v.LazyNestedComponentProp.jsonDecode(data.overflowMenuComponent)
 				end
 
 				return v2
@@ -29970,7 +30397,7 @@ do
 						if v3 == 1 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
-							result.props = v.CollectionGridSchema_Props.decode(v5)
+							result.props = v.CollectionSlotsLayoutSchema_Props.decode(v5)
 						elseif v3 == 2 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
@@ -30012,7 +30439,7 @@ do
 				local v2 = class112.new()
 
 				if p.props ~= nil then
-					v2.props = v.CollectionGridSchema_Props.jsonDecode(p.props)
+					v2.props = v.CollectionSlotsLayoutSchema_Props.jsonDecode(p.props)
 				end
 
 				if p.shared ~= nil then
@@ -30023,20 +30450,904 @@ do
 			end
 
 			class112.descriptor = {
-				name = "CollectionGridSchema",
-				fullName = "roblox.apppageplatform.shared.v1beta1.CollectionGridSchema"
+				name = "CollectionSlotsLayoutSchema",
+				fullName = "roblox.apppageplatform.shared.v1beta1.CollectionSlotsLayoutSchema"
 			}
 
-			v.CollectionGridSchema = class112
+			v.CollectionSlotsLayoutSchema = class112
 		end
 
-		typeRegistry.default:register(v.CollectionGridSchema)
+		typeRegistry.default:register(v.CollectionSlotsLayoutSchema)
 
 		do
 			local class113 = {}
 			class113.__index = class113
 
 			function class113.new(data)
+				local v3
+
+				if not (data == nil or data.leading == nil) then
+					v3 = data.leading
+				end
+
+				local v4
+
+				if not (data == nil or data.leading_collection_item_size == nil) then
+					v4 = data.leading_collection_item_size
+				end
+
+				local v5
+
+				if not (data == nil or data.leading_columns == nil) then
+					v5 = data.leading_columns
+				end
+
+				local v6
+
+				if not (data == nil or data.content == nil) then
+					v6 = data.content
+				end
+
+				local v7
+
+				if not (data == nil or data.trailing == nil) then
+					v7 = data.trailing
+				end
+
+				local v8
+
+				if not (data == nil or data.trailing_collection_item_size == nil) then
+					v8 = data.trailing_collection_item_size
+				end
+
+				local v9
+
+				if not (data == nil or data.trailing_columns == nil) then
+					v9 = data.trailing_columns
+				end
+
+				local v10
+
+				if not (data == nil or data.layout_order == nil) then
+					v10 = data.layout_order
+				end
+
+				local v11
+
+				if not (data == nil or data.test_id == nil) then
+					v11 = data.test_id
+				end
+
+				local v12
+
+				if not (data == nil or data.enable_hover_overflow == nil) then
+					v12 = data.enable_hover_overflow
+				end
+
+				return (setmetatable({
+					leading = v3,
+					leading_collection_item_size = v4,
+					leading_columns = v5,
+					content = v6,
+					trailing = v7,
+					trailing_collection_item_size = v8,
+					trailing_columns = v9,
+					layout_order = v10,
+					test_id = v11,
+					enable_hover_overflow = v12
+				}, class113))
+			end
+
+			function class113:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.leading ~= nil then
+					local encoded = self.leading:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.leading_collection_item_size ~= nil then
+					local encoded = self.leading_collection_item_size:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.leading_columns ~= nil then
+					local encoded = self.leading_columns:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.content ~= nil then
+					local encoded = self.content:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.trailing ~= nil then
+					local encoded = self.trailing:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.trailing_collection_item_size ~= nil then
+					local encoded = self.trailing_collection_item_size:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 6, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.trailing_columns ~= nil then
+					local encoded = self.trailing_columns:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 7, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.layout_order ~= nil then
+					local encoded = self.layout_order:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 8, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.test_id ~= nil then
+					local encoded = self.test_id:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 9, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.enable_hover_overflow ~= nil then
+					local encoded = self.enable_hover_overflow:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 10, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class113.decode(buf: buffer)
+				local result = class113.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.leading = v.NestedComponentProp.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.leading_collection_item_size = prop_types.StringProp.decode(v5)
+						elseif v3 == 3 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.leading_columns = prop_types.Int32Prop.decode(v5)
+						elseif v3 == 4 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.content = v.NestedComponentProp.decode(v5)
+						elseif v3 == 5 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.trailing = v.NestedComponentProp.decode(v5)
+						elseif v3 == 6 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.trailing_collection_item_size = prop_types.StringProp.decode(v5)
+						elseif v3 == 7 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.trailing_columns = prop_types.Int32Prop.decode(v5)
+						elseif v3 == 8 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.layout_order = prop_types.Int32Prop.decode(v5)
+						elseif v3 == 9 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.test_id = prop_types.StringProp.decode(v5)
+						elseif v3 == 10 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.enable_hover_overflow = prop_types.BoolProp.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class113:jsonEncode()
+				local v2 = {}
+
+				if self.leading ~= nil then
+					v2.leading = self.leading:jsonEncode()
+				end
+
+				if self.leading_collection_item_size ~= nil then
+					v2.leadingCollectionItemSize = self.leading_collection_item_size:jsonEncode()
+				end
+
+				if self.leading_columns ~= nil then
+					v2.leadingColumns = self.leading_columns:jsonEncode()
+				end
+
+				if self.content ~= nil then
+					v2.content = self.content:jsonEncode()
+				end
+
+				if self.trailing ~= nil then
+					v2.trailing = self.trailing:jsonEncode()
+				end
+
+				if self.trailing_collection_item_size ~= nil then
+					v2.trailingCollectionItemSize = self.trailing_collection_item_size:jsonEncode()
+				end
+
+				if self.trailing_columns ~= nil then
+					v2.trailingColumns = self.trailing_columns:jsonEncode()
+				end
+
+				if self.layout_order ~= nil then
+					v2.layoutOrder = self.layout_order:jsonEncode()
+				end
+
+				if self.test_id ~= nil then
+					v2.testId = self.test_id:jsonEncode()
+				end
+
+				if self.enable_hover_overflow ~= nil then
+					v2.enableHoverOverflow = self.enable_hover_overflow:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class113.jsonDecode(data)
+				local v2 = class113.new()
+
+				if data.leading ~= nil then
+					v2.leading = v.NestedComponentProp.jsonDecode(data.leading)
+				end
+
+				if data.leading_collection_item_size ~= nil then
+					v2.leading_collection_item_size = prop_types.StringProp.jsonDecode(data.leading_collection_item_size)
+				end
+
+				if data.leadingCollectionItemSize ~= nil then
+					v2.leading_collection_item_size = prop_types.StringProp.jsonDecode(data.leadingCollectionItemSize)
+				end
+
+				if data.leading_columns ~= nil then
+					v2.leading_columns = prop_types.Int32Prop.jsonDecode(data.leading_columns)
+				end
+
+				if data.leadingColumns ~= nil then
+					v2.leading_columns = prop_types.Int32Prop.jsonDecode(data.leadingColumns)
+				end
+
+				if data.content ~= nil then
+					v2.content = v.NestedComponentProp.jsonDecode(data.content)
+				end
+
+				if data.trailing ~= nil then
+					v2.trailing = v.NestedComponentProp.jsonDecode(data.trailing)
+				end
+
+				if data.trailing_collection_item_size ~= nil then
+					v2.trailing_collection_item_size = prop_types.StringProp.jsonDecode(data.trailing_collection_item_size)
+				end
+
+				if data.trailingCollectionItemSize ~= nil then
+					v2.trailing_collection_item_size = prop_types.StringProp.jsonDecode(data.trailingCollectionItemSize)
+				end
+
+				if data.trailing_columns ~= nil then
+					v2.trailing_columns = prop_types.Int32Prop.jsonDecode(data.trailing_columns)
+				end
+
+				if data.trailingColumns ~= nil then
+					v2.trailing_columns = prop_types.Int32Prop.jsonDecode(data.trailingColumns)
+				end
+
+				if data.layout_order ~= nil then
+					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layout_order)
+				end
+
+				if data.layoutOrder ~= nil then
+					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layoutOrder)
+				end
+
+				if data.test_id ~= nil then
+					v2.test_id = prop_types.StringProp.jsonDecode(data.test_id)
+				end
+
+				if data.testId ~= nil then
+					v2.test_id = prop_types.StringProp.jsonDecode(data.testId)
+				end
+
+				if data.enable_hover_overflow ~= nil then
+					v2.enable_hover_overflow = prop_types.BoolProp.jsonDecode(data.enable_hover_overflow)
+				end
+
+				if data.enableHoverOverflow ~= nil then
+					v2.enable_hover_overflow = prop_types.BoolProp.jsonDecode(data.enableHoverOverflow)
+				end
+
+				return v2
+			end
+
+			class113.descriptor = {
+				name = "CollectionSlotsLayoutSchema_Props",
+				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
+			}
+
+			v.CollectionSlotsLayoutSchema_Props = class113
+		end
+
+		typeRegistry.default:register(v.CollectionSlotsLayoutSchema_Props)
+
+		do
+			local class114 = {}
+			class114.__index = class114
+
+			function class114.new(p)
+				local v3
+
+				if not (p == nil or p.props == nil) then
+					v3 = p.props
+				end
+
+				local v4
+
+				if not (p == nil or p.shared == nil) then
+					v4 = p.shared
+				end
+
+				return (setmetatable({ props = v3, shared = v4 }, class114))
+			end
+
+			function class114:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.props ~= nil then
+					local encoded = self.props:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.shared ~= nil then
+					local encoded = self.shared:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class114.decode(buf: buffer)
+				local result = class114.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.props = v.MuralSectionSchema_Props.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.shared = component_shared.ComponentShared.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class114:jsonEncode()
+				local v2 = {}
+
+				if self.props ~= nil then
+					v2.props = self.props:jsonEncode()
+				end
+
+				if self.shared ~= nil then
+					v2.shared = self.shared:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class114.jsonDecode(p)
+				local v2 = class114.new()
+
+				if p.props ~= nil then
+					v2.props = v.MuralSectionSchema_Props.jsonDecode(p.props)
+				end
+
+				if p.shared ~= nil then
+					v2.shared = component_shared.ComponentShared.jsonDecode(p.shared)
+				end
+
+				return v2
+			end
+
+			class114.descriptor = {
+				name = "MuralSectionSchema",
+				fullName = "roblox.apppageplatform.shared.v1beta1.MuralSectionSchema"
+			}
+
+			v.MuralSectionSchema = class114
+		end
+
+		typeRegistry.default:register(v.MuralSectionSchema)
+
+		do
+			local class115 = {}
+			class115.__index = class115
+
+			function class115.new(data)
+				local v3
+
+				if not (data == nil or data.content == nil) then
+					v3 = data.content
+				end
+
+				local v4
+
+				if not (data == nil or data.background_mural_url == nil) then
+					v4 = data.background_mural_url
+				end
+
+				local v5
+
+				if not (data == nil or data.full_bleed == nil) then
+					v5 = data.full_bleed
+				end
+
+				local v6
+
+				if not (data == nil or data.color_mode == nil) then
+					v6 = data.color_mode
+				end
+
+				local v7
+
+				if not (data == nil or data.corner_radius == nil) then
+					v7 = data.corner_radius
+				end
+
+				local v8
+
+				if not (data == nil or data.layout_order == nil) then
+					v8 = data.layout_order
+				end
+
+				local v9
+
+				if not (data == nil or data.test_id == nil) then
+					v9 = data.test_id
+				end
+
+				local v10
+
+				if not (data == nil or data.content_tag == nil) then
+					v10 = data.content_tag
+				end
+
+				return (setmetatable({
+					content = v3,
+					background_mural_url = v4,
+					full_bleed = v5,
+					color_mode = v6,
+					corner_radius = v7,
+					layout_order = v8,
+					test_id = v9,
+					content_tag = v10
+				}, class115))
+			end
+
+			function class115:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.content ~= nil then
+					local encoded = self.content:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.background_mural_url ~= nil then
+					local encoded = self.background_mural_url:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.full_bleed ~= nil then
+					local encoded = self.full_bleed:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.color_mode ~= nil then
+					local encoded = self.color_mode:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.corner_radius ~= nil then
+					local encoded = self.corner_radius:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.layout_order ~= nil then
+					local encoded = self.layout_order:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 6, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.test_id ~= nil then
+					local encoded = self.test_id:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 7, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.content_tag ~= nil then
+					local encoded = self.content_tag:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 8, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class115.decode(buf: buffer)
+				local result = class115.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.content = v.NestedComponentProp.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.background_mural_url = prop_types.ImageStringProp.decode(v5)
+						elseif v3 == 3 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.full_bleed = prop_types.BoolProp.decode(v5)
+						elseif v3 == 4 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.color_mode = prop_types.StringProp.decode(v5)
+						elseif v3 == 5 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.corner_radius = prop_types.Int32Prop.decode(v5)
+						elseif v3 == 6 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.layout_order = prop_types.Int32Prop.decode(v5)
+						elseif v3 == 7 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.test_id = prop_types.StringProp.decode(v5)
+						elseif v3 == 8 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.content_tag = prop_types.StringProp.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class115:jsonEncode()
+				local v2 = {}
+
+				if self.content ~= nil then
+					v2.content = self.content:jsonEncode()
+				end
+
+				if self.background_mural_url ~= nil then
+					v2.backgroundMuralUrl = self.background_mural_url:jsonEncode()
+				end
+
+				if self.full_bleed ~= nil then
+					v2.fullBleed = self.full_bleed:jsonEncode()
+				end
+
+				if self.color_mode ~= nil then
+					v2.colorMode = self.color_mode:jsonEncode()
+				end
+
+				if self.corner_radius ~= nil then
+					v2.cornerRadius = self.corner_radius:jsonEncode()
+				end
+
+				if self.layout_order ~= nil then
+					v2.layoutOrder = self.layout_order:jsonEncode()
+				end
+
+				if self.test_id ~= nil then
+					v2.testId = self.test_id:jsonEncode()
+				end
+
+				if self.content_tag ~= nil then
+					v2.contentTag = self.content_tag:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class115.jsonDecode(data)
+				local v2 = class115.new()
+
+				if data.content ~= nil then
+					v2.content = v.NestedComponentProp.jsonDecode(data.content)
+				end
+
+				if data.background_mural_url ~= nil then
+					v2.background_mural_url = prop_types.ImageStringProp.jsonDecode(data.background_mural_url)
+				end
+
+				if data.backgroundMuralUrl ~= nil then
+					v2.background_mural_url = prop_types.ImageStringProp.jsonDecode(data.backgroundMuralUrl)
+				end
+
+				if data.full_bleed ~= nil then
+					v2.full_bleed = prop_types.BoolProp.jsonDecode(data.full_bleed)
+				end
+
+				if data.fullBleed ~= nil then
+					v2.full_bleed = prop_types.BoolProp.jsonDecode(data.fullBleed)
+				end
+
+				if data.color_mode ~= nil then
+					v2.color_mode = prop_types.StringProp.jsonDecode(data.color_mode)
+				end
+
+				if data.colorMode ~= nil then
+					v2.color_mode = prop_types.StringProp.jsonDecode(data.colorMode)
+				end
+
+				if data.corner_radius ~= nil then
+					v2.corner_radius = prop_types.Int32Prop.jsonDecode(data.corner_radius)
+				end
+
+				if data.cornerRadius ~= nil then
+					v2.corner_radius = prop_types.Int32Prop.jsonDecode(data.cornerRadius)
+				end
+
+				if data.layout_order ~= nil then
+					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layout_order)
+				end
+
+				if data.layoutOrder ~= nil then
+					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layoutOrder)
+				end
+
+				if data.test_id ~= nil then
+					v2.test_id = prop_types.StringProp.jsonDecode(data.test_id)
+				end
+
+				if data.testId ~= nil then
+					v2.test_id = prop_types.StringProp.jsonDecode(data.testId)
+				end
+
+				if data.content_tag ~= nil then
+					v2.content_tag = prop_types.StringProp.jsonDecode(data.content_tag)
+				end
+
+				if data.contentTag ~= nil then
+					v2.content_tag = prop_types.StringProp.jsonDecode(data.contentTag)
+				end
+
+				return v2
+			end
+
+			class115.descriptor = {
+				name = "MuralSectionSchema_Props",
+				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
+			}
+
+			v.MuralSectionSchema_Props = class115
+		end
+
+		typeRegistry.default:register(v.MuralSectionSchema_Props)
+
+		do
+			local class116 = {}
+			class116.__index = class116
+
+			function class116.new(p)
+				local v3
+
+				if not (p == nil or p.props == nil) then
+					v3 = p.props
+				end
+
+				local v4
+
+				if not (p == nil or p.shared == nil) then
+					v4 = p.shared
+				end
+
+				return (setmetatable({ props = v3, shared = v4 }, class116))
+			end
+
+			function class116:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.props ~= nil then
+					local encoded = self.props:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.shared ~= nil then
+					local encoded = self.shared:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class116.decode(buf: buffer)
+				local result = class116.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.props = v.CollectionGridSchema_Props.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.shared = component_shared.ComponentShared.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class116:jsonEncode()
+				local v2 = {}
+
+				if self.props ~= nil then
+					v2.props = self.props:jsonEncode()
+				end
+
+				if self.shared ~= nil then
+					v2.shared = self.shared:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class116.jsonDecode(p)
+				local v2 = class116.new()
+
+				if p.props ~= nil then
+					v2.props = v.CollectionGridSchema_Props.jsonDecode(p.props)
+				end
+
+				if p.shared ~= nil then
+					v2.shared = component_shared.ComponentShared.jsonDecode(p.shared)
+				end
+
+				return v2
+			end
+
+			class116.descriptor = {
+				name = "CollectionGridSchema",
+				fullName = "roblox.apppageplatform.shared.v1beta1.CollectionGridSchema"
+			}
+
+			v.CollectionGridSchema = class116
+		end
+
+		typeRegistry.default:register(v.CollectionGridSchema)
+
+		do
+			local class117 = {}
+			class117.__index = class117
+
+			function class117.new(data)
 				local v3
 
 				if not (data == nil or data.anchor_point == nil) then
@@ -30175,6 +31486,12 @@ do
 					v25 = data.preferred_text_size_line_count
 				end
 
+				local v26
+
+				if not (data == nil or data.dwell_logging_enabled == nil) then
+					v26 = data.dwell_logging_enabled
+				end
+
 				return (setmetatable({
 					anchor_point = v3,
 					position = v4,
@@ -30198,11 +31515,12 @@ do
 					initial_feed_visible_rows = v22,
 					visible_rows_per_reveal = v23,
 					reveal_rows_component = v24,
-					preferred_text_size_line_count = v25
-				}, class113))
+					preferred_text_size_line_count = v25,
+					dwell_logging_enabled = v26
+				}, class117))
 			end
 
-			function class113:encode()
+			function class117:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -30344,13 +31662,19 @@ do
 					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 				end
 
+				if self.dwell_logging_enabled ~= nil then
+					local encoded = self.dwell_logging_enabled:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 24, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
 				local buf = buffer.create(v3)
 				buffer.copy(buf, 0, v2, 0, v3)
 				return buf
 			end
 
-			function class113.decode(buf: buffer)
-				local result = class113.new()
+			function class117.decode(buf: buffer)
+				local result = class117.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -30453,6 +31777,10 @@ do
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
 							result.preferred_text_size_line_count = prop_types.Int32Prop.decode(v5)
+						elseif v3 == 24 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.dwell_logging_enabled = prop_types.BoolProp.decode(v5)
 						else
 							local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -30472,7 +31800,7 @@ do
 				return result
 			end
 
-			function class113:jsonEncode()
+			function class117:jsonEncode()
 				local v2 = {}
 
 				if self.anchor_point ~= nil then
@@ -30567,11 +31895,15 @@ do
 					v2.preferredTextSizeLineCount = self.preferred_text_size_line_count:jsonEncode()
 				end
 
+				if self.dwell_logging_enabled ~= nil then
+					v2.dwellLoggingEnabled = self.dwell_logging_enabled:jsonEncode()
+				end
+
 				return v2
 			end
 
-			function class113.jsonDecode(data)
-				local v2 = class113.new()
+			function class117.jsonDecode(data)
+				local v2 = class117.new()
 
 				if data.anchor_point ~= nil then
 					v2.anchor_point = prop_types.Vector2Prop.jsonDecode(data.anchor_point)
@@ -30745,614 +32077,26 @@ do
 					v2.preferred_text_size_line_count = prop_types.Int32Prop.jsonDecode(data.preferredTextSizeLineCount)
 				end
 
-				return v2
-			end
-
-			class113.descriptor = {
-				name = "CollectionGridSchema_Props",
-				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
-			}
-
-			v.CollectionGridSchema_Props = class113
-		end
-
-		typeRegistry.default:register(v.CollectionGridSchema_Props)
-
-		do
-			local class114 = {}
-			class114.__index = class114
-
-			function class114.new(p)
-				local v3
-
-				if not (p == nil or p.props == nil) then
-					v3 = p.props
+				if data.dwell_logging_enabled ~= nil then
+					v2.dwell_logging_enabled = prop_types.BoolProp.jsonDecode(data.dwell_logging_enabled)
 				end
 
-				local v4
-
-				if not (p == nil or p.shared == nil) then
-					v4 = p.shared
-				end
-
-				return (setmetatable({ props = v3, shared = v4 }, class114))
-			end
-
-			function class114:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.props ~= nil then
-					local encoded = self.props:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.shared ~= nil then
-					local encoded = self.shared:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class114.decode(buf: buffer)
-				local result = class114.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.props = v.RevealRowsButtonWithDividerSchema_Props.decode(v5)
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.shared = component_shared.ComponentShared.decode(v5)
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class114:jsonEncode()
-				local v2 = {}
-
-				if self.props ~= nil then
-					v2.props = self.props:jsonEncode()
-				end
-
-				if self.shared ~= nil then
-					v2.shared = self.shared:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class114.jsonDecode(p)
-				local v2 = class114.new()
-
-				if p.props ~= nil then
-					v2.props = v.RevealRowsButtonWithDividerSchema_Props.jsonDecode(p.props)
-				end
-
-				if p.shared ~= nil then
-					v2.shared = component_shared.ComponentShared.jsonDecode(p.shared)
-				end
-
-				return v2
-			end
-
-			class114.descriptor = {
-				name = "RevealRowsButtonWithDividerSchema",
-				fullName = "roblox.apppageplatform.shared.v1beta1.RevealRowsButtonWithDividerSchema"
-			}
-
-			v.RevealRowsButtonWithDividerSchema = class114
-		end
-
-		typeRegistry.default:register(v.RevealRowsButtonWithDividerSchema)
-
-		do
-			local class115 = {}
-			class115.__index = class115
-
-			function class115.new(p)
-				local v3
-
-				if not (p == nil or p.cta_component == nil) then
-					v3 = p.cta_component
-				end
-
-				return (setmetatable({ cta_component = v3 }, class115))
-			end
-
-			function class115:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.cta_component ~= nil then
-					local encoded = self.cta_component:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class115.decode(buf: buffer)
-				local result = class115.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.cta_component = v.LazyNestedComponentProp.decode(v5)
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class115:jsonEncode()
-				local v2 = {}
-
-				if self.cta_component ~= nil then
-					v2.ctaComponent = self.cta_component:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class115.jsonDecode(p)
-				local v2 = class115.new()
-
-				if p.cta_component ~= nil then
-					v2.cta_component = v.LazyNestedComponentProp.jsonDecode(p.cta_component)
-				end
-
-				if p.ctaComponent ~= nil then
-					v2.cta_component = v.LazyNestedComponentProp.jsonDecode(p.ctaComponent)
-				end
-
-				return v2
-			end
-
-			class115.descriptor = {
-				name = "RevealRowsButtonWithDividerSchema_Props",
-				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
-			}
-
-			v.RevealRowsButtonWithDividerSchema_Props = class115
-		end
-
-		typeRegistry.default:register(v.RevealRowsButtonWithDividerSchema_Props)
-
-		do
-			local class116 = {}
-			class116.__index = class116
-
-			function class116.new(p)
-				local v3
-
-				if not (p == nil or p.props == nil) then
-					v3 = p.props
-				end
-
-				local v4
-
-				if not (p == nil or p.shared == nil) then
-					v4 = p.shared
-				end
-
-				return (setmetatable({ props = v3, shared = v4 }, class116))
-			end
-
-			function class116:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.props ~= nil then
-					local encoded = self.props:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.shared ~= nil then
-					local encoded = self.shared:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class116.decode(buf: buffer)
-				local result = class116.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.props = v.SingleItemCollectionSchema_Props.decode(v5)
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.shared = component_shared.ComponentShared.decode(v5)
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class116:jsonEncode()
-				local v2 = {}
-
-				if self.props ~= nil then
-					v2.props = self.props:jsonEncode()
-				end
-
-				if self.shared ~= nil then
-					v2.shared = self.shared:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class116.jsonDecode(p)
-				local v2 = class116.new()
-
-				if p.props ~= nil then
-					v2.props = v.SingleItemCollectionSchema_Props.jsonDecode(p.props)
-				end
-
-				if p.shared ~= nil then
-					v2.shared = component_shared.ComponentShared.jsonDecode(p.shared)
-				end
-
-				return v2
-			end
-
-			class116.descriptor = {
-				name = "SingleItemCollectionSchema",
-				fullName = "roblox.apppageplatform.shared.v1beta1.SingleItemCollectionSchema"
-			}
-
-			v.SingleItemCollectionSchema = class116
-		end
-
-		typeRegistry.default:register(v.SingleItemCollectionSchema)
-
-		do
-			local class117 = {}
-			class117.__index = class117
-
-			function class117.new(data)
-				local v3
-
-				if not (data == nil or data.automatic_size == nil) then
-					v3 = data.automatic_size
-				end
-
-				local v4
-
-				if not (data == nil or data.anchor_point == nil) then
-					v4 = data.anchor_point
-				end
-
-				local v5
-
-				if not (data == nil or data.position == nil) then
-					v5 = data.position
-				end
-
-				local v6
-
-				if not (data == nil or data.size == nil) then
-					v6 = data.size
-				end
-
-				local v7
-
-				if not (data == nil or data.item == nil) then
-					v7 = data.item
-				end
-
-				local v8
-
-				if not (data == nil or data.impression_event_name == nil) then
-					v8 = data.impression_event_name
-				end
-
-				local v9
-
-				if not (data == nil or data.skip_item_impressions_log == nil) then
-					v9 = data.skip_item_impressions_log
-				end
-
-				return (setmetatable({
-					automatic_size = v3,
-					anchor_point = v4,
-					position = v5,
-					size = v6,
-					item = v7,
-					impression_event_name = v8,
-					skip_item_impressions_log = v9
-				}, class117))
-			end
-
-			function class117:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.automatic_size ~= nil then
-					local encoded = self.automatic_size:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.anchor_point ~= nil then
-					local encoded = self.anchor_point:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.position ~= nil then
-					local encoded = self.position:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.size ~= nil then
-					local encoded = self.size:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.item ~= nil then
-					local encoded = self.item:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.impression_event_name ~= nil then
-					local encoded = self.impression_event_name:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 6, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.skip_item_impressions_log ~= nil then
-					local encoded = self.skip_item_impressions_log:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 7, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class117.decode(buf: buffer)
-				local result = class117.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.automatic_size = prop_types.StringProp.decode(v5)
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.anchor_point = prop_types.Vector2Prop.decode(v5)
-						elseif v3 == 3 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.position = prop_types.UDim2Prop.decode(v5)
-						elseif v3 == 4 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.size = prop_types.UDim2Prop.decode(v5)
-						elseif v3 == 5 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.item = v.LazyNestedComponentProp.decode(v5)
-						elseif v3 == 6 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.impression_event_name = prop_types.StringProp.decode(v5)
-						elseif v3 == 7 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.skip_item_impressions_log = prop_types.BoolProp.decode(v5)
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class117:jsonEncode()
-				local v2 = {}
-
-				if self.automatic_size ~= nil then
-					v2.automaticSize = self.automatic_size:jsonEncode()
-				end
-
-				if self.anchor_point ~= nil then
-					v2.anchorPoint = self.anchor_point:jsonEncode()
-				end
-
-				if self.position ~= nil then
-					v2.position = self.position:jsonEncode()
-				end
-
-				if self.size ~= nil then
-					v2.size = self.size:jsonEncode()
-				end
-
-				if self.item ~= nil then
-					v2.item = self.item:jsonEncode()
-				end
-
-				if self.impression_event_name ~= nil then
-					v2.impressionEventName = self.impression_event_name:jsonEncode()
-				end
-
-				if self.skip_item_impressions_log ~= nil then
-					v2.skipItemImpressionsLog = self.skip_item_impressions_log:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class117.jsonDecode(data)
-				local v2 = class117.new()
-
-				if data.automatic_size ~= nil then
-					v2.automatic_size = prop_types.StringProp.jsonDecode(data.automatic_size)
-				end
-
-				if data.automaticSize ~= nil then
-					v2.automatic_size = prop_types.StringProp.jsonDecode(data.automaticSize)
-				end
-
-				if data.anchor_point ~= nil then
-					v2.anchor_point = prop_types.Vector2Prop.jsonDecode(data.anchor_point)
-				end
-
-				if data.anchorPoint ~= nil then
-					v2.anchor_point = prop_types.Vector2Prop.jsonDecode(data.anchorPoint)
-				end
-
-				if data.position ~= nil then
-					v2.position = prop_types.UDim2Prop.jsonDecode(data.position)
-				end
-
-				if data.size ~= nil then
-					v2.size = prop_types.UDim2Prop.jsonDecode(data.size)
-				end
-
-				if data.item ~= nil then
-					v2.item = v.LazyNestedComponentProp.jsonDecode(data.item)
-				end
-
-				if data.impression_event_name ~= nil then
-					v2.impression_event_name = prop_types.StringProp.jsonDecode(data.impression_event_name)
-				end
-
-				if data.impressionEventName ~= nil then
-					v2.impression_event_name = prop_types.StringProp.jsonDecode(data.impressionEventName)
-				end
-
-				if data.skip_item_impressions_log ~= nil then
-					v2.skip_item_impressions_log = prop_types.BoolProp.jsonDecode(data.skip_item_impressions_log)
-				end
-
-				if data.skipItemImpressionsLog ~= nil then
-					v2.skip_item_impressions_log = prop_types.BoolProp.jsonDecode(data.skipItemImpressionsLog)
+				if data.dwellLoggingEnabled ~= nil then
+					v2.dwell_logging_enabled = prop_types.BoolProp.jsonDecode(data.dwellLoggingEnabled)
 				end
 
 				return v2
 			end
 
 			class117.descriptor = {
-				name = "SingleItemCollectionSchema_Props",
+				name = "CollectionGridSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.SingleItemCollectionSchema_Props = class117
+			v.CollectionGridSchema_Props = class117
 		end
 
-		typeRegistry.default:register(v.SingleItemCollectionSchema_Props)
+		typeRegistry.default:register(v.CollectionGridSchema_Props)
 
 		do
 			local class118 = {}
@@ -31410,7 +32154,7 @@ do
 						if v3 == 1 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
-							result.props = v.SeeAllTileSchema_Props.decode(v5)
+							result.props = v.RevealRowsButtonWithDividerSchema_Props.decode(v5)
 						elseif v3 == 2 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
@@ -31452,7 +32196,7 @@ do
 				local v2 = class118.new()
 
 				if p.props ~= nil then
-					v2.props = v.SeeAllTileSchema_Props.jsonDecode(p.props)
+					v2.props = v.RevealRowsButtonWithDividerSchema_Props.jsonDecode(p.props)
 				end
 
 				if p.shared ~= nil then
@@ -31463,90 +32207,36 @@ do
 			end
 
 			class118.descriptor = {
-				name = "SeeAllTileSchema",
-				fullName = "roblox.apppageplatform.shared.v1beta1.SeeAllTileSchema"
+				name = "RevealRowsButtonWithDividerSchema",
+				fullName = "roblox.apppageplatform.shared.v1beta1.RevealRowsButtonWithDividerSchema"
 			}
 
-			v.SeeAllTileSchema = class118
+			v.RevealRowsButtonWithDividerSchema = class118
 		end
 
-		typeRegistry.default:register(v.SeeAllTileSchema)
+		typeRegistry.default:register(v.RevealRowsButtonWithDividerSchema)
 
 		do
 			local class119 = {}
 			class119.__index = class119
 
-			function class119.new(data)
+			function class119.new(p)
 				local v3
 
-				if not (data == nil or data.layout_order == nil) then
-					v3 = data.layout_order
+				if not (p == nil or p.cta_component == nil) then
+					v3 = p.cta_component
 				end
 
-				local v4
-
-				if not (data == nil or data.size == nil) then
-					v4 = data.size
-				end
-
-				local v5
-
-				if not (data == nil or data.on_activated == nil) then
-					v5 = data.on_activated
-				end
-
-				local v6
-
-				if not (data == nil or data.icon == nil) then
-					v6 = data.icon
-				end
-
-				local v7
-
-				if not (data == nil or data.title == nil) then
-					v7 = data.title
-				end
-
-				return (setmetatable({
-					layout_order = v3,
-					size = v4,
-					on_activated = v5,
-					icon = v6,
-					title = v7
-				}, class119))
+				return (setmetatable({ cta_component = v3 }, class119))
 			end
 
 			function class119:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
-				if self.layout_order ~= nil then
-					local encoded = self.layout_order:encode()
+				if self.cta_component ~= nil then
+					local encoded = self.cta_component:encode()
 					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.size ~= nil then
-					local encoded = self.size:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.on_activated ~= nil then
-					local encoded = self.on_activated:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.icon ~= nil then
-					local encoded = self.icon:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.title ~= nil then
-					local encoded = self.title:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
 					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 				end
 
@@ -31570,23 +32260,7 @@ do
 						if v3 == 1 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
-							result.layout_order = prop_types.FloatProp.decode(v5)
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.size = prop_types.UDim2Prop.decode(v5)
-						elseif v3 == 3 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.on_activated = actions.ActionProp.decode(v5)
-						elseif v3 == 4 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.icon = prop_types.IconProp.decode(v5)
-						elseif v3 == 5 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.title = prop_types.StringProp.decode(v5)
+							result.cta_component = v.LazyNestedComponentProp.decode(v5)
 						else
 							local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -31609,72 +32283,36 @@ do
 			function class119:jsonEncode()
 				local v2 = {}
 
-				if self.layout_order ~= nil then
-					v2.layoutOrder = self.layout_order:jsonEncode()
-				end
-
-				if self.size ~= nil then
-					v2.size = self.size:jsonEncode()
-				end
-
-				if self.on_activated ~= nil then
-					v2.onActivated = self.on_activated:jsonEncode()
-				end
-
-				if self.icon ~= nil then
-					v2.icon = self.icon:jsonEncode()
-				end
-
-				if self.title ~= nil then
-					v2.title = self.title:jsonEncode()
+				if self.cta_component ~= nil then
+					v2.ctaComponent = self.cta_component:jsonEncode()
 				end
 
 				return v2
 			end
 
-			function class119.jsonDecode(data)
+			function class119.jsonDecode(p)
 				local v2 = class119.new()
 
-				if data.layout_order ~= nil then
-					v2.layout_order = prop_types.FloatProp.jsonDecode(data.layout_order)
+				if p.cta_component ~= nil then
+					v2.cta_component = v.LazyNestedComponentProp.jsonDecode(p.cta_component)
 				end
 
-				if data.layoutOrder ~= nil then
-					v2.layout_order = prop_types.FloatProp.jsonDecode(data.layoutOrder)
-				end
-
-				if data.size ~= nil then
-					v2.size = prop_types.UDim2Prop.jsonDecode(data.size)
-				end
-
-				if data.on_activated ~= nil then
-					v2.on_activated = actions.ActionProp.jsonDecode(data.on_activated)
-				end
-
-				if data.onActivated ~= nil then
-					v2.on_activated = actions.ActionProp.jsonDecode(data.onActivated)
-				end
-
-				if data.icon ~= nil then
-					v2.icon = prop_types.IconProp.jsonDecode(data.icon)
-				end
-
-				if data.title ~= nil then
-					v2.title = prop_types.StringProp.jsonDecode(data.title)
+				if p.ctaComponent ~= nil then
+					v2.cta_component = v.LazyNestedComponentProp.jsonDecode(p.ctaComponent)
 				end
 
 				return v2
 			end
 
 			class119.descriptor = {
-				name = "SeeAllTileSchema_Props",
+				name = "RevealRowsButtonWithDividerSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.SeeAllTileSchema_Props = class119
+			v.RevealRowsButtonWithDividerSchema_Props = class119
 		end
 
-		typeRegistry.default:register(v.SeeAllTileSchema_Props)
+		typeRegistry.default:register(v.RevealRowsButtonWithDividerSchema_Props)
 
 		do
 			local class120 = {}
@@ -31732,7 +32370,7 @@ do
 						if v3 == 1 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
-							result.props = v.FocusNavActionsSchema_Props.decode(v5)
+							result.props = v.SingleItemCollectionSchema_Props.decode(v5)
 						elseif v3 == 2 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
@@ -31774,7 +32412,7 @@ do
 				local v2 = class120.new()
 
 				if p.props ~= nil then
-					v2.props = v.FocusNavActionsSchema_Props.jsonDecode(p.props)
+					v2.props = v.SingleItemCollectionSchema_Props.jsonDecode(p.props)
 				end
 
 				if p.shared ~= nil then
@@ -31785,36 +32423,116 @@ do
 			end
 
 			class120.descriptor = {
-				name = "FocusNavActionsSchema",
-				fullName = "roblox.apppageplatform.shared.v1beta1.FocusNavActionsSchema"
+				name = "SingleItemCollectionSchema",
+				fullName = "roblox.apppageplatform.shared.v1beta1.SingleItemCollectionSchema"
 			}
 
-			v.FocusNavActionsSchema = class120
+			v.SingleItemCollectionSchema = class120
 		end
 
-		typeRegistry.default:register(v.FocusNavActionsSchema)
+		typeRegistry.default:register(v.SingleItemCollectionSchema)
 
 		do
 			local class121 = {}
 			class121.__index = class121
 
-			function class121.new(p)
+			function class121.new(data)
 				local v3
 
-				if not (p == nil or p.focus_nav_actions == nil) then
-					v3 = p.focus_nav_actions
+				if not (data == nil or data.automatic_size == nil) then
+					v3 = data.automatic_size
 				end
 
-				return (setmetatable({ focus_nav_actions = v3 }, class121))
+				local v4
+
+				if not (data == nil or data.anchor_point == nil) then
+					v4 = data.anchor_point
+				end
+
+				local v5
+
+				if not (data == nil or data.position == nil) then
+					v5 = data.position
+				end
+
+				local v6
+
+				if not (data == nil or data.size == nil) then
+					v6 = data.size
+				end
+
+				local v7
+
+				if not (data == nil or data.item == nil) then
+					v7 = data.item
+				end
+
+				local v8
+
+				if not (data == nil or data.impression_event_name == nil) then
+					v8 = data.impression_event_name
+				end
+
+				local v9
+
+				if not (data == nil or data.skip_item_impressions_log == nil) then
+					v9 = data.skip_item_impressions_log
+				end
+
+				return (setmetatable({
+					automatic_size = v3,
+					anchor_point = v4,
+					position = v5,
+					size = v6,
+					item = v7,
+					impression_event_name = v8,
+					skip_item_impressions_log = v9
+				}, class121))
 			end
 
 			function class121:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
-				if self.focus_nav_actions ~= nil then
-					local encoded = self.focus_nav_actions:encode()
+				if self.automatic_size ~= nil then
+					local encoded = self.automatic_size:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.anchor_point ~= nil then
+					local encoded = self.anchor_point:encode()
 					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.position ~= nil then
+					local encoded = self.position:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.size ~= nil then
+					local encoded = self.size:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.item ~= nil then
+					local encoded = self.item:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.impression_event_name ~= nil then
+					local encoded = self.impression_event_name:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 6, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.skip_item_impressions_log ~= nil then
+					local encoded = self.skip_item_impressions_log:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 7, proto.wireTypes.lengthDelimited)
 					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 				end
 
@@ -31835,10 +32553,34 @@ do
 						local v5
 						v5, v2 = proto.readVarInt(buf, v2)
 					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 2 then
+						if v3 == 1 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
-							result.focus_nav_actions = actions.FocusNavActionsProp.decode(v5)
+							result.automatic_size = prop_types.StringProp.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.anchor_point = prop_types.Vector2Prop.decode(v5)
+						elseif v3 == 3 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.position = prop_types.UDim2Prop.decode(v5)
+						elseif v3 == 4 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.size = prop_types.UDim2Prop.decode(v5)
+						elseif v3 == 5 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.item = v.LazyNestedComponentProp.decode(v5)
+						elseif v3 == 6 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.impression_event_name = prop_types.StringProp.decode(v5)
+						elseif v3 == 7 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.skip_item_impressions_log = prop_types.BoolProp.decode(v5)
 						else
 							local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -31861,36 +32603,96 @@ do
 			function class121:jsonEncode()
 				local v2 = {}
 
-				if self.focus_nav_actions ~= nil then
-					v2.focusNavActions = self.focus_nav_actions:jsonEncode()
+				if self.automatic_size ~= nil then
+					v2.automaticSize = self.automatic_size:jsonEncode()
+				end
+
+				if self.anchor_point ~= nil then
+					v2.anchorPoint = self.anchor_point:jsonEncode()
+				end
+
+				if self.position ~= nil then
+					v2.position = self.position:jsonEncode()
+				end
+
+				if self.size ~= nil then
+					v2.size = self.size:jsonEncode()
+				end
+
+				if self.item ~= nil then
+					v2.item = self.item:jsonEncode()
+				end
+
+				if self.impression_event_name ~= nil then
+					v2.impressionEventName = self.impression_event_name:jsonEncode()
+				end
+
+				if self.skip_item_impressions_log ~= nil then
+					v2.skipItemImpressionsLog = self.skip_item_impressions_log:jsonEncode()
 				end
 
 				return v2
 			end
 
-			function class121.jsonDecode(p)
+			function class121.jsonDecode(data)
 				local v2 = class121.new()
 
-				if p.focus_nav_actions ~= nil then
-					v2.focus_nav_actions = actions.FocusNavActionsProp.jsonDecode(p.focus_nav_actions)
+				if data.automatic_size ~= nil then
+					v2.automatic_size = prop_types.StringProp.jsonDecode(data.automatic_size)
 				end
 
-				if p.focusNavActions ~= nil then
-					v2.focus_nav_actions = actions.FocusNavActionsProp.jsonDecode(p.focusNavActions)
+				if data.automaticSize ~= nil then
+					v2.automatic_size = prop_types.StringProp.jsonDecode(data.automaticSize)
+				end
+
+				if data.anchor_point ~= nil then
+					v2.anchor_point = prop_types.Vector2Prop.jsonDecode(data.anchor_point)
+				end
+
+				if data.anchorPoint ~= nil then
+					v2.anchor_point = prop_types.Vector2Prop.jsonDecode(data.anchorPoint)
+				end
+
+				if data.position ~= nil then
+					v2.position = prop_types.UDim2Prop.jsonDecode(data.position)
+				end
+
+				if data.size ~= nil then
+					v2.size = prop_types.UDim2Prop.jsonDecode(data.size)
+				end
+
+				if data.item ~= nil then
+					v2.item = v.LazyNestedComponentProp.jsonDecode(data.item)
+				end
+
+				if data.impression_event_name ~= nil then
+					v2.impression_event_name = prop_types.StringProp.jsonDecode(data.impression_event_name)
+				end
+
+				if data.impressionEventName ~= nil then
+					v2.impression_event_name = prop_types.StringProp.jsonDecode(data.impressionEventName)
+				end
+
+				if data.skip_item_impressions_log ~= nil then
+					v2.skip_item_impressions_log = prop_types.BoolProp.jsonDecode(data.skip_item_impressions_log)
+				end
+
+				if data.skipItemImpressionsLog ~= nil then
+					v2.skip_item_impressions_log = prop_types.BoolProp.jsonDecode(data.skipItemImpressionsLog)
 				end
 
 				return v2
 			end
 
 			class121.descriptor = {
-				name = "FocusNavActionsSchema_Props",
+				name = "SingleItemCollectionSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.FocusNavActionsSchema_Props = class121
+			v.SingleItemCollectionSchema_Props = class121
 		end
 
-		typeRegistry.default:register(v.FocusNavActionsSchema_Props)
+		typeRegistry.default:register(v.SingleItemCollectionSchema_Props)
 
 		do
 			local class122 = {}
@@ -31948,7 +32750,7 @@ do
 						if v3 == 1 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
-							result.props = v.FragmentSchema_Props.decode(v5)
+							result.props = v.SeeAllTileSchema_Props.decode(v5)
 						elseif v3 == 2 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
@@ -31990,7 +32792,7 @@ do
 				local v2 = class122.new()
 
 				if p.props ~= nil then
-					v2.props = v.FragmentSchema_Props.jsonDecode(p.props)
+					v2.props = v.SeeAllTileSchema_Props.jsonDecode(p.props)
 				end
 
 				if p.shared ~= nil then
@@ -32001,24 +32803,562 @@ do
 			end
 
 			class122.descriptor = {
-				name = "FragmentSchema",
-				fullName = "roblox.apppageplatform.shared.v1beta1.FragmentSchema"
+				name = "SeeAllTileSchema",
+				fullName = "roblox.apppageplatform.shared.v1beta1.SeeAllTileSchema"
 			}
 
-			v.FragmentSchema = class122
+			v.SeeAllTileSchema = class122
 		end
 
-		typeRegistry.default:register(v.FragmentSchema)
+		typeRegistry.default:register(v.SeeAllTileSchema)
 
 		do
 			local class123 = {}
 			class123.__index = class123
 
-			function class123.new(_)
-				return (setmetatable({}, class123))
+			function class123.new(data)
+				local v3
+
+				if not (data == nil or data.layout_order == nil) then
+					v3 = data.layout_order
+				end
+
+				local v4
+
+				if not (data == nil or data.size == nil) then
+					v4 = data.size
+				end
+
+				local v5
+
+				if not (data == nil or data.on_activated == nil) then
+					v5 = data.on_activated
+				end
+
+				local v6
+
+				if not (data == nil or data.icon == nil) then
+					v6 = data.icon
+				end
+
+				local v7
+
+				if not (data == nil or data.title == nil) then
+					v7 = data.title
+				end
+
+				return (setmetatable({
+					layout_order = v3,
+					size = v4,
+					on_activated = v5,
+					icon = v6,
+					title = v7
+				}, class123))
 			end
 
 			function class123:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.layout_order ~= nil then
+					local encoded = self.layout_order:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.size ~= nil then
+					local encoded = self.size:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.on_activated ~= nil then
+					local encoded = self.on_activated:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.icon ~= nil then
+					local encoded = self.icon:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.title ~= nil then
+					local encoded = self.title:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class123.decode(buf: buffer)
+				local result = class123.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.layout_order = prop_types.FloatProp.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.size = prop_types.UDim2Prop.decode(v5)
+						elseif v3 == 3 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.on_activated = actions.ActionProp.decode(v5)
+						elseif v3 == 4 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.icon = prop_types.IconProp.decode(v5)
+						elseif v3 == 5 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.title = prop_types.StringProp.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class123:jsonEncode()
+				local v2 = {}
+
+				if self.layout_order ~= nil then
+					v2.layoutOrder = self.layout_order:jsonEncode()
+				end
+
+				if self.size ~= nil then
+					v2.size = self.size:jsonEncode()
+				end
+
+				if self.on_activated ~= nil then
+					v2.onActivated = self.on_activated:jsonEncode()
+				end
+
+				if self.icon ~= nil then
+					v2.icon = self.icon:jsonEncode()
+				end
+
+				if self.title ~= nil then
+					v2.title = self.title:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class123.jsonDecode(data)
+				local v2 = class123.new()
+
+				if data.layout_order ~= nil then
+					v2.layout_order = prop_types.FloatProp.jsonDecode(data.layout_order)
+				end
+
+				if data.layoutOrder ~= nil then
+					v2.layout_order = prop_types.FloatProp.jsonDecode(data.layoutOrder)
+				end
+
+				if data.size ~= nil then
+					v2.size = prop_types.UDim2Prop.jsonDecode(data.size)
+				end
+
+				if data.on_activated ~= nil then
+					v2.on_activated = actions.ActionProp.jsonDecode(data.on_activated)
+				end
+
+				if data.onActivated ~= nil then
+					v2.on_activated = actions.ActionProp.jsonDecode(data.onActivated)
+				end
+
+				if data.icon ~= nil then
+					v2.icon = prop_types.IconProp.jsonDecode(data.icon)
+				end
+
+				if data.title ~= nil then
+					v2.title = prop_types.StringProp.jsonDecode(data.title)
+				end
+
+				return v2
+			end
+
+			class123.descriptor = {
+				name = "SeeAllTileSchema_Props",
+				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
+			}
+
+			v.SeeAllTileSchema_Props = class123
+		end
+
+		typeRegistry.default:register(v.SeeAllTileSchema_Props)
+
+		do
+			local class124 = {}
+			class124.__index = class124
+
+			function class124.new(p)
+				local v3
+
+				if not (p == nil or p.props == nil) then
+					v3 = p.props
+				end
+
+				local v4
+
+				if not (p == nil or p.shared == nil) then
+					v4 = p.shared
+				end
+
+				return (setmetatable({ props = v3, shared = v4 }, class124))
+			end
+
+			function class124:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.props ~= nil then
+					local encoded = self.props:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.shared ~= nil then
+					local encoded = self.shared:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class124.decode(buf: buffer)
+				local result = class124.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.props = v.FocusNavActionsSchema_Props.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.shared = component_shared.ComponentShared.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class124:jsonEncode()
+				local v2 = {}
+
+				if self.props ~= nil then
+					v2.props = self.props:jsonEncode()
+				end
+
+				if self.shared ~= nil then
+					v2.shared = self.shared:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class124.jsonDecode(p)
+				local v2 = class124.new()
+
+				if p.props ~= nil then
+					v2.props = v.FocusNavActionsSchema_Props.jsonDecode(p.props)
+				end
+
+				if p.shared ~= nil then
+					v2.shared = component_shared.ComponentShared.jsonDecode(p.shared)
+				end
+
+				return v2
+			end
+
+			class124.descriptor = {
+				name = "FocusNavActionsSchema",
+				fullName = "roblox.apppageplatform.shared.v1beta1.FocusNavActionsSchema"
+			}
+
+			v.FocusNavActionsSchema = class124
+		end
+
+		typeRegistry.default:register(v.FocusNavActionsSchema)
+
+		do
+			local class125 = {}
+			class125.__index = class125
+
+			function class125.new(p)
+				local v3
+
+				if not (p == nil or p.focus_nav_actions == nil) then
+					v3 = p.focus_nav_actions
+				end
+
+				return (setmetatable({ focus_nav_actions = v3 }, class125))
+			end
+
+			function class125:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.focus_nav_actions ~= nil then
+					local encoded = self.focus_nav_actions:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class125.decode(buf: buffer)
+				local result = class125.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.focus_nav_actions = actions.FocusNavActionsProp.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class125:jsonEncode()
+				local v2 = {}
+
+				if self.focus_nav_actions ~= nil then
+					v2.focusNavActions = self.focus_nav_actions:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class125.jsonDecode(p)
+				local v2 = class125.new()
+
+				if p.focus_nav_actions ~= nil then
+					v2.focus_nav_actions = actions.FocusNavActionsProp.jsonDecode(p.focus_nav_actions)
+				end
+
+				if p.focusNavActions ~= nil then
+					v2.focus_nav_actions = actions.FocusNavActionsProp.jsonDecode(p.focusNavActions)
+				end
+
+				return v2
+			end
+
+			class125.descriptor = {
+				name = "FocusNavActionsSchema_Props",
+				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
+			}
+
+			v.FocusNavActionsSchema_Props = class125
+		end
+
+		typeRegistry.default:register(v.FocusNavActionsSchema_Props)
+
+		do
+			local class126 = {}
+			class126.__index = class126
+
+			function class126.new(p)
+				local v3
+
+				if not (p == nil or p.props == nil) then
+					v3 = p.props
+				end
+
+				local v4
+
+				if not (p == nil or p.shared == nil) then
+					v4 = p.shared
+				end
+
+				return (setmetatable({ props = v3, shared = v4 }, class126))
+			end
+
+			function class126:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.props ~= nil then
+					local encoded = self.props:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.shared ~= nil then
+					local encoded = self.shared:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class126.decode(buf: buffer)
+				local result = class126.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.props = v.FragmentSchema_Props.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.shared = component_shared.ComponentShared.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class126:jsonEncode()
+				local v2 = {}
+
+				if self.props ~= nil then
+					v2.props = self.props:jsonEncode()
+				end
+
+				if self.shared ~= nil then
+					v2.shared = self.shared:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class126.jsonDecode(p)
+				local v2 = class126.new()
+
+				if p.props ~= nil then
+					v2.props = v.FragmentSchema_Props.jsonDecode(p.props)
+				end
+
+				if p.shared ~= nil then
+					v2.shared = component_shared.ComponentShared.jsonDecode(p.shared)
+				end
+
+				return v2
+			end
+
+			class126.descriptor = {
+				name = "FragmentSchema",
+				fullName = "roblox.apppageplatform.shared.v1beta1.FragmentSchema"
+			}
+
+			v.FragmentSchema = class126
+		end
+
+		typeRegistry.default:register(v.FragmentSchema)
+
+		do
+			local class127 = {}
+			class127.__index = class127
+
+			function class127.new(_)
+				return (setmetatable({}, class127))
+			end
+
+			function class127:encode()
 				local buf = buffer.create(0)
 
 				local buf2 = buffer.create(0)
@@ -32026,8 +33366,8 @@ do
 				return buf2
 			end
 
-			function class123.decode(buf: buffer)
-				local v2 = class123.new()
+			function class127.decode(buf: buffer)
+				local v2 = class127.new()
 				local v3 = 0
 
 				while v3 < buffer.len(buf) do
@@ -32055,29 +33395,29 @@ do
 				return v2
 			end
 
-			function class123:jsonEncode()
+			function class127:jsonEncode()
 				return {}
 			end
 
-			function class123.jsonDecode(_)
-				return (class123.new())
+			function class127.jsonDecode(_)
+				return (class127.new())
 			end
 
-			class123.descriptor = {
+			class127.descriptor = {
 				name = "FragmentSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.FragmentSchema_Props = class123
+			v.FragmentSchema_Props = class127
 		end
 
 		typeRegistry.default:register(v.FragmentSchema_Props)
 
 		do
-			local class124 = {}
-			class124.__index = class124
+			local class128 = {}
+			class128.__index = class128
 
-			function class124.new(data)
+			function class128.new(data)
 				local v3
 
 				if not (data == nil or data.props == nil) then
@@ -32096,10 +33436,10 @@ do
 					v5 = data.web_props
 				end
 
-				return (setmetatable({ props = v3, shared = v4, web_props = v5 }, class124))
+				return (setmetatable({ props = v3, shared = v4, web_props = v5 }, class128))
 			end
 
-			function class124:encode()
+			function class128:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -32126,8 +33466,8 @@ do
 				return buf
 			end
 
-			function class124.decode(buf: buffer)
-				local result = class124.new()
+			function class128.decode(buf: buffer)
+				local result = class128.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -32169,7 +33509,7 @@ do
 				return result
 			end
 
-			function class124:jsonEncode()
+			function class128:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -32187,8 +33527,8 @@ do
 				return v2
 			end
 
-			function class124.jsonDecode(data)
-				local v2 = class124.new()
+			function class128.jsonDecode(data)
+				local v2 = class128.new()
 
 				if data.props ~= nil then
 					v2.props = v.VerticalFeedSchema_Props.jsonDecode(data.props)
@@ -32209,21 +33549,21 @@ do
 				return v2
 			end
 
-			class124.descriptor = {
+			class128.descriptor = {
 				name = "VerticalFeedSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.VerticalFeedSchema"
 			}
 
-			v.VerticalFeedSchema = class124
+			v.VerticalFeedSchema = class128
 		end
 
 		typeRegistry.default:register(v.VerticalFeedSchema)
 
 		do
-			local class125 = {}
-			class125.__index = class125
+			local class129 = {}
+			class129.__index = class129
 
-			function class125.new(data)
+			function class129.new(data)
 				local v3
 
 				if not (data == nil or data.layout_order == nil) then
@@ -32400,10 +33740,10 @@ do
 					progressive_fill_on_scroll = v25,
 					gap_after_first_feed_item = v26,
 					same_pool_feed_item_gap = v27
-				}, class125))
+				}, class129))
 			end
 
-			function class125:encode()
+			function class129:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -32562,8 +33902,8 @@ do
 				return buf
 			end
 
-			function class125.decode(buf: buffer)
-				local result = class125.new()
+			function class129.decode(buf: buffer)
+				local result = class129.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -32693,7 +34033,7 @@ do
 				return result
 			end
 
-			function class125:jsonEncode()
+			function class129:jsonEncode()
 				local v2 = {}
 
 				if self.layout_order ~= nil then
@@ -32799,8 +34139,8 @@ do
 				return v2
 			end
 
-			function class125.jsonDecode(data)
-				local v2 = class125.new()
+			function class129.jsonDecode(data)
+				local v2 = class129.new()
 
 				if data.layout_order ~= nil then
 					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layout_order)
@@ -33005,31 +34345,31 @@ do
 				return v2
 			end
 
-			class125.descriptor = {
+			class129.descriptor = {
 				name = "VerticalFeedSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.VerticalFeedSchema_Props = class125
+			v.VerticalFeedSchema_Props = class129
 		end
 
 		typeRegistry.default:register(v.VerticalFeedSchema_Props)
 
 		do
-			local class126 = {}
-			class126.__index = class126
+			local class130 = {}
+			class130.__index = class130
 
-			function class126.new(p)
+			function class130.new(p)
 				local v3
 
 				if not (p == nil or p.max_width == nil) then
 					v3 = p.max_width
 				end
 
-				return (setmetatable({ max_width = v3 }, class126))
+				return (setmetatable({ max_width = v3 }, class130))
 			end
 
-			function class126:encode()
+			function class130:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -33044,8 +34384,8 @@ do
 				return buf
 			end
 
-			function class126.decode(buf: buffer)
-				local result = class126.new()
+			function class130.decode(buf: buffer)
+				local result = class130.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -33079,7 +34419,7 @@ do
 				return result
 			end
 
-			function class126:jsonEncode()
+			function class130:jsonEncode()
 				local v2 = {}
 
 				if self.max_width ~= nil then
@@ -33089,8 +34429,8 @@ do
 				return v2
 			end
 
-			function class126.jsonDecode(p)
-				local v2 = class126.new()
+			function class130.jsonDecode(p)
+				local v2 = class130.new()
 
 				if p.max_width ~= nil then
 					v2.max_width = prop_types.Int32Prop.jsonDecode(p.max_width)
@@ -33103,21 +34443,21 @@ do
 				return v2
 			end
 
-			class126.descriptor = {
+			class130.descriptor = {
 				name = "VerticalFeedSchema_WebProps",
 				fullName = "roblox.apppageplatform.shared.v1beta1.WebProps"
 			}
 
-			v.VerticalFeedSchema_WebProps = class126
+			v.VerticalFeedSchema_WebProps = class130
 		end
 
 		typeRegistry.default:register(v.VerticalFeedSchema_WebProps)
 
 		do
-			local class127 = {}
-			class127.__index = class127
+			local class131 = {}
+			class131.__index = class131
 
-			function class127.new(p)
+			function class131.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -33130,10 +34470,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class127))
+				return (setmetatable({ props = v3, shared = v4 }, class131))
 			end
 
-			function class127:encode()
+			function class131:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -33154,8 +34494,8 @@ do
 				return buf
 			end
 
-			function class127.decode(buf: buffer)
-				local result = class127.new()
+			function class131.decode(buf: buffer)
+				local result = class131.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -33193,7 +34533,7 @@ do
 				return result
 			end
 
-			function class127:jsonEncode()
+			function class131:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -33207,8 +34547,8 @@ do
 				return v2
 			end
 
-			function class127.jsonDecode(p)
-				local v2 = class127.new()
+			function class131.jsonDecode(p)
+				local v2 = class131.new()
 
 				if p.props ~= nil then
 					v2.props = v.InfoTableSchema_Props.jsonDecode(p.props)
@@ -33221,21 +34561,21 @@ do
 				return v2
 			end
 
-			class127.descriptor = {
+			class131.descriptor = {
 				name = "InfoTableSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.InfoTableSchema"
 			}
 
-			v.InfoTableSchema = class127
+			v.InfoTableSchema = class131
 		end
 
 		typeRegistry.default:register(v.InfoTableSchema)
 
 		do
-			local class128 = {}
-			class128.__index = class128
+			local class132 = {}
+			class132.__index = class132
 
-			function class128.new(data)
+			function class132.new(data)
 				local v3
 
 				if not (data == nil or data.items == nil) then
@@ -33300,10 +34640,10 @@ do
 					size = v9,
 					header_component = v10,
 					tag = v11
-				}, class128))
+				}, class132))
 			end
 
-			function class128:encode()
+			function class132:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -33366,8 +34706,8 @@ do
 				return buf
 			end
 
-			function class128.decode(buf: buffer)
-				local result = class128.new()
+			function class132.decode(buf: buffer)
+				local result = class132.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -33433,7 +34773,7 @@ do
 				return result
 			end
 
-			function class128:jsonEncode()
+			function class132:jsonEncode()
 				local v2 = {}
 
 				if self.items ~= nil then
@@ -33475,8 +34815,8 @@ do
 				return v2
 			end
 
-			function class128.jsonDecode(data)
-				local v2 = class128.new()
+			function class132.jsonDecode(data)
+				local v2 = class132.new()
 
 				if data.items ~= nil then
 					v2.items = v.LazyNestedComponentListProp.jsonDecode(data.items)
@@ -33537,557 +34877,15 @@ do
 				return v2
 			end
 
-			class128.descriptor = {
+			class132.descriptor = {
 				name = "InfoTableSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.InfoTableSchema_Props = class128
+			v.InfoTableSchema_Props = class132
 		end
 
 		typeRegistry.default:register(v.InfoTableSchema_Props)
-
-		do
-			local class129 = {}
-			class129.__index = class129
-
-			function class129.new(p)
-				local v3
-
-				if not (p == nil or p.props == nil) then
-					v3 = p.props
-				end
-
-				local v4
-
-				if not (p == nil or p.shared == nil) then
-					v4 = p.shared
-				end
-
-				return (setmetatable({ props = v3, shared = v4 }, class129))
-			end
-
-			function class129:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.props ~= nil then
-					local encoded = self.props:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.shared ~= nil then
-					local encoded = self.shared:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class129.decode(buf: buffer)
-				local result = class129.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.props = v.InfoTableCellSchema_Props.decode(v5)
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.shared = component_shared.ComponentShared.decode(v5)
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class129:jsonEncode()
-				local v2 = {}
-
-				if self.props ~= nil then
-					v2.props = self.props:jsonEncode()
-				end
-
-				if self.shared ~= nil then
-					v2.shared = self.shared:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class129.jsonDecode(p)
-				local v2 = class129.new()
-
-				if p.props ~= nil then
-					v2.props = v.InfoTableCellSchema_Props.jsonDecode(p.props)
-				end
-
-				if p.shared ~= nil then
-					v2.shared = component_shared.ComponentShared.jsonDecode(p.shared)
-				end
-
-				return v2
-			end
-
-			class129.descriptor = {
-				name = "InfoTableCellSchema",
-				fullName = "roblox.apppageplatform.shared.v1beta1.InfoTableCellSchema"
-			}
-
-			v.InfoTableCellSchema = class129
-		end
-
-		typeRegistry.default:register(v.InfoTableCellSchema)
-
-		do
-			local class130 = {}
-			class130.__index = class130
-
-			function class130.new(data)
-				local v3
-
-				if not (data == nil or data.label_component == nil) then
-					v3 = data.label_component
-				end
-
-				local v4
-
-				if not (data == nil or data.value_component == nil) then
-					v4 = data.value_component
-				end
-
-				local v5
-
-				if not (data == nil or data.on_activated == nil) then
-					v5 = data.on_activated
-				end
-
-				local v6
-
-				if not (data == nil or data.layout_order == nil) then
-					v6 = data.layout_order
-				end
-
-				local v7
-
-				if not (data == nil or data.selectable == nil) then
-					v7 = data.selectable
-				end
-
-				return (setmetatable({
-					label_component = v3,
-					value_component = v4,
-					on_activated = v5,
-					layout_order = v6,
-					selectable = v7
-				}, class130))
-			end
-
-			function class130:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.label_component ~= nil then
-					local encoded = self.label_component:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.value_component ~= nil then
-					local encoded = self.value_component:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.on_activated ~= nil then
-					local encoded = self.on_activated:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.layout_order ~= nil then
-					local encoded = self.layout_order:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.selectable ~= nil then
-					local encoded = self.selectable:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class130.decode(buf: buffer)
-				local result = class130.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.label_component = v.NestedComponentProp.decode(v5)
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.value_component = v.NestedComponentProp.decode(v5)
-						elseif v3 == 3 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.on_activated = actions.ActionProp.decode(v5)
-						elseif v3 == 4 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.layout_order = prop_types.Int32Prop.decode(v5)
-						elseif v3 == 5 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.selectable = prop_types.BoolProp.decode(v5)
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class130:jsonEncode()
-				local v2 = {}
-
-				if self.label_component ~= nil then
-					v2.labelComponent = self.label_component:jsonEncode()
-				end
-
-				if self.value_component ~= nil then
-					v2.valueComponent = self.value_component:jsonEncode()
-				end
-
-				if self.on_activated ~= nil then
-					v2.onActivated = self.on_activated:jsonEncode()
-				end
-
-				if self.layout_order ~= nil then
-					v2.layoutOrder = self.layout_order:jsonEncode()
-				end
-
-				if self.selectable ~= nil then
-					v2.selectable = self.selectable:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class130.jsonDecode(data)
-				local v2 = class130.new()
-
-				if data.label_component ~= nil then
-					v2.label_component = v.NestedComponentProp.jsonDecode(data.label_component)
-				end
-
-				if data.labelComponent ~= nil then
-					v2.label_component = v.NestedComponentProp.jsonDecode(data.labelComponent)
-				end
-
-				if data.value_component ~= nil then
-					v2.value_component = v.NestedComponentProp.jsonDecode(data.value_component)
-				end
-
-				if data.valueComponent ~= nil then
-					v2.value_component = v.NestedComponentProp.jsonDecode(data.valueComponent)
-				end
-
-				if data.on_activated ~= nil then
-					v2.on_activated = actions.ActionProp.jsonDecode(data.on_activated)
-				end
-
-				if data.onActivated ~= nil then
-					v2.on_activated = actions.ActionProp.jsonDecode(data.onActivated)
-				end
-
-				if data.layout_order ~= nil then
-					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layout_order)
-				end
-
-				if data.layoutOrder ~= nil then
-					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layoutOrder)
-				end
-
-				if data.selectable ~= nil then
-					v2.selectable = prop_types.BoolProp.jsonDecode(data.selectable)
-				end
-
-				return v2
-			end
-
-			class130.descriptor = {
-				name = "InfoTableCellSchema_Props",
-				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
-			}
-
-			v.InfoTableCellSchema_Props = class130
-		end
-
-		typeRegistry.default:register(v.InfoTableCellSchema_Props)
-
-		do
-			local class131 = {}
-			class131.__index = class131
-
-			function class131.new(p)
-				local v3
-
-				if not (p == nil or p.props == nil) then
-					v3 = p.props
-				end
-
-				local v4
-
-				if not (p == nil or p.shared == nil) then
-					v4 = p.shared
-				end
-
-				return (setmetatable({ props = v3, shared = v4 }, class131))
-			end
-
-			function class131:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.props ~= nil then
-					local encoded = self.props:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.shared ~= nil then
-					local encoded = self.shared:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class131.decode(buf: buffer)
-				local result = class131.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.props = v.MarkdownTextSchema_Props.decode(v5)
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.shared = component_shared.ComponentShared.decode(v5)
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class131:jsonEncode()
-				local v2 = {}
-
-				if self.props ~= nil then
-					v2.props = self.props:jsonEncode()
-				end
-
-				if self.shared ~= nil then
-					v2.shared = self.shared:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class131.jsonDecode(p)
-				local v2 = class131.new()
-
-				if p.props ~= nil then
-					v2.props = v.MarkdownTextSchema_Props.jsonDecode(p.props)
-				end
-
-				if p.shared ~= nil then
-					v2.shared = component_shared.ComponentShared.jsonDecode(p.shared)
-				end
-
-				return v2
-			end
-
-			class131.descriptor = {
-				name = "MarkdownTextSchema",
-				fullName = "roblox.apppageplatform.shared.v1beta1.MarkdownTextSchema"
-			}
-
-			v.MarkdownTextSchema = class131
-		end
-
-		typeRegistry.default:register(v.MarkdownTextSchema)
-
-		do
-			local class132 = {}
-			class132.__index = class132
-
-			function class132.new(p)
-				local v3
-
-				if not (p == nil or p.text == nil) then
-					v3 = p.text
-				end
-
-				return (setmetatable({ text = v3 }, class132))
-			end
-
-			function class132:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.text ~= nil then
-					local encoded = self.text:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class132.decode(buf: buffer)
-				local result = class132.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.text = prop_types.StringProp.decode(v5)
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class132:jsonEncode()
-				local v2 = {}
-
-				if self.text ~= nil then
-					v2.text = self.text:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class132.jsonDecode(p)
-				local v2 = class132.new()
-
-				if p.text ~= nil then
-					v2.text = prop_types.StringProp.jsonDecode(p.text)
-				end
-
-				return v2
-			end
-
-			class132.descriptor = {
-				name = "MarkdownTextSchema_Props",
-				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
-			}
-
-			v.MarkdownTextSchema_Props = class132
-		end
-
-		typeRegistry.default:register(v.MarkdownTextSchema_Props)
 
 		do
 			local class133 = {}
@@ -34145,7 +34943,7 @@ do
 						if v3 == 1 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
-							result.props = v.ChipSchema_Props.decode(v5)
+							result.props = v.InfoTableCellSchema_Props.decode(v5)
 						elseif v3 == 2 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
@@ -34187,7 +34985,7 @@ do
 				local v2 = class133.new()
 
 				if p.props ~= nil then
-					v2.props = v.ChipSchema_Props.jsonDecode(p.props)
+					v2.props = v.InfoTableCellSchema_Props.jsonDecode(p.props)
 				end
 
 				if p.shared ~= nil then
@@ -34198,20 +34996,614 @@ do
 			end
 
 			class133.descriptor = {
-				name = "ChipSchema",
-				fullName = "roblox.apppageplatform.shared.v1beta1.ChipSchema"
+				name = "InfoTableCellSchema",
+				fullName = "roblox.apppageplatform.shared.v1beta1.InfoTableCellSchema"
 			}
 
-			v.ChipSchema = class133
+			v.InfoTableCellSchema = class133
 		end
 
-		typeRegistry.default:register(v.ChipSchema)
+		typeRegistry.default:register(v.InfoTableCellSchema)
 
 		do
 			local class134 = {}
 			class134.__index = class134
 
 			function class134.new(data)
+				local v3
+
+				if not (data == nil or data.label_component == nil) then
+					v3 = data.label_component
+				end
+
+				local v4
+
+				if not (data == nil or data.value_component == nil) then
+					v4 = data.value_component
+				end
+
+				local v5
+
+				if not (data == nil or data.on_activated == nil) then
+					v5 = data.on_activated
+				end
+
+				local v6
+
+				if not (data == nil or data.layout_order == nil) then
+					v6 = data.layout_order
+				end
+
+				local v7
+
+				if not (data == nil or data.selectable == nil) then
+					v7 = data.selectable
+				end
+
+				return (setmetatable({
+					label_component = v3,
+					value_component = v4,
+					on_activated = v5,
+					layout_order = v6,
+					selectable = v7
+				}, class134))
+			end
+
+			function class134:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.label_component ~= nil then
+					local encoded = self.label_component:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.value_component ~= nil then
+					local encoded = self.value_component:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.on_activated ~= nil then
+					local encoded = self.on_activated:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.layout_order ~= nil then
+					local encoded = self.layout_order:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.selectable ~= nil then
+					local encoded = self.selectable:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class134.decode(buf: buffer)
+				local result = class134.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.label_component = v.NestedComponentProp.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.value_component = v.NestedComponentProp.decode(v5)
+						elseif v3 == 3 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.on_activated = actions.ActionProp.decode(v5)
+						elseif v3 == 4 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.layout_order = prop_types.Int32Prop.decode(v5)
+						elseif v3 == 5 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.selectable = prop_types.BoolProp.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class134:jsonEncode()
+				local v2 = {}
+
+				if self.label_component ~= nil then
+					v2.labelComponent = self.label_component:jsonEncode()
+				end
+
+				if self.value_component ~= nil then
+					v2.valueComponent = self.value_component:jsonEncode()
+				end
+
+				if self.on_activated ~= nil then
+					v2.onActivated = self.on_activated:jsonEncode()
+				end
+
+				if self.layout_order ~= nil then
+					v2.layoutOrder = self.layout_order:jsonEncode()
+				end
+
+				if self.selectable ~= nil then
+					v2.selectable = self.selectable:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class134.jsonDecode(data)
+				local v2 = class134.new()
+
+				if data.label_component ~= nil then
+					v2.label_component = v.NestedComponentProp.jsonDecode(data.label_component)
+				end
+
+				if data.labelComponent ~= nil then
+					v2.label_component = v.NestedComponentProp.jsonDecode(data.labelComponent)
+				end
+
+				if data.value_component ~= nil then
+					v2.value_component = v.NestedComponentProp.jsonDecode(data.value_component)
+				end
+
+				if data.valueComponent ~= nil then
+					v2.value_component = v.NestedComponentProp.jsonDecode(data.valueComponent)
+				end
+
+				if data.on_activated ~= nil then
+					v2.on_activated = actions.ActionProp.jsonDecode(data.on_activated)
+				end
+
+				if data.onActivated ~= nil then
+					v2.on_activated = actions.ActionProp.jsonDecode(data.onActivated)
+				end
+
+				if data.layout_order ~= nil then
+					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layout_order)
+				end
+
+				if data.layoutOrder ~= nil then
+					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layoutOrder)
+				end
+
+				if data.selectable ~= nil then
+					v2.selectable = prop_types.BoolProp.jsonDecode(data.selectable)
+				end
+
+				return v2
+			end
+
+			class134.descriptor = {
+				name = "InfoTableCellSchema_Props",
+				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
+			}
+
+			v.InfoTableCellSchema_Props = class134
+		end
+
+		typeRegistry.default:register(v.InfoTableCellSchema_Props)
+
+		do
+			local class135 = {}
+			class135.__index = class135
+
+			function class135.new(p)
+				local v3
+
+				if not (p == nil or p.props == nil) then
+					v3 = p.props
+				end
+
+				local v4
+
+				if not (p == nil or p.shared == nil) then
+					v4 = p.shared
+				end
+
+				return (setmetatable({ props = v3, shared = v4 }, class135))
+			end
+
+			function class135:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.props ~= nil then
+					local encoded = self.props:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.shared ~= nil then
+					local encoded = self.shared:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class135.decode(buf: buffer)
+				local result = class135.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.props = v.MarkdownTextSchema_Props.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.shared = component_shared.ComponentShared.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class135:jsonEncode()
+				local v2 = {}
+
+				if self.props ~= nil then
+					v2.props = self.props:jsonEncode()
+				end
+
+				if self.shared ~= nil then
+					v2.shared = self.shared:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class135.jsonDecode(p)
+				local v2 = class135.new()
+
+				if p.props ~= nil then
+					v2.props = v.MarkdownTextSchema_Props.jsonDecode(p.props)
+				end
+
+				if p.shared ~= nil then
+					v2.shared = component_shared.ComponentShared.jsonDecode(p.shared)
+				end
+
+				return v2
+			end
+
+			class135.descriptor = {
+				name = "MarkdownTextSchema",
+				fullName = "roblox.apppageplatform.shared.v1beta1.MarkdownTextSchema"
+			}
+
+			v.MarkdownTextSchema = class135
+		end
+
+		typeRegistry.default:register(v.MarkdownTextSchema)
+
+		do
+			local class136 = {}
+			class136.__index = class136
+
+			function class136.new(data)
+				local v3
+
+				if not (data == nil or data.text == nil) then
+					v3 = data.text
+				end
+
+				local v4
+
+				if not (data == nil or data.max_lines == nil) then
+					v4 = data.max_lines
+				end
+
+				local v5
+
+				if not (data == nil or data.interactable == nil) then
+					v5 = data.interactable
+				end
+
+				return (setmetatable({ text = v3, max_lines = v4, interactable = v5 }, class136))
+			end
+
+			function class136:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.text ~= nil then
+					local encoded = self.text:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.max_lines ~= nil then
+					local encoded = self.max_lines:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.interactable ~= nil then
+					local encoded = self.interactable:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class136.decode(buf: buffer)
+				local result = class136.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.text = prop_types.StringProp.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.max_lines = prop_types.Int32Prop.decode(v5)
+						elseif v3 == 3 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.interactable = prop_types.BoolProp.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class136:jsonEncode()
+				local v2 = {}
+
+				if self.text ~= nil then
+					v2.text = self.text:jsonEncode()
+				end
+
+				if self.max_lines ~= nil then
+					v2.maxLines = self.max_lines:jsonEncode()
+				end
+
+				if self.interactable ~= nil then
+					v2.interactable = self.interactable:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class136.jsonDecode(data)
+				local v2 = class136.new()
+
+				if data.text ~= nil then
+					v2.text = prop_types.StringProp.jsonDecode(data.text)
+				end
+
+				if data.max_lines ~= nil then
+					v2.max_lines = prop_types.Int32Prop.jsonDecode(data.max_lines)
+				end
+
+				if data.maxLines ~= nil then
+					v2.max_lines = prop_types.Int32Prop.jsonDecode(data.maxLines)
+				end
+
+				if data.interactable ~= nil then
+					v2.interactable = prop_types.BoolProp.jsonDecode(data.interactable)
+				end
+
+				return v2
+			end
+
+			class136.descriptor = {
+				name = "MarkdownTextSchema_Props",
+				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
+			}
+
+			v.MarkdownTextSchema_Props = class136
+		end
+
+		typeRegistry.default:register(v.MarkdownTextSchema_Props)
+
+		do
+			local class137 = {}
+			class137.__index = class137
+
+			function class137.new(p)
+				local v3
+
+				if not (p == nil or p.props == nil) then
+					v3 = p.props
+				end
+
+				local v4
+
+				if not (p == nil or p.shared == nil) then
+					v4 = p.shared
+				end
+
+				return (setmetatable({ props = v3, shared = v4 }, class137))
+			end
+
+			function class137:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.props ~= nil then
+					local encoded = self.props:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.shared ~= nil then
+					local encoded = self.shared:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class137.decode(buf: buffer)
+				local result = class137.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.props = v.ChipSchema_Props.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.shared = component_shared.ComponentShared.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class137:jsonEncode()
+				local v2 = {}
+
+				if self.props ~= nil then
+					v2.props = self.props:jsonEncode()
+				end
+
+				if self.shared ~= nil then
+					v2.shared = self.shared:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class137.jsonDecode(p)
+				local v2 = class137.new()
+
+				if p.props ~= nil then
+					v2.props = v.ChipSchema_Props.jsonDecode(p.props)
+				end
+
+				if p.shared ~= nil then
+					v2.shared = component_shared.ComponentShared.jsonDecode(p.shared)
+				end
+
+				return v2
+			end
+
+			class137.descriptor = {
+				name = "ChipSchema",
+				fullName = "roblox.apppageplatform.shared.v1beta1.ChipSchema"
+			}
+
+			v.ChipSchema = class137
+		end
+
+		typeRegistry.default:register(v.ChipSchema)
+
+		do
+			local class138 = {}
+			class138.__index = class138
+
+			function class138.new(data)
 				local v3
 
 				if not (data == nil or data.text == nil) then
@@ -34325,10 +35717,10 @@ do
 					is_disabled = v16,
 					variant = v17,
 					chip_size = v18
-				}, class134))
+				}, class138))
 			end
 
-			function class134:encode()
+			function class138:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -34433,8 +35825,8 @@ do
 				return buf
 			end
 
-			function class134.decode(buf: buffer)
-				local result = class134.new()
+			function class138.decode(buf: buffer)
+				local result = class138.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -34528,7 +35920,7 @@ do
 				return result
 			end
 
-			function class134:jsonEncode()
+			function class138:jsonEncode()
 				local v2 = {}
 
 				if self.text ~= nil then
@@ -34598,8 +35990,8 @@ do
 				return v2
 			end
 
-			function class134.jsonDecode(data)
-				local v2 = class134.new()
+			function class138.jsonDecode(data)
+				local v2 = class138.new()
 
 				if data.text ~= nil then
 					v2.text = prop_types.StringProp.jsonDecode(data.text)
@@ -34716,21 +36108,21 @@ do
 				return v2
 			end
 
-			class134.descriptor = {
+			class138.descriptor = {
 				name = "ChipSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.ChipSchema_Props = class134
+			v.ChipSchema_Props = class138
 		end
 
 		typeRegistry.default:register(v.ChipSchema_Props)
 
 		do
-			local class135 = {}
-			class135.__index = class135
+			local class139 = {}
+			class139.__index = class139
 
-			function class135.new(p)
+			function class139.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -34743,10 +36135,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class135))
+				return (setmetatable({ props = v3, shared = v4 }, class139))
 			end
 
-			function class135:encode()
+			function class139:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -34767,8 +36159,8 @@ do
 				return buf
 			end
 
-			function class135.decode(buf: buffer)
-				local result = class135.new()
+			function class139.decode(buf: buffer)
+				local result = class139.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -34806,7 +36198,7 @@ do
 				return result
 			end
 
-			function class135:jsonEncode()
+			function class139:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -34820,8 +36212,8 @@ do
 				return v2
 			end
 
-			function class135.jsonDecode(p)
-				local v2 = class135.new()
+			function class139.jsonDecode(p)
+				local v2 = class139.new()
 
 				if p.props ~= nil then
 					v2.props = v.DualActionChipSchema_Props.jsonDecode(p.props)
@@ -34834,21 +36226,21 @@ do
 				return v2
 			end
 
-			class135.descriptor = {
+			class139.descriptor = {
 				name = "DualActionChipSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.DualActionChipSchema"
 			}
 
-			v.DualActionChipSchema = class135
+			v.DualActionChipSchema = class139
 		end
 
 		typeRegistry.default:register(v.DualActionChipSchema)
 
 		do
-			local class136 = {}
-			class136.__index = class136
+			local class140 = {}
+			class140.__index = class140
 
-			function class136.new(data)
+			function class140.new(data)
 				local v3
 
 				if not (data == nil or data.text == nil) then
@@ -34948,10 +36340,10 @@ do
 					anchor_point = v14,
 					position = v15,
 					size = v16
-				}, class136))
+				}, class140))
 			end
 
-			function class136:encode()
+			function class140:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -35044,8 +36436,8 @@ do
 				return buf
 			end
 
-			function class136.decode(buf: buffer)
-				local result = class136.new()
+			function class140.decode(buf: buffer)
+				local result = class140.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -35131,7 +36523,7 @@ do
 				return result
 			end
 
-			function class136:jsonEncode()
+			function class140:jsonEncode()
 				local v2 = {}
 
 				if self.text ~= nil then
@@ -35193,8 +36585,8 @@ do
 				return v2
 			end
 
-			function class136.jsonDecode(data)
-				local v2 = class136.new()
+			function class140.jsonDecode(data)
+				local v2 = class140.new()
 
 				if data.text ~= nil then
 					v2.text = prop_types.StringProp.jsonDecode(data.text)
@@ -35299,21 +36691,21 @@ do
 				return v2
 			end
 
-			class136.descriptor = {
+			class140.descriptor = {
 				name = "DualActionChipSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.DualActionChipSchema_Props = class136
+			v.DualActionChipSchema_Props = class140
 		end
 
 		typeRegistry.default:register(v.DualActionChipSchema_Props)
 
 		do
-			local class137 = {}
-			class137.__index = class137
+			local class141 = {}
+			class141.__index = class141
 
-			function class137.new(p)
+			function class141.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -35326,10 +36718,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class137))
+				return (setmetatable({ props = v3, shared = v4 }, class141))
 			end
 
-			function class137:encode()
+			function class141:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -35350,8 +36742,8 @@ do
 				return buf
 			end
 
-			function class137.decode(buf: buffer)
-				local result = class137.new()
+			function class141.decode(buf: buffer)
+				local result = class141.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -35389,7 +36781,7 @@ do
 				return result
 			end
 
-			function class137:jsonEncode()
+			function class141:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -35403,8 +36795,8 @@ do
 				return v2
 			end
 
-			function class137.jsonDecode(p)
-				local v2 = class137.new()
+			function class141.jsonDecode(p)
+				local v2 = class141.new()
 
 				if p.props ~= nil then
 					v2.props = v.ExpandableTextSchema_Props.jsonDecode(p.props)
@@ -35417,21 +36809,21 @@ do
 				return v2
 			end
 
-			class137.descriptor = {
+			class141.descriptor = {
 				name = "ExpandableTextSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ExpandableTextSchema"
 			}
 
-			v.ExpandableTextSchema = class137
+			v.ExpandableTextSchema = class141
 		end
 
 		typeRegistry.default:register(v.ExpandableTextSchema)
 
 		do
-			local class138 = {}
-			class138.__index = class138
+			local class142 = {}
+			class142.__index = class142
 
-			function class138.new(data)
+			function class142.new(data)
 				local v3
 
 				if not (data == nil or data.text == nil) then
@@ -35517,10 +36909,10 @@ do
 					pressed_text_style = v12,
 					avoid_blank_line_clip = v13,
 					font_style = v14
-				}, class138))
+				}, class142))
 			end
 
-			function class138:encode()
+			function class142:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -35601,8 +36993,8 @@ do
 				return buf
 			end
 
-			function class138.decode(buf: buffer)
-				local result = class138.new()
+			function class142.decode(buf: buffer)
+				local result = class142.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -35680,7 +37072,7 @@ do
 				return result
 			end
 
-			function class138:jsonEncode()
+			function class142:jsonEncode()
 				local v2 = {}
 
 				if self.text ~= nil then
@@ -35734,8 +37126,8 @@ do
 				return v2
 			end
 
-			function class138.jsonDecode(data)
-				local v2 = class138.new()
+			function class142.jsonDecode(data)
+				local v2 = class142.new()
 
 				if data.text ~= nil then
 					v2.text = prop_types.StringProp.jsonDecode(data.text)
@@ -35824,21 +37216,21 @@ do
 				return v2
 			end
 
-			class138.descriptor = {
+			class142.descriptor = {
 				name = "ExpandableTextSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.ExpandableTextSchema_Props = class138
+			v.ExpandableTextSchema_Props = class142
 		end
 
 		typeRegistry.default:register(v.ExpandableTextSchema_Props)
 
 		do
-			local class139 = {}
-			class139.__index = class139
+			local class143 = {}
+			class143.__index = class143
 
-			function class139.new(p)
+			function class143.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -35851,10 +37243,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class139))
+				return (setmetatable({ props = v3, shared = v4 }, class143))
 			end
 
-			function class139:encode()
+			function class143:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -35875,8 +37267,8 @@ do
 				return buf
 			end
 
-			function class139.decode(buf: buffer)
-				local result = class139.new()
+			function class143.decode(buf: buffer)
+				local result = class143.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -35914,7 +37306,7 @@ do
 				return result
 			end
 
-			function class139:jsonEncode()
+			function class143:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -35928,8 +37320,8 @@ do
 				return v2
 			end
 
-			function class139.jsonDecode(p)
-				local v2 = class139.new()
+			function class143.jsonDecode(p)
+				local v2 = class143.new()
 
 				if p.props ~= nil then
 					v2.props = v.AssociatedItemsRowSchema_Props.jsonDecode(p.props)
@@ -35942,21 +37334,21 @@ do
 				return v2
 			end
 
-			class139.descriptor = {
+			class143.descriptor = {
 				name = "AssociatedItemsRowSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.AssociatedItemsRowSchema"
 			}
 
-			v.AssociatedItemsRowSchema = class139
+			v.AssociatedItemsRowSchema = class143
 		end
 
 		typeRegistry.default:register(v.AssociatedItemsRowSchema)
 
 		do
-			local class140 = {}
-			class140.__index = class140
+			local class144 = {}
+			class144.__index = class144
 
-			function class140.new(data)
+			function class144.new(data)
 				local v3
 
 				if not (data == nil or data.items == nil) then
@@ -35975,10 +37367,10 @@ do
 					v5 = data.footer_component
 				end
 
-				return (setmetatable({ items = v3, layout_order = v4, footer_component = v5 }, class140))
+				return (setmetatable({ items = v3, layout_order = v4, footer_component = v5 }, class144))
 			end
 
-			function class140:encode()
+			function class144:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -36005,8 +37397,8 @@ do
 				return buf
 			end
 
-			function class140.decode(buf: buffer)
-				local result = class140.new()
+			function class144.decode(buf: buffer)
+				local result = class144.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -36048,7 +37440,7 @@ do
 				return result
 			end
 
-			function class140:jsonEncode()
+			function class144:jsonEncode()
 				local v2 = {}
 
 				if self.items ~= nil then
@@ -36066,8 +37458,8 @@ do
 				return v2
 			end
 
-			function class140.jsonDecode(data)
-				local v2 = class140.new()
+			function class144.jsonDecode(data)
+				local v2 = class144.new()
 
 				if data.items ~= nil then
 					v2.items = v.LazyNestedComponentListProp.jsonDecode(data.items)
@@ -36092,682 +37484,15 @@ do
 				return v2
 			end
 
-			class140.descriptor = {
+			class144.descriptor = {
 				name = "AssociatedItemsRowSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.AssociatedItemsRowSchema_Props = class140
+			v.AssociatedItemsRowSchema_Props = class144
 		end
 
 		typeRegistry.default:register(v.AssociatedItemsRowSchema_Props)
-
-		do
-			local class141 = {}
-			class141.__index = class141
-
-			function class141.new(p)
-				local v3
-
-				if not (p == nil or p.kind == nil) then
-					v3 = p.kind
-				end
-
-				return (setmetatable({ kind = v3 }, class141))
-			end
-
-			function class141:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.kind ~= nil then
-					if self.kind.type == "literal" then
-						local encoded = self.kind.value:encode()
-						local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-						v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-					elseif self.kind.type == "binding_path" then
-						local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-						v2, v3 = proto.writeString(v4, v5, self.kind.value)
-					elseif self.kind.type == "conditional" then
-						local encoded = self.kind.value:encode()
-						local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-						v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-					end
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class141.decode(buf: buffer)
-				local result = class141.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.kind = {
-								type = "literal",
-								value = v.MenuItemProp_MenuItem.decode(v5)
-							}
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.kind = { type = "binding_path", value = buffer.tostring(v5) }
-						elseif v3 == 3 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.kind = {
-								type = "conditional",
-								value = v.MenuItemProp_ConditionalOptions.decode(v5)
-							}
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class141:jsonEncode()
-				local v2 = {}
-
-				if self.kind == nil then
-					return v2
-				end
-
-				if self.kind.type == "literal" then
-					v2.literal = self.kind.value:jsonEncode()
-					return v2
-				end
-
-				if self.kind.type == "binding_path" then
-					v2.bindingPath = self.kind.value
-					return v2
-				end
-
-				if self.kind.type == "conditional" then
-					v2.conditional = self.kind.value:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class141.jsonDecode(data)
-				local v2 = class141.new()
-
-				if data.literal ~= nil then
-					v2.kind = {
-						type = "literal",
-						value = v.MenuItemProp_MenuItem.jsonDecode(data.literal)
-					}
-				end
-
-				if data.binding_path ~= nil then
-					v2.kind = { type = "binding_path", value = data.binding_path }
-				end
-
-				if data.bindingPath ~= nil then
-					v2.kind = { type = "binding_path", value = data.bindingPath }
-				end
-
-				if data.conditional ~= nil then
-					v2.kind = {
-						type = "conditional",
-						value = v.MenuItemProp_ConditionalOptions.jsonDecode(data.conditional)
-					}
-				end
-
-				return v2
-			end
-
-			class141.descriptor = {
-				name = "MenuItemProp",
-				fullName = "roblox.apppageplatform.shared.v1beta1.MenuItemProp"
-			}
-
-			v.MenuItemProp = class141
-		end
-
-		typeRegistry.default:register(v.MenuItemProp)
-
-		do
-			local class142 = {}
-			class142.__index = class142
-
-			function class142.new(p)
-				local v3
-
-				if not (p == nil or p.condition == nil) then
-					v3 = p.condition
-				end
-
-				local v4
-
-				if not (p == nil or p.kind == nil) then
-					v4 = p.kind
-				end
-
-				return (setmetatable({ condition = v3, kind = v4 }, class142))
-			end
-
-			function class142:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.condition ~= nil then
-					local encoded = self.condition:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.kind ~= nil then
-					if self.kind.type == "literal" then
-						local encoded = self.kind.value:encode()
-						local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-						v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-					elseif self.kind.type == "binding_path" then
-						local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-						v2, v3 = proto.writeString(v4, v5, self.kind.value)
-					end
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class142.decode(buf: buffer)
-				local result = class142.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.condition = prop_condition.PropCondition.decode(v5)
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.kind = {
-								type = "literal",
-								value = v.MenuItemProp_MenuItem.decode(v5)
-							}
-						elseif v3 == 3 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.kind = { type = "binding_path", value = buffer.tostring(v5) }
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class142:jsonEncode()
-				local v2 = {}
-
-				if self.condition ~= nil then
-					v2.condition = self.condition:jsonEncode()
-				end
-
-				if self.kind == nil then
-					return v2
-				end
-
-				if self.kind.type == "literal" then
-					v2.literal = self.kind.value:jsonEncode()
-					return v2
-				elseif self.kind.type == "binding_path" then
-					v2.bindingPath = self.kind.value
-				end
-
-				return v2
-			end
-
-			function class142.jsonDecode(data)
-				local v2 = class142.new()
-
-				if data.condition ~= nil then
-					v2.condition = prop_condition.PropCondition.jsonDecode(data.condition)
-				end
-
-				if data.literal ~= nil then
-					v2.kind = {
-						type = "literal",
-						value = v.MenuItemProp_MenuItem.jsonDecode(data.literal)
-					}
-				end
-
-				if data.binding_path ~= nil then
-					v2.kind = { type = "binding_path", value = data.binding_path }
-				end
-
-				if data.bindingPath ~= nil then
-					v2.kind = { type = "binding_path", value = data.bindingPath }
-				end
-
-				return v2
-			end
-
-			class142.descriptor = {
-				name = "MenuItemProp_ConditionalOption",
-				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
-			}
-
-			v.MenuItemProp_ConditionalOption = class142
-		end
-
-		typeRegistry.default:register(v.MenuItemProp_ConditionalOption)
-
-		do
-			local class143 = {}
-			class143.__index = class143
-
-			function class143.new(p)
-				return (setmetatable({
-					options = (p == nil or p.options == nil) and {} or p.options
-				}, class143))
-			end
-
-			function class143:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.options ~= nil and #self.options > 0 then
-					for _, option in self.options do
-						local encoded = option:encode()
-						local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-						v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-					end
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class143.decode(buf: buffer)
-				local v2 = class143.new()
-				local v3 = 0
-
-				while v3 < buffer.len(buf) do
-					local v4, v5
-					v4, v5, v3 = proto.readTag(buf, v3)
-
-					if v5 == proto.wireTypes.varint then
-						local v6
-						v6, v3 = proto.readVarInt(buf, v3)
-					elseif v5 == proto.wireTypes.lengthDelimited then
-						if v4 == 1 then
-							local v6
-							v6, v3 = proto.readBuffer(buf, v3)
-							table.insert(v2.options, v.MenuItemProp_ConditionalOption.decode(v6))
-						else
-							local varInt, v6 = proto.readVarInt(buf, v3)
-
-							v3 = v6 + varInt
-						end
-					elseif v5 == proto.wireTypes.i32 then
-						local v6
-						v6, v3 = proto.readFixed32(buf, v3)
-					elseif v5 == proto.wireTypes.i64 then
-						local v6
-						v6, v3 = proto.readFixed64(buf, v3)
-					else
-						error("Unsupported wire type: " .. v5)
-					end
-				end
-
-				return v2
-			end
-
-			function class143:jsonEncode()
-				local v2 = {}
-
-				if self.options == nil or not (#self.options > 0) then
-					return v2
-				end
-
-				local v3 = {}
-
-				for _, option in self.options do
-					table.insert(v3, option:jsonEncode())
-				end
-
-				v2.options = v3
-
-				return v2
-			end
-
-			function class143.jsonDecode(p)
-				local v2 = class143.new()
-
-				if p.options == nil then
-					return v2
-				end
-
-				local v3 = {}
-
-				for _, option in p.options do
-					table.insert(v3, v.MenuItemProp_ConditionalOption.jsonDecode(option))
-				end
-
-				v2.options = v3
-
-				return v2
-			end
-
-			class143.descriptor = {
-				name = "MenuItemProp_ConditionalOptions",
-				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
-			}
-
-			v.MenuItemProp_ConditionalOptions = class143
-		end
-
-		typeRegistry.default:register(v.MenuItemProp_ConditionalOptions)
-
-		do
-			local class144 = {}
-			class144.__index = class144
-
-			function class144.new(data)
-				local v3
-
-				if not (data == nil or data.id == nil) then
-					v3 = data.id
-				end
-
-				local v4
-
-				if not (data == nil or data.text == nil) then
-					v4 = data.text
-				end
-
-				local v5
-
-				if not (data == nil or data.icon == nil) then
-					v5 = data.icon
-				end
-
-				local v6
-
-				if not (data == nil or data.on_activated == nil) then
-					v6 = data.on_activated
-				end
-
-				local v7
-
-				if not (data == nil or data.is_disabled == nil) then
-					v7 = data.is_disabled
-				end
-
-				local v8
-
-				if not (data == nil or data.is_checked == nil) then
-					v8 = data.is_checked
-				end
-
-				local v9
-
-				if not (data == nil or data.input_size == nil) then
-					v9 = data.input_size
-				end
-
-				return (setmetatable({
-					id = v3,
-					text = v4,
-					icon = v5,
-					on_activated = v6,
-					is_disabled = v7,
-					is_checked = v8,
-					input_size = v9
-				}, class144))
-			end
-
-			function class144:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.id ~= nil then
-					local encoded = self.id:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.text ~= nil then
-					local encoded = self.text:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.icon ~= nil then
-					local encoded = self.icon:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.on_activated ~= nil then
-					local encoded = self.on_activated:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.is_disabled ~= nil then
-					local encoded = self.is_disabled:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.is_checked ~= nil then
-					local encoded = self.is_checked:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 6, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.input_size ~= nil then
-					local encoded = self.input_size:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 7, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class144.decode(buf: buffer)
-				local result = class144.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.id = prop_types.StringProp.decode(v5)
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.text = prop_types.StringProp.decode(v5)
-						elseif v3 == 3 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.icon = prop_types.StringProp.decode(v5)
-						elseif v3 == 4 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.on_activated = actions.ActionProp.decode(v5)
-						elseif v3 == 5 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.is_disabled = prop_types.BoolProp.decode(v5)
-						elseif v3 == 6 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.is_checked = prop_types.BoolProp.decode(v5)
-						elseif v3 == 7 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.input_size = prop_types.StringProp.decode(v5)
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class144:jsonEncode()
-				local v2 = {}
-
-				if self.id ~= nil then
-					v2.id = self.id:jsonEncode()
-				end
-
-				if self.text ~= nil then
-					v2.text = self.text:jsonEncode()
-				end
-
-				if self.icon ~= nil then
-					v2.icon = self.icon:jsonEncode()
-				end
-
-				if self.on_activated ~= nil then
-					v2.onActivated = self.on_activated:jsonEncode()
-				end
-
-				if self.is_disabled ~= nil then
-					v2.isDisabled = self.is_disabled:jsonEncode()
-				end
-
-				if self.is_checked ~= nil then
-					v2.isChecked = self.is_checked:jsonEncode()
-				end
-
-				if self.input_size ~= nil then
-					v2.inputSize = self.input_size:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class144.jsonDecode(data)
-				local v2 = class144.new()
-
-				if data.id ~= nil then
-					v2.id = prop_types.StringProp.jsonDecode(data.id)
-				end
-
-				if data.text ~= nil then
-					v2.text = prop_types.StringProp.jsonDecode(data.text)
-				end
-
-				if data.icon ~= nil then
-					v2.icon = prop_types.StringProp.jsonDecode(data.icon)
-				end
-
-				if data.on_activated ~= nil then
-					v2.on_activated = actions.ActionProp.jsonDecode(data.on_activated)
-				end
-
-				if data.onActivated ~= nil then
-					v2.on_activated = actions.ActionProp.jsonDecode(data.onActivated)
-				end
-
-				if data.is_disabled ~= nil then
-					v2.is_disabled = prop_types.BoolProp.jsonDecode(data.is_disabled)
-				end
-
-				if data.isDisabled ~= nil then
-					v2.is_disabled = prop_types.BoolProp.jsonDecode(data.isDisabled)
-				end
-
-				if data.is_checked ~= nil then
-					v2.is_checked = prop_types.BoolProp.jsonDecode(data.is_checked)
-				end
-
-				if data.isChecked ~= nil then
-					v2.is_checked = prop_types.BoolProp.jsonDecode(data.isChecked)
-				end
-
-				if data.input_size ~= nil then
-					v2.input_size = prop_types.StringProp.jsonDecode(data.input_size)
-				end
-
-				if data.inputSize ~= nil then
-					v2.input_size = prop_types.StringProp.jsonDecode(data.inputSize)
-				end
-
-				return v2
-			end
-
-			class144.descriptor = {
-				name = "MenuItemProp_MenuItem",
-				fullName = "roblox.apppageplatform.shared.v1beta1.MenuItem"
-			}
-
-			v.MenuItemProp_MenuItem = class144
-		end
-
-		typeRegistry.default:register(v.MenuItemProp_MenuItem)
 
 		do
 			local class145 = {}
@@ -36824,7 +37549,7 @@ do
 							v5, v2 = proto.readBuffer(buf, v2)
 							result.kind = {
 								type = "literal",
-								value = v.ArrayOfMenuItemProp_ArrayOfMenuItems.decode(v5)
+								value = v.MenuItemProp_MenuItem.decode(v5)
 							}
 						elseif v3 == 2 then
 							local v5
@@ -36835,7 +37560,7 @@ do
 							v5, v2 = proto.readBuffer(buf, v2)
 							result.kind = {
 								type = "conditional",
-								value = v.ArrayOfMenuItemProp_ConditionalOptions.decode(v5)
+								value = v.MenuItemProp_ConditionalOptions.decode(v5)
 							}
 						else
 							local varInt, v5 = proto.readVarInt(buf, v2)
@@ -36886,7 +37611,7 @@ do
 				if data.literal ~= nil then
 					v2.kind = {
 						type = "literal",
-						value = v.ArrayOfMenuItemProp_ArrayOfMenuItems.jsonDecode(data.literal)
+						value = v.MenuItemProp_MenuItem.jsonDecode(data.literal)
 					}
 				end
 
@@ -36901,7 +37626,7 @@ do
 				if data.conditional ~= nil then
 					v2.kind = {
 						type = "conditional",
-						value = v.ArrayOfMenuItemProp_ConditionalOptions.jsonDecode(data.conditional)
+						value = v.MenuItemProp_ConditionalOptions.jsonDecode(data.conditional)
 					}
 				end
 
@@ -36909,14 +37634,14 @@ do
 			end
 
 			class145.descriptor = {
-				name = "ArrayOfMenuItemProp",
-				fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfMenuItemProp"
+				name = "MenuItemProp",
+				fullName = "roblox.apppageplatform.shared.v1beta1.MenuItemProp"
 			}
 
-			v.ArrayOfMenuItemProp = class145
+			v.MenuItemProp = class145
 		end
 
-		typeRegistry.default:register(v.ArrayOfMenuItemProp)
+		typeRegistry.default:register(v.MenuItemProp)
 
 		do
 			local class146 = {}
@@ -36985,7 +37710,7 @@ do
 							v5, v2 = proto.readBuffer(buf, v2)
 							result.kind = {
 								type = "literal",
-								value = v.ArrayOfMenuItemProp_ArrayOfMenuItems.decode(v5)
+								value = v.MenuItemProp_MenuItem.decode(v5)
 							}
 						elseif v3 == 3 then
 							local v5
@@ -37041,7 +37766,7 @@ do
 				if data.literal ~= nil then
 					v2.kind = {
 						type = "literal",
-						value = v.ArrayOfMenuItemProp_ArrayOfMenuItems.jsonDecode(data.literal)
+						value = v.MenuItemProp_MenuItem.jsonDecode(data.literal)
 					}
 				end
 
@@ -37057,14 +37782,14 @@ do
 			end
 
 			class146.descriptor = {
-				name = "ArrayOfMenuItemProp_ConditionalOption",
+				name = "MenuItemProp_ConditionalOption",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
 			}
 
-			v.ArrayOfMenuItemProp_ConditionalOption = class146
+			v.MenuItemProp_ConditionalOption = class146
 		end
 
-		typeRegistry.default:register(v.ArrayOfMenuItemProp_ConditionalOption)
+		typeRegistry.default:register(v.MenuItemProp_ConditionalOption)
 
 		do
 			local class147 = {}
@@ -37108,7 +37833,7 @@ do
 						if v4 == 1 then
 							local v6
 							v6, v3 = proto.readBuffer(buf, v3)
-							table.insert(v2.options, v.ArrayOfMenuItemProp_ConditionalOption.decode(v6))
+							table.insert(v2.options, v.MenuItemProp_ConditionalOption.decode(v6))
 						else
 							local varInt, v6 = proto.readVarInt(buf, v3)
 
@@ -37156,7 +37881,7 @@ do
 				local v3 = {}
 
 				for _, option in p.options do
-					table.insert(v3, v.ArrayOfMenuItemProp_ConditionalOption.jsonDecode(option))
+					table.insert(v3, v.MenuItemProp_ConditionalOption.jsonDecode(option))
 				end
 
 				v2.options = v3
@@ -37165,26 +37890,693 @@ do
 			end
 
 			class147.descriptor = {
-				name = "ArrayOfMenuItemProp_ConditionalOptions",
+				name = "MenuItemProp_ConditionalOptions",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
 			}
 
-			v.ArrayOfMenuItemProp_ConditionalOptions = class147
+			v.MenuItemProp_ConditionalOptions = class147
 		end
 
-		typeRegistry.default:register(v.ArrayOfMenuItemProp_ConditionalOptions)
+		typeRegistry.default:register(v.MenuItemProp_ConditionalOptions)
 
 		do
 			local class148 = {}
 			class148.__index = class148
 
-			function class148.new(p)
+			function class148.new(data)
+				local v3
+
+				if not (data == nil or data.id == nil) then
+					v3 = data.id
+				end
+
+				local v4
+
+				if not (data == nil or data.text == nil) then
+					v4 = data.text
+				end
+
+				local v5
+
+				if not (data == nil or data.icon == nil) then
+					v5 = data.icon
+				end
+
+				local v6
+
+				if not (data == nil or data.on_activated == nil) then
+					v6 = data.on_activated
+				end
+
+				local v7
+
+				if not (data == nil or data.is_disabled == nil) then
+					v7 = data.is_disabled
+				end
+
+				local v8
+
+				if not (data == nil or data.is_checked == nil) then
+					v8 = data.is_checked
+				end
+
+				local v9
+
+				if not (data == nil or data.input_size == nil) then
+					v9 = data.input_size
+				end
+
 				return (setmetatable({
-					array = (p == nil or p.array == nil) and {} or p.array
+					id = v3,
+					text = v4,
+					icon = v5,
+					on_activated = v6,
+					is_disabled = v7,
+					is_checked = v8,
+					input_size = v9
 				}, class148))
 			end
 
 			function class148:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.id ~= nil then
+					local encoded = self.id:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.text ~= nil then
+					local encoded = self.text:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.icon ~= nil then
+					local encoded = self.icon:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.on_activated ~= nil then
+					local encoded = self.on_activated:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.is_disabled ~= nil then
+					local encoded = self.is_disabled:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.is_checked ~= nil then
+					local encoded = self.is_checked:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 6, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.input_size ~= nil then
+					local encoded = self.input_size:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 7, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class148.decode(buf: buffer)
+				local result = class148.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.id = prop_types.StringProp.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.text = prop_types.StringProp.decode(v5)
+						elseif v3 == 3 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.icon = prop_types.StringProp.decode(v5)
+						elseif v3 == 4 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.on_activated = actions.ActionProp.decode(v5)
+						elseif v3 == 5 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.is_disabled = prop_types.BoolProp.decode(v5)
+						elseif v3 == 6 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.is_checked = prop_types.BoolProp.decode(v5)
+						elseif v3 == 7 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.input_size = prop_types.StringProp.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class148:jsonEncode()
+				local v2 = {}
+
+				if self.id ~= nil then
+					v2.id = self.id:jsonEncode()
+				end
+
+				if self.text ~= nil then
+					v2.text = self.text:jsonEncode()
+				end
+
+				if self.icon ~= nil then
+					v2.icon = self.icon:jsonEncode()
+				end
+
+				if self.on_activated ~= nil then
+					v2.onActivated = self.on_activated:jsonEncode()
+				end
+
+				if self.is_disabled ~= nil then
+					v2.isDisabled = self.is_disabled:jsonEncode()
+				end
+
+				if self.is_checked ~= nil then
+					v2.isChecked = self.is_checked:jsonEncode()
+				end
+
+				if self.input_size ~= nil then
+					v2.inputSize = self.input_size:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class148.jsonDecode(data)
+				local v2 = class148.new()
+
+				if data.id ~= nil then
+					v2.id = prop_types.StringProp.jsonDecode(data.id)
+				end
+
+				if data.text ~= nil then
+					v2.text = prop_types.StringProp.jsonDecode(data.text)
+				end
+
+				if data.icon ~= nil then
+					v2.icon = prop_types.StringProp.jsonDecode(data.icon)
+				end
+
+				if data.on_activated ~= nil then
+					v2.on_activated = actions.ActionProp.jsonDecode(data.on_activated)
+				end
+
+				if data.onActivated ~= nil then
+					v2.on_activated = actions.ActionProp.jsonDecode(data.onActivated)
+				end
+
+				if data.is_disabled ~= nil then
+					v2.is_disabled = prop_types.BoolProp.jsonDecode(data.is_disabled)
+				end
+
+				if data.isDisabled ~= nil then
+					v2.is_disabled = prop_types.BoolProp.jsonDecode(data.isDisabled)
+				end
+
+				if data.is_checked ~= nil then
+					v2.is_checked = prop_types.BoolProp.jsonDecode(data.is_checked)
+				end
+
+				if data.isChecked ~= nil then
+					v2.is_checked = prop_types.BoolProp.jsonDecode(data.isChecked)
+				end
+
+				if data.input_size ~= nil then
+					v2.input_size = prop_types.StringProp.jsonDecode(data.input_size)
+				end
+
+				if data.inputSize ~= nil then
+					v2.input_size = prop_types.StringProp.jsonDecode(data.inputSize)
+				end
+
+				return v2
+			end
+
+			class148.descriptor = {
+				name = "MenuItemProp_MenuItem",
+				fullName = "roblox.apppageplatform.shared.v1beta1.MenuItem"
+			}
+
+			v.MenuItemProp_MenuItem = class148
+		end
+
+		typeRegistry.default:register(v.MenuItemProp_MenuItem)
+
+		do
+			local class149 = {}
+			class149.__index = class149
+
+			function class149.new(p)
+				local v3
+
+				if not (p == nil or p.kind == nil) then
+					v3 = p.kind
+				end
+
+				return (setmetatable({ kind = v3 }, class149))
+			end
+
+			function class149:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.kind ~= nil then
+					if self.kind.type == "literal" then
+						local encoded = self.kind.value:encode()
+						local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+						v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+					elseif self.kind.type == "binding_path" then
+						local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+						v2, v3 = proto.writeString(v4, v5, self.kind.value)
+					elseif self.kind.type == "conditional" then
+						local encoded = self.kind.value:encode()
+						local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+						v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+					end
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class149.decode(buf: buffer)
+				local result = class149.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.kind = {
+								type = "literal",
+								value = v.ArrayOfMenuItemProp_ArrayOfMenuItems.decode(v5)
+							}
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.kind = { type = "binding_path", value = buffer.tostring(v5) }
+						elseif v3 == 3 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.kind = {
+								type = "conditional",
+								value = v.ArrayOfMenuItemProp_ConditionalOptions.decode(v5)
+							}
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class149:jsonEncode()
+				local v2 = {}
+
+				if self.kind == nil then
+					return v2
+				end
+
+				if self.kind.type == "literal" then
+					v2.literal = self.kind.value:jsonEncode()
+					return v2
+				end
+
+				if self.kind.type == "binding_path" then
+					v2.bindingPath = self.kind.value
+					return v2
+				end
+
+				if self.kind.type == "conditional" then
+					v2.conditional = self.kind.value:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class149.jsonDecode(data)
+				local v2 = class149.new()
+
+				if data.literal ~= nil then
+					v2.kind = {
+						type = "literal",
+						value = v.ArrayOfMenuItemProp_ArrayOfMenuItems.jsonDecode(data.literal)
+					}
+				end
+
+				if data.binding_path ~= nil then
+					v2.kind = { type = "binding_path", value = data.binding_path }
+				end
+
+				if data.bindingPath ~= nil then
+					v2.kind = { type = "binding_path", value = data.bindingPath }
+				end
+
+				if data.conditional ~= nil then
+					v2.kind = {
+						type = "conditional",
+						value = v.ArrayOfMenuItemProp_ConditionalOptions.jsonDecode(data.conditional)
+					}
+				end
+
+				return v2
+			end
+
+			class149.descriptor = {
+				name = "ArrayOfMenuItemProp",
+				fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfMenuItemProp"
+			}
+
+			v.ArrayOfMenuItemProp = class149
+		end
+
+		typeRegistry.default:register(v.ArrayOfMenuItemProp)
+
+		do
+			local class150 = {}
+			class150.__index = class150
+
+			function class150.new(p)
+				local v3
+
+				if not (p == nil or p.condition == nil) then
+					v3 = p.condition
+				end
+
+				local v4
+
+				if not (p == nil or p.kind == nil) then
+					v4 = p.kind
+				end
+
+				return (setmetatable({ condition = v3, kind = v4 }, class150))
+			end
+
+			function class150:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.condition ~= nil then
+					local encoded = self.condition:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.kind ~= nil then
+					if self.kind.type == "literal" then
+						local encoded = self.kind.value:encode()
+						local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+						v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+					elseif self.kind.type == "binding_path" then
+						local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+						v2, v3 = proto.writeString(v4, v5, self.kind.value)
+					end
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class150.decode(buf: buffer)
+				local result = class150.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.condition = prop_condition.PropCondition.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.kind = {
+								type = "literal",
+								value = v.ArrayOfMenuItemProp_ArrayOfMenuItems.decode(v5)
+							}
+						elseif v3 == 3 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.kind = { type = "binding_path", value = buffer.tostring(v5) }
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class150:jsonEncode()
+				local v2 = {}
+
+				if self.condition ~= nil then
+					v2.condition = self.condition:jsonEncode()
+				end
+
+				if self.kind == nil then
+					return v2
+				end
+
+				if self.kind.type == "literal" then
+					v2.literal = self.kind.value:jsonEncode()
+					return v2
+				elseif self.kind.type == "binding_path" then
+					v2.bindingPath = self.kind.value
+				end
+
+				return v2
+			end
+
+			function class150.jsonDecode(data)
+				local v2 = class150.new()
+
+				if data.condition ~= nil then
+					v2.condition = prop_condition.PropCondition.jsonDecode(data.condition)
+				end
+
+				if data.literal ~= nil then
+					v2.kind = {
+						type = "literal",
+						value = v.ArrayOfMenuItemProp_ArrayOfMenuItems.jsonDecode(data.literal)
+					}
+				end
+
+				if data.binding_path ~= nil then
+					v2.kind = { type = "binding_path", value = data.binding_path }
+				end
+
+				if data.bindingPath ~= nil then
+					v2.kind = { type = "binding_path", value = data.bindingPath }
+				end
+
+				return v2
+			end
+
+			class150.descriptor = {
+				name = "ArrayOfMenuItemProp_ConditionalOption",
+				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
+			}
+
+			v.ArrayOfMenuItemProp_ConditionalOption = class150
+		end
+
+		typeRegistry.default:register(v.ArrayOfMenuItemProp_ConditionalOption)
+
+		do
+			local class151 = {}
+			class151.__index = class151
+
+			function class151.new(p)
+				return (setmetatable({
+					options = (p == nil or p.options == nil) and {} or p.options
+				}, class151))
+			end
+
+			function class151:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.options ~= nil and #self.options > 0 then
+					for _, option in self.options do
+						local encoded = option:encode()
+						local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+						v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+					end
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class151.decode(buf: buffer)
+				local v2 = class151.new()
+				local v3 = 0
+
+				while v3 < buffer.len(buf) do
+					local v4, v5
+					v4, v5, v3 = proto.readTag(buf, v3)
+
+					if v5 == proto.wireTypes.varint then
+						local v6
+						v6, v3 = proto.readVarInt(buf, v3)
+					elseif v5 == proto.wireTypes.lengthDelimited then
+						if v4 == 1 then
+							local v6
+							v6, v3 = proto.readBuffer(buf, v3)
+							table.insert(v2.options, v.ArrayOfMenuItemProp_ConditionalOption.decode(v6))
+						else
+							local varInt, v6 = proto.readVarInt(buf, v3)
+
+							v3 = v6 + varInt
+						end
+					elseif v5 == proto.wireTypes.i32 then
+						local v6
+						v6, v3 = proto.readFixed32(buf, v3)
+					elseif v5 == proto.wireTypes.i64 then
+						local v6
+						v6, v3 = proto.readFixed64(buf, v3)
+					else
+						error("Unsupported wire type: " .. v5)
+					end
+				end
+
+				return v2
+			end
+
+			function class151:jsonEncode()
+				local v2 = {}
+
+				if self.options == nil or not (#self.options > 0) then
+					return v2
+				end
+
+				local v3 = {}
+
+				for _, option in self.options do
+					table.insert(v3, option:jsonEncode())
+				end
+
+				v2.options = v3
+
+				return v2
+			end
+
+			function class151.jsonDecode(p)
+				local v2 = class151.new()
+
+				if p.options == nil then
+					return v2
+				end
+
+				local v3 = {}
+
+				for _, option in p.options do
+					table.insert(v3, v.ArrayOfMenuItemProp_ConditionalOption.jsonDecode(option))
+				end
+
+				v2.options = v3
+
+				return v2
+			end
+
+			class151.descriptor = {
+				name = "ArrayOfMenuItemProp_ConditionalOptions",
+				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
+			}
+
+			v.ArrayOfMenuItemProp_ConditionalOptions = class151
+		end
+
+		typeRegistry.default:register(v.ArrayOfMenuItemProp_ConditionalOptions)
+
+		do
+			local class152 = {}
+			class152.__index = class152
+
+			function class152.new(p)
+				return (setmetatable({
+					array = (p == nil or p.array == nil) and {} or p.array
+				}, class152))
+			end
+
+			function class152:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -37201,8 +38593,8 @@ do
 				return buf
 			end
 
-			function class148.decode(buf: buffer)
-				local v2 = class148.new()
+			function class152.decode(buf: buffer)
+				local v2 = class152.new()
 				local v3 = 0
 
 				while v3 < buffer.len(buf) do
@@ -37236,7 +38628,7 @@ do
 				return v2
 			end
 
-			function class148:jsonEncode()
+			function class152:jsonEncode()
 				local v2 = {}
 
 				if self.array == nil or not (#self.array > 0) then
@@ -37254,8 +38646,8 @@ do
 				return v2
 			end
 
-			function class148.jsonDecode(p)
-				local v2 = class148.new()
+			function class152.jsonDecode(p)
+				local v2 = class152.new()
 
 				if p.array == nil then
 					return v2
@@ -37272,21 +38664,21 @@ do
 				return v2
 			end
 
-			class148.descriptor = {
+			class152.descriptor = {
 				name = "ArrayOfMenuItemProp_ArrayOfMenuItems",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfMenuItems"
 			}
 
-			v.ArrayOfMenuItemProp_ArrayOfMenuItems = class148
+			v.ArrayOfMenuItemProp_ArrayOfMenuItems = class152
 		end
 
 		typeRegistry.default:register(v.ArrayOfMenuItemProp_ArrayOfMenuItems)
 
 		do
-			local class149 = {}
-			class149.__index = class149
+			local class153 = {}
+			class153.__index = class153
 
-			function class149.new(p)
+			function class153.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -37299,10 +38691,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class149))
+				return (setmetatable({ props = v3, shared = v4 }, class153))
 			end
 
-			function class149:encode()
+			function class153:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -37323,8 +38715,8 @@ do
 				return buf
 			end
 
-			function class149.decode(buf: buffer)
-				local result = class149.new()
+			function class153.decode(buf: buffer)
+				local result = class153.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -37362,7 +38754,7 @@ do
 				return result
 			end
 
-			function class149:jsonEncode()
+			function class153:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -37376,8 +38768,8 @@ do
 				return v2
 			end
 
-			function class149.jsonDecode(p)
-				local v2 = class149.new()
+			function class153.jsonDecode(p)
+				local v2 = class153.new()
 
 				if p.props ~= nil then
 					v2.props = v.OverflowMenuSchema_Props.jsonDecode(p.props)
@@ -37390,21 +38782,21 @@ do
 				return v2
 			end
 
-			class149.descriptor = {
+			class153.descriptor = {
 				name = "OverflowMenuSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.OverflowMenuSchema"
 			}
 
-			v.OverflowMenuSchema = class149
+			v.OverflowMenuSchema = class153
 		end
 
 		typeRegistry.default:register(v.OverflowMenuSchema)
 
 		do
-			local class150 = {}
-			class150.__index = class150
+			local class154 = {}
+			class154.__index = class154
 
-			function class150.new(data)
+			function class154.new(data)
 				local v3
 
 				if not (data == nil or data.items == nil) then
@@ -37511,10 +38903,10 @@ do
 					button_is_circular = v15,
 					button_tag = v16,
 					include_menu_item_telemetry = v17
-				}, class150))
+				}, class154))
 			end
 
-			function class150:encode()
+			function class154:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -37613,8 +39005,8 @@ do
 				return buf
 			end
 
-			function class150.decode(buf: buffer)
-				local result = class150.new()
+			function class154.decode(buf: buffer)
+				local result = class154.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -37704,7 +39096,7 @@ do
 				return result
 			end
 
-			function class150:jsonEncode()
+			function class154:jsonEncode()
 				local v2 = {}
 
 				if self.items ~= nil then
@@ -37770,8 +39162,8 @@ do
 				return v2
 			end
 
-			function class150.jsonDecode(data)
-				local v2 = class150.new()
+			function class154.jsonDecode(data)
+				local v2 = class154.new()
 
 				if data.items ~= nil then
 					v2.items = v.ArrayOfMenuItemProp.jsonDecode(data.items)
@@ -37888,21 +39280,21 @@ do
 				return v2
 			end
 
-			class150.descriptor = {
+			class154.descriptor = {
 				name = "OverflowMenuSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.OverflowMenuSchema_Props = class150
+			v.OverflowMenuSchema_Props = class154
 		end
 
 		typeRegistry.default:register(v.OverflowMenuSchema_Props)
 
 		do
-			local class151 = {}
-			class151.__index = class151
+			local class155 = {}
+			class155.__index = class155
 
-			function class151.new(p)
+			function class155.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -37915,10 +39307,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class151))
+				return (setmetatable({ props = v3, shared = v4 }, class155))
 			end
 
-			function class151:encode()
+			function class155:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -37939,8 +39331,8 @@ do
 				return buf
 			end
 
-			function class151.decode(buf: buffer)
-				local result = class151.new()
+			function class155.decode(buf: buffer)
+				local result = class155.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -37978,7 +39370,7 @@ do
 				return result
 			end
 
-			function class151:jsonEncode()
+			function class155:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -37992,8 +39384,8 @@ do
 				return v2
 			end
 
-			function class151.jsonDecode(p)
-				local v2 = class151.new()
+			function class155.jsonDecode(p)
+				local v2 = class155.new()
 
 				if p.props ~= nil then
 					v2.props = v.GameTileHiddenStateSchema_Props.jsonDecode(p.props)
@@ -38006,21 +39398,21 @@ do
 				return v2
 			end
 
-			class151.descriptor = {
+			class155.descriptor = {
 				name = "GameTileHiddenStateSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.GameTileHiddenStateSchema"
 			}
 
-			v.GameTileHiddenStateSchema = class151
+			v.GameTileHiddenStateSchema = class155
 		end
 
 		typeRegistry.default:register(v.GameTileHiddenStateSchema)
 
 		do
-			local class152 = {}
-			class152.__index = class152
+			local class156 = {}
+			class156.__index = class156
 
-			function class152.new(data)
+			function class156.new(data)
 				local v3
 
 				if not (data == nil or data.message_component == nil) then
@@ -38052,11 +39444,11 @@ do
 						on_undo_activated = v5,
 						container_tag = v6
 					},
-					class152
+					class156
 				))
 			end
 
-			function class152:encode()
+			function class156:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -38089,8 +39481,8 @@ do
 				return buf
 			end
 
-			function class152.decode(buf: buffer)
-				local result = class152.new()
+			function class156.decode(buf: buffer)
+				local result = class156.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -38136,7 +39528,7 @@ do
 				return result
 			end
 
-			function class152:jsonEncode()
+			function class156:jsonEncode()
 				local v2 = {}
 
 				if self.message_component ~= nil then
@@ -38158,8 +39550,8 @@ do
 				return v2
 			end
 
-			function class152.jsonDecode(data)
-				local v2 = class152.new()
+			function class156.jsonDecode(data)
+				local v2 = class156.new()
 
 				if data.message_component ~= nil then
 					v2.message_component = v.NestedComponentProp.jsonDecode(data.message_component)
@@ -38196,21 +39588,21 @@ do
 				return v2
 			end
 
-			class152.descriptor = {
+			class156.descriptor = {
 				name = "GameTileHiddenStateSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.GameTileHiddenStateSchema_Props = class152
+			v.GameTileHiddenStateSchema_Props = class156
 		end
 
 		typeRegistry.default:register(v.GameTileHiddenStateSchema_Props)
 
 		do
-			local class153 = {}
-			class153.__index = class153
+			local class157 = {}
+			class157.__index = class157
 
-			function class153.new(p)
+			function class157.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -38223,10 +39615,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class153))
+				return (setmetatable({ props = v3, shared = v4 }, class157))
 			end
 
-			function class153:encode()
+			function class157:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -38247,8 +39639,8 @@ do
 				return buf
 			end
 
-			function class153.decode(buf: buffer)
-				local result = class153.new()
+			function class157.decode(buf: buffer)
+				local result = class157.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -38286,7 +39678,7 @@ do
 				return result
 			end
 
-			function class153:jsonEncode()
+			function class157:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -38300,8 +39692,8 @@ do
 				return v2
 			end
 
-			function class153.jsonDecode(p)
-				local v2 = class153.new()
+			function class157.jsonDecode(p)
+				local v2 = class157.new()
 
 				if p.props ~= nil then
 					v2.props = v.DetailsPageImageHeaderSchema_Props.jsonDecode(p.props)
@@ -38314,21 +39706,21 @@ do
 				return v2
 			end
 
-			class153.descriptor = {
+			class157.descriptor = {
 				name = "DetailsPageImageHeaderSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.DetailsPageImageHeaderSchema"
 			}
 
-			v.DetailsPageImageHeaderSchema = class153
+			v.DetailsPageImageHeaderSchema = class157
 		end
 
 		typeRegistry.default:register(v.DetailsPageImageHeaderSchema)
 
 		do
-			local class154 = {}
-			class154.__index = class154
+			local class158 = {}
+			class158.__index = class158
 
-			function class154.new(data)
+			function class158.new(data)
 				local v3
 
 				if not (data == nil or data.image == nil) then
@@ -38449,10 +39841,10 @@ do
 					test_id = v17,
 					image_tag = v18,
 					image_size_constraint = v19
-				}, class154))
+				}, class158))
 			end
 
-			function class154:encode()
+			function class158:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -38563,8 +39955,8 @@ do
 				return buf
 			end
 
-			function class154.decode(buf: buffer)
-				local result = class154.new()
+			function class158.decode(buf: buffer)
+				local result = class158.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -38662,7 +40054,7 @@ do
 				return result
 			end
 
-			function class154:jsonEncode()
+			function class158:jsonEncode()
 				local v2 = {}
 
 				if self.image ~= nil then
@@ -38736,8 +40128,8 @@ do
 				return v2
 			end
 
-			function class154.jsonDecode(data)
-				local v2 = class154.new()
+			function class158.jsonDecode(data)
+				local v2 = class158.new()
 
 				if data.image ~= nil then
 					v2.image = prop_types.ImageStringProp.jsonDecode(data.image)
@@ -38862,21 +40254,21 @@ do
 				return v2
 			end
 
-			class154.descriptor = {
+			class158.descriptor = {
 				name = "DetailsPageImageHeaderSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.DetailsPageImageHeaderSchema_Props = class154
+			v.DetailsPageImageHeaderSchema_Props = class158
 		end
 
 		typeRegistry.default:register(v.DetailsPageImageHeaderSchema_Props)
 
 		do
-			local class155 = {}
-			class155.__index = class155
+			local class159 = {}
+			class159.__index = class159
 
-			function class155.new(data)
+			function class159.new(data)
 				local v3
 
 				if not (data == nil or data.props == nil) then
@@ -38895,10 +40287,10 @@ do
 					v5 = data.web_props
 				end
 
-				return (setmetatable({ props = v3, shared = v4, web_props = v5 }, class155))
+				return (setmetatable({ props = v3, shared = v4, web_props = v5 }, class159))
 			end
 
-			function class155:encode()
+			function class159:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -38925,8 +40317,8 @@ do
 				return buf
 			end
 
-			function class155.decode(buf: buffer)
-				local result = class155.new()
+			function class159.decode(buf: buffer)
+				local result = class159.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -38968,7 +40360,7 @@ do
 				return result
 			end
 
-			function class155:jsonEncode()
+			function class159:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -38986,8 +40378,8 @@ do
 				return v2
 			end
 
-			function class155.jsonDecode(data)
-				local v2 = class155.new()
+			function class159.jsonDecode(data)
+				local v2 = class159.new()
 
 				if data.props ~= nil then
 					v2.props = v.LayeredContainerSchema_Props.jsonDecode(data.props)
@@ -39008,21 +40400,21 @@ do
 				return v2
 			end
 
-			class155.descriptor = {
+			class159.descriptor = {
 				name = "LayeredContainerSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.LayeredContainerSchema"
 			}
 
-			v.LayeredContainerSchema = class155
+			v.LayeredContainerSchema = class159
 		end
 
 		typeRegistry.default:register(v.LayeredContainerSchema)
 
 		do
-			local class156 = {}
-			class156.__index = class156
+			local class160 = {}
+			class160.__index = class160
 
-			function class156.new(data)
+			function class160.new(data)
 				local v3
 
 				if not (data == nil or data.background_component == nil) then
@@ -39045,10 +40437,10 @@ do
 					background_component = v3,
 					foreground_component = v4,
 					size = v5
-				}, class156))
+				}, class160))
 			end
 
-			function class156:encode()
+			function class160:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -39075,8 +40467,8 @@ do
 				return buf
 			end
 
-			function class156.decode(buf: buffer)
-				local result = class156.new()
+			function class160.decode(buf: buffer)
+				local result = class160.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -39118,7 +40510,7 @@ do
 				return result
 			end
 
-			function class156:jsonEncode()
+			function class160:jsonEncode()
 				local v2 = {}
 
 				if self.background_component ~= nil then
@@ -39136,8 +40528,8 @@ do
 				return v2
 			end
 
-			function class156.jsonDecode(data)
-				local v2 = class156.new()
+			function class160.jsonDecode(data)
+				local v2 = class160.new()
 
 				if data.background_component ~= nil then
 					v2.background_component = v.NestedComponentProp.jsonDecode(data.background_component)
@@ -39162,21 +40554,21 @@ do
 				return v2
 			end
 
-			class156.descriptor = {
+			class160.descriptor = {
 				name = "LayeredContainerSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.LayeredContainerSchema_Props = class156
+			v.LayeredContainerSchema_Props = class160
 		end
 
 		typeRegistry.default:register(v.LayeredContainerSchema_Props)
 
 		do
-			local class157 = {}
-			class157.__index = class157
+			local class161 = {}
+			class161.__index = class161
 
-			function class157.new(data)
+			function class161.new(data)
 				local v3
 
 				if not (data == nil or data.class_names == nil) then
@@ -39213,10 +40605,10 @@ do
 					foreground_horizontal_padding = v5,
 					foreground_top_padding = v6,
 					foreground_bottom_padding = v7
-				}, class157))
+				}, class161))
 			end
 
-			function class157:encode()
+			function class161:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -39255,8 +40647,8 @@ do
 				return buf
 			end
 
-			function class157.decode(buf: buffer)
-				local result = class157.new()
+			function class161.decode(buf: buffer)
+				local result = class161.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -39306,7 +40698,7 @@ do
 				return result
 			end
 
-			function class157:jsonEncode()
+			function class161:jsonEncode()
 				local v2 = {}
 
 				if self.class_names ~= nil then
@@ -39332,8 +40724,8 @@ do
 				return v2
 			end
 
-			function class157.jsonDecode(data)
-				local v2 = class157.new()
+			function class161.jsonDecode(data)
+				local v2 = class161.new()
 
 				if data.class_names ~= nil then
 					v2.class_names = prop_types.StringProp.jsonDecode(data.class_names)
@@ -39378,21 +40770,21 @@ do
 				return v2
 			end
 
-			class157.descriptor = {
+			class161.descriptor = {
 				name = "LayeredContainerSchema_WebProps",
 				fullName = "roblox.apppageplatform.shared.v1beta1.WebProps"
 			}
 
-			v.LayeredContainerSchema_WebProps = class157
+			v.LayeredContainerSchema_WebProps = class161
 		end
 
 		typeRegistry.default:register(v.LayeredContainerSchema_WebProps)
 
 		do
-			local class158 = {}
-			class158.__index = class158
+			local class162 = {}
+			class162.__index = class162
 
-			function class158.new(data)
+			function class162.new(data)
 				local v3
 
 				if not (data == nil or data.props == nil) then
@@ -39411,10 +40803,10 @@ do
 					v5 = data.web_props
 				end
 
-				return (setmetatable({ props = v3, shared = v4, web_props = v5 }, class158))
+				return (setmetatable({ props = v3, shared = v4, web_props = v5 }, class162))
 			end
 
-			function class158:encode()
+			function class162:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -39441,8 +40833,8 @@ do
 				return buf
 			end
 
-			function class158.decode(buf: buffer)
-				local result = class158.new()
+			function class162.decode(buf: buffer)
+				local result = class162.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -39484,7 +40876,7 @@ do
 				return result
 			end
 
-			function class158:jsonEncode()
+			function class162:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -39502,8 +40894,8 @@ do
 				return v2
 			end
 
-			function class158.jsonDecode(data)
-				local v2 = class158.new()
+			function class162.jsonDecode(data)
+				local v2 = class162.new()
 
 				if data.props ~= nil then
 					v2.props = v.BackgroundBlurSchema_Props.jsonDecode(data.props)
@@ -39524,21 +40916,21 @@ do
 				return v2
 			end
 
-			class158.descriptor = {
+			class162.descriptor = {
 				name = "BackgroundBlurSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.BackgroundBlurSchema"
 			}
 
-			v.BackgroundBlurSchema = class158
+			v.BackgroundBlurSchema = class162
 		end
 
 		typeRegistry.default:register(v.BackgroundBlurSchema)
 
 		do
-			local class159 = {}
-			class159.__index = class159
+			local class163 = {}
+			class163.__index = class163
 
-			function class159.new(data)
+			function class163.new(data)
 				local v3
 
 				if not (data == nil or data.scrim_gradient == nil) then
@@ -39575,10 +40967,10 @@ do
 					scroll_fade_viewport_percent = v5,
 					scroll_fade_offset_px = v6,
 					scroll_fade_range_px = v7
-				}, class159))
+				}, class163))
 			end
 
-			function class159:encode()
+			function class163:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -39617,8 +41009,8 @@ do
 				return buf
 			end
 
-			function class159.decode(buf: buffer)
-				local result = class159.new()
+			function class163.decode(buf: buffer)
+				local result = class163.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -39668,7 +41060,7 @@ do
 				return result
 			end
 
-			function class159:jsonEncode()
+			function class163:jsonEncode()
 				local v2 = {}
 
 				if self.scrim_gradient ~= nil then
@@ -39694,8 +41086,8 @@ do
 				return v2
 			end
 
-			function class159.jsonDecode(data)
-				local v2 = class159.new()
+			function class163.jsonDecode(data)
+				local v2 = class163.new()
 
 				if data.scrim_gradient ~= nil then
 					v2.scrim_gradient = prop_types.GradientProp.jsonDecode(data.scrim_gradient)
@@ -39736,21 +41128,21 @@ do
 				return v2
 			end
 
-			class159.descriptor = {
+			class163.descriptor = {
 				name = "BackgroundBlurSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.BackgroundBlurSchema_Props = class159
+			v.BackgroundBlurSchema_Props = class163
 		end
 
 		typeRegistry.default:register(v.BackgroundBlurSchema_Props)
 
 		do
-			local class160 = {}
-			class160.__index = class160
+			local class164 = {}
+			class164.__index = class164
 
-			function class160.new(p)
+			function class164.new(p)
 				local v3
 
 				if not (p == nil or p.blur_radius == nil) then
@@ -39763,10 +41155,10 @@ do
 					v4 = p.mask
 				end
 
-				return (setmetatable({ blur_radius = v3, mask = v4 }, class160))
+				return (setmetatable({ blur_radius = v3, mask = v4 }, class164))
 			end
 
-			function class160:encode()
+			function class164:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -39787,8 +41179,8 @@ do
 				return buf
 			end
 
-			function class160.decode(buf: buffer)
-				local result = class160.new()
+			function class164.decode(buf: buffer)
+				local result = class164.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -39826,7 +41218,7 @@ do
 				return result
 			end
 
-			function class160:jsonEncode()
+			function class164:jsonEncode()
 				local v2 = {}
 
 				if self.blur_radius ~= nil then
@@ -39840,8 +41232,8 @@ do
 				return v2
 			end
 
-			function class160.jsonDecode(data)
-				local v2 = class160.new()
+			function class164.jsonDecode(data)
+				local v2 = class164.new()
 
 				if data.blur_radius ~= nil then
 					v2.blur_radius = prop_types.FloatProp.jsonDecode(data.blur_radius)
@@ -39858,21 +41250,21 @@ do
 				return v2
 			end
 
-			class160.descriptor = {
+			class164.descriptor = {
 				name = "BackgroundBlurSchema_WebProps",
 				fullName = "roblox.apppageplatform.shared.v1beta1.WebProps"
 			}
 
-			v.BackgroundBlurSchema_WebProps = class160
+			v.BackgroundBlurSchema_WebProps = class164
 		end
 
 		typeRegistry.default:register(v.BackgroundBlurSchema_WebProps)
 
 		do
-			local class161 = {}
-			class161.__index = class161
+			local class165 = {}
+			class165.__index = class165
 
-			function class161.new(p)
+			function class165.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -39885,10 +41277,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class161))
+				return (setmetatable({ props = v3, shared = v4 }, class165))
 			end
 
-			function class161:encode()
+			function class165:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -39909,8 +41301,8 @@ do
 				return buf
 			end
 
-			function class161.decode(buf: buffer)
-				local result = class161.new()
+			function class165.decode(buf: buffer)
+				local result = class165.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -39948,7 +41340,7 @@ do
 				return result
 			end
 
-			function class161:jsonEncode()
+			function class165:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -39962,8 +41354,8 @@ do
 				return v2
 			end
 
-			function class161.jsonDecode(p)
-				local v2 = class161.new()
+			function class165.jsonDecode(p)
+				local v2 = class165.new()
 
 				if p.props ~= nil then
 					v2.props = v.LogoSchema_Props.jsonDecode(p.props)
@@ -39976,21 +41368,21 @@ do
 				return v2
 			end
 
-			class161.descriptor = {
+			class165.descriptor = {
 				name = "LogoSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.LogoSchema"
 			}
 
-			v.LogoSchema = class161
+			v.LogoSchema = class165
 		end
 
 		typeRegistry.default:register(v.LogoSchema)
 
 		do
-			local class162 = {}
-			class162.__index = class162
+			local class166 = {}
+			class166.__index = class166
 
-			function class162.new(p)
+			function class166.new(p)
 				local v3
 
 				if not (p == nil or p.name == nil) then
@@ -40003,10 +41395,10 @@ do
 					v4 = p.width
 				end
 
-				return (setmetatable({ name = v3, width = v4 }, class162))
+				return (setmetatable({ name = v3, width = v4 }, class166))
 			end
 
-			function class162:encode()
+			function class166:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -40027,8 +41419,8 @@ do
 				return buf
 			end
 
-			function class162.decode(buf: buffer)
-				local result = class162.new()
+			function class166.decode(buf: buffer)
+				local result = class166.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -40066,7 +41458,7 @@ do
 				return result
 			end
 
-			function class162:jsonEncode()
+			function class166:jsonEncode()
 				local v2 = {}
 
 				if self.name ~= nil then
@@ -40080,8 +41472,8 @@ do
 				return v2
 			end
 
-			function class162.jsonDecode(p)
-				local v2 = class162.new()
+			function class166.jsonDecode(p)
+				local v2 = class166.new()
 
 				if p.name ~= nil then
 					v2.name = prop_types.StringProp.jsonDecode(p.name)
@@ -40094,21 +41486,21 @@ do
 				return v2
 			end
 
-			class162.descriptor = {
+			class166.descriptor = {
 				name = "LogoSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.LogoSchema_Props = class162
+			v.LogoSchema_Props = class166
 		end
 
 		typeRegistry.default:register(v.LogoSchema_Props)
 
 		do
-			local class163 = {}
-			class163.__index = class163
+			local class167 = {}
+			class167.__index = class167
 
-			function class163.new(p)
+			function class167.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -40121,10 +41513,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class163))
+				return (setmetatable({ props = v3, shared = v4 }, class167))
 			end
 
-			function class163:encode()
+			function class167:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -40145,8 +41537,8 @@ do
 				return buf
 			end
 
-			function class163.decode(buf: buffer)
-				local result = class163.new()
+			function class167.decode(buf: buffer)
+				local result = class167.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -40184,7 +41576,7 @@ do
 				return result
 			end
 
-			function class163:jsonEncode()
+			function class167:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -40198,8 +41590,8 @@ do
 				return v2
 			end
 
-			function class163.jsonDecode(p)
-				local v2 = class163.new()
+			function class167.jsonDecode(p)
+				local v2 = class167.new()
 
 				if p.props ~= nil then
 					v2.props = v.VirtualGameItemTextSchema_Props.jsonDecode(p.props)
@@ -40212,21 +41604,21 @@ do
 				return v2
 			end
 
-			class163.descriptor = {
+			class167.descriptor = {
 				name = "VirtualGameItemTextSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.VirtualGameItemTextSchema"
 			}
 
-			v.VirtualGameItemTextSchema = class163
+			v.VirtualGameItemTextSchema = class167
 		end
 
 		typeRegistry.default:register(v.VirtualGameItemTextSchema)
 
 		do
-			local class164 = {}
-			class164.__index = class164
+			local class168 = {}
+			class168.__index = class168
 
-			function class164.new(data)
+			function class168.new(data)
 				local v3
 
 				if not (data == nil or data.title == nil) then
@@ -40417,10 +41809,10 @@ do
 					base_price_robux_icon_size = v27,
 					base_price_robux_icon_style = v28,
 					title_font_style = v29
-				}, class164))
+				}, class168))
 			end
 
-			function class164:encode()
+			function class168:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -40591,8 +41983,8 @@ do
 				return buf
 			end
 
-			function class164.decode(buf: buffer)
-				local result = class164.new()
+			function class168.decode(buf: buffer)
+				local result = class168.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -40730,7 +42122,7 @@ do
 				return result
 			end
 
-			function class164:jsonEncode()
+			function class168:jsonEncode()
 				local v2 = {}
 
 				if self.title ~= nil then
@@ -40844,8 +42236,8 @@ do
 				return v2
 			end
 
-			function class164.jsonDecode(data)
-				local v2 = class164.new()
+			function class168.jsonDecode(data)
+				local v2 = class168.new()
 
 				if data.title ~= nil then
 					v2.title = prop_types.StringProp.jsonDecode(data.title)
@@ -41058,21 +42450,21 @@ do
 				return v2
 			end
 
-			class164.descriptor = {
+			class168.descriptor = {
 				name = "VirtualGameItemTextSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.VirtualGameItemTextSchema_Props = class164
+			v.VirtualGameItemTextSchema_Props = class168
 		end
 
 		typeRegistry.default:register(v.VirtualGameItemTextSchema_Props)
 
 		do
-			local class165 = {}
-			class165.__index = class165
+			local class169 = {}
+			class169.__index = class169
 
-			function class165.new(p)
+			function class169.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -41085,10 +42477,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class165))
+				return (setmetatable({ props = v3, shared = v4 }, class169))
 			end
 
-			function class165:encode()
+			function class169:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -41109,8 +42501,8 @@ do
 				return buf
 			end
 
-			function class165.decode(buf: buffer)
-				local result = class165.new()
+			function class169.decode(buf: buffer)
+				local result = class169.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -41148,7 +42540,7 @@ do
 				return result
 			end
 
-			function class165:jsonEncode()
+			function class169:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -41162,8 +42554,8 @@ do
 				return v2
 			end
 
-			function class165.jsonDecode(p)
-				local v2 = class165.new()
+			function class169.jsonDecode(p)
+				local v2 = class169.new()
 
 				if p.props ~= nil then
 					v2.props = v.VideoPlayerSchema_Props.jsonDecode(p.props)
@@ -41176,21 +42568,21 @@ do
 				return v2
 			end
 
-			class165.descriptor = {
+			class169.descriptor = {
 				name = "VideoPlayerSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.VideoPlayerSchema"
 			}
 
-			v.VideoPlayerSchema = class165
+			v.VideoPlayerSchema = class169
 		end
 
 		typeRegistry.default:register(v.VideoPlayerSchema)
 
 		do
-			local class166 = {}
-			class166.__index = class166
+			local class170 = {}
+			class170.__index = class170
 
-			function class166.new(data)
+			function class170.new(data)
 				local v3
 
 				if not (data == nil or data.video_asset_id == nil) then
@@ -41290,10 +42682,10 @@ do
 					trim_end_time = v14,
 					music_asset_id = v15,
 					music_start_time = v16
-				}, class166))
+				}, class170))
 			end
 
-			function class166:encode()
+			function class170:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -41386,8 +42778,8 @@ do
 				return buf
 			end
 
-			function class166.decode(buf: buffer)
-				local result = class166.new()
+			function class170.decode(buf: buffer)
+				local result = class170.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -41473,7 +42865,7 @@ do
 				return result
 			end
 
-			function class166:jsonEncode()
+			function class170:jsonEncode()
 				local v2 = {}
 
 				if self.video_asset_id ~= nil then
@@ -41535,8 +42927,8 @@ do
 				return v2
 			end
 
-			function class166.jsonDecode(data)
-				local v2 = class166.new()
+			function class170.jsonDecode(data)
+				local v2 = class170.new()
 
 				if data.video_asset_id ~= nil then
 					v2.video_asset_id = prop_types.StringProp.jsonDecode(data.video_asset_id)
@@ -41645,21 +43037,21 @@ do
 				return v2
 			end
 
-			class166.descriptor = {
+			class170.descriptor = {
 				name = "VideoPlayerSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.VideoPlayerSchema_Props = class166
+			v.VideoPlayerSchema_Props = class170
 		end
 
 		typeRegistry.default:register(v.VideoPlayerSchema_Props)
 
 		do
-			local class167 = {}
-			class167.__index = class167
+			local class171 = {}
+			class171.__index = class171
 
-			function class167.new(data)
+			function class171.new(data)
 				local v3
 
 				if not (data == nil or data.props == nil) then
@@ -41678,10 +43070,10 @@ do
 					v5 = data.web_props
 				end
 
-				return (setmetatable({ props = v3, shared = v4, web_props = v5 }, class167))
+				return (setmetatable({ props = v3, shared = v4, web_props = v5 }, class171))
 			end
 
-			function class167:encode()
+			function class171:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -41708,8 +43100,8 @@ do
 				return buf
 			end
 
-			function class167.decode(buf: buffer)
-				local result = class167.new()
+			function class171.decode(buf: buffer)
+				local result = class171.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -41751,7 +43143,7 @@ do
 				return result
 			end
 
-			function class167:jsonEncode()
+			function class171:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -41769,8 +43161,8 @@ do
 				return v2
 			end
 
-			function class167.jsonDecode(data)
-				local v2 = class167.new()
+			function class171.jsonDecode(data)
+				local v2 = class171.new()
 
 				if data.props ~= nil then
 					v2.props = v.PageHeaderSchema_Props.jsonDecode(data.props)
@@ -41791,21 +43183,21 @@ do
 				return v2
 			end
 
-			class167.descriptor = {
+			class171.descriptor = {
 				name = "PageHeaderSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.PageHeaderSchema"
 			}
 
-			v.PageHeaderSchema = class167
+			v.PageHeaderSchema = class171
 		end
 
 		typeRegistry.default:register(v.PageHeaderSchema)
 
 		do
-			local class168 = {}
-			class168.__index = class168
+			local class172 = {}
+			class172.__index = class172
 
-			function class168.new(data)
+			function class172.new(data)
 				local v3
 
 				if not (data == nil or data.background_component == nil) then
@@ -41842,10 +43234,10 @@ do
 					gradient = v5,
 					gradient_height_percent = v6,
 					gradient_width_percent = v7
-				}, class168))
+				}, class172))
 			end
 
-			function class168:encode()
+			function class172:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -41884,8 +43276,8 @@ do
 				return buf
 			end
 
-			function class168.decode(buf: buffer)
-				local result = class168.new()
+			function class172.decode(buf: buffer)
+				local result = class172.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -41935,7 +43327,7 @@ do
 				return result
 			end
 
-			function class168:jsonEncode()
+			function class172:jsonEncode()
 				local v2 = {}
 
 				if self.background_component ~= nil then
@@ -41961,8 +43353,8 @@ do
 				return v2
 			end
 
-			function class168.jsonDecode(data)
-				local v2 = class168.new()
+			function class172.jsonDecode(data)
+				local v2 = class172.new()
 
 				if data.background_component ~= nil then
 					v2.background_component = v.NestedComponentProp.jsonDecode(data.background_component)
@@ -42003,21 +43395,21 @@ do
 				return v2
 			end
 
-			class168.descriptor = {
+			class172.descriptor = {
 				name = "PageHeaderSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.PageHeaderSchema_Props = class168
+			v.PageHeaderSchema_Props = class172
 		end
 
 		typeRegistry.default:register(v.PageHeaderSchema_Props)
 
 		do
-			local class169 = {}
-			class169.__index = class169
+			local class173 = {}
+			class173.__index = class173
 
-			function class169.new(data)
+			function class173.new(data)
 				local v3
 
 				if not (data == nil or data.background_max_width == nil) then
@@ -42061,10 +43453,10 @@ do
 					foreground_bottom_padding = v6,
 					foreground_fill = v7,
 					foreground_top_padding = v8
-				}, class169))
+				}, class173))
 			end
 
-			function class169:encode()
+			function class173:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -42109,8 +43501,8 @@ do
 				return buf
 			end
 
-			function class169.decode(buf: buffer)
-				local result = class169.new()
+			function class173.decode(buf: buffer)
+				local result = class173.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -42164,7 +43556,7 @@ do
 				return result
 			end
 
-			function class169:jsonEncode()
+			function class173:jsonEncode()
 				local v2 = {}
 
 				if self.background_max_width ~= nil then
@@ -42194,8 +43586,8 @@ do
 				return v2
 			end
 
-			function class169.jsonDecode(data)
-				local v2 = class169.new()
+			function class173.jsonDecode(data)
+				local v2 = class173.new()
 
 				if data.background_max_width ~= nil then
 					v2.background_max_width = prop_types.FloatProp.jsonDecode(data.background_max_width)
@@ -42248,21 +43640,21 @@ do
 				return v2
 			end
 
-			class169.descriptor = {
+			class173.descriptor = {
 				name = "PageHeaderSchema_WebProps",
 				fullName = "roblox.apppageplatform.shared.v1beta1.WebProps"
 			}
 
-			v.PageHeaderSchema_WebProps = class169
+			v.PageHeaderSchema_WebProps = class173
 		end
 
 		typeRegistry.default:register(v.PageHeaderSchema_WebProps)
 
 		do
-			local class170 = {}
-			class170.__index = class170
+			local class174 = {}
+			class174.__index = class174
 
-			function class170.new(p)
+			function class174.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -42275,10 +43667,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class170))
+				return (setmetatable({ props = v3, shared = v4 }, class174))
 			end
 
-			function class170:encode()
+			function class174:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -42299,8 +43691,8 @@ do
 				return buf
 			end
 
-			function class170.decode(buf: buffer)
-				local result = class170.new()
+			function class174.decode(buf: buffer)
+				local result = class174.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -42338,7 +43730,7 @@ do
 				return result
 			end
 
-			function class170:jsonEncode()
+			function class174:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -42352,8 +43744,8 @@ do
 				return v2
 			end
 
-			function class170.jsonDecode(p)
-				local v2 = class170.new()
+			function class174.jsonDecode(p)
+				local v2 = class174.new()
 
 				if p.props ~= nil then
 					v2.props = v.CardSchema_Props.jsonDecode(p.props)
@@ -42366,21 +43758,21 @@ do
 				return v2
 			end
 
-			class170.descriptor = {
+			class174.descriptor = {
 				name = "CardSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.CardSchema"
 			}
 
-			v.CardSchema = class170
+			v.CardSchema = class174
 		end
 
 		typeRegistry.default:register(v.CardSchema)
 
 		do
-			local class171 = {}
-			class171.__index = class171
+			local class175 = {}
+			class175.__index = class175
 
-			function class171.new(data)
+			function class175.new(data)
 				local v3
 
 				if not (data == nil or data.title_text == nil) then
@@ -42501,10 +43893,10 @@ do
 					description_max_lines = v17,
 					image_scale_type = v18,
 					background_on_activated = v19
-				}, class171))
+				}, class175))
 			end
 
-			function class171:encode()
+			function class175:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -42615,8 +44007,8 @@ do
 				return buf
 			end
 
-			function class171.decode(buf: buffer)
-				local result = class171.new()
+			function class175.decode(buf: buffer)
+				local result = class175.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -42714,7 +44106,7 @@ do
 				return result
 			end
 
-			function class171:jsonEncode()
+			function class175:jsonEncode()
 				local v2 = {}
 
 				if self.title_text ~= nil then
@@ -42788,8 +44180,8 @@ do
 				return v2
 			end
 
-			function class171.jsonDecode(data)
-				local v2 = class171.new()
+			function class175.jsonDecode(data)
+				local v2 = class175.new()
 
 				if data.title_text ~= nil then
 					v2.title_text = prop_types.StringProp.jsonDecode(data.title_text)
@@ -42926,31 +44318,31 @@ do
 				return v2
 			end
 
-			class171.descriptor = {
+			class175.descriptor = {
 				name = "CardSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.CardSchema_Props = class171
+			v.CardSchema_Props = class175
 		end
 
 		typeRegistry.default:register(v.CardSchema_Props)
 
 		do
-			local class172 = {}
-			class172.__index = class172
+			local class176 = {}
+			class176.__index = class176
 
-			function class172.new(p)
+			function class176.new(p)
 				local v3
 
 				if not (p == nil or p.kind == nil) then
 					v3 = p.kind
 				end
 
-				return (setmetatable({ kind = v3 }, class172))
+				return (setmetatable({ kind = v3 }, class176))
 			end
 
-			function class172:encode()
+			function class176:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -42974,8 +44366,8 @@ do
 				return buf
 			end
 
-			function class172.decode(buf: buffer)
-				local result = class172.new()
+			function class176.decode(buf: buffer)
+				local result = class176.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -43023,7 +44415,7 @@ do
 				return result
 			end
 
-			function class172:jsonEncode()
+			function class176:jsonEncode()
 				local v2 = {}
 
 				if self.kind == nil then
@@ -43047,8 +44439,8 @@ do
 				return v2
 			end
 
-			function class172.jsonDecode(data)
-				local v2 = class172.new()
+			function class176.jsonDecode(data)
+				local v2 = class176.new()
 
 				if data.literal ~= nil then
 					v2.kind = {
@@ -43075,21 +44467,21 @@ do
 				return v2
 			end
 
-			class172.descriptor = {
+			class176.descriptor = {
 				name = "TabItemIconData",
 				fullName = "roblox.apppageplatform.shared.v1beta1.TabItemIconData"
 			}
 
-			v.TabItemIconData = class172
+			v.TabItemIconData = class176
 		end
 
 		typeRegistry.default:register(v.TabItemIconData)
 
 		do
-			local class173 = {}
-			class173.__index = class173
+			local class177 = {}
+			class177.__index = class177
 
-			function class173.new(p)
+			function class177.new(p)
 				local v3
 
 				if not (p == nil or p.condition == nil) then
@@ -43102,10 +44494,10 @@ do
 					v4 = p.kind
 				end
 
-				return (setmetatable({ condition = v3, kind = v4 }, class173))
+				return (setmetatable({ condition = v3, kind = v4 }, class177))
 			end
 
-			function class173:encode()
+			function class177:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -43131,8 +44523,8 @@ do
 				return buf
 			end
 
-			function class173.decode(buf: buffer)
-				local result = class173.new()
+			function class177.decode(buf: buffer)
+				local result = class177.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -43177,7 +44569,7 @@ do
 				return result
 			end
 
-			function class173:jsonEncode()
+			function class177:jsonEncode()
 				local v2 = {}
 
 				if self.condition ~= nil then
@@ -43198,8 +44590,8 @@ do
 				return v2
 			end
 
-			function class173.jsonDecode(data)
-				local v2 = class173.new()
+			function class177.jsonDecode(data)
+				local v2 = class177.new()
 
 				if data.condition ~= nil then
 					v2.condition = prop_condition.PropCondition.jsonDecode(data.condition)
@@ -43223,27 +44615,27 @@ do
 				return v2
 			end
 
-			class173.descriptor = {
+			class177.descriptor = {
 				name = "TabItemIconData_ConditionalOption",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
 			}
 
-			v.TabItemIconData_ConditionalOption = class173
+			v.TabItemIconData_ConditionalOption = class177
 		end
 
 		typeRegistry.default:register(v.TabItemIconData_ConditionalOption)
 
 		do
-			local class174 = {}
-			class174.__index = class174
+			local class178 = {}
+			class178.__index = class178
 
-			function class174.new(p)
+			function class178.new(p)
 				return (setmetatable({
 					options = (p == nil or p.options == nil) and {} or p.options
-				}, class174))
+				}, class178))
 			end
 
-			function class174:encode()
+			function class178:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -43260,8 +44652,8 @@ do
 				return buf
 			end
 
-			function class174.decode(buf: buffer)
-				local v2 = class174.new()
+			function class178.decode(buf: buffer)
+				local v2 = class178.new()
 				local v3 = 0
 
 				while v3 < buffer.len(buf) do
@@ -43295,7 +44687,7 @@ do
 				return v2
 			end
 
-			function class174:jsonEncode()
+			function class178:jsonEncode()
 				local v2 = {}
 
 				if self.options == nil or not (#self.options > 0) then
@@ -43313,8 +44705,8 @@ do
 				return v2
 			end
 
-			function class174.jsonDecode(p)
-				local v2 = class174.new()
+			function class178.jsonDecode(p)
+				local v2 = class178.new()
 
 				if p.options == nil then
 					return v2
@@ -43331,21 +44723,21 @@ do
 				return v2
 			end
 
-			class174.descriptor = {
+			class178.descriptor = {
 				name = "TabItemIconData_ConditionalOptions",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
 			}
 
-			v.TabItemIconData_ConditionalOptions = class174
+			v.TabItemIconData_ConditionalOptions = class178
 		end
 
 		typeRegistry.default:register(v.TabItemIconData_ConditionalOptions)
 
 		do
-			local class175 = {}
-			class175.__index = class175
+			local class179 = {}
+			class179.__index = class179
 
-			function class175.new(p)
+			function class179.new(p)
 				local v3
 
 				if not (p == nil or p.name == nil) then
@@ -43358,10 +44750,10 @@ do
 					v4 = p.variant
 				end
 
-				return (setmetatable({ name = v3, variant = v4 }, class175))
+				return (setmetatable({ name = v3, variant = v4 }, class179))
 			end
 
-			function class175:encode()
+			function class179:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -43382,8 +44774,8 @@ do
 				return buf
 			end
 
-			function class175.decode(buf: buffer)
-				local result = class175.new()
+			function class179.decode(buf: buffer)
+				local result = class179.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -43421,7 +44813,7 @@ do
 				return result
 			end
 
-			function class175:jsonEncode()
+			function class179:jsonEncode()
 				local v2 = {}
 
 				if self.name ~= nil then
@@ -43435,8 +44827,8 @@ do
 				return v2
 			end
 
-			function class175.jsonDecode(p)
-				local v2 = class175.new()
+			function class179.jsonDecode(p)
+				local v2 = class179.new()
 
 				if p.name ~= nil then
 					v2.name = prop_types.StringProp.jsonDecode(p.name)
@@ -43449,31 +44841,31 @@ do
 				return v2
 			end
 
-			class175.descriptor = {
+			class179.descriptor = {
 				name = "TabItemIconData_TabItemIcon",
 				fullName = "roblox.apppageplatform.shared.v1beta1.TabItemIcon"
 			}
 
-			v.TabItemIconData_TabItemIcon = class175
+			v.TabItemIconData_TabItemIcon = class179
 		end
 
 		typeRegistry.default:register(v.TabItemIconData_TabItemIcon)
 
 		do
-			local class176 = {}
-			class176.__index = class176
+			local class180 = {}
+			class180.__index = class180
 
-			function class176.new(p)
+			function class180.new(p)
 				local v3
 
 				if not (p == nil or p.oneof_prop == nil) then
 					v3 = p.oneof_prop
 				end
 
-				return (setmetatable({ oneof_prop = v3 }, class176))
+				return (setmetatable({ oneof_prop = v3 }, class180))
 			end
 
-			function class176:encode()
+			function class180:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -43494,8 +44886,8 @@ do
 				return buf
 			end
 
-			function class176.decode(buf: buffer)
-				local result = class176.new()
+			function class180.decode(buf: buffer)
+				local result = class180.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -43539,7 +44931,7 @@ do
 				return result
 			end
 
-			function class176:jsonEncode()
+			function class180:jsonEncode()
 				local v2 = {}
 
 				if self.oneof_prop == nil then
@@ -43558,8 +44950,8 @@ do
 				return v2
 			end
 
-			function class176.jsonDecode(data)
-				local v2 = class176.new()
+			function class180.jsonDecode(data)
+				local v2 = class180.new()
 
 				if data.tab_item_icon ~= nil then
 					v2.oneof_prop = {
@@ -43592,590 +44984,15 @@ do
 				return v2
 			end
 
-			class176.descriptor = {
+			class180.descriptor = {
 				name = "TabItemIconData_TabItemIconOrString",
 				fullName = "roblox.apppageplatform.shared.v1beta1.TabItemIconOrString"
 			}
 
-			v.TabItemIconData_TabItemIconOrString = class176
+			v.TabItemIconData_TabItemIconOrString = class180
 		end
 
 		typeRegistry.default:register(v.TabItemIconData_TabItemIconOrString)
-
-		do
-			local class177 = {}
-			class177.__index = class177
-
-			function class177.new(p)
-				local v3
-
-				if not (p == nil or p.kind == nil) then
-					v3 = p.kind
-				end
-
-				return (setmetatable({ kind = v3 }, class177))
-			end
-
-			function class177:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.kind ~= nil then
-					if self.kind.type == "literal" then
-						local encoded = self.kind.value:encode()
-						local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-						v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-					elseif self.kind.type == "binding_path" then
-						local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-						v2, v3 = proto.writeString(v4, v5, self.kind.value)
-					elseif self.kind.type == "conditional" then
-						local encoded = self.kind.value:encode()
-						local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-						v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-					end
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class177.decode(buf: buffer)
-				local result = class177.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.kind = {
-								type = "literal",
-								value = v.TabItemData_TabItem.decode(v5)
-							}
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.kind = { type = "binding_path", value = buffer.tostring(v5) }
-						elseif v3 == 3 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.kind = {
-								type = "conditional",
-								value = v.TabItemData_ConditionalOptions.decode(v5)
-							}
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class177:jsonEncode()
-				local v2 = {}
-
-				if self.kind == nil then
-					return v2
-				end
-
-				if self.kind.type == "literal" then
-					v2.literal = self.kind.value:jsonEncode()
-					return v2
-				end
-
-				if self.kind.type == "binding_path" then
-					v2.bindingPath = self.kind.value
-					return v2
-				end
-
-				if self.kind.type == "conditional" then
-					v2.conditional = self.kind.value:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class177.jsonDecode(data)
-				local v2 = class177.new()
-
-				if data.literal ~= nil then
-					v2.kind = {
-						type = "literal",
-						value = v.TabItemData_TabItem.jsonDecode(data.literal)
-					}
-				end
-
-				if data.binding_path ~= nil then
-					v2.kind = { type = "binding_path", value = data.binding_path }
-				end
-
-				if data.bindingPath ~= nil then
-					v2.kind = { type = "binding_path", value = data.bindingPath }
-				end
-
-				if data.conditional ~= nil then
-					v2.kind = {
-						type = "conditional",
-						value = v.TabItemData_ConditionalOptions.jsonDecode(data.conditional)
-					}
-				end
-
-				return v2
-			end
-
-			class177.descriptor = {
-				name = "TabItemData",
-				fullName = "roblox.apppageplatform.shared.v1beta1.TabItemData"
-			}
-
-			v.TabItemData = class177
-		end
-
-		typeRegistry.default:register(v.TabItemData)
-
-		do
-			local class178 = {}
-			class178.__index = class178
-
-			function class178.new(p)
-				local v3
-
-				if not (p == nil or p.condition == nil) then
-					v3 = p.condition
-				end
-
-				local v4
-
-				if not (p == nil or p.kind == nil) then
-					v4 = p.kind
-				end
-
-				return (setmetatable({ condition = v3, kind = v4 }, class178))
-			end
-
-			function class178:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.condition ~= nil then
-					local encoded = self.condition:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.kind ~= nil then
-					if self.kind.type == "literal" then
-						local encoded = self.kind.value:encode()
-						local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-						v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-					elseif self.kind.type == "binding_path" then
-						local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-						v2, v3 = proto.writeString(v4, v5, self.kind.value)
-					end
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class178.decode(buf: buffer)
-				local result = class178.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.condition = prop_condition.PropCondition.decode(v5)
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.kind = {
-								type = "literal",
-								value = v.TabItemData_TabItem.decode(v5)
-							}
-						elseif v3 == 3 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.kind = { type = "binding_path", value = buffer.tostring(v5) }
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class178:jsonEncode()
-				local v2 = {}
-
-				if self.condition ~= nil then
-					v2.condition = self.condition:jsonEncode()
-				end
-
-				if self.kind == nil then
-					return v2
-				end
-
-				if self.kind.type == "literal" then
-					v2.literal = self.kind.value:jsonEncode()
-					return v2
-				elseif self.kind.type == "binding_path" then
-					v2.bindingPath = self.kind.value
-				end
-
-				return v2
-			end
-
-			function class178.jsonDecode(data)
-				local v2 = class178.new()
-
-				if data.condition ~= nil then
-					v2.condition = prop_condition.PropCondition.jsonDecode(data.condition)
-				end
-
-				if data.literal ~= nil then
-					v2.kind = {
-						type = "literal",
-						value = v.TabItemData_TabItem.jsonDecode(data.literal)
-					}
-				end
-
-				if data.binding_path ~= nil then
-					v2.kind = { type = "binding_path", value = data.binding_path }
-				end
-
-				if data.bindingPath ~= nil then
-					v2.kind = { type = "binding_path", value = data.bindingPath }
-				end
-
-				return v2
-			end
-
-			class178.descriptor = {
-				name = "TabItemData_ConditionalOption",
-				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
-			}
-
-			v.TabItemData_ConditionalOption = class178
-		end
-
-		typeRegistry.default:register(v.TabItemData_ConditionalOption)
-
-		do
-			local class179 = {}
-			class179.__index = class179
-
-			function class179.new(p)
-				return (setmetatable({
-					options = (p == nil or p.options == nil) and {} or p.options
-				}, class179))
-			end
-
-			function class179:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.options ~= nil and #self.options > 0 then
-					for _, option in self.options do
-						local encoded = option:encode()
-						local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-						v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-					end
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class179.decode(buf: buffer)
-				local v2 = class179.new()
-				local v3 = 0
-
-				while v3 < buffer.len(buf) do
-					local v4, v5
-					v4, v5, v3 = proto.readTag(buf, v3)
-
-					if v5 == proto.wireTypes.varint then
-						local v6
-						v6, v3 = proto.readVarInt(buf, v3)
-					elseif v5 == proto.wireTypes.lengthDelimited then
-						if v4 == 1 then
-							local v6
-							v6, v3 = proto.readBuffer(buf, v3)
-							table.insert(v2.options, v.TabItemData_ConditionalOption.decode(v6))
-						else
-							local varInt, v6 = proto.readVarInt(buf, v3)
-
-							v3 = v6 + varInt
-						end
-					elseif v5 == proto.wireTypes.i32 then
-						local v6
-						v6, v3 = proto.readFixed32(buf, v3)
-					elseif v5 == proto.wireTypes.i64 then
-						local v6
-						v6, v3 = proto.readFixed64(buf, v3)
-					else
-						error("Unsupported wire type: " .. v5)
-					end
-				end
-
-				return v2
-			end
-
-			function class179:jsonEncode()
-				local v2 = {}
-
-				if self.options == nil or not (#self.options > 0) then
-					return v2
-				end
-
-				local v3 = {}
-
-				for _, option in self.options do
-					table.insert(v3, option:jsonEncode())
-				end
-
-				v2.options = v3
-
-				return v2
-			end
-
-			function class179.jsonDecode(p)
-				local v2 = class179.new()
-
-				if p.options == nil then
-					return v2
-				end
-
-				local v3 = {}
-
-				for _, option in p.options do
-					table.insert(v3, v.TabItemData_ConditionalOption.jsonDecode(option))
-				end
-
-				v2.options = v3
-
-				return v2
-			end
-
-			class179.descriptor = {
-				name = "TabItemData_ConditionalOptions",
-				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
-			}
-
-			v.TabItemData_ConditionalOptions = class179
-		end
-
-		typeRegistry.default:register(v.TabItemData_ConditionalOptions)
-
-		do
-			local class180 = {}
-			class180.__index = class180
-
-			function class180.new(data)
-				local v3
-
-				if not (data == nil or data.id == nil) then
-					v3 = data.id
-				end
-
-				local v4
-
-				if not (data == nil or data.text == nil) then
-					v4 = data.text
-				end
-
-				local v5
-
-				if not (data == nil or data.icon == nil) then
-					v5 = data.icon
-				end
-
-				local v6
-
-				if not (data == nil or data.is_disabled == nil) then
-					v6 = data.is_disabled
-				end
-
-				return (setmetatable({ id = v3, text = v4, icon = v5, is_disabled = v6 }, class180))
-			end
-
-			function class180:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.id ~= nil then
-					local encoded = self.id:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.text ~= nil then
-					local encoded = self.text:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.icon ~= nil then
-					local encoded = self.icon:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.is_disabled ~= nil then
-					local encoded = self.is_disabled:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class180.decode(buf: buffer)
-				local result = class180.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.id = prop_types.StringProp.decode(v5)
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.text = prop_types.StringProp.decode(v5)
-						elseif v3 == 3 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.icon = v.TabItemIconData.decode(v5)
-						elseif v3 == 4 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.is_disabled = prop_types.BoolProp.decode(v5)
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class180:jsonEncode()
-				local v2 = {}
-
-				if self.id ~= nil then
-					v2.id = self.id:jsonEncode()
-				end
-
-				if self.text ~= nil then
-					v2.text = self.text:jsonEncode()
-				end
-
-				if self.icon ~= nil then
-					v2.icon = self.icon:jsonEncode()
-				end
-
-				if self.is_disabled ~= nil then
-					v2.isDisabled = self.is_disabled:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class180.jsonDecode(data)
-				local v2 = class180.new()
-
-				if data.id ~= nil then
-					v2.id = prop_types.StringProp.jsonDecode(data.id)
-				end
-
-				if data.text ~= nil then
-					v2.text = prop_types.StringProp.jsonDecode(data.text)
-				end
-
-				if data.icon ~= nil then
-					v2.icon = v.TabItemIconData.jsonDecode(data.icon)
-				end
-
-				if data.is_disabled ~= nil then
-					v2.is_disabled = prop_types.BoolProp.jsonDecode(data.is_disabled)
-				end
-
-				if data.isDisabled ~= nil then
-					v2.is_disabled = prop_types.BoolProp.jsonDecode(data.isDisabled)
-				end
-
-				return v2
-			end
-
-			class180.descriptor = {
-				name = "TabItemData_TabItem",
-				fullName = "roblox.apppageplatform.shared.v1beta1.TabItem"
-			}
-
-			v.TabItemData_TabItem = class180
-		end
-
-		typeRegistry.default:register(v.TabItemData_TabItem)
 
 		do
 			local class181 = {}
@@ -44232,7 +45049,7 @@ do
 							v5, v2 = proto.readBuffer(buf, v2)
 							result.kind = {
 								type = "literal",
-								value = v.ArrayOfTabItemDataProp_ArrayOfTabItemData.decode(v5)
+								value = v.TabItemData_TabItem.decode(v5)
 							}
 						elseif v3 == 2 then
 							local v5
@@ -44243,7 +45060,7 @@ do
 							v5, v2 = proto.readBuffer(buf, v2)
 							result.kind = {
 								type = "conditional",
-								value = v.ArrayOfTabItemDataProp_ConditionalOptions.decode(v5)
+								value = v.TabItemData_ConditionalOptions.decode(v5)
 							}
 						else
 							local varInt, v5 = proto.readVarInt(buf, v2)
@@ -44294,7 +45111,7 @@ do
 				if data.literal ~= nil then
 					v2.kind = {
 						type = "literal",
-						value = v.ArrayOfTabItemDataProp_ArrayOfTabItemData.jsonDecode(data.literal)
+						value = v.TabItemData_TabItem.jsonDecode(data.literal)
 					}
 				end
 
@@ -44309,7 +45126,7 @@ do
 				if data.conditional ~= nil then
 					v2.kind = {
 						type = "conditional",
-						value = v.ArrayOfTabItemDataProp_ConditionalOptions.jsonDecode(data.conditional)
+						value = v.TabItemData_ConditionalOptions.jsonDecode(data.conditional)
 					}
 				end
 
@@ -44317,14 +45134,14 @@ do
 			end
 
 			class181.descriptor = {
-				name = "ArrayOfTabItemDataProp",
-				fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfTabItemDataProp"
+				name = "TabItemData",
+				fullName = "roblox.apppageplatform.shared.v1beta1.TabItemData"
 			}
 
-			v.ArrayOfTabItemDataProp = class181
+			v.TabItemData = class181
 		end
 
-		typeRegistry.default:register(v.ArrayOfTabItemDataProp)
+		typeRegistry.default:register(v.TabItemData)
 
 		do
 			local class182 = {}
@@ -44393,7 +45210,7 @@ do
 							v5, v2 = proto.readBuffer(buf, v2)
 							result.kind = {
 								type = "literal",
-								value = v.ArrayOfTabItemDataProp_ArrayOfTabItemData.decode(v5)
+								value = v.TabItemData_TabItem.decode(v5)
 							}
 						elseif v3 == 3 then
 							local v5
@@ -44449,7 +45266,7 @@ do
 				if data.literal ~= nil then
 					v2.kind = {
 						type = "literal",
-						value = v.ArrayOfTabItemDataProp_ArrayOfTabItemData.jsonDecode(data.literal)
+						value = v.TabItemData_TabItem.jsonDecode(data.literal)
 					}
 				end
 
@@ -44465,14 +45282,14 @@ do
 			end
 
 			class182.descriptor = {
-				name = "ArrayOfTabItemDataProp_ConditionalOption",
+				name = "TabItemData_ConditionalOption",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
 			}
 
-			v.ArrayOfTabItemDataProp_ConditionalOption = class182
+			v.TabItemData_ConditionalOption = class182
 		end
 
-		typeRegistry.default:register(v.ArrayOfTabItemDataProp_ConditionalOption)
+		typeRegistry.default:register(v.TabItemData_ConditionalOption)
 
 		do
 			local class183 = {}
@@ -44516,7 +45333,7 @@ do
 						if v4 == 1 then
 							local v6
 							v6, v3 = proto.readBuffer(buf, v3)
-							table.insert(v2.options, v.ArrayOfTabItemDataProp_ConditionalOption.decode(v6))
+							table.insert(v2.options, v.TabItemData_ConditionalOption.decode(v6))
 						else
 							local varInt, v6 = proto.readVarInt(buf, v3)
 
@@ -44564,7 +45381,7 @@ do
 				local v3 = {}
 
 				for _, option in p.options do
-					table.insert(v3, v.ArrayOfTabItemDataProp_ConditionalOption.jsonDecode(option))
+					table.insert(v3, v.TabItemData_ConditionalOption.jsonDecode(option))
 				end
 
 				v2.options = v3
@@ -44573,26 +45390,601 @@ do
 			end
 
 			class183.descriptor = {
-				name = "ArrayOfTabItemDataProp_ConditionalOptions",
+				name = "TabItemData_ConditionalOptions",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
 			}
 
-			v.ArrayOfTabItemDataProp_ConditionalOptions = class183
+			v.TabItemData_ConditionalOptions = class183
 		end
 
-		typeRegistry.default:register(v.ArrayOfTabItemDataProp_ConditionalOptions)
+		typeRegistry.default:register(v.TabItemData_ConditionalOptions)
 
 		do
 			local class184 = {}
 			class184.__index = class184
 
-			function class184.new(p)
-				return (setmetatable({
-					array = (p == nil or p.array == nil) and {} or p.array
-				}, class184))
+			function class184.new(data)
+				local v3
+
+				if not (data == nil or data.id == nil) then
+					v3 = data.id
+				end
+
+				local v4
+
+				if not (data == nil or data.text == nil) then
+					v4 = data.text
+				end
+
+				local v5
+
+				if not (data == nil or data.icon == nil) then
+					v5 = data.icon
+				end
+
+				local v6
+
+				if not (data == nil or data.is_disabled == nil) then
+					v6 = data.is_disabled
+				end
+
+				return (setmetatable({ id = v3, text = v4, icon = v5, is_disabled = v6 }, class184))
 			end
 
 			function class184:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.id ~= nil then
+					local encoded = self.id:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.text ~= nil then
+					local encoded = self.text:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.icon ~= nil then
+					local encoded = self.icon:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.is_disabled ~= nil then
+					local encoded = self.is_disabled:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class184.decode(buf: buffer)
+				local result = class184.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.id = prop_types.StringProp.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.text = prop_types.StringProp.decode(v5)
+						elseif v3 == 3 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.icon = v.TabItemIconData.decode(v5)
+						elseif v3 == 4 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.is_disabled = prop_types.BoolProp.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class184:jsonEncode()
+				local v2 = {}
+
+				if self.id ~= nil then
+					v2.id = self.id:jsonEncode()
+				end
+
+				if self.text ~= nil then
+					v2.text = self.text:jsonEncode()
+				end
+
+				if self.icon ~= nil then
+					v2.icon = self.icon:jsonEncode()
+				end
+
+				if self.is_disabled ~= nil then
+					v2.isDisabled = self.is_disabled:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class184.jsonDecode(data)
+				local v2 = class184.new()
+
+				if data.id ~= nil then
+					v2.id = prop_types.StringProp.jsonDecode(data.id)
+				end
+
+				if data.text ~= nil then
+					v2.text = prop_types.StringProp.jsonDecode(data.text)
+				end
+
+				if data.icon ~= nil then
+					v2.icon = v.TabItemIconData.jsonDecode(data.icon)
+				end
+
+				if data.is_disabled ~= nil then
+					v2.is_disabled = prop_types.BoolProp.jsonDecode(data.is_disabled)
+				end
+
+				if data.isDisabled ~= nil then
+					v2.is_disabled = prop_types.BoolProp.jsonDecode(data.isDisabled)
+				end
+
+				return v2
+			end
+
+			class184.descriptor = {
+				name = "TabItemData_TabItem",
+				fullName = "roblox.apppageplatform.shared.v1beta1.TabItem"
+			}
+
+			v.TabItemData_TabItem = class184
+		end
+
+		typeRegistry.default:register(v.TabItemData_TabItem)
+
+		do
+			local class185 = {}
+			class185.__index = class185
+
+			function class185.new(p)
+				local v3
+
+				if not (p == nil or p.kind == nil) then
+					v3 = p.kind
+				end
+
+				return (setmetatable({ kind = v3 }, class185))
+			end
+
+			function class185:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.kind ~= nil then
+					if self.kind.type == "literal" then
+						local encoded = self.kind.value:encode()
+						local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+						v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+					elseif self.kind.type == "binding_path" then
+						local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+						v2, v3 = proto.writeString(v4, v5, self.kind.value)
+					elseif self.kind.type == "conditional" then
+						local encoded = self.kind.value:encode()
+						local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+						v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+					end
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class185.decode(buf: buffer)
+				local result = class185.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.kind = {
+								type = "literal",
+								value = v.ArrayOfTabItemDataProp_ArrayOfTabItemData.decode(v5)
+							}
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.kind = { type = "binding_path", value = buffer.tostring(v5) }
+						elseif v3 == 3 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.kind = {
+								type = "conditional",
+								value = v.ArrayOfTabItemDataProp_ConditionalOptions.decode(v5)
+							}
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class185:jsonEncode()
+				local v2 = {}
+
+				if self.kind == nil then
+					return v2
+				end
+
+				if self.kind.type == "literal" then
+					v2.literal = self.kind.value:jsonEncode()
+					return v2
+				end
+
+				if self.kind.type == "binding_path" then
+					v2.bindingPath = self.kind.value
+					return v2
+				end
+
+				if self.kind.type == "conditional" then
+					v2.conditional = self.kind.value:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class185.jsonDecode(data)
+				local v2 = class185.new()
+
+				if data.literal ~= nil then
+					v2.kind = {
+						type = "literal",
+						value = v.ArrayOfTabItemDataProp_ArrayOfTabItemData.jsonDecode(data.literal)
+					}
+				end
+
+				if data.binding_path ~= nil then
+					v2.kind = { type = "binding_path", value = data.binding_path }
+				end
+
+				if data.bindingPath ~= nil then
+					v2.kind = { type = "binding_path", value = data.bindingPath }
+				end
+
+				if data.conditional ~= nil then
+					v2.kind = {
+						type = "conditional",
+						value = v.ArrayOfTabItemDataProp_ConditionalOptions.jsonDecode(data.conditional)
+					}
+				end
+
+				return v2
+			end
+
+			class185.descriptor = {
+				name = "ArrayOfTabItemDataProp",
+				fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfTabItemDataProp"
+			}
+
+			v.ArrayOfTabItemDataProp = class185
+		end
+
+		typeRegistry.default:register(v.ArrayOfTabItemDataProp)
+
+		do
+			local class186 = {}
+			class186.__index = class186
+
+			function class186.new(p)
+				local v3
+
+				if not (p == nil or p.condition == nil) then
+					v3 = p.condition
+				end
+
+				local v4
+
+				if not (p == nil or p.kind == nil) then
+					v4 = p.kind
+				end
+
+				return (setmetatable({ condition = v3, kind = v4 }, class186))
+			end
+
+			function class186:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.condition ~= nil then
+					local encoded = self.condition:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.kind ~= nil then
+					if self.kind.type == "literal" then
+						local encoded = self.kind.value:encode()
+						local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+						v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+					elseif self.kind.type == "binding_path" then
+						local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+						v2, v3 = proto.writeString(v4, v5, self.kind.value)
+					end
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class186.decode(buf: buffer)
+				local result = class186.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.condition = prop_condition.PropCondition.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.kind = {
+								type = "literal",
+								value = v.ArrayOfTabItemDataProp_ArrayOfTabItemData.decode(v5)
+							}
+						elseif v3 == 3 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.kind = { type = "binding_path", value = buffer.tostring(v5) }
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class186:jsonEncode()
+				local v2 = {}
+
+				if self.condition ~= nil then
+					v2.condition = self.condition:jsonEncode()
+				end
+
+				if self.kind == nil then
+					return v2
+				end
+
+				if self.kind.type == "literal" then
+					v2.literal = self.kind.value:jsonEncode()
+					return v2
+				elseif self.kind.type == "binding_path" then
+					v2.bindingPath = self.kind.value
+				end
+
+				return v2
+			end
+
+			function class186.jsonDecode(data)
+				local v2 = class186.new()
+
+				if data.condition ~= nil then
+					v2.condition = prop_condition.PropCondition.jsonDecode(data.condition)
+				end
+
+				if data.literal ~= nil then
+					v2.kind = {
+						type = "literal",
+						value = v.ArrayOfTabItemDataProp_ArrayOfTabItemData.jsonDecode(data.literal)
+					}
+				end
+
+				if data.binding_path ~= nil then
+					v2.kind = { type = "binding_path", value = data.binding_path }
+				end
+
+				if data.bindingPath ~= nil then
+					v2.kind = { type = "binding_path", value = data.bindingPath }
+				end
+
+				return v2
+			end
+
+			class186.descriptor = {
+				name = "ArrayOfTabItemDataProp_ConditionalOption",
+				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
+			}
+
+			v.ArrayOfTabItemDataProp_ConditionalOption = class186
+		end
+
+		typeRegistry.default:register(v.ArrayOfTabItemDataProp_ConditionalOption)
+
+		do
+			local class187 = {}
+			class187.__index = class187
+
+			function class187.new(p)
+				return (setmetatable({
+					options = (p == nil or p.options == nil) and {} or p.options
+				}, class187))
+			end
+
+			function class187:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.options ~= nil and #self.options > 0 then
+					for _, option in self.options do
+						local encoded = option:encode()
+						local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+						v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+					end
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class187.decode(buf: buffer)
+				local v2 = class187.new()
+				local v3 = 0
+
+				while v3 < buffer.len(buf) do
+					local v4, v5
+					v4, v5, v3 = proto.readTag(buf, v3)
+
+					if v5 == proto.wireTypes.varint then
+						local v6
+						v6, v3 = proto.readVarInt(buf, v3)
+					elseif v5 == proto.wireTypes.lengthDelimited then
+						if v4 == 1 then
+							local v6
+							v6, v3 = proto.readBuffer(buf, v3)
+							table.insert(v2.options, v.ArrayOfTabItemDataProp_ConditionalOption.decode(v6))
+						else
+							local varInt, v6 = proto.readVarInt(buf, v3)
+
+							v3 = v6 + varInt
+						end
+					elseif v5 == proto.wireTypes.i32 then
+						local v6
+						v6, v3 = proto.readFixed32(buf, v3)
+					elseif v5 == proto.wireTypes.i64 then
+						local v6
+						v6, v3 = proto.readFixed64(buf, v3)
+					else
+						error("Unsupported wire type: " .. v5)
+					end
+				end
+
+				return v2
+			end
+
+			function class187:jsonEncode()
+				local v2 = {}
+
+				if self.options == nil or not (#self.options > 0) then
+					return v2
+				end
+
+				local v3 = {}
+
+				for _, option in self.options do
+					table.insert(v3, option:jsonEncode())
+				end
+
+				v2.options = v3
+
+				return v2
+			end
+
+			function class187.jsonDecode(p)
+				local v2 = class187.new()
+
+				if p.options == nil then
+					return v2
+				end
+
+				local v3 = {}
+
+				for _, option in p.options do
+					table.insert(v3, v.ArrayOfTabItemDataProp_ConditionalOption.jsonDecode(option))
+				end
+
+				v2.options = v3
+
+				return v2
+			end
+
+			class187.descriptor = {
+				name = "ArrayOfTabItemDataProp_ConditionalOptions",
+				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
+			}
+
+			v.ArrayOfTabItemDataProp_ConditionalOptions = class187
+		end
+
+		typeRegistry.default:register(v.ArrayOfTabItemDataProp_ConditionalOptions)
+
+		do
+			local class188 = {}
+			class188.__index = class188
+
+			function class188.new(p)
+				return (setmetatable({
+					array = (p == nil or p.array == nil) and {} or p.array
+				}, class188))
+			end
+
+			function class188:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -44609,8 +46001,8 @@ do
 				return buf
 			end
 
-			function class184.decode(buf: buffer)
-				local v2 = class184.new()
+			function class188.decode(buf: buffer)
+				local v2 = class188.new()
 				local v3 = 0
 
 				while v3 < buffer.len(buf) do
@@ -44644,7 +46036,7 @@ do
 				return v2
 			end
 
-			function class184:jsonEncode()
+			function class188:jsonEncode()
 				local v2 = {}
 
 				if self.array == nil or not (#self.array > 0) then
@@ -44662,8 +46054,8 @@ do
 				return v2
 			end
 
-			function class184.jsonDecode(p)
-				local v2 = class184.new()
+			function class188.jsonDecode(p)
+				local v2 = class188.new()
 
 				if p.array == nil then
 					return v2
@@ -44680,21 +46072,21 @@ do
 				return v2
 			end
 
-			class184.descriptor = {
+			class188.descriptor = {
 				name = "ArrayOfTabItemDataProp_ArrayOfTabItemData",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfTabItemData"
 			}
 
-			v.ArrayOfTabItemDataProp_ArrayOfTabItemData = class184
+			v.ArrayOfTabItemDataProp_ArrayOfTabItemData = class188
 		end
 
 		typeRegistry.default:register(v.ArrayOfTabItemDataProp_ArrayOfTabItemData)
 
 		do
-			local class185 = {}
-			class185.__index = class185
+			local class189 = {}
+			class189.__index = class189
 
-			function class185.new(p)
+			function class189.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -44707,10 +46099,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class185))
+				return (setmetatable({ props = v3, shared = v4 }, class189))
 			end
 
-			function class185:encode()
+			function class189:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -44731,8 +46123,8 @@ do
 				return buf
 			end
 
-			function class185.decode(buf: buffer)
-				local result = class185.new()
+			function class189.decode(buf: buffer)
+				local result = class189.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -44770,7 +46162,7 @@ do
 				return result
 			end
 
-			function class185:jsonEncode()
+			function class189:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -44784,8 +46176,8 @@ do
 				return v2
 			end
 
-			function class185.jsonDecode(p)
-				local v2 = class185.new()
+			function class189.jsonDecode(p)
+				local v2 = class189.new()
 
 				if p.props ~= nil then
 					v2.props = v.TabsSchema_Props.jsonDecode(p.props)
@@ -44798,21 +46190,21 @@ do
 				return v2
 			end
 
-			class185.descriptor = {
+			class189.descriptor = {
 				name = "TabsSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.TabsSchema"
 			}
 
-			v.TabsSchema = class185
+			v.TabsSchema = class189
 		end
 
 		typeRegistry.default:register(v.TabsSchema)
 
 		do
-			local class186 = {}
-			class186.__index = class186
+			local class190 = {}
+			class190.__index = class190
 
-			function class186.new(data)
+			function class190.new(data)
 				local v3
 
 				if not (data == nil or data.anchor_point == nil) then
@@ -44905,10 +46297,10 @@ do
 					fill_behavior = v13,
 					on_absolute_size_changed = v14,
 					on_absolute_position_changed = v15
-				}, class186))
+				}, class190))
 			end
 
-			function class186:encode()
+			function class190:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -44995,8 +46387,8 @@ do
 				return buf
 			end
 
-			function class186.decode(buf: buffer)
-				local result = class186.new()
+			function class190.decode(buf: buffer)
+				local result = class190.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -45078,7 +46470,7 @@ do
 				return result
 			end
 
-			function class186:jsonEncode()
+			function class190:jsonEncode()
 				local v2 = {}
 
 				if self.anchor_point ~= nil then
@@ -45136,8 +46528,8 @@ do
 				return v2
 			end
 
-			function class186.jsonDecode(data)
-				local v2 = class186.new()
+			function class190.jsonDecode(data)
+				local v2 = class190.new()
 
 				if data.anchor_point ~= nil then
 					v2.anchor_point = prop_types.Vector2Prop.jsonDecode(data.anchor_point)
@@ -45230,21 +46622,21 @@ do
 				return v2
 			end
 
-			class186.descriptor = {
+			class190.descriptor = {
 				name = "TabsSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.TabsSchema_Props = class186
+			v.TabsSchema_Props = class190
 		end
 
 		typeRegistry.default:register(v.TabsSchema_Props)
 
 		do
-			local class187 = {}
-			class187.__index = class187
+			local class191 = {}
+			class191.__index = class191
 
-			function class187.new(p)
+			function class191.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -45257,10 +46649,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class187))
+				return (setmetatable({ props = v3, shared = v4 }, class191))
 			end
 
-			function class187:encode()
+			function class191:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -45281,8 +46673,8 @@ do
 				return buf
 			end
 
-			function class187.decode(buf: buffer)
-				local result = class187.new()
+			function class191.decode(buf: buffer)
+				local result = class191.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -45320,7 +46712,7 @@ do
 				return result
 			end
 
-			function class187:jsonEncode()
+			function class191:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -45334,8 +46726,8 @@ do
 				return v2
 			end
 
-			function class187.jsonDecode(p)
-				local v2 = class187.new()
+			function class191.jsonDecode(p)
+				local v2 = class191.new()
 
 				if p.props ~= nil then
 					v2.props = v.ActionBarSchema_Props.jsonDecode(p.props)
@@ -45348,21 +46740,21 @@ do
 				return v2
 			end
 
-			class187.descriptor = {
+			class191.descriptor = {
 				name = "ActionBarSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ActionBarSchema"
 			}
 
-			v.ActionBarSchema = class187
+			v.ActionBarSchema = class191
 		end
 
 		typeRegistry.default:register(v.ActionBarSchema)
 
 		do
-			local class188 = {}
-			class188.__index = class188
+			local class192 = {}
+			class192.__index = class192
 
-			function class188.new(data)
+			function class192.new(data)
 				local v3
 
 				if not (data == nil or data.items == nil) then
@@ -45420,10 +46812,10 @@ do
 					footer = v8,
 					row_tag = v9,
 					wrapper_tag = v10
-				}, class188))
+				}, class192))
 			end
 
-			function class188:encode()
+			function class192:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -45480,8 +46872,8 @@ do
 				return buf
 			end
 
-			function class188.decode(buf: buffer)
-				local result = class188.new()
+			function class192.decode(buf: buffer)
+				local result = class192.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -45543,7 +46935,7 @@ do
 				return result
 			end
 
-			function class188:jsonEncode()
+			function class192:jsonEncode()
 				local v2 = {}
 
 				if self.items ~= nil then
@@ -45581,8 +46973,8 @@ do
 				return v2
 			end
 
-			function class188.jsonDecode(data)
-				local v2 = class188.new()
+			function class192.jsonDecode(data)
+				local v2 = class192.new()
 
 				if data.items ~= nil then
 					v2.items = v.LazyNestedComponentListProp.jsonDecode(data.items)
@@ -45635,21 +47027,21 @@ do
 				return v2
 			end
 
-			class188.descriptor = {
+			class192.descriptor = {
 				name = "ActionBarSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.ActionBarSchema_Props = class188
+			v.ActionBarSchema_Props = class192
 		end
 
 		typeRegistry.default:register(v.ActionBarSchema_Props)
 
 		do
-			local class189 = {}
-			class189.__index = class189
+			local class193 = {}
+			class193.__index = class193
 
-			function class189.new(p)
+			function class193.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -45662,10 +47054,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class189))
+				return (setmetatable({ props = v3, shared = v4 }, class193))
 			end
 
-			function class189:encode()
+			function class193:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -45686,8 +47078,8 @@ do
 				return buf
 			end
 
-			function class189.decode(buf: buffer)
-				local result = class189.new()
+			function class193.decode(buf: buffer)
+				local result = class193.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -45725,7 +47117,7 @@ do
 				return result
 			end
 
-			function class189:jsonEncode()
+			function class193:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -45739,8 +47131,8 @@ do
 				return v2
 			end
 
-			function class189.jsonDecode(p)
-				local v2 = class189.new()
+			function class193.jsonDecode(p)
+				local v2 = class193.new()
 
 				if p.props ~= nil then
 					v2.props = v.CatalogVirtualizedFeedSchema_Props.jsonDecode(p.props)
@@ -45753,21 +47145,21 @@ do
 				return v2
 			end
 
-			class189.descriptor = {
+			class193.descriptor = {
 				name = "CatalogVirtualizedFeedSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.CatalogVirtualizedFeedSchema"
 			}
 
-			v.CatalogVirtualizedFeedSchema = class189
+			v.CatalogVirtualizedFeedSchema = class193
 		end
 
 		typeRegistry.default:register(v.CatalogVirtualizedFeedSchema)
 
 		do
-			local class190 = {}
-			class190.__index = class190
+			local class194 = {}
+			class194.__index = class194
 
-			function class190.new(data)
+			function class194.new(data)
 				local v3
 
 				if not (data == nil or data.feed_items == nil) then
@@ -45825,10 +47217,10 @@ do
 					layout_order = v8,
 					anchor_point = v9,
 					size = v10
-				}, class190))
+				}, class194))
 			end
 
-			function class190:encode()
+			function class194:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -45885,8 +47277,8 @@ do
 				return buf
 			end
 
-			function class190.decode(buf: buffer)
-				local result = class190.new()
+			function class194.decode(buf: buffer)
+				local result = class194.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -45948,7 +47340,7 @@ do
 				return result
 			end
 
-			function class190:jsonEncode()
+			function class194:jsonEncode()
 				local v2 = {}
 
 				if self.feed_items ~= nil then
@@ -45986,8 +47378,8 @@ do
 				return v2
 			end
 
-			function class190.jsonDecode(data)
-				local v2 = class190.new()
+			function class194.jsonDecode(data)
+				local v2 = class194.new()
 
 				if data.feed_items ~= nil then
 					v2.feed_items = v.LazyNestedComponentListProp.jsonDecode(data.feed_items)
@@ -46044,21 +47436,21 @@ do
 				return v2
 			end
 
-			class190.descriptor = {
+			class194.descriptor = {
 				name = "CatalogVirtualizedFeedSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.CatalogVirtualizedFeedSchema_Props = class190
+			v.CatalogVirtualizedFeedSchema_Props = class194
 		end
 
 		typeRegistry.default:register(v.CatalogVirtualizedFeedSchema_Props)
 
 		do
-			local class191 = {}
-			class191.__index = class191
+			local class195 = {}
+			class195.__index = class195
 
-			function class191.new(p)
+			function class195.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -46071,10 +47463,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class191))
+				return (setmetatable({ props = v3, shared = v4 }, class195))
 			end
 
-			function class191:encode()
+			function class195:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -46095,8 +47487,8 @@ do
 				return buf
 			end
 
-			function class191.decode(buf: buffer)
-				local result = class191.new()
+			function class195.decode(buf: buffer)
+				local result = class195.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -46134,7 +47526,7 @@ do
 				return result
 			end
 
-			function class191:jsonEncode()
+			function class195:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -46148,8 +47540,8 @@ do
 				return v2
 			end
 
-			function class191.jsonDecode(p)
-				local v2 = class191.new()
+			function class195.jsonDecode(p)
+				local v2 = class195.new()
 
 				if p.props ~= nil then
 					v2.props = v.CatalogItemGroupSchema_Props.jsonDecode(p.props)
@@ -46162,21 +47554,21 @@ do
 				return v2
 			end
 
-			class191.descriptor = {
+			class195.descriptor = {
 				name = "CatalogItemGroupSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.CatalogItemGroupSchema"
 			}
 
-			v.CatalogItemGroupSchema = class191
+			v.CatalogItemGroupSchema = class195
 		end
 
 		typeRegistry.default:register(v.CatalogItemGroupSchema)
 
 		do
-			local class192 = {}
-			class192.__index = class192
+			local class196 = {}
+			class196.__index = class196
 
-			function class192.new(data)
+			function class196.new(data)
 				local v3
 
 				if not (data == nil or data.id == nil) then
@@ -46304,10 +47696,10 @@ do
 					tag_id = v18,
 					information_popover_text = v19,
 					widget_style = v20
-				}, class192))
+				}, class196))
 			end
 
-			function class192:encode()
+			function class196:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -46424,8 +47816,8 @@ do
 				return buf
 			end
 
-			function class192.decode(buf: buffer)
-				local result = class192.new()
+			function class196.decode(buf: buffer)
+				local result = class196.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -46527,7 +47919,7 @@ do
 				return result
 			end
 
-			function class192:jsonEncode()
+			function class196:jsonEncode()
 				local v2 = {}
 
 				if self.id ~= nil then
@@ -46605,8 +47997,8 @@ do
 				return v2
 			end
 
-			function class192.jsonDecode(data)
-				local v2 = class192.new()
+			function class196.jsonDecode(data)
+				local v2 = class196.new()
 
 				if data.id ~= nil then
 					v2.id = prop_types.StringProp.jsonDecode(data.id)
@@ -46723,21 +48115,21 @@ do
 				return v2
 			end
 
-			class192.descriptor = {
+			class196.descriptor = {
 				name = "CatalogItemGroupSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.CatalogItemGroupSchema_Props = class192
+			v.CatalogItemGroupSchema_Props = class196
 		end
 
 		typeRegistry.default:register(v.CatalogItemGroupSchema_Props)
 
 		do
-			local class193 = {}
-			class193.__index = class193
+			local class197 = {}
+			class197.__index = class197
 
-			function class193.new(p)
+			function class197.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -46750,10 +48142,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class193))
+				return (setmetatable({ props = v3, shared = v4 }, class197))
 			end
 
-			function class193:encode()
+			function class197:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -46774,8 +48166,8 @@ do
 				return buf
 			end
 
-			function class193.decode(buf: buffer)
-				local result = class193.new()
+			function class197.decode(buf: buffer)
+				local result = class197.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -46813,7 +48205,7 @@ do
 				return result
 			end
 
-			function class193:jsonEncode()
+			function class197:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -46827,8 +48219,8 @@ do
 				return v2
 			end
 
-			function class193.jsonDecode(p)
-				local v2 = class193.new()
+			function class197.jsonDecode(p)
+				local v2 = class197.new()
 
 				if p.props ~= nil then
 					v2.props = v.CatalogItemGridSchema_Props.jsonDecode(p.props)
@@ -46841,21 +48233,21 @@ do
 				return v2
 			end
 
-			class193.descriptor = {
+			class197.descriptor = {
 				name = "CatalogItemGridSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.CatalogItemGridSchema"
 			}
 
-			v.CatalogItemGridSchema = class193
+			v.CatalogItemGridSchema = class197
 		end
 
 		typeRegistry.default:register(v.CatalogItemGridSchema)
 
 		do
-			local class194 = {}
-			class194.__index = class194
+			local class198 = {}
+			class198.__index = class198
 
-			function class194.new(data)
+			function class198.new(data)
 				local v3
 
 				if not (data == nil or data.content == nil) then
@@ -46892,10 +48284,10 @@ do
 					on_load_more = v5,
 					enable_continuous_load = v6,
 					load_more_label = v7
-				}, class194))
+				}, class198))
 			end
 
-			function class194:encode()
+			function class198:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -46934,8 +48326,8 @@ do
 				return buf
 			end
 
-			function class194.decode(buf: buffer)
-				local result = class194.new()
+			function class198.decode(buf: buffer)
+				local result = class198.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -46985,7 +48377,7 @@ do
 				return result
 			end
 
-			function class194:jsonEncode()
+			function class198:jsonEncode()
 				local v2 = {}
 
 				if self.content ~= nil then
@@ -47011,8 +48403,8 @@ do
 				return v2
 			end
 
-			function class194.jsonDecode(data)
-				local v2 = class194.new()
+			function class198.jsonDecode(data)
+				local v2 = class198.new()
 
 				if data.content ~= nil then
 					v2.content = catalog_sort_prop_types.ArrayOfCatalogSortContentProp.jsonDecode(data.content)
@@ -47053,21 +48445,21 @@ do
 				return v2
 			end
 
-			class194.descriptor = {
+			class198.descriptor = {
 				name = "CatalogItemGridSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.CatalogItemGridSchema_Props = class194
+			v.CatalogItemGridSchema_Props = class198
 		end
 
 		typeRegistry.default:register(v.CatalogItemGridSchema_Props)
 
 		do
-			local class195 = {}
-			class195.__index = class195
+			local class199 = {}
+			class199.__index = class199
 
-			function class195.new(p)
+			function class199.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -47080,10 +48472,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class195))
+				return (setmetatable({ props = v3, shared = v4 }, class199))
 			end
 
-			function class195:encode()
+			function class199:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -47104,8 +48496,8 @@ do
 				return buf
 			end
 
-			function class195.decode(buf: buffer)
-				local result = class195.new()
+			function class199.decode(buf: buffer)
+				local result = class199.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -47143,7 +48535,7 @@ do
 				return result
 			end
 
-			function class195:jsonEncode()
+			function class199:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -47157,8 +48549,8 @@ do
 				return v2
 			end
 
-			function class195.jsonDecode(p)
-				local v2 = class195.new()
+			function class199.jsonDecode(p)
+				local v2 = class199.new()
 
 				if p.props ~= nil then
 					v2.props = v.MarketplaceFavoritesCategoryMenuSchema_Props.jsonDecode(p.props)
@@ -47171,21 +48563,21 @@ do
 				return v2
 			end
 
-			class195.descriptor = {
+			class199.descriptor = {
 				name = "MarketplaceFavoritesCategoryMenuSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.MarketplaceFavoritesCategoryMenuSchema"
 			}
 
-			v.MarketplaceFavoritesCategoryMenuSchema = class195
+			v.MarketplaceFavoritesCategoryMenuSchema = class199
 		end
 
 		typeRegistry.default:register(v.MarketplaceFavoritesCategoryMenuSchema)
 
 		do
-			local class196 = {}
-			class196.__index = class196
+			local class200 = {}
+			class200.__index = class200
 
-			function class196.new(data)
+			function class200.new(data)
 				local v3
 
 				if not (data == nil or data.categories == nil) then
@@ -47264,10 +48656,10 @@ do
 					position = v11,
 					layout_order = v12,
 					z_index = v13
-				}, class196))
+				}, class200))
 			end
 
-			function class196:encode()
+			function class200:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -47342,8 +48734,8 @@ do
 				return buf
 			end
 
-			function class196.decode(buf: buffer)
-				local result = class196.new()
+			function class200.decode(buf: buffer)
+				local result = class200.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -47417,7 +48809,7 @@ do
 				return result
 			end
 
-			function class196:jsonEncode()
+			function class200:jsonEncode()
 				local v2 = {}
 
 				if self.categories ~= nil then
@@ -47467,8 +48859,8 @@ do
 				return v2
 			end
 
-			function class196.jsonDecode(data)
-				local v2 = class196.new()
+			function class200.jsonDecode(data)
+				local v2 = class200.new()
 
 				if data.categories ~= nil then
 					v2.categories = v.ArrayOfCatalogCategoryMenuItemProp.jsonDecode(data.categories)
@@ -47545,605 +48937,15 @@ do
 				return v2
 			end
 
-			class196.descriptor = {
+			class200.descriptor = {
 				name = "MarketplaceFavoritesCategoryMenuSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.MarketplaceFavoritesCategoryMenuSchema_Props = class196
+			v.MarketplaceFavoritesCategoryMenuSchema_Props = class200
 		end
 
 		typeRegistry.default:register(v.MarketplaceFavoritesCategoryMenuSchema_Props)
-
-		do
-			local class197 = {}
-			class197.__index = class197
-
-			function class197.new(p)
-				local v3
-
-				if not (p == nil or p.props == nil) then
-					v3 = p.props
-				end
-
-				local v4
-
-				if not (p == nil or p.shared == nil) then
-					v4 = p.shared
-				end
-
-				return (setmetatable({ props = v3, shared = v4 }, class197))
-			end
-
-			function class197:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.props ~= nil then
-					local encoded = self.props:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.shared ~= nil then
-					local encoded = self.shared:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class197.decode(buf: buffer)
-				local result = class197.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.props = v.UserListSchema_Props.decode(v5)
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.shared = component_shared.ComponentShared.decode(v5)
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class197:jsonEncode()
-				local v2 = {}
-
-				if self.props ~= nil then
-					v2.props = self.props:jsonEncode()
-				end
-
-				if self.shared ~= nil then
-					v2.shared = self.shared:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class197.jsonDecode(p)
-				local v2 = class197.new()
-
-				if p.props ~= nil then
-					v2.props = v.UserListSchema_Props.jsonDecode(p.props)
-				end
-
-				if p.shared ~= nil then
-					v2.shared = component_shared.ComponentShared.jsonDecode(p.shared)
-				end
-
-				return v2
-			end
-
-			class197.descriptor = {
-				name = "UserListSchema",
-				fullName = "roblox.apppageplatform.shared.v1beta1.UserListSchema"
-			}
-
-			v.UserListSchema = class197
-		end
-
-		typeRegistry.default:register(v.UserListSchema)
-
-		do
-			local class198 = {}
-			class198.__index = class198
-
-			function class198.new(data)
-				local v3
-
-				if not (data == nil or data.title == nil) then
-					v3 = data.title
-				end
-
-				local v4
-
-				if not (data == nil or data.max_visible_rows == nil) then
-					v4 = data.max_visible_rows
-				end
-
-				local v5
-
-				if not (data == nil or data.user_items == nil) then
-					v5 = data.user_items
-				end
-
-				return (setmetatable({ title = v3, max_visible_rows = v4, user_items = v5 }, class198))
-			end
-
-			function class198:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.title ~= nil then
-					local encoded = self.title:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.max_visible_rows ~= nil then
-					local encoded = self.max_visible_rows:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.user_items ~= nil then
-					local encoded = self.user_items:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class198.decode(buf: buffer)
-				local result = class198.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.title = prop_types.StringProp.decode(v5)
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.max_visible_rows = prop_types.Int32Prop.decode(v5)
-						elseif v3 == 3 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.user_items = prop_types.ArrayOfStructProp.decode(v5)
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class198:jsonEncode()
-				local v2 = {}
-
-				if self.title ~= nil then
-					v2.title = self.title:jsonEncode()
-				end
-
-				if self.max_visible_rows ~= nil then
-					v2.maxVisibleRows = self.max_visible_rows:jsonEncode()
-				end
-
-				if self.user_items ~= nil then
-					v2.userItems = self.user_items:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class198.jsonDecode(data)
-				local v2 = class198.new()
-
-				if data.title ~= nil then
-					v2.title = prop_types.StringProp.jsonDecode(data.title)
-				end
-
-				if data.max_visible_rows ~= nil then
-					v2.max_visible_rows = prop_types.Int32Prop.jsonDecode(data.max_visible_rows)
-				end
-
-				if data.maxVisibleRows ~= nil then
-					v2.max_visible_rows = prop_types.Int32Prop.jsonDecode(data.maxVisibleRows)
-				end
-
-				if data.user_items ~= nil then
-					v2.user_items = prop_types.ArrayOfStructProp.jsonDecode(data.user_items)
-				end
-
-				if data.userItems ~= nil then
-					v2.user_items = prop_types.ArrayOfStructProp.jsonDecode(data.userItems)
-				end
-
-				return v2
-			end
-
-			class198.descriptor = {
-				name = "UserListSchema_Props",
-				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
-			}
-
-			v.UserListSchema_Props = class198
-		end
-
-		typeRegistry.default:register(v.UserListSchema_Props)
-
-		do
-			local class199 = {}
-			class199.__index = class199
-
-			function class199.new(p)
-				local v3
-
-				if not (p == nil or p.props == nil) then
-					v3 = p.props
-				end
-
-				local v4
-
-				if not (p == nil or p.shared == nil) then
-					v4 = p.shared
-				end
-
-				return (setmetatable({ props = v3, shared = v4 }, class199))
-			end
-
-			function class199:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.props ~= nil then
-					local encoded = self.props:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.shared ~= nil then
-					local encoded = self.shared:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class199.decode(buf: buffer)
-				local result = class199.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.props = v.FriendRequestButtonSchema_Props.decode(v5)
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.shared = component_shared.ComponentShared.decode(v5)
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class199:jsonEncode()
-				local v2 = {}
-
-				if self.props ~= nil then
-					v2.props = self.props:jsonEncode()
-				end
-
-				if self.shared ~= nil then
-					v2.shared = self.shared:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class199.jsonDecode(p)
-				local v2 = class199.new()
-
-				if p.props ~= nil then
-					v2.props = v.FriendRequestButtonSchema_Props.jsonDecode(p.props)
-				end
-
-				if p.shared ~= nil then
-					v2.shared = component_shared.ComponentShared.jsonDecode(p.shared)
-				end
-
-				return v2
-			end
-
-			class199.descriptor = {
-				name = "FriendRequestButtonSchema",
-				fullName = "roblox.apppageplatform.shared.v1beta1.FriendRequestButtonSchema"
-			}
-
-			v.FriendRequestButtonSchema = class199
-		end
-
-		typeRegistry.default:register(v.FriendRequestButtonSchema)
-
-		do
-			local class200 = {}
-			class200.__index = class200
-
-			function class200.new(data)
-				local v3
-
-				if not (data == nil or data.user_id == nil) then
-					v3 = data.user_id
-				end
-
-				local v4
-
-				if not (data == nil or data.source == nil) then
-					v4 = data.source
-				end
-
-				local v5
-
-				if not (data == nil or data.layout_order == nil) then
-					v5 = data.layout_order
-				end
-
-				local v6
-
-				if not (data == nil or data.size == nil) then
-					v6 = data.size
-				end
-
-				local v7
-
-				if not (data == nil or data.visible == nil) then
-					v7 = data.visible
-				end
-
-				return (setmetatable({
-					user_id = v3,
-					source = v4,
-					layout_order = v5,
-					size = v6,
-					visible = v7
-				}, class200))
-			end
-
-			function class200:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.user_id ~= nil then
-					local encoded = self.user_id:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.source ~= nil then
-					local encoded = self.source:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.layout_order ~= nil then
-					local encoded = self.layout_order:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.size ~= nil then
-					local encoded = self.size:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.visible ~= nil then
-					local encoded = self.visible:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class200.decode(buf: buffer)
-				local result = class200.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.user_id = prop_types.StringProp.decode(v5)
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.source = prop_types.StringProp.decode(v5)
-						elseif v3 == 3 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.layout_order = prop_types.Int32Prop.decode(v5)
-						elseif v3 == 4 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.size = prop_types.InputSizeProp.decode(v5)
-						elseif v3 == 5 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.visible = prop_types.BoolProp.decode(v5)
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class200:jsonEncode()
-				local v2 = {}
-
-				if self.user_id ~= nil then
-					v2.userId = self.user_id:jsonEncode()
-				end
-
-				if self.source ~= nil then
-					v2.source = self.source:jsonEncode()
-				end
-
-				if self.layout_order ~= nil then
-					v2.layoutOrder = self.layout_order:jsonEncode()
-				end
-
-				if self.size ~= nil then
-					v2.size = self.size:jsonEncode()
-				end
-
-				if self.visible ~= nil then
-					v2.visible = self.visible:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class200.jsonDecode(data)
-				local v2 = class200.new()
-
-				if data.user_id ~= nil then
-					v2.user_id = prop_types.StringProp.jsonDecode(data.user_id)
-				end
-
-				if data.userId ~= nil then
-					v2.user_id = prop_types.StringProp.jsonDecode(data.userId)
-				end
-
-				if data.source ~= nil then
-					v2.source = prop_types.StringProp.jsonDecode(data.source)
-				end
-
-				if data.layout_order ~= nil then
-					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layout_order)
-				end
-
-				if data.layoutOrder ~= nil then
-					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layoutOrder)
-				end
-
-				if data.size ~= nil then
-					v2.size = prop_types.InputSizeProp.jsonDecode(data.size)
-				end
-
-				if data.visible ~= nil then
-					v2.visible = prop_types.BoolProp.jsonDecode(data.visible)
-				end
-
-				return v2
-			end
-
-			class200.descriptor = {
-				name = "FriendRequestButtonSchema_Props",
-				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
-			}
-
-			v.FriendRequestButtonSchema_Props = class200
-		end
-
-		typeRegistry.default:register(v.FriendRequestButtonSchema_Props)
 
 		do
 			local class201 = {}
@@ -48201,7 +49003,7 @@ do
 						if v3 == 1 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
-							result.props = v.FriendCarouselSchema_Props.decode(v5)
+							result.props = v.UserListSchema_Props.decode(v5)
 						elseif v3 == 2 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
@@ -48243,7 +49045,7 @@ do
 				local v2 = class201.new()
 
 				if p.props ~= nil then
-					v2.props = v.FriendCarouselSchema_Props.jsonDecode(p.props)
+					v2.props = v.UserListSchema_Props.jsonDecode(p.props)
 				end
 
 				if p.shared ~= nil then
@@ -48254,36 +49056,60 @@ do
 			end
 
 			class201.descriptor = {
-				name = "FriendCarouselSchema",
-				fullName = "roblox.apppageplatform.shared.v1beta1.FriendCarouselSchema"
+				name = "UserListSchema",
+				fullName = "roblox.apppageplatform.shared.v1beta1.UserListSchema"
 			}
 
-			v.FriendCarouselSchema = class201
+			v.UserListSchema = class201
 		end
 
-		typeRegistry.default:register(v.FriendCarouselSchema)
+		typeRegistry.default:register(v.UserListSchema)
 
 		do
 			local class202 = {}
 			class202.__index = class202
 
-			function class202.new(p)
+			function class202.new(data)
 				local v3
 
-				if not (p == nil or p.sort_id == nil) then
-					v3 = p.sort_id
+				if not (data == nil or data.title == nil) then
+					v3 = data.title
 				end
 
-				return (setmetatable({ sort_id = v3 }, class202))
+				local v4
+
+				if not (data == nil or data.max_visible_rows == nil) then
+					v4 = data.max_visible_rows
+				end
+
+				local v5
+
+				if not (data == nil or data.user_items == nil) then
+					v5 = data.user_items
+				end
+
+				return (setmetatable({ title = v3, max_visible_rows = v4, user_items = v5 }, class202))
 			end
 
 			function class202:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
-				if self.sort_id ~= nil then
-					local encoded = self.sort_id:encode()
+				if self.title ~= nil then
+					local encoded = self.title:encode()
 					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.max_visible_rows ~= nil then
+					local encoded = self.max_visible_rows:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.user_items ~= nil then
+					local encoded = self.user_items:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
 					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 				end
 
@@ -48307,7 +49133,15 @@ do
 						if v3 == 1 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
-							result.sort_id = prop_types.StringProp.decode(v5)
+							result.title = prop_types.StringProp.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.max_visible_rows = prop_types.Int32Prop.decode(v5)
+						elseif v3 == 3 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.user_items = prop_types.ArrayOfStructProp.decode(v5)
 						else
 							local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -48330,36 +49164,56 @@ do
 			function class202:jsonEncode()
 				local v2 = {}
 
-				if self.sort_id ~= nil then
-					v2.sortId = self.sort_id:jsonEncode()
+				if self.title ~= nil then
+					v2.title = self.title:jsonEncode()
+				end
+
+				if self.max_visible_rows ~= nil then
+					v2.maxVisibleRows = self.max_visible_rows:jsonEncode()
+				end
+
+				if self.user_items ~= nil then
+					v2.userItems = self.user_items:jsonEncode()
 				end
 
 				return v2
 			end
 
-			function class202.jsonDecode(p)
+			function class202.jsonDecode(data)
 				local v2 = class202.new()
 
-				if p.sort_id ~= nil then
-					v2.sort_id = prop_types.StringProp.jsonDecode(p.sort_id)
+				if data.title ~= nil then
+					v2.title = prop_types.StringProp.jsonDecode(data.title)
 				end
 
-				if p.sortId ~= nil then
-					v2.sort_id = prop_types.StringProp.jsonDecode(p.sortId)
+				if data.max_visible_rows ~= nil then
+					v2.max_visible_rows = prop_types.Int32Prop.jsonDecode(data.max_visible_rows)
+				end
+
+				if data.maxVisibleRows ~= nil then
+					v2.max_visible_rows = prop_types.Int32Prop.jsonDecode(data.maxVisibleRows)
+				end
+
+				if data.user_items ~= nil then
+					v2.user_items = prop_types.ArrayOfStructProp.jsonDecode(data.user_items)
+				end
+
+				if data.userItems ~= nil then
+					v2.user_items = prop_types.ArrayOfStructProp.jsonDecode(data.userItems)
 				end
 
 				return v2
 			end
 
 			class202.descriptor = {
-				name = "FriendCarouselSchema_Props",
+				name = "UserListSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.FriendCarouselSchema_Props = class202
+			v.UserListSchema_Props = class202
 		end
 
-		typeRegistry.default:register(v.FriendCarouselSchema_Props)
+		typeRegistry.default:register(v.UserListSchema_Props)
 
 		do
 			local class203 = {}
@@ -48417,7 +49271,7 @@ do
 						if v3 == 1 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
-							result.props = v.PymkCarouselSchema_Props.decode(v5)
+							result.props = v.FriendRequestButtonSchema_Props.decode(v5)
 						elseif v3 == 2 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
@@ -48459,7 +49313,7 @@ do
 				local v2 = class203.new()
 
 				if p.props ~= nil then
-					v2.props = v.PymkCarouselSchema_Props.jsonDecode(p.props)
+					v2.props = v.FriendRequestButtonSchema_Props.jsonDecode(p.props)
 				end
 
 				if p.shared ~= nil then
@@ -48470,14 +49324,14 @@ do
 			end
 
 			class203.descriptor = {
-				name = "PymkCarouselSchema",
-				fullName = "roblox.apppageplatform.shared.v1beta1.PymkCarouselSchema"
+				name = "FriendRequestButtonSchema",
+				fullName = "roblox.apppageplatform.shared.v1beta1.FriendRequestButtonSchema"
 			}
 
-			v.PymkCarouselSchema = class203
+			v.FriendRequestButtonSchema = class203
 		end
 
-		typeRegistry.default:register(v.PymkCarouselSchema)
+		typeRegistry.default:register(v.FriendRequestButtonSchema)
 
 		do
 			local class204 = {}
@@ -48486,40 +49340,40 @@ do
 			function class204.new(data)
 				local v3
 
-				if not (data == nil or data.title == nil) then
-					v3 = data.title
+				if not (data == nil or data.user_id == nil) then
+					v3 = data.user_id
 				end
 
 				local v4
 
-				if not (data == nil or data.items == nil) then
-					v4 = data.items
+				if not (data == nil or data.source == nil) then
+					v4 = data.source
 				end
 
 				local v5
 
-				if not (data == nil or data.sort_id == nil) then
-					v5 = data.sort_id
+				if not (data == nil or data.layout_order == nil) then
+					v5 = data.layout_order
 				end
 
 				local v6
 
-				if not (data == nil or data.recommendation_request_id == nil) then
-					v6 = data.recommendation_request_id
+				if not (data == nil or data.size == nil) then
+					v6 = data.size
 				end
 
 				local v7
 
-				if not (data == nil or data.seed_user_id == nil) then
-					v7 = data.seed_user_id
+				if not (data == nil or data.visible == nil) then
+					v7 = data.visible
 				end
 
 				return (setmetatable({
-					title = v3,
-					items = v4,
-					sort_id = v5,
-					recommendation_request_id = v6,
-					seed_user_id = v7
+					user_id = v3,
+					source = v4,
+					layout_order = v5,
+					size = v6,
+					visible = v7
 				}, class204))
 			end
 
@@ -48527,32 +49381,32 @@ do
 				local v2 = buffer.create(0)
 				local v3 = 0
 
-				if self.title ~= nil then
-					local encoded = self.title:encode()
+				if self.user_id ~= nil then
+					local encoded = self.user_id:encode()
 					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
 					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 				end
 
-				if self.items ~= nil then
-					local encoded = self.items:encode()
+				if self.source ~= nil then
+					local encoded = self.source:encode()
 					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
 					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 				end
 
-				if self.sort_id ~= nil then
-					local encoded = self.sort_id:encode()
+				if self.layout_order ~= nil then
+					local encoded = self.layout_order:encode()
 					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
 					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 				end
 
-				if self.recommendation_request_id ~= nil then
-					local encoded = self.recommendation_request_id:encode()
+				if self.size ~= nil then
+					local encoded = self.size:encode()
 					local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
 					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 				end
 
-				if self.seed_user_id ~= nil then
-					local encoded = self.seed_user_id:encode()
+				if self.visible ~= nil then
+					local encoded = self.visible:encode()
 					local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
 					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 				end
@@ -48577,23 +49431,23 @@ do
 						if v3 == 1 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
-							result.title = prop_types.StringProp.decode(v5)
+							result.user_id = prop_types.StringProp.decode(v5)
 						elseif v3 == 2 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
-							result.items = prop_types.ArrayOfPymkItemDataProp.decode(v5)
+							result.source = prop_types.StringProp.decode(v5)
 						elseif v3 == 3 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
-							result.sort_id = prop_types.StringProp.decode(v5)
+							result.layout_order = prop_types.Int32Prop.decode(v5)
 						elseif v3 == 4 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
-							result.recommendation_request_id = prop_types.StringProp.decode(v5)
+							result.size = prop_types.InputSizeProp.decode(v5)
 						elseif v3 == 5 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
-							result.seed_user_id = prop_types.Int64Prop.decode(v5)
+							result.visible = prop_types.BoolProp.decode(v5)
 						else
 							local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -48616,24 +49470,24 @@ do
 			function class204:jsonEncode()
 				local v2 = {}
 
-				if self.title ~= nil then
-					v2.title = self.title:jsonEncode()
+				if self.user_id ~= nil then
+					v2.userId = self.user_id:jsonEncode()
 				end
 
-				if self.items ~= nil then
-					v2.items = self.items:jsonEncode()
+				if self.source ~= nil then
+					v2.source = self.source:jsonEncode()
 				end
 
-				if self.sort_id ~= nil then
-					v2.sortId = self.sort_id:jsonEncode()
+				if self.layout_order ~= nil then
+					v2.layoutOrder = self.layout_order:jsonEncode()
 				end
 
-				if self.recommendation_request_id ~= nil then
-					v2.recommendationRequestId = self.recommendation_request_id:jsonEncode()
+				if self.size ~= nil then
+					v2.size = self.size:jsonEncode()
 				end
 
-				if self.seed_user_id ~= nil then
-					v2.seedUserId = self.seed_user_id:jsonEncode()
+				if self.visible ~= nil then
+					v2.visible = self.visible:jsonEncode()
 				end
 
 				return v2
@@ -48642,50 +49496,46 @@ do
 			function class204.jsonDecode(data)
 				local v2 = class204.new()
 
-				if data.title ~= nil then
-					v2.title = prop_types.StringProp.jsonDecode(data.title)
+				if data.user_id ~= nil then
+					v2.user_id = prop_types.StringProp.jsonDecode(data.user_id)
 				end
 
-				if data.items ~= nil then
-					v2.items = prop_types.ArrayOfPymkItemDataProp.jsonDecode(data.items)
+				if data.userId ~= nil then
+					v2.user_id = prop_types.StringProp.jsonDecode(data.userId)
 				end
 
-				if data.sort_id ~= nil then
-					v2.sort_id = prop_types.StringProp.jsonDecode(data.sort_id)
+				if data.source ~= nil then
+					v2.source = prop_types.StringProp.jsonDecode(data.source)
 				end
 
-				if data.sortId ~= nil then
-					v2.sort_id = prop_types.StringProp.jsonDecode(data.sortId)
+				if data.layout_order ~= nil then
+					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layout_order)
 				end
 
-				if data.recommendation_request_id ~= nil then
-					v2.recommendation_request_id = prop_types.StringProp.jsonDecode(data.recommendation_request_id)
+				if data.layoutOrder ~= nil then
+					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layoutOrder)
 				end
 
-				if data.recommendationRequestId ~= nil then
-					v2.recommendation_request_id = prop_types.StringProp.jsonDecode(data.recommendationRequestId)
+				if data.size ~= nil then
+					v2.size = prop_types.InputSizeProp.jsonDecode(data.size)
 				end
 
-				if data.seed_user_id ~= nil then
-					v2.seed_user_id = prop_types.Int64Prop.jsonDecode(data.seed_user_id)
-				end
-
-				if data.seedUserId ~= nil then
-					v2.seed_user_id = prop_types.Int64Prop.jsonDecode(data.seedUserId)
+				if data.visible ~= nil then
+					v2.visible = prop_types.BoolProp.jsonDecode(data.visible)
 				end
 
 				return v2
 			end
 
 			class204.descriptor = {
-				name = "PymkCarouselSchema_Props",
+				name = "FriendRequestButtonSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.PymkCarouselSchema_Props = class204
+			v.FriendRequestButtonSchema_Props = class204
 		end
 
-		typeRegistry.default:register(v.PymkCarouselSchema_Props)
+		typeRegistry.default:register(v.FriendRequestButtonSchema_Props)
 
 		do
 			local class205 = {}
@@ -48743,7 +49593,7 @@ do
 						if v3 == 1 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
-							result.props = v.FriendsOwnedChipSchema_Props.decode(v5)
+							result.props = v.FriendCarouselSchema_Props.decode(v5)
 						elseif v3 == 2 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
@@ -48785,7 +49635,7 @@ do
 				local v2 = class205.new()
 
 				if p.props ~= nil then
-					v2.props = v.FriendsOwnedChipSchema_Props.jsonDecode(p.props)
+					v2.props = v.FriendCarouselSchema_Props.jsonDecode(p.props)
 				end
 
 				if p.shared ~= nil then
@@ -48796,60 +49646,36 @@ do
 			end
 
 			class205.descriptor = {
-				name = "FriendsOwnedChipSchema",
-				fullName = "roblox.apppageplatform.shared.v1beta1.FriendsOwnedChipSchema"
+				name = "FriendCarouselSchema",
+				fullName = "roblox.apppageplatform.shared.v1beta1.FriendCarouselSchema"
 			}
 
-			v.FriendsOwnedChipSchema = class205
+			v.FriendCarouselSchema = class205
 		end
 
-		typeRegistry.default:register(v.FriendsOwnedChipSchema)
+		typeRegistry.default:register(v.FriendCarouselSchema)
 
 		do
 			local class206 = {}
 			class206.__index = class206
 
-			function class206.new(data)
+			function class206.new(p)
 				local v3
 
-				if not (data == nil or data.item_id == nil) then
-					v3 = data.item_id
+				if not (p == nil or p.sort_id == nil) then
+					v3 = p.sort_id
 				end
 
-				local v4
-
-				if not (data == nil or data.item_type == nil) then
-					v4 = data.item_type
-				end
-
-				local v5
-
-				if not (data == nil or data.layout_order == nil) then
-					v5 = data.layout_order
-				end
-
-				return (setmetatable({ item_id = v3, item_type = v4, layout_order = v5 }, class206))
+				return (setmetatable({ sort_id = v3 }, class206))
 			end
 
 			function class206:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
-				if self.item_id ~= nil then
-					local encoded = self.item_id:encode()
+				if self.sort_id ~= nil then
+					local encoded = self.sort_id:encode()
 					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.item_type ~= nil then
-					local encoded = self.item_type:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.layout_order ~= nil then
-					local encoded = self.layout_order:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
 					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 				end
 
@@ -48873,15 +49699,7 @@ do
 						if v3 == 1 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
-							result.item_id = prop_types.StringProp.decode(v5)
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.item_type = prop_types.StringProp.decode(v5)
-						elseif v3 == 3 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.layout_order = prop_types.Int32Prop.decode(v5)
+							result.sort_id = prop_types.StringProp.decode(v5)
 						else
 							local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -48904,60 +49722,36 @@ do
 			function class206:jsonEncode()
 				local v2 = {}
 
-				if self.item_id ~= nil then
-					v2.itemId = self.item_id:jsonEncode()
-				end
-
-				if self.item_type ~= nil then
-					v2.itemType = self.item_type:jsonEncode()
-				end
-
-				if self.layout_order ~= nil then
-					v2.layoutOrder = self.layout_order:jsonEncode()
+				if self.sort_id ~= nil then
+					v2.sortId = self.sort_id:jsonEncode()
 				end
 
 				return v2
 			end
 
-			function class206.jsonDecode(data)
+			function class206.jsonDecode(p)
 				local v2 = class206.new()
 
-				if data.item_id ~= nil then
-					v2.item_id = prop_types.StringProp.jsonDecode(data.item_id)
+				if p.sort_id ~= nil then
+					v2.sort_id = prop_types.StringProp.jsonDecode(p.sort_id)
 				end
 
-				if data.itemId ~= nil then
-					v2.item_id = prop_types.StringProp.jsonDecode(data.itemId)
-				end
-
-				if data.item_type ~= nil then
-					v2.item_type = prop_types.StringProp.jsonDecode(data.item_type)
-				end
-
-				if data.itemType ~= nil then
-					v2.item_type = prop_types.StringProp.jsonDecode(data.itemType)
-				end
-
-				if data.layout_order ~= nil then
-					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layout_order)
-				end
-
-				if data.layoutOrder ~= nil then
-					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layoutOrder)
+				if p.sortId ~= nil then
+					v2.sort_id = prop_types.StringProp.jsonDecode(p.sortId)
 				end
 
 				return v2
 			end
 
 			class206.descriptor = {
-				name = "FriendsOwnedChipSchema_Props",
+				name = "FriendCarouselSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.FriendsOwnedChipSchema_Props = class206
+			v.FriendCarouselSchema_Props = class206
 		end
 
-		typeRegistry.default:register(v.FriendsOwnedChipSchema_Props)
+		typeRegistry.default:register(v.FriendCarouselSchema_Props)
 
 		do
 			local class207 = {}
@@ -49015,7 +49809,7 @@ do
 						if v3 == 1 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
-							result.props = v.HomeUserInfoWidgetSchema_Props.decode(v5)
+							result.props = v.PymkCarouselSchema_Props.decode(v5)
 						elseif v3 == 2 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
@@ -49057,7 +49851,7 @@ do
 				local v2 = class207.new()
 
 				if p.props ~= nil then
-					v2.props = v.HomeUserInfoWidgetSchema_Props.jsonDecode(p.props)
+					v2.props = v.PymkCarouselSchema_Props.jsonDecode(p.props)
 				end
 
 				if p.shared ~= nil then
@@ -49068,77 +49862,222 @@ do
 			end
 
 			class207.descriptor = {
-				name = "HomeUserInfoWidgetSchema",
-				fullName = "roblox.apppageplatform.shared.v1beta1.HomeUserInfoWidgetSchema"
+				name = "PymkCarouselSchema",
+				fullName = "roblox.apppageplatform.shared.v1beta1.PymkCarouselSchema"
 			}
 
-			v.HomeUserInfoWidgetSchema = class207
+			v.PymkCarouselSchema = class207
 		end
 
-		typeRegistry.default:register(v.HomeUserInfoWidgetSchema)
+		typeRegistry.default:register(v.PymkCarouselSchema)
 
 		do
 			local class208 = {}
 			class208.__index = class208
 
-			function class208.new(_)
-				return (setmetatable({}, class208))
+			function class208.new(data)
+				local v3
+
+				if not (data == nil or data.title == nil) then
+					v3 = data.title
+				end
+
+				local v4
+
+				if not (data == nil or data.items == nil) then
+					v4 = data.items
+				end
+
+				local v5
+
+				if not (data == nil or data.sort_id == nil) then
+					v5 = data.sort_id
+				end
+
+				local v6
+
+				if not (data == nil or data.recommendation_request_id == nil) then
+					v6 = data.recommendation_request_id
+				end
+
+				local v7
+
+				if not (data == nil or data.seed_user_id == nil) then
+					v7 = data.seed_user_id
+				end
+
+				return (setmetatable({
+					title = v3,
+					items = v4,
+					sort_id = v5,
+					recommendation_request_id = v6,
+					seed_user_id = v7
+				}, class208))
 			end
 
 			function class208:encode()
-				local buf = buffer.create(0)
+				local v2 = buffer.create(0)
+				local v3 = 0
 
-				local buf2 = buffer.create(0)
-				buffer.copy(buf2, 0, buf, 0, 0)
-				return buf2
+				if self.title ~= nil then
+					local encoded = self.title:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.items ~= nil then
+					local encoded = self.items:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.sort_id ~= nil then
+					local encoded = self.sort_id:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.recommendation_request_id ~= nil then
+					local encoded = self.recommendation_request_id:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.seed_user_id ~= nil then
+					local encoded = self.seed_user_id:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
 			end
 
 			function class208.decode(buf: buffer)
-				local v2 = class208.new()
-				local v3 = 0
+				local result = class208.new()
+				local v2 = 0
 
-				while v3 < buffer.len(buf) do
-					local v4, v5
-					v4, v5, v3 = proto.readTag(buf, v3)
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
 
-					if v5 == proto.wireTypes.varint then
-						local v6
-						v6, v3 = proto.readVarInt(buf, v3)
-					elseif v5 == proto.wireTypes.lengthDelimited then
-						local varInt, v6 = proto.readVarInt(buf, v3)
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.title = prop_types.StringProp.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.items = prop_types.ArrayOfPymkItemDataProp.decode(v5)
+						elseif v3 == 3 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.sort_id = prop_types.StringProp.decode(v5)
+						elseif v3 == 4 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.recommendation_request_id = prop_types.StringProp.decode(v5)
+						elseif v3 == 5 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.seed_user_id = prop_types.Int64Prop.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
 
-						v3 = v6 + varInt
-					elseif v5 == proto.wireTypes.i32 then
-						local v6
-						v6, v3 = proto.readFixed32(buf, v3)
-					elseif v5 == proto.wireTypes.i64 then
-						local v6
-						v6, v3 = proto.readFixed64(buf, v3)
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
 					else
-						error("Unsupported wire type: " .. v5)
+						error("Unsupported wire type: " .. v4)
 					end
+				end
+
+				return result
+			end
+
+			function class208:jsonEncode()
+				local v2 = {}
+
+				if self.title ~= nil then
+					v2.title = self.title:jsonEncode()
+				end
+
+				if self.items ~= nil then
+					v2.items = self.items:jsonEncode()
+				end
+
+				if self.sort_id ~= nil then
+					v2.sortId = self.sort_id:jsonEncode()
+				end
+
+				if self.recommendation_request_id ~= nil then
+					v2.recommendationRequestId = self.recommendation_request_id:jsonEncode()
+				end
+
+				if self.seed_user_id ~= nil then
+					v2.seedUserId = self.seed_user_id:jsonEncode()
 				end
 
 				return v2
 			end
 
-			function class208:jsonEncode()
-				return {}
-			end
+			function class208.jsonDecode(data)
+				local v2 = class208.new()
 
-			function class208.jsonDecode(_)
-				return (class208.new())
+				if data.title ~= nil then
+					v2.title = prop_types.StringProp.jsonDecode(data.title)
+				end
+
+				if data.items ~= nil then
+					v2.items = prop_types.ArrayOfPymkItemDataProp.jsonDecode(data.items)
+				end
+
+				if data.sort_id ~= nil then
+					v2.sort_id = prop_types.StringProp.jsonDecode(data.sort_id)
+				end
+
+				if data.sortId ~= nil then
+					v2.sort_id = prop_types.StringProp.jsonDecode(data.sortId)
+				end
+
+				if data.recommendation_request_id ~= nil then
+					v2.recommendation_request_id = prop_types.StringProp.jsonDecode(data.recommendation_request_id)
+				end
+
+				if data.recommendationRequestId ~= nil then
+					v2.recommendation_request_id = prop_types.StringProp.jsonDecode(data.recommendationRequestId)
+				end
+
+				if data.seed_user_id ~= nil then
+					v2.seed_user_id = prop_types.Int64Prop.jsonDecode(data.seed_user_id)
+				end
+
+				if data.seedUserId ~= nil then
+					v2.seed_user_id = prop_types.Int64Prop.jsonDecode(data.seedUserId)
+				end
+
+				return v2
 			end
 
 			class208.descriptor = {
-				name = "HomeUserInfoWidgetSchema_Props",
+				name = "PymkCarouselSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.HomeUserInfoWidgetSchema_Props = class208
+			v.PymkCarouselSchema_Props = class208
 		end
 
-		typeRegistry.default:register(v.HomeUserInfoWidgetSchema_Props)
+		typeRegistry.default:register(v.PymkCarouselSchema_Props)
 
 		do
 			local class209 = {}
@@ -49196,7 +50135,7 @@ do
 						if v3 == 1 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
-							result.props = v.CatalogItemCarouselSchema_Props.decode(v5)
+							result.props = v.FriendsOwnedChipSchema_Props.decode(v5)
 						elseif v3 == 2 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
@@ -49238,7 +50177,7 @@ do
 				local v2 = class209.new()
 
 				if p.props ~= nil then
-					v2.props = v.CatalogItemCarouselSchema_Props.jsonDecode(p.props)
+					v2.props = v.FriendsOwnedChipSchema_Props.jsonDecode(p.props)
 				end
 
 				if p.shared ~= nil then
@@ -49249,20 +50188,473 @@ do
 			end
 
 			class209.descriptor = {
-				name = "CatalogItemCarouselSchema",
-				fullName = "roblox.apppageplatform.shared.v1beta1.CatalogItemCarouselSchema"
+				name = "FriendsOwnedChipSchema",
+				fullName = "roblox.apppageplatform.shared.v1beta1.FriendsOwnedChipSchema"
 			}
 
-			v.CatalogItemCarouselSchema = class209
+			v.FriendsOwnedChipSchema = class209
 		end
 
-		typeRegistry.default:register(v.CatalogItemCarouselSchema)
+		typeRegistry.default:register(v.FriendsOwnedChipSchema)
 
 		do
 			local class210 = {}
 			class210.__index = class210
 
 			function class210.new(data)
+				local v3
+
+				if not (data == nil or data.item_id == nil) then
+					v3 = data.item_id
+				end
+
+				local v4
+
+				if not (data == nil or data.item_type == nil) then
+					v4 = data.item_type
+				end
+
+				local v5
+
+				if not (data == nil or data.layout_order == nil) then
+					v5 = data.layout_order
+				end
+
+				return (setmetatable({ item_id = v3, item_type = v4, layout_order = v5 }, class210))
+			end
+
+			function class210:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.item_id ~= nil then
+					local encoded = self.item_id:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.item_type ~= nil then
+					local encoded = self.item_type:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.layout_order ~= nil then
+					local encoded = self.layout_order:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class210.decode(buf: buffer)
+				local result = class210.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.item_id = prop_types.StringProp.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.item_type = prop_types.StringProp.decode(v5)
+						elseif v3 == 3 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.layout_order = prop_types.Int32Prop.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class210:jsonEncode()
+				local v2 = {}
+
+				if self.item_id ~= nil then
+					v2.itemId = self.item_id:jsonEncode()
+				end
+
+				if self.item_type ~= nil then
+					v2.itemType = self.item_type:jsonEncode()
+				end
+
+				if self.layout_order ~= nil then
+					v2.layoutOrder = self.layout_order:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class210.jsonDecode(data)
+				local v2 = class210.new()
+
+				if data.item_id ~= nil then
+					v2.item_id = prop_types.StringProp.jsonDecode(data.item_id)
+				end
+
+				if data.itemId ~= nil then
+					v2.item_id = prop_types.StringProp.jsonDecode(data.itemId)
+				end
+
+				if data.item_type ~= nil then
+					v2.item_type = prop_types.StringProp.jsonDecode(data.item_type)
+				end
+
+				if data.itemType ~= nil then
+					v2.item_type = prop_types.StringProp.jsonDecode(data.itemType)
+				end
+
+				if data.layout_order ~= nil then
+					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layout_order)
+				end
+
+				if data.layoutOrder ~= nil then
+					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layoutOrder)
+				end
+
+				return v2
+			end
+
+			class210.descriptor = {
+				name = "FriendsOwnedChipSchema_Props",
+				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
+			}
+
+			v.FriendsOwnedChipSchema_Props = class210
+		end
+
+		typeRegistry.default:register(v.FriendsOwnedChipSchema_Props)
+
+		do
+			local class211 = {}
+			class211.__index = class211
+
+			function class211.new(p)
+				local v3
+
+				if not (p == nil or p.props == nil) then
+					v3 = p.props
+				end
+
+				local v4
+
+				if not (p == nil or p.shared == nil) then
+					v4 = p.shared
+				end
+
+				return (setmetatable({ props = v3, shared = v4 }, class211))
+			end
+
+			function class211:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.props ~= nil then
+					local encoded = self.props:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.shared ~= nil then
+					local encoded = self.shared:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class211.decode(buf: buffer)
+				local result = class211.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.props = v.HomeUserInfoWidgetSchema_Props.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.shared = component_shared.ComponentShared.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class211:jsonEncode()
+				local v2 = {}
+
+				if self.props ~= nil then
+					v2.props = self.props:jsonEncode()
+				end
+
+				if self.shared ~= nil then
+					v2.shared = self.shared:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class211.jsonDecode(p)
+				local v2 = class211.new()
+
+				if p.props ~= nil then
+					v2.props = v.HomeUserInfoWidgetSchema_Props.jsonDecode(p.props)
+				end
+
+				if p.shared ~= nil then
+					v2.shared = component_shared.ComponentShared.jsonDecode(p.shared)
+				end
+
+				return v2
+			end
+
+			class211.descriptor = {
+				name = "HomeUserInfoWidgetSchema",
+				fullName = "roblox.apppageplatform.shared.v1beta1.HomeUserInfoWidgetSchema"
+			}
+
+			v.HomeUserInfoWidgetSchema = class211
+		end
+
+		typeRegistry.default:register(v.HomeUserInfoWidgetSchema)
+
+		do
+			local class212 = {}
+			class212.__index = class212
+
+			function class212.new(_)
+				return (setmetatable({}, class212))
+			end
+
+			function class212:encode()
+				local buf = buffer.create(0)
+
+				local buf2 = buffer.create(0)
+				buffer.copy(buf2, 0, buf, 0, 0)
+				return buf2
+			end
+
+			function class212.decode(buf: buffer)
+				local v2 = class212.new()
+				local v3 = 0
+
+				while v3 < buffer.len(buf) do
+					local v4, v5
+					v4, v5, v3 = proto.readTag(buf, v3)
+
+					if v5 == proto.wireTypes.varint then
+						local v6
+						v6, v3 = proto.readVarInt(buf, v3)
+					elseif v5 == proto.wireTypes.lengthDelimited then
+						local varInt, v6 = proto.readVarInt(buf, v3)
+
+						v3 = v6 + varInt
+					elseif v5 == proto.wireTypes.i32 then
+						local v6
+						v6, v3 = proto.readFixed32(buf, v3)
+					elseif v5 == proto.wireTypes.i64 then
+						local v6
+						v6, v3 = proto.readFixed64(buf, v3)
+					else
+						error("Unsupported wire type: " .. v5)
+					end
+				end
+
+				return v2
+			end
+
+			function class212:jsonEncode()
+				return {}
+			end
+
+			function class212.jsonDecode(_)
+				return (class212.new())
+			end
+
+			class212.descriptor = {
+				name = "HomeUserInfoWidgetSchema_Props",
+				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
+			}
+
+			v.HomeUserInfoWidgetSchema_Props = class212
+		end
+
+		typeRegistry.default:register(v.HomeUserInfoWidgetSchema_Props)
+
+		do
+			local class213 = {}
+			class213.__index = class213
+
+			function class213.new(p)
+				local v3
+
+				if not (p == nil or p.props == nil) then
+					v3 = p.props
+				end
+
+				local v4
+
+				if not (p == nil or p.shared == nil) then
+					v4 = p.shared
+				end
+
+				return (setmetatable({ props = v3, shared = v4 }, class213))
+			end
+
+			function class213:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.props ~= nil then
+					local encoded = self.props:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.shared ~= nil then
+					local encoded = self.shared:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class213.decode(buf: buffer)
+				local result = class213.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.props = v.CatalogItemCarouselSchema_Props.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.shared = component_shared.ComponentShared.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class213:jsonEncode()
+				local v2 = {}
+
+				if self.props ~= nil then
+					v2.props = self.props:jsonEncode()
+				end
+
+				if self.shared ~= nil then
+					v2.shared = self.shared:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class213.jsonDecode(p)
+				local v2 = class213.new()
+
+				if p.props ~= nil then
+					v2.props = v.CatalogItemCarouselSchema_Props.jsonDecode(p.props)
+				end
+
+				if p.shared ~= nil then
+					v2.shared = component_shared.ComponentShared.jsonDecode(p.shared)
+				end
+
+				return v2
+			end
+
+			class213.descriptor = {
+				name = "CatalogItemCarouselSchema",
+				fullName = "roblox.apppageplatform.shared.v1beta1.CatalogItemCarouselSchema"
+			}
+
+			v.CatalogItemCarouselSchema = class213
+		end
+
+		typeRegistry.default:register(v.CatalogItemCarouselSchema)
+
+		do
+			local class214 = {}
+			class214.__index = class214
+
+			function class214.new(data)
 				local v3
 
 				if not (data == nil or data.id == nil) then
@@ -49390,10 +50782,10 @@ do
 					tag_id = v18,
 					information_popover_text = v19,
 					widget_style = v20
-				}, class210))
+				}, class214))
 			end
 
-			function class210:encode()
+			function class214:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -49510,8 +50902,8 @@ do
 				return buf
 			end
 
-			function class210.decode(buf: buffer)
-				local result = class210.new()
+			function class214.decode(buf: buffer)
+				local result = class214.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -49613,7 +51005,7 @@ do
 				return result
 			end
 
-			function class210:jsonEncode()
+			function class214:jsonEncode()
 				local v2 = {}
 
 				if self.id ~= nil then
@@ -49691,8 +51083,8 @@ do
 				return v2
 			end
 
-			function class210.jsonDecode(data)
-				local v2 = class210.new()
+			function class214.jsonDecode(data)
+				local v2 = class214.new()
 
 				if data.id ~= nil then
 					v2.id = prop_types.StringProp.jsonDecode(data.id)
@@ -49809,21 +51201,21 @@ do
 				return v2
 			end
 
-			class210.descriptor = {
+			class214.descriptor = {
 				name = "CatalogItemCarouselSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.CatalogItemCarouselSchema_Props = class210
+			v.CatalogItemCarouselSchema_Props = class214
 		end
 
 		typeRegistry.default:register(v.CatalogItemCarouselSchema_Props)
 
 		do
-			local class211 = {}
-			class211.__index = class211
+			local class215 = {}
+			class215.__index = class215
 
-			function class211.new(p)
+			function class215.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -49836,10 +51228,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class211))
+				return (setmetatable({ props = v3, shared = v4 }, class215))
 			end
 
-			function class211:encode()
+			function class215:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -49860,8 +51252,8 @@ do
 				return buf
 			end
 
-			function class211.decode(buf: buffer)
-				local result = class211.new()
+			function class215.decode(buf: buffer)
+				local result = class215.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -49899,7 +51291,7 @@ do
 				return result
 			end
 
-			function class211:jsonEncode()
+			function class215:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -49913,8 +51305,8 @@ do
 				return v2
 			end
 
-			function class211.jsonDecode(p)
-				local v2 = class211.new()
+			function class215.jsonDecode(p)
+				local v2 = class215.new()
 
 				if p.props ~= nil then
 					v2.props = v.CatalogHeroUnitSchema_Props.jsonDecode(p.props)
@@ -49927,21 +51319,21 @@ do
 				return v2
 			end
 
-			class211.descriptor = {
+			class215.descriptor = {
 				name = "CatalogHeroUnitSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.CatalogHeroUnitSchema"
 			}
 
-			v.CatalogHeroUnitSchema = class211
+			v.CatalogHeroUnitSchema = class215
 		end
 
 		typeRegistry.default:register(v.CatalogHeroUnitSchema)
 
 		do
-			local class212 = {}
-			class212.__index = class212
+			local class216 = {}
+			class216.__index = class216
 
-			function class212.new(data)
+			function class216.new(data)
 				local v3
 
 				if not (data == nil or data.id == nil) then
@@ -50062,10 +51454,10 @@ do
 					anchor_point = v17,
 					size = v18,
 					tag_id = v19
-				}, class212))
+				}, class216))
 			end
 
-			function class212:encode()
+			function class216:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -50176,8 +51568,8 @@ do
 				return buf
 			end
 
-			function class212.decode(buf: buffer)
-				local result = class212.new()
+			function class216.decode(buf: buffer)
+				local result = class216.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -50275,7 +51667,7 @@ do
 				return result
 			end
 
-			function class212:jsonEncode()
+			function class216:jsonEncode()
 				local v2 = {}
 
 				if self.id ~= nil then
@@ -50349,8 +51741,8 @@ do
 				return v2
 			end
 
-			function class212.jsonDecode(data)
-				local v2 = class212.new()
+			function class216.jsonDecode(data)
+				local v2 = class216.new()
 
 				if data.id ~= nil then
 					v2.id = prop_types.StringProp.jsonDecode(data.id)
@@ -50459,21 +51851,21 @@ do
 				return v2
 			end
 
-			class212.descriptor = {
+			class216.descriptor = {
 				name = "CatalogHeroUnitSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.CatalogHeroUnitSchema_Props = class212
+			v.CatalogHeroUnitSchema_Props = class216
 		end
 
 		typeRegistry.default:register(v.CatalogHeroUnitSchema_Props)
 
 		do
-			local class213 = {}
-			class213.__index = class213
+			local class217 = {}
+			class217.__index = class217
 
-			function class213.new(data)
+			function class217.new(data)
 				local v3
 
 				if not (data == nil or data.on_activated == nil) then
@@ -50492,10 +51884,10 @@ do
 					v5 = data.variant
 				end
 
-				return (setmetatable({ on_activated = v3, text = v4, variant = v5 }, class213))
+				return (setmetatable({ on_activated = v3, text = v4, variant = v5 }, class217))
 			end
 
-			function class213:encode()
+			function class217:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -50522,8 +51914,8 @@ do
 				return buf
 			end
 
-			function class213.decode(buf: buffer)
-				local result = class213.new()
+			function class217.decode(buf: buffer)
+				local result = class217.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -50565,7 +51957,7 @@ do
 				return result
 			end
 
-			function class213:jsonEncode()
+			function class217:jsonEncode()
 				local v2 = {}
 
 				if self.on_activated ~= nil then
@@ -50583,8 +51975,8 @@ do
 				return v2
 			end
 
-			function class213.jsonDecode(data)
-				local v2 = class213.new()
+			function class217.jsonDecode(data)
+				local v2 = class217.new()
 
 				if data.on_activated ~= nil then
 					v2.on_activated = actions.ActionProp.jsonDecode(data.on_activated)
@@ -50605,31 +51997,31 @@ do
 				return v2
 			end
 
-			class213.descriptor = {
+			class217.descriptor = {
 				name = "TooltipInfoActionProps",
 				fullName = "roblox.apppageplatform.shared.v1beta1.TooltipInfoActionProps"
 			}
 
-			v.TooltipInfoActionProps = class213
+			v.TooltipInfoActionProps = class217
 		end
 
 		typeRegistry.default:register(v.TooltipInfoActionProps)
 
 		do
-			local class214 = {}
-			class214.__index = class214
+			local class218 = {}
+			class218.__index = class218
 
-			function class214.new(p)
+			function class218.new(p)
 				local v3
 
 				if not (p == nil or p.kind == nil) then
 					v3 = p.kind
 				end
 
-				return (setmetatable({ kind = v3 }, class214))
+				return (setmetatable({ kind = v3 }, class218))
 			end
 
-			function class214:encode()
+			function class218:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -50653,8 +52045,8 @@ do
 				return buf
 			end
 
-			function class214.decode(buf: buffer)
-				local result = class214.new()
+			function class218.decode(buf: buffer)
+				local result = class218.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -50702,7 +52094,7 @@ do
 				return result
 			end
 
-			function class214:jsonEncode()
+			function class218:jsonEncode()
 				local v2 = {}
 
 				if self.kind == nil then
@@ -50726,8 +52118,8 @@ do
 				return v2
 			end
 
-			function class214.jsonDecode(data)
-				local v2 = class214.new()
+			function class218.jsonDecode(data)
+				local v2 = class218.new()
 
 				if data.literal ~= nil then
 					v2.kind = {
@@ -50754,21 +52146,21 @@ do
 				return v2
 			end
 
-			class214.descriptor = {
+			class218.descriptor = {
 				name = "TooltipInfoActionPropsProp",
 				fullName = "roblox.apppageplatform.shared.v1beta1.TooltipInfoActionPropsProp"
 			}
 
-			v.TooltipInfoActionPropsProp = class214
+			v.TooltipInfoActionPropsProp = class218
 		end
 
 		typeRegistry.default:register(v.TooltipInfoActionPropsProp)
 
 		do
-			local class215 = {}
-			class215.__index = class215
+			local class219 = {}
+			class219.__index = class219
 
-			function class215.new(p)
+			function class219.new(p)
 				local v3
 
 				if not (p == nil or p.condition == nil) then
@@ -50781,10 +52173,10 @@ do
 					v4 = p.kind
 				end
 
-				return (setmetatable({ condition = v3, kind = v4 }, class215))
+				return (setmetatable({ condition = v3, kind = v4 }, class219))
 			end
 
-			function class215:encode()
+			function class219:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -50810,8 +52202,8 @@ do
 				return buf
 			end
 
-			function class215.decode(buf: buffer)
-				local result = class215.new()
+			function class219.decode(buf: buffer)
+				local result = class219.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -50856,7 +52248,7 @@ do
 				return result
 			end
 
-			function class215:jsonEncode()
+			function class219:jsonEncode()
 				local v2 = {}
 
 				if self.condition ~= nil then
@@ -50877,8 +52269,8 @@ do
 				return v2
 			end
 
-			function class215.jsonDecode(data)
-				local v2 = class215.new()
+			function class219.jsonDecode(data)
+				local v2 = class219.new()
 
 				if data.condition ~= nil then
 					v2.condition = prop_condition.PropCondition.jsonDecode(data.condition)
@@ -50902,27 +52294,27 @@ do
 				return v2
 			end
 
-			class215.descriptor = {
+			class219.descriptor = {
 				name = "TooltipInfoActionPropsProp_ConditionalOption",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
 			}
 
-			v.TooltipInfoActionPropsProp_ConditionalOption = class215
+			v.TooltipInfoActionPropsProp_ConditionalOption = class219
 		end
 
 		typeRegistry.default:register(v.TooltipInfoActionPropsProp_ConditionalOption)
 
 		do
-			local class216 = {}
-			class216.__index = class216
+			local class220 = {}
+			class220.__index = class220
 
-			function class216.new(p)
+			function class220.new(p)
 				return (setmetatable({
 					options = (p == nil or p.options == nil) and {} or p.options
-				}, class216))
+				}, class220))
 			end
 
-			function class216:encode()
+			function class220:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -50939,8 +52331,8 @@ do
 				return buf
 			end
 
-			function class216.decode(buf: buffer)
-				local v2 = class216.new()
+			function class220.decode(buf: buffer)
+				local v2 = class220.new()
 				local v3 = 0
 
 				while v3 < buffer.len(buf) do
@@ -50974,7 +52366,7 @@ do
 				return v2
 			end
 
-			function class216:jsonEncode()
+			function class220:jsonEncode()
 				local v2 = {}
 
 				if self.options == nil or not (#self.options > 0) then
@@ -50992,8 +52384,8 @@ do
 				return v2
 			end
 
-			function class216.jsonDecode(p)
-				local v2 = class216.new()
+			function class220.jsonDecode(p)
+				local v2 = class220.new()
 
 				if p.options == nil then
 					return v2
@@ -51010,31 +52402,31 @@ do
 				return v2
 			end
 
-			class216.descriptor = {
+			class220.descriptor = {
 				name = "TooltipInfoActionPropsProp_ConditionalOptions",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
 			}
 
-			v.TooltipInfoActionPropsProp_ConditionalOptions = class216
+			v.TooltipInfoActionPropsProp_ConditionalOptions = class220
 		end
 
 		typeRegistry.default:register(v.TooltipInfoActionPropsProp_ConditionalOptions)
 
 		do
-			local class217 = {}
-			class217.__index = class217
+			local class221 = {}
+			class221.__index = class221
 
-			function class217.new(p)
+			function class221.new(p)
 				local v3
 
 				if not (p == nil or p.kind == nil) then
 					v3 = p.kind
 				end
 
-				return (setmetatable({ kind = v3 }, class217))
+				return (setmetatable({ kind = v3 }, class221))
 			end
 
-			function class217:encode()
+			function class221:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -51058,8 +52450,8 @@ do
 				return buf
 			end
 
-			function class217.decode(buf: buffer)
-				local result = class217.new()
+			function class221.decode(buf: buffer)
+				local result = class221.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -51107,7 +52499,7 @@ do
 				return result
 			end
 
-			function class217:jsonEncode()
+			function class221:jsonEncode()
 				local v2 = {}
 
 				if self.kind == nil then
@@ -51131,8 +52523,8 @@ do
 				return v2
 			end
 
-			function class217.jsonDecode(data)
-				local v2 = class217.new()
+			function class221.jsonDecode(data)
+				local v2 = class221.new()
 
 				if data.literal ~= nil then
 					v2.kind = {
@@ -51159,21 +52551,21 @@ do
 				return v2
 			end
 
-			class217.descriptor = {
+			class221.descriptor = {
 				name = "ArrayOfTooltipInfoActionsProp",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfTooltipInfoActionsProp"
 			}
 
-			v.ArrayOfTooltipInfoActionsProp = class217
+			v.ArrayOfTooltipInfoActionsProp = class221
 		end
 
 		typeRegistry.default:register(v.ArrayOfTooltipInfoActionsProp)
 
 		do
-			local class218 = {}
-			class218.__index = class218
+			local class222 = {}
+			class222.__index = class222
 
-			function class218.new(p)
+			function class222.new(p)
 				local v3
 
 				if not (p == nil or p.condition == nil) then
@@ -51186,10 +52578,10 @@ do
 					v4 = p.kind
 				end
 
-				return (setmetatable({ condition = v3, kind = v4 }, class218))
+				return (setmetatable({ condition = v3, kind = v4 }, class222))
 			end
 
-			function class218:encode()
+			function class222:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -51215,8 +52607,8 @@ do
 				return buf
 			end
 
-			function class218.decode(buf: buffer)
-				local result = class218.new()
+			function class222.decode(buf: buffer)
+				local result = class222.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -51261,7 +52653,7 @@ do
 				return result
 			end
 
-			function class218:jsonEncode()
+			function class222:jsonEncode()
 				local v2 = {}
 
 				if self.condition ~= nil then
@@ -51282,8 +52674,8 @@ do
 				return v2
 			end
 
-			function class218.jsonDecode(data)
-				local v2 = class218.new()
+			function class222.jsonDecode(data)
+				local v2 = class222.new()
 
 				if data.condition ~= nil then
 					v2.condition = prop_condition.PropCondition.jsonDecode(data.condition)
@@ -51307,27 +52699,27 @@ do
 				return v2
 			end
 
-			class218.descriptor = {
+			class222.descriptor = {
 				name = "ArrayOfTooltipInfoActionsProp_ConditionalOption",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
 			}
 
-			v.ArrayOfTooltipInfoActionsProp_ConditionalOption = class218
+			v.ArrayOfTooltipInfoActionsProp_ConditionalOption = class222
 		end
 
 		typeRegistry.default:register(v.ArrayOfTooltipInfoActionsProp_ConditionalOption)
 
 		do
-			local class219 = {}
-			class219.__index = class219
+			local class223 = {}
+			class223.__index = class223
 
-			function class219.new(p)
+			function class223.new(p)
 				return (setmetatable({
 					options = (p == nil or p.options == nil) and {} or p.options
-				}, class219))
+				}, class223))
 			end
 
-			function class219:encode()
+			function class223:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -51344,8 +52736,8 @@ do
 				return buf
 			end
 
-			function class219.decode(buf: buffer)
-				local v2 = class219.new()
+			function class223.decode(buf: buffer)
+				local v2 = class223.new()
 				local v3 = 0
 
 				while v3 < buffer.len(buf) do
@@ -51379,7 +52771,7 @@ do
 				return v2
 			end
 
-			function class219:jsonEncode()
+			function class223:jsonEncode()
 				local v2 = {}
 
 				if self.options == nil or not (#self.options > 0) then
@@ -51397,8 +52789,8 @@ do
 				return v2
 			end
 
-			function class219.jsonDecode(p)
-				local v2 = class219.new()
+			function class223.jsonDecode(p)
+				local v2 = class223.new()
 
 				if p.options == nil then
 					return v2
@@ -51415,27 +52807,27 @@ do
 				return v2
 			end
 
-			class219.descriptor = {
+			class223.descriptor = {
 				name = "ArrayOfTooltipInfoActionsProp_ConditionalOptions",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
 			}
 
-			v.ArrayOfTooltipInfoActionsProp_ConditionalOptions = class219
+			v.ArrayOfTooltipInfoActionsProp_ConditionalOptions = class223
 		end
 
 		typeRegistry.default:register(v.ArrayOfTooltipInfoActionsProp_ConditionalOptions)
 
 		do
-			local class220 = {}
-			class220.__index = class220
+			local class224 = {}
+			class224.__index = class224
 
-			function class220.new(p)
+			function class224.new(p)
 				return (setmetatable({
 					array = (p == nil or p.array == nil) and {} or p.array
-				}, class220))
+				}, class224))
 			end
 
-			function class220:encode()
+			function class224:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -51452,8 +52844,8 @@ do
 				return buf
 			end
 
-			function class220.decode(buf: buffer)
-				local v2 = class220.new()
+			function class224.decode(buf: buffer)
+				local v2 = class224.new()
 				local v3 = 0
 
 				while v3 < buffer.len(buf) do
@@ -51487,7 +52879,7 @@ do
 				return v2
 			end
 
-			function class220:jsonEncode()
+			function class224:jsonEncode()
 				local v2 = {}
 
 				if self.array == nil or not (#self.array > 0) then
@@ -51505,8 +52897,8 @@ do
 				return v2
 			end
 
-			function class220.jsonDecode(p)
-				local v2 = class220.new()
+			function class224.jsonDecode(p)
+				local v2 = class224.new()
 
 				if p.array == nil then
 					return v2
@@ -51523,21 +52915,21 @@ do
 				return v2
 			end
 
-			class220.descriptor = {
+			class224.descriptor = {
 				name = "ArrayOfTooltipInfoActionsProp_ArrayOfTooltipInfoActions",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfTooltipInfoActions"
 			}
 
-			v.ArrayOfTooltipInfoActionsProp_ArrayOfTooltipInfoActions = class220
+			v.ArrayOfTooltipInfoActionsProp_ArrayOfTooltipInfoActions = class224
 		end
 
 		typeRegistry.default:register(v.ArrayOfTooltipInfoActionsProp_ArrayOfTooltipInfoActions)
 
 		do
-			local class221 = {}
-			class221.__index = class221
+			local class225 = {}
+			class225.__index = class225
 
-			function class221.new(data)
+			function class225.new(data)
 				local v3
 
 				if not (data == nil or data.anchor_id == nil) then
@@ -51595,10 +52987,10 @@ do
 					side = v8,
 					align = v9,
 					actions = v10
-				}, class221))
+				}, class225))
 			end
 
-			function class221:encode()
+			function class225:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -51655,8 +53047,8 @@ do
 				return buf
 			end
 
-			function class221.decode(buf: buffer)
-				local result = class221.new()
+			function class225.decode(buf: buffer)
+				local result = class225.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -51718,7 +53110,7 @@ do
 				return result
 			end
 
-			function class221:jsonEncode()
+			function class225:jsonEncode()
 				local v2 = {}
 
 				if self.anchor_id ~= nil then
@@ -51756,8 +53148,8 @@ do
 				return v2
 			end
 
-			function class221.jsonDecode(data)
-				local v2 = class221.new()
+			function class225.jsonDecode(data)
+				local v2 = class225.new()
 
 				if data.anchor_id ~= nil then
 					v2.anchor_id = prop_types.StringProp.jsonDecode(data.anchor_id)
@@ -51806,31 +53198,31 @@ do
 				return v2
 			end
 
-			class221.descriptor = {
+			class225.descriptor = {
 				name = "CatalogCategoryMenuTooltipInfo",
 				fullName = "roblox.apppageplatform.shared.v1beta1.CatalogCategoryMenuTooltipInfo"
 			}
 
-			v.CatalogCategoryMenuTooltipInfo = class221
+			v.CatalogCategoryMenuTooltipInfo = class225
 		end
 
 		typeRegistry.default:register(v.CatalogCategoryMenuTooltipInfo)
 
 		do
-			local class222 = {}
-			class222.__index = class222
+			local class226 = {}
+			class226.__index = class226
 
-			function class222.new(p)
+			function class226.new(p)
 				local v3
 
 				if not (p == nil or p.kind == nil) then
 					v3 = p.kind
 				end
 
-				return (setmetatable({ kind = v3 }, class222))
+				return (setmetatable({ kind = v3 }, class226))
 			end
 
-			function class222:encode()
+			function class226:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -51854,8 +53246,8 @@ do
 				return buf
 			end
 
-			function class222.decode(buf: buffer)
-				local result = class222.new()
+			function class226.decode(buf: buffer)
+				local result = class226.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -51903,7 +53295,7 @@ do
 				return result
 			end
 
-			function class222:jsonEncode()
+			function class226:jsonEncode()
 				local v2 = {}
 
 				if self.kind == nil then
@@ -51927,8 +53319,8 @@ do
 				return v2
 			end
 
-			function class222.jsonDecode(data)
-				local v2 = class222.new()
+			function class226.jsonDecode(data)
+				local v2 = class226.new()
 
 				if data.literal ~= nil then
 					v2.kind = {
@@ -51955,21 +53347,21 @@ do
 				return v2
 			end
 
-			class222.descriptor = {
+			class226.descriptor = {
 				name = "CatalogCategoryMenuTooltipInfoProp",
 				fullName = "roblox.apppageplatform.shared.v1beta1.CatalogCategoryMenuTooltipInfoProp"
 			}
 
-			v.CatalogCategoryMenuTooltipInfoProp = class222
+			v.CatalogCategoryMenuTooltipInfoProp = class226
 		end
 
 		typeRegistry.default:register(v.CatalogCategoryMenuTooltipInfoProp)
 
 		do
-			local class223 = {}
-			class223.__index = class223
+			local class227 = {}
+			class227.__index = class227
 
-			function class223.new(p)
+			function class227.new(p)
 				local v3
 
 				if not (p == nil or p.condition == nil) then
@@ -51982,10 +53374,10 @@ do
 					v4 = p.kind
 				end
 
-				return (setmetatable({ condition = v3, kind = v4 }, class223))
+				return (setmetatable({ condition = v3, kind = v4 }, class227))
 			end
 
-			function class223:encode()
+			function class227:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -52011,8 +53403,8 @@ do
 				return buf
 			end
 
-			function class223.decode(buf: buffer)
-				local result = class223.new()
+			function class227.decode(buf: buffer)
+				local result = class227.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -52057,7 +53449,7 @@ do
 				return result
 			end
 
-			function class223:jsonEncode()
+			function class227:jsonEncode()
 				local v2 = {}
 
 				if self.condition ~= nil then
@@ -52078,8 +53470,8 @@ do
 				return v2
 			end
 
-			function class223.jsonDecode(data)
-				local v2 = class223.new()
+			function class227.jsonDecode(data)
+				local v2 = class227.new()
 
 				if data.condition ~= nil then
 					v2.condition = prop_condition.PropCondition.jsonDecode(data.condition)
@@ -52103,27 +53495,27 @@ do
 				return v2
 			end
 
-			class223.descriptor = {
+			class227.descriptor = {
 				name = "CatalogCategoryMenuTooltipInfoProp_ConditionalOption",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
 			}
 
-			v.CatalogCategoryMenuTooltipInfoProp_ConditionalOption = class223
+			v.CatalogCategoryMenuTooltipInfoProp_ConditionalOption = class227
 		end
 
 		typeRegistry.default:register(v.CatalogCategoryMenuTooltipInfoProp_ConditionalOption)
 
 		do
-			local class224 = {}
-			class224.__index = class224
+			local class228 = {}
+			class228.__index = class228
 
-			function class224.new(p)
+			function class228.new(p)
 				return (setmetatable({
 					options = (p == nil or p.options == nil) and {} or p.options
-				}, class224))
+				}, class228))
 			end
 
-			function class224:encode()
+			function class228:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -52140,8 +53532,8 @@ do
 				return buf
 			end
 
-			function class224.decode(buf: buffer)
-				local v2 = class224.new()
+			function class228.decode(buf: buffer)
+				local v2 = class228.new()
 				local v3 = 0
 
 				while v3 < buffer.len(buf) do
@@ -52175,7 +53567,7 @@ do
 				return v2
 			end
 
-			function class224:jsonEncode()
+			function class228:jsonEncode()
 				local v2 = {}
 
 				if self.options == nil or not (#self.options > 0) then
@@ -52193,8 +53585,8 @@ do
 				return v2
 			end
 
-			function class224.jsonDecode(p)
-				local v2 = class224.new()
+			function class228.jsonDecode(p)
+				local v2 = class228.new()
 
 				if p.options == nil then
 					return v2
@@ -52211,21 +53603,21 @@ do
 				return v2
 			end
 
-			class224.descriptor = {
+			class228.descriptor = {
 				name = "CatalogCategoryMenuTooltipInfoProp_ConditionalOptions",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
 			}
 
-			v.CatalogCategoryMenuTooltipInfoProp_ConditionalOptions = class224
+			v.CatalogCategoryMenuTooltipInfoProp_ConditionalOptions = class228
 		end
 
 		typeRegistry.default:register(v.CatalogCategoryMenuTooltipInfoProp_ConditionalOptions)
 
 		do
-			local class225 = {}
-			class225.__index = class225
+			local class229 = {}
+			class229.__index = class229
 
-			function class225.new(data)
+			function class229.new(data)
 				local v3
 
 				if not (data == nil or data.id == nil) then
@@ -52244,10 +53636,10 @@ do
 					v5 = data.is_disabled
 				end
 
-				return (setmetatable({ id = v3, text = v4, is_disabled = v5 }, class225))
+				return (setmetatable({ id = v3, text = v4, is_disabled = v5 }, class229))
 			end
 
-			function class225:encode()
+			function class229:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -52274,8 +53666,8 @@ do
 				return buf
 			end
 
-			function class225.decode(buf: buffer)
-				local result = class225.new()
+			function class229.decode(buf: buffer)
+				local result = class229.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -52317,7 +53709,7 @@ do
 				return result
 			end
 
-			function class225:jsonEncode()
+			function class229:jsonEncode()
 				local v2 = {}
 
 				if self.id ~= nil then
@@ -52335,8 +53727,8 @@ do
 				return v2
 			end
 
-			function class225.jsonDecode(data)
-				local v2 = class225.new()
+			function class229.jsonDecode(data)
+				local v2 = class229.new()
 
 				if data.id ~= nil then
 					v2.id = prop_types.StringProp.jsonDecode(data.id)
@@ -52357,21 +53749,21 @@ do
 				return v2
 			end
 
-			class225.descriptor = {
+			class229.descriptor = {
 				name = "CatalogCategoryMenuItem",
 				fullName = "roblox.apppageplatform.shared.v1beta1.CatalogCategoryMenuItem"
 			}
 
-			v.CatalogCategoryMenuItem = class225
+			v.CatalogCategoryMenuItem = class229
 		end
 
 		typeRegistry.default:register(v.CatalogCategoryMenuItem)
 
 		do
-			local class226 = {}
-			class226.__index = class226
+			local class230 = {}
+			class230.__index = class230
 
-			function class226.new(data)
+			function class230.new(data)
 				local v3
 
 				if not (data == nil or data.id == nil) then
@@ -52396,10 +53788,10 @@ do
 					v6 = data.is_disabled
 				end
 
-				return (setmetatable({ id = v3, icon = v4, on_activated = v5, is_disabled = v6 }, class226))
+				return (setmetatable({ id = v3, icon = v4, on_activated = v5, is_disabled = v6 }, class230))
 			end
 
-			function class226:encode()
+			function class230:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -52432,8 +53824,8 @@ do
 				return buf
 			end
 
-			function class226.decode(buf: buffer)
-				local result = class226.new()
+			function class230.decode(buf: buffer)
+				local result = class230.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -52479,7 +53871,7 @@ do
 				return result
 			end
 
-			function class226:jsonEncode()
+			function class230:jsonEncode()
 				local v2 = {}
 
 				if self.id ~= nil then
@@ -52501,8 +53893,8 @@ do
 				return v2
 			end
 
-			function class226.jsonDecode(data)
-				local v2 = class226.new()
+			function class230.jsonDecode(data)
+				local v2 = class230.new()
 
 				if data.id ~= nil then
 					v2.id = prop_types.StringProp.jsonDecode(data.id)
@@ -52531,31 +53923,31 @@ do
 				return v2
 			end
 
-			class226.descriptor = {
+			class230.descriptor = {
 				name = "CategoryMenuButton",
 				fullName = "roblox.apppageplatform.shared.v1beta1.CategoryMenuButton"
 			}
 
-			v.CategoryMenuButton = class226
+			v.CategoryMenuButton = class230
 		end
 
 		typeRegistry.default:register(v.CategoryMenuButton)
 
 		do
-			local class227 = {}
-			class227.__index = class227
+			local class231 = {}
+			class231.__index = class231
 
-			function class227.new(p)
+			function class231.new(p)
 				local v3
 
 				if not (p == nil or p.kind == nil) then
 					v3 = p.kind
 				end
 
-				return (setmetatable({ kind = v3 }, class227))
+				return (setmetatable({ kind = v3 }, class231))
 			end
 
-			function class227:encode()
+			function class231:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -52579,8 +53971,8 @@ do
 				return buf
 			end
 
-			function class227.decode(buf: buffer)
-				local result = class227.new()
+			function class231.decode(buf: buffer)
+				local result = class231.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -52628,7 +54020,7 @@ do
 				return result
 			end
 
-			function class227:jsonEncode()
+			function class231:jsonEncode()
 				local v2 = {}
 
 				if self.kind == nil then
@@ -52652,8 +54044,8 @@ do
 				return v2
 			end
 
-			function class227.jsonDecode(data)
-				local v2 = class227.new()
+			function class231.jsonDecode(data)
+				local v2 = class231.new()
 
 				if data.literal ~= nil then
 					v2.kind = {
@@ -52680,21 +54072,21 @@ do
 				return v2
 			end
 
-			class227.descriptor = {
+			class231.descriptor = {
 				name = "CategoryMenuButtonProp",
 				fullName = "roblox.apppageplatform.shared.v1beta1.CategoryMenuButtonProp"
 			}
 
-			v.CategoryMenuButtonProp = class227
+			v.CategoryMenuButtonProp = class231
 		end
 
 		typeRegistry.default:register(v.CategoryMenuButtonProp)
 
 		do
-			local class228 = {}
-			class228.__index = class228
+			local class232 = {}
+			class232.__index = class232
 
-			function class228.new(p)
+			function class232.new(p)
 				local v3
 
 				if not (p == nil or p.condition == nil) then
@@ -52707,10 +54099,10 @@ do
 					v4 = p.kind
 				end
 
-				return (setmetatable({ condition = v3, kind = v4 }, class228))
+				return (setmetatable({ condition = v3, kind = v4 }, class232))
 			end
 
-			function class228:encode()
+			function class232:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -52736,8 +54128,8 @@ do
 				return buf
 			end
 
-			function class228.decode(buf: buffer)
-				local result = class228.new()
+			function class232.decode(buf: buffer)
+				local result = class232.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -52782,7 +54174,7 @@ do
 				return result
 			end
 
-			function class228:jsonEncode()
+			function class232:jsonEncode()
 				local v2 = {}
 
 				if self.condition ~= nil then
@@ -52803,8 +54195,8 @@ do
 				return v2
 			end
 
-			function class228.jsonDecode(data)
-				local v2 = class228.new()
+			function class232.jsonDecode(data)
+				local v2 = class232.new()
 
 				if data.condition ~= nil then
 					v2.condition = prop_condition.PropCondition.jsonDecode(data.condition)
@@ -52828,27 +54220,27 @@ do
 				return v2
 			end
 
-			class228.descriptor = {
+			class232.descriptor = {
 				name = "CategoryMenuButtonProp_ConditionalOption",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
 			}
 
-			v.CategoryMenuButtonProp_ConditionalOption = class228
+			v.CategoryMenuButtonProp_ConditionalOption = class232
 		end
 
 		typeRegistry.default:register(v.CategoryMenuButtonProp_ConditionalOption)
 
 		do
-			local class229 = {}
-			class229.__index = class229
+			local class233 = {}
+			class233.__index = class233
 
-			function class229.new(p)
+			function class233.new(p)
 				return (setmetatable({
 					options = (p == nil or p.options == nil) and {} or p.options
-				}, class229))
+				}, class233))
 			end
 
-			function class229:encode()
+			function class233:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -52865,8 +54257,8 @@ do
 				return buf
 			end
 
-			function class229.decode(buf: buffer)
-				local v2 = class229.new()
+			function class233.decode(buf: buffer)
+				local v2 = class233.new()
 				local v3 = 0
 
 				while v3 < buffer.len(buf) do
@@ -52900,7 +54292,7 @@ do
 				return v2
 			end
 
-			function class229:jsonEncode()
+			function class233:jsonEncode()
 				local v2 = {}
 
 				if self.options == nil or not (#self.options > 0) then
@@ -52918,8 +54310,8 @@ do
 				return v2
 			end
 
-			function class229.jsonDecode(p)
-				local v2 = class229.new()
+			function class233.jsonDecode(p)
+				local v2 = class233.new()
 
 				if p.options == nil then
 					return v2
@@ -52936,31 +54328,31 @@ do
 				return v2
 			end
 
-			class229.descriptor = {
+			class233.descriptor = {
 				name = "CategoryMenuButtonProp_ConditionalOptions",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
 			}
 
-			v.CategoryMenuButtonProp_ConditionalOptions = class229
+			v.CategoryMenuButtonProp_ConditionalOptions = class233
 		end
 
 		typeRegistry.default:register(v.CategoryMenuButtonProp_ConditionalOptions)
 
 		do
-			local class230 = {}
-			class230.__index = class230
+			local class234 = {}
+			class234.__index = class234
 
-			function class230.new(p)
+			function class234.new(p)
 				local v3
 
 				if not (p == nil or p.kind == nil) then
 					v3 = p.kind
 				end
 
-				return (setmetatable({ kind = v3 }, class230))
+				return (setmetatable({ kind = v3 }, class234))
 			end
 
-			function class230:encode()
+			function class234:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -52988,8 +54380,8 @@ do
 				return buf
 			end
 
-			function class230.decode(buf: buffer)
-				local result = class230.new()
+			function class234.decode(buf: buffer)
+				local result = class234.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -53044,7 +54436,7 @@ do
 				return result
 			end
 
-			function class230:jsonEncode()
+			function class234:jsonEncode()
 				local v2 = {}
 
 				if self.kind == nil then
@@ -53073,8 +54465,8 @@ do
 				return v2
 			end
 
-			function class230.jsonDecode(data)
-				local v2 = class230.new()
+			function class234.jsonDecode(data)
+				local v2 = class234.new()
 
 				if data.literal ~= nil then
 					v2.kind = {
@@ -53115,21 +54507,21 @@ do
 				return v2
 			end
 
-			class230.descriptor = {
+			class234.descriptor = {
 				name = "ArrayOfCatalogCategoryMenuItemProp",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfCatalogCategoryMenuItemProp"
 			}
 
-			v.ArrayOfCatalogCategoryMenuItemProp = class230
+			v.ArrayOfCatalogCategoryMenuItemProp = class234
 		end
 
 		typeRegistry.default:register(v.ArrayOfCatalogCategoryMenuItemProp)
 
 		do
-			local class231 = {}
-			class231.__index = class231
+			local class235 = {}
+			class235.__index = class235
 
-			function class231.new(p)
+			function class235.new(p)
 				local v3
 
 				if not (p == nil or p.condition == nil) then
@@ -53142,10 +54534,10 @@ do
 					v4 = p.kind
 				end
 
-				return (setmetatable({ condition = v3, kind = v4 }, class231))
+				return (setmetatable({ condition = v3, kind = v4 }, class235))
 			end
 
-			function class231:encode()
+			function class235:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -53171,8 +54563,8 @@ do
 				return buf
 			end
 
-			function class231.decode(buf: buffer)
-				local result = class231.new()
+			function class235.decode(buf: buffer)
+				local result = class235.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -53217,7 +54609,7 @@ do
 				return result
 			end
 
-			function class231:jsonEncode()
+			function class235:jsonEncode()
 				local v2 = {}
 
 				if self.condition ~= nil then
@@ -53238,8 +54630,8 @@ do
 				return v2
 			end
 
-			function class231.jsonDecode(data)
-				local v2 = class231.new()
+			function class235.jsonDecode(data)
+				local v2 = class235.new()
 
 				if data.condition ~= nil then
 					v2.condition = prop_condition.PropCondition.jsonDecode(data.condition)
@@ -53263,27 +54655,27 @@ do
 				return v2
 			end
 
-			class231.descriptor = {
+			class235.descriptor = {
 				name = "ArrayOfCatalogCategoryMenuItemProp_ConditionalOption",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
 			}
 
-			v.ArrayOfCatalogCategoryMenuItemProp_ConditionalOption = class231
+			v.ArrayOfCatalogCategoryMenuItemProp_ConditionalOption = class235
 		end
 
 		typeRegistry.default:register(v.ArrayOfCatalogCategoryMenuItemProp_ConditionalOption)
 
 		do
-			local class232 = {}
-			class232.__index = class232
+			local class236 = {}
+			class236.__index = class236
 
-			function class232.new(p)
+			function class236.new(p)
 				return (setmetatable({
 					options = (p == nil or p.options == nil) and {} or p.options
-				}, class232))
+				}, class236))
 			end
 
-			function class232:encode()
+			function class236:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -53300,8 +54692,8 @@ do
 				return buf
 			end
 
-			function class232.decode(buf: buffer)
-				local v2 = class232.new()
+			function class236.decode(buf: buffer)
+				local v2 = class236.new()
 				local v3 = 0
 
 				while v3 < buffer.len(buf) do
@@ -53335,7 +54727,7 @@ do
 				return v2
 			end
 
-			function class232:jsonEncode()
+			function class236:jsonEncode()
 				local v2 = {}
 
 				if self.options == nil or not (#self.options > 0) then
@@ -53353,8 +54745,8 @@ do
 				return v2
 			end
 
-			function class232.jsonDecode(p)
-				local v2 = class232.new()
+			function class236.jsonDecode(p)
+				local v2 = class236.new()
 
 				if p.options == nil then
 					return v2
@@ -53371,27 +54763,27 @@ do
 				return v2
 			end
 
-			class232.descriptor = {
+			class236.descriptor = {
 				name = "ArrayOfCatalogCategoryMenuItemProp_ConditionalOptions",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
 			}
 
-			v.ArrayOfCatalogCategoryMenuItemProp_ConditionalOptions = class232
+			v.ArrayOfCatalogCategoryMenuItemProp_ConditionalOptions = class236
 		end
 
 		typeRegistry.default:register(v.ArrayOfCatalogCategoryMenuItemProp_ConditionalOptions)
 
 		do
-			local class233 = {}
-			class233.__index = class233
+			local class237 = {}
+			class237.__index = class237
 
-			function class233.new(p)
+			function class237.new(p)
 				return (setmetatable({
 					array = (p == nil or p.array == nil) and {} or p.array
-				}, class233))
+				}, class237))
 			end
 
-			function class233:encode()
+			function class237:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -53408,8 +54800,8 @@ do
 				return buf
 			end
 
-			function class233.decode(buf: buffer)
-				local v2 = class233.new()
+			function class237.decode(buf: buffer)
+				local v2 = class237.new()
 				local v3 = 0
 
 				while v3 < buffer.len(buf) do
@@ -53443,7 +54835,7 @@ do
 				return v2
 			end
 
-			function class233:jsonEncode()
+			function class237:jsonEncode()
 				local v2 = {}
 
 				if self.array == nil or not (#self.array > 0) then
@@ -53461,8 +54853,8 @@ do
 				return v2
 			end
 
-			function class233.jsonDecode(p)
-				local v2 = class233.new()
+			function class237.jsonDecode(p)
+				local v2 = class237.new()
 
 				if p.array == nil then
 					return v2
@@ -53479,21 +54871,21 @@ do
 				return v2
 			end
 
-			class233.descriptor = {
+			class237.descriptor = {
 				name = "ArrayOfCatalogCategoryMenuItemProp_ArrayOfCatalogCategoryMenuItem",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfCatalogCategoryMenuItem"
 			}
 
-			v.ArrayOfCatalogCategoryMenuItemProp_ArrayOfCatalogCategoryMenuItem = class233
+			v.ArrayOfCatalogCategoryMenuItemProp_ArrayOfCatalogCategoryMenuItem = class237
 		end
 
 		typeRegistry.default:register(v.ArrayOfCatalogCategoryMenuItemProp_ArrayOfCatalogCategoryMenuItem)
 
 		do
-			local class234 = {}
-			class234.__index = class234
+			local class238 = {}
+			class238.__index = class238
 
-			function class234.new(data)
+			function class238.new(data)
 				local v3
 
 				if not (data == nil or data.kind == nil) then
@@ -53512,10 +54904,10 @@ do
 				end
 
 				v2.field_map = v4
-				return (setmetatable(v2, class234))
+				return (setmetatable(v2, class238))
 			end
 
-			function class234:encode()
+			function class238:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -53549,8 +54941,8 @@ do
 				return buf
 			end
 
-			function class234.decode(buf: buffer)
-				local result = class234.new()
+			function class238.decode(buf: buffer)
+				local result = class238.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -53599,7 +54991,7 @@ do
 				return result
 			end
 
-			function class234:jsonEncode()
+			function class238:jsonEncode()
 				local v2 = {}
 
 				if self.kind ~= nil then
@@ -53627,8 +55019,8 @@ do
 				return v2
 			end
 
-			function class234.jsonDecode(data)
-				local v2 = class234.new()
+			function class238.jsonDecode(data)
+				local v2 = class238.new()
 
 				if data.binding_path ~= nil then
 					v2.kind = { type = "binding_path", value = data.binding_path }
@@ -53676,27 +55068,27 @@ do
 				return v2
 			end
 
-			class234.descriptor = {
+			class238.descriptor = {
 				name = "ArrayOfCatalogCategoryMenuItemProp_ArrayMap",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ArrayMap"
 			}
 
-			v.ArrayOfCatalogCategoryMenuItemProp_ArrayMap = class234
+			v.ArrayOfCatalogCategoryMenuItemProp_ArrayMap = class238
 		end
 
 		typeRegistry.default:register(v.ArrayOfCatalogCategoryMenuItemProp_ArrayMap)
 
 		do
-			local class235 = {}
-			class235.__index = class235
+			local class239 = {}
+			class239.__index = class239
 
-			function class235.new(p)
+			function class239.new(p)
 				return (setmetatable({
 					items = (p == nil or p.items == nil) and {} or p.items
-				}, class235))
+				}, class239))
 			end
 
-			function class235:encode()
+			function class239:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -53713,8 +55105,8 @@ do
 				return buf
 			end
 
-			function class235.decode(buf: buffer)
-				local v2 = class235.new()
+			function class239.decode(buf: buffer)
+				local v2 = class239.new()
 				local v3 = 0
 
 				while v3 < buffer.len(buf) do
@@ -53751,7 +55143,7 @@ do
 				return v2
 			end
 
-			function class235:jsonEncode()
+			function class239:jsonEncode()
 				local v2 = {}
 
 				if self.items == nil or not (#self.items > 0) then
@@ -53769,8 +55161,8 @@ do
 				return v2
 			end
 
-			function class235.jsonDecode(p)
-				local v2 = class235.new()
+			function class239.jsonDecode(p)
+				local v2 = class239.new()
 
 				if p.items == nil then
 					return v2
@@ -53790,531 +55182,15 @@ do
 				return v2
 			end
 
-			class235.descriptor = {
+			class239.descriptor = {
 				name = "ArrayOfCatalogCategoryMenuItemProp_ArrayMap_LiteralItems",
 				fullName = "roblox.apppageplatform.shared.v1beta1.LiteralItems"
 			}
 
-			v.ArrayOfCatalogCategoryMenuItemProp_ArrayMap_LiteralItems = class235
+			v.ArrayOfCatalogCategoryMenuItemProp_ArrayMap_LiteralItems = class239
 		end
 
 		typeRegistry.default:register(v.ArrayOfCatalogCategoryMenuItemProp_ArrayMap_LiteralItems)
-
-		do
-			local class236 = {}
-			class236.__index = class236
-
-			function class236.new(p)
-				local v3
-
-				if not (p == nil or p.kind == nil) then
-					v3 = p.kind
-				end
-
-				return (setmetatable({ kind = v3 }, class236))
-			end
-
-			function class236:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.kind ~= nil then
-					if self.kind.type == "literal" then
-						local encoded = self.kind.value:encode()
-						local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-						v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-					elseif self.kind.type == "binding_path" then
-						local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-						v2, v3 = proto.writeString(v4, v5, self.kind.value)
-					elseif self.kind.type == "conditional" then
-						local encoded = self.kind.value:encode()
-						local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-						v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-					end
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class236.decode(buf: buffer)
-				local result = class236.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.kind = {
-								type = "literal",
-								value = v.ArrayOfCatalogCategoryMenuTooltipInfoProp_ArrayOfCatalogCategoryMenuTooltipInfo.decode(v5)
-							}
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.kind = { type = "binding_path", value = buffer.tostring(v5) }
-						elseif v3 == 3 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.kind = {
-								type = "conditional",
-								value = v.ArrayOfCatalogCategoryMenuTooltipInfoProp_ConditionalOptions.decode(v5)
-							}
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class236:jsonEncode()
-				local v2 = {}
-
-				if self.kind == nil then
-					return v2
-				end
-
-				if self.kind.type == "literal" then
-					v2.literal = self.kind.value:jsonEncode()
-					return v2
-				end
-
-				if self.kind.type == "binding_path" then
-					v2.bindingPath = self.kind.value
-					return v2
-				end
-
-				if self.kind.type == "conditional" then
-					v2.conditional = self.kind.value:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class236.jsonDecode(data)
-				local v2 = class236.new()
-
-				if data.literal ~= nil then
-					v2.kind = {
-						type = "literal",
-						value = v.ArrayOfCatalogCategoryMenuTooltipInfoProp_ArrayOfCatalogCategoryMenuTooltipInfo.jsonDecode(data.literal)
-					}
-				end
-
-				if data.binding_path ~= nil then
-					v2.kind = { type = "binding_path", value = data.binding_path }
-				end
-
-				if data.bindingPath ~= nil then
-					v2.kind = { type = "binding_path", value = data.bindingPath }
-				end
-
-				if data.conditional ~= nil then
-					v2.kind = {
-						type = "conditional",
-						value = v.ArrayOfCatalogCategoryMenuTooltipInfoProp_ConditionalOptions.jsonDecode(data.conditional)
-					}
-				end
-
-				return v2
-			end
-
-			class236.descriptor = {
-				name = "ArrayOfCatalogCategoryMenuTooltipInfoProp",
-				fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfCatalogCategoryMenuTooltipInfoProp"
-			}
-
-			v.ArrayOfCatalogCategoryMenuTooltipInfoProp = class236
-		end
-
-		typeRegistry.default:register(v.ArrayOfCatalogCategoryMenuTooltipInfoProp)
-
-		do
-			local class237 = {}
-			class237.__index = class237
-
-			function class237.new(p)
-				local v3
-
-				if not (p == nil or p.condition == nil) then
-					v3 = p.condition
-				end
-
-				local v4
-
-				if not (p == nil or p.kind == nil) then
-					v4 = p.kind
-				end
-
-				return (setmetatable({ condition = v3, kind = v4 }, class237))
-			end
-
-			function class237:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.condition ~= nil then
-					local encoded = self.condition:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.kind ~= nil then
-					if self.kind.type == "literal" then
-						local encoded = self.kind.value:encode()
-						local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-						v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-					elseif self.kind.type == "binding_path" then
-						local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-						v2, v3 = proto.writeString(v4, v5, self.kind.value)
-					end
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class237.decode(buf: buffer)
-				local result = class237.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.condition = prop_condition.PropCondition.decode(v5)
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.kind = {
-								type = "literal",
-								value = v.ArrayOfCatalogCategoryMenuTooltipInfoProp_ArrayOfCatalogCategoryMenuTooltipInfo.decode(v5)
-							}
-						elseif v3 == 3 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.kind = { type = "binding_path", value = buffer.tostring(v5) }
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class237:jsonEncode()
-				local v2 = {}
-
-				if self.condition ~= nil then
-					v2.condition = self.condition:jsonEncode()
-				end
-
-				if self.kind == nil then
-					return v2
-				end
-
-				if self.kind.type == "literal" then
-					v2.literal = self.kind.value:jsonEncode()
-					return v2
-				elseif self.kind.type == "binding_path" then
-					v2.bindingPath = self.kind.value
-				end
-
-				return v2
-			end
-
-			function class237.jsonDecode(data)
-				local v2 = class237.new()
-
-				if data.condition ~= nil then
-					v2.condition = prop_condition.PropCondition.jsonDecode(data.condition)
-				end
-
-				if data.literal ~= nil then
-					v2.kind = {
-						type = "literal",
-						value = v.ArrayOfCatalogCategoryMenuTooltipInfoProp_ArrayOfCatalogCategoryMenuTooltipInfo.jsonDecode(data.literal)
-					}
-				end
-
-				if data.binding_path ~= nil then
-					v2.kind = { type = "binding_path", value = data.binding_path }
-				end
-
-				if data.bindingPath ~= nil then
-					v2.kind = { type = "binding_path", value = data.bindingPath }
-				end
-
-				return v2
-			end
-
-			class237.descriptor = {
-				name = "ArrayOfCatalogCategoryMenuTooltipInfoProp_ConditionalOption",
-				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
-			}
-
-			v.ArrayOfCatalogCategoryMenuTooltipInfoProp_ConditionalOption = class237
-		end
-
-		typeRegistry.default:register(v.ArrayOfCatalogCategoryMenuTooltipInfoProp_ConditionalOption)
-
-		do
-			local class238 = {}
-			class238.__index = class238
-
-			function class238.new(p)
-				return (setmetatable({
-					options = (p == nil or p.options == nil) and {} or p.options
-				}, class238))
-			end
-
-			function class238:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.options ~= nil and #self.options > 0 then
-					for _, option in self.options do
-						local encoded = option:encode()
-						local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-						v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-					end
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class238.decode(buf: buffer)
-				local v2 = class238.new()
-				local v3 = 0
-
-				while v3 < buffer.len(buf) do
-					local v4, v5
-					v4, v5, v3 = proto.readTag(buf, v3)
-
-					if v5 == proto.wireTypes.varint then
-						local v6
-						v6, v3 = proto.readVarInt(buf, v3)
-					elseif v5 == proto.wireTypes.lengthDelimited then
-						if v4 == 1 then
-							local v6
-							v6, v3 = proto.readBuffer(buf, v3)
-							table.insert(
-								v2.options,
-								v.ArrayOfCatalogCategoryMenuTooltipInfoProp_ConditionalOption.decode(v6)
-							)
-						else
-							local varInt, v6 = proto.readVarInt(buf, v3)
-
-							v3 = v6 + varInt
-						end
-					elseif v5 == proto.wireTypes.i32 then
-						local v6
-						v6, v3 = proto.readFixed32(buf, v3)
-					elseif v5 == proto.wireTypes.i64 then
-						local v6
-						v6, v3 = proto.readFixed64(buf, v3)
-					else
-						error("Unsupported wire type: " .. v5)
-					end
-				end
-
-				return v2
-			end
-
-			function class238:jsonEncode()
-				local v2 = {}
-
-				if self.options == nil or not (#self.options > 0) then
-					return v2
-				end
-
-				local v3 = {}
-
-				for _, option in self.options do
-					table.insert(v3, option:jsonEncode())
-				end
-
-				v2.options = v3
-
-				return v2
-			end
-
-			function class238.jsonDecode(p)
-				local v2 = class238.new()
-
-				if p.options == nil then
-					return v2
-				end
-
-				local v3 = {}
-
-				for _, option in p.options do
-					table.insert(v3, v.ArrayOfCatalogCategoryMenuTooltipInfoProp_ConditionalOption.jsonDecode(option))
-				end
-
-				v2.options = v3
-
-				return v2
-			end
-
-			class238.descriptor = {
-				name = "ArrayOfCatalogCategoryMenuTooltipInfoProp_ConditionalOptions",
-				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
-			}
-
-			v.ArrayOfCatalogCategoryMenuTooltipInfoProp_ConditionalOptions = class238
-		end
-
-		typeRegistry.default:register(v.ArrayOfCatalogCategoryMenuTooltipInfoProp_ConditionalOptions)
-
-		do
-			local class239 = {}
-			class239.__index = class239
-
-			function class239.new(p)
-				return (setmetatable({
-					array = (p == nil or p.array == nil) and {} or p.array
-				}, class239))
-			end
-
-			function class239:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.array ~= nil and #self.array > 0 then
-					for _, item in self.array do
-						local encoded = item:encode()
-						local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-						v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-					end
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class239.decode(buf: buffer)
-				local v2 = class239.new()
-				local v3 = 0
-
-				while v3 < buffer.len(buf) do
-					local v4, v5
-					v4, v5, v3 = proto.readTag(buf, v3)
-
-					if v5 == proto.wireTypes.varint then
-						local v6
-						v6, v3 = proto.readVarInt(buf, v3)
-					elseif v5 == proto.wireTypes.lengthDelimited then
-						if v4 == 1 then
-							local v6
-							v6, v3 = proto.readBuffer(buf, v3)
-							table.insert(v2.array, v.CatalogCategoryMenuTooltipInfoProp.decode(v6))
-						else
-							local varInt, v6 = proto.readVarInt(buf, v3)
-
-							v3 = v6 + varInt
-						end
-					elseif v5 == proto.wireTypes.i32 then
-						local v6
-						v6, v3 = proto.readFixed32(buf, v3)
-					elseif v5 == proto.wireTypes.i64 then
-						local v6
-						v6, v3 = proto.readFixed64(buf, v3)
-					else
-						error("Unsupported wire type: " .. v5)
-					end
-				end
-
-				return v2
-			end
-
-			function class239:jsonEncode()
-				local v2 = {}
-
-				if self.array == nil or not (#self.array > 0) then
-					return v2
-				end
-
-				local v3 = {}
-
-				for _, item in self.array do
-					table.insert(v3, item:jsonEncode())
-				end
-
-				v2.array = v3
-
-				return v2
-			end
-
-			function class239.jsonDecode(p)
-				local v2 = class239.new()
-
-				if p.array == nil then
-					return v2
-				end
-
-				local v3 = {}
-
-				for _, item in p.array do
-					table.insert(v3, v.CatalogCategoryMenuTooltipInfoProp.jsonDecode(item))
-				end
-
-				v2.array = v3
-
-				return v2
-			end
-
-			class239.descriptor = {
-				name = "ArrayOfCatalogCategoryMenuTooltipInfoProp_ArrayOfCatalogCategoryMenuTooltipInfo",
-				fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfCatalogCategoryMenuTooltipInfo"
-			}
-
-			v.ArrayOfCatalogCategoryMenuTooltipInfoProp_ArrayOfCatalogCategoryMenuTooltipInfo = class239
-		end
-
-		typeRegistry.default:register(v.ArrayOfCatalogCategoryMenuTooltipInfoProp_ArrayOfCatalogCategoryMenuTooltipInfo)
 
 		do
 			local class240 = {}
@@ -54371,7 +55247,7 @@ do
 							v5, v2 = proto.readBuffer(buf, v2)
 							result.kind = {
 								type = "literal",
-								value = v.ArrayOfCategoryMenuButtonProp_ArrayOfCategoryMenuButton.decode(v5)
+								value = v.ArrayOfCatalogCategoryMenuTooltipInfoProp_ArrayOfCatalogCategoryMenuTooltipInfo.decode(v5)
 							}
 						elseif v3 == 2 then
 							local v5
@@ -54382,7 +55258,7 @@ do
 							v5, v2 = proto.readBuffer(buf, v2)
 							result.kind = {
 								type = "conditional",
-								value = v.ArrayOfCategoryMenuButtonProp_ConditionalOptions.decode(v5)
+								value = v.ArrayOfCatalogCategoryMenuTooltipInfoProp_ConditionalOptions.decode(v5)
 							}
 						else
 							local varInt, v5 = proto.readVarInt(buf, v2)
@@ -54433,7 +55309,7 @@ do
 				if data.literal ~= nil then
 					v2.kind = {
 						type = "literal",
-						value = v.ArrayOfCategoryMenuButtonProp_ArrayOfCategoryMenuButton.jsonDecode(data.literal)
+						value = v.ArrayOfCatalogCategoryMenuTooltipInfoProp_ArrayOfCatalogCategoryMenuTooltipInfo.jsonDecode(data.literal)
 					}
 				end
 
@@ -54448,7 +55324,7 @@ do
 				if data.conditional ~= nil then
 					v2.kind = {
 						type = "conditional",
-						value = v.ArrayOfCategoryMenuButtonProp_ConditionalOptions.jsonDecode(data.conditional)
+						value = v.ArrayOfCatalogCategoryMenuTooltipInfoProp_ConditionalOptions.jsonDecode(data.conditional)
 					}
 				end
 
@@ -54456,14 +55332,14 @@ do
 			end
 
 			class240.descriptor = {
-				name = "ArrayOfCategoryMenuButtonProp",
-				fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfCategoryMenuButtonProp"
+				name = "ArrayOfCatalogCategoryMenuTooltipInfoProp",
+				fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfCatalogCategoryMenuTooltipInfoProp"
 			}
 
-			v.ArrayOfCategoryMenuButtonProp = class240
+			v.ArrayOfCatalogCategoryMenuTooltipInfoProp = class240
 		end
 
-		typeRegistry.default:register(v.ArrayOfCategoryMenuButtonProp)
+		typeRegistry.default:register(v.ArrayOfCatalogCategoryMenuTooltipInfoProp)
 
 		do
 			local class241 = {}
@@ -54532,7 +55408,7 @@ do
 							v5, v2 = proto.readBuffer(buf, v2)
 							result.kind = {
 								type = "literal",
-								value = v.ArrayOfCategoryMenuButtonProp_ArrayOfCategoryMenuButton.decode(v5)
+								value = v.ArrayOfCatalogCategoryMenuTooltipInfoProp_ArrayOfCatalogCategoryMenuTooltipInfo.decode(v5)
 							}
 						elseif v3 == 3 then
 							local v5
@@ -54588,7 +55464,7 @@ do
 				if data.literal ~= nil then
 					v2.kind = {
 						type = "literal",
-						value = v.ArrayOfCategoryMenuButtonProp_ArrayOfCategoryMenuButton.jsonDecode(data.literal)
+						value = v.ArrayOfCatalogCategoryMenuTooltipInfoProp_ArrayOfCatalogCategoryMenuTooltipInfo.jsonDecode(data.literal)
 					}
 				end
 
@@ -54604,14 +55480,14 @@ do
 			end
 
 			class241.descriptor = {
-				name = "ArrayOfCategoryMenuButtonProp_ConditionalOption",
+				name = "ArrayOfCatalogCategoryMenuTooltipInfoProp_ConditionalOption",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
 			}
 
-			v.ArrayOfCategoryMenuButtonProp_ConditionalOption = class241
+			v.ArrayOfCatalogCategoryMenuTooltipInfoProp_ConditionalOption = class241
 		end
 
-		typeRegistry.default:register(v.ArrayOfCategoryMenuButtonProp_ConditionalOption)
+		typeRegistry.default:register(v.ArrayOfCatalogCategoryMenuTooltipInfoProp_ConditionalOption)
 
 		do
 			local class242 = {}
@@ -54655,7 +55531,10 @@ do
 						if v4 == 1 then
 							local v6
 							v6, v3 = proto.readBuffer(buf, v3)
-							table.insert(v2.options, v.ArrayOfCategoryMenuButtonProp_ConditionalOption.decode(v6))
+							table.insert(
+								v2.options,
+								v.ArrayOfCatalogCategoryMenuTooltipInfoProp_ConditionalOption.decode(v6)
+							)
 						else
 							local varInt, v6 = proto.readVarInt(buf, v3)
 
@@ -54703,7 +55582,7 @@ do
 				local v3 = {}
 
 				for _, option in p.options do
-					table.insert(v3, v.ArrayOfCategoryMenuButtonProp_ConditionalOption.jsonDecode(option))
+					table.insert(v3, v.ArrayOfCatalogCategoryMenuTooltipInfoProp_ConditionalOption.jsonDecode(option))
 				end
 
 				v2.options = v3
@@ -54712,14 +55591,14 @@ do
 			end
 
 			class242.descriptor = {
-				name = "ArrayOfCategoryMenuButtonProp_ConditionalOptions",
+				name = "ArrayOfCatalogCategoryMenuTooltipInfoProp_ConditionalOptions",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
 			}
 
-			v.ArrayOfCategoryMenuButtonProp_ConditionalOptions = class242
+			v.ArrayOfCatalogCategoryMenuTooltipInfoProp_ConditionalOptions = class242
 		end
 
-		typeRegistry.default:register(v.ArrayOfCategoryMenuButtonProp_ConditionalOptions)
+		typeRegistry.default:register(v.ArrayOfCatalogCategoryMenuTooltipInfoProp_ConditionalOptions)
 
 		do
 			local class243 = {}
@@ -54763,7 +55642,7 @@ do
 						if v4 == 1 then
 							local v6
 							v6, v3 = proto.readBuffer(buf, v3)
-							table.insert(v2.array, v.CategoryMenuButtonProp.decode(v6))
+							table.insert(v2.array, v.CatalogCategoryMenuTooltipInfoProp.decode(v6))
 						else
 							local varInt, v6 = proto.readVarInt(buf, v3)
 
@@ -54811,7 +55690,7 @@ do
 				local v3 = {}
 
 				for _, item in p.array do
-					table.insert(v3, v.CategoryMenuButtonProp.jsonDecode(item))
+					table.insert(v3, v.CatalogCategoryMenuTooltipInfoProp.jsonDecode(item))
 				end
 
 				v2.array = v3
@@ -54820,20 +55699,533 @@ do
 			end
 
 			class243.descriptor = {
-				name = "ArrayOfCategoryMenuButtonProp_ArrayOfCategoryMenuButton",
-				fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfCategoryMenuButton"
+				name = "ArrayOfCatalogCategoryMenuTooltipInfoProp_ArrayOfCatalogCategoryMenuTooltipInfo",
+				fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfCatalogCategoryMenuTooltipInfo"
 			}
 
-			v.ArrayOfCategoryMenuButtonProp_ArrayOfCategoryMenuButton = class243
+			v.ArrayOfCatalogCategoryMenuTooltipInfoProp_ArrayOfCatalogCategoryMenuTooltipInfo = class243
 		end
 
-		typeRegistry.default:register(v.ArrayOfCategoryMenuButtonProp_ArrayOfCategoryMenuButton)
+		typeRegistry.default:register(v.ArrayOfCatalogCategoryMenuTooltipInfoProp_ArrayOfCatalogCategoryMenuTooltipInfo)
 
 		do
 			local class244 = {}
 			class244.__index = class244
 
 			function class244.new(p)
+				local v3
+
+				if not (p == nil or p.kind == nil) then
+					v3 = p.kind
+				end
+
+				return (setmetatable({ kind = v3 }, class244))
+			end
+
+			function class244:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.kind ~= nil then
+					if self.kind.type == "literal" then
+						local encoded = self.kind.value:encode()
+						local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+						v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+					elseif self.kind.type == "binding_path" then
+						local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+						v2, v3 = proto.writeString(v4, v5, self.kind.value)
+					elseif self.kind.type == "conditional" then
+						local encoded = self.kind.value:encode()
+						local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+						v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+					end
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class244.decode(buf: buffer)
+				local result = class244.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.kind = {
+								type = "literal",
+								value = v.ArrayOfCategoryMenuButtonProp_ArrayOfCategoryMenuButton.decode(v5)
+							}
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.kind = { type = "binding_path", value = buffer.tostring(v5) }
+						elseif v3 == 3 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.kind = {
+								type = "conditional",
+								value = v.ArrayOfCategoryMenuButtonProp_ConditionalOptions.decode(v5)
+							}
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class244:jsonEncode()
+				local v2 = {}
+
+				if self.kind == nil then
+					return v2
+				end
+
+				if self.kind.type == "literal" then
+					v2.literal = self.kind.value:jsonEncode()
+					return v2
+				end
+
+				if self.kind.type == "binding_path" then
+					v2.bindingPath = self.kind.value
+					return v2
+				end
+
+				if self.kind.type == "conditional" then
+					v2.conditional = self.kind.value:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class244.jsonDecode(data)
+				local v2 = class244.new()
+
+				if data.literal ~= nil then
+					v2.kind = {
+						type = "literal",
+						value = v.ArrayOfCategoryMenuButtonProp_ArrayOfCategoryMenuButton.jsonDecode(data.literal)
+					}
+				end
+
+				if data.binding_path ~= nil then
+					v2.kind = { type = "binding_path", value = data.binding_path }
+				end
+
+				if data.bindingPath ~= nil then
+					v2.kind = { type = "binding_path", value = data.bindingPath }
+				end
+
+				if data.conditional ~= nil then
+					v2.kind = {
+						type = "conditional",
+						value = v.ArrayOfCategoryMenuButtonProp_ConditionalOptions.jsonDecode(data.conditional)
+					}
+				end
+
+				return v2
+			end
+
+			class244.descriptor = {
+				name = "ArrayOfCategoryMenuButtonProp",
+				fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfCategoryMenuButtonProp"
+			}
+
+			v.ArrayOfCategoryMenuButtonProp = class244
+		end
+
+		typeRegistry.default:register(v.ArrayOfCategoryMenuButtonProp)
+
+		do
+			local class245 = {}
+			class245.__index = class245
+
+			function class245.new(p)
+				local v3
+
+				if not (p == nil or p.condition == nil) then
+					v3 = p.condition
+				end
+
+				local v4
+
+				if not (p == nil or p.kind == nil) then
+					v4 = p.kind
+				end
+
+				return (setmetatable({ condition = v3, kind = v4 }, class245))
+			end
+
+			function class245:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.condition ~= nil then
+					local encoded = self.condition:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.kind ~= nil then
+					if self.kind.type == "literal" then
+						local encoded = self.kind.value:encode()
+						local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+						v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+					elseif self.kind.type == "binding_path" then
+						local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+						v2, v3 = proto.writeString(v4, v5, self.kind.value)
+					end
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class245.decode(buf: buffer)
+				local result = class245.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.condition = prop_condition.PropCondition.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.kind = {
+								type = "literal",
+								value = v.ArrayOfCategoryMenuButtonProp_ArrayOfCategoryMenuButton.decode(v5)
+							}
+						elseif v3 == 3 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.kind = { type = "binding_path", value = buffer.tostring(v5) }
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class245:jsonEncode()
+				local v2 = {}
+
+				if self.condition ~= nil then
+					v2.condition = self.condition:jsonEncode()
+				end
+
+				if self.kind == nil then
+					return v2
+				end
+
+				if self.kind.type == "literal" then
+					v2.literal = self.kind.value:jsonEncode()
+					return v2
+				elseif self.kind.type == "binding_path" then
+					v2.bindingPath = self.kind.value
+				end
+
+				return v2
+			end
+
+			function class245.jsonDecode(data)
+				local v2 = class245.new()
+
+				if data.condition ~= nil then
+					v2.condition = prop_condition.PropCondition.jsonDecode(data.condition)
+				end
+
+				if data.literal ~= nil then
+					v2.kind = {
+						type = "literal",
+						value = v.ArrayOfCategoryMenuButtonProp_ArrayOfCategoryMenuButton.jsonDecode(data.literal)
+					}
+				end
+
+				if data.binding_path ~= nil then
+					v2.kind = { type = "binding_path", value = data.binding_path }
+				end
+
+				if data.bindingPath ~= nil then
+					v2.kind = { type = "binding_path", value = data.bindingPath }
+				end
+
+				return v2
+			end
+
+			class245.descriptor = {
+				name = "ArrayOfCategoryMenuButtonProp_ConditionalOption",
+				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
+			}
+
+			v.ArrayOfCategoryMenuButtonProp_ConditionalOption = class245
+		end
+
+		typeRegistry.default:register(v.ArrayOfCategoryMenuButtonProp_ConditionalOption)
+
+		do
+			local class246 = {}
+			class246.__index = class246
+
+			function class246.new(p)
+				return (setmetatable({
+					options = (p == nil or p.options == nil) and {} or p.options
+				}, class246))
+			end
+
+			function class246:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.options ~= nil and #self.options > 0 then
+					for _, option in self.options do
+						local encoded = option:encode()
+						local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+						v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+					end
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class246.decode(buf: buffer)
+				local v2 = class246.new()
+				local v3 = 0
+
+				while v3 < buffer.len(buf) do
+					local v4, v5
+					v4, v5, v3 = proto.readTag(buf, v3)
+
+					if v5 == proto.wireTypes.varint then
+						local v6
+						v6, v3 = proto.readVarInt(buf, v3)
+					elseif v5 == proto.wireTypes.lengthDelimited then
+						if v4 == 1 then
+							local v6
+							v6, v3 = proto.readBuffer(buf, v3)
+							table.insert(v2.options, v.ArrayOfCategoryMenuButtonProp_ConditionalOption.decode(v6))
+						else
+							local varInt, v6 = proto.readVarInt(buf, v3)
+
+							v3 = v6 + varInt
+						end
+					elseif v5 == proto.wireTypes.i32 then
+						local v6
+						v6, v3 = proto.readFixed32(buf, v3)
+					elseif v5 == proto.wireTypes.i64 then
+						local v6
+						v6, v3 = proto.readFixed64(buf, v3)
+					else
+						error("Unsupported wire type: " .. v5)
+					end
+				end
+
+				return v2
+			end
+
+			function class246:jsonEncode()
+				local v2 = {}
+
+				if self.options == nil or not (#self.options > 0) then
+					return v2
+				end
+
+				local v3 = {}
+
+				for _, option in self.options do
+					table.insert(v3, option:jsonEncode())
+				end
+
+				v2.options = v3
+
+				return v2
+			end
+
+			function class246.jsonDecode(p)
+				local v2 = class246.new()
+
+				if p.options == nil then
+					return v2
+				end
+
+				local v3 = {}
+
+				for _, option in p.options do
+					table.insert(v3, v.ArrayOfCategoryMenuButtonProp_ConditionalOption.jsonDecode(option))
+				end
+
+				v2.options = v3
+
+				return v2
+			end
+
+			class246.descriptor = {
+				name = "ArrayOfCategoryMenuButtonProp_ConditionalOptions",
+				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
+			}
+
+			v.ArrayOfCategoryMenuButtonProp_ConditionalOptions = class246
+		end
+
+		typeRegistry.default:register(v.ArrayOfCategoryMenuButtonProp_ConditionalOptions)
+
+		do
+			local class247 = {}
+			class247.__index = class247
+
+			function class247.new(p)
+				return (setmetatable({
+					array = (p == nil or p.array == nil) and {} or p.array
+				}, class247))
+			end
+
+			function class247:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.array ~= nil and #self.array > 0 then
+					for _, item in self.array do
+						local encoded = item:encode()
+						local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+						v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+					end
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class247.decode(buf: buffer)
+				local v2 = class247.new()
+				local v3 = 0
+
+				while v3 < buffer.len(buf) do
+					local v4, v5
+					v4, v5, v3 = proto.readTag(buf, v3)
+
+					if v5 == proto.wireTypes.varint then
+						local v6
+						v6, v3 = proto.readVarInt(buf, v3)
+					elseif v5 == proto.wireTypes.lengthDelimited then
+						if v4 == 1 then
+							local v6
+							v6, v3 = proto.readBuffer(buf, v3)
+							table.insert(v2.array, v.CategoryMenuButtonProp.decode(v6))
+						else
+							local varInt, v6 = proto.readVarInt(buf, v3)
+
+							v3 = v6 + varInt
+						end
+					elseif v5 == proto.wireTypes.i32 then
+						local v6
+						v6, v3 = proto.readFixed32(buf, v3)
+					elseif v5 == proto.wireTypes.i64 then
+						local v6
+						v6, v3 = proto.readFixed64(buf, v3)
+					else
+						error("Unsupported wire type: " .. v5)
+					end
+				end
+
+				return v2
+			end
+
+			function class247:jsonEncode()
+				local v2 = {}
+
+				if self.array == nil or not (#self.array > 0) then
+					return v2
+				end
+
+				local v3 = {}
+
+				for _, item in self.array do
+					table.insert(v3, item:jsonEncode())
+				end
+
+				v2.array = v3
+
+				return v2
+			end
+
+			function class247.jsonDecode(p)
+				local v2 = class247.new()
+
+				if p.array == nil then
+					return v2
+				end
+
+				local v3 = {}
+
+				for _, item in p.array do
+					table.insert(v3, v.CategoryMenuButtonProp.jsonDecode(item))
+				end
+
+				v2.array = v3
+
+				return v2
+			end
+
+			class247.descriptor = {
+				name = "ArrayOfCategoryMenuButtonProp_ArrayOfCategoryMenuButton",
+				fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfCategoryMenuButton"
+			}
+
+			v.ArrayOfCategoryMenuButtonProp_ArrayOfCategoryMenuButton = class247
+		end
+
+		typeRegistry.default:register(v.ArrayOfCategoryMenuButtonProp_ArrayOfCategoryMenuButton)
+
+		do
+			local class248 = {}
+			class248.__index = class248
+
+			function class248.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -54846,10 +56238,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class244))
+				return (setmetatable({ props = v3, shared = v4 }, class248))
 			end
 
-			function class244:encode()
+			function class248:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -54870,8 +56262,8 @@ do
 				return buf
 			end
 
-			function class244.decode(buf: buffer)
-				local result = class244.new()
+			function class248.decode(buf: buffer)
+				local result = class248.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -54909,7 +56301,7 @@ do
 				return result
 			end
 
-			function class244:jsonEncode()
+			function class248:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -54923,8 +56315,8 @@ do
 				return v2
 			end
 
-			function class244.jsonDecode(p)
-				local v2 = class244.new()
+			function class248.jsonDecode(p)
+				local v2 = class248.new()
 
 				if p.props ~= nil then
 					v2.props = v.CatalogCategoryMenuSchema_Props.jsonDecode(p.props)
@@ -54937,21 +56329,21 @@ do
 				return v2
 			end
 
-			class244.descriptor = {
+			class248.descriptor = {
 				name = "CatalogCategoryMenuSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.CatalogCategoryMenuSchema"
 			}
 
-			v.CatalogCategoryMenuSchema = class244
+			v.CatalogCategoryMenuSchema = class248
 		end
 
 		typeRegistry.default:register(v.CatalogCategoryMenuSchema)
 
 		do
-			local class245 = {}
-			class245.__index = class245
+			local class249 = {}
+			class249.__index = class249
 
-			function class245.new(data)
+			function class249.new(data)
 				local v3
 
 				if not (data == nil or data.categories == nil) then
@@ -55030,10 +56422,10 @@ do
 					position = v11,
 					layout_order = v12,
 					z_index = v13
-				}, class245))
+				}, class249))
 			end
 
-			function class245:encode()
+			function class249:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -55108,8 +56500,8 @@ do
 				return buf
 			end
 
-			function class245.decode(buf: buffer)
-				local result = class245.new()
+			function class249.decode(buf: buffer)
+				local result = class249.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -55183,7 +56575,7 @@ do
 				return result
 			end
 
-			function class245:jsonEncode()
+			function class249:jsonEncode()
 				local v2 = {}
 
 				if self.categories ~= nil then
@@ -55233,8 +56625,8 @@ do
 				return v2
 			end
 
-			function class245.jsonDecode(data)
-				local v2 = class245.new()
+			function class249.jsonDecode(data)
+				local v2 = class249.new()
 
 				if data.categories ~= nil then
 					v2.categories = v.ArrayOfCatalogCategoryMenuItemProp.jsonDecode(data.categories)
@@ -55311,21 +56703,21 @@ do
 				return v2
 			end
 
-			class245.descriptor = {
+			class249.descriptor = {
 				name = "CatalogCategoryMenuSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.CatalogCategoryMenuSchema_Props = class245
+			v.CatalogCategoryMenuSchema_Props = class249
 		end
 
 		typeRegistry.default:register(v.CatalogCategoryMenuSchema_Props)
 
 		do
-			local class246 = {}
-			class246.__index = class246
+			local class250 = {}
+			class250.__index = class250
 
-			function class246.new(p)
+			function class250.new(p)
 				local v3
 
 				if not (p == nil or p.id == nil) then
@@ -55338,10 +56730,10 @@ do
 					v4 = p.type
 				end
 
-				return (setmetatable({ id = v3, type = v4 }, class246))
+				return (setmetatable({ id = v3, type = v4 }, class250))
 			end
 
-			function class246:encode()
+			function class250:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -55362,8 +56754,8 @@ do
 				return buf
 			end
 
-			function class246.decode(buf: buffer)
-				local result = class246.new()
+			function class250.decode(buf: buffer)
+				local result = class250.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -55401,7 +56793,7 @@ do
 				return result
 			end
 
-			function class246:jsonEncode()
+			function class250:jsonEncode()
 				local v2 = {}
 
 				if self.id ~= nil then
@@ -55415,8 +56807,8 @@ do
 				return v2
 			end
 
-			function class246.jsonDecode(p)
-				local v2 = class246.new()
+			function class250.jsonDecode(p)
+				local v2 = class250.new()
 
 				if p.id ~= nil then
 					v2.id = prop_types.StringProp.jsonDecode(p.id)
@@ -55429,31 +56821,31 @@ do
 				return v2
 			end
 
-			class246.descriptor = {
+			class250.descriptor = {
 				name = "ItemMediaHeaderBundleItem",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ItemMediaHeaderBundleItem"
 			}
 
-			v.ItemMediaHeaderBundleItem = class246
+			v.ItemMediaHeaderBundleItem = class250
 		end
 
 		typeRegistry.default:register(v.ItemMediaHeaderBundleItem)
 
 		do
-			local class247 = {}
-			class247.__index = class247
+			local class251 = {}
+			class251.__index = class251
 
-			function class247.new(p)
+			function class251.new(p)
 				local v3
 
 				if not (p == nil or p.kind == nil) then
 					v3 = p.kind
 				end
 
-				return (setmetatable({ kind = v3 }, class247))
+				return (setmetatable({ kind = v3 }, class251))
 			end
 
-			function class247:encode()
+			function class251:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -55481,8 +56873,8 @@ do
 				return buf
 			end
 
-			function class247.decode(buf: buffer)
-				local result = class247.new()
+			function class251.decode(buf: buffer)
+				local result = class251.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -55537,7 +56929,7 @@ do
 				return result
 			end
 
-			function class247:jsonEncode()
+			function class251:jsonEncode()
 				local v2 = {}
 
 				if self.kind == nil then
@@ -55566,8 +56958,8 @@ do
 				return v2
 			end
 
-			function class247.jsonDecode(data)
-				local v2 = class247.new()
+			function class251.jsonDecode(data)
+				local v2 = class251.new()
 
 				if data.literal ~= nil then
 					v2.kind = {
@@ -55608,21 +57000,21 @@ do
 				return v2
 			end
 
-			class247.descriptor = {
+			class251.descriptor = {
 				name = "ArrayOfItemMediaHeaderBundleItemProp",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfItemMediaHeaderBundleItemProp"
 			}
 
-			v.ArrayOfItemMediaHeaderBundleItemProp = class247
+			v.ArrayOfItemMediaHeaderBundleItemProp = class251
 		end
 
 		typeRegistry.default:register(v.ArrayOfItemMediaHeaderBundleItemProp)
 
 		do
-			local class248 = {}
-			class248.__index = class248
+			local class252 = {}
+			class252.__index = class252
 
-			function class248.new(p)
+			function class252.new(p)
 				local v3
 
 				if not (p == nil or p.condition == nil) then
@@ -55635,10 +57027,10 @@ do
 					v4 = p.kind
 				end
 
-				return (setmetatable({ condition = v3, kind = v4 }, class248))
+				return (setmetatable({ condition = v3, kind = v4 }, class252))
 			end
 
-			function class248:encode()
+			function class252:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -55664,8 +57056,8 @@ do
 				return buf
 			end
 
-			function class248.decode(buf: buffer)
-				local result = class248.new()
+			function class252.decode(buf: buffer)
+				local result = class252.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -55710,7 +57102,7 @@ do
 				return result
 			end
 
-			function class248:jsonEncode()
+			function class252:jsonEncode()
 				local v2 = {}
 
 				if self.condition ~= nil then
@@ -55731,8 +57123,8 @@ do
 				return v2
 			end
 
-			function class248.jsonDecode(data)
-				local v2 = class248.new()
+			function class252.jsonDecode(data)
+				local v2 = class252.new()
 
 				if data.condition ~= nil then
 					v2.condition = prop_condition.PropCondition.jsonDecode(data.condition)
@@ -55756,27 +57148,27 @@ do
 				return v2
 			end
 
-			class248.descriptor = {
+			class252.descriptor = {
 				name = "ArrayOfItemMediaHeaderBundleItemProp_ConditionalOption",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
 			}
 
-			v.ArrayOfItemMediaHeaderBundleItemProp_ConditionalOption = class248
+			v.ArrayOfItemMediaHeaderBundleItemProp_ConditionalOption = class252
 		end
 
 		typeRegistry.default:register(v.ArrayOfItemMediaHeaderBundleItemProp_ConditionalOption)
 
 		do
-			local class249 = {}
-			class249.__index = class249
+			local class253 = {}
+			class253.__index = class253
 
-			function class249.new(p)
+			function class253.new(p)
 				return (setmetatable({
 					options = (p == nil or p.options == nil) and {} or p.options
-				}, class249))
+				}, class253))
 			end
 
-			function class249:encode()
+			function class253:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -55793,8 +57185,8 @@ do
 				return buf
 			end
 
-			function class249.decode(buf: buffer)
-				local v2 = class249.new()
+			function class253.decode(buf: buffer)
+				local v2 = class253.new()
 				local v3 = 0
 
 				while v3 < buffer.len(buf) do
@@ -55831,7 +57223,7 @@ do
 				return v2
 			end
 
-			function class249:jsonEncode()
+			function class253:jsonEncode()
 				local v2 = {}
 
 				if self.options == nil or not (#self.options > 0) then
@@ -55849,8 +57241,8 @@ do
 				return v2
 			end
 
-			function class249.jsonDecode(p)
-				local v2 = class249.new()
+			function class253.jsonDecode(p)
+				local v2 = class253.new()
 
 				if p.options == nil then
 					return v2
@@ -55867,27 +57259,27 @@ do
 				return v2
 			end
 
-			class249.descriptor = {
+			class253.descriptor = {
 				name = "ArrayOfItemMediaHeaderBundleItemProp_ConditionalOptions",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
 			}
 
-			v.ArrayOfItemMediaHeaderBundleItemProp_ConditionalOptions = class249
+			v.ArrayOfItemMediaHeaderBundleItemProp_ConditionalOptions = class253
 		end
 
 		typeRegistry.default:register(v.ArrayOfItemMediaHeaderBundleItemProp_ConditionalOptions)
 
 		do
-			local class250 = {}
-			class250.__index = class250
+			local class254 = {}
+			class254.__index = class254
 
-			function class250.new(p)
+			function class254.new(p)
 				return (setmetatable({
 					array = (p == nil or p.array == nil) and {} or p.array
-				}, class250))
+				}, class254))
 			end
 
-			function class250:encode()
+			function class254:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -55904,8 +57296,8 @@ do
 				return buf
 			end
 
-			function class250.decode(buf: buffer)
-				local v2 = class250.new()
+			function class254.decode(buf: buffer)
+				local v2 = class254.new()
 				local v3 = 0
 
 				while v3 < buffer.len(buf) do
@@ -55939,7 +57331,7 @@ do
 				return v2
 			end
 
-			function class250:jsonEncode()
+			function class254:jsonEncode()
 				local v2 = {}
 
 				if self.array == nil or not (#self.array > 0) then
@@ -55957,8 +57349,8 @@ do
 				return v2
 			end
 
-			function class250.jsonDecode(p)
-				local v2 = class250.new()
+			function class254.jsonDecode(p)
+				local v2 = class254.new()
 
 				if p.array == nil then
 					return v2
@@ -55975,21 +57367,21 @@ do
 				return v2
 			end
 
-			class250.descriptor = {
+			class254.descriptor = {
 				name = "ArrayOfItemMediaHeaderBundleItemProp_ArrayOfItemMediaHeaderBundleItem",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfItemMediaHeaderBundleItem"
 			}
 
-			v.ArrayOfItemMediaHeaderBundleItemProp_ArrayOfItemMediaHeaderBundleItem = class250
+			v.ArrayOfItemMediaHeaderBundleItemProp_ArrayOfItemMediaHeaderBundleItem = class254
 		end
 
 		typeRegistry.default:register(v.ArrayOfItemMediaHeaderBundleItemProp_ArrayOfItemMediaHeaderBundleItem)
 
 		do
-			local class251 = {}
-			class251.__index = class251
+			local class255 = {}
+			class255.__index = class255
 
-			function class251.new(data)
+			function class255.new(data)
 				local v3
 
 				if not (data == nil or data.kind == nil) then
@@ -56008,10 +57400,10 @@ do
 				end
 
 				v2.field_map = v4
-				return (setmetatable(v2, class251))
+				return (setmetatable(v2, class255))
 			end
 
-			function class251:encode()
+			function class255:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -56045,8 +57437,8 @@ do
 				return buf
 			end
 
-			function class251.decode(buf: buffer)
-				local result = class251.new()
+			function class255.decode(buf: buffer)
+				local result = class255.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -56095,7 +57487,7 @@ do
 				return result
 			end
 
-			function class251:jsonEncode()
+			function class255:jsonEncode()
 				local v2 = {}
 
 				if self.kind ~= nil then
@@ -56123,8 +57515,8 @@ do
 				return v2
 			end
 
-			function class251.jsonDecode(data)
-				local v2 = class251.new()
+			function class255.jsonDecode(data)
+				local v2 = class255.new()
 
 				if data.binding_path ~= nil then
 					v2.kind = { type = "binding_path", value = data.binding_path }
@@ -56172,27 +57564,27 @@ do
 				return v2
 			end
 
-			class251.descriptor = {
+			class255.descriptor = {
 				name = "ArrayOfItemMediaHeaderBundleItemProp_ArrayMap",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ArrayMap"
 			}
 
-			v.ArrayOfItemMediaHeaderBundleItemProp_ArrayMap = class251
+			v.ArrayOfItemMediaHeaderBundleItemProp_ArrayMap = class255
 		end
 
 		typeRegistry.default:register(v.ArrayOfItemMediaHeaderBundleItemProp_ArrayMap)
 
 		do
-			local class252 = {}
-			class252.__index = class252
+			local class256 = {}
+			class256.__index = class256
 
-			function class252.new(p)
+			function class256.new(p)
 				return (setmetatable({
 					items = (p == nil or p.items == nil) and {} or p.items
-				}, class252))
+				}, class256))
 			end
 
-			function class252:encode()
+			function class256:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -56209,8 +57601,8 @@ do
 				return buf
 			end
 
-			function class252.decode(buf: buffer)
-				local v2 = class252.new()
+			function class256.decode(buf: buffer)
+				local v2 = class256.new()
 				local v3 = 0
 
 				while v3 < buffer.len(buf) do
@@ -56247,7 +57639,7 @@ do
 				return v2
 			end
 
-			function class252:jsonEncode()
+			function class256:jsonEncode()
 				local v2 = {}
 
 				if self.items == nil or not (#self.items > 0) then
@@ -56265,8 +57657,8 @@ do
 				return v2
 			end
 
-			function class252.jsonDecode(p)
-				local v2 = class252.new()
+			function class256.jsonDecode(p)
+				local v2 = class256.new()
 
 				if p.items == nil then
 					return v2
@@ -56283,21 +57675,21 @@ do
 				return v2
 			end
 
-			class252.descriptor = {
+			class256.descriptor = {
 				name = "ArrayOfItemMediaHeaderBundleItemProp_ArrayMap_LiteralItems",
 				fullName = "roblox.apppageplatform.shared.v1beta1.LiteralItems"
 			}
 
-			v.ArrayOfItemMediaHeaderBundleItemProp_ArrayMap_LiteralItems = class252
+			v.ArrayOfItemMediaHeaderBundleItemProp_ArrayMap_LiteralItems = class256
 		end
 
 		typeRegistry.default:register(v.ArrayOfItemMediaHeaderBundleItemProp_ArrayMap_LiteralItems)
 
 		do
-			local class253 = {}
-			class253.__index = class253
+			local class257 = {}
+			class257.__index = class257
 
-			function class253.new(p)
+			function class257.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -56310,10 +57702,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class253))
+				return (setmetatable({ props = v3, shared = v4 }, class257))
 			end
 
-			function class253:encode()
+			function class257:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -56334,8 +57726,8 @@ do
 				return buf
 			end
 
-			function class253.decode(buf: buffer)
-				local result = class253.new()
+			function class257.decode(buf: buffer)
+				local result = class257.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -56373,7 +57765,7 @@ do
 				return result
 			end
 
-			function class253:jsonEncode()
+			function class257:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -56387,8 +57779,8 @@ do
 				return v2
 			end
 
-			function class253.jsonDecode(p)
-				local v2 = class253.new()
+			function class257.jsonDecode(p)
+				local v2 = class257.new()
 
 				if p.props ~= nil then
 					v2.props = v.ItemMediaHeaderSchema_Props.jsonDecode(p.props)
@@ -56401,21 +57793,21 @@ do
 				return v2
 			end
 
-			class253.descriptor = {
+			class257.descriptor = {
 				name = "ItemMediaHeaderSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ItemMediaHeaderSchema"
 			}
 
-			v.ItemMediaHeaderSchema = class253
+			v.ItemMediaHeaderSchema = class257
 		end
 
 		typeRegistry.default:register(v.ItemMediaHeaderSchema)
 
 		do
-			local class254 = {}
-			class254.__index = class254
+			local class258 = {}
+			class258.__index = class258
 
-			function class254.new(data)
+			function class258.new(data)
 				local v3
 
 				if not (data == nil or data.item_id == nil) then
@@ -56501,10 +57893,10 @@ do
 					z_index = v12,
 					visible = v13,
 					test_id = v14
-				}, class254))
+				}, class258))
 			end
 
-			function class254:encode()
+			function class258:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -56585,8 +57977,8 @@ do
 				return buf
 			end
 
-			function class254.decode(buf: buffer)
-				local result = class254.new()
+			function class258.decode(buf: buffer)
+				local result = class258.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -56664,7 +58056,7 @@ do
 				return result
 			end
 
-			function class254:jsonEncode()
+			function class258:jsonEncode()
 				local v2 = {}
 
 				if self.item_id ~= nil then
@@ -56718,8 +58110,8 @@ do
 				return v2
 			end
 
-			function class254.jsonDecode(data)
-				local v2 = class254.new()
+			function class258.jsonDecode(data)
+				local v2 = class258.new()
 
 				if data.item_id ~= nil then
 					v2.item_id = prop_types.StringProp.jsonDecode(data.item_id)
@@ -56808,21 +58200,21 @@ do
 				return v2
 			end
 
-			class254.descriptor = {
+			class258.descriptor = {
 				name = "ItemMediaHeaderSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.ItemMediaHeaderSchema_Props = class254
+			v.ItemMediaHeaderSchema_Props = class258
 		end
 
 		typeRegistry.default:register(v.ItemMediaHeaderSchema_Props)
 
 		do
-			local class255 = {}
-			class255.__index = class255
+			local class259 = {}
+			class259.__index = class259
 
-			function class255.new(p)
+			function class259.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -56835,10 +58227,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class255))
+				return (setmetatable({ props = v3, shared = v4 }, class259))
 			end
 
-			function class255:encode()
+			function class259:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -56859,8 +58251,8 @@ do
 				return buf
 			end
 
-			function class255.decode(buf: buffer)
-				local result = class255.new()
+			function class259.decode(buf: buffer)
+				local result = class259.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -56898,7 +58290,7 @@ do
 				return result
 			end
 
-			function class255:jsonEncode()
+			function class259:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -56912,8 +58304,8 @@ do
 				return v2
 			end
 
-			function class255.jsonDecode(p)
-				local v2 = class255.new()
+			function class259.jsonDecode(p)
+				local v2 = class259.new()
 
 				if p.props ~= nil then
 					v2.props = v.CatalogItemCardSchema_Props.jsonDecode(p.props)
@@ -56926,21 +58318,21 @@ do
 				return v2
 			end
 
-			class255.descriptor = {
+			class259.descriptor = {
 				name = "CatalogItemCardSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.CatalogItemCardSchema"
 			}
 
-			v.CatalogItemCardSchema = class255
+			v.CatalogItemCardSchema = class259
 		end
 
 		typeRegistry.default:register(v.CatalogItemCardSchema)
 
 		do
-			local class256 = {}
-			class256.__index = class256
+			local class260 = {}
+			class260.__index = class260
 
-			function class256.new(data)
+			function class260.new(data)
 				local v3
 
 				if not (data == nil or data.item_id == nil) then
@@ -57033,10 +58425,10 @@ do
 					layout_order = v13,
 					visible = v14,
 					card_style = v15
-				}, class256))
+				}, class260))
 			end
 
-			function class256:encode()
+			function class260:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -57123,8 +58515,8 @@ do
 				return buf
 			end
 
-			function class256.decode(buf: buffer)
-				local result = class256.new()
+			function class260.decode(buf: buffer)
+				local result = class260.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -57206,7 +58598,7 @@ do
 				return result
 			end
 
-			function class256:jsonEncode()
+			function class260:jsonEncode()
 				local v2 = {}
 
 				if self.item_id ~= nil then
@@ -57264,8 +58656,8 @@ do
 				return v2
 			end
 
-			function class256.jsonDecode(data)
-				local v2 = class256.new()
+			function class260.jsonDecode(data)
+				local v2 = class260.new()
 
 				if data.item_id ~= nil then
 					v2.item_id = prop_types.StringProp.jsonDecode(data.item_id)
@@ -57358,21 +58750,21 @@ do
 				return v2
 			end
 
-			class256.descriptor = {
+			class260.descriptor = {
 				name = "CatalogItemCardSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.CatalogItemCardSchema_Props = class256
+			v.CatalogItemCardSchema_Props = class260
 		end
 
 		typeRegistry.default:register(v.CatalogItemCardSchema_Props)
 
 		do
-			local class257 = {}
-			class257.__index = class257
+			local class261 = {}
+			class261.__index = class261
 
-			function class257.new(p)
+			function class261.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -57385,10 +58777,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class257))
+				return (setmetatable({ props = v3, shared = v4 }, class261))
 			end
 
-			function class257:encode()
+			function class261:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -57409,8 +58801,8 @@ do
 				return buf
 			end
 
-			function class257.decode(buf: buffer)
-				local result = class257.new()
+			function class261.decode(buf: buffer)
+				local result = class261.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -57448,7 +58840,7 @@ do
 				return result
 			end
 
-			function class257:jsonEncode()
+			function class261:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -57462,8 +58854,8 @@ do
 				return v2
 			end
 
-			function class257.jsonDecode(p)
-				local v2 = class257.new()
+			function class261.jsonDecode(p)
+				local v2 = class261.new()
 
 				if p.props ~= nil then
 					v2.props = v.IconSchema_Props.jsonDecode(p.props)
@@ -57476,21 +58868,21 @@ do
 				return v2
 			end
 
-			class257.descriptor = {
+			class261.descriptor = {
 				name = "IconSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.IconSchema"
 			}
 
-			v.IconSchema = class257
+			v.IconSchema = class261
 		end
 
 		typeRegistry.default:register(v.IconSchema)
 
 		do
-			local class258 = {}
-			class258.__index = class258
+			local class262 = {}
+			class262.__index = class262
 
-			function class258.new(data)
+			function class262.new(data)
 				local v3
 
 				if not (data == nil or data.name == nil) then
@@ -57576,10 +58968,10 @@ do
 					z_index = v12,
 					children = v13,
 					icon = v14
-				}, class258))
+				}, class262))
 			end
 
-			function class258:encode()
+			function class262:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -57660,8 +59052,8 @@ do
 				return buf
 			end
 
-			function class258.decode(buf: buffer)
-				local result = class258.new()
+			function class262.decode(buf: buffer)
+				local result = class262.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -57739,7 +59131,7 @@ do
 				return result
 			end
 
-			function class258:jsonEncode()
+			function class262:jsonEncode()
 				local v2 = {}
 
 				if self.name ~= nil then
@@ -57793,8 +59185,8 @@ do
 				return v2
 			end
 
-			function class258.jsonDecode(data)
-				local v2 = class258.new()
+			function class262.jsonDecode(data)
+				local v2 = class262.new()
 
 				if data.name ~= nil then
 					v2.name = prop_types.StringProp.jsonDecode(data.name)
@@ -57859,700 +59251,15 @@ do
 				return v2
 			end
 
-			class258.descriptor = {
+			class262.descriptor = {
 				name = "IconSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.IconSchema_Props = class258
+			v.IconSchema_Props = class262
 		end
 
 		typeRegistry.default:register(v.IconSchema_Props)
-
-		do
-			local class259 = {}
-			class259.__index = class259
-
-			function class259.new(p)
-				local v3
-
-				if not (p == nil or p.props == nil) then
-					v3 = p.props
-				end
-
-				local v4
-
-				if not (p == nil or p.shared == nil) then
-					v4 = p.shared
-				end
-
-				return (setmetatable({ props = v3, shared = v4 }, class259))
-			end
-
-			function class259:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.props ~= nil then
-					local encoded = self.props:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.shared ~= nil then
-					local encoded = self.shared:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class259.decode(buf: buffer)
-				local result = class259.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.props = v.CircleIconSchema_Props.decode(v5)
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.shared = component_shared.ComponentShared.decode(v5)
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class259:jsonEncode()
-				local v2 = {}
-
-				if self.props ~= nil then
-					v2.props = self.props:jsonEncode()
-				end
-
-				if self.shared ~= nil then
-					v2.shared = self.shared:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class259.jsonDecode(p)
-				local v2 = class259.new()
-
-				if p.props ~= nil then
-					v2.props = v.CircleIconSchema_Props.jsonDecode(p.props)
-				end
-
-				if p.shared ~= nil then
-					v2.shared = component_shared.ComponentShared.jsonDecode(p.shared)
-				end
-
-				return v2
-			end
-
-			class259.descriptor = {
-				name = "CircleIconSchema",
-				fullName = "roblox.apppageplatform.shared.v1beta1.CircleIconSchema"
-			}
-
-			v.CircleIconSchema = class259
-		end
-
-		typeRegistry.default:register(v.CircleIconSchema)
-
-		do
-			local class260 = {}
-			class260.__index = class260
-
-			function class260.new(data)
-				local v3
-
-				if not (data == nil or data.icon_name == nil) then
-					v3 = data.icon_name
-				end
-
-				local v4
-
-				if not (data == nil or data.icon_size == nil) then
-					v4 = data.icon_size
-				end
-
-				local v5
-
-				if not (data == nil or data.background_style == nil) then
-					v5 = data.background_style
-				end
-
-				local v6
-
-				if not (data == nil or data.size == nil) then
-					v6 = data.size
-				end
-
-				local v7
-
-				if not (data == nil or data.layout_order == nil) then
-					v7 = data.layout_order
-				end
-
-				return (setmetatable({
-					icon_name = v3,
-					icon_size = v4,
-					background_style = v5,
-					size = v6,
-					layout_order = v7
-				}, class260))
-			end
-
-			function class260:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.icon_name ~= nil then
-					local encoded = self.icon_name:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.icon_size ~= nil then
-					local encoded = self.icon_size:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.background_style ~= nil then
-					local encoded = self.background_style:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.size ~= nil then
-					local encoded = self.size:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.layout_order ~= nil then
-					local encoded = self.layout_order:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class260.decode(buf: buffer)
-				local result = class260.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.icon_name = prop_types.StringProp.decode(v5)
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.icon_size = prop_types.IconSizeProp.decode(v5)
-						elseif v3 == 3 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.background_style = prop_types.ColorStyleProp.decode(v5)
-						elseif v3 == 4 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.size = prop_types.UDim2Prop.decode(v5)
-						elseif v3 == 5 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.layout_order = prop_types.Int32Prop.decode(v5)
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class260:jsonEncode()
-				local v2 = {}
-
-				if self.icon_name ~= nil then
-					v2.iconName = self.icon_name:jsonEncode()
-				end
-
-				if self.icon_size ~= nil then
-					v2.iconSize = self.icon_size:jsonEncode()
-				end
-
-				if self.background_style ~= nil then
-					v2.backgroundStyle = self.background_style:jsonEncode()
-				end
-
-				if self.size ~= nil then
-					v2.size = self.size:jsonEncode()
-				end
-
-				if self.layout_order ~= nil then
-					v2.layoutOrder = self.layout_order:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class260.jsonDecode(data)
-				local v2 = class260.new()
-
-				if data.icon_name ~= nil then
-					v2.icon_name = prop_types.StringProp.jsonDecode(data.icon_name)
-				end
-
-				if data.iconName ~= nil then
-					v2.icon_name = prop_types.StringProp.jsonDecode(data.iconName)
-				end
-
-				if data.icon_size ~= nil then
-					v2.icon_size = prop_types.IconSizeProp.jsonDecode(data.icon_size)
-				end
-
-				if data.iconSize ~= nil then
-					v2.icon_size = prop_types.IconSizeProp.jsonDecode(data.iconSize)
-				end
-
-				if data.background_style ~= nil then
-					v2.background_style = prop_types.ColorStyleProp.jsonDecode(data.background_style)
-				end
-
-				if data.backgroundStyle ~= nil then
-					v2.background_style = prop_types.ColorStyleProp.jsonDecode(data.backgroundStyle)
-				end
-
-				if data.size ~= nil then
-					v2.size = prop_types.UDim2Prop.jsonDecode(data.size)
-				end
-
-				if data.layout_order ~= nil then
-					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layout_order)
-				end
-
-				if data.layoutOrder ~= nil then
-					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layoutOrder)
-				end
-
-				return v2
-			end
-
-			class260.descriptor = {
-				name = "CircleIconSchema_Props",
-				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
-			}
-
-			v.CircleIconSchema_Props = class260
-		end
-
-		typeRegistry.default:register(v.CircleIconSchema_Props)
-
-		do
-			local class261 = {}
-			class261.__index = class261
-
-			function class261.new(p)
-				local v3
-
-				if not (p == nil or p.props == nil) then
-					v3 = p.props
-				end
-
-				local v4
-
-				if not (p == nil or p.shared == nil) then
-					v4 = p.shared
-				end
-
-				return (setmetatable({ props = v3, shared = v4 }, class261))
-			end
-
-			function class261:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.props ~= nil then
-					local encoded = self.props:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.shared ~= nil then
-					local encoded = self.shared:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class261.decode(buf: buffer)
-				local result = class261.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.props = v.ContentRatingLabelSchema_Props.decode(v5)
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.shared = component_shared.ComponentShared.decode(v5)
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class261:jsonEncode()
-				local v2 = {}
-
-				if self.props ~= nil then
-					v2.props = self.props:jsonEncode()
-				end
-
-				if self.shared ~= nil then
-					v2.shared = self.shared:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class261.jsonDecode(p)
-				local v2 = class261.new()
-
-				if p.props ~= nil then
-					v2.props = v.ContentRatingLabelSchema_Props.jsonDecode(p.props)
-				end
-
-				if p.shared ~= nil then
-					v2.shared = component_shared.ComponentShared.jsonDecode(p.shared)
-				end
-
-				return v2
-			end
-
-			class261.descriptor = {
-				name = "ContentRatingLabelSchema",
-				fullName = "roblox.apppageplatform.shared.v1beta1.ContentRatingLabelSchema"
-			}
-
-			v.ContentRatingLabelSchema = class261
-		end
-
-		typeRegistry.default:register(v.ContentRatingLabelSchema)
-
-		do
-			local class262 = {}
-			class262.__index = class262
-
-			function class262.new(data)
-				local v3
-
-				if not (data == nil or data.image == nil) then
-					v3 = data.image
-				end
-
-				local v4
-
-				if not (data == nil or data.display_text == nil) then
-					v4 = data.display_text
-				end
-
-				local v5
-
-				if not (data == nil or data.font_style == nil) then
-					v5 = data.font_style
-				end
-
-				local v6
-
-				if not (data == nil or data.width == nil) then
-					v6 = data.width
-				end
-
-				local v7
-
-				if not (data == nil or data.on_activated == nil) then
-					v7 = data.on_activated
-				end
-
-				local v8
-
-				if not (data == nil or data.layout_order == nil) then
-					v8 = data.layout_order
-				end
-
-				return (setmetatable({
-					image = v3,
-					display_text = v4,
-					font_style = v5,
-					width = v6,
-					on_activated = v7,
-					layout_order = v8
-				}, class262))
-			end
-
-			function class262:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.image ~= nil then
-					local encoded = self.image:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.display_text ~= nil then
-					local encoded = self.display_text:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.font_style ~= nil then
-					local encoded = self.font_style:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.width ~= nil then
-					local encoded = self.width:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.on_activated ~= nil then
-					local encoded = self.on_activated:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.layout_order ~= nil then
-					local encoded = self.layout_order:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 6, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class262.decode(buf: buffer)
-				local result = class262.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.image = prop_types.StringProp.decode(v5)
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.display_text = prop_types.StringProp.decode(v5)
-						elseif v3 == 3 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.font_style = prop_types.TypographyProp.decode(v5)
-						elseif v3 == 4 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.width = prop_types.Int32Prop.decode(v5)
-						elseif v3 == 5 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.on_activated = actions.ActionProp.decode(v5)
-						elseif v3 == 6 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.layout_order = prop_types.Int32Prop.decode(v5)
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class262:jsonEncode()
-				local v2 = {}
-
-				if self.image ~= nil then
-					v2.image = self.image:jsonEncode()
-				end
-
-				if self.display_text ~= nil then
-					v2.displayText = self.display_text:jsonEncode()
-				end
-
-				if self.font_style ~= nil then
-					v2.fontStyle = self.font_style:jsonEncode()
-				end
-
-				if self.width ~= nil then
-					v2.width = self.width:jsonEncode()
-				end
-
-				if self.on_activated ~= nil then
-					v2.onActivated = self.on_activated:jsonEncode()
-				end
-
-				if self.layout_order ~= nil then
-					v2.layoutOrder = self.layout_order:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class262.jsonDecode(data)
-				local v2 = class262.new()
-
-				if data.image ~= nil then
-					v2.image = prop_types.StringProp.jsonDecode(data.image)
-				end
-
-				if data.display_text ~= nil then
-					v2.display_text = prop_types.StringProp.jsonDecode(data.display_text)
-				end
-
-				if data.displayText ~= nil then
-					v2.display_text = prop_types.StringProp.jsonDecode(data.displayText)
-				end
-
-				if data.font_style ~= nil then
-					v2.font_style = prop_types.TypographyProp.jsonDecode(data.font_style)
-				end
-
-				if data.fontStyle ~= nil then
-					v2.font_style = prop_types.TypographyProp.jsonDecode(data.fontStyle)
-				end
-
-				if data.width ~= nil then
-					v2.width = prop_types.Int32Prop.jsonDecode(data.width)
-				end
-
-				if data.on_activated ~= nil then
-					v2.on_activated = actions.ActionProp.jsonDecode(data.on_activated)
-				end
-
-				if data.onActivated ~= nil then
-					v2.on_activated = actions.ActionProp.jsonDecode(data.onActivated)
-				end
-
-				if data.layout_order ~= nil then
-					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layout_order)
-				end
-
-				if data.layoutOrder ~= nil then
-					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layoutOrder)
-				end
-
-				return v2
-			end
-
-			class262.descriptor = {
-				name = "ContentRatingLabelSchema_Props",
-				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
-			}
-
-			v.ContentRatingLabelSchema_Props = class262
-		end
-
-		typeRegistry.default:register(v.ContentRatingLabelSchema_Props)
 
 		do
 			local class263 = {}
@@ -58610,7 +59317,7 @@ do
 						if v3 == 1 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
-							result.props = v.LinkTextSchema_Props.decode(v5)
+							result.props = v.CircleIconSchema_Props.decode(v5)
 						elseif v3 == 2 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
@@ -58652,7 +59359,7 @@ do
 				local v2 = class263.new()
 
 				if p.props ~= nil then
-					v2.props = v.LinkTextSchema_Props.jsonDecode(p.props)
+					v2.props = v.CircleIconSchema_Props.jsonDecode(p.props)
 				end
 
 				if p.shared ~= nil then
@@ -58663,20 +59370,705 @@ do
 			end
 
 			class263.descriptor = {
-				name = "LinkTextSchema",
-				fullName = "roblox.apppageplatform.shared.v1beta1.LinkTextSchema"
+				name = "CircleIconSchema",
+				fullName = "roblox.apppageplatform.shared.v1beta1.CircleIconSchema"
 			}
 
-			v.LinkTextSchema = class263
+			v.CircleIconSchema = class263
 		end
 
-		typeRegistry.default:register(v.LinkTextSchema)
+		typeRegistry.default:register(v.CircleIconSchema)
 
 		do
 			local class264 = {}
 			class264.__index = class264
 
 			function class264.new(data)
+				local v3
+
+				if not (data == nil or data.icon_name == nil) then
+					v3 = data.icon_name
+				end
+
+				local v4
+
+				if not (data == nil or data.icon_size == nil) then
+					v4 = data.icon_size
+				end
+
+				local v5
+
+				if not (data == nil or data.background_style == nil) then
+					v5 = data.background_style
+				end
+
+				local v6
+
+				if not (data == nil or data.size == nil) then
+					v6 = data.size
+				end
+
+				local v7
+
+				if not (data == nil or data.layout_order == nil) then
+					v7 = data.layout_order
+				end
+
+				return (setmetatable({
+					icon_name = v3,
+					icon_size = v4,
+					background_style = v5,
+					size = v6,
+					layout_order = v7
+				}, class264))
+			end
+
+			function class264:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.icon_name ~= nil then
+					local encoded = self.icon_name:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.icon_size ~= nil then
+					local encoded = self.icon_size:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.background_style ~= nil then
+					local encoded = self.background_style:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.size ~= nil then
+					local encoded = self.size:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.layout_order ~= nil then
+					local encoded = self.layout_order:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class264.decode(buf: buffer)
+				local result = class264.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.icon_name = prop_types.StringProp.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.icon_size = prop_types.IconSizeProp.decode(v5)
+						elseif v3 == 3 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.background_style = prop_types.ColorStyleProp.decode(v5)
+						elseif v3 == 4 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.size = prop_types.UDim2Prop.decode(v5)
+						elseif v3 == 5 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.layout_order = prop_types.Int32Prop.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class264:jsonEncode()
+				local v2 = {}
+
+				if self.icon_name ~= nil then
+					v2.iconName = self.icon_name:jsonEncode()
+				end
+
+				if self.icon_size ~= nil then
+					v2.iconSize = self.icon_size:jsonEncode()
+				end
+
+				if self.background_style ~= nil then
+					v2.backgroundStyle = self.background_style:jsonEncode()
+				end
+
+				if self.size ~= nil then
+					v2.size = self.size:jsonEncode()
+				end
+
+				if self.layout_order ~= nil then
+					v2.layoutOrder = self.layout_order:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class264.jsonDecode(data)
+				local v2 = class264.new()
+
+				if data.icon_name ~= nil then
+					v2.icon_name = prop_types.StringProp.jsonDecode(data.icon_name)
+				end
+
+				if data.iconName ~= nil then
+					v2.icon_name = prop_types.StringProp.jsonDecode(data.iconName)
+				end
+
+				if data.icon_size ~= nil then
+					v2.icon_size = prop_types.IconSizeProp.jsonDecode(data.icon_size)
+				end
+
+				if data.iconSize ~= nil then
+					v2.icon_size = prop_types.IconSizeProp.jsonDecode(data.iconSize)
+				end
+
+				if data.background_style ~= nil then
+					v2.background_style = prop_types.ColorStyleProp.jsonDecode(data.background_style)
+				end
+
+				if data.backgroundStyle ~= nil then
+					v2.background_style = prop_types.ColorStyleProp.jsonDecode(data.backgroundStyle)
+				end
+
+				if data.size ~= nil then
+					v2.size = prop_types.UDim2Prop.jsonDecode(data.size)
+				end
+
+				if data.layout_order ~= nil then
+					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layout_order)
+				end
+
+				if data.layoutOrder ~= nil then
+					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layoutOrder)
+				end
+
+				return v2
+			end
+
+			class264.descriptor = {
+				name = "CircleIconSchema_Props",
+				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
+			}
+
+			v.CircleIconSchema_Props = class264
+		end
+
+		typeRegistry.default:register(v.CircleIconSchema_Props)
+
+		do
+			local class265 = {}
+			class265.__index = class265
+
+			function class265.new(p)
+				local v3
+
+				if not (p == nil or p.props == nil) then
+					v3 = p.props
+				end
+
+				local v4
+
+				if not (p == nil or p.shared == nil) then
+					v4 = p.shared
+				end
+
+				return (setmetatable({ props = v3, shared = v4 }, class265))
+			end
+
+			function class265:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.props ~= nil then
+					local encoded = self.props:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.shared ~= nil then
+					local encoded = self.shared:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class265.decode(buf: buffer)
+				local result = class265.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.props = v.ContentRatingLabelSchema_Props.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.shared = component_shared.ComponentShared.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class265:jsonEncode()
+				local v2 = {}
+
+				if self.props ~= nil then
+					v2.props = self.props:jsonEncode()
+				end
+
+				if self.shared ~= nil then
+					v2.shared = self.shared:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class265.jsonDecode(p)
+				local v2 = class265.new()
+
+				if p.props ~= nil then
+					v2.props = v.ContentRatingLabelSchema_Props.jsonDecode(p.props)
+				end
+
+				if p.shared ~= nil then
+					v2.shared = component_shared.ComponentShared.jsonDecode(p.shared)
+				end
+
+				return v2
+			end
+
+			class265.descriptor = {
+				name = "ContentRatingLabelSchema",
+				fullName = "roblox.apppageplatform.shared.v1beta1.ContentRatingLabelSchema"
+			}
+
+			v.ContentRatingLabelSchema = class265
+		end
+
+		typeRegistry.default:register(v.ContentRatingLabelSchema)
+
+		do
+			local class266 = {}
+			class266.__index = class266
+
+			function class266.new(data)
+				local v3
+
+				if not (data == nil or data.image == nil) then
+					v3 = data.image
+				end
+
+				local v4
+
+				if not (data == nil or data.display_text == nil) then
+					v4 = data.display_text
+				end
+
+				local v5
+
+				if not (data == nil or data.font_style == nil) then
+					v5 = data.font_style
+				end
+
+				local v6
+
+				if not (data == nil or data.width == nil) then
+					v6 = data.width
+				end
+
+				local v7
+
+				if not (data == nil or data.on_activated == nil) then
+					v7 = data.on_activated
+				end
+
+				local v8
+
+				if not (data == nil or data.layout_order == nil) then
+					v8 = data.layout_order
+				end
+
+				return (setmetatable({
+					image = v3,
+					display_text = v4,
+					font_style = v5,
+					width = v6,
+					on_activated = v7,
+					layout_order = v8
+				}, class266))
+			end
+
+			function class266:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.image ~= nil then
+					local encoded = self.image:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.display_text ~= nil then
+					local encoded = self.display_text:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.font_style ~= nil then
+					local encoded = self.font_style:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.width ~= nil then
+					local encoded = self.width:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.on_activated ~= nil then
+					local encoded = self.on_activated:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.layout_order ~= nil then
+					local encoded = self.layout_order:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 6, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class266.decode(buf: buffer)
+				local result = class266.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.image = prop_types.StringProp.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.display_text = prop_types.StringProp.decode(v5)
+						elseif v3 == 3 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.font_style = prop_types.TypographyProp.decode(v5)
+						elseif v3 == 4 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.width = prop_types.Int32Prop.decode(v5)
+						elseif v3 == 5 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.on_activated = actions.ActionProp.decode(v5)
+						elseif v3 == 6 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.layout_order = prop_types.Int32Prop.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class266:jsonEncode()
+				local v2 = {}
+
+				if self.image ~= nil then
+					v2.image = self.image:jsonEncode()
+				end
+
+				if self.display_text ~= nil then
+					v2.displayText = self.display_text:jsonEncode()
+				end
+
+				if self.font_style ~= nil then
+					v2.fontStyle = self.font_style:jsonEncode()
+				end
+
+				if self.width ~= nil then
+					v2.width = self.width:jsonEncode()
+				end
+
+				if self.on_activated ~= nil then
+					v2.onActivated = self.on_activated:jsonEncode()
+				end
+
+				if self.layout_order ~= nil then
+					v2.layoutOrder = self.layout_order:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class266.jsonDecode(data)
+				local v2 = class266.new()
+
+				if data.image ~= nil then
+					v2.image = prop_types.StringProp.jsonDecode(data.image)
+				end
+
+				if data.display_text ~= nil then
+					v2.display_text = prop_types.StringProp.jsonDecode(data.display_text)
+				end
+
+				if data.displayText ~= nil then
+					v2.display_text = prop_types.StringProp.jsonDecode(data.displayText)
+				end
+
+				if data.font_style ~= nil then
+					v2.font_style = prop_types.TypographyProp.jsonDecode(data.font_style)
+				end
+
+				if data.fontStyle ~= nil then
+					v2.font_style = prop_types.TypographyProp.jsonDecode(data.fontStyle)
+				end
+
+				if data.width ~= nil then
+					v2.width = prop_types.Int32Prop.jsonDecode(data.width)
+				end
+
+				if data.on_activated ~= nil then
+					v2.on_activated = actions.ActionProp.jsonDecode(data.on_activated)
+				end
+
+				if data.onActivated ~= nil then
+					v2.on_activated = actions.ActionProp.jsonDecode(data.onActivated)
+				end
+
+				if data.layout_order ~= nil then
+					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layout_order)
+				end
+
+				if data.layoutOrder ~= nil then
+					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layoutOrder)
+				end
+
+				return v2
+			end
+
+			class266.descriptor = {
+				name = "ContentRatingLabelSchema_Props",
+				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
+			}
+
+			v.ContentRatingLabelSchema_Props = class266
+		end
+
+		typeRegistry.default:register(v.ContentRatingLabelSchema_Props)
+
+		do
+			local class267 = {}
+			class267.__index = class267
+
+			function class267.new(p)
+				local v3
+
+				if not (p == nil or p.props == nil) then
+					v3 = p.props
+				end
+
+				local v4
+
+				if not (p == nil or p.shared == nil) then
+					v4 = p.shared
+				end
+
+				return (setmetatable({ props = v3, shared = v4 }, class267))
+			end
+
+			function class267:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.props ~= nil then
+					local encoded = self.props:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.shared ~= nil then
+					local encoded = self.shared:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class267.decode(buf: buffer)
+				local result = class267.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.props = v.LinkTextSchema_Props.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.shared = component_shared.ComponentShared.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class267:jsonEncode()
+				local v2 = {}
+
+				if self.props ~= nil then
+					v2.props = self.props:jsonEncode()
+				end
+
+				if self.shared ~= nil then
+					v2.shared = self.shared:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class267.jsonDecode(p)
+				local v2 = class267.new()
+
+				if p.props ~= nil then
+					v2.props = v.LinkTextSchema_Props.jsonDecode(p.props)
+				end
+
+				if p.shared ~= nil then
+					v2.shared = component_shared.ComponentShared.jsonDecode(p.shared)
+				end
+
+				return v2
+			end
+
+			class267.descriptor = {
+				name = "LinkTextSchema",
+				fullName = "roblox.apppageplatform.shared.v1beta1.LinkTextSchema"
+			}
+
+			v.LinkTextSchema = class267
+		end
+
+		typeRegistry.default:register(v.LinkTextSchema)
+
+		do
+			local class268 = {}
+			class268.__index = class268
+
+			function class268.new(data)
 				local v3
 
 				if not (data == nil or data.anchor_point == nil) then
@@ -58832,10 +60224,10 @@ do
 					is_link_bold = v22,
 					is_link_underlined = v23,
 					state_layer_affordance = v24
-				}, class264))
+				}, class268))
 			end
 
-			function class264:encode()
+			function class268:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -58976,8 +60368,8 @@ do
 				return buf
 			end
 
-			function class264.decode(buf: buffer)
-				local result = class264.new()
+			function class268.decode(buf: buffer)
+				local result = class268.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -59095,7 +60487,7 @@ do
 				return result
 			end
 
-			function class264:jsonEncode()
+			function class268:jsonEncode()
 				local v2 = {}
 
 				if self.anchor_point ~= nil then
@@ -59189,8 +60581,8 @@ do
 				return v2
 			end
 
-			function class264.jsonDecode(data)
-				local v2 = class264.new()
+			function class268.jsonDecode(data)
+				local v2 = class268.new()
 
 				if data.anchor_point ~= nil then
 					v2.anchor_point = prop_types.Vector2Prop.jsonDecode(data.anchor_point)
@@ -59355,21 +60747,21 @@ do
 				return v2
 			end
 
-			class264.descriptor = {
+			class268.descriptor = {
 				name = "LinkTextSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.LinkTextSchema_Props = class264
+			v.LinkTextSchema_Props = class268
 		end
 
 		typeRegistry.default:register(v.LinkTextSchema_Props)
 
 		do
-			local class265 = {}
-			class265.__index = class265
+			local class269 = {}
+			class269.__index = class269
 
-			function class265.new(p)
+			function class269.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -59382,10 +60774,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class265))
+				return (setmetatable({ props = v3, shared = v4 }, class269))
 			end
 
-			function class265:encode()
+			function class269:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -59406,8 +60798,8 @@ do
 				return buf
 			end
 
-			function class265.decode(buf: buffer)
-				local result = class265.new()
+			function class269.decode(buf: buffer)
+				local result = class269.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -59445,7 +60837,7 @@ do
 				return result
 			end
 
-			function class265:jsonEncode()
+			function class269:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -59459,8 +60851,8 @@ do
 				return v2
 			end
 
-			function class265.jsonDecode(p)
-				local v2 = class265.new()
+			function class269.jsonDecode(p)
+				local v2 = class269.new()
 
 				if p.props ~= nil then
 					v2.props = v.MediaGallerySchema_Props.jsonDecode(p.props)
@@ -59473,21 +60865,21 @@ do
 				return v2
 			end
 
-			class265.descriptor = {
+			class269.descriptor = {
 				name = "MediaGallerySchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.MediaGallerySchema"
 			}
 
-			v.MediaGallerySchema = class265
+			v.MediaGallerySchema = class269
 		end
 
 		typeRegistry.default:register(v.MediaGallerySchema)
 
 		do
-			local class266 = {}
-			class266.__index = class266
+			local class270 = {}
+			class270.__index = class270
 
-			function class266.new(data)
+			function class270.new(data)
 				local v3
 
 				if not (data == nil or data.image_id == nil) then
@@ -59554,6 +60946,12 @@ do
 					v13 = data.music_start_time
 				end
 
+				local v14
+
+				if not (data == nil or data.is_moment == nil) then
+					v14 = data.is_moment
+				end
+
 				return (setmetatable({
 					image_id = v3,
 					asset_type_id = v4,
@@ -59565,11 +60963,12 @@ do
 					trim_start_time = v10,
 					trim_end_time = v11,
 					music_asset_id = v12,
-					music_start_time = v13
-				}, class266))
+					music_start_time = v13,
+					is_moment = v14
+				}, class270))
 			end
 
-			function class266:encode()
+			function class270:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -59639,13 +61038,19 @@ do
 					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 				end
 
+				if self.is_moment ~= nil then
+					local encoded = self.is_moment:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 12, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
 				local buf = buffer.create(v3)
 				buffer.copy(buf, 0, v2, 0, v3)
 				return buf
 			end
 
-			function class266.decode(buf: buffer)
-				local result = class266.new()
+			function class270.decode(buf: buffer)
+				local result = class270.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -59700,6 +61105,10 @@ do
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
 							result.music_start_time = prop_types.FloatProp.decode(v5)
+						elseif v3 == 12 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.is_moment = prop_types.BoolProp.decode(v5)
 						else
 							local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -59719,7 +61128,7 @@ do
 				return result
 			end
 
-			function class266:jsonEncode()
+			function class270:jsonEncode()
 				local v2 = {}
 
 				if self.image_id ~= nil then
@@ -59766,11 +61175,15 @@ do
 					v2.musicStartTime = self.music_start_time:jsonEncode()
 				end
 
+				if self.is_moment ~= nil then
+					v2.isMoment = self.is_moment:jsonEncode()
+				end
+
 				return v2
 			end
 
-			function class266.jsonDecode(data)
-				local v2 = class266.new()
+			function class270.jsonDecode(data)
+				local v2 = class270.new()
 
 				if data.image_id ~= nil then
 					v2.image_id = prop_types.StringProp.jsonDecode(data.image_id)
@@ -59860,34 +61273,42 @@ do
 					v2.music_start_time = prop_types.FloatProp.jsonDecode(data.musicStartTime)
 				end
 
+				if data.is_moment ~= nil then
+					v2.is_moment = prop_types.BoolProp.jsonDecode(data.is_moment)
+				end
+
+				if data.isMoment ~= nil then
+					v2.is_moment = prop_types.BoolProp.jsonDecode(data.isMoment)
+				end
+
 				return v2
 			end
 
-			class266.descriptor = {
+			class270.descriptor = {
 				name = "MediaGallerySchema_MediaItemFields",
 				fullName = "roblox.apppageplatform.shared.v1beta1.MediaItemFields"
 			}
 
-			v.MediaGallerySchema_MediaItemFields = class266
+			v.MediaGallerySchema_MediaItemFields = class270
 		end
 
 		typeRegistry.default:register(v.MediaGallerySchema_MediaItemFields)
 
 		do
-			local class267 = {}
-			class267.__index = class267
+			local class271 = {}
+			class271.__index = class271
 
-			function class267.new(p)
+			function class271.new(p)
 				local v3
 
 				if not (p == nil or p.kind == nil) then
 					v3 = p.kind
 				end
 
-				return (setmetatable({ kind = v3 }, class267))
+				return (setmetatable({ kind = v3 }, class271))
 			end
 
-			function class267:encode()
+			function class271:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -59908,8 +61329,8 @@ do
 				return buf
 			end
 
-			function class267.decode(buf: buffer)
-				local result = class267.new()
+			function class271.decode(buf: buffer)
+				local result = class271.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -59953,7 +61374,7 @@ do
 				return result
 			end
 
-			function class267:jsonEncode()
+			function class271:jsonEncode()
 				local v2 = {}
 
 				if self.kind == nil then
@@ -59972,8 +61393,8 @@ do
 				return v2
 			end
 
-			function class267.jsonDecode(data)
-				local v2 = class267.new()
+			function class271.jsonDecode(data)
+				local v2 = class271.new()
 
 				if data.array_map ~= nil then
 					v2.kind = {
@@ -59999,21 +61420,21 @@ do
 				return v2
 			end
 
-			class267.descriptor = {
+			class271.descriptor = {
 				name = "MediaGallerySchema_MediaItemArrayProp",
 				fullName = "roblox.apppageplatform.shared.v1beta1.MediaItemArrayProp"
 			}
 
-			v.MediaGallerySchema_MediaItemArrayProp = class267
+			v.MediaGallerySchema_MediaItemArrayProp = class271
 		end
 
 		typeRegistry.default:register(v.MediaGallerySchema_MediaItemArrayProp)
 
 		do
-			local class268 = {}
-			class268.__index = class268
+			local class272 = {}
+			class272.__index = class272
 
-			function class268.new(data)
+			function class272.new(data)
 				local v3
 
 				if not (data == nil or data.kind == nil) then
@@ -60032,10 +61453,10 @@ do
 				end
 
 				v2.field_map = v4
-				return (setmetatable(v2, class268))
+				return (setmetatable(v2, class272))
 			end
 
-			function class268:encode()
+			function class272:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -60069,8 +61490,8 @@ do
 				return buf
 			end
 
-			function class268.decode(buf: buffer)
-				local result = class268.new()
+			function class272.decode(buf: buffer)
+				local result = class272.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -60119,7 +61540,7 @@ do
 				return result
 			end
 
-			function class268:jsonEncode()
+			function class272:jsonEncode()
 				local v2 = {}
 
 				if self.kind ~= nil then
@@ -60147,8 +61568,8 @@ do
 				return v2
 			end
 
-			function class268.jsonDecode(data)
-				local v2 = class268.new()
+			function class272.jsonDecode(data)
+				local v2 = class272.new()
 
 				if data.binding_path ~= nil then
 					v2.kind = { type = "binding_path", value = data.binding_path }
@@ -60196,27 +61617,27 @@ do
 				return v2
 			end
 
-			class268.descriptor = {
+			class272.descriptor = {
 				name = "MediaGallerySchema_MediaItemArrayProp_ArrayMap",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ArrayMap"
 			}
 
-			v.MediaGallerySchema_MediaItemArrayProp_ArrayMap = class268
+			v.MediaGallerySchema_MediaItemArrayProp_ArrayMap = class272
 		end
 
 		typeRegistry.default:register(v.MediaGallerySchema_MediaItemArrayProp_ArrayMap)
 
 		do
-			local class269 = {}
-			class269.__index = class269
+			local class273 = {}
+			class273.__index = class273
 
-			function class269.new(p)
+			function class273.new(p)
 				return (setmetatable({
 					items = (p == nil or p.items == nil) and {} or p.items
-				}, class269))
+				}, class273))
 			end
 
-			function class269:encode()
+			function class273:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -60233,8 +61654,8 @@ do
 				return buf
 			end
 
-			function class269.decode(buf: buffer)
-				local v2 = class269.new()
+			function class273.decode(buf: buffer)
+				local v2 = class273.new()
 				local v3 = 0
 
 				while v3 < buffer.len(buf) do
@@ -60271,7 +61692,7 @@ do
 				return v2
 			end
 
-			function class269:jsonEncode()
+			function class273:jsonEncode()
 				local v2 = {}
 
 				if self.items == nil or not (#self.items > 0) then
@@ -60289,8 +61710,8 @@ do
 				return v2
 			end
 
-			function class269.jsonDecode(p)
-				local v2 = class269.new()
+			function class273.jsonDecode(p)
+				local v2 = class273.new()
 
 				if p.items == nil then
 					return v2
@@ -60307,21 +61728,21 @@ do
 				return v2
 			end
 
-			class269.descriptor = {
+			class273.descriptor = {
 				name = "MediaGallerySchema_MediaItemArrayProp_ArrayMap_LiteralItems",
 				fullName = "roblox.apppageplatform.shared.v1beta1.LiteralItems"
 			}
 
-			v.MediaGallerySchema_MediaItemArrayProp_ArrayMap_LiteralItems = class269
+			v.MediaGallerySchema_MediaItemArrayProp_ArrayMap_LiteralItems = class273
 		end
 
 		typeRegistry.default:register(v.MediaGallerySchema_MediaItemArrayProp_ArrayMap_LiteralItems)
 
 		do
-			local class270 = {}
-			class270.__index = class270
+			local class274 = {}
+			class274.__index = class274
 
-			function class270.new(p)
+			function class274.new(p)
 				local v3
 
 				if not (p == nil or p.condition == nil) then
@@ -60334,10 +61755,10 @@ do
 					v4 = p.array_map
 				end
 
-				return (setmetatable({ condition = v3, array_map = v4 }, class270))
+				return (setmetatable({ condition = v3, array_map = v4 }, class274))
 			end
 
-			function class270:encode()
+			function class274:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -60358,8 +61779,8 @@ do
 				return buf
 			end
 
-			function class270.decode(buf: buffer)
-				local result = class270.new()
+			function class274.decode(buf: buffer)
+				local result = class274.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -60397,7 +61818,7 @@ do
 				return result
 			end
 
-			function class270:jsonEncode()
+			function class274:jsonEncode()
 				local v2 = {}
 
 				if self.condition ~= nil then
@@ -60411,8 +61832,8 @@ do
 				return v2
 			end
 
-			function class270.jsonDecode(data)
-				local v2 = class270.new()
+			function class274.jsonDecode(data)
+				local v2 = class274.new()
 
 				if data.condition ~= nil then
 					v2.condition = prop_condition.PropCondition.jsonDecode(data.condition)
@@ -60429,27 +61850,27 @@ do
 				return v2
 			end
 
-			class270.descriptor = {
+			class274.descriptor = {
 				name = "MediaGallerySchema_MediaItemArrayProp_ConditionalOption",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
 			}
 
-			v.MediaGallerySchema_MediaItemArrayProp_ConditionalOption = class270
+			v.MediaGallerySchema_MediaItemArrayProp_ConditionalOption = class274
 		end
 
 		typeRegistry.default:register(v.MediaGallerySchema_MediaItemArrayProp_ConditionalOption)
 
 		do
-			local class271 = {}
-			class271.__index = class271
+			local class275 = {}
+			class275.__index = class275
 
-			function class271.new(p)
+			function class275.new(p)
 				return (setmetatable({
 					options = (p == nil or p.options == nil) and {} or p.options
-				}, class271))
+				}, class275))
 			end
 
-			function class271:encode()
+			function class275:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -60466,8 +61887,8 @@ do
 				return buf
 			end
 
-			function class271.decode(buf: buffer)
-				local v2 = class271.new()
+			function class275.decode(buf: buffer)
+				local v2 = class275.new()
 				local v3 = 0
 
 				while v3 < buffer.len(buf) do
@@ -60504,7 +61925,7 @@ do
 				return v2
 			end
 
-			function class271:jsonEncode()
+			function class275:jsonEncode()
 				local v2 = {}
 
 				if self.options == nil or not (#self.options > 0) then
@@ -60522,8 +61943,8 @@ do
 				return v2
 			end
 
-			function class271.jsonDecode(p)
-				local v2 = class271.new()
+			function class275.jsonDecode(p)
+				local v2 = class275.new()
 
 				if p.options == nil then
 					return v2
@@ -60540,21 +61961,21 @@ do
 				return v2
 			end
 
-			class271.descriptor = {
+			class275.descriptor = {
 				name = "MediaGallerySchema_MediaItemArrayProp_ConditionalOptions",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
 			}
 
-			v.MediaGallerySchema_MediaItemArrayProp_ConditionalOptions = class271
+			v.MediaGallerySchema_MediaItemArrayProp_ConditionalOptions = class275
 		end
 
 		typeRegistry.default:register(v.MediaGallerySchema_MediaItemArrayProp_ConditionalOptions)
 
 		do
-			local class272 = {}
-			class272.__index = class272
+			local class276 = {}
+			class276.__index = class276
 
-			function class272.new(data)
+			function class276.new(data)
 				local v3
 
 				if not (data == nil or data.universe_id == nil) then
@@ -60717,10 +62138,10 @@ do
 					place_id = v23,
 					media_gallery_analytics_context = v24,
 					on_first_media_resolved = v25
-				}, class272))
+				}, class276))
 			end
 
-			function class272:encode()
+			function class276:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -60867,8 +62288,8 @@ do
 				return buf
 			end
 
-			function class272.decode(buf: buffer)
-				local result = class272.new()
+			function class276.decode(buf: buffer)
+				local result = class276.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -60990,7 +62411,7 @@ do
 				return result
 			end
 
-			function class272:jsonEncode()
+			function class276:jsonEncode()
 				local v2 = {}
 
 				if self.universe_id ~= nil then
@@ -61088,8 +62509,8 @@ do
 				return v2
 			end
 
-			function class272.jsonDecode(data)
-				local v2 = class272.new()
+			function class276.jsonDecode(data)
+				local v2 = class276.new()
 
 				if data.universe_id ~= nil then
 					v2.universe_id = prop_types.StringProp.jsonDecode(data.universe_id)
@@ -61254,535 +62675,15 @@ do
 				return v2
 			end
 
-			class272.descriptor = {
+			class276.descriptor = {
 				name = "MediaGallerySchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.MediaGallerySchema_Props = class272
+			v.MediaGallerySchema_Props = class276
 		end
 
 		typeRegistry.default:register(v.MediaGallerySchema_Props)
-
-		do
-			local class273 = {}
-			class273.__index = class273
-
-			function class273.new(p)
-				local v3
-
-				if not (p == nil or p.props == nil) then
-					v3 = p.props
-				end
-
-				local v4
-
-				if not (p == nil or p.shared == nil) then
-					v4 = p.shared
-				end
-
-				return (setmetatable({ props = v3, shared = v4 }, class273))
-			end
-
-			function class273:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.props ~= nil then
-					local encoded = self.props:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.shared ~= nil then
-					local encoded = self.shared:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class273.decode(buf: buffer)
-				local result = class273.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.props = v.PlayButtonContextualMessageSchema_Props.decode(v5)
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.shared = component_shared.ComponentShared.decode(v5)
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class273:jsonEncode()
-				local v2 = {}
-
-				if self.props ~= nil then
-					v2.props = self.props:jsonEncode()
-				end
-
-				if self.shared ~= nil then
-					v2.shared = self.shared:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class273.jsonDecode(p)
-				local v2 = class273.new()
-
-				if p.props ~= nil then
-					v2.props = v.PlayButtonContextualMessageSchema_Props.jsonDecode(p.props)
-				end
-
-				if p.shared ~= nil then
-					v2.shared = component_shared.ComponentShared.jsonDecode(p.shared)
-				end
-
-				return v2
-			end
-
-			class273.descriptor = {
-				name = "PlayButtonContextualMessageSchema",
-				fullName = "roblox.apppageplatform.shared.v1beta1.PlayButtonContextualMessageSchema"
-			}
-
-			v.PlayButtonContextualMessageSchema = class273
-		end
-
-		typeRegistry.default:register(v.PlayButtonContextualMessageSchema)
-
-		do
-			local class274 = {}
-			class274.__index = class274
-
-			function class274.new(data)
-				local v3
-
-				if not (data == nil or data.universe_id == nil) then
-					v3 = data.universe_id
-				end
-
-				local v4
-
-				if not (data == nil or data.fetch_delay_in_seconds == nil) then
-					v4 = data.fetch_delay_in_seconds
-				end
-
-				local v5
-
-				if not (data == nil or data.layout_order == nil) then
-					v5 = data.layout_order
-				end
-
-				return (setmetatable({
-					universe_id = v3,
-					fetch_delay_in_seconds = v4,
-					layout_order = v5
-				}, class274))
-			end
-
-			function class274:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.universe_id ~= nil then
-					local encoded = self.universe_id:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.fetch_delay_in_seconds ~= nil then
-					local encoded = self.fetch_delay_in_seconds:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.layout_order ~= nil then
-					local encoded = self.layout_order:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class274.decode(buf: buffer)
-				local result = class274.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.universe_id = prop_types.StringProp.decode(v5)
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.fetch_delay_in_seconds = prop_types.FloatProp.decode(v5)
-						elseif v3 == 3 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.layout_order = prop_types.Int32Prop.decode(v5)
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class274:jsonEncode()
-				local v2 = {}
-
-				if self.universe_id ~= nil then
-					v2.universeId = self.universe_id:jsonEncode()
-				end
-
-				if self.fetch_delay_in_seconds ~= nil then
-					v2.fetchDelayInSeconds = self.fetch_delay_in_seconds:jsonEncode()
-				end
-
-				if self.layout_order ~= nil then
-					v2.layoutOrder = self.layout_order:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class274.jsonDecode(data)
-				local v2 = class274.new()
-
-				if data.universe_id ~= nil then
-					v2.universe_id = prop_types.StringProp.jsonDecode(data.universe_id)
-				end
-
-				if data.universeId ~= nil then
-					v2.universe_id = prop_types.StringProp.jsonDecode(data.universeId)
-				end
-
-				if data.fetch_delay_in_seconds ~= nil then
-					v2.fetch_delay_in_seconds = prop_types.FloatProp.jsonDecode(data.fetch_delay_in_seconds)
-				end
-
-				if data.fetchDelayInSeconds ~= nil then
-					v2.fetch_delay_in_seconds = prop_types.FloatProp.jsonDecode(data.fetchDelayInSeconds)
-				end
-
-				if data.layout_order ~= nil then
-					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layout_order)
-				end
-
-				if data.layoutOrder ~= nil then
-					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layoutOrder)
-				end
-
-				return v2
-			end
-
-			class274.descriptor = {
-				name = "PlayButtonContextualMessageSchema_Props",
-				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
-			}
-
-			v.PlayButtonContextualMessageSchema_Props = class274
-		end
-
-		typeRegistry.default:register(v.PlayButtonContextualMessageSchema_Props)
-
-		do
-			local class275 = {}
-			class275.__index = class275
-
-			function class275.new(p)
-				local v3
-
-				if not (p == nil or p.props == nil) then
-					v3 = p.props
-				end
-
-				local v4
-
-				if not (p == nil or p.shared == nil) then
-					v4 = p.shared
-				end
-
-				return (setmetatable({ props = v3, shared = v4 }, class275))
-			end
-
-			function class275:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.props ~= nil then
-					local encoded = self.props:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.shared ~= nil then
-					local encoded = self.shared:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class275.decode(buf: buffer)
-				local result = class275.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.props = v.PlusEarlyAccessUpsellSchema_Props.decode(v5)
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.shared = component_shared.ComponentShared.decode(v5)
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class275:jsonEncode()
-				local v2 = {}
-
-				if self.props ~= nil then
-					v2.props = self.props:jsonEncode()
-				end
-
-				if self.shared ~= nil then
-					v2.shared = self.shared:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class275.jsonDecode(p)
-				local v2 = class275.new()
-
-				if p.props ~= nil then
-					v2.props = v.PlusEarlyAccessUpsellSchema_Props.jsonDecode(p.props)
-				end
-
-				if p.shared ~= nil then
-					v2.shared = component_shared.ComponentShared.jsonDecode(p.shared)
-				end
-
-				return v2
-			end
-
-			class275.descriptor = {
-				name = "PlusEarlyAccessUpsellSchema",
-				fullName = "roblox.apppageplatform.shared.v1beta1.PlusEarlyAccessUpsellSchema"
-			}
-
-			v.PlusEarlyAccessUpsellSchema = class275
-		end
-
-		typeRegistry.default:register(v.PlusEarlyAccessUpsellSchema)
-
-		do
-			local class276 = {}
-			class276.__index = class276
-
-			function class276.new(p)
-				local v3
-
-				if not (p == nil or p.universe_id == nil) then
-					v3 = p.universe_id
-				end
-
-				local v4
-
-				if not (p == nil or p.layout_order == nil) then
-					v4 = p.layout_order
-				end
-
-				return (setmetatable({ universe_id = v3, layout_order = v4 }, class276))
-			end
-
-			function class276:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.universe_id ~= nil then
-					local encoded = self.universe_id:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.layout_order ~= nil then
-					local encoded = self.layout_order:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class276.decode(buf: buffer)
-				local result = class276.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.universe_id = prop_types.StringProp.decode(v5)
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.layout_order = prop_types.Int32Prop.decode(v5)
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class276:jsonEncode()
-				local v2 = {}
-
-				if self.universe_id ~= nil then
-					v2.universeId = self.universe_id:jsonEncode()
-				end
-
-				if self.layout_order ~= nil then
-					v2.layoutOrder = self.layout_order:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class276.jsonDecode(data)
-				local v2 = class276.new()
-
-				if data.universe_id ~= nil then
-					v2.universe_id = prop_types.StringProp.jsonDecode(data.universe_id)
-				end
-
-				if data.universeId ~= nil then
-					v2.universe_id = prop_types.StringProp.jsonDecode(data.universeId)
-				end
-
-				if data.layout_order ~= nil then
-					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layout_order)
-				end
-
-				if data.layoutOrder ~= nil then
-					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layoutOrder)
-				end
-
-				return v2
-			end
-
-			class276.descriptor = {
-				name = "PlusEarlyAccessUpsellSchema_Props",
-				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
-			}
-
-			v.PlusEarlyAccessUpsellSchema_Props = class276
-		end
-
-		typeRegistry.default:register(v.PlusEarlyAccessUpsellSchema_Props)
 
 		do
 			local class277 = {}
@@ -61840,7 +62741,7 @@ do
 						if v3 == 1 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
-							result.props = v.ContentRowSchema_Props.decode(v5)
+							result.props = v.PlayButtonContextualMessageSchema_Props.decode(v5)
 						elseif v3 == 2 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
@@ -61882,7 +62783,7 @@ do
 				local v2 = class277.new()
 
 				if p.props ~= nil then
-					v2.props = v.ContentRowSchema_Props.jsonDecode(p.props)
+					v2.props = v.PlayButtonContextualMessageSchema_Props.jsonDecode(p.props)
 				end
 
 				if p.shared ~= nil then
@@ -61893,20 +62794,540 @@ do
 			end
 
 			class277.descriptor = {
-				name = "ContentRowSchema",
-				fullName = "roblox.apppageplatform.shared.v1beta1.ContentRowSchema"
+				name = "PlayButtonContextualMessageSchema",
+				fullName = "roblox.apppageplatform.shared.v1beta1.PlayButtonContextualMessageSchema"
 			}
 
-			v.ContentRowSchema = class277
+			v.PlayButtonContextualMessageSchema = class277
 		end
 
-		typeRegistry.default:register(v.ContentRowSchema)
+		typeRegistry.default:register(v.PlayButtonContextualMessageSchema)
 
 		do
 			local class278 = {}
 			class278.__index = class278
 
 			function class278.new(data)
+				local v3
+
+				if not (data == nil or data.universe_id == nil) then
+					v3 = data.universe_id
+				end
+
+				local v4
+
+				if not (data == nil or data.fetch_delay_in_seconds == nil) then
+					v4 = data.fetch_delay_in_seconds
+				end
+
+				local v5
+
+				if not (data == nil or data.layout_order == nil) then
+					v5 = data.layout_order
+				end
+
+				return (setmetatable({
+					universe_id = v3,
+					fetch_delay_in_seconds = v4,
+					layout_order = v5
+				}, class278))
+			end
+
+			function class278:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.universe_id ~= nil then
+					local encoded = self.universe_id:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.fetch_delay_in_seconds ~= nil then
+					local encoded = self.fetch_delay_in_seconds:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.layout_order ~= nil then
+					local encoded = self.layout_order:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class278.decode(buf: buffer)
+				local result = class278.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.universe_id = prop_types.StringProp.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.fetch_delay_in_seconds = prop_types.FloatProp.decode(v5)
+						elseif v3 == 3 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.layout_order = prop_types.Int32Prop.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class278:jsonEncode()
+				local v2 = {}
+
+				if self.universe_id ~= nil then
+					v2.universeId = self.universe_id:jsonEncode()
+				end
+
+				if self.fetch_delay_in_seconds ~= nil then
+					v2.fetchDelayInSeconds = self.fetch_delay_in_seconds:jsonEncode()
+				end
+
+				if self.layout_order ~= nil then
+					v2.layoutOrder = self.layout_order:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class278.jsonDecode(data)
+				local v2 = class278.new()
+
+				if data.universe_id ~= nil then
+					v2.universe_id = prop_types.StringProp.jsonDecode(data.universe_id)
+				end
+
+				if data.universeId ~= nil then
+					v2.universe_id = prop_types.StringProp.jsonDecode(data.universeId)
+				end
+
+				if data.fetch_delay_in_seconds ~= nil then
+					v2.fetch_delay_in_seconds = prop_types.FloatProp.jsonDecode(data.fetch_delay_in_seconds)
+				end
+
+				if data.fetchDelayInSeconds ~= nil then
+					v2.fetch_delay_in_seconds = prop_types.FloatProp.jsonDecode(data.fetchDelayInSeconds)
+				end
+
+				if data.layout_order ~= nil then
+					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layout_order)
+				end
+
+				if data.layoutOrder ~= nil then
+					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layoutOrder)
+				end
+
+				return v2
+			end
+
+			class278.descriptor = {
+				name = "PlayButtonContextualMessageSchema_Props",
+				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
+			}
+
+			v.PlayButtonContextualMessageSchema_Props = class278
+		end
+
+		typeRegistry.default:register(v.PlayButtonContextualMessageSchema_Props)
+
+		do
+			local class279 = {}
+			class279.__index = class279
+
+			function class279.new(p)
+				local v3
+
+				if not (p == nil or p.props == nil) then
+					v3 = p.props
+				end
+
+				local v4
+
+				if not (p == nil or p.shared == nil) then
+					v4 = p.shared
+				end
+
+				return (setmetatable({ props = v3, shared = v4 }, class279))
+			end
+
+			function class279:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.props ~= nil then
+					local encoded = self.props:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.shared ~= nil then
+					local encoded = self.shared:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class279.decode(buf: buffer)
+				local result = class279.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.props = v.PlusEarlyAccessUpsellSchema_Props.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.shared = component_shared.ComponentShared.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class279:jsonEncode()
+				local v2 = {}
+
+				if self.props ~= nil then
+					v2.props = self.props:jsonEncode()
+				end
+
+				if self.shared ~= nil then
+					v2.shared = self.shared:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class279.jsonDecode(p)
+				local v2 = class279.new()
+
+				if p.props ~= nil then
+					v2.props = v.PlusEarlyAccessUpsellSchema_Props.jsonDecode(p.props)
+				end
+
+				if p.shared ~= nil then
+					v2.shared = component_shared.ComponentShared.jsonDecode(p.shared)
+				end
+
+				return v2
+			end
+
+			class279.descriptor = {
+				name = "PlusEarlyAccessUpsellSchema",
+				fullName = "roblox.apppageplatform.shared.v1beta1.PlusEarlyAccessUpsellSchema"
+			}
+
+			v.PlusEarlyAccessUpsellSchema = class279
+		end
+
+		typeRegistry.default:register(v.PlusEarlyAccessUpsellSchema)
+
+		do
+			local class280 = {}
+			class280.__index = class280
+
+			function class280.new(p)
+				local v3
+
+				if not (p == nil or p.universe_id == nil) then
+					v3 = p.universe_id
+				end
+
+				local v4
+
+				if not (p == nil or p.layout_order == nil) then
+					v4 = p.layout_order
+				end
+
+				return (setmetatable({ universe_id = v3, layout_order = v4 }, class280))
+			end
+
+			function class280:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.universe_id ~= nil then
+					local encoded = self.universe_id:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.layout_order ~= nil then
+					local encoded = self.layout_order:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class280.decode(buf: buffer)
+				local result = class280.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.universe_id = prop_types.StringProp.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.layout_order = prop_types.Int32Prop.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class280:jsonEncode()
+				local v2 = {}
+
+				if self.universe_id ~= nil then
+					v2.universeId = self.universe_id:jsonEncode()
+				end
+
+				if self.layout_order ~= nil then
+					v2.layoutOrder = self.layout_order:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class280.jsonDecode(data)
+				local v2 = class280.new()
+
+				if data.universe_id ~= nil then
+					v2.universe_id = prop_types.StringProp.jsonDecode(data.universe_id)
+				end
+
+				if data.universeId ~= nil then
+					v2.universe_id = prop_types.StringProp.jsonDecode(data.universeId)
+				end
+
+				if data.layout_order ~= nil then
+					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layout_order)
+				end
+
+				if data.layoutOrder ~= nil then
+					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layoutOrder)
+				end
+
+				return v2
+			end
+
+			class280.descriptor = {
+				name = "PlusEarlyAccessUpsellSchema_Props",
+				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
+			}
+
+			v.PlusEarlyAccessUpsellSchema_Props = class280
+		end
+
+		typeRegistry.default:register(v.PlusEarlyAccessUpsellSchema_Props)
+
+		do
+			local class281 = {}
+			class281.__index = class281
+
+			function class281.new(p)
+				local v3
+
+				if not (p == nil or p.props == nil) then
+					v3 = p.props
+				end
+
+				local v4
+
+				if not (p == nil or p.shared == nil) then
+					v4 = p.shared
+				end
+
+				return (setmetatable({ props = v3, shared = v4 }, class281))
+			end
+
+			function class281:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.props ~= nil then
+					local encoded = self.props:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.shared ~= nil then
+					local encoded = self.shared:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class281.decode(buf: buffer)
+				local result = class281.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.props = v.ContentRowSchema_Props.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.shared = component_shared.ComponentShared.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class281:jsonEncode()
+				local v2 = {}
+
+				if self.props ~= nil then
+					v2.props = self.props:jsonEncode()
+				end
+
+				if self.shared ~= nil then
+					v2.shared = self.shared:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class281.jsonDecode(p)
+				local v2 = class281.new()
+
+				if p.props ~= nil then
+					v2.props = v.ContentRowSchema_Props.jsonDecode(p.props)
+				end
+
+				if p.shared ~= nil then
+					v2.shared = component_shared.ComponentShared.jsonDecode(p.shared)
+				end
+
+				return v2
+			end
+
+			class281.descriptor = {
+				name = "ContentRowSchema",
+				fullName = "roblox.apppageplatform.shared.v1beta1.ContentRowSchema"
+			}
+
+			v.ContentRowSchema = class281
+		end
+
+		typeRegistry.default:register(v.ContentRowSchema)
+
+		do
+			local class282 = {}
+			class282.__index = class282
+
+			function class282.new(data)
 				local v3
 
 				if not (data == nil or data.leading == nil) then
@@ -62006,10 +63427,10 @@ do
 					z_index = v14,
 					state_layer_affordance = v15,
 					selectable = v16
-				}, class278))
+				}, class282))
 			end
 
-			function class278:encode()
+			function class282:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -62102,8 +63523,8 @@ do
 				return buf
 			end
 
-			function class278.decode(buf: buffer)
-				local result = class278.new()
+			function class282.decode(buf: buffer)
+				local result = class282.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -62189,7 +63610,7 @@ do
 				return result
 			end
 
-			function class278:jsonEncode()
+			function class282:jsonEncode()
 				local v2 = {}
 
 				if self.leading ~= nil then
@@ -62251,8 +63672,8 @@ do
 				return v2
 			end
 
-			function class278.jsonDecode(data)
-				local v2 = class278.new()
+			function class282.jsonDecode(data)
+				local v2 = class282.new()
 
 				if data.leading ~= nil then
 					v2.leading = v.NestedComponentListProp.jsonDecode(data.leading)
@@ -62345,21 +63766,21 @@ do
 				return v2
 			end
 
-			class278.descriptor = {
+			class282.descriptor = {
 				name = "ContentRowSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.ContentRowSchema_Props = class278
+			v.ContentRowSchema_Props = class282
 		end
 
 		typeRegistry.default:register(v.ContentRowSchema_Props)
 
 		do
-			local class279 = {}
-			class279.__index = class279
+			local class283 = {}
+			class283.__index = class283
 
-			function class279.new(p)
+			function class283.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -62372,10 +63793,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class279))
+				return (setmetatable({ props = v3, shared = v4 }, class283))
 			end
 
-			function class279:encode()
+			function class283:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -62396,8 +63817,8 @@ do
 				return buf
 			end
 
-			function class279.decode(buf: buffer)
-				local result = class279.new()
+			function class283.decode(buf: buffer)
+				local result = class283.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -62435,7 +63856,7 @@ do
 				return result
 			end
 
-			function class279:jsonEncode()
+			function class283:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -62449,8 +63870,8 @@ do
 				return v2
 			end
 
-			function class279.jsonDecode(p)
-				local v2 = class279.new()
+			function class283.jsonDecode(p)
+				local v2 = class283.new()
 
 				if p.props ~= nil then
 					v2.props = v.ListRootSchema_Props.jsonDecode(p.props)
@@ -62463,21 +63884,21 @@ do
 				return v2
 			end
 
-			class279.descriptor = {
+			class283.descriptor = {
 				name = "ListRootSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ListRootSchema"
 			}
 
-			v.ListRootSchema = class279
+			v.ListRootSchema = class283
 		end
 
 		typeRegistry.default:register(v.ListRootSchema)
 
 		do
-			local class280 = {}
-			class280.__index = class280
+			local class284 = {}
+			class284.__index = class284
 
-			function class280.new(data)
+			function class284.new(data)
 				local v3
 
 				if not (data == nil or data.items == nil) then
@@ -62535,10 +63956,10 @@ do
 					size = v8,
 					layout_order = v9,
 					test_id = v10
-				}, class280))
+				}, class284))
 			end
 
-			function class280:encode()
+			function class284:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -62595,8 +64016,8 @@ do
 				return buf
 			end
 
-			function class280.decode(buf: buffer)
-				local result = class280.new()
+			function class284.decode(buf: buffer)
+				local result = class284.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -62658,7 +64079,7 @@ do
 				return result
 			end
 
-			function class280:jsonEncode()
+			function class284:jsonEncode()
 				local v2 = {}
 
 				if self.items ~= nil then
@@ -62696,8 +64117,8 @@ do
 				return v2
 			end
 
-			function class280.jsonDecode(data)
-				local v2 = class280.new()
+			function class284.jsonDecode(data)
+				local v2 = class284.new()
 
 				if data.items ~= nil then
 					v2.items = v.LazyNestedComponentListProp.jsonDecode(data.items)
@@ -62758,21 +64179,21 @@ do
 				return v2
 			end
 
-			class280.descriptor = {
+			class284.descriptor = {
 				name = "ListRootSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.ListRootSchema_Props = class280
+			v.ListRootSchema_Props = class284
 		end
 
 		typeRegistry.default:register(v.ListRootSchema_Props)
 
 		do
-			local class281 = {}
-			class281.__index = class281
+			local class285 = {}
+			class285.__index = class285
 
-			function class281.new(p)
+			function class285.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -62785,10 +64206,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class281))
+				return (setmetatable({ props = v3, shared = v4 }, class285))
 			end
 
-			function class281:encode()
+			function class285:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -62809,8 +64230,8 @@ do
 				return buf
 			end
 
-			function class281.decode(buf: buffer)
-				local result = class281.new()
+			function class285.decode(buf: buffer)
+				local result = class285.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -62848,7 +64269,7 @@ do
 				return result
 			end
 
-			function class281:jsonEncode()
+			function class285:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -62862,8 +64283,8 @@ do
 				return v2
 			end
 
-			function class281.jsonDecode(p)
-				local v2 = class281.new()
+			function class285.jsonDecode(p)
+				local v2 = class285.new()
 
 				if p.props ~= nil then
 					v2.props = v.ExpandableListRootSchema_Props.jsonDecode(p.props)
@@ -62876,21 +64297,21 @@ do
 				return v2
 			end
 
-			class281.descriptor = {
+			class285.descriptor = {
 				name = "ExpandableListRootSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ExpandableListRootSchema"
 			}
 
-			v.ExpandableListRootSchema = class281
+			v.ExpandableListRootSchema = class285
 		end
 
 		typeRegistry.default:register(v.ExpandableListRootSchema)
 
 		do
-			local class282 = {}
-			class282.__index = class282
+			local class286 = {}
+			class286.__index = class286
 
-			function class282.new(data)
+			function class286.new(data)
 				local v3
 
 				if not (data == nil or data.state_key == nil) then
@@ -62941,10 +64362,10 @@ do
 					initially_expanded = v7,
 					layout_order = v8,
 					test_id = v9
-				}, class282))
+				}, class286))
 			end
 
-			function class282:encode()
+			function class286:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -62995,8 +64416,8 @@ do
 				return buf
 			end
 
-			function class282.decode(buf: buffer)
-				local result = class282.new()
+			function class286.decode(buf: buffer)
+				local result = class286.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -63054,7 +64475,7 @@ do
 				return result
 			end
 
-			function class282:jsonEncode()
+			function class286:jsonEncode()
 				local v2 = {}
 
 				if self.state_key ~= nil then
@@ -63088,8 +64509,8 @@ do
 				return v2
 			end
 
-			function class282.jsonDecode(data)
-				local v2 = class282.new()
+			function class286.jsonDecode(data)
+				local v2 = class286.new()
 
 				if data.state_key ~= nil then
 					v2.state_key = prop_types.StringProp.jsonDecode(data.state_key)
@@ -63138,21 +64559,21 @@ do
 				return v2
 			end
 
-			class282.descriptor = {
+			class286.descriptor = {
 				name = "ExpandableListRootSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.ExpandableListRootSchema_Props = class282
+			v.ExpandableListRootSchema_Props = class286
 		end
 
 		typeRegistry.default:register(v.ExpandableListRootSchema_Props)
 
 		do
-			local class283 = {}
-			class283.__index = class283
+			local class287 = {}
+			class287.__index = class287
 
-			function class283.new(p)
+			function class287.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -63165,10 +64586,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class283))
+				return (setmetatable({ props = v3, shared = v4 }, class287))
 			end
 
-			function class283:encode()
+			function class287:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -63189,8 +64610,8 @@ do
 				return buf
 			end
 
-			function class283.decode(buf: buffer)
-				local result = class283.new()
+			function class287.decode(buf: buffer)
+				local result = class287.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -63228,7 +64649,7 @@ do
 				return result
 			end
 
-			function class283:jsonEncode()
+			function class287:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -63242,8 +64663,8 @@ do
 				return v2
 			end
 
-			function class283.jsonDecode(p)
-				local v2 = class283.new()
+			function class287.jsonDecode(p)
+				local v2 = class287.new()
 
 				if p.props ~= nil then
 					v2.props = v.ExpandableListItemSchema_Props.jsonDecode(p.props)
@@ -63256,21 +64677,21 @@ do
 				return v2
 			end
 
-			class283.descriptor = {
+			class287.descriptor = {
 				name = "ExpandableListItemSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ExpandableListItemSchema"
 			}
 
-			v.ExpandableListItemSchema = class283
+			v.ExpandableListItemSchema = class287
 		end
 
 		typeRegistry.default:register(v.ExpandableListItemSchema)
 
 		do
-			local class284 = {}
-			class284.__index = class284
+			local class288 = {}
+			class288.__index = class288
 
-			function class284.new(data)
+			function class288.new(data)
 				local v3
 
 				if not (data == nil or data.title == nil) then
@@ -63356,10 +64777,10 @@ do
 					test_id = v12,
 					description = v13,
 					size = v14
-				}, class284))
+				}, class288))
 			end
 
-			function class284:encode()
+			function class288:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -63440,8 +64861,8 @@ do
 				return buf
 			end
 
-			function class284.decode(buf: buffer)
-				local result = class284.new()
+			function class288.decode(buf: buffer)
+				local result = class288.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -63519,7 +64940,7 @@ do
 				return result
 			end
 
-			function class284:jsonEncode()
+			function class288:jsonEncode()
 				local v2 = {}
 
 				if self.title ~= nil then
@@ -63573,8 +64994,8 @@ do
 				return v2
 			end
 
-			function class284.jsonDecode(data)
-				local v2 = class284.new()
+			function class288.jsonDecode(data)
+				local v2 = class288.new()
 
 				if data.title ~= nil then
 					v2.title = prop_types.StringProp.jsonDecode(data.title)
@@ -63651,754 +65072,15 @@ do
 				return v2
 			end
 
-			class284.descriptor = {
+			class288.descriptor = {
 				name = "ExpandableListItemSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.ExpandableListItemSchema_Props = class284
+			v.ExpandableListItemSchema_Props = class288
 		end
 
 		typeRegistry.default:register(v.ExpandableListItemSchema_Props)
-
-		do
-			local class285 = {}
-			class285.__index = class285
-
-			function class285.new(p)
-				local v3
-
-				if not (p == nil or p.props == nil) then
-					v3 = p.props
-				end
-
-				local v4
-
-				if not (p == nil or p.shared == nil) then
-					v4 = p.shared
-				end
-
-				return (setmetatable({ props = v3, shared = v4 }, class285))
-			end
-
-			function class285:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.props ~= nil then
-					local encoded = self.props:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.shared ~= nil then
-					local encoded = self.shared:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class285.decode(buf: buffer)
-				local result = class285.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.props = v.GroupSidebarSchema_Props.decode(v5)
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.shared = component_shared.ComponentShared.decode(v5)
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class285:jsonEncode()
-				local v2 = {}
-
-				if self.props ~= nil then
-					v2.props = self.props:jsonEncode()
-				end
-
-				if self.shared ~= nil then
-					v2.shared = self.shared:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class285.jsonDecode(p)
-				local v2 = class285.new()
-
-				if p.props ~= nil then
-					v2.props = v.GroupSidebarSchema_Props.jsonDecode(p.props)
-				end
-
-				if p.shared ~= nil then
-					v2.shared = component_shared.ComponentShared.jsonDecode(p.shared)
-				end
-
-				return v2
-			end
-
-			class285.descriptor = {
-				name = "GroupSidebarSchema",
-				fullName = "roblox.apppageplatform.shared.v1beta1.GroupSidebarSchema"
-			}
-
-			v.GroupSidebarSchema = class285
-		end
-
-		typeRegistry.default:register(v.GroupSidebarSchema)
-
-		do
-			local class286 = {}
-			class286.__index = class286
-
-			function class286.new(data)
-				local v3
-
-				if not (data == nil or data.header == nil) then
-					v3 = data.header
-				end
-
-				local v4
-
-				if not (data == nil or data.items == nil) then
-					v4 = data.items
-				end
-
-				local v5
-
-				if not (data == nil or data.empty == nil) then
-					v5 = data.empty
-				end
-
-				local v6
-
-				if not (data == nil or data.no_results == nil) then
-					v6 = data.no_results
-				end
-
-				local v7
-
-				if not (data == nil or data.layout_order == nil) then
-					v7 = data.layout_order
-				end
-
-				local v8
-
-				if not (data == nil or data.test_id == nil) then
-					v8 = data.test_id
-				end
-
-				local v9
-
-				if not (data == nil or data.heading == nil) then
-					v9 = data.heading
-				end
-
-				return (setmetatable({
-					header = v3,
-					items = v4,
-					empty = v5,
-					no_results = v6,
-					layout_order = v7,
-					test_id = v8,
-					heading = v9
-				}, class286))
-			end
-
-			function class286:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.header ~= nil then
-					local encoded = self.header:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.items ~= nil then
-					local encoded = self.items:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.empty ~= nil then
-					local encoded = self.empty:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.no_results ~= nil then
-					local encoded = self.no_results:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.layout_order ~= nil then
-					local encoded = self.layout_order:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 7, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.test_id ~= nil then
-					local encoded = self.test_id:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 8, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.heading ~= nil then
-					local encoded = self.heading:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 9, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class286.decode(buf: buffer)
-				local result = class286.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.header = v.NestedComponentProp.decode(v5)
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.items = v.LazyNestedComponentListProp.decode(v5)
-						elseif v3 == 3 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.empty = v.NestedComponentProp.decode(v5)
-						elseif v3 == 4 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.no_results = v.NestedComponentProp.decode(v5)
-						elseif v3 == 7 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.layout_order = prop_types.Int32Prop.decode(v5)
-						elseif v3 == 8 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.test_id = prop_types.StringProp.decode(v5)
-						elseif v3 == 9 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.heading = prop_types.StringProp.decode(v5)
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class286:jsonEncode()
-				local v2 = {}
-
-				if self.header ~= nil then
-					v2.header = self.header:jsonEncode()
-				end
-
-				if self.items ~= nil then
-					v2.items = self.items:jsonEncode()
-				end
-
-				if self.empty ~= nil then
-					v2.empty = self.empty:jsonEncode()
-				end
-
-				if self.no_results ~= nil then
-					v2.noResults = self.no_results:jsonEncode()
-				end
-
-				if self.layout_order ~= nil then
-					v2.layoutOrder = self.layout_order:jsonEncode()
-				end
-
-				if self.test_id ~= nil then
-					v2.testId = self.test_id:jsonEncode()
-				end
-
-				if self.heading ~= nil then
-					v2.heading = self.heading:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class286.jsonDecode(data)
-				local v2 = class286.new()
-
-				if data.header ~= nil then
-					v2.header = v.NestedComponentProp.jsonDecode(data.header)
-				end
-
-				if data.items ~= nil then
-					v2.items = v.LazyNestedComponentListProp.jsonDecode(data.items)
-				end
-
-				if data.empty ~= nil then
-					v2.empty = v.NestedComponentProp.jsonDecode(data.empty)
-				end
-
-				if data.no_results ~= nil then
-					v2.no_results = v.NestedComponentProp.jsonDecode(data.no_results)
-				end
-
-				if data.noResults ~= nil then
-					v2.no_results = v.NestedComponentProp.jsonDecode(data.noResults)
-				end
-
-				if data.layout_order ~= nil then
-					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layout_order)
-				end
-
-				if data.layoutOrder ~= nil then
-					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layoutOrder)
-				end
-
-				if data.test_id ~= nil then
-					v2.test_id = prop_types.StringProp.jsonDecode(data.test_id)
-				end
-
-				if data.testId ~= nil then
-					v2.test_id = prop_types.StringProp.jsonDecode(data.testId)
-				end
-
-				if data.heading ~= nil then
-					v2.heading = prop_types.StringProp.jsonDecode(data.heading)
-				end
-
-				return v2
-			end
-
-			class286.descriptor = {
-				name = "GroupSidebarSchema_Props",
-				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
-			}
-
-			v.GroupSidebarSchema_Props = class286
-		end
-
-		typeRegistry.default:register(v.GroupSidebarSchema_Props)
-
-		do
-			local class287 = {}
-			class287.__index = class287
-
-			function class287.new(p)
-				local v3
-
-				if not (p == nil or p.props == nil) then
-					v3 = p.props
-				end
-
-				local v4
-
-				if not (p == nil or p.shared == nil) then
-					v4 = p.shared
-				end
-
-				return (setmetatable({ props = v3, shared = v4 }, class287))
-			end
-
-			function class287:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.props ~= nil then
-					local encoded = self.props:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.shared ~= nil then
-					local encoded = self.shared:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class287.decode(buf: buffer)
-				local result = class287.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.props = v.GroupSectionSchema_Props.decode(v5)
-						elseif v3 == 2 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.shared = component_shared.ComponentShared.decode(v5)
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class287:jsonEncode()
-				local v2 = {}
-
-				if self.props ~= nil then
-					v2.props = self.props:jsonEncode()
-				end
-
-				if self.shared ~= nil then
-					v2.shared = self.shared:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class287.jsonDecode(p)
-				local v2 = class287.new()
-
-				if p.props ~= nil then
-					v2.props = v.GroupSectionSchema_Props.jsonDecode(p.props)
-				end
-
-				if p.shared ~= nil then
-					v2.shared = component_shared.ComponentShared.jsonDecode(p.shared)
-				end
-
-				return v2
-			end
-
-			class287.descriptor = {
-				name = "GroupSectionSchema",
-				fullName = "roblox.apppageplatform.shared.v1beta1.GroupSectionSchema"
-			}
-
-			v.GroupSectionSchema = class287
-		end
-
-		typeRegistry.default:register(v.GroupSectionSchema)
-
-		do
-			local class288 = {}
-			class288.__index = class288
-
-			function class288.new(data)
-				local v3
-
-				if not (data == nil or data.group_id == nil) then
-					v3 = data.group_id
-				end
-
-				local v4
-
-				if not (data == nil or data.expandable_list == nil) then
-					v4 = data.expandable_list
-				end
-
-				local v5
-
-				if not (data == nil or data.layout_order == nil) then
-					v5 = data.layout_order
-				end
-
-				local v6
-
-				if not (data == nil or data.test_id == nil) then
-					v6 = data.test_id
-				end
-
-				local v7
-
-				if not (data == nil or data.error_text == nil) then
-					v7 = data.error_text
-				end
-
-				local v8
-
-				if not (data == nil or data.retry_text == nil) then
-					v8 = data.retry_text
-				end
-
-				return (setmetatable({
-					group_id = v3,
-					expandable_list = v4,
-					layout_order = v5,
-					test_id = v6,
-					error_text = v7,
-					retry_text = v8
-				}, class288))
-			end
-
-			function class288:encode()
-				local v2 = buffer.create(0)
-				local v3 = 0
-
-				if self.group_id ~= nil then
-					local encoded = self.group_id:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.expandable_list ~= nil then
-					local encoded = self.expandable_list:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.layout_order ~= nil then
-					local encoded = self.layout_order:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.test_id ~= nil then
-					local encoded = self.test_id:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.error_text ~= nil then
-					local encoded = self.error_text:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 7, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				if self.retry_text ~= nil then
-					local encoded = self.retry_text:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 8, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
-
-				local buf = buffer.create(v3)
-				buffer.copy(buf, 0, v2, 0, v3)
-				return buf
-			end
-
-			function class288.decode(buf: buffer)
-				local result = class288.new()
-				local v2 = 0
-
-				while v2 < buffer.len(buf) do
-					local v3, v4
-					v3, v4, v2 = proto.readTag(buf, v2)
-
-					if v4 == proto.wireTypes.varint then
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					elseif v4 == proto.wireTypes.lengthDelimited then
-						if v3 == 1 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.group_id = prop_types.StringProp.decode(v5)
-						elseif v3 == 3 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.expandable_list = v.LazyNestedComponentProp.decode(v5)
-						elseif v3 == 4 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.layout_order = prop_types.Int32Prop.decode(v5)
-						elseif v3 == 5 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.test_id = prop_types.StringProp.decode(v5)
-						elseif v3 == 7 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.error_text = prop_types.StringProp.decode(v5)
-						elseif v3 == 8 then
-							local v5
-							v5, v2 = proto.readBuffer(buf, v2)
-							result.retry_text = prop_types.StringProp.decode(v5)
-						else
-							local varInt, v5 = proto.readVarInt(buf, v2)
-
-							v2 = v5 + varInt
-						end
-					elseif v4 == proto.wireTypes.i32 then
-						local v5
-						v5, v2 = proto.readFixed32(buf, v2)
-					elseif v4 == proto.wireTypes.i64 then
-						local v5
-						v5, v2 = proto.readFixed64(buf, v2)
-					else
-						error("Unsupported wire type: " .. v4)
-					end
-				end
-
-				return result
-			end
-
-			function class288:jsonEncode()
-				local v2 = {}
-
-				if self.group_id ~= nil then
-					v2.groupId = self.group_id:jsonEncode()
-				end
-
-				if self.expandable_list ~= nil then
-					v2.expandableList = self.expandable_list:jsonEncode()
-				end
-
-				if self.layout_order ~= nil then
-					v2.layoutOrder = self.layout_order:jsonEncode()
-				end
-
-				if self.test_id ~= nil then
-					v2.testId = self.test_id:jsonEncode()
-				end
-
-				if self.error_text ~= nil then
-					v2.errorText = self.error_text:jsonEncode()
-				end
-
-				if self.retry_text ~= nil then
-					v2.retryText = self.retry_text:jsonEncode()
-				end
-
-				return v2
-			end
-
-			function class288.jsonDecode(data)
-				local v2 = class288.new()
-
-				if data.group_id ~= nil then
-					v2.group_id = prop_types.StringProp.jsonDecode(data.group_id)
-				end
-
-				if data.groupId ~= nil then
-					v2.group_id = prop_types.StringProp.jsonDecode(data.groupId)
-				end
-
-				if data.expandable_list ~= nil then
-					v2.expandable_list = v.LazyNestedComponentProp.jsonDecode(data.expandable_list)
-				end
-
-				if data.expandableList ~= nil then
-					v2.expandable_list = v.LazyNestedComponentProp.jsonDecode(data.expandableList)
-				end
-
-				if data.layout_order ~= nil then
-					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layout_order)
-				end
-
-				if data.layoutOrder ~= nil then
-					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layoutOrder)
-				end
-
-				if data.test_id ~= nil then
-					v2.test_id = prop_types.StringProp.jsonDecode(data.test_id)
-				end
-
-				if data.testId ~= nil then
-					v2.test_id = prop_types.StringProp.jsonDecode(data.testId)
-				end
-
-				if data.error_text ~= nil then
-					v2.error_text = prop_types.StringProp.jsonDecode(data.error_text)
-				end
-
-				if data.errorText ~= nil then
-					v2.error_text = prop_types.StringProp.jsonDecode(data.errorText)
-				end
-
-				if data.retry_text ~= nil then
-					v2.retry_text = prop_types.StringProp.jsonDecode(data.retry_text)
-				end
-
-				if data.retryText ~= nil then
-					v2.retry_text = prop_types.StringProp.jsonDecode(data.retryText)
-				end
-
-				return v2
-			end
-
-			class288.descriptor = {
-				name = "GroupSectionSchema_Props",
-				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
-			}
-
-			v.GroupSectionSchema_Props = class288
-		end
-
-		typeRegistry.default:register(v.GroupSectionSchema_Props)
 
 		do
 			local class289 = {}
@@ -64456,7 +65138,7 @@ do
 						if v3 == 1 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
-							result.props = v.ListItemSchema_Props.decode(v5)
+							result.props = v.GroupSidebarSchema_Props.decode(v5)
 						elseif v3 == 2 then
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
@@ -64498,7 +65180,7 @@ do
 				local v2 = class289.new()
 
 				if p.props ~= nil then
-					v2.props = v.ListItemSchema_Props.jsonDecode(p.props)
+					v2.props = v.GroupSidebarSchema_Props.jsonDecode(p.props)
 				end
 
 				if p.shared ~= nil then
@@ -64509,20 +65191,759 @@ do
 			end
 
 			class289.descriptor = {
-				name = "ListItemSchema",
-				fullName = "roblox.apppageplatform.shared.v1beta1.ListItemSchema"
+				name = "GroupSidebarSchema",
+				fullName = "roblox.apppageplatform.shared.v1beta1.GroupSidebarSchema"
 			}
 
-			v.ListItemSchema = class289
+			v.GroupSidebarSchema = class289
 		end
 
-		typeRegistry.default:register(v.ListItemSchema)
+		typeRegistry.default:register(v.GroupSidebarSchema)
 
 		do
 			local class290 = {}
 			class290.__index = class290
 
 			function class290.new(data)
+				local v3
+
+				if not (data == nil or data.header == nil) then
+					v3 = data.header
+				end
+
+				local v4
+
+				if not (data == nil or data.items == nil) then
+					v4 = data.items
+				end
+
+				local v5
+
+				if not (data == nil or data.empty == nil) then
+					v5 = data.empty
+				end
+
+				local v6
+
+				if not (data == nil or data.no_results == nil) then
+					v6 = data.no_results
+				end
+
+				local v7
+
+				if not (data == nil or data.layout_order == nil) then
+					v7 = data.layout_order
+				end
+
+				local v8
+
+				if not (data == nil or data.test_id == nil) then
+					v8 = data.test_id
+				end
+
+				local v9
+
+				if not (data == nil or data.heading == nil) then
+					v9 = data.heading
+				end
+
+				return (setmetatable({
+					header = v3,
+					items = v4,
+					empty = v5,
+					no_results = v6,
+					layout_order = v7,
+					test_id = v8,
+					heading = v9
+				}, class290))
+			end
+
+			function class290:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.header ~= nil then
+					local encoded = self.header:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.items ~= nil then
+					local encoded = self.items:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.empty ~= nil then
+					local encoded = self.empty:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.no_results ~= nil then
+					local encoded = self.no_results:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.layout_order ~= nil then
+					local encoded = self.layout_order:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 7, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.test_id ~= nil then
+					local encoded = self.test_id:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 8, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.heading ~= nil then
+					local encoded = self.heading:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 9, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class290.decode(buf: buffer)
+				local result = class290.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.header = v.NestedComponentProp.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.items = v.LazyNestedComponentListProp.decode(v5)
+						elseif v3 == 3 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.empty = v.NestedComponentProp.decode(v5)
+						elseif v3 == 4 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.no_results = v.NestedComponentProp.decode(v5)
+						elseif v3 == 7 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.layout_order = prop_types.Int32Prop.decode(v5)
+						elseif v3 == 8 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.test_id = prop_types.StringProp.decode(v5)
+						elseif v3 == 9 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.heading = prop_types.StringProp.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class290:jsonEncode()
+				local v2 = {}
+
+				if self.header ~= nil then
+					v2.header = self.header:jsonEncode()
+				end
+
+				if self.items ~= nil then
+					v2.items = self.items:jsonEncode()
+				end
+
+				if self.empty ~= nil then
+					v2.empty = self.empty:jsonEncode()
+				end
+
+				if self.no_results ~= nil then
+					v2.noResults = self.no_results:jsonEncode()
+				end
+
+				if self.layout_order ~= nil then
+					v2.layoutOrder = self.layout_order:jsonEncode()
+				end
+
+				if self.test_id ~= nil then
+					v2.testId = self.test_id:jsonEncode()
+				end
+
+				if self.heading ~= nil then
+					v2.heading = self.heading:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class290.jsonDecode(data)
+				local v2 = class290.new()
+
+				if data.header ~= nil then
+					v2.header = v.NestedComponentProp.jsonDecode(data.header)
+				end
+
+				if data.items ~= nil then
+					v2.items = v.LazyNestedComponentListProp.jsonDecode(data.items)
+				end
+
+				if data.empty ~= nil then
+					v2.empty = v.NestedComponentProp.jsonDecode(data.empty)
+				end
+
+				if data.no_results ~= nil then
+					v2.no_results = v.NestedComponentProp.jsonDecode(data.no_results)
+				end
+
+				if data.noResults ~= nil then
+					v2.no_results = v.NestedComponentProp.jsonDecode(data.noResults)
+				end
+
+				if data.layout_order ~= nil then
+					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layout_order)
+				end
+
+				if data.layoutOrder ~= nil then
+					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layoutOrder)
+				end
+
+				if data.test_id ~= nil then
+					v2.test_id = prop_types.StringProp.jsonDecode(data.test_id)
+				end
+
+				if data.testId ~= nil then
+					v2.test_id = prop_types.StringProp.jsonDecode(data.testId)
+				end
+
+				if data.heading ~= nil then
+					v2.heading = prop_types.StringProp.jsonDecode(data.heading)
+				end
+
+				return v2
+			end
+
+			class290.descriptor = {
+				name = "GroupSidebarSchema_Props",
+				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
+			}
+
+			v.GroupSidebarSchema_Props = class290
+		end
+
+		typeRegistry.default:register(v.GroupSidebarSchema_Props)
+
+		do
+			local class291 = {}
+			class291.__index = class291
+
+			function class291.new(p)
+				local v3
+
+				if not (p == nil or p.props == nil) then
+					v3 = p.props
+				end
+
+				local v4
+
+				if not (p == nil or p.shared == nil) then
+					v4 = p.shared
+				end
+
+				return (setmetatable({ props = v3, shared = v4 }, class291))
+			end
+
+			function class291:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.props ~= nil then
+					local encoded = self.props:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.shared ~= nil then
+					local encoded = self.shared:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class291.decode(buf: buffer)
+				local result = class291.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.props = v.GroupSectionSchema_Props.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.shared = component_shared.ComponentShared.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class291:jsonEncode()
+				local v2 = {}
+
+				if self.props ~= nil then
+					v2.props = self.props:jsonEncode()
+				end
+
+				if self.shared ~= nil then
+					v2.shared = self.shared:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class291.jsonDecode(p)
+				local v2 = class291.new()
+
+				if p.props ~= nil then
+					v2.props = v.GroupSectionSchema_Props.jsonDecode(p.props)
+				end
+
+				if p.shared ~= nil then
+					v2.shared = component_shared.ComponentShared.jsonDecode(p.shared)
+				end
+
+				return v2
+			end
+
+			class291.descriptor = {
+				name = "GroupSectionSchema",
+				fullName = "roblox.apppageplatform.shared.v1beta1.GroupSectionSchema"
+			}
+
+			v.GroupSectionSchema = class291
+		end
+
+		typeRegistry.default:register(v.GroupSectionSchema)
+
+		do
+			local class292 = {}
+			class292.__index = class292
+
+			function class292.new(data)
+				local v3
+
+				if not (data == nil or data.group_id == nil) then
+					v3 = data.group_id
+				end
+
+				local v4
+
+				if not (data == nil or data.expandable_list == nil) then
+					v4 = data.expandable_list
+				end
+
+				local v5
+
+				if not (data == nil or data.layout_order == nil) then
+					v5 = data.layout_order
+				end
+
+				local v6
+
+				if not (data == nil or data.test_id == nil) then
+					v6 = data.test_id
+				end
+
+				local v7
+
+				if not (data == nil or data.error_text == nil) then
+					v7 = data.error_text
+				end
+
+				local v8
+
+				if not (data == nil or data.retry_text == nil) then
+					v8 = data.retry_text
+				end
+
+				return (setmetatable({
+					group_id = v3,
+					expandable_list = v4,
+					layout_order = v5,
+					test_id = v6,
+					error_text = v7,
+					retry_text = v8
+				}, class292))
+			end
+
+			function class292:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.group_id ~= nil then
+					local encoded = self.group_id:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.expandable_list ~= nil then
+					local encoded = self.expandable_list:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.layout_order ~= nil then
+					local encoded = self.layout_order:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.test_id ~= nil then
+					local encoded = self.test_id:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.error_text ~= nil then
+					local encoded = self.error_text:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 7, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.retry_text ~= nil then
+					local encoded = self.retry_text:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 8, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class292.decode(buf: buffer)
+				local result = class292.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.group_id = prop_types.StringProp.decode(v5)
+						elseif v3 == 3 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.expandable_list = v.LazyNestedComponentProp.decode(v5)
+						elseif v3 == 4 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.layout_order = prop_types.Int32Prop.decode(v5)
+						elseif v3 == 5 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.test_id = prop_types.StringProp.decode(v5)
+						elseif v3 == 7 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.error_text = prop_types.StringProp.decode(v5)
+						elseif v3 == 8 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.retry_text = prop_types.StringProp.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class292:jsonEncode()
+				local v2 = {}
+
+				if self.group_id ~= nil then
+					v2.groupId = self.group_id:jsonEncode()
+				end
+
+				if self.expandable_list ~= nil then
+					v2.expandableList = self.expandable_list:jsonEncode()
+				end
+
+				if self.layout_order ~= nil then
+					v2.layoutOrder = self.layout_order:jsonEncode()
+				end
+
+				if self.test_id ~= nil then
+					v2.testId = self.test_id:jsonEncode()
+				end
+
+				if self.error_text ~= nil then
+					v2.errorText = self.error_text:jsonEncode()
+				end
+
+				if self.retry_text ~= nil then
+					v2.retryText = self.retry_text:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class292.jsonDecode(data)
+				local v2 = class292.new()
+
+				if data.group_id ~= nil then
+					v2.group_id = prop_types.StringProp.jsonDecode(data.group_id)
+				end
+
+				if data.groupId ~= nil then
+					v2.group_id = prop_types.StringProp.jsonDecode(data.groupId)
+				end
+
+				if data.expandable_list ~= nil then
+					v2.expandable_list = v.LazyNestedComponentProp.jsonDecode(data.expandable_list)
+				end
+
+				if data.expandableList ~= nil then
+					v2.expandable_list = v.LazyNestedComponentProp.jsonDecode(data.expandableList)
+				end
+
+				if data.layout_order ~= nil then
+					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layout_order)
+				end
+
+				if data.layoutOrder ~= nil then
+					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layoutOrder)
+				end
+
+				if data.test_id ~= nil then
+					v2.test_id = prop_types.StringProp.jsonDecode(data.test_id)
+				end
+
+				if data.testId ~= nil then
+					v2.test_id = prop_types.StringProp.jsonDecode(data.testId)
+				end
+
+				if data.error_text ~= nil then
+					v2.error_text = prop_types.StringProp.jsonDecode(data.error_text)
+				end
+
+				if data.errorText ~= nil then
+					v2.error_text = prop_types.StringProp.jsonDecode(data.errorText)
+				end
+
+				if data.retry_text ~= nil then
+					v2.retry_text = prop_types.StringProp.jsonDecode(data.retry_text)
+				end
+
+				if data.retryText ~= nil then
+					v2.retry_text = prop_types.StringProp.jsonDecode(data.retryText)
+				end
+
+				return v2
+			end
+
+			class292.descriptor = {
+				name = "GroupSectionSchema_Props",
+				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
+			}
+
+			v.GroupSectionSchema_Props = class292
+		end
+
+		typeRegistry.default:register(v.GroupSectionSchema_Props)
+
+		do
+			local class293 = {}
+			class293.__index = class293
+
+			function class293.new(p)
+				local v3
+
+				if not (p == nil or p.props == nil) then
+					v3 = p.props
+				end
+
+				local v4
+
+				if not (p == nil or p.shared == nil) then
+					v4 = p.shared
+				end
+
+				return (setmetatable({ props = v3, shared = v4 }, class293))
+			end
+
+			function class293:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.props ~= nil then
+					local encoded = self.props:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.shared ~= nil then
+					local encoded = self.shared:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class293.decode(buf: buffer)
+				local result = class293.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.props = v.ListItemSchema_Props.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.shared = component_shared.ComponentShared.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class293:jsonEncode()
+				local v2 = {}
+
+				if self.props ~= nil then
+					v2.props = self.props:jsonEncode()
+				end
+
+				if self.shared ~= nil then
+					v2.shared = self.shared:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class293.jsonDecode(p)
+				local v2 = class293.new()
+
+				if p.props ~= nil then
+					v2.props = v.ListItemSchema_Props.jsonDecode(p.props)
+				end
+
+				if p.shared ~= nil then
+					v2.shared = component_shared.ComponentShared.jsonDecode(p.shared)
+				end
+
+				return v2
+			end
+
+			class293.descriptor = {
+				name = "ListItemSchema",
+				fullName = "roblox.apppageplatform.shared.v1beta1.ListItemSchema"
+			}
+
+			v.ListItemSchema = class293
+		end
+
+		typeRegistry.default:register(v.ListItemSchema)
+
+		do
+			local class294 = {}
+			class294.__index = class294
+
+			function class294.new(data)
 				local v3
 
 				if not (data == nil or data.leading_icon == nil) then
@@ -64587,10 +66008,10 @@ do
 					input = v9,
 					layout_order = v10,
 					test_id = v11
-				}, class290))
+				}, class294))
 			end
 
-			function class290:encode()
+			function class294:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -64653,8 +66074,8 @@ do
 				return buf
 			end
 
-			function class290.decode(buf: buffer)
-				local result = class290.new()
+			function class294.decode(buf: buffer)
+				local result = class294.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -64720,7 +66141,7 @@ do
 				return result
 			end
 
-			function class290:jsonEncode()
+			function class294:jsonEncode()
 				local v2 = {}
 
 				if self.leading_icon ~= nil then
@@ -64762,8 +66183,8 @@ do
 				return v2
 			end
 
-			function class290.jsonDecode(data)
-				local v2 = class290.new()
+			function class294.jsonDecode(data)
+				local v2 = class294.new()
 
 				if data.leading_icon ~= nil then
 					v2.leading_icon = prop_types.ImageStringProp.jsonDecode(data.leading_icon)
@@ -64824,21 +66245,21 @@ do
 				return v2
 			end
 
-			class290.descriptor = {
+			class294.descriptor = {
 				name = "ListItemSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.ListItemSchema_Props = class290
+			v.ListItemSchema_Props = class294
 		end
 
 		typeRegistry.default:register(v.ListItemSchema_Props)
 
 		do
-			local class291 = {}
-			class291.__index = class291
+			local class295 = {}
+			class295.__index = class295
 
-			function class291.new(p)
+			function class295.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -64851,10 +66272,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class291))
+				return (setmetatable({ props = v3, shared = v4 }, class295))
 			end
 
-			function class291:encode()
+			function class295:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -64875,8 +66296,8 @@ do
 				return buf
 			end
 
-			function class291.decode(buf: buffer)
-				local result = class291.new()
+			function class295.decode(buf: buffer)
+				local result = class295.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -64914,7 +66335,7 @@ do
 				return result
 			end
 
-			function class291:jsonEncode()
+			function class295:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -64928,8 +66349,8 @@ do
 				return v2
 			end
 
-			function class291.jsonDecode(p)
-				local v2 = class291.new()
+			function class295.jsonDecode(p)
+				local v2 = class295.new()
 
 				if p.props ~= nil then
 					v2.props = v.SearchAutocompleteSuggestionSchema_Props.jsonDecode(p.props)
@@ -64942,21 +66363,21 @@ do
 				return v2
 			end
 
-			class291.descriptor = {
+			class295.descriptor = {
 				name = "SearchAutocompleteSuggestionSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.SearchAutocompleteSuggestionSchema"
 			}
 
-			v.SearchAutocompleteSuggestionSchema = class291
+			v.SearchAutocompleteSuggestionSchema = class295
 		end
 
 		typeRegistry.default:register(v.SearchAutocompleteSuggestionSchema)
 
 		do
-			local class292 = {}
-			class292.__index = class292
+			local class296 = {}
+			class296.__index = class296
 
-			function class292.new(data)
+			function class296.new(data)
 				local v3
 
 				if not (data == nil or data.title == nil) then
@@ -64993,10 +66414,10 @@ do
 					keyword = v5,
 					rich_icon = v6,
 					on_activated = v7
-				}, class292))
+				}, class296))
 			end
 
-			function class292:encode()
+			function class296:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -65035,8 +66456,8 @@ do
 				return buf
 			end
 
-			function class292.decode(buf: buffer)
-				local result = class292.new()
+			function class296.decode(buf: buffer)
+				local result = class296.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -65086,7 +66507,7 @@ do
 				return result
 			end
 
-			function class292:jsonEncode()
+			function class296:jsonEncode()
 				local v2 = {}
 
 				if self.title ~= nil then
@@ -65112,8 +66533,8 @@ do
 				return v2
 			end
 
-			function class292.jsonDecode(data)
-				local v2 = class292.new()
+			function class296.jsonDecode(data)
+				local v2 = class296.new()
 
 				if data.title ~= nil then
 					v2.title = prop_types.StringProp.jsonDecode(data.title)
@@ -65150,31 +66571,31 @@ do
 				return v2
 			end
 
-			class292.descriptor = {
+			class296.descriptor = {
 				name = "SearchAutocompleteSuggestionSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.SearchAutocompleteSuggestionSchema_Props = class292
+			v.SearchAutocompleteSuggestionSchema_Props = class296
 		end
 
 		typeRegistry.default:register(v.SearchAutocompleteSuggestionSchema_Props)
 
 		do
-			local class293 = {}
-			class293.__index = class293
+			local class297 = {}
+			class297.__index = class297
 
-			function class293.new(p)
+			function class297.new(p)
 				local v3
 
 				if not (p == nil or p.oneof_prop == nil) then
 					v3 = p.oneof_prop
 				end
 
-				return (setmetatable({ oneof_prop = v3 }, class293))
+				return (setmetatable({ oneof_prop = v3 }, class297))
 			end
 
-			function class293:encode()
+			function class297:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -65195,8 +66616,8 @@ do
 				return buf
 			end
 
-			function class293.decode(buf: buffer)
-				local result = class293.new()
+			function class297.decode(buf: buffer)
+				local result = class297.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -65240,7 +66661,7 @@ do
 				return result
 			end
 
-			function class293:jsonEncode()
+			function class297:jsonEncode()
 				local v2 = {}
 
 				if self.oneof_prop == nil then
@@ -65259,8 +66680,8 @@ do
 				return v2
 			end
 
-			function class293.jsonDecode(p)
-				local v2 = class293.new()
+			function class297.jsonDecode(p)
+				local v2 = class297.new()
 
 				if p.value ~= nil then
 					v2.oneof_prop = {
@@ -65279,31 +66700,31 @@ do
 				return v2
 			end
 
-			class293.descriptor = {
+			class297.descriptor = {
 				name = "ListItemInputProp",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ListItemInputProp"
 			}
 
-			v.ListItemInputProp = class293
+			v.ListItemInputProp = class297
 		end
 
 		typeRegistry.default:register(v.ListItemInputProp)
 
 		do
-			local class294 = {}
-			class294.__index = class294
+			local class298 = {}
+			class298.__index = class298
 
-			function class294.new(p)
+			function class298.new(p)
 				local v3
 
 				if not (p == nil or p.kind == nil) then
 					v3 = p.kind
 				end
 
-				return (setmetatable({ kind = v3 }, class294))
+				return (setmetatable({ kind = v3 }, class298))
 			end
 
-			function class294:encode()
+			function class298:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -65327,8 +66748,8 @@ do
 				return buf
 			end
 
-			function class294.decode(buf: buffer)
-				local result = class294.new()
+			function class298.decode(buf: buffer)
+				local result = class298.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -65376,7 +66797,7 @@ do
 				return result
 			end
 
-			function class294:jsonEncode()
+			function class298:jsonEncode()
 				local v2 = {}
 
 				if self.kind == nil then
@@ -65400,8 +66821,8 @@ do
 				return v2
 			end
 
-			function class294.jsonDecode(data)
-				local v2 = class294.new()
+			function class298.jsonDecode(data)
+				local v2 = class298.new()
 
 				if data.literal ~= nil then
 					v2.kind = {
@@ -65428,21 +66849,21 @@ do
 				return v2
 			end
 
-			class294.descriptor = {
+			class298.descriptor = {
 				name = "ListItemInputControlProp",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ListItemInputControlProp"
 			}
 
-			v.ListItemInputControlProp = class294
+			v.ListItemInputControlProp = class298
 		end
 
 		typeRegistry.default:register(v.ListItemInputControlProp)
 
 		do
-			local class295 = {}
-			class295.__index = class295
+			local class299 = {}
+			class299.__index = class299
 
-			function class295.new(p)
+			function class299.new(p)
 				local v3
 
 				if not (p == nil or p.condition == nil) then
@@ -65455,10 +66876,10 @@ do
 					v4 = p.kind
 				end
 
-				return (setmetatable({ condition = v3, kind = v4 }, class295))
+				return (setmetatable({ condition = v3, kind = v4 }, class299))
 			end
 
-			function class295:encode()
+			function class299:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -65484,8 +66905,8 @@ do
 				return buf
 			end
 
-			function class295.decode(buf: buffer)
-				local result = class295.new()
+			function class299.decode(buf: buffer)
+				local result = class299.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -65530,7 +66951,7 @@ do
 				return result
 			end
 
-			function class295:jsonEncode()
+			function class299:jsonEncode()
 				local v2 = {}
 
 				if self.condition ~= nil then
@@ -65551,8 +66972,8 @@ do
 				return v2
 			end
 
-			function class295.jsonDecode(data)
-				local v2 = class295.new()
+			function class299.jsonDecode(data)
+				local v2 = class299.new()
 
 				if data.condition ~= nil then
 					v2.condition = prop_condition.PropCondition.jsonDecode(data.condition)
@@ -65576,27 +66997,27 @@ do
 				return v2
 			end
 
-			class295.descriptor = {
+			class299.descriptor = {
 				name = "ListItemInputControlProp_ConditionalOption",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
 			}
 
-			v.ListItemInputControlProp_ConditionalOption = class295
+			v.ListItemInputControlProp_ConditionalOption = class299
 		end
 
 		typeRegistry.default:register(v.ListItemInputControlProp_ConditionalOption)
 
 		do
-			local class296 = {}
-			class296.__index = class296
+			local class300 = {}
+			class300.__index = class300
 
-			function class296.new(p)
+			function class300.new(p)
 				return (setmetatable({
 					options = (p == nil or p.options == nil) and {} or p.options
-				}, class296))
+				}, class300))
 			end
 
-			function class296:encode()
+			function class300:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -65613,8 +67034,8 @@ do
 				return buf
 			end
 
-			function class296.decode(buf: buffer)
-				local v2 = class296.new()
+			function class300.decode(buf: buffer)
+				local v2 = class300.new()
 				local v3 = 0
 
 				while v3 < buffer.len(buf) do
@@ -65648,7 +67069,7 @@ do
 				return v2
 			end
 
-			function class296:jsonEncode()
+			function class300:jsonEncode()
 				local v2 = {}
 
 				if self.options == nil or not (#self.options > 0) then
@@ -65666,8 +67087,8 @@ do
 				return v2
 			end
 
-			function class296.jsonDecode(p)
-				local v2 = class296.new()
+			function class300.jsonDecode(p)
+				local v2 = class300.new()
 
 				if p.options == nil then
 					return v2
@@ -65684,21 +67105,21 @@ do
 				return v2
 			end
 
-			class296.descriptor = {
+			class300.descriptor = {
 				name = "ListItemInputControlProp_ConditionalOptions",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
 			}
 
-			v.ListItemInputControlProp_ConditionalOptions = class296
+			v.ListItemInputControlProp_ConditionalOptions = class300
 		end
 
 		typeRegistry.default:register(v.ListItemInputControlProp_ConditionalOptions)
 
 		do
-			local class297 = {}
-			class297.__index = class297
+			local class301 = {}
+			class301.__index = class301
 
-			function class297.new(data)
+			function class301.new(data)
 				local v3
 
 				if not (data == nil or data.type == nil) then
@@ -65717,10 +67138,10 @@ do
 					v5 = data.on_activated
 				end
 
-				return (setmetatable({ type = v3, is_checked = v4, on_activated = v5 }, class297))
+				return (setmetatable({ type = v3, is_checked = v4, on_activated = v5 }, class301))
 			end
 
-			function class297:encode()
+			function class301:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -65747,8 +67168,8 @@ do
 				return buf
 			end
 
-			function class297.decode(buf: buffer)
-				local result = class297.new()
+			function class301.decode(buf: buffer)
+				local result = class301.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -65790,7 +67211,7 @@ do
 				return result
 			end
 
-			function class297:jsonEncode()
+			function class301:jsonEncode()
 				local v2 = {}
 
 				if self.type ~= nil then
@@ -65808,8 +67229,8 @@ do
 				return v2
 			end
 
-			function class297.jsonDecode(data)
-				local v2 = class297.new()
+			function class301.jsonDecode(data)
+				local v2 = class301.new()
 
 				if data.type ~= nil then
 					v2.type = prop_types.StringProp.jsonDecode(data.type)
@@ -65834,21 +67255,21 @@ do
 				return v2
 			end
 
-			class297.descriptor = {
+			class301.descriptor = {
 				name = "ListItemInputControlProp_ListItemInputControl",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ListItemInputControl"
 			}
 
-			v.ListItemInputControlProp_ListItemInputControl = class297
+			v.ListItemInputControlProp_ListItemInputControl = class301
 		end
 
 		typeRegistry.default:register(v.ListItemInputControlProp_ListItemInputControl)
 
 		do
-			local class298 = {}
-			class298.__index = class298
+			local class302 = {}
+			class302.__index = class302
 
-			function class298.new(p)
+			function class302.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -65861,10 +67282,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class298))
+				return (setmetatable({ props = v3, shared = v4 }, class302))
 			end
 
-			function class298:encode()
+			function class302:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -65885,8 +67306,8 @@ do
 				return buf
 			end
 
-			function class298.decode(buf: buffer)
-				local result = class298.new()
+			function class302.decode(buf: buffer)
+				local result = class302.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -65924,7 +67345,7 @@ do
 				return result
 			end
 
-			function class298:jsonEncode()
+			function class302:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -65938,8 +67359,8 @@ do
 				return v2
 			end
 
-			function class298.jsonDecode(p)
-				local v2 = class298.new()
+			function class302.jsonDecode(p)
+				local v2 = class302.new()
 
 				if p.props ~= nil then
 					v2.props = v.AccordionSchema_Props.jsonDecode(p.props)
@@ -65952,21 +67373,21 @@ do
 				return v2
 			end
 
-			class298.descriptor = {
+			class302.descriptor = {
 				name = "AccordionSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.AccordionSchema"
 			}
 
-			v.AccordionSchema = class298
+			v.AccordionSchema = class302
 		end
 
 		typeRegistry.default:register(v.AccordionSchema)
 
 		do
-			local class299 = {}
-			class299.__index = class299
+			local class303 = {}
+			class303.__index = class303
 
-			function class299.new(data)
+			function class303.new(data)
 				local v3
 
 				if not (data == nil or data.items == nil) then
@@ -66010,10 +67431,10 @@ do
 					chevron_position = v6,
 					layout_order = v7,
 					test_id = v8
-				}, class299))
+				}, class303))
 			end
 
-			function class299:encode()
+			function class303:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -66058,8 +67479,8 @@ do
 				return buf
 			end
 
-			function class299.decode(buf: buffer)
-				local result = class299.new()
+			function class303.decode(buf: buffer)
+				local result = class303.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -66113,7 +67534,7 @@ do
 				return result
 			end
 
-			function class299:jsonEncode()
+			function class303:jsonEncode()
 				local v2 = {}
 
 				if self.items ~= nil then
@@ -66143,8 +67564,8 @@ do
 				return v2
 			end
 
-			function class299.jsonDecode(data)
-				local v2 = class299.new()
+			function class303.jsonDecode(data)
+				local v2 = class303.new()
 
 				if data.items ~= nil then
 					v2.items = v.LazyNestedComponentListProp.jsonDecode(data.items)
@@ -66189,21 +67610,21 @@ do
 				return v2
 			end
 
-			class299.descriptor = {
+			class303.descriptor = {
 				name = "AccordionSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.AccordionSchema_Props = class299
+			v.AccordionSchema_Props = class303
 		end
 
 		typeRegistry.default:register(v.AccordionSchema_Props)
 
 		do
-			local class300 = {}
-			class300.__index = class300
+			local class304 = {}
+			class304.__index = class304
 
-			function class300.new(p)
+			function class304.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -66216,10 +67637,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class300))
+				return (setmetatable({ props = v3, shared = v4 }, class304))
 			end
 
-			function class300:encode()
+			function class304:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -66240,8 +67661,8 @@ do
 				return buf
 			end
 
-			function class300.decode(buf: buffer)
-				local result = class300.new()
+			function class304.decode(buf: buffer)
+				local result = class304.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -66279,7 +67700,7 @@ do
 				return result
 			end
 
-			function class300:jsonEncode()
+			function class304:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -66293,8 +67714,8 @@ do
 				return v2
 			end
 
-			function class300.jsonDecode(p)
-				local v2 = class300.new()
+			function class304.jsonDecode(p)
+				local v2 = class304.new()
 
 				if p.props ~= nil then
 					v2.props = v.AccordionItemSchema_Props.jsonDecode(p.props)
@@ -66307,21 +67728,21 @@ do
 				return v2
 			end
 
-			class300.descriptor = {
+			class304.descriptor = {
 				name = "AccordionItemSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.AccordionItemSchema"
 			}
 
-			v.AccordionItemSchema = class300
+			v.AccordionItemSchema = class304
 		end
 
 		typeRegistry.default:register(v.AccordionItemSchema)
 
 		do
-			local class301 = {}
-			class301.__index = class301
+			local class305 = {}
+			class305.__index = class305
 
-			function class301.new(data)
+			function class305.new(data)
 				local v3
 
 				if not (data == nil or data.text == nil) then
@@ -66379,10 +67800,10 @@ do
 					is_expanded = v8,
 					content = v9,
 					layout_order = v10
-				}, class301))
+				}, class305))
 			end
 
-			function class301:encode()
+			function class305:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -66439,8 +67860,8 @@ do
 				return buf
 			end
 
-			function class301.decode(buf: buffer)
-				local result = class301.new()
+			function class305.decode(buf: buffer)
+				local result = class305.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -66502,7 +67923,7 @@ do
 				return result
 			end
 
-			function class301:jsonEncode()
+			function class305:jsonEncode()
 				local v2 = {}
 
 				if self.text ~= nil then
@@ -66540,8 +67961,8 @@ do
 				return v2
 			end
 
-			function class301.jsonDecode(data)
-				local v2 = class301.new()
+			function class305.jsonDecode(data)
+				local v2 = class305.new()
 
 				if data.text ~= nil then
 					v2.text = prop_types.StringProp.jsonDecode(data.text)
@@ -66594,21 +68015,21 @@ do
 				return v2
 			end
 
-			class301.descriptor = {
+			class305.descriptor = {
 				name = "AccordionItemSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.AccordionItemSchema_Props = class301
+			v.AccordionItemSchema_Props = class305
 		end
 
 		typeRegistry.default:register(v.AccordionItemSchema_Props)
 
 		do
-			local class302 = {}
-			class302.__index = class302
+			local class306 = {}
+			class306.__index = class306
 
-			function class302.new(p)
+			function class306.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -66621,10 +68042,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class302))
+				return (setmetatable({ props = v3, shared = v4 }, class306))
 			end
 
-			function class302:encode()
+			function class306:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -66645,8 +68066,8 @@ do
 				return buf
 			end
 
-			function class302.decode(buf: buffer)
-				local result = class302.new()
+			function class306.decode(buf: buffer)
+				local result = class306.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -66684,7 +68105,7 @@ do
 				return result
 			end
 
-			function class302:jsonEncode()
+			function class306:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -66698,8 +68119,8 @@ do
 				return v2
 			end
 
-			function class302.jsonDecode(p)
-				local v2 = class302.new()
+			function class306.jsonDecode(p)
+				local v2 = class306.new()
 
 				if p.props ~= nil then
 					v2.props = v.AgeCheckUpsellRowSchema_Props.jsonDecode(p.props)
@@ -66712,21 +68133,21 @@ do
 				return v2
 			end
 
-			class302.descriptor = {
+			class306.descriptor = {
 				name = "AgeCheckUpsellRowSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.AgeCheckUpsellRowSchema"
 			}
 
-			v.AgeCheckUpsellRowSchema = class302
+			v.AgeCheckUpsellRowSchema = class306
 		end
 
 		typeRegistry.default:register(v.AgeCheckUpsellRowSchema)
 
 		do
-			local class303 = {}
-			class303.__index = class303
+			local class307 = {}
+			class307.__index = class307
 
-			function class303.new(data)
+			function class307.new(data)
 				local v3
 
 				if not (data == nil or data.leading == nil) then
@@ -66805,10 +68226,10 @@ do
 					layout_order = v11,
 					position = v12,
 					z_index = v13
-				}, class303))
+				}, class307))
 			end
 
-			function class303:encode()
+			function class307:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -66883,8 +68304,8 @@ do
 				return buf
 			end
 
-			function class303.decode(buf: buffer)
-				local result = class303.new()
+			function class307.decode(buf: buffer)
+				local result = class307.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -66958,7 +68379,7 @@ do
 				return result
 			end
 
-			function class303:jsonEncode()
+			function class307:jsonEncode()
 				local v2 = {}
 
 				if self.leading ~= nil then
@@ -67008,8 +68429,8 @@ do
 				return v2
 			end
 
-			function class303.jsonDecode(data)
-				local v2 = class303.new()
+			function class307.jsonDecode(data)
+				local v2 = class307.new()
 
 				if data.leading ~= nil then
 					v2.leading = v.NestedComponentListProp.jsonDecode(data.leading)
@@ -67082,21 +68503,21 @@ do
 				return v2
 			end
 
-			class303.descriptor = {
+			class307.descriptor = {
 				name = "AgeCheckUpsellRowSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.AgeCheckUpsellRowSchema_Props = class303
+			v.AgeCheckUpsellRowSchema_Props = class307
 		end
 
 		typeRegistry.default:register(v.AgeCheckUpsellRowSchema_Props)
 
 		do
-			local class304 = {}
-			class304.__index = class304
+			local class308 = {}
+			class308.__index = class308
 
-			function class304.new(p)
+			function class308.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -67109,10 +68530,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class304))
+				return (setmetatable({ props = v3, shared = v4 }, class308))
 			end
 
-			function class304:encode()
+			function class308:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -67133,8 +68554,8 @@ do
 				return buf
 			end
 
-			function class304.decode(buf: buffer)
-				local result = class304.new()
+			function class308.decode(buf: buffer)
+				local result = class308.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -67172,7 +68593,7 @@ do
 				return result
 			end
 
-			function class304:jsonEncode()
+			function class308:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -67186,8 +68607,8 @@ do
 				return v2
 			end
 
-			function class304.jsonDecode(p)
-				local v2 = class304.new()
+			function class308.jsonDecode(p)
+				local v2 = class308.new()
 
 				if p.props ~= nil then
 					v2.props = v.FilterPillsCarouselSchema_Props.jsonDecode(p.props)
@@ -67200,21 +68621,21 @@ do
 				return v2
 			end
 
-			class304.descriptor = {
+			class308.descriptor = {
 				name = "FilterPillsCarouselSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.FilterPillsCarouselSchema"
 			}
 
-			v.FilterPillsCarouselSchema = class304
+			v.FilterPillsCarouselSchema = class308
 		end
 
 		typeRegistry.default:register(v.FilterPillsCarouselSchema)
 
 		do
-			local class305 = {}
-			class305.__index = class305
+			local class309 = {}
+			class309.__index = class309
 
-			function class305.new(data)
+			function class309.new(data)
 				local v3
 
 				if not (data == nil or data.filter_groups == nil) then
@@ -67272,10 +68693,10 @@ do
 					title = v8,
 					background_style = v9,
 					tag = v10
-				}, class305))
+				}, class309))
 			end
 
-			function class305:encode()
+			function class309:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -67332,8 +68753,8 @@ do
 				return buf
 			end
 
-			function class305.decode(buf: buffer)
-				local result = class305.new()
+			function class309.decode(buf: buffer)
+				local result = class309.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -67395,7 +68816,7 @@ do
 				return result
 			end
 
-			function class305:jsonEncode()
+			function class309:jsonEncode()
 				local v2 = {}
 
 				if self.filter_groups ~= nil then
@@ -67433,8 +68854,8 @@ do
 				return v2
 			end
 
-			function class305.jsonDecode(data)
-				local v2 = class305.new()
+			function class309.jsonDecode(data)
+				local v2 = class309.new()
 
 				if data.filter_groups ~= nil then
 					v2.filter_groups = prop_types.ArrayOfStructProp.jsonDecode(data.filter_groups)
@@ -67495,21 +68916,21 @@ do
 				return v2
 			end
 
-			class305.descriptor = {
+			class309.descriptor = {
 				name = "FilterPillsCarouselSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.FilterPillsCarouselSchema_Props = class305
+			v.FilterPillsCarouselSchema_Props = class309
 		end
 
 		typeRegistry.default:register(v.FilterPillsCarouselSchema_Props)
 
 		do
-			local class306 = {}
-			class306.__index = class306
+			local class310 = {}
+			class310.__index = class310
 
-			function class306.new(p)
+			function class310.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -67522,10 +68943,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class306))
+				return (setmetatable({ props = v3, shared = v4 }, class310))
 			end
 
-			function class306:encode()
+			function class310:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -67546,8 +68967,8 @@ do
 				return buf
 			end
 
-			function class306.decode(buf: buffer)
-				local result = class306.new()
+			function class310.decode(buf: buffer)
+				local result = class310.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -67585,7 +69006,7 @@ do
 				return result
 			end
 
-			function class306:jsonEncode()
+			function class310:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -67599,8 +69020,8 @@ do
 				return v2
 			end
 
-			function class306.jsonDecode(p)
-				local v2 = class306.new()
+			function class310.jsonDecode(p)
+				local v2 = class310.new()
 
 				if p.props ~= nil then
 					v2.props = v.PillTabsCarouselSchema_Props.jsonDecode(p.props)
@@ -67613,21 +69034,21 @@ do
 				return v2
 			end
 
-			class306.descriptor = {
+			class310.descriptor = {
 				name = "PillTabsCarouselSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.PillTabsCarouselSchema"
 			}
 
-			v.PillTabsCarouselSchema = class306
+			v.PillTabsCarouselSchema = class310
 		end
 
 		typeRegistry.default:register(v.PillTabsCarouselSchema)
 
 		do
-			local class307 = {}
-			class307.__index = class307
+			local class311 = {}
+			class311.__index = class311
 
-			function class307.new(data)
+			function class311.new(data)
 				local v3
 
 				if not (data == nil or data.options == nil) then
@@ -67671,10 +69092,10 @@ do
 					tag = v6,
 					chip_size = v7,
 					default_option = v8
-				}, class307))
+				}, class311))
 			end
 
-			function class307:encode()
+			function class311:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -67719,8 +69140,8 @@ do
 				return buf
 			end
 
-			function class307.decode(buf: buffer)
-				local result = class307.new()
+			function class311.decode(buf: buffer)
+				local result = class311.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -67774,7 +69195,7 @@ do
 				return result
 			end
 
-			function class307:jsonEncode()
+			function class311:jsonEncode()
 				local v2 = {}
 
 				if self.options ~= nil then
@@ -67804,8 +69225,8 @@ do
 				return v2
 			end
 
-			function class307.jsonDecode(data)
-				local v2 = class307.new()
+			function class311.jsonDecode(data)
+				local v2 = class311.new()
 
 				if data.options ~= nil then
 					v2.options = prop_types.ArrayOfStructProp.jsonDecode(data.options)
@@ -67850,21 +69271,21 @@ do
 				return v2
 			end
 
-			class307.descriptor = {
+			class311.descriptor = {
 				name = "PillTabsCarouselSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.PillTabsCarouselSchema_Props = class307
+			v.PillTabsCarouselSchema_Props = class311
 		end
 
 		typeRegistry.default:register(v.PillTabsCarouselSchema_Props)
 
 		do
-			local class308 = {}
-			class308.__index = class308
+			local class312 = {}
+			class312.__index = class312
 
-			function class308.new(data)
+			function class312.new(data)
 				local v3
 
 				if not (data == nil or data.on_activated == nil) then
@@ -67883,10 +69304,10 @@ do
 					v5 = data.variant
 				end
 
-				return (setmetatable({ on_activated = v3, text = v4, variant = v5 }, class308))
+				return (setmetatable({ on_activated = v3, text = v4, variant = v5 }, class312))
 			end
 
-			function class308:encode()
+			function class312:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -67913,8 +69334,8 @@ do
 				return buf
 			end
 
-			function class308.decode(buf: buffer)
-				local result = class308.new()
+			function class312.decode(buf: buffer)
+				local result = class312.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -67956,7 +69377,7 @@ do
 				return result
 			end
 
-			function class308:jsonEncode()
+			function class312:jsonEncode()
 				local v2 = {}
 
 				if self.on_activated ~= nil then
@@ -67974,8 +69395,8 @@ do
 				return v2
 			end
 
-			function class308.jsonDecode(data)
-				local v2 = class308.new()
+			function class312.jsonDecode(data)
+				local v2 = class312.new()
 
 				if data.on_activated ~= nil then
 					v2.on_activated = actions.ActionProp.jsonDecode(data.on_activated)
@@ -67996,31 +69417,31 @@ do
 				return v2
 			end
 
-			class308.descriptor = {
+			class312.descriptor = {
 				name = "CoachmarkActionProp",
 				fullName = "roblox.apppageplatform.shared.v1beta1.CoachmarkActionProp"
 			}
 
-			v.CoachmarkActionProp = class308
+			v.CoachmarkActionProp = class312
 		end
 
 		typeRegistry.default:register(v.CoachmarkActionProp)
 
 		do
-			local class309 = {}
-			class309.__index = class309
+			local class313 = {}
+			class313.__index = class313
 
-			function class309.new(p)
+			function class313.new(p)
 				local v3
 
 				if not (p == nil or p.kind == nil) then
 					v3 = p.kind
 				end
 
-				return (setmetatable({ kind = v3 }, class309))
+				return (setmetatable({ kind = v3 }, class313))
 			end
 
-			function class309:encode()
+			function class313:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -68044,8 +69465,8 @@ do
 				return buf
 			end
 
-			function class309.decode(buf: buffer)
-				local result = class309.new()
+			function class313.decode(buf: buffer)
+				local result = class313.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -68093,7 +69514,7 @@ do
 				return result
 			end
 
-			function class309:jsonEncode()
+			function class313:jsonEncode()
 				local v2 = {}
 
 				if self.kind == nil then
@@ -68117,8 +69538,8 @@ do
 				return v2
 			end
 
-			function class309.jsonDecode(data)
-				local v2 = class309.new()
+			function class313.jsonDecode(data)
+				local v2 = class313.new()
 
 				if data.literal ~= nil then
 					v2.kind = {
@@ -68145,21 +69566,21 @@ do
 				return v2
 			end
 
-			class309.descriptor = {
+			class313.descriptor = {
 				name = "ArrayOfCoachmarkActionsProp",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfCoachmarkActionsProp"
 			}
 
-			v.ArrayOfCoachmarkActionsProp = class309
+			v.ArrayOfCoachmarkActionsProp = class313
 		end
 
 		typeRegistry.default:register(v.ArrayOfCoachmarkActionsProp)
 
 		do
-			local class310 = {}
-			class310.__index = class310
+			local class314 = {}
+			class314.__index = class314
 
-			function class310.new(p)
+			function class314.new(p)
 				local v3
 
 				if not (p == nil or p.condition == nil) then
@@ -68172,10 +69593,10 @@ do
 					v4 = p.kind
 				end
 
-				return (setmetatable({ condition = v3, kind = v4 }, class310))
+				return (setmetatable({ condition = v3, kind = v4 }, class314))
 			end
 
-			function class310:encode()
+			function class314:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -68201,8 +69622,8 @@ do
 				return buf
 			end
 
-			function class310.decode(buf: buffer)
-				local result = class310.new()
+			function class314.decode(buf: buffer)
+				local result = class314.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -68247,7 +69668,7 @@ do
 				return result
 			end
 
-			function class310:jsonEncode()
+			function class314:jsonEncode()
 				local v2 = {}
 
 				if self.condition ~= nil then
@@ -68268,8 +69689,8 @@ do
 				return v2
 			end
 
-			function class310.jsonDecode(data)
-				local v2 = class310.new()
+			function class314.jsonDecode(data)
+				local v2 = class314.new()
 
 				if data.condition ~= nil then
 					v2.condition = prop_condition.PropCondition.jsonDecode(data.condition)
@@ -68293,27 +69714,27 @@ do
 				return v2
 			end
 
-			class310.descriptor = {
+			class314.descriptor = {
 				name = "ArrayOfCoachmarkActionsProp_ConditionalOption",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
 			}
 
-			v.ArrayOfCoachmarkActionsProp_ConditionalOption = class310
+			v.ArrayOfCoachmarkActionsProp_ConditionalOption = class314
 		end
 
 		typeRegistry.default:register(v.ArrayOfCoachmarkActionsProp_ConditionalOption)
 
 		do
-			local class311 = {}
-			class311.__index = class311
+			local class315 = {}
+			class315.__index = class315
 
-			function class311.new(p)
+			function class315.new(p)
 				return (setmetatable({
 					options = (p == nil or p.options == nil) and {} or p.options
-				}, class311))
+				}, class315))
 			end
 
-			function class311:encode()
+			function class315:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -68330,8 +69751,8 @@ do
 				return buf
 			end
 
-			function class311.decode(buf: buffer)
-				local v2 = class311.new()
+			function class315.decode(buf: buffer)
+				local v2 = class315.new()
 				local v3 = 0
 
 				while v3 < buffer.len(buf) do
@@ -68365,7 +69786,7 @@ do
 				return v2
 			end
 
-			function class311:jsonEncode()
+			function class315:jsonEncode()
 				local v2 = {}
 
 				if self.options == nil or not (#self.options > 0) then
@@ -68383,8 +69804,8 @@ do
 				return v2
 			end
 
-			function class311.jsonDecode(p)
-				local v2 = class311.new()
+			function class315.jsonDecode(p)
+				local v2 = class315.new()
 
 				if p.options == nil then
 					return v2
@@ -68401,27 +69822,27 @@ do
 				return v2
 			end
 
-			class311.descriptor = {
+			class315.descriptor = {
 				name = "ArrayOfCoachmarkActionsProp_ConditionalOptions",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
 			}
 
-			v.ArrayOfCoachmarkActionsProp_ConditionalOptions = class311
+			v.ArrayOfCoachmarkActionsProp_ConditionalOptions = class315
 		end
 
 		typeRegistry.default:register(v.ArrayOfCoachmarkActionsProp_ConditionalOptions)
 
 		do
-			local class312 = {}
-			class312.__index = class312
+			local class316 = {}
+			class316.__index = class316
 
-			function class312.new(p)
+			function class316.new(p)
 				return (setmetatable({
 					array = (p == nil or p.array == nil) and {} or p.array
-				}, class312))
+				}, class316))
 			end
 
-			function class312:encode()
+			function class316:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -68438,8 +69859,8 @@ do
 				return buf
 			end
 
-			function class312.decode(buf: buffer)
-				local v2 = class312.new()
+			function class316.decode(buf: buffer)
+				local v2 = class316.new()
 				local v3 = 0
 
 				while v3 < buffer.len(buf) do
@@ -68473,7 +69894,7 @@ do
 				return v2
 			end
 
-			function class312:jsonEncode()
+			function class316:jsonEncode()
 				local v2 = {}
 
 				if self.array == nil or not (#self.array > 0) then
@@ -68491,8 +69912,8 @@ do
 				return v2
 			end
 
-			function class312.jsonDecode(p)
-				local v2 = class312.new()
+			function class316.jsonDecode(p)
+				local v2 = class316.new()
 
 				if p.array == nil then
 					return v2
@@ -68509,21 +69930,21 @@ do
 				return v2
 			end
 
-			class312.descriptor = {
+			class316.descriptor = {
 				name = "ArrayOfCoachmarkActionsProp_ArrayOfCoachmarkActions",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfCoachmarkActions"
 			}
 
-			v.ArrayOfCoachmarkActionsProp_ArrayOfCoachmarkActions = class312
+			v.ArrayOfCoachmarkActionsProp_ArrayOfCoachmarkActions = class316
 		end
 
 		typeRegistry.default:register(v.ArrayOfCoachmarkActionsProp_ArrayOfCoachmarkActions)
 
 		do
-			local class313 = {}
-			class313.__index = class313
+			local class317 = {}
+			class317.__index = class317
 
-			function class313.new(data)
+			function class317.new(data)
 				local v3
 
 				if not (data == nil or data.props == nil) then
@@ -68542,10 +69963,10 @@ do
 					v5 = data.web_props
 				end
 
-				return (setmetatable({ props = v3, shared = v4, web_props = v5 }, class313))
+				return (setmetatable({ props = v3, shared = v4, web_props = v5 }, class317))
 			end
 
-			function class313:encode()
+			function class317:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -68572,8 +69993,8 @@ do
 				return buf
 			end
 
-			function class313.decode(buf: buffer)
-				local result = class313.new()
+			function class317.decode(buf: buffer)
+				local result = class317.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -68615,7 +70036,7 @@ do
 				return result
 			end
 
-			function class313:jsonEncode()
+			function class317:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -68633,8 +70054,8 @@ do
 				return v2
 			end
 
-			function class313.jsonDecode(data)
-				local v2 = class313.new()
+			function class317.jsonDecode(data)
+				local v2 = class317.new()
 
 				if data.props ~= nil then
 					v2.props = v.CoachmarkSchema_Props.jsonDecode(data.props)
@@ -68655,21 +70076,21 @@ do
 				return v2
 			end
 
-			class313.descriptor = {
+			class317.descriptor = {
 				name = "CoachmarkSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.CoachmarkSchema"
 			}
 
-			v.CoachmarkSchema = class313
+			v.CoachmarkSchema = class317
 		end
 
 		typeRegistry.default:register(v.CoachmarkSchema)
 
 		do
-			local class314 = {}
-			class314.__index = class314
+			local class318 = {}
+			class318.__index = class318
 
-			function class314.new(data)
+			function class318.new(data)
 				local v3
 
 				if not (data == nil or data.title == nil) then
@@ -68727,10 +70148,10 @@ do
 					on_close = v8,
 					actions = v9,
 					media = v10
-				}, class314))
+				}, class318))
 			end
 
-			function class314:encode()
+			function class318:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -68787,8 +70208,8 @@ do
 				return buf
 			end
 
-			function class314.decode(buf: buffer)
-				local result = class314.new()
+			function class318.decode(buf: buffer)
+				local result = class318.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -68850,7 +70271,7 @@ do
 				return result
 			end
 
-			function class314:jsonEncode()
+			function class318:jsonEncode()
 				local v2 = {}
 
 				if self.title ~= nil then
@@ -68888,8 +70309,8 @@ do
 				return v2
 			end
 
-			function class314.jsonDecode(data)
-				local v2 = class314.new()
+			function class318.jsonDecode(data)
+				local v2 = class318.new()
 
 				if data.title ~= nil then
 					v2.title = prop_types.StringProp.jsonDecode(data.title)
@@ -68934,31 +70355,31 @@ do
 				return v2
 			end
 
-			class314.descriptor = {
+			class318.descriptor = {
 				name = "CoachmarkSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.CoachmarkSchema_Props = class314
+			v.CoachmarkSchema_Props = class318
 		end
 
 		typeRegistry.default:register(v.CoachmarkSchema_Props)
 
 		do
-			local class315 = {}
-			class315.__index = class315
+			local class319 = {}
+			class319.__index = class319
 
-			function class315.new(p)
+			function class319.new(p)
 				local v3
 
 				if not (p == nil or p.close_button_aria_label == nil) then
 					v3 = p.close_button_aria_label
 				end
 
-				return (setmetatable({ close_button_aria_label = v3 }, class315))
+				return (setmetatable({ close_button_aria_label = v3 }, class319))
 			end
 
-			function class315:encode()
+			function class319:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -68973,8 +70394,8 @@ do
 				return buf
 			end
 
-			function class315.decode(buf: buffer)
-				local result = class315.new()
+			function class319.decode(buf: buffer)
+				local result = class319.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -69008,7 +70429,7 @@ do
 				return result
 			end
 
-			function class315:jsonEncode()
+			function class319:jsonEncode()
 				local v2 = {}
 
 				if self.close_button_aria_label ~= nil then
@@ -69018,8 +70439,8 @@ do
 				return v2
 			end
 
-			function class315.jsonDecode(p)
-				local v2 = class315.new()
+			function class319.jsonDecode(p)
+				local v2 = class319.new()
 
 				if p.close_button_aria_label ~= nil then
 					v2.close_button_aria_label = prop_types.StringProp.jsonDecode(p.close_button_aria_label)
@@ -69032,21 +70453,21 @@ do
 				return v2
 			end
 
-			class315.descriptor = {
+			class319.descriptor = {
 				name = "CoachmarkSchema_WebProps",
 				fullName = "roblox.apppageplatform.shared.v1beta1.WebProps"
 			}
 
-			v.CoachmarkSchema_WebProps = class315
+			v.CoachmarkSchema_WebProps = class319
 		end
 
 		typeRegistry.default:register(v.CoachmarkSchema_WebProps)
 
 		do
-			local class316 = {}
-			class316.__index = class316
+			local class320 = {}
+			class320.__index = class320
 
-			function class316.new(p)
+			function class320.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -69059,10 +70480,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class316))
+				return (setmetatable({ props = v3, shared = v4 }, class320))
 			end
 
-			function class316:encode()
+			function class320:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -69083,8 +70504,8 @@ do
 				return buf
 			end
 
-			function class316.decode(buf: buffer)
-				local result = class316.new()
+			function class320.decode(buf: buffer)
+				local result = class320.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -69122,7 +70543,7 @@ do
 				return result
 			end
 
-			function class316:jsonEncode()
+			function class320:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -69136,8 +70557,8 @@ do
 				return v2
 			end
 
-			function class316.jsonDecode(p)
-				local v2 = class316.new()
+			function class320.jsonDecode(p)
+				local v2 = class320.new()
 
 				if p.props ~= nil then
 					v2.props = v.BadgeSchema_Props.jsonDecode(p.props)
@@ -69150,21 +70571,21 @@ do
 				return v2
 			end
 
-			class316.descriptor = {
+			class320.descriptor = {
 				name = "BadgeSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.BadgeSchema"
 			}
 
-			v.BadgeSchema = class316
+			v.BadgeSchema = class320
 		end
 
 		typeRegistry.default:register(v.BadgeSchema)
 
 		do
-			local class317 = {}
-			class317.__index = class317
+			local class321 = {}
+			class321.__index = class321
 
-			function class317.new(data)
+			function class321.new(data)
 				local v3
 
 				if not (data == nil or data.text == nil) then
@@ -69219,6 +70640,12 @@ do
 					v11 = data.foundation_icon
 				end
 
+				local v12
+
+				if not (data == nil or data.shape == nil) then
+					v12 = data.shape
+				end
+
 				return (setmetatable({
 					text = v3,
 					icon = v4,
@@ -69228,11 +70655,12 @@ do
 					position = v8,
 					visible = v9,
 					z_index = v10,
-					foundation_icon = v11
-				}, class317))
+					foundation_icon = v11,
+					shape = v12
+				}, class321))
 			end
 
-			function class317:encode()
+			function class321:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -69290,13 +70718,19 @@ do
 					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 				end
 
+				if self.shape ~= nil then
+					local encoded = self.shape:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 10, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
 				local buf = buffer.create(v3)
 				buffer.copy(buf, 0, v2, 0, v3)
 				return buf
 			end
 
-			function class317.decode(buf: buffer)
-				local result = class317.new()
+			function class321.decode(buf: buffer)
+				local result = class321.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -69343,6 +70777,10 @@ do
 							local v5
 							v5, v2 = proto.readBuffer(buf, v2)
 							result.foundation_icon = prop_types.FoundationIconConfigProp.decode(v5)
+						elseif v3 == 10 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.shape = prop_types.StringProp.decode(v5)
 						else
 							local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -69362,7 +70800,7 @@ do
 				return result
 			end
 
-			function class317:jsonEncode()
+			function class321:jsonEncode()
 				local v2 = {}
 
 				if self.text ~= nil then
@@ -69401,11 +70839,15 @@ do
 					v2.foundationIcon = self.foundation_icon:jsonEncode()
 				end
 
+				if self.shape ~= nil then
+					v2.shape = self.shape:jsonEncode()
+				end
+
 				return v2
 			end
 
-			function class317.jsonDecode(data)
-				local v2 = class317.new()
+			function class321.jsonDecode(data)
+				local v2 = class321.new()
 
 				if data.text ~= nil then
 					v2.text = prop_types.StringProp.jsonDecode(data.text)
@@ -69459,24 +70901,28 @@ do
 					v2.foundation_icon = prop_types.FoundationIconConfigProp.jsonDecode(data.foundationIcon)
 				end
 
+				if data.shape ~= nil then
+					v2.shape = prop_types.StringProp.jsonDecode(data.shape)
+				end
+
 				return v2
 			end
 
-			class317.descriptor = {
+			class321.descriptor = {
 				name = "BadgeSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.BadgeSchema_Props = class317
+			v.BadgeSchema_Props = class321
 		end
 
 		typeRegistry.default:register(v.BadgeSchema_Props)
 
 		do
-			local class318 = {}
-			class318.__index = class318
+			local class322 = {}
+			class322.__index = class322
 
-			function class318.new(p)
+			function class322.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -69489,10 +70935,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class318))
+				return (setmetatable({ props = v3, shared = v4 }, class322))
 			end
 
-			function class318:encode()
+			function class322:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -69513,8 +70959,463 @@ do
 				return buf
 			end
 
-			function class318.decode(buf: buffer)
-				local result = class318.new()
+			function class322.decode(buf: buffer)
+				local result = class322.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.props = v.StatusBadgeSchema_Props.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.shared = component_shared.ComponentShared.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class322:jsonEncode()
+				local v2 = {}
+
+				if self.props ~= nil then
+					v2.props = self.props:jsonEncode()
+				end
+
+				if self.shared ~= nil then
+					v2.shared = self.shared:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class322.jsonDecode(p)
+				local v2 = class322.new()
+
+				if p.props ~= nil then
+					v2.props = v.StatusBadgeSchema_Props.jsonDecode(p.props)
+				end
+
+				if p.shared ~= nil then
+					v2.shared = component_shared.ComponentShared.jsonDecode(p.shared)
+				end
+
+				return v2
+			end
+
+			class322.descriptor = {
+				name = "StatusBadgeSchema",
+				fullName = "roblox.apppageplatform.shared.v1beta1.StatusBadgeSchema"
+			}
+
+			v.StatusBadgeSchema = class322
+		end
+
+		typeRegistry.default:register(v.StatusBadgeSchema)
+
+		do
+			local class323 = {}
+			class323.__index = class323
+
+			function class323.new(data)
+				local v3
+
+				if not (data == nil or data.text == nil) then
+					v3 = data.text
+				end
+
+				local v4
+
+				if not (data == nil or data.variant == nil) then
+					v4 = data.variant
+				end
+
+				local v5
+
+				if not (data == nil or data.shape == nil) then
+					v5 = data.shape
+				end
+
+				local v6
+
+				if not (data == nil or data.size == nil) then
+					v6 = data.size
+				end
+
+				local v7
+
+				if not (data == nil or data.layout_order == nil) then
+					v7 = data.layout_order
+				end
+
+				local v8
+
+				if not (data == nil or data.anchor_point == nil) then
+					v8 = data.anchor_point
+				end
+
+				local v9
+
+				if not (data == nil or data.position == nil) then
+					v9 = data.position
+				end
+
+				local v10
+
+				if not (data == nil or data.visible == nil) then
+					v10 = data.visible
+				end
+
+				local v11
+
+				if not (data == nil or data.z_index == nil) then
+					v11 = data.z_index
+				end
+
+				local v12
+
+				if not (data == nil or data.test_id == nil) then
+					v12 = data.test_id
+				end
+
+				return (setmetatable({
+					text = v3,
+					variant = v4,
+					shape = v5,
+					size = v6,
+					layout_order = v7,
+					anchor_point = v8,
+					position = v9,
+					visible = v10,
+					z_index = v11,
+					test_id = v12
+				}, class323))
+			end
+
+			function class323:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.text ~= nil then
+					local encoded = self.text:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.variant ~= nil then
+					local encoded = self.variant:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.shape ~= nil then
+					local encoded = self.shape:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.size ~= nil then
+					local encoded = self.size:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.layout_order ~= nil then
+					local encoded = self.layout_order:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.anchor_point ~= nil then
+					local encoded = self.anchor_point:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 6, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.position ~= nil then
+					local encoded = self.position:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 7, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.visible ~= nil then
+					local encoded = self.visible:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 8, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.z_index ~= nil then
+					local encoded = self.z_index:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 9, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.test_id ~= nil then
+					local encoded = self.test_id:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 10, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class323.decode(buf: buffer)
+				local result = class323.new()
+				local v2 = 0
+
+				while v2 < buffer.len(buf) do
+					local v3, v4
+					v3, v4, v2 = proto.readTag(buf, v2)
+
+					if v4 == proto.wireTypes.varint then
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					elseif v4 == proto.wireTypes.lengthDelimited then
+						if v3 == 1 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.text = prop_types.StringProp.decode(v5)
+						elseif v3 == 2 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.variant = prop_types.StringProp.decode(v5)
+						elseif v3 == 3 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.shape = prop_types.StringProp.decode(v5)
+						elseif v3 == 4 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.size = prop_types.StringProp.decode(v5)
+						elseif v3 == 5 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.layout_order = prop_types.Int32Prop.decode(v5)
+						elseif v3 == 6 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.anchor_point = prop_types.Vector2Prop.decode(v5)
+						elseif v3 == 7 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.position = prop_types.UDim2Prop.decode(v5)
+						elseif v3 == 8 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.visible = prop_types.BoolProp.decode(v5)
+						elseif v3 == 9 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.z_index = prop_types.Int32Prop.decode(v5)
+						elseif v3 == 10 then
+							local v5
+							v5, v2 = proto.readBuffer(buf, v2)
+							result.test_id = prop_types.StringProp.decode(v5)
+						else
+							local varInt, v5 = proto.readVarInt(buf, v2)
+
+							v2 = v5 + varInt
+						end
+					elseif v4 == proto.wireTypes.i32 then
+						local v5
+						v5, v2 = proto.readFixed32(buf, v2)
+					elseif v4 == proto.wireTypes.i64 then
+						local v5
+						v5, v2 = proto.readFixed64(buf, v2)
+					else
+						error("Unsupported wire type: " .. v4)
+					end
+				end
+
+				return result
+			end
+
+			function class323:jsonEncode()
+				local v2 = {}
+
+				if self.text ~= nil then
+					v2.text = self.text:jsonEncode()
+				end
+
+				if self.variant ~= nil then
+					v2.variant = self.variant:jsonEncode()
+				end
+
+				if self.shape ~= nil then
+					v2.shape = self.shape:jsonEncode()
+				end
+
+				if self.size ~= nil then
+					v2.size = self.size:jsonEncode()
+				end
+
+				if self.layout_order ~= nil then
+					v2.layoutOrder = self.layout_order:jsonEncode()
+				end
+
+				if self.anchor_point ~= nil then
+					v2.anchorPoint = self.anchor_point:jsonEncode()
+				end
+
+				if self.position ~= nil then
+					v2.position = self.position:jsonEncode()
+				end
+
+				if self.visible ~= nil then
+					v2.visible = self.visible:jsonEncode()
+				end
+
+				if self.z_index ~= nil then
+					v2.zIndex = self.z_index:jsonEncode()
+				end
+
+				if self.test_id ~= nil then
+					v2.testId = self.test_id:jsonEncode()
+				end
+
+				return v2
+			end
+
+			function class323.jsonDecode(data)
+				local v2 = class323.new()
+
+				if data.text ~= nil then
+					v2.text = prop_types.StringProp.jsonDecode(data.text)
+				end
+
+				if data.variant ~= nil then
+					v2.variant = prop_types.StringProp.jsonDecode(data.variant)
+				end
+
+				if data.shape ~= nil then
+					v2.shape = prop_types.StringProp.jsonDecode(data.shape)
+				end
+
+				if data.size ~= nil then
+					v2.size = prop_types.StringProp.jsonDecode(data.size)
+				end
+
+				if data.layout_order ~= nil then
+					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layout_order)
+				end
+
+				if data.layoutOrder ~= nil then
+					v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layoutOrder)
+				end
+
+				if data.anchor_point ~= nil then
+					v2.anchor_point = prop_types.Vector2Prop.jsonDecode(data.anchor_point)
+				end
+
+				if data.anchorPoint ~= nil then
+					v2.anchor_point = prop_types.Vector2Prop.jsonDecode(data.anchorPoint)
+				end
+
+				if data.position ~= nil then
+					v2.position = prop_types.UDim2Prop.jsonDecode(data.position)
+				end
+
+				if data.visible ~= nil then
+					v2.visible = prop_types.BoolProp.jsonDecode(data.visible)
+				end
+
+				if data.z_index ~= nil then
+					v2.z_index = prop_types.Int32Prop.jsonDecode(data.z_index)
+				end
+
+				if data.zIndex ~= nil then
+					v2.z_index = prop_types.Int32Prop.jsonDecode(data.zIndex)
+				end
+
+				if data.test_id ~= nil then
+					v2.test_id = prop_types.StringProp.jsonDecode(data.test_id)
+				end
+
+				if data.testId ~= nil then
+					v2.test_id = prop_types.StringProp.jsonDecode(data.testId)
+				end
+
+				return v2
+			end
+
+			class323.descriptor = {
+				name = "StatusBadgeSchema_Props",
+				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
+			}
+
+			v.StatusBadgeSchema_Props = class323
+		end
+
+		typeRegistry.default:register(v.StatusBadgeSchema_Props)
+
+		do
+			local class324 = {}
+			class324.__index = class324
+
+			function class324.new(p)
+				local v3
+
+				if not (p == nil or p.props == nil) then
+					v3 = p.props
+				end
+
+				local v4
+
+				if not (p == nil or p.shared == nil) then
+					v4 = p.shared
+				end
+
+				return (setmetatable({ props = v3, shared = v4 }, class324))
+			end
+
+			function class324:encode()
+				local v2 = buffer.create(0)
+				local v3 = 0
+
+				if self.props ~= nil then
+					local encoded = self.props:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				if self.shared ~= nil then
+					local encoded = self.shared:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
+
+				local buf = buffer.create(v3)
+				buffer.copy(buf, 0, v2, 0, v3)
+				return buf
+			end
+
+			function class324.decode(buf: buffer)
+				local result = class324.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -69552,7 +71453,7 @@ do
 				return result
 			end
 
-			function class318:jsonEncode()
+			function class324:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -69566,8 +71467,8 @@ do
 				return v2
 			end
 
-			function class318.jsonDecode(p)
-				local v2 = class318.new()
+			function class324.jsonDecode(p)
+				local v2 = class324.new()
 
 				if p.props ~= nil then
 					v2.props = v.SongTileSchema_Props.jsonDecode(p.props)
@@ -69580,21 +71481,21 @@ do
 				return v2
 			end
 
-			class318.descriptor = {
+			class324.descriptor = {
 				name = "SongTileSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.SongTileSchema"
 			}
 
-			v.SongTileSchema = class318
+			v.SongTileSchema = class324
 		end
 
 		typeRegistry.default:register(v.SongTileSchema)
 
 		do
-			local class319 = {}
-			class319.__index = class319
+			local class325 = {}
+			class325.__index = class325
 
-			function class319.new(data)
+			function class325.new(data)
 				local v3
 
 				if not (data == nil or data.image_aspect_ratio == nil) then
@@ -69771,10 +71672,10 @@ do
 					background_style = v25,
 					song_id = v26,
 					artist_text = v27
-				}, class319))
+				}, class325))
 			end
 
-			function class319:encode()
+			function class325:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -69933,8 +71834,8 @@ do
 				return buf
 			end
 
-			function class319.decode(buf: buffer)
-				local result = class319.new()
+			function class325.decode(buf: buffer)
+				local result = class325.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -70064,7 +71965,7 @@ do
 				return result
 			end
 
-			function class319:jsonEncode()
+			function class325:jsonEncode()
 				local v2 = {}
 
 				if self.image_aspect_ratio ~= nil then
@@ -70170,8 +72071,8 @@ do
 				return v2
 			end
 
-			function class319.jsonDecode(data)
-				local v2 = class319.new()
+			function class325.jsonDecode(data)
+				local v2 = class325.new()
 
 				if data.image_aspect_ratio ~= nil then
 					v2.image_aspect_ratio = prop_types.FloatProp.jsonDecode(data.image_aspect_ratio)
@@ -70372,21 +72273,21 @@ do
 				return v2
 			end
 
-			class319.descriptor = {
+			class325.descriptor = {
 				name = "SongTileSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.SongTileSchema_Props = class319
+			v.SongTileSchema_Props = class325
 		end
 
 		typeRegistry.default:register(v.SongTileSchema_Props)
 
 		do
-			local class320 = {}
-			class320.__index = class320
+			local class326 = {}
+			class326.__index = class326
 
-			function class320.new(p)
+			function class326.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -70399,10 +72300,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class320))
+				return (setmetatable({ props = v3, shared = v4 }, class326))
 			end
 
-			function class320:encode()
+			function class326:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -70423,8 +72324,8 @@ do
 				return buf
 			end
 
-			function class320.decode(buf: buffer)
-				local result = class320.new()
+			function class326.decode(buf: buffer)
+				local result = class326.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -70462,7 +72363,7 @@ do
 				return result
 			end
 
-			function class320:jsonEncode()
+			function class326:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -70476,8 +72377,8 @@ do
 				return v2
 			end
 
-			function class320.jsonDecode(p)
-				local v2 = class320.new()
+			function class326.jsonDecode(p)
+				local v2 = class326.new()
 
 				if p.props ~= nil then
 					v2.props = v.EventTileSchema_Props.jsonDecode(p.props)
@@ -70490,21 +72391,21 @@ do
 				return v2
 			end
 
-			class320.descriptor = {
+			class326.descriptor = {
 				name = "EventTileSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.EventTileSchema"
 			}
 
-			v.EventTileSchema = class320
+			v.EventTileSchema = class326
 		end
 
 		typeRegistry.default:register(v.EventTileSchema)
 
 		do
-			local class321 = {}
-			class321.__index = class321
+			local class327 = {}
+			class327.__index = class327
 
-			function class321.new(data)
+			function class327.new(data)
 				local v3
 
 				if not (data == nil or data.image_aspect_ratio == nil) then
@@ -70730,10 +72631,10 @@ do
 					formatted_start_date = v32,
 					subtitle = v33,
 					user_rsvp = v34
-				}, class321))
+				}, class327))
 			end
 
-			function class321:encode()
+			function class327:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -70934,8 +72835,8 @@ do
 				return buf
 			end
 
-			function class321.decode(buf: buffer)
-				local result = class321.new()
+			function class327.decode(buf: buffer)
+				local result = class327.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -71093,7 +72994,7 @@ do
 				return result
 			end
 
-			function class321:jsonEncode()
+			function class327:jsonEncode()
 				local v2 = {}
 
 				if self.image_aspect_ratio ~= nil then
@@ -71227,8 +73128,8 @@ do
 				return v2
 			end
 
-			function class321.jsonDecode(data)
-				local v2 = class321.new()
+			function class327.jsonDecode(data)
+				local v2 = class327.new()
 
 				if data.image_aspect_ratio ~= nil then
 					v2.image_aspect_ratio = prop_types.FloatProp.jsonDecode(data.image_aspect_ratio)
@@ -71481,21 +73382,21 @@ do
 				return v2
 			end
 
-			class321.descriptor = {
+			class327.descriptor = {
 				name = "EventTileSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.EventTileSchema_Props = class321
+			v.EventTileSchema_Props = class327
 		end
 
 		typeRegistry.default:register(v.EventTileSchema_Props)
 
 		do
-			local class322 = {}
-			class322.__index = class322
+			local class328 = {}
+			class328.__index = class328
 
-			function class322.new(p)
+			function class328.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -71508,10 +73409,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class322))
+				return (setmetatable({ props = v3, shared = v4 }, class328))
 			end
 
-			function class322:encode()
+			function class328:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -71532,8 +73433,8 @@ do
 				return buf
 			end
 
-			function class322.decode(buf: buffer)
-				local result = class322.new()
+			function class328.decode(buf: buffer)
+				local result = class328.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -71571,7 +73472,7 @@ do
 				return result
 			end
 
-			function class322:jsonEncode()
+			function class328:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -71585,8 +73486,8 @@ do
 				return v2
 			end
 
-			function class322.jsonDecode(p)
-				local v2 = class322.new()
+			function class328.jsonDecode(p)
+				local v2 = class328.new()
 
 				if p.props ~= nil then
 					v2.props = v.SheetFullBleedSchema_Props.jsonDecode(p.props)
@@ -71599,21 +73500,21 @@ do
 				return v2
 			end
 
-			class322.descriptor = {
+			class328.descriptor = {
 				name = "SheetFullBleedSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.SheetFullBleedSchema"
 			}
 
-			v.SheetFullBleedSchema = class322
+			v.SheetFullBleedSchema = class328
 		end
 
 		typeRegistry.default:register(v.SheetFullBleedSchema)
 
 		do
-			local class323 = {}
-			class323.__index = class323
+			local class329 = {}
+			class329.__index = class329
 
-			function class323.new(data)
+			function class329.new(data)
 				local v3
 
 				if not (data == nil or data.media == nil) then
@@ -71664,10 +73565,10 @@ do
 					aspect_ratio = v7,
 					sticky = v8,
 					children = v9
-				}, class323))
+				}, class329))
 			end
 
-			function class323:encode()
+			function class329:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -71718,8 +73619,8 @@ do
 				return buf
 			end
 
-			function class323.decode(buf: buffer)
-				local result = class323.new()
+			function class329.decode(buf: buffer)
+				local result = class329.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -71777,7 +73678,7 @@ do
 				return result
 			end
 
-			function class323:jsonEncode()
+			function class329:jsonEncode()
 				local v2 = {}
 
 				if self.media ~= nil then
@@ -71811,8 +73712,8 @@ do
 				return v2
 			end
 
-			function class323.jsonDecode(data)
-				local v2 = class323.new()
+			function class329.jsonDecode(data)
+				local v2 = class329.new()
 
 				if data.media ~= nil then
 					v2.media = prop_types.ImageStringProp.jsonDecode(data.media)
@@ -71857,21 +73758,21 @@ do
 				return v2
 			end
 
-			class323.descriptor = {
+			class329.descriptor = {
 				name = "SheetFullBleedSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.SheetFullBleedSchema_Props = class323
+			v.SheetFullBleedSchema_Props = class329
 		end
 
 		typeRegistry.default:register(v.SheetFullBleedSchema_Props)
 
 		do
-			local class324 = {}
-			class324.__index = class324
+			local class330 = {}
+			class330.__index = class330
 
-			function class324.new(p)
+			function class330.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -71884,10 +73785,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class324))
+				return (setmetatable({ props = v3, shared = v4 }, class330))
 			end
 
-			function class324:encode()
+			function class330:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -71908,8 +73809,8 @@ do
 				return buf
 			end
 
-			function class324.decode(buf: buffer)
-				local result = class324.new()
+			function class330.decode(buf: buffer)
+				local result = class330.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -71947,7 +73848,7 @@ do
 				return result
 			end
 
-			function class324:jsonEncode()
+			function class330:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -71961,8 +73862,8 @@ do
 				return v2
 			end
 
-			function class324.jsonDecode(p)
-				local v2 = class324.new()
+			function class330.jsonDecode(p)
+				local v2 = class330.new()
 
 				if p.props ~= nil then
 					v2.props = v.SheetSchema_Props.jsonDecode(p.props)
@@ -71975,21 +73876,21 @@ do
 				return v2
 			end
 
-			class324.descriptor = {
+			class330.descriptor = {
 				name = "SheetSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.SheetSchema"
 			}
 
-			v.SheetSchema = class324
+			v.SheetSchema = class330
 		end
 
 		typeRegistry.default:register(v.SheetSchema)
 
 		do
-			local class325 = {}
-			class325.__index = class325
+			local class331 = {}
+			class331.__index = class331
 
-			function class325.new(data)
+			function class331.new(data)
 				local v3
 
 				if not (data == nil or data.is_open == nil) then
@@ -72103,10 +74004,10 @@ do
 					content_is_reversed = v16,
 					action_components = v17,
 					test_id = v18
-				}, class325))
+				}, class331))
 			end
 
-			function class325:encode()
+			function class331:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -72211,8 +74112,8 @@ do
 				return buf
 			end
 
-			function class325.decode(buf: buffer)
-				local result = class325.new()
+			function class331.decode(buf: buffer)
+				local result = class331.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -72306,7 +74207,7 @@ do
 				return result
 			end
 
-			function class325:jsonEncode()
+			function class331:jsonEncode()
 				local v2 = {}
 
 				if self.is_open ~= nil then
@@ -72376,8 +74277,8 @@ do
 				return v2
 			end
 
-			function class325.jsonDecode(data)
-				local v2 = class325.new()
+			function class331.jsonDecode(data)
+				local v2 = class331.new()
 
 				if data.is_open ~= nil then
 					v2.is_open = prop_types.BoolProp.jsonDecode(data.is_open)
@@ -72506,21 +74407,21 @@ do
 				return v2
 			end
 
-			class325.descriptor = {
+			class331.descriptor = {
 				name = "SheetSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.SheetSchema_Props = class325
+			v.SheetSchema_Props = class331
 		end
 
 		typeRegistry.default:register(v.SheetSchema_Props)
 
 		do
-			local class326 = {}
-			class326.__index = class326
+			local class332 = {}
+			class332.__index = class332
 
-			function class326.new(p)
+			function class332.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -72533,10 +74434,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class326))
+				return (setmetatable({ props = v3, shared = v4 }, class332))
 			end
 
-			function class326:encode()
+			function class332:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -72557,8 +74458,8 @@ do
 				return buf
 			end
 
-			function class326.decode(buf: buffer)
-				local result = class326.new()
+			function class332.decode(buf: buffer)
+				local result = class332.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -72596,7 +74497,7 @@ do
 				return result
 			end
 
-			function class326:jsonEncode()
+			function class332:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -72610,8 +74511,8 @@ do
 				return v2
 			end
 
-			function class326.jsonDecode(p)
-				local v2 = class326.new()
+			function class332.jsonDecode(p)
+				local v2 = class332.new()
 
 				if p.props ~= nil then
 					v2.props = v.SubscriptionCellSchema_Props.jsonDecode(p.props)
@@ -72624,21 +74525,21 @@ do
 				return v2
 			end
 
-			class326.descriptor = {
+			class332.descriptor = {
 				name = "SubscriptionCellSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.SubscriptionCellSchema"
 			}
 
-			v.SubscriptionCellSchema = class326
+			v.SubscriptionCellSchema = class332
 		end
 
 		typeRegistry.default:register(v.SubscriptionCellSchema)
 
 		do
-			local class327 = {}
-			class327.__index = class327
+			local class333 = {}
+			class333.__index = class333
 
-			function class327.new(data)
+			function class333.new(data)
 				local v3
 
 				if not (data == nil or data.content_row_component == nil) then
@@ -72689,10 +74590,10 @@ do
 					layout_order = v7,
 					content_row_slot_tag = v8,
 					button_slot_tag = v9
-				}, class327))
+				}, class333))
 			end
 
-			function class327:encode()
+			function class333:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -72743,8 +74644,8 @@ do
 				return buf
 			end
 
-			function class327.decode(buf: buffer)
-				local result = class327.new()
+			function class333.decode(buf: buffer)
+				local result = class333.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -72802,7 +74703,7 @@ do
 				return result
 			end
 
-			function class327:jsonEncode()
+			function class333:jsonEncode()
 				local v2 = {}
 
 				if self.content_row_component ~= nil then
@@ -72836,8 +74737,8 @@ do
 				return v2
 			end
 
-			function class327.jsonDecode(data)
-				local v2 = class327.new()
+			function class333.jsonDecode(data)
+				local v2 = class333.new()
 
 				if data.content_row_component ~= nil then
 					v2.content_row_component = v.NestedComponentProp.jsonDecode(data.content_row_component)
@@ -72894,21 +74795,21 @@ do
 				return v2
 			end
 
-			class327.descriptor = {
+			class333.descriptor = {
 				name = "SubscriptionCellSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.SubscriptionCellSchema_Props = class327
+			v.SubscriptionCellSchema_Props = class333
 		end
 
 		typeRegistry.default:register(v.SubscriptionCellSchema_Props)
 
 		do
-			local class328 = {}
-			class328.__index = class328
+			local class334 = {}
+			class334.__index = class334
 
-			function class328.new(p)
+			function class334.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -72921,10 +74822,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class328))
+				return (setmetatable({ props = v3, shared = v4 }, class334))
 			end
 
-			function class328:encode()
+			function class334:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -72945,8 +74846,8 @@ do
 				return buf
 			end
 
-			function class328.decode(buf: buffer)
-				local result = class328.new()
+			function class334.decode(buf: buffer)
+				local result = class334.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -72984,7 +74885,7 @@ do
 				return result
 			end
 
-			function class328:jsonEncode()
+			function class334:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -72998,8 +74899,8 @@ do
 				return v2
 			end
 
-			function class328.jsonDecode(p)
-				local v2 = class328.new()
+			function class334.jsonDecode(p)
+				local v2 = class334.new()
 
 				if p.props ~= nil then
 					v2.props = v.TooltipSchema_Props.jsonDecode(p.props)
@@ -73012,21 +74913,21 @@ do
 				return v2
 			end
 
-			class328.descriptor = {
+			class334.descriptor = {
 				name = "TooltipSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.TooltipSchema"
 			}
 
-			v.TooltipSchema = class328
+			v.TooltipSchema = class334
 		end
 
 		typeRegistry.default:register(v.TooltipSchema)
 
 		do
-			local class329 = {}
-			class329.__index = class329
+			local class335 = {}
+			class335.__index = class335
 
-			function class329.new(data)
+			function class335.new(data)
 				local v3
 
 				if not (data == nil or data.title == nil) then
@@ -73072,10 +74973,10 @@ do
 					layout_order = v8,
 					shortcut = (data == nil or data.shortcut == nil) and {} or data.shortcut
 				}
-				return (setmetatable(v2, class329))
+				return (setmetatable(v2, class335))
 			end
 
-			function class329:encode()
+			function class335:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -73128,8 +75029,8 @@ do
 				return buf
 			end
 
-			function class329.decode(buf: buffer)
-				local result = class329.new()
+			function class335.decode(buf: buffer)
+				local result = class335.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -73187,7 +75088,7 @@ do
 				return result
 			end
 
-			function class329:jsonEncode()
+			function class335:jsonEncode()
 				local v2 = {}
 
 				if self.title ~= nil then
@@ -73229,8 +75130,8 @@ do
 				return v2
 			end
 
-			function class329.jsonDecode(data)
-				local v2 = class329.new()
+			function class335.jsonDecode(data)
+				local v2 = class335.new()
 
 				if data.title ~= nil then
 					v2.title = prop_types.StringProp.jsonDecode(data.title)
@@ -73275,21 +75176,21 @@ do
 				return v2
 			end
 
-			class329.descriptor = {
+			class335.descriptor = {
 				name = "TooltipSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.TooltipSchema_Props = class329
+			v.TooltipSchema_Props = class335
 		end
 
 		typeRegistry.default:register(v.TooltipSchema_Props)
 
 		do
-			local class330 = {}
-			class330.__index = class330
+			local class336 = {}
+			class336.__index = class336
 
-			function class330.new(data)
+			function class336.new(data)
 				local v3
 
 				if not (data == nil or data.on_activated == nil) then
@@ -73308,10 +75209,10 @@ do
 					v5 = data.variant
 				end
 
-				return (setmetatable({ on_activated = v3, text = v4, variant = v5 }, class330))
+				return (setmetatable({ on_activated = v3, text = v4, variant = v5 }, class336))
 			end
 
-			function class330:encode()
+			function class336:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -73338,8 +75239,8 @@ do
 				return buf
 			end
 
-			function class330.decode(buf: buffer)
-				local result = class330.new()
+			function class336.decode(buf: buffer)
+				local result = class336.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -73381,7 +75282,7 @@ do
 				return result
 			end
 
-			function class330:jsonEncode()
+			function class336:jsonEncode()
 				local v2 = {}
 
 				if self.on_activated ~= nil then
@@ -73399,8 +75300,8 @@ do
 				return v2
 			end
 
-			function class330.jsonDecode(data)
-				local v2 = class330.new()
+			function class336.jsonDecode(data)
+				local v2 = class336.new()
 
 				if data.on_activated ~= nil then
 					v2.on_activated = actions.ActionProp.jsonDecode(data.on_activated)
@@ -73421,31 +75322,31 @@ do
 				return v2
 			end
 
-			class330.descriptor = {
+			class336.descriptor = {
 				name = "SystemBannerAction",
 				fullName = "roblox.apppageplatform.shared.v1beta1.SystemBannerAction"
 			}
 
-			v.SystemBannerAction = class330
+			v.SystemBannerAction = class336
 		end
 
 		typeRegistry.default:register(v.SystemBannerAction)
 
 		do
-			local class331 = {}
-			class331.__index = class331
+			local class337 = {}
+			class337.__index = class337
 
-			function class331.new(p)
+			function class337.new(p)
 				local v3
 
 				if not (p == nil or p.kind == nil) then
 					v3 = p.kind
 				end
 
-				return (setmetatable({ kind = v3 }, class331))
+				return (setmetatable({ kind = v3 }, class337))
 			end
 
-			function class331:encode()
+			function class337:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -73469,8 +75370,8 @@ do
 				return buf
 			end
 
-			function class331.decode(buf: buffer)
-				local result = class331.new()
+			function class337.decode(buf: buffer)
+				local result = class337.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -73518,7 +75419,7 @@ do
 				return result
 			end
 
-			function class331:jsonEncode()
+			function class337:jsonEncode()
 				local v2 = {}
 
 				if self.kind == nil then
@@ -73542,8 +75443,8 @@ do
 				return v2
 			end
 
-			function class331.jsonDecode(data)
-				local v2 = class331.new()
+			function class337.jsonDecode(data)
+				local v2 = class337.new()
 
 				if data.literal ~= nil then
 					v2.kind = {
@@ -73570,21 +75471,21 @@ do
 				return v2
 			end
 
-			class331.descriptor = {
+			class337.descriptor = {
 				name = "SystemBannerActionProp",
 				fullName = "roblox.apppageplatform.shared.v1beta1.SystemBannerActionProp"
 			}
 
-			v.SystemBannerActionProp = class331
+			v.SystemBannerActionProp = class337
 		end
 
 		typeRegistry.default:register(v.SystemBannerActionProp)
 
 		do
-			local class332 = {}
-			class332.__index = class332
+			local class338 = {}
+			class338.__index = class338
 
-			function class332.new(p)
+			function class338.new(p)
 				local v3
 
 				if not (p == nil or p.condition == nil) then
@@ -73597,10 +75498,10 @@ do
 					v4 = p.kind
 				end
 
-				return (setmetatable({ condition = v3, kind = v4 }, class332))
+				return (setmetatable({ condition = v3, kind = v4 }, class338))
 			end
 
-			function class332:encode()
+			function class338:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -73626,8 +75527,8 @@ do
 				return buf
 			end
 
-			function class332.decode(buf: buffer)
-				local result = class332.new()
+			function class338.decode(buf: buffer)
+				local result = class338.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -73672,7 +75573,7 @@ do
 				return result
 			end
 
-			function class332:jsonEncode()
+			function class338:jsonEncode()
 				local v2 = {}
 
 				if self.condition ~= nil then
@@ -73693,8 +75594,8 @@ do
 				return v2
 			end
 
-			function class332.jsonDecode(data)
-				local v2 = class332.new()
+			function class338.jsonDecode(data)
+				local v2 = class338.new()
 
 				if data.condition ~= nil then
 					v2.condition = prop_condition.PropCondition.jsonDecode(data.condition)
@@ -73718,27 +75619,27 @@ do
 				return v2
 			end
 
-			class332.descriptor = {
+			class338.descriptor = {
 				name = "SystemBannerActionProp_ConditionalOption",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
 			}
 
-			v.SystemBannerActionProp_ConditionalOption = class332
+			v.SystemBannerActionProp_ConditionalOption = class338
 		end
 
 		typeRegistry.default:register(v.SystemBannerActionProp_ConditionalOption)
 
 		do
-			local class333 = {}
-			class333.__index = class333
+			local class339 = {}
+			class339.__index = class339
 
-			function class333.new(p)
+			function class339.new(p)
 				return (setmetatable({
 					options = (p == nil or p.options == nil) and {} or p.options
-				}, class333))
+				}, class339))
 			end
 
-			function class333:encode()
+			function class339:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -73755,8 +75656,8 @@ do
 				return buf
 			end
 
-			function class333.decode(buf: buffer)
-				local v2 = class333.new()
+			function class339.decode(buf: buffer)
+				local v2 = class339.new()
 				local v3 = 0
 
 				while v3 < buffer.len(buf) do
@@ -73790,7 +75691,7 @@ do
 				return v2
 			end
 
-			function class333:jsonEncode()
+			function class339:jsonEncode()
 				local v2 = {}
 
 				if self.options == nil or not (#self.options > 0) then
@@ -73808,8 +75709,8 @@ do
 				return v2
 			end
 
-			function class333.jsonDecode(p)
-				local v2 = class333.new()
+			function class339.jsonDecode(p)
+				local v2 = class339.new()
 
 				if p.options == nil then
 					return v2
@@ -73826,31 +75727,31 @@ do
 				return v2
 			end
 
-			class333.descriptor = {
+			class339.descriptor = {
 				name = "SystemBannerActionProp_ConditionalOptions",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
 			}
 
-			v.SystemBannerActionProp_ConditionalOptions = class333
+			v.SystemBannerActionProp_ConditionalOptions = class339
 		end
 
 		typeRegistry.default:register(v.SystemBannerActionProp_ConditionalOptions)
 
 		do
-			local class334 = {}
-			class334.__index = class334
+			local class340 = {}
+			class340.__index = class340
 
-			function class334.new(p)
+			function class340.new(p)
 				local v3
 
 				if not (p == nil or p.kind == nil) then
 					v3 = p.kind
 				end
 
-				return (setmetatable({ kind = v3 }, class334))
+				return (setmetatable({ kind = v3 }, class340))
 			end
 
-			function class334:encode()
+			function class340:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -73874,8 +75775,8 @@ do
 				return buf
 			end
 
-			function class334.decode(buf: buffer)
-				local result = class334.new()
+			function class340.decode(buf: buffer)
+				local result = class340.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -73923,7 +75824,7 @@ do
 				return result
 			end
 
-			function class334:jsonEncode()
+			function class340:jsonEncode()
 				local v2 = {}
 
 				if self.kind == nil then
@@ -73947,8 +75848,8 @@ do
 				return v2
 			end
 
-			function class334.jsonDecode(data)
-				local v2 = class334.new()
+			function class340.jsonDecode(data)
+				local v2 = class340.new()
 
 				if data.literal ~= nil then
 					v2.kind = {
@@ -73975,21 +75876,21 @@ do
 				return v2
 			end
 
-			class334.descriptor = {
+			class340.descriptor = {
 				name = "ArrayOfSystemBannerActionsProp",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfSystemBannerActionsProp"
 			}
 
-			v.ArrayOfSystemBannerActionsProp = class334
+			v.ArrayOfSystemBannerActionsProp = class340
 		end
 
 		typeRegistry.default:register(v.ArrayOfSystemBannerActionsProp)
 
 		do
-			local class335 = {}
-			class335.__index = class335
+			local class341 = {}
+			class341.__index = class341
 
-			function class335.new(p)
+			function class341.new(p)
 				local v3
 
 				if not (p == nil or p.condition == nil) then
@@ -74002,10 +75903,10 @@ do
 					v4 = p.kind
 				end
 
-				return (setmetatable({ condition = v3, kind = v4 }, class335))
+				return (setmetatable({ condition = v3, kind = v4 }, class341))
 			end
 
-			function class335:encode()
+			function class341:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -74031,8 +75932,8 @@ do
 				return buf
 			end
 
-			function class335.decode(buf: buffer)
-				local result = class335.new()
+			function class341.decode(buf: buffer)
+				local result = class341.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -74077,7 +75978,7 @@ do
 				return result
 			end
 
-			function class335:jsonEncode()
+			function class341:jsonEncode()
 				local v2 = {}
 
 				if self.condition ~= nil then
@@ -74098,8 +75999,8 @@ do
 				return v2
 			end
 
-			function class335.jsonDecode(data)
-				local v2 = class335.new()
+			function class341.jsonDecode(data)
+				local v2 = class341.new()
 
 				if data.condition ~= nil then
 					v2.condition = prop_condition.PropCondition.jsonDecode(data.condition)
@@ -74123,27 +76024,27 @@ do
 				return v2
 			end
 
-			class335.descriptor = {
+			class341.descriptor = {
 				name = "ArrayOfSystemBannerActionsProp_ConditionalOption",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
 			}
 
-			v.ArrayOfSystemBannerActionsProp_ConditionalOption = class335
+			v.ArrayOfSystemBannerActionsProp_ConditionalOption = class341
 		end
 
 		typeRegistry.default:register(v.ArrayOfSystemBannerActionsProp_ConditionalOption)
 
 		do
-			local class336 = {}
-			class336.__index = class336
+			local class342 = {}
+			class342.__index = class342
 
-			function class336.new(p)
+			function class342.new(p)
 				return (setmetatable({
 					options = (p == nil or p.options == nil) and {} or p.options
-				}, class336))
+				}, class342))
 			end
 
-			function class336:encode()
+			function class342:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -74160,8 +76061,8 @@ do
 				return buf
 			end
 
-			function class336.decode(buf: buffer)
-				local v2 = class336.new()
+			function class342.decode(buf: buffer)
+				local v2 = class342.new()
 				local v3 = 0
 
 				while v3 < buffer.len(buf) do
@@ -74195,7 +76096,7 @@ do
 				return v2
 			end
 
-			function class336:jsonEncode()
+			function class342:jsonEncode()
 				local v2 = {}
 
 				if self.options == nil or not (#self.options > 0) then
@@ -74213,8 +76114,8 @@ do
 				return v2
 			end
 
-			function class336.jsonDecode(p)
-				local v2 = class336.new()
+			function class342.jsonDecode(p)
+				local v2 = class342.new()
 
 				if p.options == nil then
 					return v2
@@ -74231,27 +76132,27 @@ do
 				return v2
 			end
 
-			class336.descriptor = {
+			class342.descriptor = {
 				name = "ArrayOfSystemBannerActionsProp_ConditionalOptions",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
 			}
 
-			v.ArrayOfSystemBannerActionsProp_ConditionalOptions = class336
+			v.ArrayOfSystemBannerActionsProp_ConditionalOptions = class342
 		end
 
 		typeRegistry.default:register(v.ArrayOfSystemBannerActionsProp_ConditionalOptions)
 
 		do
-			local class337 = {}
-			class337.__index = class337
+			local class343 = {}
+			class343.__index = class343
 
-			function class337.new(p)
+			function class343.new(p)
 				return (setmetatable({
 					array = (p == nil or p.array == nil) and {} or p.array
-				}, class337))
+				}, class343))
 			end
 
-			function class337:encode()
+			function class343:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -74268,8 +76169,8 @@ do
 				return buf
 			end
 
-			function class337.decode(buf: buffer)
-				local v2 = class337.new()
+			function class343.decode(buf: buffer)
+				local v2 = class343.new()
 				local v3 = 0
 
 				while v3 < buffer.len(buf) do
@@ -74303,7 +76204,7 @@ do
 				return v2
 			end
 
-			function class337:jsonEncode()
+			function class343:jsonEncode()
 				local v2 = {}
 
 				if self.array == nil or not (#self.array > 0) then
@@ -74321,8 +76222,8 @@ do
 				return v2
 			end
 
-			function class337.jsonDecode(p)
-				local v2 = class337.new()
+			function class343.jsonDecode(p)
+				local v2 = class343.new()
 
 				if p.array == nil then
 					return v2
@@ -74339,21 +76240,21 @@ do
 				return v2
 			end
 
-			class337.descriptor = {
+			class343.descriptor = {
 				name = "ArrayOfSystemBannerActionsProp_ArrayOfSystemBannerActions",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfSystemBannerActions"
 			}
 
-			v.ArrayOfSystemBannerActionsProp_ArrayOfSystemBannerActions = class337
+			v.ArrayOfSystemBannerActionsProp_ArrayOfSystemBannerActions = class343
 		end
 
 		typeRegistry.default:register(v.ArrayOfSystemBannerActionsProp_ArrayOfSystemBannerActions)
 
 		do
-			local class338 = {}
-			class338.__index = class338
+			local class344 = {}
+			class344.__index = class344
 
-			function class338.new(data)
+			function class344.new(data)
 				local v3
 
 				if not (data == nil or data.props == nil) then
@@ -74372,10 +76273,10 @@ do
 					v5 = data.web_props
 				end
 
-				return (setmetatable({ props = v3, shared = v4, web_props = v5 }, class338))
+				return (setmetatable({ props = v3, shared = v4, web_props = v5 }, class344))
 			end
 
-			function class338:encode()
+			function class344:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -74402,8 +76303,8 @@ do
 				return buf
 			end
 
-			function class338.decode(buf: buffer)
-				local result = class338.new()
+			function class344.decode(buf: buffer)
+				local result = class344.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -74445,7 +76346,7 @@ do
 				return result
 			end
 
-			function class338:jsonEncode()
+			function class344:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -74463,8 +76364,8 @@ do
 				return v2
 			end
 
-			function class338.jsonDecode(data)
-				local v2 = class338.new()
+			function class344.jsonDecode(data)
+				local v2 = class344.new()
 
 				if data.props ~= nil then
 					v2.props = v.SystemBannerSchema_Props.jsonDecode(data.props)
@@ -74485,21 +76386,21 @@ do
 				return v2
 			end
 
-			class338.descriptor = {
+			class344.descriptor = {
 				name = "SystemBannerSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.SystemBannerSchema"
 			}
 
-			v.SystemBannerSchema = class338
+			v.SystemBannerSchema = class344
 		end
 
 		typeRegistry.default:register(v.SystemBannerSchema)
 
 		do
-			local class339 = {}
-			class339.__index = class339
+			local class345 = {}
+			class345.__index = class345
 
-			function class339.new(data)
+			function class345.new(data)
 				local v3
 
 				if not (data == nil or data.severity == nil) then
@@ -74585,10 +76486,10 @@ do
 					z_index = v12,
 					anchor_point = v13,
 					visible = v14
-				}, class339))
+				}, class345))
 			end
 
-			function class339:encode()
+			function class345:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -74669,8 +76570,8 @@ do
 				return buf
 			end
 
-			function class339.decode(buf: buffer)
-				local result = class339.new()
+			function class345.decode(buf: buffer)
+				local result = class345.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -74748,7 +76649,7 @@ do
 				return result
 			end
 
-			function class339:jsonEncode()
+			function class345:jsonEncode()
 				local v2 = {}
 
 				if self.severity ~= nil then
@@ -74802,8 +76703,8 @@ do
 				return v2
 			end
 
-			function class339.jsonDecode(data)
-				local v2 = class339.new()
+			function class345.jsonDecode(data)
+				local v2 = class345.new()
 
 				if data.severity ~= nil then
 					v2.severity = prop_types.StringProp.jsonDecode(data.severity)
@@ -74876,31 +76777,31 @@ do
 				return v2
 			end
 
-			class339.descriptor = {
+			class345.descriptor = {
 				name = "SystemBannerSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.SystemBannerSchema_Props = class339
+			v.SystemBannerSchema_Props = class345
 		end
 
 		typeRegistry.default:register(v.SystemBannerSchema_Props)
 
 		do
-			local class340 = {}
-			class340.__index = class340
+			local class346 = {}
+			class346.__index = class346
 
-			function class340.new(p)
+			function class346.new(p)
 				local v3
 
 				if not (p == nil or p.close_button_aria_label == nil) then
 					v3 = p.close_button_aria_label
 				end
 
-				return (setmetatable({ close_button_aria_label = v3 }, class340))
+				return (setmetatable({ close_button_aria_label = v3 }, class346))
 			end
 
-			function class340:encode()
+			function class346:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -74915,8 +76816,8 @@ do
 				return buf
 			end
 
-			function class340.decode(buf: buffer)
-				local result = class340.new()
+			function class346.decode(buf: buffer)
+				local result = class346.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -74950,7 +76851,7 @@ do
 				return result
 			end
 
-			function class340:jsonEncode()
+			function class346:jsonEncode()
 				local v2 = {}
 
 				if self.close_button_aria_label ~= nil then
@@ -74960,8 +76861,8 @@ do
 				return v2
 			end
 
-			function class340.jsonDecode(p)
-				local v2 = class340.new()
+			function class346.jsonDecode(p)
+				local v2 = class346.new()
 
 				if p.close_button_aria_label ~= nil then
 					v2.close_button_aria_label = prop_types.StringProp.jsonDecode(p.close_button_aria_label)
@@ -74974,21 +76875,21 @@ do
 				return v2
 			end
 
-			class340.descriptor = {
+			class346.descriptor = {
 				name = "SystemBannerSchema_WebProps",
 				fullName = "roblox.apppageplatform.shared.v1beta1.WebProps"
 			}
 
-			v.SystemBannerSchema_WebProps = class340
+			v.SystemBannerSchema_WebProps = class346
 		end
 
 		typeRegistry.default:register(v.SystemBannerSchema_WebProps)
 
 		do
-			local class341 = {}
-			class341.__index = class341
+			local class347 = {}
+			class347.__index = class347
 
-			function class341.new(p)
+			function class347.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -75001,10 +76902,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class341))
+				return (setmetatable({ props = v3, shared = v4 }, class347))
 			end
 
-			function class341:encode()
+			function class347:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -75025,8 +76926,8 @@ do
 				return buf
 			end
 
-			function class341.decode(buf: buffer)
-				local result = class341.new()
+			function class347.decode(buf: buffer)
+				local result = class347.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -75064,7 +76965,7 @@ do
 				return result
 			end
 
-			function class341:jsonEncode()
+			function class347:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -75078,8 +76979,8 @@ do
 				return v2
 			end
 
-			function class341.jsonDecode(p)
-				local v2 = class341.new()
+			function class347.jsonDecode(p)
+				local v2 = class347.new()
 
 				if p.props ~= nil then
 					v2.props = v.BannerSchema_Props.jsonDecode(p.props)
@@ -75092,21 +76993,21 @@ do
 				return v2
 			end
 
-			class341.descriptor = {
+			class347.descriptor = {
 				name = "BannerSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.BannerSchema"
 			}
 
-			v.BannerSchema = class341
+			v.BannerSchema = class347
 		end
 
 		typeRegistry.default:register(v.BannerSchema)
 
 		do
-			local class342 = {}
-			class342.__index = class342
+			local class348 = {}
+			class348.__index = class348
 
-			function class342.new(data)
+			function class348.new(data)
 				local v3
 
 				if not (data == nil or data.size == nil) then
@@ -75255,10 +77156,10 @@ do
 					visible = v21,
 					test_id = v22,
 					on_close = v23
-				}, class342))
+				}, class348))
 			end
 
-			function class342:encode()
+			function class348:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -75393,8 +77294,8 @@ do
 				return buf
 			end
 
-			function class342.decode(buf: buffer)
-				local result = class342.new()
+			function class348.decode(buf: buffer)
+				local result = class348.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -75508,7 +77409,7 @@ do
 				return result
 			end
 
-			function class342:jsonEncode()
+			function class348:jsonEncode()
 				local v2 = {}
 
 				if self.size ~= nil then
@@ -75598,8 +77499,8 @@ do
 				return v2
 			end
 
-			function class342.jsonDecode(data)
-				local v2 = class342.new()
+			function class348.jsonDecode(data)
+				local v2 = class348.new()
 
 				if data.size ~= nil then
 					v2.size = prop_types.StringProp.jsonDecode(data.size)
@@ -75744,21 +77645,21 @@ do
 				return v2
 			end
 
-			class342.descriptor = {
+			class348.descriptor = {
 				name = "BannerSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.BannerSchema_Props = class342
+			v.BannerSchema_Props = class348
 		end
 
 		typeRegistry.default:register(v.BannerSchema_Props)
 
 		do
-			local class343 = {}
-			class343.__index = class343
+			local class349 = {}
+			class349.__index = class349
 
-			function class343.new(p)
+			function class349.new(p)
 				local v3
 
 				if not (p == nil or p.text == nil) then
@@ -75771,10 +77672,10 @@ do
 					v4 = p.on_activated
 				end
 
-				return (setmetatable({ text = v3, on_activated = v4 }, class343))
+				return (setmetatable({ text = v3, on_activated = v4 }, class349))
 			end
 
-			function class343:encode()
+			function class349:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -75795,8 +77696,8 @@ do
 				return buf
 			end
 
-			function class343.decode(buf: buffer)
-				local result = class343.new()
+			function class349.decode(buf: buffer)
+				local result = class349.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -75834,7 +77735,7 @@ do
 				return result
 			end
 
-			function class343:jsonEncode()
+			function class349:jsonEncode()
 				local v2 = {}
 
 				if self.text ~= nil then
@@ -75848,8 +77749,8 @@ do
 				return v2
 			end
 
-			function class343.jsonDecode(data)
-				local v2 = class343.new()
+			function class349.jsonDecode(data)
+				local v2 = class349.new()
 
 				if data.text ~= nil then
 					v2.text = prop_types.StringProp.jsonDecode(data.text)
@@ -75866,31 +77767,31 @@ do
 				return v2
 			end
 
-			class343.descriptor = {
+			class349.descriptor = {
 				name = "FoundationInternalNoticeLink",
 				fullName = "roblox.apppageplatform.shared.v1beta1.FoundationInternalNoticeLink"
 			}
 
-			v.FoundationInternalNoticeLink = class343
+			v.FoundationInternalNoticeLink = class349
 		end
 
 		typeRegistry.default:register(v.FoundationInternalNoticeLink)
 
 		do
-			local class344 = {}
-			class344.__index = class344
+			local class350 = {}
+			class350.__index = class350
 
-			function class344.new(p)
+			function class350.new(p)
 				local v3
 
 				if not (p == nil or p.kind == nil) then
 					v3 = p.kind
 				end
 
-				return (setmetatable({ kind = v3 }, class344))
+				return (setmetatable({ kind = v3 }, class350))
 			end
 
-			function class344:encode()
+			function class350:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -75914,8 +77815,8 @@ do
 				return buf
 			end
 
-			function class344.decode(buf: buffer)
-				local result = class344.new()
+			function class350.decode(buf: buffer)
+				local result = class350.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -75963,7 +77864,7 @@ do
 				return result
 			end
 
-			function class344:jsonEncode()
+			function class350:jsonEncode()
 				local v2 = {}
 
 				if self.kind == nil then
@@ -75987,8 +77888,8 @@ do
 				return v2
 			end
 
-			function class344.jsonDecode(data)
-				local v2 = class344.new()
+			function class350.jsonDecode(data)
+				local v2 = class350.new()
 
 				if data.literal ~= nil then
 					v2.kind = {
@@ -76015,21 +77916,21 @@ do
 				return v2
 			end
 
-			class344.descriptor = {
+			class350.descriptor = {
 				name = "FoundationInternalNoticeLinkProp",
 				fullName = "roblox.apppageplatform.shared.v1beta1.FoundationInternalNoticeLinkProp"
 			}
 
-			v.FoundationInternalNoticeLinkProp = class344
+			v.FoundationInternalNoticeLinkProp = class350
 		end
 
 		typeRegistry.default:register(v.FoundationInternalNoticeLinkProp)
 
 		do
-			local class345 = {}
-			class345.__index = class345
+			local class351 = {}
+			class351.__index = class351
 
-			function class345.new(p)
+			function class351.new(p)
 				local v3
 
 				if not (p == nil or p.condition == nil) then
@@ -76042,10 +77943,10 @@ do
 					v4 = p.kind
 				end
 
-				return (setmetatable({ condition = v3, kind = v4 }, class345))
+				return (setmetatable({ condition = v3, kind = v4 }, class351))
 			end
 
-			function class345:encode()
+			function class351:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -76071,8 +77972,8 @@ do
 				return buf
 			end
 
-			function class345.decode(buf: buffer)
-				local result = class345.new()
+			function class351.decode(buf: buffer)
+				local result = class351.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -76117,7 +78018,7 @@ do
 				return result
 			end
 
-			function class345:jsonEncode()
+			function class351:jsonEncode()
 				local v2 = {}
 
 				if self.condition ~= nil then
@@ -76138,8 +78039,8 @@ do
 				return v2
 			end
 
-			function class345.jsonDecode(data)
-				local v2 = class345.new()
+			function class351.jsonDecode(data)
+				local v2 = class351.new()
 
 				if data.condition ~= nil then
 					v2.condition = prop_condition.PropCondition.jsonDecode(data.condition)
@@ -76163,27 +78064,27 @@ do
 				return v2
 			end
 
-			class345.descriptor = {
+			class351.descriptor = {
 				name = "FoundationInternalNoticeLinkProp_ConditionalOption",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
 			}
 
-			v.FoundationInternalNoticeLinkProp_ConditionalOption = class345
+			v.FoundationInternalNoticeLinkProp_ConditionalOption = class351
 		end
 
 		typeRegistry.default:register(v.FoundationInternalNoticeLinkProp_ConditionalOption)
 
 		do
-			local class346 = {}
-			class346.__index = class346
+			local class352 = {}
+			class352.__index = class352
 
-			function class346.new(p)
+			function class352.new(p)
 				return (setmetatable({
 					options = (p == nil or p.options == nil) and {} or p.options
-				}, class346))
+				}, class352))
 			end
 
-			function class346:encode()
+			function class352:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -76200,8 +78101,8 @@ do
 				return buf
 			end
 
-			function class346.decode(buf: buffer)
-				local v2 = class346.new()
+			function class352.decode(buf: buffer)
+				local v2 = class352.new()
 				local v3 = 0
 
 				while v3 < buffer.len(buf) do
@@ -76235,7 +78136,7 @@ do
 				return v2
 			end
 
-			function class346:jsonEncode()
+			function class352:jsonEncode()
 				local v2 = {}
 
 				if self.options == nil or not (#self.options > 0) then
@@ -76253,8 +78154,8 @@ do
 				return v2
 			end
 
-			function class346.jsonDecode(p)
-				local v2 = class346.new()
+			function class352.jsonDecode(p)
+				local v2 = class352.new()
 
 				if p.options == nil then
 					return v2
@@ -76271,21 +78172,21 @@ do
 				return v2
 			end
 
-			class346.descriptor = {
+			class352.descriptor = {
 				name = "FoundationInternalNoticeLinkProp_ConditionalOptions",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
 			}
 
-			v.FoundationInternalNoticeLinkProp_ConditionalOptions = class346
+			v.FoundationInternalNoticeLinkProp_ConditionalOptions = class352
 		end
 
 		typeRegistry.default:register(v.FoundationInternalNoticeLinkProp_ConditionalOptions)
 
 		do
-			local class347 = {}
-			class347.__index = class347
+			local class353 = {}
+			class353.__index = class353
 
-			function class347.new(p)
+			function class353.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -76298,10 +78199,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class347))
+				return (setmetatable({ props = v3, shared = v4 }, class353))
 			end
 
-			function class347:encode()
+			function class353:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -76322,8 +78223,8 @@ do
 				return buf
 			end
 
-			function class347.decode(buf: buffer)
-				local result = class347.new()
+			function class353.decode(buf: buffer)
+				local result = class353.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -76361,7 +78262,7 @@ do
 				return result
 			end
 
-			function class347:jsonEncode()
+			function class353:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -76375,8 +78276,8 @@ do
 				return v2
 			end
 
-			function class347.jsonDecode(p)
-				local v2 = class347.new()
+			function class353.jsonDecode(p)
+				local v2 = class353.new()
 
 				if p.props ~= nil then
 					v2.props = v.BannerContextSchema_Props.jsonDecode(p.props)
@@ -76389,21 +78290,21 @@ do
 				return v2
 			end
 
-			class347.descriptor = {
+			class353.descriptor = {
 				name = "BannerContextSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.BannerContextSchema"
 			}
 
-			v.BannerContextSchema = class347
+			v.BannerContextSchema = class353
 		end
 
 		typeRegistry.default:register(v.BannerContextSchema)
 
 		do
-			local class348 = {}
-			class348.__index = class348
+			local class354 = {}
+			class354.__index = class354
 
-			function class348.new(data)
+			function class354.new(data)
 				local v3
 
 				if not (data == nil or data.text == nil) then
@@ -76482,10 +78383,10 @@ do
 					z_index = v11,
 					anchor_point = v12,
 					visible = v13
-				}, class348))
+				}, class354))
 			end
 
-			function class348:encode()
+			function class354:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -76560,8 +78461,8 @@ do
 				return buf
 			end
 
-			function class348.decode(buf: buffer)
-				local result = class348.new()
+			function class354.decode(buf: buffer)
+				local result = class354.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -76635,7 +78536,7 @@ do
 				return result
 			end
 
-			function class348:jsonEncode()
+			function class354:jsonEncode()
 				local v2 = {}
 
 				if self.text ~= nil then
@@ -76685,8 +78586,8 @@ do
 				return v2
 			end
 
-			function class348.jsonDecode(data)
-				local v2 = class348.new()
+			function class354.jsonDecode(data)
+				local v2 = class354.new()
 
 				if data.text ~= nil then
 					v2.text = prop_types.StringProp.jsonDecode(data.text)
@@ -76751,21 +78652,21 @@ do
 				return v2
 			end
 
-			class348.descriptor = {
+			class354.descriptor = {
 				name = "BannerContextSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.BannerContextSchema_Props = class348
+			v.BannerContextSchema_Props = class354
 		end
 
 		typeRegistry.default:register(v.BannerContextSchema_Props)
 
 		do
-			local class349 = {}
-			class349.__index = class349
+			local class355 = {}
+			class355.__index = class355
 
-			function class349.new(p)
+			function class355.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -76778,10 +78679,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class349))
+				return (setmetatable({ props = v3, shared = v4 }, class355))
 			end
 
-			function class349:encode()
+			function class355:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -76802,8 +78703,8 @@ do
 				return buf
 			end
 
-			function class349.decode(buf: buffer)
-				local result = class349.new()
+			function class355.decode(buf: buffer)
+				local result = class355.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -76841,7 +78742,7 @@ do
 				return result
 			end
 
-			function class349:jsonEncode()
+			function class355:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -76855,8 +78756,8 @@ do
 				return v2
 			end
 
-			function class349.jsonDecode(p)
-				local v2 = class349.new()
+			function class355.jsonDecode(p)
+				local v2 = class355.new()
 
 				if p.props ~= nil then
 					v2.props = v.ViewportVisibilitySchema_Props.jsonDecode(p.props)
@@ -76869,21 +78770,21 @@ do
 				return v2
 			end
 
-			class349.descriptor = {
+			class355.descriptor = {
 				name = "ViewportVisibilitySchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.ViewportVisibilitySchema"
 			}
 
-			v.ViewportVisibilitySchema = class349
+			v.ViewportVisibilitySchema = class355
 		end
 
 		typeRegistry.default:register(v.ViewportVisibilitySchema)
 
 		do
-			local class350 = {}
-			class350.__index = class350
+			local class356 = {}
+			class356.__index = class356
 
-			function class350.new(data)
+			function class356.new(data)
 				local v3
 
 				if not (data == nil or data.content_component == nil) then
@@ -76927,10 +78828,10 @@ do
 					tag = v6,
 					layout_order = v7,
 					visible = v8
-				}, class350))
+				}, class356))
 			end
 
-			function class350:encode()
+			function class356:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -76975,8 +78876,8 @@ do
 				return buf
 			end
 
-			function class350.decode(buf: buffer)
-				local result = class350.new()
+			function class356.decode(buf: buffer)
+				local result = class356.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -77030,7 +78931,7 @@ do
 				return result
 			end
 
-			function class350:jsonEncode()
+			function class356:jsonEncode()
 				local v2 = {}
 
 				if self.content_component ~= nil then
@@ -77060,8 +78961,8 @@ do
 				return v2
 			end
 
-			function class350.jsonDecode(data)
-				local v2 = class350.new()
+			function class356.jsonDecode(data)
+				local v2 = class356.new()
 
 				if data.content_component ~= nil then
 					v2.content_component = v.NestedComponentProp.jsonDecode(data.content_component)
@@ -77106,21 +79007,21 @@ do
 				return v2
 			end
 
-			class350.descriptor = {
+			class356.descriptor = {
 				name = "ViewportVisibilitySchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.ViewportVisibilitySchema_Props = class350
+			v.ViewportVisibilitySchema_Props = class356
 		end
 
 		typeRegistry.default:register(v.ViewportVisibilitySchema_Props)
 
 		do
-			local class351 = {}
-			class351.__index = class351
+			local class357 = {}
+			class357.__index = class357
 
-			function class351.new(p)
+			function class357.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -77133,10 +79034,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class351))
+				return (setmetatable({ props = v3, shared = v4 }, class357))
 			end
 
-			function class351:encode()
+			function class357:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -77157,8 +79058,8 @@ do
 				return buf
 			end
 
-			function class351.decode(buf: buffer)
-				local result = class351.new()
+			function class357.decode(buf: buffer)
+				local result = class357.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -77196,7 +79097,7 @@ do
 				return result
 			end
 
-			function class351:jsonEncode()
+			function class357:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -77210,8 +79111,8 @@ do
 				return v2
 			end
 
-			function class351.jsonDecode(p)
-				local v2 = class351.new()
+			function class357.jsonDecode(p)
+				local v2 = class357.new()
 
 				if p.props ~= nil then
 					v2.props = v.PlayWithRewardSchema_Props.jsonDecode(p.props)
@@ -77224,21 +79125,21 @@ do
 				return v2
 			end
 
-			class351.descriptor = {
+			class357.descriptor = {
 				name = "PlayWithRewardSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.PlayWithRewardSchema"
 			}
 
-			v.PlayWithRewardSchema = class351
+			v.PlayWithRewardSchema = class357
 		end
 
 		typeRegistry.default:register(v.PlayWithRewardSchema)
 
 		do
-			local class352 = {}
-			class352.__index = class352
+			local class358 = {}
+			class358.__index = class358
 
-			function class352.new(data)
+			function class358.new(data)
 				local v3
 
 				if not (data == nil or data.universe_id == nil) then
@@ -77303,10 +79204,10 @@ do
 					variant_id = v9,
 					children = v10,
 					is_universe_interstitial_eligible = v11
-				}, class352))
+				}, class358))
 			end
 
-			function class352:encode()
+			function class358:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -77369,8 +79270,8 @@ do
 				return buf
 			end
 
-			function class352.decode(buf: buffer)
-				local result = class352.new()
+			function class358.decode(buf: buffer)
+				local result = class358.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -77436,7 +79337,7 @@ do
 				return result
 			end
 
-			function class352:jsonEncode()
+			function class358:jsonEncode()
 				local v2 = {}
 
 				if self.universe_id ~= nil then
@@ -77478,8 +79379,8 @@ do
 				return v2
 			end
 
-			function class352.jsonDecode(data)
-				local v2 = class352.new()
+			function class358.jsonDecode(data)
+				local v2 = class358.new()
 
 				if data.universe_id ~= nil then
 					v2.universe_id = prop_types.StringProp.jsonDecode(data.universe_id)
@@ -77552,21 +79453,21 @@ do
 				return v2
 			end
 
-			class352.descriptor = {
+			class358.descriptor = {
 				name = "PlayWithRewardSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.PlayWithRewardSchema_Props = class352
+			v.PlayWithRewardSchema_Props = class358
 		end
 
 		typeRegistry.default:register(v.PlayWithRewardSchema_Props)
 
 		do
-			local class353 = {}
-			class353.__index = class353
+			local class359 = {}
+			class359.__index = class359
 
-			function class353.new(p)
+			function class359.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -77579,10 +79480,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class353))
+				return (setmetatable({ props = v3, shared = v4 }, class359))
 			end
 
-			function class353:encode()
+			function class359:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -77603,8 +79504,8 @@ do
 				return buf
 			end
 
-			function class353.decode(buf: buffer)
-				local result = class353.new()
+			function class359.decode(buf: buffer)
+				local result = class359.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -77642,7 +79543,7 @@ do
 				return result
 			end
 
-			function class353:jsonEncode()
+			function class359:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -77656,8 +79557,8 @@ do
 				return v2
 			end
 
-			function class353.jsonDecode(p)
-				local v2 = class353.new()
+			function class359.jsonDecode(p)
+				local v2 = class359.new()
 
 				if p.props ~= nil then
 					v2.props = v.AvatarGroupSchema_Props.jsonDecode(p.props)
@@ -77670,21 +79571,21 @@ do
 				return v2
 			end
 
-			class353.descriptor = {
+			class359.descriptor = {
 				name = "AvatarGroupSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.AvatarGroupSchema"
 			}
 
-			v.AvatarGroupSchema = class353
+			v.AvatarGroupSchema = class359
 		end
 
 		typeRegistry.default:register(v.AvatarGroupSchema)
 
 		do
-			local class354 = {}
-			class354.__index = class354
+			local class360 = {}
+			class360.__index = class360
 
-			function class354.new(data)
+			function class360.new(data)
 				local v3
 
 				if not (data == nil or data.avatars == nil) then
@@ -77728,10 +79629,10 @@ do
 					size = v6,
 					backplate_style = v7,
 					layout_order = v8
-				}, class354))
+				}, class360))
 			end
 
-			function class354:encode()
+			function class360:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -77776,8 +79677,8 @@ do
 				return buf
 			end
 
-			function class354.decode(buf: buffer)
-				local result = class354.new()
+			function class360.decode(buf: buffer)
+				local result = class360.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -77831,7 +79732,7 @@ do
 				return result
 			end
 
-			function class354:jsonEncode()
+			function class360:jsonEncode()
 				local v2 = {}
 
 				if self.avatars ~= nil then
@@ -77861,8 +79762,8 @@ do
 				return v2
 			end
 
-			function class354.jsonDecode(data)
-				local v2 = class354.new()
+			function class360.jsonDecode(data)
+				local v2 = class360.new()
 
 				if data.avatars ~= nil then
 					v2.avatars = prop_types.ArrayOfAvatarProp.jsonDecode(data.avatars)
@@ -77899,21 +79800,21 @@ do
 				return v2
 			end
 
-			class354.descriptor = {
+			class360.descriptor = {
 				name = "AvatarGroupSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.AvatarGroupSchema_Props = class354
+			v.AvatarGroupSchema_Props = class360
 		end
 
 		typeRegistry.default:register(v.AvatarGroupSchema_Props)
 
 		do
-			local class355 = {}
-			class355.__index = class355
+			local class361 = {}
+			class361.__index = class361
 
-			function class355.new(p)
+			function class361.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -77926,10 +79827,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class355))
+				return (setmetatable({ props = v3, shared = v4 }, class361))
 			end
 
-			function class355:encode()
+			function class361:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -77950,8 +79851,8 @@ do
 				return buf
 			end
 
-			function class355.decode(buf: buffer)
-				local result = class355.new()
+			function class361.decode(buf: buffer)
+				local result = class361.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -77989,7 +79890,7 @@ do
 				return result
 			end
 
-			function class355:jsonEncode()
+			function class361:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -78003,8 +79904,8 @@ do
 				return v2
 			end
 
-			function class355.jsonDecode(p)
-				local v2 = class355.new()
+			function class361.jsonDecode(p)
+				local v2 = class361.new()
 
 				if p.props ~= nil then
 					v2.props = v.AiOverviewSchema_Props.jsonDecode(p.props)
@@ -78017,21 +79918,21 @@ do
 				return v2
 			end
 
-			class355.descriptor = {
+			class361.descriptor = {
 				name = "AiOverviewSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.AiOverviewSchema"
 			}
 
-			v.AiOverviewSchema = class355
+			v.AiOverviewSchema = class361
 		end
 
 		typeRegistry.default:register(v.AiOverviewSchema)
 
 		do
-			local class356 = {}
-			class356.__index = class356
+			local class362 = {}
+			class362.__index = class362
 
-			function class356.new(data)
+			function class362.new(data)
 				local v3
 
 				if not (data == nil or data.title_component == nil) then
@@ -78103,10 +80004,10 @@ do
 					test_id = v10,
 					header_gap = v11,
 					section_gap = v12
-				}, class356))
+				}, class362))
 			end
 
-			function class356:encode()
+			function class362:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -78175,8 +80076,8 @@ do
 				return buf
 			end
 
-			function class356.decode(buf: buffer)
-				local result = class356.new()
+			function class362.decode(buf: buffer)
+				local result = class362.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -78246,7 +80147,7 @@ do
 				return result
 			end
 
-			function class356:jsonEncode()
+			function class362:jsonEncode()
 				local v2 = {}
 
 				if self.title_component ~= nil then
@@ -78292,8 +80193,8 @@ do
 				return v2
 			end
 
-			function class356.jsonDecode(data)
-				local v2 = class356.new()
+			function class362.jsonDecode(data)
+				local v2 = class362.new()
 
 				if data.title_component ~= nil then
 					v2.title_component = v.NestedComponentProp.jsonDecode(data.title_component)
@@ -78370,21 +80271,21 @@ do
 				return v2
 			end
 
-			class356.descriptor = {
+			class362.descriptor = {
 				name = "AiOverviewSchema_Props",
 				fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 			}
 
-			v.AiOverviewSchema_Props = class356
+			v.AiOverviewSchema_Props = class362
 		end
 
 		typeRegistry.default:register(v.AiOverviewSchema_Props)
 
 		do
-			local class357 = {}
-			class357.__index = class357
+			local class363 = {}
+			class363.__index = class363
 
-			function class357.new(p)
+			function class363.new(p)
 				local v3
 
 				if not (p == nil or p.props == nil) then
@@ -78397,10 +80298,10 @@ do
 					v4 = p.shared
 				end
 
-				return (setmetatable({ props = v3, shared = v4 }, class357))
+				return (setmetatable({ props = v3, shared = v4 }, class363))
 			end
 
-			function class357:encode()
+			function class363:encode()
 				local v2 = buffer.create(0)
 				local v3 = 0
 
@@ -78421,8 +80322,8 @@ do
 				return buf
 			end
 
-			function class357.decode(buf: buffer)
-				local result = class357.new()
+			function class363.decode(buf: buffer)
+				local result = class363.new()
 				local v2 = 0
 
 				while v2 < buffer.len(buf) do
@@ -78460,7 +80361,7 @@ do
 				return result
 			end
 
-			function class357:jsonEncode()
+			function class363:jsonEncode()
 				local v2 = {}
 
 				if self.props ~= nil then
@@ -78474,8 +80375,8 @@ do
 				return v2
 			end
 
-			function class357.jsonDecode(p)
-				local v2 = class357.new()
+			function class363.jsonDecode(p)
+				local v2 = class363.new()
 
 				if p.props ~= nil then
 					v2.props = v.PlaceholderSchema_Props.jsonDecode(p.props)
@@ -78488,20 +80389,20 @@ do
 				return v2
 			end
 
-			class357.descriptor = {
+			class363.descriptor = {
 				name = "PlaceholderSchema",
 				fullName = "roblox.apppageplatform.shared.v1beta1.PlaceholderSchema"
 			}
 
-			v.PlaceholderSchema = class357
+			v.PlaceholderSchema = class363
 		end
 
 		typeRegistry.default:register(v.PlaceholderSchema)
 
-		local class358 = {}
-		class358.__index = class358
+		local class364 = {}
+		class364.__index = class364
 
-		function class358.new(data)
+		function class364.new(data)
 			local v3
 
 			if not (data == nil or data.background_style == nil) then
@@ -78566,10 +80467,10 @@ do
 				size = v9,
 				z_index = v10,
 				test_id = v11
-			}, class358))
+			}, class364))
 		end
 
-		function class358:encode()
+		function class364:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -78632,8 +80533,8 @@ do
 			return buf
 		end
 
-		function class358.decode(buf: buffer)
-			local result = class358.new()
+		function class364.decode(buf: buffer)
+			local result = class364.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -78699,7 +80600,7 @@ do
 			return result
 		end
 
-		function class358:jsonEncode()
+		function class364:jsonEncode()
 			local v2 = {}
 
 			if self.background_style ~= nil then
@@ -78741,8 +80642,8 @@ do
 			return v2
 		end
 
-		function class358.jsonDecode(data)
-			local v2 = class358.new()
+		function class364.jsonDecode(data)
+			local v2 = class364.new()
 
 			if data.background_style ~= nil then
 				v2.background_style = prop_types.ColorStyleProp.jsonDecode(data.background_style)
@@ -78811,21 +80712,21 @@ do
 			return v2
 		end
 
-		class358.descriptor = {
+		class364.descriptor = {
 			name = "PlaceholderSchema_Props",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 		}
 
-		v.PlaceholderSchema_Props = class358
+		v.PlaceholderSchema_Props = class364
 	end
 
 	typeRegistry.default:register(v.PlaceholderSchema_Props)
 
 	do
-		local class359 = {}
-		class359.__index = class359
+		local class365 = {}
+		class365.__index = class365
 
-		function class359.new(p)
+		function class365.new(p)
 			local v3
 
 			if not (p == nil or p.props == nil) then
@@ -78838,10 +80739,10 @@ do
 				v4 = p.shared
 			end
 
-			return (setmetatable({ props = v3, shared = v4 }, class359))
+			return (setmetatable({ props = v3, shared = v4 }, class365))
 		end
 
-		function class359:encode()
+		function class365:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -78862,8 +80763,8 @@ do
 			return buf
 		end
 
-		function class359.decode(buf: buffer)
-			local result = class359.new()
+		function class365.decode(buf: buffer)
+			local result = class365.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -78901,7 +80802,7 @@ do
 			return result
 		end
 
-		function class359:jsonEncode()
+		function class365:jsonEncode()
 			local v2 = {}
 
 			if self.props ~= nil then
@@ -78915,8 +80816,8 @@ do
 			return v2
 		end
 
-		function class359.jsonDecode(p)
-			local v2 = class359.new()
+		function class365.jsonDecode(p)
+			local v2 = class365.new()
 
 			if p.props ~= nil then
 				v2.props = v.PlaceholderTileSchema_Props.jsonDecode(p.props)
@@ -78929,21 +80830,21 @@ do
 			return v2
 		end
 
-		class359.descriptor = {
+		class365.descriptor = {
 			name = "PlaceholderTileSchema",
 			fullName = "roblox.apppageplatform.shared.v1beta1.PlaceholderTileSchema"
 		}
 
-		v.PlaceholderTileSchema = class359
+		v.PlaceholderTileSchema = class365
 	end
 
 	typeRegistry.default:register(v.PlaceholderTileSchema)
 
 	do
-		local class360 = {}
-		class360.__index = class360
+		local class366 = {}
+		class366.__index = class366
 
-		function class360.new(data)
+		function class366.new(data)
 			local v3
 
 			if not (data == nil or data.background_style == nil) then
@@ -79043,10 +80944,10 @@ do
 				line_gap = v14,
 				line_height = v15,
 				z_index = v16
-			}, class360))
+			}, class366))
 		end
 
-		function class360:encode()
+		function class366:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -79139,8 +81040,8 @@ do
 			return buf
 		end
 
-		function class360.decode(buf: buffer)
-			local result = class360.new()
+		function class366.decode(buf: buffer)
+			local result = class366.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -79226,7 +81127,7 @@ do
 			return result
 		end
 
-		function class360:jsonEncode()
+		function class366:jsonEncode()
 			local v2 = {}
 
 			if self.background_style ~= nil then
@@ -79288,8 +81189,8 @@ do
 			return v2
 		end
 
-		function class360.jsonDecode(data)
-			local v2 = class360.new()
+		function class366.jsonDecode(data)
+			local v2 = class366.new()
 
 			if data.background_style ~= nil then
 				v2.background_style = prop_types.ColorStyleProp.jsonDecode(data.background_style)
@@ -79398,21 +81299,21 @@ do
 			return v2
 		end
 
-		class360.descriptor = {
+		class366.descriptor = {
 			name = "PlaceholderTileSchema_Props",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 		}
 
-		v.PlaceholderTileSchema_Props = class360
+		v.PlaceholderTileSchema_Props = class366
 	end
 
 	typeRegistry.default:register(v.PlaceholderTileSchema_Props)
 
 	do
-		local class361 = {}
-		class361.__index = class361
+		local class367 = {}
+		class367.__index = class367
 
-		function class361.new(p)
+		function class367.new(p)
 			local v3
 
 			if not (p == nil or p.props == nil) then
@@ -79425,10 +81326,10 @@ do
 				v4 = p.shared
 			end
 
-			return (setmetatable({ props = v3, shared = v4 }, class361))
+			return (setmetatable({ props = v3, shared = v4 }, class367))
 		end
 
-		function class361:encode()
+		function class367:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -79449,8 +81350,8 @@ do
 			return buf
 		end
 
-		function class361.decode(buf: buffer)
-			local result = class361.new()
+		function class367.decode(buf: buffer)
+			local result = class367.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -79488,7 +81389,7 @@ do
 			return result
 		end
 
-		function class361:jsonEncode()
+		function class367:jsonEncode()
 			local v2 = {}
 
 			if self.props ~= nil then
@@ -79502,8 +81403,8 @@ do
 			return v2
 		end
 
-		function class361.jsonDecode(p)
-			local v2 = class361.new()
+		function class367.jsonDecode(p)
+			local v2 = class367.new()
 
 			if p.props ~= nil then
 				v2.props = v.PlaceholderWrapperSchema_Props.jsonDecode(p.props)
@@ -79516,21 +81417,21 @@ do
 			return v2
 		end
 
-		class361.descriptor = {
+		class367.descriptor = {
 			name = "PlaceholderWrapperSchema",
 			fullName = "roblox.apppageplatform.shared.v1beta1.PlaceholderWrapperSchema"
 		}
 
-		v.PlaceholderWrapperSchema = class361
+		v.PlaceholderWrapperSchema = class367
 	end
 
 	typeRegistry.default:register(v.PlaceholderWrapperSchema)
 
 	do
-		local class362 = {}
-		class362.__index = class362
+		local class368 = {}
+		class368.__index = class368
 
-		function class362.new(data)
+		function class368.new(data)
 			local v3
 
 			if not (data == nil or data.is_placeholder == nil) then
@@ -79581,10 +81482,10 @@ do
 				mount_real_during_placeholder = v7,
 				layout_order = v8,
 				z_index = v9
-			}, class362))
+			}, class368))
 		end
 
-		function class362:encode()
+		function class368:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -79635,8 +81536,8 @@ do
 			return buf
 		end
 
-		function class362.decode(buf: buffer)
-			local result = class362.new()
+		function class368.decode(buf: buffer)
+			local result = class368.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -79694,7 +81595,7 @@ do
 			return result
 		end
 
-		function class362:jsonEncode()
+		function class368:jsonEncode()
 			local v2 = {}
 
 			if self.is_placeholder ~= nil then
@@ -79728,8 +81629,8 @@ do
 			return v2
 		end
 
-		function class362.jsonDecode(data)
-			local v2 = class362.new()
+		function class368.jsonDecode(data)
+			local v2 = class368.new()
 
 			if data.is_placeholder ~= nil then
 				v2.is_placeholder = prop_types.BoolProp.jsonDecode(data.is_placeholder)
@@ -79782,21 +81683,21 @@ do
 			return v2
 		end
 
-		class362.descriptor = {
+		class368.descriptor = {
 			name = "PlaceholderWrapperSchema_Props",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 		}
 
-		v.PlaceholderWrapperSchema_Props = class362
+		v.PlaceholderWrapperSchema_Props = class368
 	end
 
 	typeRegistry.default:register(v.PlaceholderWrapperSchema_Props)
 
 	do
-		local class363 = {}
-		class363.__index = class363
+		local class369 = {}
+		class369.__index = class369
 
-		function class363.new(p)
+		function class369.new(p)
 			local v3
 
 			if not (p == nil or p.props == nil) then
@@ -79809,10 +81710,10 @@ do
 				v4 = p.shared
 			end
 
-			return (setmetatable({ props = v3, shared = v4 }, class363))
+			return (setmetatable({ props = v3, shared = v4 }, class369))
 		end
 
-		function class363:encode()
+		function class369:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -79833,8 +81734,8 @@ do
 			return buf
 		end
 
-		function class363.decode(buf: buffer)
-			local result = class363.new()
+		function class369.decode(buf: buffer)
+			local result = class369.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -79872,7 +81773,7 @@ do
 			return result
 		end
 
-		function class363:jsonEncode()
+		function class369:jsonEncode()
 			local v2 = {}
 
 			if self.props ~= nil then
@@ -79886,8 +81787,8 @@ do
 			return v2
 		end
 
-		function class363.jsonDecode(p)
-			local v2 = class363.new()
+		function class369.jsonDecode(p)
+			local v2 = class369.new()
 
 			if p.props ~= nil then
 				v2.props = v.SkeletonSchema_Props.jsonDecode(p.props)
@@ -79900,21 +81801,21 @@ do
 			return v2
 		end
 
-		class363.descriptor = {
+		class369.descriptor = {
 			name = "SkeletonSchema",
 			fullName = "roblox.apppageplatform.shared.v1beta1.SkeletonSchema"
 		}
 
-		v.SkeletonSchema = class363
+		v.SkeletonSchema = class369
 	end
 
 	typeRegistry.default:register(v.SkeletonSchema)
 
 	do
-		local class364 = {}
-		class364.__index = class364
+		local class370 = {}
+		class370.__index = class370
 
-		function class364.new(data)
+		function class370.new(data)
 			local v3
 
 			if not (data == nil or data.radius == nil) then
@@ -79972,10 +81873,10 @@ do
 				visible = v8,
 				z_index = v9,
 				test_id = v10
-			}, class364))
+			}, class370))
 		end
 
-		function class364:encode()
+		function class370:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -80032,8 +81933,8 @@ do
 			return buf
 		end
 
-		function class364.decode(buf: buffer)
-			local result = class364.new()
+		function class370.decode(buf: buffer)
+			local result = class370.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -80095,7 +81996,7 @@ do
 			return result
 		end
 
-		function class364:jsonEncode()
+		function class370:jsonEncode()
 			local v2 = {}
 
 			if self.radius ~= nil then
@@ -80133,8 +82034,8 @@ do
 			return v2
 		end
 
-		function class364.jsonDecode(data)
-			local v2 = class364.new()
+		function class370.jsonDecode(data)
+			local v2 = class370.new()
 
 			if data.radius ~= nil then
 				v2.radius = prop_types.StringProp.jsonDecode(data.radius)
@@ -80187,21 +82088,21 @@ do
 			return v2
 		end
 
-		class364.descriptor = {
+		class370.descriptor = {
 			name = "SkeletonSchema_Props",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 		}
 
-		v.SkeletonSchema_Props = class364
+		v.SkeletonSchema_Props = class370
 	end
 
 	typeRegistry.default:register(v.SkeletonSchema_Props)
 
 	do
-		local class365 = {}
-		class365.__index = class365
+		local class371 = {}
+		class371.__index = class371
 
-		function class365.new(data)
+		function class371.new(data)
 			local v3
 
 			if not (data == nil or data.on_activated == nil) then
@@ -80220,10 +82121,10 @@ do
 				v5 = data.variant
 			end
 
-			return (setmetatable({ on_activated = v3, text = v4, variant = v5 }, class365))
+			return (setmetatable({ on_activated = v3, text = v4, variant = v5 }, class371))
 		end
 
-		function class365:encode()
+		function class371:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -80250,8 +82151,8 @@ do
 			return buf
 		end
 
-		function class365.decode(buf: buffer)
-			local result = class365.new()
+		function class371.decode(buf: buffer)
+			local result = class371.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -80293,7 +82194,7 @@ do
 			return result
 		end
 
-		function class365:jsonEncode()
+		function class371:jsonEncode()
 			local v2 = {}
 
 			if self.on_activated ~= nil then
@@ -80311,8 +82212,8 @@ do
 			return v2
 		end
 
-		function class365.jsonDecode(data)
-			local v2 = class365.new()
+		function class371.jsonDecode(data)
+			local v2 = class371.new()
 
 			if data.on_activated ~= nil then
 				v2.on_activated = actions.ActionProp.jsonDecode(data.on_activated)
@@ -80333,31 +82234,31 @@ do
 			return v2
 		end
 
-		class365.descriptor = {
+		class371.descriptor = {
 			name = "FeedbackBannerAction",
 			fullName = "roblox.apppageplatform.shared.v1beta1.FeedbackBannerAction"
 		}
 
-		v.FeedbackBannerAction = class365
+		v.FeedbackBannerAction = class371
 	end
 
 	typeRegistry.default:register(v.FeedbackBannerAction)
 
 	do
-		local class366 = {}
-		class366.__index = class366
+		local class372 = {}
+		class372.__index = class372
 
-		function class366.new(p)
+		function class372.new(p)
 			local v3
 
 			if not (p == nil or p.kind == nil) then
 				v3 = p.kind
 			end
 
-			return (setmetatable({ kind = v3 }, class366))
+			return (setmetatable({ kind = v3 }, class372))
 		end
 
-		function class366:encode()
+		function class372:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -80381,8 +82282,8 @@ do
 			return buf
 		end
 
-		function class366.decode(buf: buffer)
-			local result = class366.new()
+		function class372.decode(buf: buffer)
+			local result = class372.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -80430,7 +82331,7 @@ do
 			return result
 		end
 
-		function class366:jsonEncode()
+		function class372:jsonEncode()
 			local v2 = {}
 
 			if self.kind == nil then
@@ -80454,8 +82355,8 @@ do
 			return v2
 		end
 
-		function class366.jsonDecode(data)
-			local v2 = class366.new()
+		function class372.jsonDecode(data)
+			local v2 = class372.new()
 
 			if data.literal ~= nil then
 				v2.kind = {
@@ -80482,21 +82383,21 @@ do
 			return v2
 		end
 
-		class366.descriptor = {
+		class372.descriptor = {
 			name = "FeedbackBannerActionProp",
 			fullName = "roblox.apppageplatform.shared.v1beta1.FeedbackBannerActionProp"
 		}
 
-		v.FeedbackBannerActionProp = class366
+		v.FeedbackBannerActionProp = class372
 	end
 
 	typeRegistry.default:register(v.FeedbackBannerActionProp)
 
 	do
-		local class367 = {}
-		class367.__index = class367
+		local class373 = {}
+		class373.__index = class373
 
-		function class367.new(p)
+		function class373.new(p)
 			local v3
 
 			if not (p == nil or p.condition == nil) then
@@ -80509,10 +82410,10 @@ do
 				v4 = p.kind
 			end
 
-			return (setmetatable({ condition = v3, kind = v4 }, class367))
+			return (setmetatable({ condition = v3, kind = v4 }, class373))
 		end
 
-		function class367:encode()
+		function class373:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -80538,8 +82439,8 @@ do
 			return buf
 		end
 
-		function class367.decode(buf: buffer)
-			local result = class367.new()
+		function class373.decode(buf: buffer)
+			local result = class373.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -80584,7 +82485,7 @@ do
 			return result
 		end
 
-		function class367:jsonEncode()
+		function class373:jsonEncode()
 			local v2 = {}
 
 			if self.condition ~= nil then
@@ -80605,8 +82506,8 @@ do
 			return v2
 		end
 
-		function class367.jsonDecode(data)
-			local v2 = class367.new()
+		function class373.jsonDecode(data)
+			local v2 = class373.new()
 
 			if data.condition ~= nil then
 				v2.condition = prop_condition.PropCondition.jsonDecode(data.condition)
@@ -80630,27 +82531,27 @@ do
 			return v2
 		end
 
-		class367.descriptor = {
+		class373.descriptor = {
 			name = "FeedbackBannerActionProp_ConditionalOption",
 			fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
 		}
 
-		v.FeedbackBannerActionProp_ConditionalOption = class367
+		v.FeedbackBannerActionProp_ConditionalOption = class373
 	end
 
 	typeRegistry.default:register(v.FeedbackBannerActionProp_ConditionalOption)
 
 	do
-		local class368 = {}
-		class368.__index = class368
+		local class374 = {}
+		class374.__index = class374
 
-		function class368.new(p)
+		function class374.new(p)
 			return (setmetatable({
 				options = (p == nil or p.options == nil) and {} or p.options
-			}, class368))
+			}, class374))
 		end
 
-		function class368:encode()
+		function class374:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -80667,8 +82568,8 @@ do
 			return buf
 		end
 
-		function class368.decode(buf: buffer)
-			local v2 = class368.new()
+		function class374.decode(buf: buffer)
+			local v2 = class374.new()
 			local v3 = 0
 
 			while v3 < buffer.len(buf) do
@@ -80702,7 +82603,7 @@ do
 			return v2
 		end
 
-		function class368:jsonEncode()
+		function class374:jsonEncode()
 			local v2 = {}
 
 			if self.options == nil or not (#self.options > 0) then
@@ -80720,8 +82621,8 @@ do
 			return v2
 		end
 
-		function class368.jsonDecode(p)
-			local v2 = class368.new()
+		function class374.jsonDecode(p)
+			local v2 = class374.new()
 
 			if p.options == nil then
 				return v2
@@ -80738,31 +82639,31 @@ do
 			return v2
 		end
 
-		class368.descriptor = {
+		class374.descriptor = {
 			name = "FeedbackBannerActionProp_ConditionalOptions",
 			fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
 		}
 
-		v.FeedbackBannerActionProp_ConditionalOptions = class368
+		v.FeedbackBannerActionProp_ConditionalOptions = class374
 	end
 
 	typeRegistry.default:register(v.FeedbackBannerActionProp_ConditionalOptions)
 
 	do
-		local class369 = {}
-		class369.__index = class369
+		local class375 = {}
+		class375.__index = class375
 
-		function class369.new(p)
+		function class375.new(p)
 			local v3
 
 			if not (p == nil or p.kind == nil) then
 				v3 = p.kind
 			end
 
-			return (setmetatable({ kind = v3 }, class369))
+			return (setmetatable({ kind = v3 }, class375))
 		end
 
-		function class369:encode()
+		function class375:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -80786,8 +82687,8 @@ do
 			return buf
 		end
 
-		function class369.decode(buf: buffer)
-			local result = class369.new()
+		function class375.decode(buf: buffer)
+			local result = class375.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -80835,7 +82736,7 @@ do
 			return result
 		end
 
-		function class369:jsonEncode()
+		function class375:jsonEncode()
 			local v2 = {}
 
 			if self.kind == nil then
@@ -80859,8 +82760,8 @@ do
 			return v2
 		end
 
-		function class369.jsonDecode(data)
-			local v2 = class369.new()
+		function class375.jsonDecode(data)
+			local v2 = class375.new()
 
 			if data.literal ~= nil then
 				v2.kind = {
@@ -80887,21 +82788,21 @@ do
 			return v2
 		end
 
-		class369.descriptor = {
+		class375.descriptor = {
 			name = "ArrayOfFeedbackBannerActionsProp",
 			fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfFeedbackBannerActionsProp"
 		}
 
-		v.ArrayOfFeedbackBannerActionsProp = class369
+		v.ArrayOfFeedbackBannerActionsProp = class375
 	end
 
 	typeRegistry.default:register(v.ArrayOfFeedbackBannerActionsProp)
 
 	do
-		local class370 = {}
-		class370.__index = class370
+		local class376 = {}
+		class376.__index = class376
 
-		function class370.new(p)
+		function class376.new(p)
 			local v3
 
 			if not (p == nil or p.condition == nil) then
@@ -80914,10 +82815,10 @@ do
 				v4 = p.kind
 			end
 
-			return (setmetatable({ condition = v3, kind = v4 }, class370))
+			return (setmetatable({ condition = v3, kind = v4 }, class376))
 		end
 
-		function class370:encode()
+		function class376:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -80943,8 +82844,8 @@ do
 			return buf
 		end
 
-		function class370.decode(buf: buffer)
-			local result = class370.new()
+		function class376.decode(buf: buffer)
+			local result = class376.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -80989,7 +82890,7 @@ do
 			return result
 		end
 
-		function class370:jsonEncode()
+		function class376:jsonEncode()
 			local v2 = {}
 
 			if self.condition ~= nil then
@@ -81010,8 +82911,8 @@ do
 			return v2
 		end
 
-		function class370.jsonDecode(data)
-			local v2 = class370.new()
+		function class376.jsonDecode(data)
+			local v2 = class376.new()
 
 			if data.condition ~= nil then
 				v2.condition = prop_condition.PropCondition.jsonDecode(data.condition)
@@ -81035,27 +82936,27 @@ do
 			return v2
 		end
 
-		class370.descriptor = {
+		class376.descriptor = {
 			name = "ArrayOfFeedbackBannerActionsProp_ConditionalOption",
 			fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
 		}
 
-		v.ArrayOfFeedbackBannerActionsProp_ConditionalOption = class370
+		v.ArrayOfFeedbackBannerActionsProp_ConditionalOption = class376
 	end
 
 	typeRegistry.default:register(v.ArrayOfFeedbackBannerActionsProp_ConditionalOption)
 
 	do
-		local class371 = {}
-		class371.__index = class371
+		local class377 = {}
+		class377.__index = class377
 
-		function class371.new(p)
+		function class377.new(p)
 			return (setmetatable({
 				options = (p == nil or p.options == nil) and {} or p.options
-			}, class371))
+			}, class377))
 		end
 
-		function class371:encode()
+		function class377:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -81072,8 +82973,8 @@ do
 			return buf
 		end
 
-		function class371.decode(buf: buffer)
-			local v2 = class371.new()
+		function class377.decode(buf: buffer)
+			local v2 = class377.new()
 			local v3 = 0
 
 			while v3 < buffer.len(buf) do
@@ -81107,7 +83008,7 @@ do
 			return v2
 		end
 
-		function class371:jsonEncode()
+		function class377:jsonEncode()
 			local v2 = {}
 
 			if self.options == nil or not (#self.options > 0) then
@@ -81125,8 +83026,8 @@ do
 			return v2
 		end
 
-		function class371.jsonDecode(p)
-			local v2 = class371.new()
+		function class377.jsonDecode(p)
+			local v2 = class377.new()
 
 			if p.options == nil then
 				return v2
@@ -81143,27 +83044,27 @@ do
 			return v2
 		end
 
-		class371.descriptor = {
+		class377.descriptor = {
 			name = "ArrayOfFeedbackBannerActionsProp_ConditionalOptions",
 			fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
 		}
 
-		v.ArrayOfFeedbackBannerActionsProp_ConditionalOptions = class371
+		v.ArrayOfFeedbackBannerActionsProp_ConditionalOptions = class377
 	end
 
 	typeRegistry.default:register(v.ArrayOfFeedbackBannerActionsProp_ConditionalOptions)
 
 	do
-		local class372 = {}
-		class372.__index = class372
+		local class378 = {}
+		class378.__index = class378
 
-		function class372.new(p)
+		function class378.new(p)
 			return (setmetatable({
 				array = (p == nil or p.array == nil) and {} or p.array
-			}, class372))
+			}, class378))
 		end
 
-		function class372:encode()
+		function class378:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -81180,8 +83081,8 @@ do
 			return buf
 		end
 
-		function class372.decode(buf: buffer)
-			local v2 = class372.new()
+		function class378.decode(buf: buffer)
+			local v2 = class378.new()
 			local v3 = 0
 
 			while v3 < buffer.len(buf) do
@@ -81215,7 +83116,7 @@ do
 			return v2
 		end
 
-		function class372:jsonEncode()
+		function class378:jsonEncode()
 			local v2 = {}
 
 			if self.array == nil or not (#self.array > 0) then
@@ -81233,8 +83134,8 @@ do
 			return v2
 		end
 
-		function class372.jsonDecode(p)
-			local v2 = class372.new()
+		function class378.jsonDecode(p)
+			local v2 = class378.new()
 
 			if p.array == nil then
 				return v2
@@ -81251,21 +83152,21 @@ do
 			return v2
 		end
 
-		class372.descriptor = {
+		class378.descriptor = {
 			name = "ArrayOfFeedbackBannerActionsProp_ArrayOfFeedbackBannerActions",
 			fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfFeedbackBannerActions"
 		}
 
-		v.ArrayOfFeedbackBannerActionsProp_ArrayOfFeedbackBannerActions = class372
+		v.ArrayOfFeedbackBannerActionsProp_ArrayOfFeedbackBannerActions = class378
 	end
 
 	typeRegistry.default:register(v.ArrayOfFeedbackBannerActionsProp_ArrayOfFeedbackBannerActions)
 
 	do
-		local class373 = {}
-		class373.__index = class373
+		local class379 = {}
+		class379.__index = class379
 
-		function class373.new(data)
+		function class379.new(data)
 			local v3
 
 			if not (data == nil or data.props == nil) then
@@ -81284,10 +83185,10 @@ do
 				v5 = data.web_props
 			end
 
-			return (setmetatable({ props = v3, shared = v4, web_props = v5 }, class373))
+			return (setmetatable({ props = v3, shared = v4, web_props = v5 }, class379))
 		end
 
-		function class373:encode()
+		function class379:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -81314,8 +83215,8 @@ do
 			return buf
 		end
 
-		function class373.decode(buf: buffer)
-			local result = class373.new()
+		function class379.decode(buf: buffer)
+			local result = class379.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -81357,7 +83258,7 @@ do
 			return result
 		end
 
-		function class373:jsonEncode()
+		function class379:jsonEncode()
 			local v2 = {}
 
 			if self.props ~= nil then
@@ -81375,8 +83276,8 @@ do
 			return v2
 		end
 
-		function class373.jsonDecode(data)
-			local v2 = class373.new()
+		function class379.jsonDecode(data)
+			local v2 = class379.new()
 
 			if data.props ~= nil then
 				v2.props = v.FeedbackBannerSchema_Props.jsonDecode(data.props)
@@ -81397,21 +83298,21 @@ do
 			return v2
 		end
 
-		class373.descriptor = {
+		class379.descriptor = {
 			name = "FeedbackBannerSchema",
 			fullName = "roblox.apppageplatform.shared.v1beta1.FeedbackBannerSchema"
 		}
 
-		v.FeedbackBannerSchema = class373
+		v.FeedbackBannerSchema = class379
 	end
 
 	typeRegistry.default:register(v.FeedbackBannerSchema)
 
 	do
-		local class374 = {}
-		class374.__index = class374
+		local class380 = {}
+		class380.__index = class380
 
-		function class374.new(data)
+		function class380.new(data)
 			local v3
 
 			if not (data == nil or data.severity == nil) then
@@ -81455,10 +83356,10 @@ do
 				actions = v6,
 				on_close = v7,
 				icon = v8
-			}, class374))
+			}, class380))
 		end
 
-		function class374:encode()
+		function class380:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -81503,8 +83404,8 @@ do
 			return buf
 		end
 
-		function class374.decode(buf: buffer)
-			local result = class374.new()
+		function class380.decode(buf: buffer)
+			local result = class380.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -81558,7 +83459,7 @@ do
 			return result
 		end
 
-		function class374:jsonEncode()
+		function class380:jsonEncode()
 			local v2 = {}
 
 			if self.severity ~= nil then
@@ -81588,8 +83489,8 @@ do
 			return v2
 		end
 
-		function class374.jsonDecode(data)
-			local v2 = class374.new()
+		function class380.jsonDecode(data)
+			local v2 = class380.new()
 
 			if data.severity ~= nil then
 				v2.severity = prop_types.StringProp.jsonDecode(data.severity)
@@ -81622,31 +83523,31 @@ do
 			return v2
 		end
 
-		class374.descriptor = {
+		class380.descriptor = {
 			name = "FeedbackBannerSchema_Props",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 		}
 
-		v.FeedbackBannerSchema_Props = class374
+		v.FeedbackBannerSchema_Props = class380
 	end
 
 	typeRegistry.default:register(v.FeedbackBannerSchema_Props)
 
 	do
-		local class375 = {}
-		class375.__index = class375
+		local class381 = {}
+		class381.__index = class381
 
-		function class375.new(p)
+		function class381.new(p)
 			local v3
 
 			if not (p == nil or p.close_button_aria_label == nil) then
 				v3 = p.close_button_aria_label
 			end
 
-			return (setmetatable({ close_button_aria_label = v3 }, class375))
+			return (setmetatable({ close_button_aria_label = v3 }, class381))
 		end
 
-		function class375:encode()
+		function class381:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -81661,8 +83562,8 @@ do
 			return buf
 		end
 
-		function class375.decode(buf: buffer)
-			local result = class375.new()
+		function class381.decode(buf: buffer)
+			local result = class381.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -81696,7 +83597,7 @@ do
 			return result
 		end
 
-		function class375:jsonEncode()
+		function class381:jsonEncode()
 			local v2 = {}
 
 			if self.close_button_aria_label ~= nil then
@@ -81706,8 +83607,8 @@ do
 			return v2
 		end
 
-		function class375.jsonDecode(p)
-			local v2 = class375.new()
+		function class381.jsonDecode(p)
+			local v2 = class381.new()
 
 			if p.close_button_aria_label ~= nil then
 				v2.close_button_aria_label = prop_types.StringProp.jsonDecode(p.close_button_aria_label)
@@ -81720,21 +83621,21 @@ do
 			return v2
 		end
 
-		class375.descriptor = {
+		class381.descriptor = {
 			name = "FeedbackBannerSchema_WebProps",
 			fullName = "roblox.apppageplatform.shared.v1beta1.WebProps"
 		}
 
-		v.FeedbackBannerSchema_WebProps = class375
+		v.FeedbackBannerSchema_WebProps = class381
 	end
 
 	typeRegistry.default:register(v.FeedbackBannerSchema_WebProps)
 
 	do
-		local class376 = {}
-		class376.__index = class376
+		local class382 = {}
+		class382.__index = class382
 
-		function class376.new(p)
+		function class382.new(p)
 			local v3
 
 			if not (p == nil or p.props == nil) then
@@ -81747,10 +83648,10 @@ do
 				v4 = p.shared
 			end
 
-			return (setmetatable({ props = v3, shared = v4 }, class376))
+			return (setmetatable({ props = v3, shared = v4 }, class382))
 		end
 
-		function class376:encode()
+		function class382:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -81771,8 +83672,8 @@ do
 			return buf
 		end
 
-		function class376.decode(buf: buffer)
-			local result = class376.new()
+		function class382.decode(buf: buffer)
+			local result = class382.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -81810,7 +83711,7 @@ do
 			return result
 		end
 
-		function class376:jsonEncode()
+		function class382:jsonEncode()
 			local v2 = {}
 
 			if self.props ~= nil then
@@ -81824,8 +83725,8 @@ do
 			return v2
 		end
 
-		function class376.jsonDecode(p)
-			local v2 = class376.new()
+		function class382.jsonDecode(p)
+			local v2 = class382.new()
 
 			if p.props ~= nil then
 				v2.props = v.GameSortDropDownSchema_Props.jsonDecode(p.props)
@@ -81838,21 +83739,21 @@ do
 			return v2
 		end
 
-		class376.descriptor = {
+		class382.descriptor = {
 			name = "GameSortDropDownSchema",
 			fullName = "roblox.apppageplatform.shared.v1beta1.GameSortDropDownSchema"
 		}
 
-		v.GameSortDropDownSchema = class376
+		v.GameSortDropDownSchema = class382
 	end
 
 	typeRegistry.default:register(v.GameSortDropDownSchema)
 
 	do
-		local class377 = {}
-		class377.__index = class377
+		local class383 = {}
+		class383.__index = class383
 
-		function class377.new(data)
+		function class383.new(data)
 			local v3
 
 			if not (data == nil or data.is_omni == nil) then
@@ -81877,10 +83778,10 @@ do
 				v6 = data.size
 			end
 
-			return (setmetatable({ is_omni = v3, include_omni_sorts = v4, position = v5, size = v6 }, class377))
+			return (setmetatable({ is_omni = v3, include_omni_sorts = v4, position = v5, size = v6 }, class383))
 		end
 
-		function class377:encode()
+		function class383:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -81913,8 +83814,8 @@ do
 			return buf
 		end
 
-		function class377.decode(buf: buffer)
-			local result = class377.new()
+		function class383.decode(buf: buffer)
+			local result = class383.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -81960,7 +83861,7 @@ do
 			return result
 		end
 
-		function class377:jsonEncode()
+		function class383:jsonEncode()
 			local v2 = {}
 
 			if self.is_omni ~= nil then
@@ -81982,8 +83883,8 @@ do
 			return v2
 		end
 
-		function class377.jsonDecode(data)
-			local v2 = class377.new()
+		function class383.jsonDecode(data)
+			local v2 = class383.new()
 
 			if data.is_omni ~= nil then
 				v2.is_omni = prop_types.BoolProp.jsonDecode(data.is_omni)
@@ -82012,21 +83913,21 @@ do
 			return v2
 		end
 
-		class377.descriptor = {
+		class383.descriptor = {
 			name = "GameSortDropDownSchema_Props",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 		}
 
-		v.GameSortDropDownSchema_Props = class377
+		v.GameSortDropDownSchema_Props = class383
 	end
 
 	typeRegistry.default:register(v.GameSortDropDownSchema_Props)
 
 	do
-		local class378 = {}
-		class378.__index = class378
+		local class384 = {}
+		class384.__index = class384
 
-		function class378.new(p)
+		function class384.new(p)
 			local v3
 
 			if not (p == nil or p.props == nil) then
@@ -82039,10 +83940,10 @@ do
 				v4 = p.shared
 			end
 
-			return (setmetatable({ props = v3, shared = v4 }, class378))
+			return (setmetatable({ props = v3, shared = v4 }, class384))
 		end
 
-		function class378:encode()
+		function class384:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -82063,8 +83964,8 @@ do
 			return buf
 		end
 
-		function class378.decode(buf: buffer)
-			local result = class378.new()
+		function class384.decode(buf: buffer)
+			local result = class384.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -82102,7 +84003,7 @@ do
 			return result
 		end
 
-		function class378:jsonEncode()
+		function class384:jsonEncode()
 			local v2 = {}
 
 			if self.props ~= nil then
@@ -82116,8 +84017,8 @@ do
 			return v2
 		end
 
-		function class378.jsonDecode(p)
-			local v2 = class378.new()
+		function class384.jsonDecode(p)
+			local v2 = class384.new()
 
 			if p.props ~= nil then
 				v2.props = v.SponsoredTwoByOneTileSchema_Props.jsonDecode(p.props)
@@ -82130,21 +84031,21 @@ do
 			return v2
 		end
 
-		class378.descriptor = {
+		class384.descriptor = {
 			name = "SponsoredTwoByOneTileSchema",
 			fullName = "roblox.apppageplatform.shared.v1beta1.SponsoredTwoByOneTileSchema"
 		}
 
-		v.SponsoredTwoByOneTileSchema = class378
+		v.SponsoredTwoByOneTileSchema = class384
 	end
 
 	typeRegistry.default:register(v.SponsoredTwoByOneTileSchema)
 
 	do
-		local class379 = {}
-		class379.__index = class379
+		local class385 = {}
+		class385.__index = class385
 
-		function class379.new(data)
+		function class385.new(data)
 			local v3
 
 			if not (data == nil or data.universe_id == nil) then
@@ -82286,10 +84187,10 @@ do
 				overflow_menu_component = v20,
 				hidden_state_component = v21,
 				footnote_text = v22
-			}, class379))
+			}, class385))
 		end
 
-		function class379:encode()
+		function class385:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -82418,8 +84319,8 @@ do
 			return buf
 		end
 
-		function class379.decode(buf: buffer)
-			local result = class379.new()
+		function class385.decode(buf: buffer)
+			local result = class385.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -82529,7 +84430,7 @@ do
 			return result
 		end
 
-		function class379:jsonEncode()
+		function class385:jsonEncode()
 			local v2 = {}
 
 			if self.universe_id ~= nil then
@@ -82615,8 +84516,8 @@ do
 			return v2
 		end
 
-		function class379.jsonDecode(data)
-			local v2 = class379.new()
+		function class385.jsonDecode(data)
+			local v2 = class385.new()
 
 			if data.universe_id ~= nil then
 				v2.universe_id = prop_types.StringProp.jsonDecode(data.universe_id)
@@ -82777,21 +84678,21 @@ do
 			return v2
 		end
 
-		class379.descriptor = {
+		class385.descriptor = {
 			name = "SponsoredTwoByOneTileSchema_Props",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 		}
 
-		v.SponsoredTwoByOneTileSchema_Props = class379
+		v.SponsoredTwoByOneTileSchema_Props = class385
 	end
 
 	typeRegistry.default:register(v.SponsoredTwoByOneTileSchema_Props)
 
 	do
-		local class380 = {}
-		class380.__index = class380
+		local class386 = {}
+		class386.__index = class386
 
-		function class380.new(data)
+		function class386.new(data)
 			local v3
 
 			if not (data == nil or data.props == nil) then
@@ -82810,10 +84711,10 @@ do
 				v5 = data.web_props
 			end
 
-			return (setmetatable({ props = v3, shared = v4, web_props = v5 }, class380))
+			return (setmetatable({ props = v3, shared = v4, web_props = v5 }, class386))
 		end
 
-		function class380:encode()
+		function class386:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -82840,8 +84741,8 @@ do
 			return buf
 		end
 
-		function class380.decode(buf: buffer)
-			local result = class380.new()
+		function class386.decode(buf: buffer)
+			local result = class386.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -82883,7 +84784,7 @@ do
 			return result
 		end
 
-		function class380:jsonEncode()
+		function class386:jsonEncode()
 			local v2 = {}
 
 			if self.props ~= nil then
@@ -82901,8 +84802,8 @@ do
 			return v2
 		end
 
-		function class380.jsonDecode(data)
-			local v2 = class380.new()
+		function class386.jsonDecode(data)
+			local v2 = class386.new()
 
 			if data.props ~= nil then
 				v2.props = v.ToggleSchema_Props.jsonDecode(data.props)
@@ -82923,21 +84824,21 @@ do
 			return v2
 		end
 
-		class380.descriptor = {
+		class386.descriptor = {
 			name = "ToggleSchema",
 			fullName = "roblox.apppageplatform.shared.v1beta1.ToggleSchema"
 		}
 
-		v.ToggleSchema = class380
+		v.ToggleSchema = class386
 	end
 
 	typeRegistry.default:register(v.ToggleSchema)
 
 	do
-		local class381 = {}
-		class381.__index = class381
+		local class387 = {}
+		class387.__index = class387
 
-		function class381.new(data)
+		function class387.new(data)
 			local v3
 
 			if not (data == nil or data.label == nil) then
@@ -82995,10 +84896,10 @@ do
 				placement = v8,
 				layout_order = v9,
 				test_id = v10
-			}, class381))
+			}, class387))
 		end
 
-		function class381:encode()
+		function class387:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -83055,8 +84956,8 @@ do
 			return buf
 		end
 
-		function class381.decode(buf: buffer)
-			local result = class381.new()
+		function class387.decode(buf: buffer)
+			local result = class387.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -83118,7 +85019,7 @@ do
 			return result
 		end
 
-		function class381:jsonEncode()
+		function class387:jsonEncode()
 			local v2 = {}
 
 			if self.label ~= nil then
@@ -83156,8 +85057,8 @@ do
 			return v2
 		end
 
-		function class381.jsonDecode(data)
-			local v2 = class381.new()
+		function class387.jsonDecode(data)
+			local v2 = class387.new()
 
 			if data.label ~= nil then
 				v2.label = prop_types.StringProp.jsonDecode(data.label)
@@ -83214,31 +85115,31 @@ do
 			return v2
 		end
 
-		class381.descriptor = {
+		class387.descriptor = {
 			name = "ToggleSchema_Props",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 		}
 
-		v.ToggleSchema_Props = class381
+		v.ToggleSchema_Props = class387
 	end
 
 	typeRegistry.default:register(v.ToggleSchema_Props)
 
 	do
-		local class382 = {}
-		class382.__index = class382
+		local class388 = {}
+		class388.__index = class388
 
-		function class382.new(p)
+		function class388.new(p)
 			local v3
 
 			if not (p == nil or p.aria_label == nil) then
 				v3 = p.aria_label
 			end
 
-			return (setmetatable({ aria_label = v3 }, class382))
+			return (setmetatable({ aria_label = v3 }, class388))
 		end
 
-		function class382:encode()
+		function class388:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -83253,8 +85154,8 @@ do
 			return buf
 		end
 
-		function class382.decode(buf: buffer)
-			local result = class382.new()
+		function class388.decode(buf: buffer)
+			local result = class388.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -83288,7 +85189,7 @@ do
 			return result
 		end
 
-		function class382:jsonEncode()
+		function class388:jsonEncode()
 			local v2 = {}
 
 			if self.aria_label ~= nil then
@@ -83298,8 +85199,8 @@ do
 			return v2
 		end
 
-		function class382.jsonDecode(p)
-			local v2 = class382.new()
+		function class388.jsonDecode(p)
+			local v2 = class388.new()
 
 			if p.aria_label ~= nil then
 				v2.aria_label = prop_types.StringProp.jsonDecode(p.aria_label)
@@ -83312,21 +85213,21 @@ do
 			return v2
 		end
 
-		class382.descriptor = {
+		class388.descriptor = {
 			name = "ToggleSchema_WebProps",
 			fullName = "roblox.apppageplatform.shared.v1beta1.WebProps"
 		}
 
-		v.ToggleSchema_WebProps = class382
+		v.ToggleSchema_WebProps = class388
 	end
 
 	typeRegistry.default:register(v.ToggleSchema_WebProps)
 
 	do
-		local class383 = {}
-		class383.__index = class383
+		local class389 = {}
+		class389.__index = class389
 
-		function class383.new(p)
+		function class389.new(p)
 			local v3
 
 			if not (p == nil or p.props == nil) then
@@ -83339,10 +85240,10 @@ do
 				v4 = p.shared
 			end
 
-			return (setmetatable({ props = v3, shared = v4 }, class383))
+			return (setmetatable({ props = v3, shared = v4 }, class389))
 		end
 
-		function class383:encode()
+		function class389:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -83363,8 +85264,8 @@ do
 			return buf
 		end
 
-		function class383.decode(buf: buffer)
-			local result = class383.new()
+		function class389.decode(buf: buffer)
+			local result = class389.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -83402,7 +85303,7 @@ do
 			return result
 		end
 
-		function class383:jsonEncode()
+		function class389:jsonEncode()
 			local v2 = {}
 
 			if self.props ~= nil then
@@ -83416,8 +85317,8 @@ do
 			return v2
 		end
 
-		function class383.jsonDecode(p)
-			local v2 = class383.new()
+		function class389.jsonDecode(p)
+			local v2 = class389.new()
 
 			if p.props ~= nil then
 				v2.props = v.SponsoredOneByTwoTileSchema_Props.jsonDecode(p.props)
@@ -83430,21 +85331,21 @@ do
 			return v2
 		end
 
-		class383.descriptor = {
+		class389.descriptor = {
 			name = "SponsoredOneByTwoTileSchema",
 			fullName = "roblox.apppageplatform.shared.v1beta1.SponsoredOneByTwoTileSchema"
 		}
 
-		v.SponsoredOneByTwoTileSchema = class383
+		v.SponsoredOneByTwoTileSchema = class389
 	end
 
 	typeRegistry.default:register(v.SponsoredOneByTwoTileSchema)
 
 	do
-		local class384 = {}
-		class384.__index = class384
+		local class390 = {}
+		class390.__index = class390
 
-		function class384.new(data)
+		function class390.new(data)
 			local v3
 
 			if not (data == nil or data.content_type == nil) then
@@ -83607,10 +85508,10 @@ do
 				overflow_menu_component = v23,
 				on_open_game_details = v24,
 				footnote_text = v25
-			}, class384))
+			}, class390))
 		end
 
-		function class384:encode()
+		function class390:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -83757,8 +85658,8 @@ do
 			return buf
 		end
 
-		function class384.decode(buf: buffer)
-			local result = class384.new()
+		function class390.decode(buf: buffer)
+			local result = class390.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -83880,7 +85781,7 @@ do
 			return result
 		end
 
-		function class384:jsonEncode()
+		function class390:jsonEncode()
 			local v2 = {}
 
 			if self.content_type ~= nil then
@@ -83978,8 +85879,8 @@ do
 			return v2
 		end
 
-		function class384.jsonDecode(data)
-			local v2 = class384.new()
+		function class390.jsonDecode(data)
+			local v2 = class390.new()
 
 			if data.content_type ~= nil then
 				v2.content_type = prop_types.StringProp.jsonDecode(data.content_type)
@@ -84164,31 +86065,31 @@ do
 			return v2
 		end
 
-		class384.descriptor = {
+		class390.descriptor = {
 			name = "SponsoredOneByTwoTileSchema_Props",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 		}
 
-		v.SponsoredOneByTwoTileSchema_Props = class384
+		v.SponsoredOneByTwoTileSchema_Props = class390
 	end
 
 	typeRegistry.default:register(v.SponsoredOneByTwoTileSchema_Props)
 
 	do
-		local class385 = {}
-		class385.__index = class385
+		local class391 = {}
+		class391.__index = class391
 
-		function class385.new(p)
+		function class391.new(p)
 			local v3
 
 			if not (p == nil or p.oneof_prop == nil) then
 				v3 = p.oneof_prop
 			end
 
-			return (setmetatable({ oneof_prop = v3 }, class385))
+			return (setmetatable({ oneof_prop = v3 }, class391))
 		end
 
-		function class385:encode()
+		function class391:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -84225,8 +86126,8 @@ do
 			return buf
 		end
 
-		function class385.decode(buf: buffer)
-			local result = class385.new()
+		function class391.decode(buf: buffer)
+			local result = class391.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -84298,7 +86199,7 @@ do
 			return result
 		end
 
-		function class385:jsonEncode()
+		function class391:jsonEncode()
 			local v2 = {}
 
 			if self.oneof_prop == nil then
@@ -84337,8 +86238,8 @@ do
 			return v2
 		end
 
-		function class385.jsonDecode(data)
-			local v2 = class385.new()
+		function class391.jsonDecode(data)
+			local v2 = class391.new()
 
 			if data.value ~= nil then
 				v2.oneof_prop = {
@@ -84413,21 +86314,21 @@ do
 			return v2
 		end
 
-		class385.descriptor = {
+		class391.descriptor = {
 			name = "ExperimentalComponentProp",
 			fullName = "roblox.apppageplatform.shared.v1beta1.ExperimentalComponentProp"
 		}
 
-		v.ExperimentalComponentProp = class385
+		v.ExperimentalComponentProp = class391
 	end
 
 	typeRegistry.default:register(v.ExperimentalComponentProp)
 
 	do
-		local class386 = {}
-		class386.__index = class386
+		local class392 = {}
+		class392.__index = class392
 
-		function class386.new(data)
+		function class392.new(data)
 			local v2 = {
 				experimental_type = (data == nil or data.experimental_type == nil) and "" or data.experimental_type,
 				props = (data == nil or data.props == nil) and {} or data.props,
@@ -84440,10 +86341,10 @@ do
 			end
 
 			v2.shared = v3
-			return (setmetatable(v2, class386))
+			return (setmetatable(v2, class392))
 		end
 
-		function class386:encode()
+		function class392:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -84477,8 +86378,8 @@ do
 			return buf
 		end
 
-		function class386.decode(buf: buffer)
-			local result = class386.new()
+		function class392.decode(buf: buffer)
+			local result = class392.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -84525,7 +86426,7 @@ do
 			return result
 		end
 
-		function class386:jsonEncode()
+		function class392:jsonEncode()
 			local v2 = {}
 
 			if self.experimental_type ~= nil and self.experimental_type ~= "" then
@@ -84549,8 +86450,8 @@ do
 			return v2
 		end
 
-		function class386.jsonDecode(data)
-			local v2 = class386.new()
+		function class392.jsonDecode(data)
+			local v2 = class392.new()
 
 			if data.experimental_type ~= nil then
 				v2.experimental_type = data.experimental_type
@@ -84577,21 +86478,21 @@ do
 			return v2
 		end
 
-		class386.descriptor = {
+		class392.descriptor = {
 			name = "ExperimentalComponentSchema",
 			fullName = "roblox.apppageplatform.shared.v1beta1.ExperimentalComponentSchema"
 		}
 
-		v.ExperimentalComponentSchema = class386
+		v.ExperimentalComponentSchema = class392
 	end
 
 	typeRegistry.default:register(v.ExperimentalComponentSchema)
 
 	do
-		local class387 = {}
-		class387.__index = class387
+		local class393 = {}
+		class393.__index = class393
 
-		function class387.new(p)
+		function class393.new(p)
 			local v2 = {
 				key = (p == nil or p.key == nil) and "" or p.key,
 				value = 0
@@ -84603,10 +86504,10 @@ do
 			end
 
 			v2.value = v3
-			return (setmetatable(v2, class387))
+			return (setmetatable(v2, class393))
 		end
 
-		function class387:encode()
+		function class393:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -84626,8 +86527,8 @@ do
 			return buf
 		end
 
-		function class387.decode(buf: buffer)
-			local result = class387.new()
+		function class393.decode(buf: buffer)
+			local result = class393.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -84665,7 +86566,7 @@ do
 			return result
 		end
 
-		function class387:jsonEncode()
+		function class393:jsonEncode()
 			local v2 = {}
 
 			if self.key ~= nil and self.key ~= "" then
@@ -84679,8 +86580,8 @@ do
 			return v2
 		end
 
-		function class387.jsonDecode(p)
-			local v2 = class387.new()
+		function class393.jsonDecode(p)
+			local v2 = class393.new()
 
 			if p.key ~= nil then
 				v2.key = p.key
@@ -84693,21 +86594,21 @@ do
 			return v2
 		end
 
-		class387.descriptor = {
+		class393.descriptor = {
 			name = "ExperimentalComponentSchema_PropsEntry",
 			fullName = "roblox.apppageplatform.shared.v1beta1.PropsEntry"
 		}
 
-		v.ExperimentalComponentSchema_PropsEntry = class387
+		v.ExperimentalComponentSchema_PropsEntry = class393
 	end
 
 	typeRegistry.default:register(v.ExperimentalComponentSchema_PropsEntry)
 
 	do
-		local class388 = {}
-		class388.__index = class388
+		local class394 = {}
+		class394.__index = class394
 
-		function class388.new(p)
+		function class394.new(p)
 			local v3
 
 			if not (p == nil or p.props == nil) then
@@ -84720,10 +86621,10 @@ do
 				v4 = p.shared
 			end
 
-			return (setmetatable({ props = v3, shared = v4 }, class388))
+			return (setmetatable({ props = v3, shared = v4 }, class394))
 		end
 
-		function class388:encode()
+		function class394:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -84744,8 +86645,8 @@ do
 			return buf
 		end
 
-		function class388.decode(buf: buffer)
-			local result = class388.new()
+		function class394.decode(buf: buffer)
+			local result = class394.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -84783,7 +86684,7 @@ do
 			return result
 		end
 
-		function class388:jsonEncode()
+		function class394:jsonEncode()
 			local v2 = {}
 
 			if self.props ~= nil then
@@ -84797,8 +86698,8 @@ do
 			return v2
 		end
 
-		function class388.jsonDecode(p)
-			local v2 = class388.new()
+		function class394.jsonDecode(p)
+			local v2 = class394.new()
 
 			if p.props ~= nil then
 				v2.props = v.SignUpFormSchema_Props.jsonDecode(p.props)
@@ -84811,21 +86712,21 @@ do
 			return v2
 		end
 
-		class388.descriptor = {
+		class394.descriptor = {
 			name = "SignUpFormSchema",
 			fullName = "roblox.apppageplatform.shared.v1beta1.SignUpFormSchema"
 		}
 
-		v.SignUpFormSchema = class388
+		v.SignUpFormSchema = class394
 	end
 
 	typeRegistry.default:register(v.SignUpFormSchema)
 
 	do
-		local class389 = {}
-		class389.__index = class389
+		local class395 = {}
+		class395.__index = class395
 
-		function class389.new(data)
+		function class395.new(data)
 			local v3
 
 			if not (data == nil or data.layout_order == nil) then
@@ -84844,10 +86745,10 @@ do
 				v5 = data.test_id
 			end
 
-			return (setmetatable({ layout_order = v3, is_visible = v4, test_id = v5 }, class389))
+			return (setmetatable({ layout_order = v3, is_visible = v4, test_id = v5 }, class395))
 		end
 
-		function class389:encode()
+		function class395:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -84874,8 +86775,8 @@ do
 			return buf
 		end
 
-		function class389.decode(buf: buffer)
-			local result = class389.new()
+		function class395.decode(buf: buffer)
+			local result = class395.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -84917,7 +86818,7 @@ do
 			return result
 		end
 
-		function class389:jsonEncode()
+		function class395:jsonEncode()
 			local v2 = {}
 
 			if self.layout_order ~= nil then
@@ -84935,8 +86836,8 @@ do
 			return v2
 		end
 
-		function class389.jsonDecode(data)
-			local v2 = class389.new()
+		function class395.jsonDecode(data)
+			local v2 = class395.new()
 
 			if data.layout_order ~= nil then
 				v2.layout_order = prop_types.Int32Prop.jsonDecode(data.layout_order)
@@ -84965,21 +86866,21 @@ do
 			return v2
 		end
 
-		class389.descriptor = {
+		class395.descriptor = {
 			name = "SignUpFormSchema_Props",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 		}
 
-		v.SignUpFormSchema_Props = class389
+		v.SignUpFormSchema_Props = class395
 	end
 
 	typeRegistry.default:register(v.SignUpFormSchema_Props)
 
 	do
-		local class390 = {}
-		class390.__index = class390
+		local class396 = {}
+		class396.__index = class396
 
-		function class390.new(p)
+		function class396.new(p)
 			local v3
 
 			if not (p == nil or p.props == nil) then
@@ -84992,10 +86893,10 @@ do
 				v4 = p.shared
 			end
 
-			return (setmetatable({ props = v3, shared = v4 }, class390))
+			return (setmetatable({ props = v3, shared = v4 }, class396))
 		end
 
-		function class390:encode()
+		function class396:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -85016,8 +86917,8 @@ do
 			return buf
 		end
 
-		function class390.decode(buf: buffer)
-			local result = class390.new()
+		function class396.decode(buf: buffer)
+			local result = class396.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -85055,7 +86956,7 @@ do
 			return result
 		end
 
-		function class390:jsonEncode()
+		function class396:jsonEncode()
 			local v2 = {}
 
 			if self.props ~= nil then
@@ -85069,8 +86970,8 @@ do
 			return v2
 		end
 
-		function class390.jsonDecode(p)
-			local v2 = class390.new()
+		function class396.jsonDecode(p)
+			local v2 = class396.new()
 
 			if p.props ~= nil then
 				v2.props = v.ProgressSchema_Props.jsonDecode(p.props)
@@ -85083,21 +86984,21 @@ do
 			return v2
 		end
 
-		class390.descriptor = {
+		class396.descriptor = {
 			name = "ProgressSchema",
 			fullName = "roblox.apppageplatform.shared.v1beta1.ProgressSchema"
 		}
 
-		v.ProgressSchema = class390
+		v.ProgressSchema = class396
 	end
 
 	typeRegistry.default:register(v.ProgressSchema)
 
 	do
-		local class391 = {}
-		class391.__index = class391
+		local class397 = {}
+		class397.__index = class397
 
-		function class391.new(data)
+		function class397.new(data)
 			local v3
 
 			if not (data == nil or data.shape == nil) then
@@ -85190,10 +87091,10 @@ do
 				anchor_point = v13,
 				z_index = v14,
 				test_id = v15
-			}, class391))
+			}, class397))
 		end
 
-		function class391:encode()
+		function class397:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -85280,8 +87181,8 @@ do
 			return buf
 		end
 
-		function class391.decode(buf: buffer)
-			local result = class391.new()
+		function class397.decode(buf: buffer)
+			local result = class397.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -85363,7 +87264,7 @@ do
 			return result
 		end
 
-		function class391:jsonEncode()
+		function class397:jsonEncode()
 			local v2 = {}
 
 			if self.shape ~= nil then
@@ -85421,8 +87322,8 @@ do
 			return v2
 		end
 
-		function class391.jsonDecode(data)
-			local v2 = class391.new()
+		function class397.jsonDecode(data)
+			local v2 = class397.new()
 
 			if data.shape ~= nil then
 				v2.shape = prop_types.StringProp.jsonDecode(data.shape)
@@ -85507,21 +87408,21 @@ do
 			return v2
 		end
 
-		class391.descriptor = {
+		class397.descriptor = {
 			name = "ProgressSchema_Props",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 		}
 
-		v.ProgressSchema_Props = class391
+		v.ProgressSchema_Props = class397
 	end
 
 	typeRegistry.default:register(v.ProgressSchema_Props)
 
 	do
-		local class392 = {}
-		class392.__index = class392
+		local class398 = {}
+		class398.__index = class398
 
-		function class392.new(p)
+		function class398.new(p)
 			local v3
 
 			if not (p == nil or p.props == nil) then
@@ -85534,10 +87435,10 @@ do
 				v4 = p.shared
 			end
 
-			return (setmetatable({ props = v3, shared = v4 }, class392))
+			return (setmetatable({ props = v3, shared = v4 }, class398))
 		end
 
-		function class392:encode()
+		function class398:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -85558,8 +87459,8 @@ do
 			return buf
 		end
 
-		function class392.decode(buf: buffer)
-			local result = class392.new()
+		function class398.decode(buf: buffer)
+			local result = class398.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -85597,7 +87498,7 @@ do
 			return result
 		end
 
-		function class392:jsonEncode()
+		function class398:jsonEncode()
 			local v2 = {}
 
 			if self.props ~= nil then
@@ -85611,8 +87512,8 @@ do
 			return v2
 		end
 
-		function class392.jsonDecode(p)
-			local v2 = class392.new()
+		function class398.jsonDecode(p)
+			local v2 = class398.new()
 
 			if p.props ~= nil then
 				v2.props = v.ConfigDrivenFormSchema_Props.jsonDecode(p.props)
@@ -85625,21 +87526,21 @@ do
 			return v2
 		end
 
-		class392.descriptor = {
+		class398.descriptor = {
 			name = "ConfigDrivenFormSchema",
 			fullName = "roblox.apppageplatform.shared.v1beta1.ConfigDrivenFormSchema"
 		}
 
-		v.ConfigDrivenFormSchema = class392
+		v.ConfigDrivenFormSchema = class398
 	end
 
 	typeRegistry.default:register(v.ConfigDrivenFormSchema)
 
 	do
-		local class393 = {}
-		class393.__index = class393
+		local class399 = {}
+		class399.__index = class399
 
-		function class393.new(data)
+		function class399.new(data)
 			local v3
 
 			if not (data == nil or data.version == nil) then
@@ -85676,10 +87577,10 @@ do
 				saved = v5,
 				catalogs = v6,
 				capabilities = v7
-			}, class393))
+			}, class399))
 		end
 
-		function class393:encode()
+		function class399:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -85718,8 +87619,8 @@ do
 			return buf
 		end
 
-		function class393.decode(buf: buffer)
-			local result = class393.new()
+		function class399.decode(buf: buffer)
+			local result = class399.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -85769,7 +87670,7 @@ do
 			return result
 		end
 
-		function class393:jsonEncode()
+		function class399:jsonEncode()
 			local v2 = {}
 
 			if self.version ~= nil then
@@ -85795,8 +87696,8 @@ do
 			return v2
 		end
 
-		function class393.jsonDecode(data)
-			local v2 = class393.new()
+		function class399.jsonDecode(data)
+			local v2 = class399.new()
 
 			if data.version ~= nil then
 				v2.version = prop_types.StringProp.jsonDecode(data.version)
@@ -85821,21 +87722,21 @@ do
 			return v2
 		end
 
-		class393.descriptor = {
+		class399.descriptor = {
 			name = "ConfigDrivenFormSchema_Props",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 		}
 
-		v.ConfigDrivenFormSchema_Props = class393
+		v.ConfigDrivenFormSchema_Props = class399
 	end
 
 	typeRegistry.default:register(v.ConfigDrivenFormSchema_Props)
 
 	do
-		local class394 = {}
-		class394.__index = class394
+		local class400 = {}
+		class400.__index = class400
 
-		function class394.new(p)
+		function class400.new(p)
 			local v3
 
 			if not (p == nil or p.props == nil) then
@@ -85848,10 +87749,10 @@ do
 				v4 = p.shared
 			end
 
-			return (setmetatable({ props = v3, shared = v4 }, class394))
+			return (setmetatable({ props = v3, shared = v4 }, class400))
 		end
 
-		function class394:encode()
+		function class400:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -85872,8 +87773,8 @@ do
 			return buf
 		end
 
-		function class394.decode(buf: buffer)
-			local result = class394.new()
+		function class400.decode(buf: buffer)
+			local result = class400.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -85911,7 +87812,7 @@ do
 			return result
 		end
 
-		function class394:jsonEncode()
+		function class400:jsonEncode()
 			local v2 = {}
 
 			if self.props ~= nil then
@@ -85925,8 +87826,8 @@ do
 			return v2
 		end
 
-		function class394.jsonDecode(p)
-			local v2 = class394.new()
+		function class400.jsonDecode(p)
+			local v2 = class400.new()
 
 			if p.props ~= nil then
 				v2.props = v.ReactionsSchema_Props.jsonDecode(p.props)
@@ -85939,21 +87840,21 @@ do
 			return v2
 		end
 
-		class394.descriptor = {
+		class400.descriptor = {
 			name = "ReactionsSchema",
 			fullName = "roblox.apppageplatform.shared.v1beta1.ReactionsSchema"
 		}
 
-		v.ReactionsSchema = class394
+		v.ReactionsSchema = class400
 	end
 
 	typeRegistry.default:register(v.ReactionsSchema)
 
 	do
-		local class395 = {}
-		class395.__index = class395
+		local class401 = {}
+		class401.__index = class401
 
-		function class395.new(data)
+		function class401.new(data)
 			local v3
 
 			if not (data == nil or data.reactions == nil) then
@@ -85997,10 +87898,10 @@ do
 				on_reaction_activated = v6,
 				id = v7,
 				is_disabled = v8
-			}, class395))
+			}, class401))
 		end
 
-		function class395:encode()
+		function class401:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -86045,8 +87946,8 @@ do
 			return buf
 		end
 
-		function class395.decode(buf: buffer)
-			local result = class395.new()
+		function class401.decode(buf: buffer)
+			local result = class401.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -86100,7 +88001,7 @@ do
 			return result
 		end
 
-		function class395:jsonEncode()
+		function class401:jsonEncode()
 			local v2 = {}
 
 			if self.reactions ~= nil then
@@ -86130,8 +88031,8 @@ do
 			return v2
 		end
 
-		function class395.jsonDecode(data)
-			local v2 = class395.new()
+		function class401.jsonDecode(data)
+			local v2 = class401.new()
 
 			if data.reactions ~= nil then
 				v2.reactions = prop_types.ArrayOfStructProp.jsonDecode(data.reactions)
@@ -86176,21 +88077,21 @@ do
 			return v2
 		end
 
-		class395.descriptor = {
+		class401.descriptor = {
 			name = "ReactionsSchema_Props",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 		}
 
-		v.ReactionsSchema_Props = class395
+		v.ReactionsSchema_Props = class401
 	end
 
 	typeRegistry.default:register(v.ReactionsSchema_Props)
 
 	do
-		local class396 = {}
-		class396.__index = class396
+		local class402 = {}
+		class402.__index = class402
 
-		function class396.new(p)
+		function class402.new(p)
 			local v3
 
 			if not (p == nil or p.props == nil) then
@@ -86203,10 +88104,10 @@ do
 				v4 = p.shared
 			end
 
-			return (setmetatable({ props = v3, shared = v4 }, class396))
+			return (setmetatable({ props = v3, shared = v4 }, class402))
 		end
 
-		function class396:encode()
+		function class402:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -86227,8 +88128,8 @@ do
 			return buf
 		end
 
-		function class396.decode(buf: buffer)
-			local result = class396.new()
+		function class402.decode(buf: buffer)
+			local result = class402.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -86266,7 +88167,7 @@ do
 			return result
 		end
 
-		function class396:jsonEncode()
+		function class402:jsonEncode()
 			local v2 = {}
 
 			if self.props ~= nil then
@@ -86280,8 +88181,8 @@ do
 			return v2
 		end
 
-		function class396.jsonDecode(p)
-			local v2 = class396.new()
+		function class402.jsonDecode(p)
+			local v2 = class402.new()
 
 			if p.props ~= nil then
 				v2.props = v.CustomFormSchema_Props.jsonDecode(p.props)
@@ -86294,20 +88195,20 @@ do
 			return v2
 		end
 
-		class396.descriptor = {
+		class402.descriptor = {
 			name = "CustomFormSchema",
 			fullName = "roblox.apppageplatform.shared.v1beta1.CustomFormSchema"
 		}
 
-		v.CustomFormSchema = class396
+		v.CustomFormSchema = class402
 	end
 
 	typeRegistry.default:register(v.CustomFormSchema)
 
-	local class397 = {}
-	class397.__index = class397
+	local class403 = {}
+	class403.__index = class403
 
-	function class397.new(data)
+	function class403.new(data)
 		local v3
 
 		if not (data == nil or data.form_definition == nil) then
@@ -86421,10 +88322,10 @@ do
 			results_summary = v16,
 			on_refresh_results = v17,
 			results_refresh_interval_seconds = v18
-		}, class397))
+		}, class403))
 	end
 
-	function class397:encode()
+	function class403:encode()
 		local v2 = buffer.create(0)
 		local v3 = 0
 
@@ -86529,8 +88430,8 @@ do
 		return buf
 	end
 
-	function class397.decode(buf: buffer)
-		local result = class397.new()
+	function class403.decode(buf: buffer)
+		local result = class403.new()
 		local v2 = 0
 
 		while v2 < buffer.len(buf) do
@@ -86624,7 +88525,7 @@ do
 		return result
 	end
 
-	function class397:jsonEncode()
+	function class403:jsonEncode()
 		local v2 = {}
 
 		if self.form_definition ~= nil then
@@ -86694,8 +88595,8 @@ do
 		return v2
 	end
 
-	function class397.jsonDecode(data)
-		local v2 = class397.new()
+	function class403.jsonDecode(data)
+		local v2 = class403.new()
 
 		if data.form_definition ~= nil then
 			v2.form_definition = prop_types.StructProp.jsonDecode(data.form_definition)
@@ -86824,31 +88725,31 @@ do
 		return v2
 	end
 
-	class397.descriptor = {
+	class403.descriptor = {
 		name = "CustomFormSchema_Props",
 		fullName = "roblox.apppageplatform.shared.v1beta1.Props"
 	}
 
-	v.CustomFormSchema_Props = class397
+	v.CustomFormSchema_Props = class403
 end
 
 typeRegistry.default:register(v.CustomFormSchema_Props)
 
 do
-	local class398 = {}
-	class398.__index = class398
+	local class404 = {}
+	class404.__index = class404
 
-	function class398.new(p)
+	function class404.new(p)
 		local v3
 
 		if not (p == nil or p.kind == nil) then
 			v3 = p.kind
 		end
 
-		return (setmetatable({ kind = v3 }, class398))
+		return (setmetatable({ kind = v3 }, class404))
 	end
 
-	function class398:encode()
+	function class404:encode()
 		local v2 = buffer.create(0)
 		local v3 = 0
 
@@ -87353,6 +89254,18 @@ do
 				local encoded = self.kind.value:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 127, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			elseif self.kind.type == "status_badge" then
+				local encoded = self.kind.value:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 128, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			elseif self.kind.type == "collection_slots_layout" then
+				local encoded = self.kind.value:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 129, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			elseif self.kind.type == "mural_section" then
+				local encoded = self.kind.value:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 130, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 		end
 
@@ -87361,8 +89274,8 @@ do
 		return buf
 	end
 
-	function class398.decode(buf: buffer)
-		local result = class398.new()
+	function class404.decode(buf: buffer)
+		local result = class404.new()
 		local v2 = 0
 
 		while v2 < buffer.len(buf) do
@@ -88089,6 +90002,24 @@ do
 						type = "group_sidebar",
 						value = v.GroupSidebarSchema.decode(v5)
 					}
+				elseif v3 == 128 then
+					local v5
+					v5, v2 = proto.readBuffer(buf, v2)
+					result.kind = { type = "status_badge", value = v.StatusBadgeSchema.decode(v5) }
+				elseif v3 == 129 then
+					local v5
+					v5, v2 = proto.readBuffer(buf, v2)
+					result.kind = {
+						type = "collection_slots_layout",
+						value = v.CollectionSlotsLayoutSchema.decode(v5)
+					}
+				elseif v3 == 130 then
+					local v5
+					v5, v2 = proto.readBuffer(buf, v2)
+					result.kind = {
+						type = "mural_section",
+						value = v.MuralSectionSchema.decode(v5)
+					}
 				else
 					local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -88108,7 +90039,7 @@ do
 		return result
 	end
 
-	function class398:jsonEncode()
+	function class404:jsonEncode()
 		local v2 = {}
 
 		if self.kind == nil then
@@ -88737,13 +90668,28 @@ do
 
 		if self.kind.type == "group_sidebar" then
 			v2.groupSidebar = self.kind.value:jsonEncode()
+			return v2
+		end
+
+		if self.kind.type == "status_badge" then
+			v2.statusBadge = self.kind.value:jsonEncode()
+			return v2
+		end
+
+		if self.kind.type == "collection_slots_layout" then
+			v2.collectionSlotsLayout = self.kind.value:jsonEncode()
+			return v2
+		end
+
+		if self.kind.type == "mural_section" then
+			v2.muralSection = self.kind.value:jsonEncode()
 		end
 
 		return v2
 	end
 
-	function class398.jsonDecode(data)
-		local v2 = class398.new()
+	function class404.jsonDecode(data)
+		local v2 = class404.new()
 
 		if data.tile ~= nil then
 			v2.kind = {
@@ -90327,15 +92273,57 @@ do
 			}
 		end
 
+		if data.status_badge ~= nil then
+			v2.kind = {
+				type = "status_badge",
+				value = v.StatusBadgeSchema.jsonDecode(data.status_badge)
+			}
+		end
+
+		if data.statusBadge ~= nil then
+			v2.kind = {
+				type = "status_badge",
+				value = v.StatusBadgeSchema.jsonDecode(data.statusBadge)
+			}
+		end
+
+		if data.collection_slots_layout ~= nil then
+			v2.kind = {
+				type = "collection_slots_layout",
+				value = v.CollectionSlotsLayoutSchema.jsonDecode(data.collection_slots_layout)
+			}
+		end
+
+		if data.collectionSlotsLayout ~= nil then
+			v2.kind = {
+				type = "collection_slots_layout",
+				value = v.CollectionSlotsLayoutSchema.jsonDecode(data.collectionSlotsLayout)
+			}
+		end
+
+		if data.mural_section ~= nil then
+			v2.kind = {
+				type = "mural_section",
+				value = v.MuralSectionSchema.jsonDecode(data.mural_section)
+			}
+		end
+
+		if data.muralSection ~= nil then
+			v2.kind = {
+				type = "mural_section",
+				value = v.MuralSectionSchema.jsonDecode(data.muralSection)
+			}
+		end
+
 		return v2
 	end
 
-	class398.descriptor = {
+	class404.descriptor = {
 		name = "UiComponentSchema",
 		fullName = "roblox.apppageplatform.shared.v1beta1.UiComponentSchema"
 	}
 
-	v.UiComponentSchema = class398
+	v.UiComponentSchema = class404
 end
 
 typeRegistry.default:register(v.UiComponentSchema)
@@ -90445,6 +92433,10 @@ return {
 	VariableItemWidthCarouselSchema_Props = v.VariableItemWidthCarouselSchema_Props,
 	OptionSelectorCollectionSchema = v.OptionSelectorCollectionSchema,
 	OptionSelectorCollectionSchema_Props = v.OptionSelectorCollectionSchema_Props,
+	CollectionSlotsLayoutSchema = v.CollectionSlotsLayoutSchema,
+	CollectionSlotsLayoutSchema_Props = v.CollectionSlotsLayoutSchema_Props,
+	MuralSectionSchema = v.MuralSectionSchema,
+	MuralSectionSchema_Props = v.MuralSectionSchema_Props,
 	CollectionGridSchema = v.CollectionGridSchema,
 	CollectionGridSchema_Props = v.CollectionGridSchema_Props,
 	RevealRowsButtonWithDividerSchema = v.RevealRowsButtonWithDividerSchema,
@@ -90651,6 +92643,8 @@ return {
 	CoachmarkSchema_WebProps = v.CoachmarkSchema_WebProps,
 	BadgeSchema = v.BadgeSchema,
 	BadgeSchema_Props = v.BadgeSchema_Props,
+	StatusBadgeSchema = v.StatusBadgeSchema,
+	StatusBadgeSchema_Props = v.StatusBadgeSchema_Props,
 	SongTileSchema = v.SongTileSchema,
 	SongTileSchema_Props = v.SongTileSchema_Props,
 	EventTileSchema = v.EventTileSchema,

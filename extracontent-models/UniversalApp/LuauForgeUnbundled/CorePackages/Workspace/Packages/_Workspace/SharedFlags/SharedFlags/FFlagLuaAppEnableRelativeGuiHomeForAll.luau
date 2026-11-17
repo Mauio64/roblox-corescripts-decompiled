@@ -1,2 +1,0 @@
-return game:DefineFastFlag("LuaAppEnableRelativeGuiHomeForAll2", false)
-	and game:GetEngineFeature("RelativeGui")

@@ -73,7 +73,7 @@ local function buildAcceptableForFolder(instance, p: string)
 	end
 end
 
-local function getFirstUnacceptableChildDetail(instance, list)
+local function getFirstUnacceptableChildDetail(instance, acceptableForFolder)
 	if not instance then
 		return nil
 	end
@@ -81,9 +81,9 @@ local function getFirstUnacceptableChildDetail(instance, list)
 	for _, child in instance:GetChildren() do
 		local v = false
 
-		for k, item in list do
+		for k, item in acceptableForFolder do
 			if item.ClassName == child.ClassName and item.Name == child.Name then
-				table.remove(list, k)
+				table.remove(acceptableForFolder, k)
 				v = true
 				break
 			end

@@ -62,7 +62,7 @@ local function getEmoteName(value) -- 1 equivalent call inferred from this helpe
 	return nil
 end
 
-local function sendErrorMessage(currentChannel, p) -- 9 equivalent calls inferred from this helper
+local function sendErrorMessage(currentChannel, p) -- 7 equivalent calls inferred from this helper
 	Util:SendSystemMessageToSelf(v:Get(p, v3[p]), currentChannel, { ChatColor = color })
 end
 
@@ -85,82 +85,77 @@ local function ProcessMessage(value, object, _): boolean
 
 	local character = LocalPlayer.Character
 
-	if not character then
-		sendErrorMessage(currentChannel, "InGame.Chat.Response.EmotesTemporarilyUnavailable") -- inferred equivalent call
-		return true
-	end
+	if character then
+		local animate = character:FindFirstChild("Animate")
 
-	local animate = character:FindFirstChild("Animate")
+		if animate and animate:FindFirstChild("PlayEmote") then
+			local humanoid = character:FindFirstChildOfClass("Humanoid")
 
-	if not animate then
-		sendErrorMessage(currentChannel, "InGame.Chat.Response.EmotesNotSupported") -- inferred equivalent call
-		return true
-	end
+			if humanoid then
+				if humanoid.RigType == Enum.HumanoidRigType.R15 then
+					local humanoidDescription = humanoid:FindFirstChildOfClass("HumanoidDescription")
 
-	if not animate:FindFirstChild("PlayEmote") then
-		sendErrorMessage(currentChannel, "InGame.Chat.Response.EmotesNotSupported") -- inferred equivalent call
-		return true
-	end
+					if humanoidDescription then
+						local emotes = humanoidDescription:GetEmotes()
+						local v4 = {}
 
-	local humanoid = character:FindFirstChildOfClass("Humanoid")
+						for k, _ in pairs(emotes) do
+							v4[string.lower(k)] = k
+						end
 
-	if not humanoid then
-		sendErrorMessage(currentChannel, "InGame.Chat.Response.EmotesTemporarilyUnavailable") -- inferred equivalent call
-		return true
-	end
+						local v5 = tonumber(emoteName)
 
-	if humanoid.RigType ~= Enum.HumanoidRigType.R15 then
-		sendErrorMessage(currentChannel, "InGame.Chat.Response.EmotesWrongAvatarType") -- inferred equivalent call
-		return true
-	end
+						if v5 then
+							local equippedEmotes = humanoidDescription:GetEquippedEmotes()
 
-	local humanoidDescription = humanoid:FindFirstChildOfClass("HumanoidDescription")
+							for _, equippedEmote in pairs(equippedEmotes) do
+								if equippedEmote.Slot == v5 then
+									emoteName = equippedEmote.Name
+								end
+							end
+						end
 
-	if not humanoidDescription then
-		sendErrorMessage(currentChannel, "InGame.Chat.Response.EmotesTemporarilyUnavailable") -- inferred equivalent call
-		return true
-	end
+						local v6 = v4[string.lower(emoteName)]
 
-	local emotes = humanoidDescription:GetEmotes()
-	local v4 = {}
+						if v6 then
+							spawn(function()
+								local success, result = pcall(function()
+									return humanoid:PlayEmote(v6)
+								end)
 
-	for k, _ in pairs(emotes) do
-		v4[string.lower(k)] = k
-	end
+								if success then
+									if not result then
+										sendErrorMessage( -- inferred equivalent call
+											currentChannel,
+											"InGame.Chat.Response.EmotesTemporarilyUnavailable"
+										)
+									end
+								else
+									sendErrorMessage(currentChannel, "InGame.Chat.Response.EmotesNotSupported") -- inferred equivalent call
+								end
+							end)
 
-	local v5 = tonumber(emoteName)
+							return true
+						end
 
-	if v5 then
-		local equippedEmotes = humanoidDescription:GetEquippedEmotes()
-
-		for _, equippedEmote in pairs(equippedEmotes) do
-			if equippedEmote.Slot == v5 then
-				emoteName = equippedEmote.Name
-			end
-		end
-	end
-
-	local v6 = v4[string.lower(emoteName)]
-
-	if v6 then
-		spawn(function()
-			local success, result = pcall(function()
-				return humanoid:PlayEmote(v6)
-			end)
-
-			if success then
-				if not result then
-					sendErrorMessage(currentChannel, "InGame.Chat.Response.EmotesTemporarilyUnavailable") -- inferred equivalent call
+						sendErrorMessage(currentChannel, "InGame.Chat.Response.EmoteNotAvailable") -- inferred equivalent call
+						return true
+					end
+				else
+					sendErrorMessage(currentChannel, "InGame.Chat.Response.EmotesWrongAvatarType") -- inferred equivalent call
+					return true
 				end
-			else
-				sendErrorMessage(currentChannel, "InGame.Chat.Response.EmotesNotSupported") -- inferred equivalent call
 			end
-		end)
 
+			sendErrorMessage(currentChannel, "InGame.Chat.Response.EmotesTemporarilyUnavailable") -- inferred equivalent call
+			return true
+		end
+
+		sendErrorMessage(currentChannel, "InGame.Chat.Response.EmotesNotSupported") -- inferred equivalent call
 		return true
 	end
 
-	sendErrorMessage(currentChannel, "InGame.Chat.Response.EmoteNotAvailable") -- inferred equivalent call
+	sendErrorMessage(currentChannel, "InGame.Chat.Response.EmotesTemporarilyUnavailable") -- inferred equivalent call
 	return true
 end
 

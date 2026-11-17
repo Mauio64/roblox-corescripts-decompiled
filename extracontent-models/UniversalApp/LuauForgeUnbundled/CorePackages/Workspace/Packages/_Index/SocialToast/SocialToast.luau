@@ -1,1 +1,0 @@
-return { ToastScreen = require("@game/CorePackages/Workspace/Packages/_Index/SocialToast/SocialToast/ToastScreen"), useOpenToast = require("@game/CorePackages/Workspace/Packages/_Index/SocialToast/SocialToast/useOpenToast") }

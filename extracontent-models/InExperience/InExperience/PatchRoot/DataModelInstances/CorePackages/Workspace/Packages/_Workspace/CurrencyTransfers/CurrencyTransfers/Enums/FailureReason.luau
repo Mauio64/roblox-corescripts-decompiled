@@ -18,7 +18,8 @@ local FailureReason = {
 	ReceiveLimitExceeded = "ReceiveLimitExceeded",
 	TransferAmountBelowMinimum = "TransferAmountBelowMinimum",
 	TransferAmountExceedsMaximum = "TransferAmountExceedsMaximum",
-	TransferAmountExceedsNonSecuredMaximum = "TransferAmountExceedsNonSecuredMaximum"
+	TransferAmountExceedsNonSecuredMaximum = "TransferAmountExceedsNonSecuredMaximum",
+	NoFreeTransfersRemaining = "NoFreeTransfersRemaining"
 }
 
 local v = {
@@ -41,7 +42,8 @@ local v = {
 	[16] = FailureReason.TransferAmountBelowMinimum,
 	[17] = FailureReason.TransferAmountExceedsMaximum,
 	[18] = FailureReason.TransferAmountExceedsNonSecuredMaximum,
-	[19] = FailureReason.ReceiveLimitExceeded
+	[19] = FailureReason.ReceiveLimitExceeded,
+	[21] = FailureReason.NoFreeTransfersRemaining
 }
 
 function FailureReason.fromValue(value)

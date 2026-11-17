@@ -9,8 +9,10 @@ local FFlagMomentsComments = SharedFlags.FFlagMomentsComments
 local FFlagMomentsCommentsIxpEnabled = SharedFlags.FFlagMomentsCommentsIxpEnabled
 local FFlagMomentsReactFeatureGate = SharedFlags.FFlagMomentsReactFeatureGate
 local FFlagMomentsCreationFeatureGate = SharedFlags.FFlagMomentsCreationFeatureGate
+local FFlagAXAvatarMomentsCreation = SharedFlags.FFlagAXAvatarMomentsCreation
 local FFlagMomentsEngagementMetricsFeature = require(MomentsCommon.Flags.FFlagMomentsEngagementMetricsFeature)
 local FFlagDebugForceEnableMoments = require(MomentsCommon.Flags.FFlagDebugForceEnableMoments)
+local FFlagMomentsParentTimeLimit = require(MomentsCommon.Flags.FFlagMomentsParentTimeLimit)
 local GetFFlagMomentsNonInfiniteScroll = require(MomentsCommon.Flags.GetFFlagMomentsNonInfiniteScroll)
 local GetFIntMomentsNonInfiniteScrollLimit = require(MomentsCommon.Flags.GetFIntMomentsNonInfiniteScrollLimit)
 
@@ -24,7 +26,7 @@ local function createMomentsCapabilities()
 
 	local v = math.max(1, GetFIntMomentsNonInfiniteScrollLimit())
 
-	local function policyCapability(p: string) -- 9 equivalent calls inferred from this helper
+	local function policyCapability(p: string) -- 10 equivalent calls inferred from this helper
 		return createComputed(function(p2): boolean
 			if FFlagDebugForceEnableMoments then
 				return true
@@ -41,6 +43,12 @@ local function createMomentsCapabilities()
 
 	if FFlagMomentsCreationFeatureGate then
 		getCanCreateMoments = policyCapability("moments_creation") -- inferred equivalent call
+	end
+
+	local getCanCreateAvatarMoments
+
+	if FFlagAXAvatarMomentsCreation then
+		getCanCreateAvatarMoments = policyCapability("avatar_creation") -- inferred equivalent call
 	end
 
 	local getIsAutoPlayEnabled
@@ -80,28 +88,53 @@ local function createMomentsCapabilities()
 		getCanReactToComments = policyCapability("comments_react") -- inferred equivalent call
 	end
 
+	local getCanShowPersonalizedRecommendationsEntryPoint = createComputed(function(p)
+		return GetAppPolicyStore(false).getAppPolicy(p).getShowInContextPersonalizedRecommendationsMomentsFeed()
+	end)
+
+	local getIsInfiniteScrollEnabled = createComputed(function(p): boolean
+		if not fFlagMomentsNonInfiniteScroll or FFlagDebugForceEnableMoments then
+			return true
+		end
+
+		local momentsFeatureList = GetAppPolicyStore(false).getAppPolicy(p).getMomentsFeatureList()
+
+		return next(momentsFeatureList) == nil or table.find(momentsFeatureList, "infinite_scroll") ~= nil
+	end)
+
+	local getMaxMomentsBeforeEndState = createComputed(function(_)
+		return v
+	end)
+	local getHasDailyLimit
+
+	if FFlagMomentsParentTimeLimit then
+		getHasDailyLimit = createComputed(function(p): boolean
+			local FFlagDebugForceMomentsDailyLimit = require(MomentsCommon.Flags.FFlagDebugForceMomentsDailyLimit)
+
+			if FFlagDebugForceMomentsDailyLimit then
+				return true
+			end
+
+			local appPolicy = GetAppPolicyStore(false).getAppPolicy(p)
+			return table.find(appPolicy.getMomentsFeatureList(), "moments_daily_limit") ~= nil
+		end)
+	end
+
 	return {
 		getHasMomentsAccess = getHasMomentsAccess,
 		getIsInfluencerContentEnabled = getIsInfluencerContentEnabled,
 		getCanCreateMoments = getCanCreateMoments,
+		getCanCreateAvatarMoments = getCanCreateAvatarMoments,
 		getIsAutoPlayEnabled = getIsAutoPlayEnabled,
 		getIsEngagementMetricsEnabled = getIsEngagementMetricsEnabled,
 		getCanReactToMoments = getCanReactToMoments,
 		getCanReadComments = getCanReadComments,
 		getCanWriteComments = getCanWriteComments,
 		getCanReactToComments = getCanReactToComments,
-		getIsInfiniteScrollEnabled = createComputed(function(p): boolean
-			if not fFlagMomentsNonInfiniteScroll or FFlagDebugForceEnableMoments then
-				return true
-			end
-
-			local momentsFeatureList = GetAppPolicyStore(false).getAppPolicy(p).getMomentsFeatureList()
-
-			return next(momentsFeatureList) == nil or table.find(momentsFeatureList, "infinite_scroll") ~= nil
-		end),
-		getMaxMomentsBeforeEndState = createComputed(function(_)
-			return v
-		end)
+		getCanShowPersonalizedRecommendationsEntryPoint = getCanShowPersonalizedRecommendationsEntryPoint,
+		getIsInfiniteScrollEnabled = getIsInfiniteScrollEnabled,
+		getMaxMomentsBeforeEndState = getMaxMomentsBeforeEndState,
+		getHasDailyLimit = getHasDailyLimit
 	}
 end
 

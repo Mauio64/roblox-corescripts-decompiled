@@ -36,6 +36,7 @@ local OpenAmpWizardContainer = AmpUpsell.OpenAmpWizardContainer
 local FFlagEnableCurrencyTransferWizardVPCPrologue = require(CurrencyTransfers.Flags.FFlagEnableCurrencyTransferWizardVPCPrologue)
 
 local FFlagCurrencyTransferVPCUseAmpWizardContainerForInApp = require(CurrencyTransfers.Flags.FFlagCurrencyTransferVPCUseAmpWizardContainerForInApp)
+local FFlagCurrencyTransferVpcUfoDirect = require(CurrencyTransfers.Flags.FFlagCurrencyTransferVpcUfoDirect)
 
 local AmpWizardTransferConstants = require(CurrencyTransfers.Constants.AmpWizardTransferConstants)
 local getCounterUserId = require(CurrencyTransfers.Utils.getCounterUserId)
@@ -90,6 +91,11 @@ local function VPCBlockContainer(p)
 
 	local v4 = FFlagCurrencyTransferVPCUseAmpWizardContainerForInApp
 		and v2.getTransferOrigination(false) == TransferOrigination.InExperience
+
+	if FFlagCurrencyTransferVpcUfoDirect and not FFlagCurrencyTransferVPCUseAmpWizardContainerForInApp then
+		v4 = v2.getTransferOrigination(false) == TransferOrigination.InExperience
+	end
+
 	local v5
 
 	if direction == TransferDirection.Send then
@@ -114,7 +120,7 @@ local function VPCBlockContainer(p)
 		return nil
 	end, { v2 })
 
-	local function logAskClicked() -- 1 equivalent call inferred from this helper
+	local function logAskClicked() -- 2 equivalent calls inferred from this helper
 		logCurrencyTransferCounter(v2, CurrencyTransferTelemetry.CurrencyTransferVPCBlockAskClickedCounter, {
 			recourseSurface = "vpc"
 		})
@@ -124,7 +130,7 @@ local function VPCBlockContainer(p)
 		end
 	end
 
-	local function logCancelClicked() -- 1 equivalent call inferred from this helper
+	local function logCancelClicked() -- 2 equivalent calls inferred from this helper
 		logCurrencyTransferCounter(v2, CurrencyTransferTelemetry.CurrencyTransferVPCBlockCancelClickedCounter, {
 			recourseSurface = "vpc"
 		})
@@ -137,6 +143,32 @@ local function VPCBlockContainer(p)
 	local function onCancelClicked()
 		logCancelClicked() -- inferred equivalent call
 		triggerOnClose()
+	end
+
+	local v7
+
+	if FFlagCurrencyTransferVpcUfoDirect then
+		local AmpV2Wizard = require(parent.AmpV2Wizard)
+		local useAmpUpsellLauncher = AmpV2Wizard.useAmpUpsellLauncher
+		local onEvent = React.useCallback(function(p2)
+			if not v6 or p2.node ~= "Prologue" then
+				return
+			end
+
+			if p2.outcome == "ODP" or p2.outcome == "Remote" then
+				logAskClicked() -- inferred equivalent call
+			elseif p2.outcome == "Cancel" then
+				logCancelClicked() -- inferred equivalent call
+			end
+		end, { v2, v6 })
+
+		v7 = useAmpUpsellLauncher({
+			surface = AmpWizardTransferConstants.ENTRY_POINT_EVENT_CTX,
+			odpEventContext = AmpWizardTransferConstants.ENTRY_POINT_EVENT_CTX,
+			onEvent = onEvent
+		})
+	else
+		v7 = nil
 	end
 
 	local function openAmpWizard()
@@ -153,7 +185,7 @@ local function VPCBlockContainer(p)
 		v2.setPreviousPromptState(promptState)
 		v2.setPromptState(PromptState.Hidden)
 
-		local v7 = {
+		local requestDetails = {
 			transferType = "Robux",
 			transferId = getTransferRequestInternalId(transferRequestId),
 			robuxTransferAmount = tostring(selectedAmount or 0)
@@ -164,6 +196,68 @@ local function VPCBlockContainer(p)
 		local v8 = counterUserId and {
 			{ name = "targetUser", value = tostring(counterUserId), type = "UserId" }
 		} or nil
+
+		if FFlagCurrencyTransferVpcUfoDirect and SharedFlags.FFlagEnableAmpV2Wizard and not v4 and v7 then
+			local AmpV2Wizard = require(parent.AmpV2Wizard)
+
+			if AmpV2Wizard.FFlagAmpV2WizardTerminalOutcome then
+				local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+				local appFeaturePolicies = UniversalAppPolicy.getAppFeaturePolicies()
+				local vpcRequestTypeEnum = AmpUpsell.AmpEnums.VPCRequestTypeEnum
+				local requestType
+
+				if direction == TransferDirection.Receive then
+					requestType = vpcRequestTypeEnum.ReceiveTransfer
+				else
+					requestType = vpcRequestTypeEnum.SendTransfer
+				end
+
+				if
+					appFeaturePolicies.getUseAmpV2WizardForVpc()
+					and table.find(appFeaturePolicies.getAmpV2VpcExcludedRequestTypes(), requestType) == nil
+				then
+					local function handleVpcSubmitted() -- 1 equivalent call inferred from this helper
+						if SharedFlags.FFlagEnableRobuxTransferFlowEventIngest then
+							logRobuxTransferFlowEvent(v2, RobuxTransferFlowEventName.vpc_submitted)
+						end
+
+						if
+							SharedFlags.FFlagSduiOpenIncomingTransferUpsellAction
+							and direction == TransferDirection.Receive
+						then
+							v2.triggerOnPromptOptimisticHide()
+						end
+					end
+
+					local extraProps = {
+						usePrologue = v6 == true
+					}
+
+					if v6 then
+						extraProps.prologueCopy = {
+							title = v.AskParentTitle,
+							description = v5,
+							confirmLabel = v.Ask
+						}
+					end
+
+					v7({
+						flow = {
+							name = "VPC",
+							props = { requestType = requestType, requestDetails = requestDetails }
+						},
+						extraProps = extraProps
+					}):andThen(function(p2)
+						if p2.reason == "Completed" and (p2.outcome == "Done" or p2.outcome == "Success") then
+							handleVpcSubmitted() -- inferred equivalent call
+						end
+
+						triggerOnClose()
+					end)
+					return
+				end
+			end
+		end
 
 		if FFlagCurrencyTransferVPCUseAmpWizardContainerForInApp and not v4 then
 			v3(OpenAmpWizardContainer(p.ampFeatureCheck, function(p2, p3)
@@ -204,7 +298,7 @@ local function VPCBlockContainer(p)
 				else
 					processTransfer(v2, selectedAmount or 0)
 				end
-			end, v7, AmpWizardTransferConstants.ENTRY_POINT_EVENT_CTX, v8, AmpWizardTransferConstants.NAMESPACE_NAME, nil, nil, nil, v6 and true or nil, v6 and {
+			end, requestDetails, AmpWizardTransferConstants.ENTRY_POINT_EVENT_CTX, v8, AmpWizardTransferConstants.NAMESPACE_NAME, nil, nil, nil, v6 and true or nil, v6 and {
 				config = {
 					titleText = v.AskParentTitle,
 					bodyText = v5,
@@ -257,7 +351,7 @@ local function VPCBlockContainer(p)
 				else
 					processTransfer(v2, selectedAmount or 0)
 				end
-			end, v7, AmpWizardTransferConstants.ENTRY_POINT_EVENT_CTX, v8, AmpWizardTransferConstants.NAMESPACE_NAME, nil, nil, nil, v6 and true or nil, v6 and {
+			end, requestDetails, AmpWizardTransferConstants.ENTRY_POINT_EVENT_CTX, v8, AmpWizardTransferConstants.NAMESPACE_NAME, nil, nil, nil, v6 and true or nil, v6 and {
 				config = {
 					titleText = v.AskParentTitle,
 					bodyText = v5,

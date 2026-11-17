@@ -17,7 +17,6 @@ local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslato
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local Foundation = require(CorePackages.Packages.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local withStyle = UIBlox.Style.withStyle
 local FullPageModal = UIBlox.App.Dialog.Modal.FullPageModal
 local Overlay = UIBlox.App.Dialog.Overlay
@@ -210,8 +209,7 @@ function extended:renderMiddle(p)
 		local footer = font.Footer
 		local color = theme.TextDefault.Color
 
-		local createFragment = Roact.createFragment
-		local children = {
+		return Roact.createFragment({
 			ScrollingFrame = Roact.createElement("ScrollingFrame", {
 				BackgroundTransparency = 1,
 				Size = UDim2.new(1, 0, 1, -50),
@@ -272,54 +270,30 @@ function extended:renderMiddle(p)
 					})
 				})
 			}),
-			DisclaimerContainer = 0
-		}
-
-		local createElement = Roact.createElement
-		local v = {
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 0, 50),
-			Position = UDim2.new(0, 0, 1, -50)
-		}
-		local v2 = {
-			padding = Roact.createElement("UIPadding", {
-				PaddingLeft = UDim.new(0, Constants.PromptSidePadding),
-				PaddingRight = UDim.new(0, Constants.PromptSidePadding)
-			}),
-			Disclaimer = 0
-		}
-
-		local createElement2 = Roact.createElement
-		local v3 = {
-			Size = UDim2.fromScale(1, 1),
-			Text = p.disclaimer,
-			Font = 0,
-			FontFace = 0,
-			TextSize = 0,
-			TextColor3 = 0,
-			BackgroundTransparency = 1,
-			TextWrapped = true
-		}
-		local font2
-
-		if not FoundationFontFaceMigration then
-			font2 = footer.Font
-		end
-
-		v3.Font = font2
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(props.Tokens.Typography.CaptionSmall.Font)
-		end
-
-		v3.FontFace = fontFace
-
-		v3.TextSize = baseSize * footer.RelativeSize
-		v3.TextColor3 = color
-		v2.Disclaimer = createElement2("TextLabel", v3)
-		children.DisclaimerContainer = createElement("Frame", v, v2)
-		return createFragment(children)
+			DisclaimerContainer = Roact.createElement(
+				"Frame",
+				{
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, 0, 0, 50),
+					Position = UDim2.new(0, 0, 1, -50)
+				},
+				{
+					padding = Roact.createElement("UIPadding", {
+						PaddingLeft = UDim.new(0, Constants.PromptSidePadding),
+						PaddingRight = UDim.new(0, Constants.PromptSidePadding)
+					}),
+					Disclaimer = Roact.createElement("TextLabel", {
+						Size = UDim2.fromScale(1, 1),
+						Text = p.disclaimer,
+						FontFace = normalizeFontFace(props.Tokens.Typography.CaptionSmall.Font),
+						TextSize = baseSize * footer.RelativeSize,
+						TextColor3 = color,
+						BackgroundTransparency = 1,
+						TextWrapped = true
+					})
+				}
+			)
+		})
 	end)
 end
 

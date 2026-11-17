@@ -7,7 +7,6 @@ require(parent.UIBlox)
 local SocialLibraries = require(AppChat.SocialLibraries)
 local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local FFlagDebugAppChatEnableDomLocators = require(AppChat.Flags.FFlagDebugAppChatEnableDomLocators)
 local FFlagAppChatRemoveConversationListDivider = require(AppChat.Flags.FFlagAppChatRemoveConversationListDivider)
 
@@ -92,31 +91,16 @@ local function StyledCell(p)
 	end
 
 	v3.avatarCirclePresenceImageTransparency = avatarCirclePresenceImageTransparency
-	local subTitleTextFont
 
-	if FoundationFontFaceMigration then
-		subTitleTextFont = v2.Typography.BodySmall.Font
-	else
-		subTitleTextFont = font.CaptionBody.Font
-	end
-
-	v3.subTitleTextFont = subTitleTextFont
-
+	v3.subTitleTextFont = v2.Typography.BodySmall.Font
 	v3.subTitleTextTransparency = theme.TextDefault.Transparency
 	v3.subTitleTextColor3 = theme.TextDefault.Color
 	v3.subTitleTextSize = font.CaptionBody.RelativeSize * font.BaseSize
 
 	v3.subTitleIconColor3 = style.Theme.IconDefault.Color
 	v3.subTitleIconTransparency = style.Theme.IconDefault.Transparency
-	local titleFont
 
-	if FoundationFontFaceMigration then
-		titleFont = v2.Typography.TitleLarge.Font
-	else
-		titleFont = font.Header2.Font
-	end
-
-	v3.titleFont = titleFont
+	v3.titleFont = v2.Typography.TitleLarge.Font
 	local titleTextTransparency
 
 	if joined.boldTitle then
@@ -136,16 +120,8 @@ local function StyledCell(p)
 
 	v3.titleTextColor3 = titleTextColor
 	v3.titleTextSize = font.Header2.RelativeSize * font.BaseSize
-	local secondaryTitleFont
 
-	if FoundationFontFaceMigration then
-		secondaryTitleFont = v2.Typography.TitleLarge.Font
-	else
-		secondaryTitleFont = font.Header2.Font
-	end
-
-	v3.secondaryTitleFont = secondaryTitleFont
-
+	v3.secondaryTitleFont = v2.Typography.TitleLarge.Font
 	v3.secondaryTitleTextTransparency = theme.TextMuted.Transparency
 	v3.secondaryTitleTextColor3 = theme.TextMuted.Color
 	v3.secondaryTitleTextSize = font.Header2.RelativeSize * font.BaseSize

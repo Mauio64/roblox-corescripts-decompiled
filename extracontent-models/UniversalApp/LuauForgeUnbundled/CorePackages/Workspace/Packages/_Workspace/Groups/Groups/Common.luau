@@ -1,1 +1,0 @@
-return { TextKeys = require("@game/CorePackages/Workspace/Packages/_Workspace/Groups/Groups/Common/TextKeys"), Types = require("@game/CorePackages/Workspace/Packages/_Workspace/Groups/Groups/Common/Types") }

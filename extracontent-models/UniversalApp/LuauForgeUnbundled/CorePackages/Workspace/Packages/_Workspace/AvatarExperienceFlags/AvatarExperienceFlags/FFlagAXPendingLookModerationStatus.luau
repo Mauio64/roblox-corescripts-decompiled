@@ -1,3 +1,0 @@
-local FFlagAXMigrateOutfitsToUserInventory = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagAXMigrateOutfitsToUserInventory")
-
-return game:DefineFastFlag("AXPendingLookModerationStatus", false) and FFlagAXMigrateOutfitsToUserInventory

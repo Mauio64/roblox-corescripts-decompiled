@@ -359,7 +359,9 @@ function TooltipButton(props)
 						return
 					end
 
-					if math.abs((position - input.Position).Magnitude) > Constants.DRAG_MAGNITUDE_THRESHOLD then
+					local position2 = input.Position
+
+					if math.abs((position - position2).Magnitude) > Constants.DRAG_MAGNITUDE_THRESHOLD then
 						ChromeAnalytics.default:onIconDrag(props.integration.id)
 						Service:storeChromeInteracted()
 						Service:toggleWindow(props.integration.id)

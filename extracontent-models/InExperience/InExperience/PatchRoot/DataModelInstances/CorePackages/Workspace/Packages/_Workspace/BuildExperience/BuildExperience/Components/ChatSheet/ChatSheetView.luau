@@ -44,14 +44,8 @@ local SharedFlags2 = require(parent.SharedFlags)
 local FFlagBuildExperienceInGameShell = SharedFlags2.FFlagBuildExperienceInGameShell
 
 local FFlagBuildExperienceChatAccordionScrollAnchor = require(BuildExperience.Flags.FFlagBuildExperienceChatAccordionScrollAnchor)
-
-local FFlagBuildExperienceChatSheetReversedContent = require(BuildExperience.Flags.FFlagBuildExperienceChatSheetReversedContent)
-local FFlagBuildExperienceChatImageAttachments = require(BuildExperience.Flags.FFlagBuildExperienceChatImageAttachments)
 local FFlagBuildCheckGamePermissions = require(BuildExperience.Flags.FFlagBuildCheckGamePermissions)
 require(BuildExperience.useGamePermissions)
-
-local SharedFlags3 = require(parent.SharedFlags)
-local FFlagBuildExperienceChatResourceAttachments = SharedFlags3.FFlagBuildExperienceChatResourceAttachments
 local Sheet = Foundation.Sheet
 local useScrollPerformanceTracker = require(BuildExperience.Telemetry.useScrollPerformanceTracker)
 
@@ -98,10 +92,11 @@ local function ChatSheetContent(props)
 		end, { props.onFramesChanged, props.sheet, state })
 	end
 
-	return React.createElement(props.sheetComponent.Content, {
-		isReversed = FFlagBuildExperienceChatSheetReversedContent and true or nil,
-		scrollingFrameRef = scrollingFrameRef
-	}, props.children)
+	return React.createElement(
+		props.sheetComponent.Content,
+		{ isReversed = true, scrollingFrameRef = scrollingFrameRef },
+		props.children
+	)
 end
 
 local function ChatSheetView(props)
@@ -256,44 +251,13 @@ local function ChatSheetView(props)
 	v7.composerText = props.composerText
 	v7.composerErrorText = props.composerErrorText
 	v7.onComposerChanged = props.onComposerChanged
-	local images
-
-	if FFlagBuildExperienceChatImageAttachments then
-		images = props.composerImages
-	end
-
-	v7.images = images
-	local onImagesChanged
-
-	if FFlagBuildExperienceChatImageAttachments then
-		onImagesChanged = props.onComposerImagesChanged
-	end
-
-	v7.onImagesChanged = onImagesChanged
-	local onRetryImage
-
-	if FFlagBuildExperienceChatImageAttachments then
-		onRetryImage = props.onRetryComposerImage
-	end
-
-	v7.onRetryImage = onRetryImage
+	v7.images = props.composerImages
+	v7.onImagesChanged = props.onComposerImagesChanged
+	v7.onRetryImage = props.onRetryComposerImage
 	v7.isSendBlocked = props.isComposerSendBlocked
 	v7.tracksExternalText = props.tracksExternalComposerText
-	local resourceAttachments
-
-	if FFlagBuildExperienceChatResourceAttachments then
-		resourceAttachments = props.composerResourceAttachments
-	end
-
-	v7.resourceAttachments = resourceAttachments
-	local onRemoveResourceAttachment
-
-	if FFlagBuildExperienceChatResourceAttachments then
-		onRemoveResourceAttachment = props.onRemoveComposerResourceAttachment
-	end
-
-	v7.onRemoveResourceAttachment = onRemoveResourceAttachment
-
+	v7.resourceAttachments = props.composerResourceAttachments
+	v7.onRemoveResourceAttachment = props.onRemoveComposerResourceAttachment
 	v7.onActivateResourceAttachment = props.onActivateComposerResourceAttachment
 	v7.placeholder = v2.composerPlaceholder
 	v7.textBoxRef = props.textBoxRef

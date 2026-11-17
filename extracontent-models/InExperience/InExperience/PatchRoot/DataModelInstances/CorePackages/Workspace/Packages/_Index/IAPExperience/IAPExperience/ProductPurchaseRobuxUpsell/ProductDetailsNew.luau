@@ -246,12 +246,13 @@ function extended.render(data)
 		end
 
 		v = getEnableCondenseRobuxUpsell() and props.itemIconHeight or v
-		local itemIcon
+		local itemIcon2
 
 		if props.model == nil then
-			itemIcon = createItemIconComponent(props.itemIcon or iconsstatusimageunavailable, v2, v, theme, props)
+			local itemIcon = props.itemIcon or iconsstatusimageunavailable
+			itemIcon2 = createItemIconComponent(itemIcon, v2, v, theme, props)
 		else
-			itemIcon = Roact.createElement(ModelViewport, {
+			itemIcon2 = Roact.createElement(ModelViewport, {
 				model = props.model,
 				Position = UDim2.fromOffset(5, 5),
 				Size = UDim2.fromOffset(v2, v)
@@ -278,7 +279,7 @@ function extended.render(data)
 				HorizontalAlignment = Enum.HorizontalAlignment.Right,
 				VerticalAlignment = Enum.VerticalAlignment.Center,
 				margin = { top = 0, bottom = 0, left = 0, right = 20 }
-			}, { ItemIcon = itemIcon }),
+			}, { ItemIcon = itemIcon2 }),
 			ItemDetailsFrame = itemDetailsComponent
 		})
 	end)

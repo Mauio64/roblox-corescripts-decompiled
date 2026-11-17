@@ -1,5 +1,6 @@
 local parent = script:FindFirstAncestor("ShareSheet").Parent
 
+local AppCommonLib = require(parent.AppCommonLib)
 local Foundation = require(parent.Foundation)
 local InExperienceLocales = require(parent.InExperienceLocales)
 local Localization = require(parent.Localization)
@@ -7,6 +8,7 @@ local React = require(parent.React)
 local ReactRoblox = require(parent.ReactRoblox)
 local SignalsReact = require(parent.SignalsReact)
 
+local FFlagShareSheetFoundationDevice = require(script.Parent.Flags.FFlagShareSheetFoundationDevice)
 local UniversalShareSheetHost = require(script.Parent.Components.UniversalShareSheet.UniversalShareSheetHost)
 
 local GetLocalizationServiceStore = Localization.GetLocalizationServiceStore
@@ -33,7 +35,14 @@ local function UniversalShareSheetScreenGui()
 
 	local createElement2 = React.createElement
 	local foundationProvider = Foundation.FoundationProvider
-	local v3 = { colorMode = Foundation.Enums.ColorMode.Dark }
+	local v3 = { colorMode = Foundation.Enums.ColorMode.Dark, device = 0 }
+	local device
+
+	if FFlagShareSheetFoundationDevice then
+		device = AppCommonLib.getDeviceType()
+	end
+
+	v3.device = device
 
 	local createElement3 = React.createElement
 	local overlayProvider

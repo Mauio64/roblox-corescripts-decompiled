@@ -6,10 +6,10 @@ local OmniRecommendationsContentType = DiscoveryTypes.OmniRecommendationsContent
 local VideoEventInterfaceKey = require(script.Parent.VideoEventInterfaceKey)
 
 local SharedFlags = require(parent.SharedFlags)
-local FFlagLuaAppEnableHomepageOneByTwoTile = SharedFlags.FFlagLuaAppEnableHomepageOneByTwoTile
+local FFlagLuaAppEnableNxMRoduxApportioning = SharedFlags.FFlagLuaAppEnableNxMRoduxApportioning
 
 local function getVideoEventParamsValidator(p)
-	if not FFlagLuaAppEnableHomepageOneByTwoTile or p.tileType ~= GameCollectionItemType.OneByTwoTile then
+	if not FFlagLuaAppEnableNxMRoduxApportioning or p.tileType ~= GameCollectionItemType.OneByTwoTile then
 		return VideoEventInterfaceKey.DefaultGameTile
 	end
 

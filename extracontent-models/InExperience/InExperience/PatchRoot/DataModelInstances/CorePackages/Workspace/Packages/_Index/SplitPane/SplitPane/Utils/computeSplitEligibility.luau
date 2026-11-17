@@ -6,6 +6,8 @@ local NavigationRodux = require(parent.NavigationRodux)
 local Constants = NavigationRodux.Constants
 local AppSplitView = require(parent.AppSplitView)
 local SplitPaneSlot = AppSplitView.Enums.SplitPaneSlot
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAXFixSplitPaneHomeTryOnReset = SharedFlags.FFlagAXFixSplitPaneHomeTryOnReset
 
 local ViewState = Navigation.ViewState
 local TempRnSwitchNavigatorName = Constants.TempRnSwitchNavigatorName
@@ -61,22 +63,26 @@ local function computeSplitEligibility(list): boolean
 		local item = list[i]
 
 		if item.viewState == ViewState.Closing then
-			continue
-		end
+			if FFlagAXFixSplitPaneHomeTryOnReset then
+				local options = resolveOptions(item)
 
-		local options = resolveOptions(item)
-		local splitPaneEligibility = options.splitPaneEligibility
+				if options.splitPaneEligibility == nil and not (options.transparent or options.overlayEnabled) then
+					return false
+				end
+			end
+		else
+			local options = resolveOptions(item)
+			local splitPaneEligibility = options.splitPaneEligibility
 
-		if not (splitPaneEligibility ~= nil or not (options.transparent or options.overlayEnabled)) then
-			continue
-		end
+			if splitPaneEligibility ~= nil or not (options.transparent or options.overlayEnabled) then
+				if splitPaneEligibility == SplitPaneSlot.Content then
+					return true
+				end
 
-		if splitPaneEligibility == SplitPaneSlot.Content then
-			return true
-		end
-
-		if splitPaneEligibility == nil then
-			return false
+				if splitPaneEligibility == nil then
+					return false
+				end
+			end
 		end
 	end
 

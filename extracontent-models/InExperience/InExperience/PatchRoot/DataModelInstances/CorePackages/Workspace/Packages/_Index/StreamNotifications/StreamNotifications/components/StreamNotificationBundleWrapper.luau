@@ -16,7 +16,6 @@ local UIBlox = require(parent.UIBlox)
 local useStyle = UIBlox.Core.Style.useStyle
 local useTokens = Foundation.Hooks.useTokens
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local Images = UIBlox.App.ImageSet.Images
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local iconsactionstruncationExpand = Images["icons/actions/truncationExpand"]
@@ -36,36 +35,9 @@ local v2 = { stiffness = 207, damping = 24, mass = 1 }
 
 return function(data)
 	local v3 = useStyle()
-	local v4
-
-	if FoundationFontFaceMigration then
-		v4 = useTokens()
-	end
-
-	local font = v3.Font
-	local font2
-
-	if FoundationFontFaceMigration then
-		font2 = nil
-	else
-		font2 = font.Header1.Font
-	end
-
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(v4.Typography.TitleMedium.Font)
-	else
-		fontFace = nil
-	end
-
-	local textSize
-
-	if FoundationFontFaceMigration then
-		textSize = v4.Typography.TitleMedium.FontSize
-	else
-		textSize = font.BaseSize * font.CaptionHeader.RelativeSize
-	end
+	local v4 = useTokens()
+	local fontFace = normalizeFontFace(v4.Typography.TitleMedium.Font)
+	local fontSize = v4.Typography.TitleMedium.FontSize
 
 	local state, setState = React.useState(true)
 	local state2, setState2 = React.useState(74)
@@ -147,8 +119,7 @@ return function(data)
 		setState3(#data.notifications > 1)
 	end, { data.notifications })
 
-	local useMemo = React.useMemo
-	local function fn3()
+	return (React.useMemo(function()
 		local children = {}
 
 		for i, notification in ipairs(data.notifications) do
@@ -281,9 +252,8 @@ return function(data)
 			showLessButton = React.createElement("TextButton", {
 				Size = UDim2.new(0, 160, 0, 40),
 				Text = "",
-				Font = font2,
 				FontFace = fontFace,
-				TextSize = textSize,
+				TextSize = fontSize,
 				[React.Event.Activated] = fn2,
 				BackgroundTransparency = 1,
 				BackgroundColor3 = v3.Theme.BackgroundMuted.Color,
@@ -318,9 +288,8 @@ return function(data)
 						ShowLessText = React.createElement("TextLabel", {
 							Text = v7 and v7.lessText,
 							LayoutOrder = 1,
-							Font = font2,
 							FontFace = fontFace,
-							TextSize = textSize,
+							TextSize = fontSize,
 							BackgroundTransparency = 1,
 							TextColor3 = v3.Theme.TextMuted.Color,
 							Size = UDim2.new(0, 0, 1, 0),
@@ -385,9 +354,8 @@ return function(data)
 							(tostring(#data.notifications - 1))
 						),
 						LayoutOrder = 1,
-						Font = font2,
 						FontFace = fontFace,
-						TextSize = textSize,
+						TextSize = fontSize,
 						BackgroundTransparency = 1,
 						TextColor3 = v3.Theme.TextMuted.Color,
 						Size = UDim2.new(0, 0, 1, 0),
@@ -419,32 +387,14 @@ return function(data)
 			BorderSizePixel = 0
 		}, children)
 		return createElement2("Frame", v8, children2)
-	end
-
-	local notifications = data.notifications
-
-	local impressionsTag = data.impressionsTag
-	local impressionMetadataByNotificationId = data.impressionMetadataByNotificationId
-	local v8
-
-	if FoundationFontFaceMigration then
-		v8 = fontFace
-	end
-
-	local v9
-
-	if FoundationFontFaceMigration then
-		v9 = textSize
-	end
-
-	return (useMemo(fn3, {
-		notifications,
+	end, {
+		data.notifications,
 		state,
 		state2,
 		state3,
-		impressionsTag,
-		impressionMetadataByNotificationId,
-		v8,
-		v9
+		data.impressionsTag,
+		data.impressionMetadataByNotificationId,
+		fontFace,
+		fontSize
 	}))
 end

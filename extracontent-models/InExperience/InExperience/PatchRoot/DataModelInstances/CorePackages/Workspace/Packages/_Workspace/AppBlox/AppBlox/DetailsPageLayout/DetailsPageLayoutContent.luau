@@ -94,26 +94,26 @@ local function DetailsPageLayoutContent(p, ref)
 	end, { hasHeader, headerBarHeight })
 
 	local paddingTop = React.useMemo(function()
-		if not contentTopOffset then
-			return nil
+		if contentTopOffset then
+			return React.joinBindings({ contentTopOffset, containerHeight or binding }):map(function(list)
+				local item = list[1]
+				local item2 = list[2]
+				local canvasPaddingTop = DetailsPageLayoutUtils.computeCanvasPaddingTop(
+					item,
+					hasFullBleed,
+					fullBleedOverlapOffset,
+					headerBarHeight
+				)
+
+				if item2 > 0 then
+					canvasPaddingTop = math.min(canvasPaddingTop, item2 * 0.75)
+				end
+
+				return UDim.new(0, canvasPaddingTop)
+			end)
 		end
 
-		return React.joinBindings({ contentTopOffset, containerHeight or binding }):map(function(list)
-			local item = list[1]
-			local item2 = list[2]
-			local canvasPaddingTop = DetailsPageLayoutUtils.computeCanvasPaddingTop(
-				item,
-				hasFullBleed,
-				fullBleedOverlapOffset,
-				headerBarHeight
-			)
-
-			if item2 > 0 then
-				canvasPaddingTop = math.min(canvasPaddingTop, item2 * 0.75)
-			end
-
-			return UDim.new(0, canvasPaddingTop)
-		end)
+		return nil
 	end, {
 		contentTopOffset,
 		containerHeight,
@@ -140,32 +140,32 @@ local function DetailsPageLayoutContent(p, ref)
 	end, { hasActions, actionBarHeight })
 
 	local position2 = React.useMemo(function()
-		if not paddingTop then
-			return nil
+		if paddingTop then
+			return React.joinBindings({ paddingTop, v4 }):map(function(list)
+				local item = list[1]
+				local item2 = list[2]
+				return UDim2.new(0, 0, 0, item.Offset - item2 - gradientTopBleedOffset)
+			end)
 		end
 
-		return React.joinBindings({ paddingTop, v4 }):map(function(list)
-			local item = list[1]
-			local item2 = list[2]
-			return UDim2.new(0, 0, 0, item.Offset - item2 - gradientTopBleedOffset)
-		end)
+		return nil
 	end, { paddingTop, v4, gradientTopBleedOffset })
 
 	local size2 = React.useMemo(function()
-		if not containerHeight then
-			return nil
+		if containerHeight then
+			return React.joinBindings({ v6, containerHeight }):map(function(list)
+				local v8 = list[1]
+				local item = list[2]
+
+				if not (v8 > 0) then
+					v8 = math.max(item, 1)
+				end
+
+				return UDim2.new(1, 0, 0, v8 + gradientTopBleedOffset)
+			end)
 		end
 
-		return React.joinBindings({ v6, containerHeight }):map(function(list)
-			local v8 = list[1]
-			local item = list[2]
-
-			if not (v8 > 0) then
-				v8 = math.max(item, 1)
-			end
-
-			return UDim2.new(1, 0, 0, v8 + gradientTopBleedOffset)
-		end)
+		return nil
 	end, { v6, containerHeight, gradientTopBleedOffset })
 
 	if isFullscreen then

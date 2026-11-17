@@ -10,8 +10,6 @@ local ContactRow = require(script.Parent.ContactRow)
 
 local SharedFlags = require(parent.SharedFlags)
 local FFlagUserListCtaIntegrationEnabled = SharedFlags.FFlagUserListCtaIntegrationEnabled
-local SharedFlags2 = require(parent.SharedFlags)
-local FFlagAddStatusIndicatorToBaseRow = SharedFlags2.FFlagAddStatusIndicatorToBaseRow
 
 local function EntityRow(props)
 	local entity = props.entity
@@ -71,13 +69,7 @@ local function EntityRow(props)
 	v.layoutOrder = props.layoutOrder
 	v.loadingState = props.loadingState
 	v.presence = props.presence
-	local shouldShowNewIndicator
-
-	if FFlagAddStatusIndicatorToBaseRow then
-		shouldShowNewIndicator = props.shouldShowNewIndicator
-	end
-
-	v.shouldShowNewIndicator = shouldShowNewIndicator
+	v.shouldShowNewIndicator = props.shouldShowNewIndicator
 	v.trailingContent = props.trailingContent
 	v.configs = props.configs
 	return createElement(UserRow, v)

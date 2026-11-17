@@ -12,7 +12,6 @@ local removeGameDetailSessionIfDeparted = require(script.Parent.removeGameDetail
 local useEdpFunctionallyReadyLogger = require(script.Parent.useEdpFunctionallyReadyLogger)
 local createExperienceDetailsPageTimer = require(script.Parent.createExperienceDetailsPageTimer)
 local useMotionJitterMetric = require(script.Parent.useMotionJitterMetric)
-local usePublishContainerWidth = require(script.Parent.usePublishContainerWidth)
 local ExperienceDetailsFallbackActionBar = require(script.Parent.Fallback.ExperienceDetailsFallbackActionBar)
 local ExperienceDetailsFallbackFeed = require(script.Parent.Fallback.ExperienceDetailsFallbackFeed)
 
@@ -71,6 +70,7 @@ local usePageScopeRef = SduiSharedUtilities.usePageScopeRef
 local SduiFeatureEntryPoint = SduiSharedUtilities.SduiFeatureEntryPoint
 local SduiPageEntryPoint = SduiSharedUtilities.SduiPageEntryPoint
 local UiStatus = SduiSharedUtilities.UiStatus
+local usePublishContainerWidth = SduiSharedUtilities.usePublishContainerWidth
 local useUiStatus = SduiSharedUtilities.useUiStatus
 local useEntrySurfacing = SduiSharedUtilities.useEntrySurfacing
 local FilterPlayWithReward = ExperienceDetailsPageScopeFields.FilterPlayWithReward

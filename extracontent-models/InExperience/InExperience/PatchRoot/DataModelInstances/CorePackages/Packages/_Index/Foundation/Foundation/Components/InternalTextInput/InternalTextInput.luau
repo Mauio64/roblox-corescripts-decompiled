@@ -59,20 +59,7 @@ local memo = React.memo(React.forwardRef(function(props, ref)
 	v2.Selectable = false
 	v2.Active = not isBoundsChecker and nil
 	v2.Visible = not isBoundsChecker and nil
-	local font
-
-	if not Flags.FoundationFontFaceMigration then
-		font = props.fontStyle.Font
-	end
-
-	v2.Font = font
-	local fontFace
-
-	if Flags.FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(props.fontStyle.Font)
-	end
-
-	v2.FontFace = fontFace
+	v2.FontFace = normalizeFontFace(props.fontStyle.Font)
 	v2.TextSize = props.fontStyle.FontSize
 	v2.LineHeight = props.fontStyle.LineHeight
 	local textColor

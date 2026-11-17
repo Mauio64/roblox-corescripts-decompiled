@@ -176,24 +176,30 @@ local function TransferRobuxConfirmSheet(_)
 	local text = React.useMemo(function()
 		if GetFFlagCurrencyTransferFlowUIImprovementFix() then
 			if v4 and v3 then
-				local v8 = math.ceil(v3 * (1 - (GetFIntCurrencyTransferDeveloperCommissionRate() + GetFIntCurrencyTransferPlatformFeeRate()) / 100))
 				local fIntCurrencyTransferDeveloperCommissionRate = GetFIntCurrencyTransferDeveloperCommissionRate()
+				local fIntCurrencyTransferPlatformFeeRate = GetFIntCurrencyTransferPlatformFeeRate()
+				local v8 = math.ceil(v3 * (1 - (fIntCurrencyTransferDeveloperCommissionRate + fIntCurrencyTransferPlatformFeeRate) / 100))
+				local fIntCurrencyTransferDeveloperCommissionRate2 = GetFIntCurrencyTransferDeveloperCommissionRate()
 				local v9 = string.gsub(v.RecipientWillGetInGame, "{amount}", (tostring(v8)))
 				return (string.gsub(
 					v9,
 					"{commissionPercentage}",
-					(tostring(fIntCurrencyTransferDeveloperCommissionRate))
+					(tostring(fIntCurrencyTransferDeveloperCommissionRate2))
 				))
 			elseif v3 then
 				return string.gsub(v.RecipientWillGetInApp, "{amount}", (tostring(v3)))
 			else
 				return nil
 			end
-		elseif v4 and v3 then
-			local v8 = math.ceil(v3 * (1 - (GetFIntCurrencyTransferDeveloperCommissionRate() + GetFIntCurrencyTransferPlatformFeeRate()) / 100))
-			return (string.gsub(v.RecipientWillGet, "{amount}", (tostring(v8))))
 		else
-			return nil
+			if not (v4 and v3) then
+				return nil
+			end
+
+			local fIntCurrencyTransferDeveloperCommissionRate = GetFIntCurrencyTransferDeveloperCommissionRate()
+			local fIntCurrencyTransferPlatformFeeRate = GetFIntCurrencyTransferPlatformFeeRate()
+			local v8 = math.ceil(v3 * (1 - (fIntCurrencyTransferDeveloperCommissionRate + fIntCurrencyTransferPlatformFeeRate) / 100))
+			return (string.gsub(v.RecipientWillGet, "{amount}", (tostring(v8))))
 		end
 	end, {
 		v4,

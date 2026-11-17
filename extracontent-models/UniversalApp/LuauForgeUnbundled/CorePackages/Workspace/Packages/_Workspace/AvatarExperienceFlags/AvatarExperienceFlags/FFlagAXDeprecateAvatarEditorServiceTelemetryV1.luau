@@ -1,1 +1,0 @@
-return game:DefineFastFlag("AXDeprecateAvatarEditorServiceTelemetryV1", false)

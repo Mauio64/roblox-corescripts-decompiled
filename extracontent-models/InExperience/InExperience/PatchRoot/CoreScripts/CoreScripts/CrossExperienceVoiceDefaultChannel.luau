@@ -540,7 +540,8 @@ function handleVoiceChanger()
 end
 
 local function fn5(p)
-	local playerByUserId = Players:GetPlayerByUserId(tonumber(p.userId) or 0)
+	local userId = tonumber(p.userId) or 0
+	local playerByUserId = Players:GetPlayerByUserId(userId)
 
 	if playerByUserId then
 		coroutine.wrap(function()
@@ -552,7 +553,8 @@ local function fn5(p)
 end
 
 local function fn6(p)
-	local playerByUserId = Players:GetPlayerByUserId(tonumber(p.userId) or 0)
+	local userId = tonumber(p.userId) or 0
+	local playerByUserId = Players:GetPlayerByUserId(userId)
 
 	if playerByUserId then
 		coroutine.wrap(function()

@@ -58,8 +58,6 @@ end
 local ContactImportButtonsIXP = require(ContactImporter.Flags.ContactImportButtonsIXP)
 
 local defineFastFlag = game:DefineFastFlag("ContactImportButtonsExperimentEnabled", false)
-local SharedFlags2 = require(parent.SharedFlags)
-local FFlagAddFriendsBannersNewUI_IXP = SharedFlags2.FFlagAddFriendsBannersNewUI_IXP
 
 local IXPService = game:GetService("IXPService")
 local Utils = require(ContactImporter.Utils)
@@ -68,16 +66,16 @@ local FFlagContactsListEmojiSorting = require(ContactImporter.Flags.FFlagContact
 local defineFastFlag2 = game:DefineFastFlag("ContactsListEmojiSortingIxpEnabled", false)
 
 local defineFastString = game:DefineFastString("ContactsListEmojiSortingIxpLayer", "Social.ContactListEmojiSorting")
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagQRCodeCopyUpdates = SharedFlags2.FFlagQRCodeCopyUpdates
 local SharedFlags3 = require(parent.SharedFlags)
-local FFlagQRCodeCopyUpdates = SharedFlags3.FFlagQRCodeCopyUpdates
+local FStringCanAccessTrustedContactsAmpFeature = SharedFlags3.FStringCanAccessTrustedContactsAmpFeature
 local SharedFlags4 = require(parent.SharedFlags)
-local FStringCanAccessTrustedContactsAmpFeature = SharedFlags4.FStringCanAccessTrustedContactsAmpFeature
+local FStringIsUserInTcEligibleCountryAmpFeature = SharedFlags4.FStringIsUserInTcEligibleCountryAmpFeature
 local SharedFlags5 = require(parent.SharedFlags)
-local FStringIsUserInTcEligibleCountryAmpFeature = SharedFlags5.FStringIsUserInTcEligibleCountryAmpFeature
+local FFlagTCPolicyCheckRedirect = SharedFlags5.FFlagTCPolicyCheckRedirect
 local SharedFlags6 = require(parent.SharedFlags)
-local FFlagTCPolicyCheckRedirect = SharedFlags6.FFlagTCPolicyCheckRedirect
-local SharedFlags7 = require(parent.SharedFlags)
-local FStringCanAccessTrustedContactsAmpNameSpace = SharedFlags7.FStringCanAccessTrustedContactsAmpNameSpace
+local FStringCanAccessTrustedContactsAmpNameSpace = SharedFlags6.FStringCanAccessTrustedContactsAmpNameSpace
 local AmpUpsell = require(parent.AmpUpsell)
 local AmpApiProvider = AmpUpsell.AmpApiProvider
 local AmpUpsell2 = require(parent.AmpUpsell)
@@ -405,11 +403,8 @@ local function ContactsList(props)
 	end
 
 	local y = userInputService.StatusBarSize.Y
-	local v9
 
-	if FFlagAddFriendsBannersNewUI_IXP then
-		v9 = ContactsSyncWarningMessage.useIsVisible()
-	end
+	local v9 = ContactsSyncWarningMessage.useIsVisible()
 
 	local children = {
 		layout = roact.createElement("UIListLayout", {
@@ -421,7 +416,7 @@ local function ContactsList(props)
 	}
 	local contactsSyncWarning
 
-	if FFlagAddFriendsBannersNewUI_IXP and v9 then
+	if v9 then
 		contactsSyncWarning = react.createElement(ContactsSyncWarningMessage.Component, {
 			layoutOrder = -1
 		})
@@ -483,7 +478,7 @@ local function ContactsList(props)
 	}
 	local contactsSyncWarning2
 
-	if FFlagAddFriendsBannersNewUI_IXP and v9 then
+	if v9 then
 		contactsSyncWarning2 = react.createElement(ContactsSyncWarningMessage.Component, {
 			layoutOrder = -1
 		})
@@ -492,7 +487,7 @@ local function ContactsList(props)
 	children2.contactsSyncWarning = contactsSyncWarning2
 	local spacer
 
-	if not (FFlagAddFriendsBannersNewUI_IXP and v9) then
+	if not v9 then
 		spacer = roact.createElement("Frame", {
 			Size = UDim2.new(1, 0, 0, 24),
 			BackgroundTransparency = 1,
@@ -503,7 +498,7 @@ local function ContactsList(props)
 	children2.spacer1 = spacer
 	local descriptionFrame
 
-	if not (FFlagAddFriendsBannersNewUI_IXP and v9) then
+	if not v9 then
 		local createElement = roact.createElement
 		local v10 = { Size = UDim2.new(1, 0, 0, 80), BackgroundTransparency = 1, LayoutOrder = 2 }
 
@@ -574,7 +569,7 @@ local function ContactsList(props)
 	children2.descriptionFrame = descriptionFrame
 	local spacer2
 
-	if not (FFlagAddFriendsBannersNewUI_IXP and v9) then
+	if not v9 then
 		spacer2 = roact.createElement("Frame", {
 			Size = UDim2.new(1, 0, 0, 24),
 			BackgroundTransparency = 1,

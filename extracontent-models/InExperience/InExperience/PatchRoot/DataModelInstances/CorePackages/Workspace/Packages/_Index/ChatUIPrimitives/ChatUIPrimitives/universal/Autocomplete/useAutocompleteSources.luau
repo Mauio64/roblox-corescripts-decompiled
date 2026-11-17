@@ -1,10 +1,12 @@
-local parent = script:FindFirstAncestor("ChatUIPrimitives").Parent
+local ChatUIPrimitives = script:FindFirstAncestor("ChatUIPrimitives")
+local parent = ChatUIPrimitives.Parent
 local React = require(parent.React)
 
 require(script.Parent.AutocompleteTypes)
 local assertUniqueSourceIds = require(script.Parent.assertUniqueSourceIds)
 local textBoxRange = require(script.Parent.textBoxRange)
 local useAutocompleteKeyboardNavigation = require(script.Parent.useAutocompleteKeyboardNavigation)
+local FFlagExpChatAutocompleteRematchOnCursorMove = require(ChatUIPrimitives.Flags.FFlagExpChatAutocompleteRematchOnCursorMove)
 
 local v = {
 	activated = false,
@@ -76,8 +78,10 @@ local function useAutocompleteSources(p, current, p2)
 	local ref5 = React.useRef(0)
 	local ref6 = React.useRef("")
 	local ref7 = React.useRef(false)
+	local ref8 = React.useRef(0)
+	local ref9 = React.useRef(0)
 
-	local function readCursor() -- 3 equivalent calls inferred from this helper
+	local function readCursor() -- 4 equivalent calls inferred from this helper
 		local current2 = p.current
 
 		if current2 ~= nil then
@@ -94,6 +98,11 @@ local function useAutocompleteSources(p, current, p2)
 	local function restoreFocus(p3: number?) -- 7 equivalent calls inferred from this helper
 		task.defer(function()
 			ref7.current = false
+
+			if FFlagExpChatAutocompleteRematchOnCursorMove then
+				ref8.current = 0
+			end
+
 			local current2 = p.current
 
 			if current2 == nil then
@@ -286,6 +295,14 @@ local function useAutocompleteSources(p, current, p2)
 
 			if cursor ~= nil then
 				ref5.current = cursor
+
+				if FFlagExpChatAutocompleteRematchOnCursorMove and os.clock() <= ref8.current then
+					ref8.current = 0
+
+					if current2:IsFocused() and current2.Text == ref6.current and cursor ~= ref9.current then
+						v2(current2.Text)
+					end
+				end
 			end
 		end)
 		return function()
@@ -302,6 +319,11 @@ local function useAutocompleteSources(p, current, p2)
 
 		if p3 == Enum.KeyCode.Escape then
 			setState(v)
+
+			if FFlagExpChatAutocompleteRematchOnCursorMove then
+				ref8.current = 0
+			end
+
 			local current3 = p.current
 			local current4 = ref5.current
 			task.defer(function()
@@ -387,6 +409,12 @@ local function useAutocompleteSources(p, current, p2)
 
 	local onTextChanged = React.useCallback(function(current2: string)
 		ref6.current = current2
+
+		if FFlagExpChatAutocompleteRematchOnCursorMove and not ref7.current then
+			ref8.current = os.clock() + 0.5
+			ref9.current = readCursor() -- inferred equivalent call
+		end
+
 		v2(current2)
 	end, { v2 })
 

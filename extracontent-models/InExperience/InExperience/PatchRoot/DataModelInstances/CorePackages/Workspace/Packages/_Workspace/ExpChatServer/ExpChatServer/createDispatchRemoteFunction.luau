@@ -7,6 +7,9 @@ local list = llama.List
 local ExpChatShared = require(parent.ExpChatShared)
 local markTextChannelAsDefault = ExpChatShared.markTextChannelAsDefault
 
+local SharedFlags = require(parent.SharedFlags)
+local FFlagExpChatWhisperSetDirectChatRequester = SharedFlags.FFlagExpChatWhisperSetDirectChatRequester
+
 local v = ExpChatShared.Logger:new("ExpChat/" .. script.Name)
 
 local function canUsersTalkToEachOther(userId: number, p: number) -- 1 equivalent call inferred from this helper
@@ -32,8 +35,8 @@ local function whisperChannelAlreadyExists(p: number, p2: number)
 	return (TextChatService:FindFirstChild("TextChannels") or TextChatService):FindFirstChild(v3)
 end
 
-local function createWhisperChannel(userId: number, p: number)
-	local name = string.format("RBXWhisper:%d_%d", userId < p and userId or p, p < userId and userId or p)
+local function createWhisperChannel(p, userId: number, p2: number)
+	local name = string.format("RBXWhisper:%d_%d", userId < p2 and userId or p2, p2 < userId and userId or p2)
 
 	local textChannels = TextChatService:FindFirstChild("TextChannels") or TextChatService
 	local textChannel = Instance.new("TextChannel")
@@ -42,8 +45,13 @@ local function createWhisperChannel(userId: number, p: number)
 	markTextChannelAsDefault(textChannel)
 	textChannel.Parent = textChannels
 
-	textChannel:AddUserAsync(userId)
-	textChannel:AddUserAsync(p)
+	if FFlagExpChatWhisperSetDirectChatRequester then
+		textChannel:SetDirectChatRequester(p)
+	else
+		textChannel:AddUserAsync(userId)
+	end
+
+	textChannel:AddUserAsync(p2)
 
 	textChannel.ChildRemoved:Connect(function(_)
 		if list.count(textChannel:GetChildren(), function(textSource)
@@ -101,7 +109,7 @@ local function createDispatchRemoteFunction()
 
 			if canUsersTalkToEachOther(userId, v2) then -- inferred equivalent call
 				v:trace("Creating whisper TextChannel")
-				return createWhisperChannel(userId, v2)
+				return createWhisperChannel(p, userId, v2)
 			end
 
 			return nil

@@ -5,10 +5,14 @@ local Loggers = require(parent.Loggers)
 local mutedError = Loggers.mutedError
 
 local Constants = require(AvatarExperienceCommon.Constants)
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAXSpawnEffectSaveRoundTrip = AvatarExperienceFlags.FFlagAXSpawnEffectSaveRoundTrip
 
 local createHumanoidDescriptionAccessoryInfo = require(AvatarExperienceCommon.Utils.Humanoid.createHumanoidDescriptionAccessoryInfo)
+local setAvatarEffectDescriptions = require(AvatarExperienceCommon.Utils.Humanoid.setAvatarEffectDescriptions)
 local setMakeupDescriptions = require(AvatarExperienceCommon.Utils.Humanoid.setMakeupDescriptions)
 local isMakeupAssetType = require(AvatarExperienceCommon.Utils.isMakeupAssetType)
+local isSpawnEffectAssetType = require(AvatarExperienceCommon.Utils.isSpawnEffectAssetType)
 
 local function applyCurrentAssets(humanoidDescription, currentAssets)
 	if currentAssets then
@@ -35,7 +39,10 @@ local function applyCurrentAssets(humanoidDescription, currentAssets)
 
 			if v4 then
 				humanoidDescription[v4] = joined
-			elseif k ~= Constants.ASSET_TYPE_NAME_TO_ID_STRING.Gear and not isMakeupAssetType(k) then
+			elseif
+				k ~= Constants.ASSET_TYPE_NAME_TO_ID_STRING.Gear
+				and not (isMakeupAssetType(k) or FFlagAXSpawnEffectSaveRoundTrip and isSpawnEffectAssetType(k))
+			then
 				mutedError(string.format(
 					"assetTypeId: %s not recognized as member of humanoidDescription",
 					(tostring(k))
@@ -45,6 +52,10 @@ local function applyCurrentAssets(humanoidDescription, currentAssets)
 
 		humanoidDescription:SetAccessories(v, true)
 		setMakeupDescriptions(humanoidDescription, currentAssets)
+
+		if FFlagAXSpawnEffectSaveRoundTrip then
+			setAvatarEffectDescriptions(humanoidDescription, currentAssets)
+		end
 	end
 end
 

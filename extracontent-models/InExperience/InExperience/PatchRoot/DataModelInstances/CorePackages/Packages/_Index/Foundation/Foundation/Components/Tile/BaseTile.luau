@@ -5,6 +5,7 @@ local React = require(parent.React)
 
 local BaseTileContent = require(script.Parent.BaseTileContent)
 local BaseTileMedia = require(script.Parent.BaseTileMedia)
+local BaseTileMediaClipping = require(Foundation.Enums.BaseTileMediaClipping)
 local TileAspectRatio = require(Foundation.Enums.TileAspectRatio)
 require(Foundation.Components.Types)
 local getTestIdTag = require(Foundation.Utility.getTestIdTag)
@@ -21,6 +22,7 @@ end
 
 local v = {
 	mediaAspectRatio = TileAspectRatio.Ratio16x9,
+	mediaClippingStyle = BaseTileMediaClipping.Default,
 	isContained = false,
 	testId = "--foundation-base-tile"
 }
@@ -98,6 +100,7 @@ local function BaseTile(p, p2)
 	local onSecondaryActivated = v2.onSecondaryActivated
 	local onStateChanged = v2.onStateChanged
 	local v6 = onActivated ~= nil or onSecondaryActivated ~= nil
+	local isSizeConstrained = v2.minSize ~= nil or v2.maxSize ~= nil
 	local v7 = onStateChanged ~= nil
 	local containedBackgroundStyle
 
@@ -171,20 +174,35 @@ local function BaseTile(p, p2)
 	local createElement = React.createElement
 	local children = {
 		Corner = React.createElement("UICorner", { CornerRadius = UDim.new(0, v3.Radius.Medium) }),
-		Layout = React.createElement("UIListLayout", {
-			FillDirection = Enum.FillDirection.Vertical,
-			HorizontalAlignment = Enum.HorizontalAlignment.Center,
-			SortOrder = Enum.SortOrder.LayoutOrder
-		}),
+		SizeConstraint = 0,
+		Layout = 0,
 		Media = 0,
 		Content = 0
 	}
+	local sizeConstraint
+
+	if isSizeConstrained then
+		sizeConstraint = React.createElement("UISizeConstraint", {
+			MinSize = v2.minSize,
+			MaxSize = v2.maxSize
+		})
+	end
+
+	children.SizeConstraint = sizeConstraint
+
+	children.Layout = React.createElement("UIListLayout", {
+		FillDirection = Enum.FillDirection.Vertical,
+		HorizontalAlignment = Enum.HorizontalAlignment.Center,
+		SortOrder = Enum.SortOrder.LayoutOrder
+	})
 
 	local createElement2 = React.createElement
 	local v12 = {
 		content = v2.mediaContent,
+		clippingStyle = v2.mediaClippingStyle,
 		aspectRatio = v2.mediaAspectRatio,
 		backgroundStyle = v2.mediaBackgroundStyle or v3.Color.Shift.Shift_200,
+		isSizeConstrained = isSizeConstrained,
 		isContained = v2.isContained,
 		tileSize = size,
 		maxHeight = 0,

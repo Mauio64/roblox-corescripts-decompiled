@@ -6,5 +6,4 @@ local FFlagGameInviteInExpUserListRenderer = require(script.Parent.FFlagGameInvi
 return SharedFlags.FFlagGameInviteInExpJoinCta3
 	and FFlagGameInviteInExpUserListRenderer
 	and SharedFlags.FFlagUserListCtaIntegrationEnabled
-	and SharedFlags.FFlagUserListComposeRenderRowWithCta
 	and SharedFlags.FFlagGameJoinCardOptionalActions

@@ -9,7 +9,6 @@ local UIBlox = require(parent.UIBlox)
 local Foundation = require(parent.Foundation)
 local Skeleton = Foundation.Skeleton
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local useStyle = UIBlox.Core.Style.useStyle
 local useSelectionCursor = UIBlox.App.SelectionImage.useSelectionCursor
@@ -67,25 +66,10 @@ return (React.forwardRef(function(props, ref)
 		BackgroundTransparency = 1,
 		Size = UDim2.new(1, 0, 1, props.hideDivider and 0 or -1)
 	}
-
-	local createElement3 = React.createElement
-	local font3
-
-	if not FoundationFontFaceMigration then
-		font3 = font.Body.Font
-	end
-
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(v.Tokens.Typography.BodyLarge.Font)
-	end
-
 	local v8 = {
-		InfoNameTextLabel = createElement3("TextLabel", {
+		InfoNameTextLabel = React.createElement("TextLabel", {
 			BackgroundTransparency = 1,
-			Font = font3,
-			FontFace = fontFace,
+			FontFace = normalizeFontFace(v.Tokens.Typography.BodyLarge.Font),
 			Size = UDim2.new(0.5, 0, 1, 0),
 			Text = infoName,
 			TextColor3 = theme.TextDefault.Color,
@@ -101,7 +85,7 @@ return (React.forwardRef(function(props, ref)
 	}
 
 	if infoDataWithEmoji then
-		local createElement4 = React.createElement
+		local createElement3 = React.createElement
 		local emojiWrapper = VerifiedBadges.EmojiWrapper
 		local v9 = {
 			emoji = VerifiedBadges.emoji.verified,
@@ -129,31 +113,18 @@ return (React.forwardRef(function(props, ref)
 		v9.horizontalAlignment = Enum.HorizontalAlignment.Right
 		v9.verticalAlignment = Enum.VerticalAlignment.Center
 
-		local createElement5 = React.createElement
-		local font4
+		local createElement4 = React.createElement
+		local v10
 
-		if not FoundationFontFaceMigration then
-			font4 = onActivate and font.Header2.Font or font.Body.Font
+		if onActivate then
+			v10 = v.Tokens.Typography.TitleLarge.Font
+		else
+			v10 = v.Tokens.Typography.BodyLarge.Font
 		end
 
-		local fontFace2
-
-		if FoundationFontFaceMigration then
-			local v10
-
-			if onActivate then
-				v10 = v.Tokens.Typography.TitleLarge.Font
-			else
-				v10 = v.Tokens.Typography.BodyLarge.Font
-			end
-
-			fontFace2 = normalizeFontFace(v10)
-		end
-
-		local v10 = {
+		local v11 = {
 			BackgroundTransparency = 1,
-			Font = font4,
-			FontFace = fontFace2,
+			FontFace = normalizeFontFace(v10),
 			Size = UDim2.new(0, 0, 1, 0),
 			Text = infoData,
 			TextColor3 = 0,
@@ -171,26 +142,25 @@ return (React.forwardRef(function(props, ref)
 			textColor = theme.TextDefault.Color
 		end
 
-		v10.TextColor3 = textColor
-		v10.TextSize = v3
-		v10.TextTruncate = Enum.TextTruncate.AtEnd
-		v10.TextScaled = props.TextScaled
-		v10.AutomaticSize = Enum.AutomaticSize.X
-		v10.TextXAlignment = Enum.TextXAlignment.Left
-		infoDataWithEmoji = createElement4(emojiWrapper, v9, {
-			InfoDataTextLabel = createElement5("TextLabel", v10)
+		v11.TextColor3 = textColor
+		v11.TextSize = v3
+		v11.TextTruncate = Enum.TextTruncate.AtEnd
+		v11.TextScaled = props.TextScaled
+		v11.AutomaticSize = Enum.AutomaticSize.X
+		v11.TextXAlignment = Enum.TextXAlignment.Left
+		infoDataWithEmoji = createElement3(emojiWrapper, v9, {
+			InfoDataTextLabel = createElement4("TextLabel", v11)
 		})
 	end
 
 	v8.InfoDataWithEmoji = infoDataWithEmoji
 
 	if infoDataTextLabel then
-		local createElement4 = React.createElement
+		local createElement3 = React.createElement
 		local v9 = {
 			AnchorPoint = Vector2.new(1, 0),
 			Position = UDim2.new(1, not onActivate and 0 or v4, 0, 0),
 			BackgroundTransparency = 1,
-			Font = 0,
 			FontFace = 0,
 			Size = 0,
 			Text = 0,
@@ -201,32 +171,15 @@ return (React.forwardRef(function(props, ref)
 			TextXAlignment = 0,
 			TextYAlignment = 0
 		}
-		local font2
+		local v10
 
-		if not FoundationFontFaceMigration then
-			if onActivate then
-				font2 = font.Header2.Font
-			else
-				font2 = font.Body.Font
-			end
+		if onActivate then
+			v10 = v.Tokens.Typography.TitleLarge.Font
+		else
+			v10 = v.Tokens.Typography.BodyLarge.Font
 		end
 
-		v9.Font = font2
-		local fontFace2
-
-		if FoundationFontFaceMigration then
-			local v10
-
-			if onActivate then
-				v10 = v.Tokens.Typography.TitleLarge.Font
-			else
-				v10 = v.Tokens.Typography.BodyLarge.Font
-			end
-
-			fontFace2 = normalizeFontFace(v10)
-		end
-
-		v9.FontFace = fontFace2
+		v9.FontFace = normalizeFontFace(v10)
 
 		v9.Size = UDim2.new(0.5, 0, 1, 0)
 		v9.Text = infoData
@@ -244,7 +197,7 @@ return (React.forwardRef(function(props, ref)
 		v9.TextScaled = props.TextScaled
 		v9.TextXAlignment = Enum.TextXAlignment.Right
 		v9.TextYAlignment = Enum.TextYAlignment.Center
-		infoDataTextLabel = createElement4("TextLabel", v9, {
+		infoDataTextLabel = createElement3("TextLabel", v9, {
 			TextSizeConstraint = props.TextScaled and React.createElement("UITextSizeConstraint", {
 				MaxTextSize = v3
 			})

@@ -1,1 +1,0 @@
-return game:DefineFastFlag("CoreUiMigrateUIBloxToFoundation3", false)

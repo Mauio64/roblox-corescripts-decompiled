@@ -32,7 +32,7 @@ else
 	UiModeBrandThemeContext = nil
 end
 
-local defineFastFlag2 = game:DefineFastFlag("AppClassicThemeGreenButtonColors", false)
+local FFlagAppClassicThemeGreenButtonColors = require(script.Parent.FFlagAppClassicThemeGreenButtonColors)
 
 local v2 = {
 	["Color.ActionEmphasis.Background.Color3"] = Color3.fromHex("#137F1F"),
@@ -108,7 +108,7 @@ local function UiModeStyleProvider(p)
 	local isActive = style2.foundationThemeName ~= nil
 	local tokenOverrides
 
-	if defineFastFlag2 and style2.foundationThemeName == ThemeName.Classic then
+	if FFlagAppClassicThemeGreenButtonColors and style2.foundationThemeName == ThemeName.Classic then
 		if v4[style2.themeName:lower()] == ColorMode.Light then
 			tokenOverrides = v3
 		else

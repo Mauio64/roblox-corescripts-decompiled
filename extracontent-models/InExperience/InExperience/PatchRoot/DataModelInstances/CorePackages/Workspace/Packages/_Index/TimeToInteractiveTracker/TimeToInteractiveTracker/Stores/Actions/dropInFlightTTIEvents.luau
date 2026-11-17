@@ -2,16 +2,21 @@ require(script.Parent.Parent.types)
 
 return function(callback)
 	return function()
+		local result = {}
 		callback(function(items)
-			local result = {}
+			local result2 = {}
 
 			for k, item in items do
 				if item and (item.startTime == nil or item.sent == true) then
-					result[k] = item
+					result2[k] = item
+				else
+					table.insert(result, k)
 				end
 			end
 
-			return result
+			return result2
 		end)
+
+		return result
 	end
 end

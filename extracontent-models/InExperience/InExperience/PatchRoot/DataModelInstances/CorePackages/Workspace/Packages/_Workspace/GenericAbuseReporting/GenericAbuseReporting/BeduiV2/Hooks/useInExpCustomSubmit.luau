@@ -37,9 +37,7 @@ function UseInExpCustomSubmit.useInExpCustomSubmit(data)
 				voiceImpactedUserCount = computeImpactedUserCount(data.voiceChatServiceManager, p.data.targetIdStr),
 				menuOpenedUnixMilli = data.menuOpenTimeRef.current
 			})
-		end
-
-		if p.endpoint == "chat" then
+		elseif p.endpoint == "chat" then
 			local inExpChatMessagesLoader = data.inExpChatMessagesLoader
 
 			if not inExpChatMessagesLoader then
@@ -79,17 +77,17 @@ function UseInExpCustomSubmit.useInExpCustomSubmit(data)
 					targetMessages = targetMessages
 				})
 			end)
-		end
+		else
+			if p.endpoint == "avatar" then
+				return submitAvatarReport(p, data.reportAnythingSnapshotRef and data.reportAnythingSnapshotRef.current)
+			end
 
-		if p.endpoint == "avatar" then
-			return submitAvatarReport(p, data.reportAnythingSnapshotRef and data.reportAnythingSnapshotRef.current)
-		end
+			if p.endpoint == "place" then
+				return submitPlaceReport(p, data.reportAnythingSnapshotRef and data.reportAnythingSnapshotRef.current)
+			end
 
-		if p.endpoint == "place" then
-			return submitPlaceReport(p, data.reportAnythingSnapshotRef and data.reportAnythingSnapshotRef.current)
+			return Promise.reject("Unknown in-experience submission endpoint: " .. tostring(p.endpoint))
 		end
-
-		return Promise.reject("Unknown in-experience submission endpoint: " .. tostring(p.endpoint))
 	end, {
 		data.voiceChatServiceManager,
 		data.inExpChatMessagesLoader,

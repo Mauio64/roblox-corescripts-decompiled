@@ -349,10 +349,10 @@ local function CenterSheet(p, ref)
 				Position = UDim2.fromScale(0.5, 0.5),
 				tag = "col align-y-center anchor-center-center size-full padding-medium",
 				testId = `{v2.testId}--center-sheet-container`,
-				onAbsoluteSizeChanged = (Flags.FoundationCenterSheetHeightFix or v2.centerSheetHeight and v8) and function(p2)
+				onAbsoluteSizeChanged = function(p2)
 					local v20 = v4.Margin.Medium * 2
 					v8((math.min(p2.AbsoluteSize.Y - v20, v6)))
-				end or nil
+				end
 			}, nil)
 		})
 	end
@@ -383,12 +383,11 @@ local function CenterSheet(p, ref)
 
 		v20.GroupTransparency = groupTransparency
 
-		v20.onAbsoluteSizeChanged = (Flags.FoundationCenterSheetHeightFix or v2.centerSheetHeight and v8)
-			and function(p2)
-				local v21 = v4.Margin.Medium * 2
-				v8((math.min(p2.AbsoluteSize.Y - v21, v6)))
-			end
-			or nil
+		function v20.onAbsoluteSizeChanged(p2)
+			local v21 = v4.Margin.Medium * 2
+			v8((math.min(p2.AbsoluteSize.Y - v21, v6)))
+		end
+
 		sheetContainer = createElement6(View, v20, nil)
 	end
 

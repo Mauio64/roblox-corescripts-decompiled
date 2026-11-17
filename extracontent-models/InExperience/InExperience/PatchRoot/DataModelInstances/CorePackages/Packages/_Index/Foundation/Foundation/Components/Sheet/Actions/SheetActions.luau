@@ -7,6 +7,7 @@ local Sheet = script:FindFirstAncestor("Sheet")
 local SheetContext = require(Sheet.SheetContext)
 local SheetType = require(Sheet.SheetType)
 
+local Flags = require(Foundation.Utility.Flags)
 local useTokens = require(Foundation.Providers.Style.useTokens)
 
 local StateLayerAffordance = require(Foundation.Enums.StateLayerAffordance)
@@ -30,6 +31,14 @@ local function SheetActions(p, ref)
 	)
 
 	local innerSurface = v2.innerSurface
+
+	if Flags.FoundationBottomSheetClearsActionsHeight then
+		React.useLayoutEffect(function()
+			return function()
+				setActionsHeight(0)
+			end
+		end, { setActionsHeight })
+	end
 
 	local bgsurface = sheetType == SheetType.Bottom
 

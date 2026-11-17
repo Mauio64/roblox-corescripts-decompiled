@@ -158,7 +158,6 @@ local FFlagEnableModerateChatRemoteEvent = SharedFlags.FFlagEnableModerateChatRe
 local FFlagLuaSupportMicroGamepadPreferredInput = SharedFlags.FFlagLuaSupportMicroGamepadPreferredInput
 local FFlagEnableClientSummarySystemMessageOnLua = SharedFlags.FFlagEnableClientSummarySystemMessageOnLua
 local GetFFlagTextChatEnableUniverseChatTabs = ExpChatShared.Flags.GetFFlagTextChatEnableUniverseChatTabs
-local GetFFlagEnableExpChatUniverseChatTabNames = ExpChatShared.Flags.GetFFlagEnableExpChatUniverseChatTabNames
 local defineFastFlag2 = game:DefineFastFlag("ExpChatRemoveSpaceFromTeamPrefix", false)
 local FFlagAIRephraseSettingEnabled = SharedFlags.FFlagAIRephraseSettingEnabled
 local FFlagChatSummariesSettingEnabled = SharedFlags.FFlagChatSummariesSettingEnabled
@@ -179,6 +178,8 @@ local ExpChatGlobalTabDefaultExperimentation = SocialExperiments2.ExpChatGlobalT
 local isGlobalTabFirst = require(ExpChat.isGlobalTabFirst)
 local getGlobalWelcomeMessageKey = require(ExpChat.getGlobalWelcomeMessageKey)
 local FFlagExpChatGlobalTabDefault = require(Flags.FFlagExpChatGlobalTabDefault)
+local FFlagExpChatStickyTabs = SharedFlags.FFlagExpChatStickyTabs
+local StickyTabObserver = require(ExpChat.StickyTabs.StickyTabObserver)
 
 function getChatTranslationEnabled()
 	local success, result = pcall(function()
@@ -1482,6 +1483,10 @@ return function(p)
 		end)
 	end
 
+	if FFlagExpChatStickyTabs then
+		StickyTabObserver:start(store)
+	end
+
 	local function isInstanceALocalTextChannelParticipant(textSource) -- 2 equivalent calls inferred from this helper
 		return textSource
 			and textSource:IsA("TextSource")
@@ -1613,7 +1618,7 @@ return function(p)
 				end
 			end
 
-			if GetFFlagEnableExpChatUniverseChatTabNames() and name ~= "" then
+			if name ~= "" then
 				local success, result = pcall(function()
 					if FFlagExpChatGlobalTabDefault then
 						return joined.translator:FormatByKey(getGlobalWelcomeMessageKey())

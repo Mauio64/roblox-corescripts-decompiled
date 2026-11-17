@@ -26,12 +26,9 @@ local SharedFlags3 = require(parent.SharedFlags)
 local FFlagLuaAppVideoAutoplayOneByTwoConcurrentPlayback = SharedFlags3.FFlagLuaAppVideoAutoplayOneByTwoConcurrentPlayback
 
 local SharedFlags4 = require(parent.SharedFlags)
-local FFlagVideoPlaybackDetectorCancelPendingScanTask = SharedFlags4.FFlagVideoPlaybackDetectorCancelPendingScanTask
-
+local FIntVideoPlaybackDetectorScanDebounceInMilliseconds = SharedFlags4.FIntVideoPlaybackDetectorScanDebounceInMilliseconds
 local SharedFlags5 = require(parent.SharedFlags)
-local FIntVideoPlaybackDetectorScanDebounceInMilliseconds = SharedFlags5.FIntVideoPlaybackDetectorScanDebounceInMilliseconds
-local SharedFlags6 = require(parent.SharedFlags)
-local FFlagEnableOnScreenAPIIntegration = SharedFlags6.FFlagEnableOnScreenAPIIntegration
+local FFlagEnableOnScreenAPIIntegration = SharedFlags5.FFlagEnableOnScreenAPIIntegration
 local useIsRouteOnScreen
 
 if FFlagEnableOnScreenAPIIntegration then
@@ -41,8 +38,8 @@ else
 	useIsRouteOnScreen = nil
 end
 
-local SharedFlags7 = require(parent.SharedFlags)
-local FFlagLuaAppVideoViewportTargetedWinnerSubscription = SharedFlags7.FFlagLuaAppVideoViewportTargetedWinnerSubscription
+local SharedFlags6 = require(parent.SharedFlags)
+local FFlagLuaAppVideoViewportTargetedWinnerSubscription = SharedFlags6.FFlagLuaAppVideoViewportTargetedWinnerSubscription
 
 local signal = Signals.createSignal({
 	instance = nil,
@@ -50,8 +47,7 @@ local signal = Signals.createSignal({
 	isUserIntentWinner = not FFlagLuaAppOneByTwoHoverIdleAutoplay and nil
 })
 
-local v = not FFlagVideoPlaybackDetectorCancelPendingScanTask and 0.5
-	or FIntVideoPlaybackDetectorScanDebounceInMilliseconds / 1000
+local v = FIntVideoPlaybackDetectorScanDebounceInMilliseconds / 1000
 
 local function VideoViewportPlaybackDetector(data): nil
 	local v2
@@ -239,26 +235,26 @@ local function VideoViewportPlaybackDetector(data): nil
 		end
 
 		local v12 = {}
-		local v13 = nil
+		local thread = nil
 
 		if data.itemFrameRef.current ~= nil then
 			local current = data.itemFrameRef.current
 			local now = nil
-			local v14 = nil
+			local v13 = nil
 
 			local function requestPlaybackIfEligible()
 				now = tick()
 
 				local videoPlaybackCoordinator2 = data.videoPlaybackCoordinator
-				local v15
+				local v14
 
 				if FFlagLuaAppEdpMediaGalleryFullScreen then
-					v15 = data.isItemOccluded
+					v14 = data.isItemOccluded
 				end
 
 				if videoPlaybackCoordinator2:isPlaybackCandidate(
 					v2,
-					v15,
+					v14,
 					data.itemFrameRef,
 					v6,
 					data.videoVisiblePercent
@@ -270,32 +266,29 @@ local function VideoViewportPlaybackDetector(data): nil
 			end
 
 			local function onItemFrameLayoutChange()
-				if v14 ~= nil then
+				if v13 ~= nil then
 					return
 				end
 
-				local v15
+				local v14
 
 				if now == nil then
-					v15 = 0
+					v14 = 0
 				else
-					v14 = now + v
-					v15 = v14 - tick()
+					v13 = now + v
+					v14 = v13 - tick()
 				end
 
-				if v15 > 0 then
-					local thread = task.delay(v15, function()
-						v14 = nil
+				if v14 > 0 then
+					thread = task.delay(v14, function()
+						v13 = nil
 						requestPlaybackIfEligible()
 					end)
-
-					if FFlagVideoPlaybackDetectorCancelPendingScanTask then
-						v13 = thread
-					end
-				else
-					v14 = nil
-					requestPlaybackIfEligible()
+					return
 				end
+
+				v13 = nil
+				requestPlaybackIfEligible()
 			end
 
 			requestPlaybackIfEligible()
@@ -304,7 +297,7 @@ local function VideoViewportPlaybackDetector(data): nil
 				requestPlaybackIfEligible()
 			end)
 
-			local v15 = ExperienceService:RegisterForExperienceLeave(function()
+			local v14 = ExperienceService:RegisterForExperienceLeave(function()
 				requestPlaybackIfEligible()
 			end)
 
@@ -314,13 +307,13 @@ local function VideoViewportPlaybackDetector(data): nil
 			}
 
 			table.insert(v12, onUnhideConnection)
-			table.insert(v12, v15)
+			table.insert(v12, v14)
 		end
 
 		return function()
-			if FFlagVideoPlaybackDetectorCancelPendingScanTask and v13 then
-				task.cancel(v13)
-				v13 = nil
+			if thread then
+				task.cancel(thread)
+				thread = nil
 			end
 
 			for _, connection in v12 do

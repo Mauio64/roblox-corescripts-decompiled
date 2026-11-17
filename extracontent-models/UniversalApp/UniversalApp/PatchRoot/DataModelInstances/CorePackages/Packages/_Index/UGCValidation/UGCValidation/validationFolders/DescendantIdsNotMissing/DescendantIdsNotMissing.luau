@@ -6,8 +6,10 @@ local Constants = require(parent.Constants)
 local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 local ParseContentIds = require(parent.util.ParseContentIds)
 require(parent.util.Types)
+local UnpublishedDependencies = require(parent.util.UnpublishedDependencies)
 local ValidationEnums = require(parent.validationSystem.ValidationEnums)
 
+local getFFlagUGCValidateAllowAnimationVersionPins = require(parent.flags.getFFlagUGCValidateAllowAnimationVersionPins)
 local getFFlagUGCValidateCheckDescendantIdsLoadable = require(parent.flags.getFFlagUGCValidateCheckDescendantIdsLoadable)
 local getFFlagUGCValidateVersionedContentIds = require(parent.flags.getFFlagUGCValidateVersionedContentIds)
 
@@ -133,30 +135,50 @@ return {
 			end
 		end
 
-		if getFFlagUGCValidateVersionedContentIds() then
+		local v3 = data.consumerConfig.validationEnv == ValidationEnums.ValidationEnv.Backend
+
+		if getFFlagUGCValidateVersionedContentIds() and v3 then
+			local v4 = {}
+
 			for k, contentId in data.contentIds do
-				for _, v3 in contentId do
-					if v3.version == nil then
+				for _, v5 in contentId do
+					local version = v5.version
+
+					if version == nil then
 						continue
 					end
 
-					local v4 = {
-						InstanceFullName = v3.instance:GetFullName(),
-						FieldName = v3.fieldName,
-						Version = tostring(v3.version),
+					local v6 = {
+						InstanceFullName = v5.instance:GetFullName(),
+						FieldName = v5.fieldName,
+						Version = tostring(version),
 						AssetId = k
 					}
 
-					if v3.fieldName == "AnimationId" then
-						object:fail(ErrorSourceStrings.Keys.DescendantIdAnimationVersionNotSupported, v4)
-					elseif v3.version ~= 1 then
-						object:fail(ErrorSourceStrings.Keys.DescendantIdVersionNotSupported, v4)
+					if v5.fieldName == "AnimationId" and not getFFlagUGCValidateAllowAnimationVersionPins() then
+						object:fail(ErrorSourceStrings.Keys.DescendantIdAnimationVersionNotSupported, v6)
+					else
+						local result = v4[k]
+
+						if result == nil then
+							local success
+							success, result = pcall(UnpublishedDependencies.getLatestVersionNumber, k)
+
+							if not success then
+								object:fetchError(`Failed to read asset {k}: {result}`)
+							end
+
+							v4[k] = result
+						end
+
+						if version ~= result then
+							v6.LatestVersion = tostring(result)
+							object:fail(ErrorSourceStrings.Keys.DescendantIdVersionNotLatest, v6)
+						end
 					end
 				end
 			end
 		end
-
-		local v3 = data.consumerConfig.validationEnv == ValidationEnums.ValidationEnv.Backend
 
 		if v3 or getFFlagUGCValidateCheckDescendantIdsLoadable() then
 			if getFFlagUGCValidateVersionedContentIds() then

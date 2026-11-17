@@ -41,6 +41,7 @@ local FFlagShopUseMockGamePassTrialRedemption = require(InExperienceShop.Flags.F
 local FFlagMockGetGamePassOwnership = require(InExperienceShop.Flags.FFlagMockGetGamePassOwnership)
 local FFlagUseGetGamePassOwnershipApi = SharedFlags.FFlagUseGetGamePassOwnershipApi
 local FFlagLuaAppEnableGamePassFreeTrials = require(InExperienceShop.Flags.FFlagLuaAppEnableGamePassFreeTrials)
+local FFlagEnableFreeTrialTopBarChip = require(InExperienceShop.Flags.FFlagEnableFreeTrialTopBarChip)
 local FFlagEnableGamePassTrialUnifiedLogging = require(InExperienceShop.Flags.FFlagEnableGamePassTrialUnifiedLogging)
 local FFlagCloseShopOnTrialRedemption = require(InExperienceShop.Flags.FFlagCloseShopOnTrialRedemption)
 local FFlagShopUseMockMultiGetProductInfo = require(InExperienceShop.Flags.FFlagShopUseMockMultiGetProductInfo)
@@ -51,6 +52,7 @@ local FStringExperienceShopFlagLinkedLayer = require(InExperienceShop.Flags.FStr
 local FStringExperienceShopLayer1 = require(InExperienceShop.Flags.FStringExperienceShopLayer1)
 local FStringExperienceShopLayer2 = require(InExperienceShop.Flags.FStringExperienceShopLayer2)
 local FFlagRefetchRobuxWidgetAfterPurchase = require(InExperienceShop.Flags.FFlagRefetchRobuxWidgetAfterPurchase)
+local FFlagRefetchShopWidgetsAfterPassPurchase = require(InExperienceShop.Flags.FFlagRefetchShopWidgetsAfterPassPurchase)
 local FFlagSkipPaymentSessionForPlainRobux = require(InExperienceShop.Flags.FFlagSkipPaymentSessionForPlainRobux)
 local FFlagEnablePartialDisplayInExperienceShop = require(InExperienceShop.Flags.FFlagEnablePartialDisplayInExperienceShop)
 require(InExperienceShop.Flags.FFlagPromoteRobuxInTopPicks)
@@ -160,38 +162,41 @@ local function createInExperienceShopStore()
 	local v24 = false
 	local v25 = false
 	local v26 = false
-
 	local v27 = false
+	local count = 0
+	local count2 = 0
 
-	local v28 = {}
+	local v28 = false
 
 	local v29 = {}
 
 	local v30 = {}
+
 	local v31 = {}
+	local v32 = {}
 
 	local signal15, setShouldOpenToRobuxTab = createSignal(false)
 
 	local signal16, setOpenedFromBuyRobux = createSignal(false)
 
 	local function commitBonusPromotionEligibility(p: string, p2) -- 5 equivalent calls inferred from this helper
-		v30[p] = p2
-		v12(table.clone(v30))
+		v31[p] = p2
+		v12(table.clone(v31))
 	end
 
 	local function sortRobuxPackagesInSections(list)
-		local v32 = false
+		local v35 = false
 
 		for _, item in list do
 			local robuxPackages = item.robuxPackages
 
 			if robuxPackages ~= nil and #robuxPackages > 1 then
-				v32 = true
+				v35 = true
 				break
 			end
 		end
 
-		if not v32 then
+		if not v35 then
 			return list
 		end
 
@@ -222,14 +227,14 @@ local function createInExperienceShopStore()
 	end
 
 	local function reapplyFeaturedPromotion() -- 7 equivalent calls inferred from this helper
-		v3(sortRobuxPackagesInSections(promoteBonusRobuxPackageToTopPicks.promoteBonusRobuxPackageToTopPicks(v29, v30)))
+		v3(sortRobuxPackagesInSections(promoteBonusRobuxPackageToTopPicks.promoteBonusRobuxPackageToTopPicks(v30, v31)))
 	end
 
 	local function bumpRedeemedTrialToTopPicks(p: string) -- 2 equivalent calls inferred from this helper
-		local topPicksSectionIndex = findTopPicksSectionIndex(v29)
+		local topPicksSectionIndex = findTopPicksSectionIndex(v30)
 
 		if topPicksSectionIndex ~= nil then
-			v29 = moveItemToPositionInShop(v29, topPicksSectionIndex, p, "GamePass", 1)
+			v30 = moveItemToPositionInShop(v30, topPicksSectionIndex, p, "GamePass", 1)
 		end
 
 		reapplyFeaturedPromotion() -- inferred equivalent call
@@ -244,14 +249,14 @@ local function createInExperienceShopStore()
 			return
 		end
 
-		local firstBonusRobuxPackage = promoteBonusRobuxPackageToTopPicks.findFirstBonusRobuxPackage(v29)
-		local v32
+		local firstBonusRobuxPackage = promoteBonusRobuxPackageToTopPicks.findFirstBonusRobuxPackage(v30)
+		local v35
 
 		if firstBonusRobuxPackage ~= nil then
-			v32 = promoteBonusRobuxPackageToTopPicks.getBonusGamePassId(firstBonusRobuxPackage)
+			v35 = promoteBonusRobuxPackageToTopPicks.getBonusGamePassId(firstBonusRobuxPackage)
 		end
 
-		if v32 == nil or v32 ~= p then
+		if v35 == nil or v35 ~= p then
 			return
 		end
 
@@ -275,15 +280,15 @@ local function createInExperienceShopStore()
 				return p2 ~= nil and p2.Owned == true
 			end)
 		else
-			local v32
+			local v35
 
 			if FFlagShopUseMockUserOwnsGamePass then
-				v32 = MockUserOwnsGamePass
+				v35 = MockUserOwnsGamePass
 			else
-				v32 = userOwnsGamePass
+				v35 = userOwnsGamePass
 			end
 
-			return v32(p)
+			return v35(p)
 		end
 	end
 
@@ -302,15 +307,15 @@ local function createInExperienceShopStore()
 
 		v19 = false
 		v16 = true
-		local v32
+		local v35
 
 		if FFlagShopUseMockGamePassTrialAvailabilities then
-			v32 = MockGamePassTrialAvailabilities.fetchGamePassTrialAvailabilities
+			v35 = MockGamePassTrialAvailabilities.fetchGamePassTrialAvailabilities
 		else
-			v32 = fetchGamePassTrialAvailabilities.fetchGamePassTrialAvailabilities
+			v35 = fetchGamePassTrialAvailabilities.fetchGamePassTrialAvailabilities
 		end
 
-		v32(game.GameId):andThen(function(p)
+		v35(game.GameId):andThen(function(p)
 			v11(p)
 			v17 = true
 
@@ -354,13 +359,21 @@ local function createInExperienceShopStore()
 		return true
 	end
 
-	local signal17, v32 = createSignal({})
-	local signal18, v35 = createSignal(0)
+	local signal17, v35 = createSignal({})
+	local signal18, v36 = createSignal(nil)
+	local signal19, v37 = createSignal(nil)
+	local signal20, v38 = createSignal(0)
+	local function recordRedeemedTrialThumbnail(gamePassId: string, p: string?) -- 2 equivalent calls inferred from this helper
+		v36({
+			image = p == nil and "" or p,
+			gamePassId = gamePassId
+		})
+	end
 	local function noteTrialRedeemSucceeded() -- 2 equivalent calls inferred from this helper
-		v35(signal18(false) + 1)
+		v38(signal20(false) + 1)
 	end
 
-	local signal19, v36 = createSignal(nil)
+	local signal21, v39 = createSignal(nil)
 
 	local function sendTrialEvent(action: number, trialElement: string, itemId: string, data, metadata)
 		local sendGamePassTrialUnifiedEvent = require(InExperienceShop.Analytics.sendGamePassTrialUnifiedEvent)
@@ -384,7 +397,7 @@ local function createInExperienceShopStore()
 			clone[p] = nil
 		end
 
-		v32(clone)
+		v35(clone)
 	end
 
 	local function signalGamePassFreeTrialRedeemed(p: number) -- 2 equivalent calls inferred from this helper
@@ -394,9 +407,9 @@ local function createInExperienceShopStore()
 			return
 		end
 
-		local v37 = MarketplaceService
+		local v40 = MarketplaceService
 		local success, result = pcall(function()
-			v37:SignalGamePassFreeTrialRedeemed(localPlayer, p)
+			v40:SignalGamePassFreeTrialRedeemed(localPlayer, p)
 		end)
 
 		if not success then
@@ -405,10 +418,10 @@ local function createInExperienceShopStore()
 	end
 
 	local function markGamePassTrialActive(p: string)
-		local v37 = signal10(false)
-		local clone = table.clone(v37.available)
-		local clone2 = table.clone(v37.active)
-		local clone3 = table.clone(v37.redeemed or {})
+		local v40 = signal10(false)
+		local clone = table.clone(v40.available)
+		local clone2 = table.clone(v40.active)
+		local clone3 = table.clone(v40.redeemed or {})
 		clone[p] = nil
 		clone3[p] = nil
 		clone2[p] = true
@@ -416,10 +429,10 @@ local function createInExperienceShopStore()
 	end
 
 	local function getTrialRedemptionFailureReason(p)
-		local v37 = parseGamePassTrialRedeemErrorCode(p)
+		local v40 = parseGamePassTrialRedeemErrorCode(p)
 
-		if v37 ~= nil then
-			return v37
+		if v40 ~= nil then
+			return v40
 		end
 
 		if typeof(p) == "table" then
@@ -439,12 +452,12 @@ local function createInExperienceShopStore()
 		return (tostring(p))
 	end
 
-	local function redeemGamePassTrial2(gamePassId: string, purchaseContext)
+	local function redeemGamePassTrial2(gamePassId: string, purchaseContext, p: string?)
 		if signal17(false)[gamePassId] then
 			return
 		end
 
-		local v37 = typeof(purchaseContext) ~= "table" and {} or purchaseContext
+		local v40 = typeof(purchaseContext) ~= "table" and {} or purchaseContext
 
 		if FFlagShopUseMockGamePassTrialRedemption then
 			if FFlagEnableGamePassTrialUnifiedLogging then
@@ -453,33 +466,37 @@ local function createInExperienceShopStore()
 					sendGamePassTrialUnifiedEvent.clickAction,
 					sendGamePassTrialUnifiedEvent.trialElement,
 					gamePassId,
-					v37
+					v40
 				)
 				sendTrialEvent(
 					sendGamePassTrialUnifiedEvent.successAction,
 					sendGamePassTrialUnifiedEvent.trialElement,
 					gamePassId,
-					v37,
+					v40,
 					{ latencyMs = 0 }
 				)
 			end
 
 			markGamePassTrialActive(gamePassId)
 
+			if FFlagEnableFreeTrialTopBarChip then
+				recordRedeemedTrialThumbnail(gamePassId, p) -- inferred equivalent call
+			end
+
 			if FFlagCloseShopOnTrialRedemption then
 				noteTrialRedeemSucceeded() -- inferred equivalent call
 			end
 
 			bumpRedeemedTrialToTopPicks(gamePassId) -- inferred equivalent call
-			local v38 = tonumber(gamePassId)
+			local v41 = tonumber(gamePassId)
 
-			if v38 ~= nil then
-				signalGamePassFreeTrialRedeemed(v38) -- inferred equivalent call
+			if v41 ~= nil then
+				signalGamePassFreeTrialRedeemed(v41) -- inferred equivalent call
 			end
 		else
-			local v38 = tonumber(gamePassId)
+			local v41 = tonumber(gamePassId)
 
-			if v38 == nil then
+			if v41 == nil then
 				warn("[Shop] redeemGamePassTrial skipped, gamePassId is not numeric", gamePassId)
 				return
 			end
@@ -494,7 +511,7 @@ local function createInExperienceShopStore()
 					sendGamePassTrialUnifiedEvent.clickAction,
 					sendGamePassTrialUnifiedEvent.trialElement,
 					gamePassId,
-					v37
+					v40
 				)
 				flag2 = true
 			else
@@ -505,7 +522,7 @@ local function createInExperienceShopStore()
 			setGamePassTrialRedemptionInFlight(gamePassId, true) -- inferred equivalent call
 			local flag3 = false
 
-			redeemGamePassTrial.redeemGamePassTrial(v38):andThen(function()
+			redeemGamePassTrial.redeemGamePassTrial(v41):andThen(function()
 				flag3 = true
 
 				if flag2 then
@@ -515,9 +532,13 @@ local function createInExperienceShopStore()
 						sendGamePassTrialUnifiedEvent.successAction,
 						sendGamePassTrialUnifiedEvent.trialElement,
 						gamePassId,
-						v37,
+						v40,
 						{ latencyMs = latencyMs }
 					)
+				end
+
+				if FFlagEnableFreeTrialTopBarChip then
+					recordRedeemedTrialThumbnail(gamePassId, p) -- inferred equivalent call
 				end
 
 				if FFlagCloseShopOnTrialRedemption then
@@ -525,17 +546,17 @@ local function createInExperienceShopStore()
 				end
 
 				bumpRedeemedTrialToTopPicks(gamePassId) -- inferred equivalent call
-				signalGamePassFreeTrialRedeemed(v38) -- inferred equivalent call
+				signalGamePassFreeTrialRedeemed(v41) -- inferred equivalent call
 				return fetchGamePassTrialAvailabilities.fetchGamePassTrialAvailabilities(game.GameId)
-			end):andThen(function(p)
-				v11(p)
+			end):andThen(function(p2)
+				v11(p2)
 				v17 = true
 
-				if p.available[gamePassId] then
+				if p2.available[gamePassId] then
 					markGamePassTrialActive(gamePassId)
 				end
-			end):catch(function(p)
-				warn("[Shop] redeemGamePassTrial failed", gamePassId, (tostring(p)))
+			end):catch(function(p2)
+				warn("[Shop] redeemGamePassTrial failed", gamePassId, (tostring(p2)))
 
 				if flag3 then
 					markGamePassTrialActive(gamePassId)
@@ -544,36 +565,36 @@ local function createInExperienceShopStore()
 					local latencyMs = math.floor((os.clock() - lastTime) * 1000)
 					local failureAction = sendGamePassTrialUnifiedEvent.failureAction
 					local trialElement = sendGamePassTrialUnifiedEvent.trialElement
-					local failureReason = parseGamePassTrialRedeemErrorCode(p)
+					local failureReason = parseGamePassTrialRedeemErrorCode(p2)
 
 					if failureReason == nil then
-						if typeof(p) == "table" then
-							failureReason = p.errorMessage
+						if typeof(p2) == "table" then
+							failureReason = p2.errorMessage
 
 							if type(failureReason) ~= "string" then
-								local responseCode = p.responseCode
+								local responseCode = p2.responseCode
 
 								if responseCode == nil then
-									failureReason = tostring(p)
+									failureReason = tostring(p2)
 								else
 									failureReason = tostring(responseCode)
 								end
 							end
 						else
-							failureReason = tostring(p)
+							failureReason = tostring(p2)
 						end
 					end
 
-					sendTrialEvent(failureAction, trialElement, gamePassId, v37, {
+					sendTrialEvent(failureAction, trialElement, gamePassId, v40, {
 						latencyMs = latencyMs,
 						failureReason = failureReason
 					})
 				end
 
 				if FFlagLuaAppEnableGamePassFreeTrials and not flag3 then
-					v36({
+					v39({
 						gamePassId = gamePassId,
-						errorCode = parseGamePassTrialRedeemErrorCode(p),
+						errorCode = parseGamePassTrialRedeemErrorCode(p2),
 						purchaseContext = purchaseContext
 					})
 				end
@@ -592,29 +613,29 @@ local function createInExperienceShopStore()
 			return
 		end
 
-		if v31[p] then
+		if v32[p] then
 			return
 		end
 
 		commitBonusPromotionEligibility(p, BonusPromotionEligibility.Unknown) -- inferred equivalent call
 		reapplyFeaturedPromotion() -- inferred equivalent call
-		local v37 = tonumber(p)
+		local v40 = tonumber(p)
 
-		if v37 == nil then
+		if v40 == nil then
 			commitBonusPromotionEligibility(p, BonusPromotionEligibility.Ineligible) -- inferred equivalent call
 			reapplyFeaturedPromotion() -- inferred equivalent call
 		else
-			v31[p] = true
-			fetchOwnedGamePass(v37):andThen(function(flag2: boolean)
-				local v38
+			v32[p] = true
+			fetchOwnedGamePass(v40):andThen(function(flag2: boolean)
+				local v41
 
 				if flag2 then
-					v38 = BonusPromotionEligibility.Ineligible
+					v41 = BonusPromotionEligibility.Ineligible
 				else
-					v38 = BonusPromotionEligibility.Eligible
+					v41 = BonusPromotionEligibility.Eligible
 				end
 
-				commitBonusPromotionEligibility(p, v38) -- inferred equivalent call
+				commitBonusPromotionEligibility(p, v41) -- inferred equivalent call
 
 				if signal9(false)[p] == nil then
 					writeOwnership(p, flag2)
@@ -626,7 +647,7 @@ local function createInExperienceShopStore()
 				commitBonusPromotionEligibility(p, BonusPromotionEligibility.Ineligible) -- inferred equivalent call
 				reapplyFeaturedPromotion() -- inferred equivalent call
 			end):finally(function()
-				v31[p] = nil
+				v32[p] = nil
 			end)
 		end
 	end
@@ -637,21 +658,21 @@ local function createInExperienceShopStore()
 		end
 
 		local firstBonusRobuxPackage = promoteBonusRobuxPackageToTopPicks.findFirstBonusRobuxPackage(p)
-		local v37
+		local v40
 
 		if firstBonusRobuxPackage ~= nil then
-			v37 = promoteBonusRobuxPackageToTopPicks.getBonusGamePassId(firstBonusRobuxPackage)
+			v40 = promoteBonusRobuxPackageToTopPicks.getBonusGamePassId(firstBonusRobuxPackage)
 		end
 
-		for _, v38 in v37 == nil and {} or { v37 } do
-			fetchBonusGamePassOwnershipForPromotionId(v38)
+		for _, v41 in v40 == nil and {} or { v40 } do
+			fetchBonusGamePassOwnershipForPromotionId(v41)
 		end
 	end
 
 	local function applySections(p) -- 6 equivalent calls inferred from this helper
-		v29 = promoteBonusRobuxPackageToTopPicks.withoutFeaturedPromotion(p)
+		v30 = promoteBonusRobuxPackageToTopPicks.withoutFeaturedPromotion(p)
 		reapplyFeaturedPromotion() -- inferred equivalent call
-		fetchBonusGamePassOwnershipForPromotion(v29)
+		fetchBonusGamePassOwnershipForPromotion(v30)
 	end
 
 	local function commitShopMetadata(data)
@@ -666,15 +687,15 @@ local function createInExperienceShopStore()
 				inExperienceGlobalIconEnabled = metadata.inExperienceGlobalIconEnabled
 			end
 
-			local v37
+			local v40
 
 			if FFlagInExperienceShopExpectStringMetadataValues then
-				v37 = inExperienceGlobalIconEnabled == "true"
+				v40 = inExperienceGlobalIconEnabled == "true"
 			else
-				v37 = inExperienceGlobalIconEnabled == true
+				v40 = inExperienceGlobalIconEnabled == true
 			end
 
-			v7(v37)
+			v7(v40)
 			v8(metadata ~= nil and metadata.newOffers == true)
 		end
 	end
@@ -705,12 +726,12 @@ local function createInExperienceShopStore()
 		local makeRequestKey = shopItemMapping.makeRequestKey
 
 		local requestKey = makeRequestKey(p2.request.id, p2.request.infoType)
-		local v37 = {}
+		local v40 = {}
 		local result = {}
 
 		for _, item in items do
 			if makeRequestKey(item.id, item.infoType) == requestKey then
-				table.insert(v37, item)
+				table.insert(v40, item)
 			else
 				table.insert(result, item)
 			end
@@ -725,13 +746,13 @@ local function createInExperienceShopStore()
 			)
 		end
 
-		local v38, v39 = refreshShopItems.insertRecoveredItemsIntoSections(mergeProductInfoIntoSections, { p2 }, v37)
+		local v41, v42 = refreshShopItems.insertRecoveredItemsIntoSections(mergeProductInfoIntoSections, { p2 }, v40)
 
-		for _, v40 in v39 do
-			table.insert(result, v40)
+		for _, v43 in v42 do
+			table.insert(result, v43)
 		end
 
-		return v38, result
+		return v41, result
 	end
 
 	local function routeStreamMultiGetProductInfo(list, onResult)
@@ -748,23 +769,25 @@ local function createInExperienceShopStore()
 				callback(p2)
 			end
 		else
-			v27 = true
-			local v37 = p
-			local v38 = p2
-			local v39 = nil
+			v28 = true
+			local v40 = p
+			local v41 = p2
+			local v42 = nil
 			local flag2 = false
+			local v43 = count2
 
 			local function flushPendingSections() -- 2 equivalent calls inferred from this helper
 				flag2 = false
 
-				if v39 ~= nil then
-					applySections(v39) -- inferred equivalent call
-					v39 = nil
+				if v42 ~= nil and v43 == count2 then
+					applySections(v42) -- inferred equivalent call
 				end
+
+				v42 = nil
 			end
 
 			local function scheduleFlush(p3) -- 1 equivalent call inferred from this helper
-				v39 = p3
+				v42 = p3
 
 				if flag2 then
 					return
@@ -775,32 +798,68 @@ local function createInExperienceShopStore()
 			end
 
 			routeStreamMultiGetProductInfo(list, function(p3)
-				v37, v38 = applyStreamingProductInfoResult(v37, p3, v38)
-				scheduleFlush(v37) -- inferred equivalent call
+				v40, v41 = applyStreamingProductInfoResult(v40, p3, v41)
+				scheduleFlush(v40) -- inferred equivalent call
 			end):andThen(function(_)
 				flushPendingSections() -- inferred equivalent call
-				applySections(v37) -- inferred equivalent call
-				v28 = v38
 
-				if #v38 > 0 then
-					logCounter(ProductInfoFailedItemsCounter, #v38)
-				end
+				if v43 == count2 then
+					applySections(v40) -- inferred equivalent call
+					v29 = v41
 
-				v27 = false
+					if #v41 > 0 then
+						logCounter(ProductInfoFailedItemsCounter, #v41)
+					end
 
-				if callback then
-					callback(v38)
+					v28 = false
+
+					if callback then
+						callback(v41)
+					end
+				else
+					v28 = false
+
+					if callback then
+						callback(v29)
+					end
 				end
 			end):catch(function(p3)
 				warn("[Shop] streamProductInfoIntoSections failed", (tostring(p3)))
 				flushPendingSections() -- inferred equivalent call
-				v27 = false
+				v28 = false
 
 				if callback then
-					callback(v38)
+					callback(v41)
 				end
 			end)
 		end
+	end
+
+	local function finishWidgetFetch(p: number) -- 2 equivalent calls inferred from this helper
+		v25 = p == count
+		v27 = not v25
+	end
+
+	local function isFailedItemOnScreen(failedItems): boolean
+		if failedItems == nil or #failedItems == 0 then
+			return false
+		end
+
+		local set = {}
+
+		for _, v40 in v30 do
+			for _, item in v40.items do
+				set[`{item.itemType}:{item.id}`] = true
+			end
+		end
+
+		for _, item in failedItems do
+			if set[`{item.itemType}:{item.id}`] then
+				return true
+			end
+		end
+
+		return false
 	end
 
 	local function runShopFetch(callback, callback2, p: string)
@@ -809,17 +868,23 @@ local function createInExperienceShopStore()
 		end
 
 		v24 = true
-		v4(true)
-		v5(nil)
-		local v37
+		local v40 = v27
+		local v41 = count
 
-		if FFlagShopUseMockData then
-			v37 = callback2()
-		else
-			v37 = callback()
+		if not v40 then
+			v4(true)
+			v5(nil)
 		end
 
-		v37:andThen(function(data)
+		local v42
+
+		if FFlagShopUseMockData then
+			v42 = callback2()
+		else
+			v42 = callback()
+		end
+
+		v42:andThen(function(data)
 			if not isValidShopData(data) then -- inferred equivalent call
 				return Errors.rejectSchema(
 					string.format("createInExperienceShopStore: %s payload missing categories/sections", p),
@@ -827,29 +892,40 @@ local function createInExperienceShopStore()
 				)
 			end
 
-			v2(data.categories)
-			applySections(data.sections) -- inferred equivalent call
-			commitShopMetadata(data)
-			publishShopHasItems(data) -- inferred equivalent call
-			v28 = data.failedItems or {}
-			v4(false)
-			v24 = false
-			v25 = true
+			if v40 and isFailedItemOnScreen(data.failedItems) then
+				warn("[Shop] stale widget refetch missing on-screen items", #data.failedItems)
+				v24 = false
+			else
+				count2 += 1
+				v2(data.categories)
+				applySections(data.sections) -- inferred equivalent call
+				commitShopMetadata(data)
+				publishShopHasItems(data) -- inferred equivalent call
+				v29 = data.failedItems or {}
+				v4(false)
+				v24 = false
+				finishWidgetFetch(v41) -- inferred equivalent call
 
-			if not applyWidgetTrialAvailabilities(data) then -- inferred equivalent call
-				hydrateGamePassTrialAvailabilities()
-			end
+				if not applyWidgetTrialAvailabilities(data) then -- inferred equivalent call
+					hydrateGamePassTrialAvailabilities()
+				end
 
-			if not FFlagEnableOffersPrefetch then
-				InExperienceOffers.getOffersStore(false).fetchOffers(v)
+				if not FFlagEnableOffersPrefetch then
+					InExperienceOffers.getOffersStore(false).fetchOffers(v)
+				end
 			end
 		end):catch(function(p2)
-			v5(p2)
-			v2({})
-			v3({})
+			if v40 then
+				warn("[Shop] stale widget refetch failed", (tostring(p2)))
+			else
+				v5(p2)
+				v2({})
+				v3({})
 
-			v28 = {}
-			v4(false)
+				v29 = {}
+				v4(false)
+			end
+
 			v24 = false
 		end)
 	end
@@ -860,17 +936,18 @@ local function createInExperienceShopStore()
 		end
 
 		v24 = true
+		local v40 = count
 		v4(true)
 		v5(nil)
-		local v37
+		local v41
 
 		if FFlagShopUseMockData then
-			v37 = fetchShopWidgetsOnly3()
+			v41 = fetchShopWidgetsOnly3()
 		else
-			v37 = fetchShopWidgetsOnly2()
+			v41 = fetchShopWidgetsOnly2()
 		end
 
-		v37:andThen(function(data)
+		v41:andThen(function(data)
 			if not isValidShopData(data) then -- inferred equivalent call
 				return Errors.rejectSchema(
 					string.format("createInExperienceShopStore: %s payload missing categories/sections", p),
@@ -882,10 +959,10 @@ local function createInExperienceShopStore()
 			applySections(data.sections) -- inferred equivalent call
 			commitShopMetadata(data)
 			publishShopHasItems(data) -- inferred equivalent call
-			v28 = data.failedItems or {}
+			v29 = data.failedItems or {}
 			v4(false)
 			v24 = false
-			v25 = true
+			finishWidgetFetch(v40) -- inferred equivalent call
 
 			if not applyWidgetTrialAvailabilities(data) then -- inferred equivalent call
 				hydrateGamePassTrialAvailabilities()
@@ -895,18 +972,22 @@ local function createInExperienceShopStore()
 				InExperienceOffers.getOffersStore(false).fetchOffers(v)
 			end
 
-			streamProductInfoIntoSections(v29, buildProductInfoRequestsForHydration(v29, v28), v28, nil)
+			streamProductInfoIntoSections(v30, buildProductInfoRequestsForHydration(v30, v29), v29, nil)
 		end):catch(function(p2)
 			v5(p2)
 			v2({})
 			v3({})
-			v28 = {}
+			v29 = {}
 			v4(false)
 			v24 = false
 		end)
 	end
 
 	local function fetchAllShopData2() -- 1 equivalent call inferred from this helper
+		if v27 then
+			return
+		end
+
 		if isPartialDisplayEnabled() then -- inferred equivalent call
 			runPartialDisplayShopFetch(
 				fetchShopWidgetsOnly,
@@ -918,29 +999,37 @@ local function createInExperienceShopStore()
 		end
 	end
 
+	local function prefetchWidgetsOnly()
+		if v27 then
+			return
+		end
+
+		runShopFetch(fetchShopWidgetsOnly, MockFetchAllShopData.fetchShopWidgetsOnly, "prefetchWidgetsOnly")
+	end
+
 	local function refreshShopItemInfo()
-		if not FFlagEnableShopProductInfoRefresh or (not v25 or v26 or v27) then
+		if not FFlagEnableShopProductInfoRefresh or (not v25 or v26 or v28) then
 			return
 		end
 
 		local refreshShopItems = require(InExperienceShop.Api.refreshShopItems)
 		local hydrateRobuxBonusItems = require(InExperienceShop.Api.hydrateRobuxBonusItems)
-		local v37
+		local v40
 
-		if #v29 > 0 then
-			v37 = v29
+		if #v30 > 0 then
+			v40 = v30
 		else
-			v37 = signal2(false)
+			v40 = signal2(false)
 		end
 
-		local requestsFromSections = refreshShopItems.buildRequestsFromSections(v37)
+		local requestsFromSections = refreshShopItems.buildRequestsFromSections(v40)
 
 		if FFlagEnableRobuxInExperienceShop then
-			hydrateRobuxBonusItems.appendBonusItemRequests(requestsFromSections, v37)
+			hydrateRobuxBonusItems.appendBonusItemRequests(requestsFromSections, v40)
 		end
 
-		local v38 = v28
-		refreshShopItems.appendFailedItemRequests(requestsFromSections, v38)
+		local v41 = v29
+		refreshShopItems.appendFailedItemRequests(requestsFromSections, v41)
 
 		if #requestsFromSections == 0 then
 			return
@@ -949,22 +1038,29 @@ local function createInExperienceShopStore()
 		v26 = true
 
 		if isPartialDisplayEnabled() then -- inferred equivalent call
-			streamProductInfoIntoSections(v37, requestsFromSections, v38, function()
+			streamProductInfoIntoSections(v40, requestsFromSections, v41, function()
 				v26 = false
 			end)
 			return
 		end
 
-		local v39
+		local v42
 
 		if FFlagShopUseMockData and FFlagShopUseMockMultiGetProductInfo then
-			v39 = MockMultiGetProductInfo.multiGetProductInfo(requestsFromSections, 0)
+			v42 = MockMultiGetProductInfo.multiGetProductInfo(requestsFromSections, 0)
 		else
-			v39 = multiGetProductInfo(requestsFromSections)
+			v42 = multiGetProductInfo(requestsFromSections)
 		end
 
-		v39:andThen(function(p)
-			local mergeProductInfoIntoSections = refreshShopItems.mergeProductInfoIntoSections(v37, p)
+		local v43 = count2
+
+		v42:andThen(function(p)
+			if v43 ~= count2 then
+				v26 = false
+				return
+			end
+
+			local mergeProductInfoIntoSections = refreshShopItems.mergeProductInfoIntoSections(v40, p)
 
 			if FFlagEnableRobuxInExperienceShop then
 				mergeProductInfoIntoSections = hydrateRobuxBonusItems.mergeBonusItemDetailsIntoSections(
@@ -973,9 +1069,9 @@ local function createInExperienceShopStore()
 				)
 			end
 
-			local v40, v41 = refreshShopItems.insertRecoveredItemsIntoSections(mergeProductInfoIntoSections, p, v38)
-			v28 = v41
-			applySections(v40) -- inferred equivalent call
+			local v44, v45 = refreshShopItems.insertRecoveredItemsIntoSections(mergeProductInfoIntoSections, p, v41)
+			v29 = v45
+			applySections(v44) -- inferred equivalent call
 			v26 = false
 		end):catch(function(p)
 			warn("[Shop] refreshShopItemInfo failed", (tostring(p)))
@@ -992,9 +1088,9 @@ local function createInExperienceShopStore()
 			local IxpServiceWrapper = require(parent.IxpServiceWrapper)
 			local ixpServiceWrapper = IxpServiceWrapper.IXPServiceWrapper
 
-			for _, v37 in { FStringExperienceShopLayer1, FStringExperienceShopLayer2 } do
-				if v37 ~= "" then
-					ixpServiceWrapper:LogUserLayerExposure(v37)
+			for _, v40 in { FStringExperienceShopLayer1, FStringExperienceShopLayer2 } do
+				if v40 ~= "" then
+					ixpServiceWrapper:LogUserLayerExposure(v40)
 				end
 			end
 		end
@@ -1012,34 +1108,39 @@ local function createInExperienceShopStore()
 			end
 		end
 
-		fetchAllShopData2() -- inferred equivalent call
+		if v27 then
+			runShopFetch(fetchAllShopData, MockFetchAllShopData.fetchAllShopData, "fetchAllShopData")
+		else
+			fetchAllShopData2() -- inferred equivalent call
+		end
+
 		refreshShopItemInfo()
 	end
 
 	local function refreshRobuxWidgetsAfterPurchase()
-		if not FFlagRefetchRobuxWidgetAfterPurchase or not v25 or flag then
+		if not FFlagRefetchRobuxWidgetAfterPurchase or not (v25 or v27) or flag then
 			return Promise.resolve()
 		end
 
 		flag = true
 		ShopDebugLogger.log("refreshRobuxWidgetsAfterPurchase: start")
-		local v37
+		local v40
 
 		if FFlagShopUseMockData then
-			v37 = MockFetchAllShopData.fetchRobuxWidgetsAfterPurchase(0)
+			v40 = MockFetchAllShopData.fetchRobuxWidgetsAfterPurchase(0)
 		else
-			v37 = fetchRobuxWidgetsAfterPurchase.fetchRobuxWidgetsAfterPurchase()
+			v40 = fetchRobuxWidgetsAfterPurchase.fetchRobuxWidgetsAfterPurchase()
 		end
 
-		return v37:andThen(function(p)
+		return v40:andThen(function(p)
 			if not isValidShopData(p) then -- inferred equivalent call
 				ShopDebugLogger.log("refreshRobuxWidgetsAfterPurchase: skip, invalid payload")
 				return
 			end
 
-			local v38, v39 = mergeRobuxShopData(signal(false), v29, p)
-			v2(v38)
-			applySections(v39) -- inferred equivalent call
+			local v41, v42 = mergeRobuxShopData(signal(false), v30, p)
+			v2(v41)
+			applySections(v42) -- inferred equivalent call
 		end):catch(function(p)
 			ShopDebugLogger.logLazy(function()
 				return "refreshRobuxWidgetsAfterPurchase: failed err=" .. tostring(p)
@@ -1047,6 +1148,15 @@ local function createInExperienceShopStore()
 		end):finally(function()
 			flag = false
 		end)
+	end
+
+	local function markWidgetDataStale() -- 1 equivalent call inferred from this helper
+		count += 1
+
+		if v25 then
+			v25 = false
+			v27 = true
+		end
 	end
 
 	local function pollOwnershipUntilTrue(callback, p: number, p2: number, POLL_INITIAL_DELAY_SECONDS: number)
@@ -1084,7 +1194,7 @@ local function createInExperienceShopStore()
 		end)
 	end
 
-	local function pollGamePassOwnershipAfterPurchase(p: string, FIntShopOwnershipFetchMaxAttempts2: number, callback, flag2: boolean?)
+	local function pollGamePassOwnershipAfterPurchase(p: string, FIntShopOwnershipFetchMaxAttempts2: number, callback, flag2: boolean?, callback2)
 		if v23[p] then
 			ShopDebugLogger.logLazy(function()
 				return "pollGamePassOwnership: already in flight itemId=" .. p
@@ -1093,9 +1203,9 @@ local function createInExperienceShopStore()
 			return
 		end
 
-		local v37 = tonumber(p)
+		local v40 = tonumber(p)
 
-		if v37 == nil then
+		if v40 == nil then
 			ShopDebugLogger.logLazy(function()
 				return "pollGamePassOwnership: skip invalid itemId=" .. p
 			end)
@@ -1111,7 +1221,7 @@ local function createInExperienceShopStore()
 		local function startPoll()
 			pollOwnershipUntilTrue(
 				callback,
-				v37,
+				v40,
 				FIntShopOwnershipFetchMaxAttempts2,
 				Constants.POLL_INITIAL_DELAY_SECONDS
 			):andThen(function(flag3: boolean?)
@@ -1125,6 +1235,14 @@ local function createInExperienceShopStore()
 
 				writeOwnership(p, flag3)
 
+				if FFlagRefetchShopWidgetsAfterPassPurchase then
+					markWidgetDataStale() -- inferred equivalent call
+				end
+
+				if callback2 ~= nil then
+					callback2(p)
+				end
+
 				if flag2 then
 					local localPlayer = Players.LocalPlayer
 
@@ -1133,7 +1251,7 @@ local function createInExperienceShopStore()
 							return "pollGamePassOwnership: SignalPromptGamePassPurchaseFinished itemId=" .. p
 						end)
 
-						MarketplaceService:SignalPromptGamePassPurchaseFinished(localPlayer, v37, true)
+						MarketplaceService:SignalPromptGamePassPurchaseFinished(localPlayer, v40, true)
 					end
 				end
 			end):finally(function()
@@ -1155,7 +1273,11 @@ local function createInExperienceShopStore()
 			return
 		end
 
-		pollGamePassOwnershipAfterPurchase(tostring(p2), FIntShopOwnershipFetchMaxAttempts, fetchOwnedGamePass)
+		local fn = FFlagEnableFreeTrialTopBarChip and function(gamePassId: string)
+			v37({ gamePassId = gamePassId })
+		end or nil
+
+		pollGamePassOwnershipAfterPurchase(tostring(p2), FIntShopOwnershipFetchMaxAttempts, fetchOwnedGamePass, nil, fn)
 	end)
 
 	if FFlagShopListenNativePurchaseFinished and FFlagEnableRobuxInExperienceShop then
@@ -1169,23 +1291,23 @@ local function createInExperienceShopStore()
 				end
 			end
 
-			local v37 = v20
-			local v38 = v21
-			local v39 = v22
+			local v40 = v20
+			local v41 = v21
+			local v42 = v22
 
 			if
-				v38 == nil
+				v41 == nil
 				or not FFlagRefetchRobuxWidgetAfterPurchase
-				and v37 == nil
-				and (not FFlagShopRobuxPurchaseCompletionModal or v39 == nil)
+				and v40 == nil
+				and (not FFlagShopRobuxPurchaseCompletionModal or v42 == nil)
 			then
 				ShopDebugLogger.log("NativePurchaseFinished: skip, no pending shop Robux purchase")
 				return
 			end
 
-			if tostring(p) ~= v38 then
+			if tostring(p) ~= v41 then
 				ShopDebugLogger.logLazy(function()
-					return "NativePurchaseFinished: skip, sku mismatch productId=" .. tostring(p) .. " pendingStoreSku=" .. v38
+					return "NativePurchaseFinished: skip, sku mismatch productId=" .. tostring(p) .. " pendingStoreSku=" .. v41
 				end)
 
 				return
@@ -1197,32 +1319,32 @@ local function createInExperienceShopStore()
 
 			if not flag2 then
 				ShopDebugLogger.logLazy(function()
-					return "NativePurchaseFinished: skip, not purchased bonusGamePassId=" .. tostring(v37)
+					return "NativePurchaseFinished: skip, not purchased bonusGamePassId=" .. tostring(v40)
 				end)
 
 				return
 			end
 
-			if FFlagShopRobuxPurchaseCompletionModal and v39 ~= nil then
-				v14(v39)
+			if FFlagShopRobuxPurchaseCompletionModal and v42 ~= nil then
+				v14(v42)
 			end
 
-			if v37 ~= nil then
+			if v40 ~= nil then
 				ShopDebugLogger.logLazy(function()
-					return "NativePurchaseFinished: polling bonusGamePassId=" .. v37
+					return "NativePurchaseFinished: polling bonusGamePassId=" .. v40
 				end)
-				local v40
+				local v43
 
 				if FFlagShopUseMockUserOwnsGamePass then
-					v40 = MockUserOwnsGamePass
+					v43 = MockUserOwnsGamePass
 				else
-					v40 = userOwnsGamePassHttp
+					v43 = userOwnsGamePassHttp
 				end
 
-				pollGamePassOwnershipAfterPurchase(v37, FIntShopOwnershipFetchMaxAttempts, v40, true)
+				pollGamePassOwnershipAfterPurchase(v40, FIntShopOwnershipFetchMaxAttempts, v43, true)
 			end
 
-			if FFlagRefetchRobuxWidgetAfterPurchase and (v37 ~= nil or not FFlagSkipPaymentSessionForPlainRobux) then
+			if FFlagRefetchRobuxWidgetAfterPurchase and (v40 ~= nil or not FFlagSkipPaymentSessionForPlainRobux) then
 				refreshRobuxWidgetsAfterPurchase()
 			end
 		end
@@ -1249,23 +1371,23 @@ local function createInExperienceShopStore()
 			end
 		end
 
-		local v37 = MarketplaceService
+		local v40 = MarketplaceService
 		local engineFeature = game:GetEngineFeature("NativePurchaseWithLocalPlayer")
 		ShopDebugLogger.logLazy(function()
 			return "NativePurchaseFinished: connecting v2=" .. tostring(FFlagLuaAppEnableNativePurchaseFinishedV2Signals) .. " localPlayerFeature=" .. tostring(engineFeature)
 		end)
 
-		connectIfAvailable(v37.NativePurchaseFinished, onNativePurchaseFinished) -- inferred equivalent call
+		connectIfAvailable(v40.NativePurchaseFinished, onNativePurchaseFinished) -- inferred equivalent call
 
 		if FFlagLuaAppEnableNativePurchaseFinishedV2Signals then
-			connectIfAvailable(v37.NativePurchaseFinishedV2, onNativePurchaseFinished) -- inferred equivalent call
+			connectIfAvailable(v40.NativePurchaseFinishedV2, onNativePurchaseFinished) -- inferred equivalent call
 		end
 
 		if engineFeature then
-			connectIfAvailable(v37.NativePurchaseFinishedWithLocalPlayer, onNativePurchaseFinishedWithLocalPlayer) -- inferred equivalent call
+			connectIfAvailable(v40.NativePurchaseFinishedWithLocalPlayer, onNativePurchaseFinishedWithLocalPlayer) -- inferred equivalent call
 
 			if FFlagLuaAppEnableNativePurchaseFinishedV2Signals then
-				connectIfAvailable(v37.NativePurchaseFinishedWithLocalPlayerV2, onNativePurchaseFinishedWithLocalPlayer) -- inferred equivalent call
+				connectIfAvailable(v40.NativePurchaseFinishedWithLocalPlayerV2, onNativePurchaseFinishedWithLocalPlayer) -- inferred equivalent call
 			end
 		end
 	end
@@ -1279,10 +1401,11 @@ local function createInExperienceShopStore()
 		getTrialAvailabilities = signal10,
 		getTrialAvailabilityPhase = signal14,
 		getTrialRedemptionInFlight = signal17,
-		getTrialRedeemSuccessCount = signal18,
-		getTrialRedemptionError = signal19,
+		getTrialRedeemSuccessCount = signal20,
+		getTrialRedemptionError = signal21,
+		getTrialRedeemThumbnail = signal18,
 		dismissTrialRedemptionError = function()
-			v36(nil)
+			v39(nil)
 		end,
 		getBonusPromotionEligibility = signal11,
 		getItemsPerRow = signal12,
@@ -1290,6 +1413,7 @@ local function createInExperienceShopStore()
 		getGlobalIconBackendEnabled = signal6,
 		getGlobalIconHasNewOffers = signal7,
 		getNotificationFreeTrialTopBarChip = signal8,
+		getPurchasedOwnedGamePass = signal19,
 		getShouldOpenToRobuxTab = signal15,
 		getOpenedFromBuyRobux = signal16,
 		getPurchasedRobuxAmount = signal13,
@@ -1298,9 +1422,7 @@ local function createInExperienceShopStore()
 		end,
 		onShopOpened = onShopOpened,
 		fetchAllShopData = fetchAllShopData2,
-		prefetchWidgetsOnly = function()
-			runShopFetch(fetchShopWidgetsOnly, MockFetchAllShopData.fetchShopWidgetsOnly, "prefetchWidgetsOnly")
-		end,
+		prefetchWidgetsOnly = prefetchWidgetsOnly,
 		refreshShopItemInfo = refreshShopItemInfo,
 		refreshRobuxWidgetsAfterPurchase = refreshRobuxWidgetsAfterPurchase,
 		fetchGamePassOwnership = function(p: string)
@@ -1308,14 +1430,14 @@ local function createInExperienceShopStore()
 				return
 			end
 
-			local v34 = tonumber(p)
+			local v35 = tonumber(p)
 
-			if v34 == nil then
+			if v35 == nil then
 				return
 			end
 
 			v15[p] = true
-			fetchOwnedGamePass(v34):andThen(function(flag2: boolean)
+			fetchOwnedGamePass(v35):andThen(function(flag2: boolean)
 				if signal9(false)[p] ~= nil then
 					return
 				end
@@ -1326,6 +1448,15 @@ local function createInExperienceShopStore()
 			end):finally(function()
 				v15[p] = nil
 			end)
+		end,
+		currentlyOwnsGamePass = function(p: string)
+			local v35 = tonumber(p)
+
+			if v35 == nil then
+				return Promise.resolve(false)
+			end
+
+			return fetchOwnedGamePass(v35)
 		end,
 		redeemGamePassTrial = redeemGamePassTrial2,
 		pollGamePassOwnership = pollGamePassOwnershipAfterPurchase,

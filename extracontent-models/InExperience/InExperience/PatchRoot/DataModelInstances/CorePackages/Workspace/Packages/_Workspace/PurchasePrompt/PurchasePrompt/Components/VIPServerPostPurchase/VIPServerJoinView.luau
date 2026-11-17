@@ -13,7 +13,12 @@ local FillBehavior = Foundation.Enums.FillBehavior
 local function VIPServerJoinView(props)
 	local createElement = React.createElement
 	local root = Sheet.Root
-	local v = { onClose = props.onClose, preferCenterSheet = true, testId = "VIPServerJoinView" }
+	local v = {
+		onClose = props.onClose,
+		preferCenterSheet = true,
+		ref = props.focusRootRef,
+		testId = "VIPServerJoinView"
+	}
 
 	local children = {
 		Header = React.createElement(Sheet.Header, nil, {
@@ -86,7 +91,8 @@ local function VIPServerJoinView(props)
 			variant = ButtonVariant.Emphasis,
 			fillBehavior = FillBehavior.Fill,
 			onActivated = props.onJoin,
-			isLoading = props.isJoining
+			isLoading = props.isJoining,
+			ref = props.joinButtonRef
 		})
 	})
 	return createElement(root, v, children)

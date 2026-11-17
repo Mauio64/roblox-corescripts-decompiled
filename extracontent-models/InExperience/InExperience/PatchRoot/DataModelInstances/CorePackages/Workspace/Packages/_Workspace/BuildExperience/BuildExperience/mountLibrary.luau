@@ -38,24 +38,31 @@ local GetLibraryStore = require(BuildExperience.Stores.GetLibraryStore)
 local GetPlayButtonStore = require(BuildExperience.Stores.GetPlayButtonStore)
 local sendBuildExperienceEvent = require(BuildExperience.Telemetry.sendBuildExperienceEvent)
 local createViewerWorldPicker = require(BuildExperience.createViewerWorldPicker)
+local getDefaultWorldFocus = require(BuildExperience.Components.Library.LibraryWorldCutout.getDefaultWorldFocus)
+local getModelBox = require(BuildExperience.Components.Library.LibraryWorldCutout.getModelBox)
+local FIntBuildExperienceLibrarySelectAllMax = require(BuildExperience.Flags.FIntBuildExperienceLibrarySelectAllMax)
+local getLibraryMatches = require(BuildExperience.Components.Library.getLibraryMatches)
 local LocalizationProvider = Localization.LocalizationProvider
 local localization = RobloxAppLocales.Localization
 local LibraryTypes = require(BuildExperience.Components.Library.LibraryTypes)
 require(BuildExperience.Chat.chatTypes)
 local SharedFlags = require(parent.SharedFlags)
 local FFlagBuildExperienceLibrary = SharedFlags.FFlagBuildExperienceLibrary
+local FFlagBuildExperienceEventContextTelemetry = require(BuildExperience.Flags.FFlagBuildExperienceEventContextTelemetry)
 
-local v = nil
+local v = {}
 local v2 = nil
 
-local function requestModelFocus(instance, p) -- 3 equivalent calls inferred from this helper
+local function requestModelFocus(instance, p) -- 4 equivalent calls inferred from this helper
 	local boundingBox, v3 = instance:GetBoundingBox()
 	p.requestFocus(boundingBox.Position, v3.Magnitude / 2, instance)
 end
 
-local function focusModel(model, p)
-	if v ~= nil then
-		v:Destroy()
+local function outlineModel(path: string, model)
+	local v3 = v[path]
+
+	if v3 ~= nil then
+		v3:Destroy()
 	end
 
 	local buildLibraryFocusHighlight = Instance.new("Highlight")
@@ -66,45 +73,72 @@ local function focusModel(model, p)
 	buildLibraryFocusHighlight.FillTransparency = 0.75
 	buildLibraryFocusHighlight.Adornee = model
 	buildLibraryFocusHighlight.Parent = CoreGui
-	v = buildLibraryFocusHighlight
-	requestModelFocus(model, p) -- inferred equivalent call
+	v[path] = buildLibraryFocusHighlight
 end
 
-local function requestWorldFocus(items, p)
-	local v3 = nil
-	local v4 = nil
+local function removeOutline(p: string) -- 1 equivalent call inferred from this helper
+	local v3 = v[p]
 
-	for _, item in items do
-		local boundingBox, v5 = item:GetBoundingBox()
+	if v3 ~= nil then
+		v3:Destroy()
+		v[p] = nil
+	end
+end
 
-		if v5 == Vector3.new(0, 0, 0) then
+local function clearOutlines() -- 4 equivalent calls inferred from this helper
+	for _, v3 in v do
+		v3:Destroy()
+	end
+
+	table.clear(v)
+end
+
+local function requestModelsFocus(models, p)
+	local minimum = nil
+	local maximum = nil
+
+	for _, item in models do
+		local modelBox = getModelBox(item)
+
+		if modelBox == nil then
 			continue
 		end
 
-		for i = -1, 1, 2 do
-			for j = -1, 1, 2 do
-				for k = -1, 1, 2 do
-					local pointToWorldSpace = boundingBox:PointToWorldSpace(v5 * Vector3.new(i, j, k) / 2)
+		if minimum == nil then
+			minimum = modelBox.minimum
+		else
+			minimum = minimum:Min(modelBox.minimum)
+		end
 
-					if v3 == nil then
-						v3 = pointToWorldSpace
-					else
-						v3 = v3:Min(pointToWorldSpace)
-					end
-
-					if v4 == nil then
-						v4 = pointToWorldSpace
-					else
-						v4 = v4:Max(pointToWorldSpace)
-					end
-				end
-			end
+		if maximum == nil then
+			maximum = modelBox.maximum
+		else
+			maximum = maximum:Max(modelBox.maximum)
 		end
 	end
 
-	if v3 ~= nil and v4 ~= nil then
-		p.requestFocus((v3 + v4) / 2, (v4 - v3).Magnitude / 2)
+	if minimum ~= nil and maximum ~= nil then
+		p.requestFocus((minimum + maximum) / 2, (maximum - minimum).Magnitude / 2)
 	end
+end
+
+local function requestWorldFocus(p, p2, p3) -- 3 equivalent calls inferred from this helper
+	local defaultWorldFocus = getDefaultWorldFocus(p, p3)
+
+	if defaultWorldFocus ~= nil then
+		p2.requestFocus(defaultWorldFocus.position, defaultWorldFocus.radius)
+	end
+end
+
+local function limitSelectAll(list, p)
+	local v3 = math.max(1, FIntBuildExperienceLibrarySelectAllMax)
+
+	if #list <= v3 then
+		return list, p.selectAll
+	end
+
+	local v4 = string.gsub(p.selectFirst, "{count}", (tostring(v3)))
+	return table.move(list, 1, v3, 1, {}), v4
 end
 
 local function getWorkspace(dataModel) -- 1 equivalent call inferred from this helper
@@ -124,10 +158,38 @@ local function ConnectedLibrary(props)
 	local ref = React.useRef(os.clock())
 	local ref2 = React.useRef(false)
 	local v3 = React.useCallback(function()
-		return { universeId = props.dataModel.GameId, placeId = props.dataModel.PlaceId }
-	end, { props.dataModel })
-	local ref3 = React.useRef(nil)
-	local ref4 = React.useRef(nil)
+		return {
+			universeId = props.dataModel.GameId,
+			placeId = props.dataModel.PlaceId,
+			conversationId = props.eventSessionId
+		}
+	end, { props.dataModel, props.eventSessionId })
+
+	local ref3 = React.useRef({})
+	local function getSelectionPaths(p: string?)
+		local paths = {}
+
+		for _, v4 in ref3.current do
+			if v4.path ~= p then
+				table.insert(paths, v4.path)
+			end
+		end
+
+		return paths
+	end
+
+	local function deselect(p: string)
+		local current = {}
+
+		for _, v4 in ref3.current do
+			if v4.path ~= p then
+				table.insert(current, v4)
+			end
+		end
+
+		ref3.current = current
+		removeOutline(p) -- inferred equivalent call
+	end
 	local v4 = useLibraryStrings()
 	local v5 = libraryStore.useIsOpen()
 	local v6 = SignalsReact.useSignalState(libraryStore.getChatComposerState)
@@ -160,12 +222,11 @@ local function ConnectedLibrary(props)
 
 		return {
 			onAddResource = function(p)
-				local current = ref3.current
+				local selectionPaths = getSelectionPaths(p.path)
 
-				if current ~= nil and current ~= p.path then
-					ref3.current = nil
-					ref4.current = nil
-					onRemoveResourceByPath(current)
+				for _, selectionPath in selectionPaths do
+					deselect(selectionPath)
+					onRemoveResourceByPath(selectionPath)
 				end
 
 				return onAddResource(p)
@@ -282,21 +343,21 @@ local function ConnectedLibrary(props)
 		params ~= nil and (params.folderId or params.itemKind)
 	})
 
-	local ref5 = React.useRef(nil)
+	local ref4 = React.useRef(nil)
 	local externalDispatchConnector = React.useCallback(function(current)
-		ref5.current = current
+		ref4.current = current
 		return function()
-			ref5.current = nil
+			ref4.current = nil
 		end
 	end, {})
 	local onNavigationStateChange = React.useCallback(function(_, p)
 		setState(p.routes[p.index])
 	end, {})
 	local state2, setState2 = React.useState("")
-	local ref6 = React.useRef(nil)
+	local ref5 = React.useRef(nil)
 	local v11 = React.useCallback(function(p: string)
 		setState2(p)
-		local current = ref5.current
+		local current = ref4.current
 
 		if current ~= nil then
 			local UserGameSettings = UserSettings():GetService("UserGameSettings")
@@ -316,12 +377,12 @@ local function ConnectedLibrary(props)
 			end
 		end
 
-		if ref6.current ~= nil then
-			task.cancel(ref6.current)
+		if ref5.current ~= nil then
+			task.cancel(ref5.current)
 		end
 
-		ref6.current = task.delay(0.3, function()
-			ref6.current = nil
+		ref5.current = task.delay(0.3, function()
+			ref5.current = nil
 			sendBuildExperienceEvent("LIBRARY_SEARCH", v3(), {
 				surface = params == nil and "Browser" or "Category",
 				kind = params == nil and "All" or params.itemKind,
@@ -333,9 +394,9 @@ local function ConnectedLibrary(props)
 
 	local function fn2()
 		return function()
-			if ref6.current ~= nil then
-				task.cancel(ref6.current)
-				ref6.current = nil
+			if ref5.current ~= nil then
+				task.cancel(ref5.current)
+				ref5.current = nil
 			end
 		end
 	end
@@ -422,7 +483,7 @@ local function ConnectedLibrary(props)
 	local v14 = SignalsReact.useSignalState(v13)
 
 	local onBack = React.useCallback(function()
-		local current = ref5.current
+		local current = ref4.current
 
 		if state.routeName == "Browser" or current == nil then
 			libraryStore.setIsOpen(false)
@@ -458,7 +519,7 @@ local function ConnectedLibrary(props)
 			setState2("")
 		end
 
-		local current = ref5.current
+		local current = ref4.current
 
 		if current ~= nil then
 			sendBuildExperienceEvent("LIBRARY_CATEGORY_CLICK", v3(), {
@@ -481,7 +542,7 @@ local function ConnectedLibrary(props)
 	end, { v12, v3, state.routeName })
 
 	local onOpenItem = React.useCallback(function(itemId2: string, p)
-		local current = ref5.current
+		local current = ref4.current
 
 		if current ~= nil then
 			local item = library.getItem(false, itemId2)
@@ -509,15 +570,15 @@ local function ConnectedLibrary(props)
 		end
 	end, { v3, state.routeName, libraryStore, library })
 
-	local ref7 = React.useRef(false)
-	local ref8 = React.useRef(nil)
+	local ref6 = React.useRef(false)
+	local ref7 = React.useRef(nil)
 	React.useEffect(function()
-		if ref7.current or v7 == nil then
+		if ref6.current or v7 == nil then
 			return
 		end
 
 		if not v5 or v10.phase ~= "Home" then
-			ref7.current = true
+			ref6.current = true
 			return
 		end
 
@@ -527,16 +588,16 @@ local function ConnectedLibrary(props)
 
 		if FFlagBuildExperienceLibrary then
 			if isAvailable then
-				ref7.current = true
-				requestWorldFocus(v9, libraryStore)
+				ref6.current = true
+				requestWorldFocus(v9, libraryStore, v7) -- inferred equivalent call
 			end
 		else
 			for _, v15 in v8 do
 				local model = v15.model
 
 				if v15.folderId == nil and v15.className ~= "Folder" and model ~= nil and model:IsDescendantOf(v7) then
-					ref7.current = true
-					ref8.current = model
+					ref6.current = true
+					ref7.current = model
 					requestModelFocus(model, libraryStore) -- inferred equivalent call
 					return
 				end
@@ -555,21 +616,21 @@ local function ConnectedLibrary(props)
 	})
 
 	local current2 = v5 and state.routeName == "Browser"
-	local ref9 = React.useRef(current2)
+	local ref8 = React.useRef(current2)
 	React.useEffect(function()
 		if FFlagBuildExperienceLibrary then
-			if current2 and not ref9.current and ref7.current and isAvailable then
-				requestWorldFocus(v9, libraryStore)
+			if current2 and not ref8.current and ref6.current and isAvailable then
+				requestWorldFocus(v9, libraryStore, v7) -- inferred equivalent call
 			end
 
-			ref9.current = current2
+			ref8.current = current2
 		else
-			local current = ref8.current
+			local current = ref7.current
 			local focusRequest = libraryStore.getFocusRequest(false)
 
 			if
 				current2
-				and not ref9.current
+				and not ref8.current
 				and current ~= nil
 				and v7 ~= nil
 				and current:IsDescendantOf(v7)
@@ -578,30 +639,30 @@ local function ConnectedLibrary(props)
 				requestModelFocus(current, libraryStore) -- inferred equivalent call
 			end
 
-			ref9.current = current2
+			ref8.current = current2
 		end
 	end, { current2, v7, libraryStore, isAvailable, v9 })
 
-	local ref10 = React.useRef("Browser")
-	ref10.current = not v5 and "World" or state.routeName
-	local ref11 = React.useRef(false)
+	local ref9 = React.useRef("Browser")
+	ref9.current = not v5 and "World" or state.routeName
+	local ref10 = React.useRef(false)
 	local current3 = React.useCallback(function(reason: string)
-		if ref11.current then
+		if ref10.current then
 			return
 		end
 
-		ref11.current = true
+		ref10.current = true
 		sendBuildExperienceEvent("LIBRARY_IMPRESSION", v3(), {
 			phase = "closed",
 			reason = reason,
-			surface = ref10.current
+			surface = ref9.current
 		})
 	end, { v3 })
-	local ref12 = React.useRef(current3)
-	ref12.current = current3
+	local ref11 = React.useRef(current3)
+	ref11.current = current3
 	React.useEffect(function()
 		return function()
-			ref12.current("other")
+			ref11.current("other")
 		end
 	end, {})
 
@@ -610,16 +671,12 @@ local function ConnectedLibrary(props)
 		ReplicatedFirst:RemoveDefaultLoadingScreen()
 		return function()
 			props.onUnmount()
-
-			if v ~= nil then
-				v:Destroy()
-				v = nil
-			end
+			clearOutlines() -- inferred equivalent call
 		end
 	end, { props.onUnmount })
 
 	local state4, setState4 = React.useState(false)
-	local ref13 = React.useRef(false)
+	local ref12 = React.useRef(false)
 
 	local state5, setState5 = React.useState(false)
 	React.useEffect(function()
@@ -631,13 +688,12 @@ local function ConnectedLibrary(props)
 		end
 	end, {})
 	React.useEffect(function()
-		if current2 and v ~= nil then
-			v:Destroy()
-			v = nil
+		if current2 then
+			clearOutlines() -- inferred equivalent call
 		end
 	end, { current2 })
 
-	local ref14 = React.useRef(0)
+	local ref13 = React.useRef(0)
 	React.useEffect(function()
 		if v14 == nil or v14.model == nil then
 			return
@@ -645,17 +701,11 @@ local function ConnectedLibrary(props)
 
 		local flag = true
 		local destroyingConnection = v14.model.Destroying:Connect(function()
-			ref14.current += 1
+			ref13.current += 1
 			libraryStore.clearFocus()
-			ref3.current = nil
-			ref4.current = nil
-			resourceActions.onRemoveResource(LibraryTypes.toChatResource(v14))
-
-			if v ~= nil then
-				v:Destroy()
-				v = nil
-			end
-
+			local chatResource = LibraryTypes.toChatResource(v14)
+			deselect(chatResource.path)
+			resourceActions.onRemoveResource(chatResource)
 			task.defer(function()
 				if flag then
 					v12()
@@ -681,23 +731,23 @@ local function ConnectedLibrary(props)
 		current4 = v6.isAssistantResponding == true
 	end
 
-	local ref15 = React.useRef(false)
-	local ref16 = React.useRef(nil)
+	local ref14 = React.useRef(false)
+	local ref15 = React.useRef(nil)
 	local v16 = SignalsReact.useSignalState(libraryStore.getPromptFailure)
-	local ref17 = React.useRef(v16 == nil and 0 or v16.token)
+	local ref16 = React.useRef(v16 == nil and 0 or v16.token)
 	React.useEffect(function()
-		if v16 == nil or v16.token <= ref17.current then
+		if v16 == nil or v16.token <= ref16.current then
 			return
 		end
 
-		ref17.current = v16.token
-		local current = ref16.current
+		ref16.current = v16.token
+		local current = ref15.current
 
 		if current == nil then
 			return
 		end
 
-		ref16.current = nil
+		ref15.current = nil
 		local clone = table.clone(current)
 		clone.phase = "failed"
 
@@ -708,74 +758,176 @@ local function ConnectedLibrary(props)
 		sendBuildExperienceEvent("LIBRARY_ASSET_CLICK", v3(), clone)
 	end, { v16, v3 })
 	React.useEffect(function()
-		if ref15.current and not current4 then
-			ref16.current = nil
+		if ref14.current and not current4 then
+			ref15.current = nil
 		end
 
-		if ref15.current and not current4 and state3 and v5 then
+		if ref14.current and not current4 and state3 and v5 then
 			v12()
 		end
 
-		ref15.current = current4
+		ref14.current = current4
 	end, { current4, state3, v5, v12 })
-	local v17 = React.useCallback(function(p, flag: boolean)
+	local ref17 = React.useRef(onRemoveResourceByPath)
+	ref17.current = onRemoveResourceByPath
+	local function removeFromChat(items) -- 2 equivalent calls inferred from this helper
+		local current = ref17.current
+
+		if current == nil then
+			libraryStore.requestRemoveAllFromChat(items)
+
+			return
+		end
+
+		for _, item in items do
+			current(item.path)
+		end
+	end
+
+	local ref18 = React.useRef({})
+	local function unwatchSelection() -- 2 equivalent calls inferred from this helper
+		for _, connection in ref18.current do
+			connection:Disconnect()
+		end
+
+		ref18.current = {}
+	end
+	local function watchSelection(items)
+		unwatchSelection() -- inferred equivalent call
+		local chatResources = {}
+
+		for _, item in items do
+			local model = item.model
+
+			if model == nil then
+				continue
+			end
+
+			local chatResource = LibraryTypes.toChatResource(item)
+			table.insert(ref18.current, model.Destroying:Connect(function()
+				if #chatResources == 0 then
+					task.defer(function()
+						local v17 = chatResources
+						chatResources = {}
+						removeFromChat(v17) -- inferred equivalent call
+						v12()
+					end)
+				end
+
+				table.insert(chatResources, chatResource)
+				deselect(chatResource.path)
+			end))
+		end
+	end
+	React.useEffect(function()
+		return unwatchSelection
+	end, {})
+	local v17 = React.useCallback(function(list, flag: boolean)
+		clearOutlines() -- inferred equivalent call
+		local models = {}
+
+		for _, item in list do
+			if item.model == nil then
+				continue
+			end
+
+			outlineModel(LibraryTypes.toChatResource(item).path, item.model)
+			table.insert(models, item.model)
+		end
+
+		if #list == 1 and #models == 1 then
+			requestModelFocus(models[1], libraryStore) -- inferred equivalent call
+		elseif #models > 0 then
+			requestModelsFocus(models, libraryStore)
+		end
+
+		libraryStore.setIsOpen(false)
+		ref13.current += 1
+		local current = ref13.current
+		task.defer(function()
+			if ref13.current ~= current or libraryStore.getIsOpen(false) then
+				return
+			end
+
+			local current5 = {}
+
+			for _, item in list do
+				table.insert(current5, LibraryTypes.toChatResource(item))
+			end
+
+			libraryStore.requestAddAllToChat(current5, getSelectionPaths(), flag)
+			ref3.current = current5
+
+			if FFlagBuildExperienceLibrary then
+				watchSelection(list)
+			end
+
+			GetPlayButtonStore().setIsActive(true)
+		end)
+	end, { libraryStore })
+	local v18 = React.useCallback(function(p, flag: boolean)
 		if p.model ~= nil and not p.model:IsDescendantOf(workspace) then
 			return
 		end
 
-		if p.model ~= nil then
-			focusModel(p.model, libraryStore)
-		end
-
-		libraryStore.setIsOpen(false)
-		ref14.current += 1
-		local current = ref14.current
-		task.defer(function()
-			if ref14.current ~= current or libraryStore.getIsOpen(false) then
-				return
-			end
-
-			local chatResource = LibraryTypes.toChatResource(p)
-			libraryStore.requestAddToChat(chatResource, ref3.current, flag)
-			ref3.current = chatResource.path
-			ref4.current = chatResource
-			GetPlayButtonStore().setIsActive(true)
-		end)
-	end, { libraryStore })
+		v17({ p }, flag)
+	end, { v17 })
 	React.useEffect(function()
 		return function()
-			ref14.current += 1
+			ref13.current += 1
 		end
 	end, {})
 
-	local v18 = SignalsReact.useSignalState(libraryStore.getChipEvent)
+	local v19 = SignalsReact.useSignalState(libraryStore.getChipEvent)
 	React.useEffect(function()
-		local current = ref4.current
-
-		if v18 == nil or current == nil or not table.find(v18.uris, LibraryTypes.toResourceUri(current.path)) then
+		if v19 == nil then
 			return
 		end
 
-		if v18.kind == "Removed" then
-			ref3.current = nil
-			ref4.current = nil
+		local v20 = {}
 
-			if v ~= nil then
-				v:Destroy()
-				v = nil
+		for _, v21 in ref3.current do
+			if not table.find(v19.uris, LibraryTypes.toResourceUri(v21.path)) then
+				continue
 			end
-		elseif v18.kind == "Activated" then
-			for _, v19 in library.getItems(false) do
-				if not (v19.path == current.path and v19.model ~= nil and v19.model:IsDescendantOf(workspace)) then
+
+			table.insert(v20, v21)
+		end
+
+		if #v20 == 0 then
+			return
+		end
+
+		if v19.kind == "Removed" then
+			for _, v21 in v20 do
+				deselect(v21.path)
+			end
+		else
+			if v19.kind ~= "Activated" then
+				libraryStore.requestAddAllToChat(v20, {}, false)
+
+				return
+			end
+
+			local pathSet = {}
+
+			for _, v21 in ref3.current do
+				pathSet[v21.path] = true
+			end
+
+			for _, v21 in library.getItems(false) do
+				if not (pathSet[v21.path] and v21.model ~= nil and v21.model:IsDescendantOf(workspace)) then
 					continue
 				end
 
-				focusModel(v19.model, libraryStore)
+				outlineModel(v21.path, v21.model)
+
+				if v21.path == v20[1].path then
+					requestModelFocus(v21.model, libraryStore) -- inferred equivalent call
+				end
 			end
-		else
-			libraryStore.requestAddToChat(current, nil, false)
 		end
-	end, { v18, libraryStore, library.getItems })
+	end, { v19, libraryStore, library.getItems })
 	React.useEffect(function()
 		if v5 or not (state3 and isAvailable) then
 			return nil
@@ -788,47 +940,43 @@ local function ConnectedLibrary(props)
 			return nil
 		end
 
-		local v19 = true
+		local v20 = true
 		local viewerWorldPicker = createViewerWorldPicker({
 			camera = currentCamera,
 			userInputService = props.dataModel:GetService("UserInputService"),
 			world = Workspace,
 			isBlocked = function()
-				return not v19 or libraryStore.getIsOpen(false)
+				return not v20 or libraryStore.getIsOpen(false)
 			end,
 			onPick = function(p)
-				local v20 = library.resolveWorldItem(p)
+				local v21 = library.resolveWorldItem(p)
 
-				if v20 == nil then
+				if v21 == nil then
 					v12()
-					v20 = library.resolveWorldItem(p)
+					v21 = library.resolveWorldItem(p)
 				end
 
-				if v20 ~= nil then
-					onOpenItem(v20.id, v20.kind)
-					v17(v20, not GetPlayButtonStore().getIsActive(false))
+				if v21 ~= nil then
+					onOpenItem(v21.id, v21.kind)
+					v18(v21, not GetPlayButtonStore().getIsActive(false))
 				end
 			end,
 			onMiss = function()
-				local current = ref4.current
+				local current = ref3.current
 
-				if current == nil then
+				if #current == 0 then
 					return
 				end
 
-				ref3.current = nil
-				ref4.current = nil
-				resourceActions.onRemoveResource(current)
-
-				if v ~= nil then
-					v:Destroy()
-					v = nil
-				end
+				ref3.current = {}
+				unwatchSelection() -- inferred equivalent call
+				clearOutlines() -- inferred equivalent call
+				removeFromChat(current) -- inferred equivalent call
 			end
 		})
 
 		return function()
-			v19 = false
+			v20 = false
 			viewerWorldPicker()
 		end
 	end, {
@@ -838,7 +986,7 @@ local function ConnectedLibrary(props)
 		libraryStore,
 		library,
 		v12,
-		v17,
+		v18,
 		onOpenItem,
 		resourceActions,
 		props.dataModel
@@ -858,23 +1006,28 @@ local function ConnectedLibrary(props)
 					kind = "All",
 					surface = "World",
 					source = "home_cutout"
+				} or FFlagBuildExperienceLibrary and itemId == nil and {
+					action = "back",
+					kind = "Model",
+					surface = "World",
+					source = "select_all"
 				} or { action = "object", kind = kind, surface = "World" }
 			)
 		end
 
-		ref14.current += 1
+		ref13.current += 1
 		GetPlayButtonStore().setIsActive(false)
 		libraryStore.setIsOpen(true)
 	end
 	local onWorldViewportChanged = React.useCallback(function(p)
 		local setWorldViewportRect = libraryStore.setWorldViewportRect
-		local v19
+		local v20
 
 		if p ~= nil then
-			v19 = Rect.new(p.AbsolutePosition, p.AbsolutePosition + p.AbsoluteSize)
+			v20 = Rect.new(p.AbsolutePosition, p.AbsolutePosition + p.AbsoluteSize)
 		end
 
-		setWorldViewportRect(v19)
+		setWorldViewportRect(v20)
 	end, { libraryStore })
 	local function fn4(value: string?)
 		if itemId ~= nil then
@@ -882,13 +1035,13 @@ local function ConnectedLibrary(props)
 
 			if item ~= nil then
 				local isOpen = libraryStore.getIsOpen(false)
-				v17(item, value ~= "prompt")
-				local v19 = isOpen and not libraryStore.getIsOpen(false)
+				v18(item, value ~= "prompt")
+				local v20 = isOpen and not libraryStore.getIsOpen(false)
 
-				if v19 or isOpen and item.model ~= nil and not item.model:IsDescendantOf(workspace) then
+				if v20 or isOpen and item.model ~= nil and not item.model:IsDescendantOf(workspace) then
 					sendBuildExperienceEvent("LIBRARY_ASSET_CLICK", v3(), {
 						action = "world",
-						outcome = not v19 and "unavailable" or nil,
+						outcome = not v20 and "unavailable" or nil,
 						kind = item.kind,
 						surface = "Detail",
 						source = value or "segmented_control",
@@ -915,39 +1068,39 @@ local function ConnectedLibrary(props)
 		})
 
 		if FFlagBuildExperienceLibrary then
-			requestWorldFocus(v9, libraryStore)
+			requestWorldFocus(v9, libraryStore, v7) -- inferred equivalent call
 		end
 
 		fn4()
 	end
 	local function returnToAppChat(p: string?, p2: string)
-		if ref13.current then
+		if ref12.current then
 			return
 		end
 
-		ref13.current = true
+		ref12.current = true
 		setState4(true)
 		current3(p2)
-		local v19 = p or props.sessionId
-		local v20 = `roblox://navigation/build?universeid={props.dataModel.GameId}`
+		local v20 = p or props.sessionId
+		local v21 = `roblox://navigation/build?universeid={props.dataModel.GameId}`
 
-		if v19 ~= nil then
-			v20 ..= `&sessionid={HttpService:UrlEncode(v19)}`
+		if v20 ~= nil then
+			v21 ..= `&sessionid={HttpService:UrlEncode(v20)}`
 		end
 
 		if default:isInternalDlicEnabled() then
-			local internalDlic = default:createInternalDlic(v20, DeepLinkSource.LuaInternal)
+			local internalDlic = default:createInternalDlic(v21, DeepLinkSource.LuaInternal)
 			task.spawn(leaveExperience, function()
 				default:detectDeeplinkIntent(internalDlic)
 			end)
 		else
 			task.spawn(leaveExperience, function()
-				default:detectURL(v20)
+				default:detectURL(v21)
 			end)
 		end
 	end
 	local function onNavigateBack()
-		if ref13.current then
+		if ref12.current then
 			return
 		end
 
@@ -959,25 +1112,25 @@ local function ConnectedLibrary(props)
 			onBack()
 		end
 	end
-	local ref18 = React.useRef(onNavigateBack)
-	ref18.current = onNavigateBack
-	local ref19 = React.useRef(nil)
+	local ref19 = React.useRef(onNavigateBack)
+	ref19.current = onNavigateBack
+	local ref20 = React.useRef(nil)
 	React.useEffect(function()
 		local function navigateBack()
-			ref18.current()
+			ref19.current()
 		end
 		local connection = getAndroidBackSignal():Connect(navigateBack)
 		local current = bindLibraryBackInput(navigateBack)
-		ref19.current = current
+		ref20.current = current
 		return function()
 			connection:Disconnect()
 			current.unbind()
-			ref19.current = nil
+			ref20.current = nil
 		end
 	end, {})
 	React.useEffect(function()
-		if ref19.current ~= nil then
-			ref19.current.setChatOpen(v15)
+		if ref20.current ~= nil then
+			ref20.current.setChatOpen(v15)
 		end
 	end, { v15 })
 	local clone
@@ -1004,31 +1157,78 @@ local function ConnectedLibrary(props)
 				sendBuildExperienceEvent("LIBRARY_ASSET_CLICK", v3(), clone2)
 			end
 
-			local v19
+			local v20
 
 			if kind == "Image" or kind == "Sound" then
-				v19 = onSend(function(p: string?)
+				v20 = onSend(function(p: string?)
 					onPromptAccepted() -- inferred equivalent call
 					returnToAppChat(p, "prompt_return")
 				end)
 			else
-				v19 = onSend(onPromptAccepted)
+				v20 = onSend(onPromptAccepted)
 			end
 
-			if v19 then
-				ref16.current = current
+			if v20 then
+				ref15.current = current
 			end
 
-			if v19 and kind == "Model" then
+			if v20 and kind == "Model" then
 				fn4("prompt")
 			end
 
 			local clone2 = table.clone(current)
 			clone2.phase = "submit"
-			clone2.outcome = v19 and "accepted" or "rejected"
+			clone2.outcome = v20 and "accepted" or "rejected"
 			sendBuildExperienceEvent("LIBRARY_ASSET_CLICK", v3(), clone2)
-			return v19
+			return v20
 		end
+	end
+
+	local v20 = state.routeName == "Category" or state.routeName == "Search"
+	local params2 = v20 and state.params or {}
+	local v21 = state.routeName ~= "Search" and "" or state2
+	local v22 = React.useMemo(function()
+		local result = {}
+
+		if not (FFlagBuildExperienceLibrary and v20) or params2.itemKind ~= nil and params2.itemKind ~= "Model" then
+			return result
+		end
+
+		local set = {}
+
+		for _, v22 in v9 do
+			set[v22] = true
+		end
+
+		for _, v22 in getLibraryMatches(v8, "Model", v21, params2.folderId, true) do
+			if v22.model ~= nil and set[v22.model] then
+				table.insert(result, v22)
+			end
+		end
+
+		return result
+	end, {
+		v20,
+		params2.itemKind or false,
+		params2.folderId or false,
+		v21,
+		v8,
+		v9
+	})
+
+	local v23, selectAllLabel = limitSelectAll(v22, v4)
+	local function fn5()
+		sendBuildExperienceEvent("LIBRARY_ASSET_CLICK", v3(), {
+			action = "select_all",
+			kind = "Model",
+			surface = state.routeName,
+			scope = params2.folderId == nil and "Root" or "Folder",
+			hasQuery = tostring(v21 ~= ""),
+			selectedCount = tostring(#v23),
+			matchCount = tostring(#v22)
+		})
+
+		v17(v23, true)
 	end
 
 	local element = React.createElement(LibraryNavigator, {
@@ -1065,7 +1265,7 @@ local function ConnectedLibrary(props)
 
 	local createElement = React.createElement
 	local focusRoot = FocusNavigationUtils.FocusRoot
-	local v19 = {
+	local v24 = {
 		surfaceIdentifier = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum.PopUp,
 		isAutoFocusRoot = v5,
 		isFocusable = v5,
@@ -1073,7 +1273,7 @@ local function ConnectedLibrary(props)
 	}
 
 	local createElement2 = React.createElement
-	local v20 = {
+	local v25 = {
 		isOpen = v5,
 		showModeControl = nil,
 		isWorldAvailable = 0,
@@ -1083,6 +1283,8 @@ local function ConnectedLibrary(props)
 		searchPlaceholder = 0,
 		onQueryChanged = 0,
 		onSearchReset = 0,
+		selectAllLabel = 0,
+		onSelectAll = 0,
 		assetLabel = 0,
 		worldLabel = 0,
 		onShowLibrary = 0,
@@ -1103,14 +1305,14 @@ local function ConnectedLibrary(props)
 		showModeControl = isAvailable
 	end
 
-	v20.showModeControl = showModeControl
+	v25.showModeControl = showModeControl
 	local isWorldAvailable
 
 	if not (v14 == nil or v14.model == nil) then
 		isWorldAvailable = v14.model:IsDescendantOf(workspace)
 	end
 
-	v20.isWorldAvailable = isWorldAvailable
+	v25.isWorldAvailable = isWorldAvailable
 	local title
 
 	if itemId == nil then
@@ -1123,10 +1325,12 @@ local function ConnectedLibrary(props)
 		title = if v14 == nil then assetLabel else v14.displayName
 	end
 
-	v20.title = title
+	v25.title = title
 	local onBack2
 
-	if itemId == nil and params == nil and state.routeName ~= "Search" then
+	if FFlagBuildExperienceLibrary and not v5 and itemId == nil then
+		onBack2 = fn3
+	elseif itemId == nil and params == nil and state.routeName ~= "Search" then
 		if not v5 then
 			onBack2 = fn3
 		end
@@ -1134,39 +1338,46 @@ local function ConnectedLibrary(props)
 		onBack2 = onBack
 	end
 
-	v20.onBack = onBack2
+	v25.onBack = onBack2
 
 	if itemId ~= nil then
 		state2 = nil
 	end
 
-	v20.query = state2
-	v20.searchPlaceholder = v4.searchPlaceholder
+	v25.query = state2
+	v25.searchPlaceholder = v4.searchPlaceholder
 	local onQueryChanged
 
 	if itemId == nil then
 		onQueryChanged = v11
 	end
 
-	v20.onQueryChanged = onQueryChanged
+	v25.onQueryChanged = onQueryChanged
 
 	if itemId ~= nil then
 		onSearchReset = nil
 	end
 
-	v20.onSearchReset = onSearchReset
-	v20.assetLabel = assetLabel
-	v20.worldLabel = v4.world
-	v20.onShowLibrary = fn3
-	v20.onShowWorld = fn4
-	v20.onWorldViewportChanged = onWorldViewportChanged
-	v20.worldCutout = v10.view
-	function v20.onLeave()
+	v25.onSearchReset = onSearchReset
+	v25.selectAllLabel = selectAllLabel
+
+	if not (#v22 > 0) then
+		fn5 = nil
+	end
+
+	v25.onSelectAll = fn5
+	v25.assetLabel = assetLabel
+	v25.worldLabel = v4.world
+	v25.onShowLibrary = fn3
+	v25.onShowWorld = fn4
+	v25.onWorldViewportChanged = onWorldViewportChanged
+	v25.worldCutout = v10.view
+	function v25.onLeave()
 		returnToAppChat(nil, "close_button")
 	end
 
-	local v21 = {
-		Experience = createElement2(LibraryExperienceView, v20, element),
+	local v26 = {
+		Experience = createElement2(LibraryExperienceView, v25, element),
 		Leaving = 0,
 		FirstFrameCover = 0
 	}
@@ -1176,7 +1387,7 @@ local function ConnectedLibrary(props)
 		leaving = React.createElement(LibraryLeavingOverlay, { ZIndex = 2 })
 	end
 
-	v21.Leaving = leaving
+	v26.Leaving = leaving
 	local firstFrameCover
 
 	if not state5 then
@@ -1187,8 +1398,8 @@ local function ConnectedLibrary(props)
 		})
 	end
 
-	v21.FirstFrameCover = firstFrameCover
-	return createElement(focusRoot, v19, v21)
+	v26.FirstFrameCover = firstFrameCover
+	return createElement(focusRoot, v24, v26)
 end
 
 local function mountLibrary(p, sessionId: string?)
@@ -1215,32 +1426,46 @@ local function mountLibrary(p, sessionId: string?)
 	local focusNavigationService = ReactFocusNavigation.FocusNavigationService.new(ReactFocusNavigation.EngineInterface.CoreGui)
 
 	ReactRoblox.flushSync(function()
-		root:render(React.createElement(LocalizationProvider, { localization = localization2 }, {
-			FoundationProvider = React.createElement(LibraryThemeProvider, { displayOrder = 10 }, {
-				CompositionStyleSheet = React.createElement(BuildExperienceCompositionStyleSheet),
-				Library = React.createElement(
-					ReactFocusNavigation.FocusNavigationContext.Provider,
-					{ value = focusNavigationService },
-					{
-						Registry = React.createElement(
-							FocusNavigationUtils.FocusNavigableSurfaceRegistry.Provider,
-							nil,
-							{
-								Content = React.createElement(ConnectedLibrary, {
-									dataModel = p or game,
-									library = buildLibraryStore,
-									sessionId = sessionId,
-									onUnmount = function()
-										focusNavigationService:teardown()
-										v2 = nil
-										buildExperienceLibrary:Destroy()
-									end
-								})
-							}
-						)
-					}
-				)
+		local createElement = React.createElement
+
+		local createElement2 = React.createElement
+		local v3 = {
+			CompositionStyleSheet = React.createElement(BuildExperienceCompositionStyleSheet),
+			Library = 0
+		}
+		local createElement3 = React.createElement
+		local provider = ReactFocusNavigation.FocusNavigationContext.Provider
+
+		local createElement4 = React.createElement
+		local provider2 = FocusNavigationUtils.FocusNavigableSurfaceRegistry.Provider
+		local createElement5 = React.createElement
+		local v4 = {
+			dataModel = p or game,
+			library = buildLibraryStore,
+			sessionId = sessionId,
+			eventSessionId = 0,
+			onUnmount = 0
+		}
+		local eventSessionId
+
+		if FFlagBuildExperienceEventContextTelemetry then
+			eventSessionId = sessionId
+		end
+
+		v4.eventSessionId = eventSessionId
+		function v4.onUnmount()
+			focusNavigationService:teardown()
+			v2 = nil
+			buildExperienceLibrary:Destroy()
+		end
+
+		v3.Library = createElement3(provider, { value = focusNavigationService }, {
+			Registry = createElement4(provider2, nil, {
+				Content = createElement5(ConnectedLibrary, v4)
 			})
+		})
+		root:render(createElement(LocalizationProvider, { localization = localization2 }, {
+			FoundationProvider = createElement2(LibraryThemeProvider, { displayOrder = 10 }, v3)
 		}))
 	end)
 

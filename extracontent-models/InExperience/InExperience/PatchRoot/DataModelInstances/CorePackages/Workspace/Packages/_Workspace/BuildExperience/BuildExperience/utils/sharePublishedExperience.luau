@@ -11,7 +11,6 @@ local SharedFlags = require(parent.SharedFlags)
 
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
 local createExperienceShareLink = require(BuildExperience.utils.createExperienceShareLink)
-local FFlagBuildShareSheetFriendsSortAll = require(BuildExperience.Flags.FFlagBuildShareSheetFriendsSortAll)
 local FFlagEnableShareSheet = SharedFlags.FFlagEnableShareSheet
 local isSubjectToDesktopPolicies = SharedFlags.isSubjectToDesktopPolicies
 local DataHydration
@@ -132,24 +131,15 @@ return {
 		end, { v4.gameShared, v5 })
 
 		local messagePlaceholder = v4.messagePlaceholder
-		return React.useCallback(function(p2: number, p3)
-			local function showShareSheet(p4: string?)
-				local show = UniversalShareSheet.show
-				local recipientSource
-
-				if FFlagBuildShareSheetFriendsSortAll then
-					recipientSource = UniversalShareSheet.RecipientSource.OneToOneFriends
-				else
-					recipientSource = p3
-				end
-
-				show({
+		return React.useCallback(function(p2: number)
+			local function showShareSheet(p3: string?)
+				UniversalShareSheet.show({
 					context = "BuildExperienceGameShare",
-					recipientSource = recipientSource,
+					recipientSource = UniversalShareSheet.RecipientSource.OneToOneFriends,
 					telemetryId = tostring(p2),
 					formatSuccessSnackbarText = formatSuccessSnackbarText2,
 					messagePlaceholder = messagePlaceholder,
-					url = p4 or getGameShareUrl(p2) -- inferred equivalent call
+					url = p3 or getGameShareUrl(p2) -- inferred equivalent call
 				})
 			end
 
@@ -162,7 +152,7 @@ return {
 			end
 		end, { formatSuccessSnackbarText2, messagePlaceholder, p })
 	end or function()
-		return React.useCallback(function(p: number, _)
+		return React.useCallback(function(p: number)
 			sharePublishedExperience(p, nil)
 		end, {})
 	end

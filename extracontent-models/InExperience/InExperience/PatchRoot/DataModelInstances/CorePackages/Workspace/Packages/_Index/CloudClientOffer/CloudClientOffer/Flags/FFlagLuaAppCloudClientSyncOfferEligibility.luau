@@ -1,0 +1,2 @@
+return game:DefineFastFlag("LuaAppCloudClientSyncOfferEligibility", false)
+	and game:GetEngineFeature("CloudClientSyncOfferEligibility")

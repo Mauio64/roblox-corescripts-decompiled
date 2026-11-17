@@ -13,8 +13,6 @@ local SharedFlags = require(parent.SharedFlags)
 local FFlagSduiPropParsersShouldHandleTokens = SharedFlags.FFlagSduiPropParsersShouldHandleTokens
 local SharedFlags2 = require(parent.SharedFlags)
 local FFlagSduiUnwrapStructPropEnvelope = SharedFlags2.FFlagSduiUnwrapStructPropEnvelope
-local SharedFlags3 = require(parent.SharedFlags)
-local FFlagSduiParseProtoGradientFields = SharedFlags3.FFlagSduiParseProtoGradientFields
 
 local function applyTokenScaling(p: number, p2) -- 5 equivalent calls inferred from this helper
 	return p * (p2 and p2.Config.UI.Scale or 1)
@@ -361,8 +359,61 @@ local v = {
 	endOpacity = 1,
 	degree = 270
 }
+local SduiClientBindingParsers = {}
+SduiClientBindingParsers.parseUDim = fn2
+SduiClientBindingParsers.parseUDim2 = fn
+SduiClientBindingParsers.parseNumber = parseNumber
+SduiClientBindingParsers.applyTokenScaling = applyTokenScaling
 
-local function parseGradient(p)
+function SduiClientBindingParsers.parseUiScaledNumber(p, p2)
+	return parseNumber(p, p2, true)
+end
+
+function SduiClientBindingParsers.parseUiScaledUDim(p: string, p2)
+	return fn2(p, p2, true)
+end
+
+function SduiClientBindingParsers.parseUiScaledUDim2(p: string, p2)
+	return fn(p, p2, true)
+end
+
+SduiClientBindingParsers.parseStruct = parseStruct
+
+function SduiClientBindingParsers.parseArrayOfStruct(items)
+	if typeof(items) ~= "table" then
+		return items
+	end
+
+	local result = {}
+
+	for k, item in items do
+		result[k] = parseStruct(item)
+	end
+
+	return result
+end
+
+SduiClientBindingParsers.parsePymkItems = parsePymkItems
+
+function SduiClientBindingParsers.parseStringArray(p)
+	if typeof(p) == "table" then
+		return p.items or p
+	end
+
+	return nil
+end
+
+function SduiClientBindingParsers.parseToString(p)
+	if p == nil then
+		return nil
+	end
+
+	return (tostring(p))
+end
+
+SduiClientBindingParsers.parseColor3 = parseColor3
+
+function SduiClientBindingParsers.parseGradient(p)
 	local v2 = parseStruct(p)
 
 	if typeof(v2) ~= "table" then
@@ -427,61 +478,6 @@ local function parseGradient(p)
 	}
 end
 
-local SduiClientBindingParsers = {
-	parseUDim = fn2,
-	parseUDim2 = fn,
-	parseNumber = parseNumber,
-	applyTokenScaling = applyTokenScaling,
-	parseUiScaledNumber = function(p, p2)
-		return parseNumber(p, p2, true)
-	end,
-	parseUiScaledUDim = function(p: string, p2)
-		return fn2(p, p2, true)
-	end,
-	parseUiScaledUDim2 = function(p: string, p2)
-		return fn(p, p2, true)
-	end,
-	parseStruct = parseStruct,
-	parseArrayOfStruct = function(items)
-		if typeof(items) ~= "table" then
-			return items
-		end
-
-		local result = {}
-
-		for k, item in items do
-			result[k] = parseStruct(item)
-		end
-
-		return result
-	end,
-	parsePymkItems = parsePymkItems,
-	parseStringArray = function(p)
-		if typeof(p) == "table" then
-			return p.items or p
-		end
-
-		return nil
-	end,
-	parseToString = function(p)
-		if p == nil then
-			return nil
-		end
-
-		return (tostring(p))
-	end,
-	parseColor3 = parseColor3,
-	parseGradient = 0,
-	parseColorPropLegacy = 0,
-	parseFocusNavActions = 0
-}
-
-if not FFlagSduiParseProtoGradientFields then
-	parseGradient = nil
-end
-
-SduiClientBindingParsers.parseGradient = parseGradient
-
 function SduiClientBindingParsers.parseColorPropLegacy(value)
 	if typeof(value) == "string" then
 		return Color3.fromHex(value)
@@ -521,4 +517,5 @@ function SduiClientBindingParsers.parseFocusNavActions(p)
 
 	return { keys = keys, events = events }
 end
+
 return SduiClientBindingParsers

@@ -23,6 +23,11 @@ local v = {
 	[EventNames.MomentCommentPostResult] = {
 		counter = RealtimeEventNames.MomentsCommentPost,
 		statusField = "outcome"
+	},
+	[EventNames.MomentCommentTranslationToggled] = {
+		counter = RealtimeEventNames.MomentsCommentTranslationToggle,
+		statusField = "isTranslationShown",
+		statusLabels = { ["true"] = "translated", ["false"] = "original" }
 	}
 }
 
@@ -50,6 +55,11 @@ function ReportMomentsCommentsRealtime.reportMomentsComments(p: string, data, ca
 
 	if v3 == nil and v2.statusField ~= nil then
 		v3 = data[v2.statusField]
+		local statusLabels = v2.statusLabels
+
+		if statusLabels ~= nil and v3 ~= nil then
+			v3 = statusLabels[v3]
+		end
 	end
 
 	emit(v2.counter, { -- inferred equivalent call

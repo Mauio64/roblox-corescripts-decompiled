@@ -108,7 +108,8 @@ local function fn(object)
 	object:dispatch(VoiceStateChanged(userId, VOICE_STATE.HIDDEN))
 	default.muteChanged.Event:Connect(function(p)
 		logger:debug("Mute changed to {}", p)
-		object:dispatch(VoiceStateChanged(userId, p and VOICE_STATE.MUTED or VOICE_STATE.INACTIVE))
+		local muted = p and VOICE_STATE.MUTED or VOICE_STATE.INACTIVE
+		object:dispatch(VoiceStateChanged(userId, muted))
 	end)
 
 	default.participantsUpdate.Event:Connect(function(items)

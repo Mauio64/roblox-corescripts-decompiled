@@ -94,6 +94,7 @@ local function CommentReactionButton(props)
 	end)
 
 	local small = v5.Padding.Small
+	local rightInset = props.rightInset or small
 	local v10
 
 	if FFlagMomentsCommentRowRedesign then
@@ -133,7 +134,7 @@ local function CommentReactionButton(props)
 		position = UDim2.new(0, 0, 0.5, -1)
 	end
 
-	local padding = { right = UDim.new(0, small), bottom = 0 }
+	local padding = { right = UDim.new(0, rightInset), bottom = 0 }
 	local bottom
 
 	if not FFlagMomentsCommentRowRedesign then

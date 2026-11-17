@@ -52,10 +52,9 @@ local function getIsUserEligibleForUnifiedPurchaseFlow(p, p2: string?)
 		return APIGetRobloxSubscriptionMetadata(p):andThen(function(p3)
 			local unifiedPurchaseFlowMetadata = p3.unifiedPurchaseFlowMetadata
 			local isUserEligibleForUnifiedPurchaseFlow = unifiedPurchaseFlowMetadata.isUserEligibleForUnifiedPurchaseFlow
-			persistUnifiedPurchaseFlowMetadata( -- inferred equivalent call
-				isUserEligibleForUnifiedPurchaseFlow,
-				v + (unifiedPurchaseFlowMetadata.expiresInSeconds or 0)
-			)
+			local expiresInSeconds = unifiedPurchaseFlowMetadata.expiresInSeconds or 0
+
+			persistUnifiedPurchaseFlowMetadata(isUserEligibleForUnifiedPurchaseFlow, v + expiresInSeconds) -- inferred equivalent call
 
 			return Promise.resolve(isUserEligibleForUnifiedPurchaseFlow)
 		end):catch(function(_)

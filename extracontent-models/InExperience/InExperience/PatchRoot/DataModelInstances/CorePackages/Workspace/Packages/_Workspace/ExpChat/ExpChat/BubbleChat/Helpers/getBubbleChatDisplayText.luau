@@ -8,7 +8,8 @@ local applyBubbleChatMessagePropertiesText = require(script.Parent.applyBubbleCh
 
 local function getBubbleChatDisplayText(data)
 	local v, v2 = applyBubbleChatMessagePropertiesText(data.text, data.translation, data.bubbleChatMessageProperties)
-	return getMessageText(getFFlagChatTranslationUIEnabledBubbleChat() and data.useTranslation, v2, v)
+	local useTranslation = getFFlagChatTranslationUIEnabledBubbleChat() and data.useTranslation
+	return getMessageText(useTranslation, v2, v)
 end
 
 return getBubbleChatDisplayText

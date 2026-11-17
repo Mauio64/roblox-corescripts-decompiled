@@ -26,11 +26,8 @@ local useCursor = UIBlox.App.SelectionCursor.useCursor
 local useInterventionPlacement = require(InterventionShared.Hooks.useInterventionPlacement)
 local Responsive = require(parent.Responsive)
 local useDeviceInsets = Responsive.useDeviceInsets
-
 local SharedFlags = require(parent.SharedFlags)
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
-local SharedFlags2 = require(parent.SharedFlags)
-local FFlagLuaAppSupportDeviceSafeInsets = SharedFlags2.FFlagLuaAppSupportDeviceSafeInsets
+local FFlagLuaAppSupportDeviceSafeInsets = SharedFlags.FFlagLuaAppSupportDeviceSafeInsets
 local defineFastFlag = game:DefineFastFlag("AppChatInterventionDeviceSafeInsets", false)
 
 local FocusNavigationUtils = require(parent.FocusNavigationUtils)
@@ -277,35 +274,39 @@ function InterventionDialog(props)
 								BodyText = bodyText
 							})
 						}),
-						ButtonContainer = React.createElement(View, {
-							Size = UDim2.new(1, 0, 0, 0),
-							AutomaticSize = Enum.AutomaticSize.Y,
-							tag = FFlagExpChatEnableFriendsTab and "padding-x-xxsmall" or nil,
-							LayoutOrder = 2
-						}, {
-							ButtonStack = React.createElement(ButtonStack, {
-								buttons = {
-									{
-										buttonType = ButtonType.PrimarySystem,
-										props = {
-											cursor = cursor,
-											text = v4.IUnderstandText,
-											onActivated = onActivated,
-											layoutOrder = 1
-										}
-									},
-									{
-										buttonType = ButtonType.Secondary,
-										props = {
-											cursor = cursor,
-											text = v4.MistakeText,
-											onActivated = onActivated2,
-											layoutOrder = 2
+						ButtonContainer = React.createElement(
+							View,
+							{
+								Size = UDim2.new(1, 0, 0, 0),
+								AutomaticSize = Enum.AutomaticSize.Y,
+								tag = "padding-x-xxsmall",
+								LayoutOrder = 2
+							},
+							{
+								ButtonStack = React.createElement(ButtonStack, {
+									buttons = {
+										{
+											buttonType = ButtonType.PrimarySystem,
+											props = {
+												cursor = cursor,
+												text = v4.IUnderstandText,
+												onActivated = onActivated,
+												layoutOrder = 1
+											}
+										},
+										{
+											buttonType = ButtonType.Secondary,
+											props = {
+												cursor = cursor,
+												text = v4.MistakeText,
+												onActivated = onActivated2,
+												layoutOrder = 2
+											}
 										}
 									}
-								}
-							})
-						})
+								})
+							}
+						)
 					})
 				})
 			})

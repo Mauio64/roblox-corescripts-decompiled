@@ -10,7 +10,8 @@ local v = {
 }
 
 local function CircleMask(props)
-	local image = v[props.overlaySize or "Size36x36"]
+	local overlaySize = props.overlaySize or "Size36x36"
+	local image = v[overlaySize]
 	local selectionImageObject = useCursor()
 
 	return React.createElement("ImageButton", {

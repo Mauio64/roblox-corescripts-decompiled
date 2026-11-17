@@ -7,6 +7,7 @@ local MomentsCommon = require(parent.MomentsCommon)
 local Analytics = MomentsCommon.Analytics
 
 local Constants = require(Moments.Constants)
+require(Moments.Enums.MomentsFeedType)
 local emitRecommendationImpression = require(Moments.Analytics.emitRecommendationImpression)
 local emitRecommendationAction = require(Moments.Analytics.emitRecommendationAction)
 
@@ -65,48 +66,50 @@ local function getSignalValue(p, p2)
 	return ""
 end
 
-local function createRecommendationTelemetry(p)
-	local getMomentsSessionId = p.getMomentsSessionId
-	local signalTracker = p.signalTracker
+local function createRecommendationTelemetry(data)
+	local getMomentsSessionId = data.getMomentsSessionId
+	local signalTracker = data.signalTracker
+	local feedType = data.feedType
 
 	return {
-		logView = function(data, p2)
+		logView = function(data2, p)
 			emitRecommendationImpression({
-				itemId = data.itemId,
-				tracingId = data.tracingId or "",
+				itemId = data2.itemId,
+				tracingId = data2.tracingId or "",
 				momentsSessionId = getMomentsSessionId(false),
-				position = p2.itemPosition,
-				durationSeconds = p2.durationSeconds,
-				contentType = data.contentType
+				position = p.itemPosition,
+				durationSeconds = p.durationSeconds,
+				contentType = data2.contentType,
+				feedType = feedType
 			})
 
 			if signalTracker then
-				signalTracker:recordSignal(data.itemId, "View", string.format("%.1f", p2.durationSeconds))
+				signalTracker:recordSignal(data2.itemId, "View", string.format("%.1f", p.durationSeconds))
 			end
 		end,
-		logAction = function(p2, data, data2)
-			local actionType = v[p2]
+		logAction = function(p, data2, data3)
+			local actionType = v[p]
 
 			if actionType == nil then
-				if signalTracker and v2[p2] then
+				if signalTracker and v2[p] then
 					signalTracker:recordSignal(
-						data.itemId,
-						p2,
-						(p2 == "AddReaction" or p2 == "RemoveReaction") and data2.reactionType or ""
+						data2.itemId,
+						p,
+						(p == "AddReaction" or p == "RemoveReaction") and data3.reactionType or ""
 					)
 				end
 
 				return nil
 			else
-				local v4 = v3[p2]
+				local v4 = v3[p]
 
 				if v4 ~= nil then
 					Analytics.reportMomentsEngagement(v4)
 				end
 
 				local v5 = {
-					itemId = data.itemId,
-					tracingId = data.tracingId or "",
+					itemId = data2.itemId,
+					tracingId = data2.tracingId or "",
 					momentsSessionId = 0,
 					actionType = 0,
 					reactionType = 0,
@@ -114,12 +117,13 @@ local function createRecommendationTelemetry(p)
 					commentText = 0,
 					actionWeight = 0,
 					contentType = 0,
-					commentSectionOpenDurationSeconds = 0
+					commentSectionOpenDurationSeconds = 0,
+					feedType = 0
 				}
 				local momentsSessionId
 
-				if FFlagMomentsComments and data2.momentsSessionId ~= nil then
-					momentsSessionId = data2.momentsSessionId
+				if FFlagMomentsComments and data3.momentsSessionId ~= nil then
+					momentsSessionId = data3.momentsSessionId
 				else
 					momentsSessionId = getMomentsSessionId(false)
 				end
@@ -127,25 +131,27 @@ local function createRecommendationTelemetry(p)
 				v5.momentsSessionId = momentsSessionId
 
 				v5.actionType = actionType
-				v5.reactionType = data2.reactionType
-				v5.destinationPlaceId = data2.destinationPlaceId
-				v5.commentText = data2.commentText
-				v5.actionWeight = data2.actionWeight
-				v5.contentType = data.contentType
+				v5.reactionType = data3.reactionType
+				v5.destinationPlaceId = data3.destinationPlaceId
+				v5.commentText = data3.commentText
+				v5.actionWeight = data3.actionWeight
+				v5.contentType = data2.contentType
 				local commentSectionOpenDurationSeconds
 
 				if FFlagMomentsComments then
-					commentSectionOpenDurationSeconds = data2.commentSectionOpenDurationSeconds
+					commentSectionOpenDurationSeconds = data3.commentSectionOpenDurationSeconds
 				end
 
 				v5.commentSectionOpenDurationSeconds = commentSectionOpenDurationSeconds
+
+				v5.feedType = feedType
 				local v6 = emitRecommendationAction(v5)
 
 				if signalTracker then
 					signalTracker:recordSignal(
-						data.itemId,
-						p2,
-						(p2 == "AddReaction" or p2 == "RemoveReaction") and data2.reactionType or ""
+						data2.itemId,
+						p,
+						(p == "AddReaction" or p == "RemoveReaction") and data3.reactionType or ""
 					)
 				end
 

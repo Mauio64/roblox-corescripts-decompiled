@@ -1,82 +1,48 @@
-local parent = script:FindFirstAncestor("GenericChallenges").Parent
-
-local CoreGui = game:GetService("CoreGui")
+local GenericChallenges = script:FindFirstAncestor("GenericChallenges")
+local parent = GenericChallenges.Parent
 
 local React = require(parent.React)
-local ReactRoblox = require(parent.ReactRoblox)
 
 local RoCaptchaChallenge = require(script.Parent.RoCaptchaChallenge)
+local mountNativeChallenge = require(script.Parent.Parent.Common.mountNativeChallenge)
+require(GenericChallenges.Types.ChallengeMetadata)
 
-local function defaultShutdownGame()
-	game:Shutdown()
-end
+return function(data)
+	mountNativeChallenge({
+		challengeId = data.challengeId,
+		shutdownOnTeardown = true,
+		mount = data.mount,
+		shutdownGame = data.shutdownGame,
+		render = function(callback)
+			return React.createElement(RoCaptchaChallenge, {
+				challengeId = data.challengeId,
+				challengeMetadata = data.challengeMetadata,
+				experienceService = data.experienceService,
+				desiredPlaceId = data.desiredPlaceId,
+				logging = data.logging,
+				onChallengeLoaded = data.onChallengeLoaded,
+				onChallengeFailed = function()
+					if data.onChallengeFailed then
+						data.onChallengeFailed()
+					end
 
-local function defaultMount(p)
-	local root = ReactRoblox.createRoot(CoreGui)
-	root:render(p)
+					callback()
+				end,
+				onChallengeAbandoned = function()
+					if data.onChallengeAbandoned then
+						data.onChallengeAbandoned()
+					end
 
-	return function()
-		root:unmount()
-	end
-end
+					callback()
+				end,
+				onChallengeCompleted = function()
+					if data.onChallengeCompleted then
+						data.onChallengeCompleted()
+					end
 
-local v = {}
-
-return function(props)
-	local challengeId = props.challengeId
-
-	if v[challengeId] then
-		return
-	end
-
-	v[challengeId] = true
-
-	local shutdownGame = props.shutdownGame or defaultShutdownGame
-	local mount = props.mount or defaultMount
-
-	local function v2() end
-	local function teardown() -- 3 equivalent calls inferred from this helper
-		v[challengeId] = nil
-		v2()
-		shutdownGame()
-	end
-
-	local element = React.createElement(RoCaptchaChallenge, {
-		challengeId = challengeId,
-		challengeMetadata = props.challengeMetadata,
-		experienceService = props.experienceService,
-		desiredPlaceId = props.desiredPlaceId,
-		logging = props.logging,
-		onChallengeLoaded = props.onChallengeLoaded,
-		onChallengeFailed = function()
-			if props.onChallengeFailed then
-				props.onChallengeFailed()
-			end
-
-			teardown() -- inferred equivalent call
-		end,
-		onChallengeAbandoned = function()
-			if props.onChallengeAbandoned then
-				props.onChallengeAbandoned()
-			end
-
-			teardown() -- inferred equivalent call
-		end,
-		onChallengeCompleted = function()
-			if props.onChallengeCompleted then
-				props.onChallengeCompleted()
-			end
-
-			teardown() -- inferred equivalent call
+					callback()
+				end
+			})
 		end
 	})
-
-	local success, result = pcall(mount, element)
-
-	if not success then
-		v[challengeId] = nil
-		error(result)
-	end
-
-	v2 = result
 end

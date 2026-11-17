@@ -72,11 +72,15 @@ local function MarqueeText(props)
 	local state2, setState2 = React.useState(0)
 	local state3, setState3 = React.useState(false)
 
-	local v6, v7 = React.useBinding(0)
+	local ref = React.useRef(props.initialOffset == nil and 0 or props.initialOffset)
 
-	local ref = React.useRef(0)
+	local v6, v7 = React.useBinding(ref.current)
 
-	local ref2 = React.useRef(false)
+	local ref2 = React.useRef(0)
+
+	local ref3 = React.useRef(false)
+	local ref4 = React.useRef(props.saveOffset)
+	ref4.current = props.saveOffset
 
 	local travelDistance = MarqueeTextMotion.travelDistance(state, state2)
 	local overflows = MarqueeTextMotion.overflows(state, state2)
@@ -85,52 +89,76 @@ local function MarqueeText(props)
 	if playStatus == MarqueePlayStatus.Idle then
 		v8 = false
 	else
-		v8 = not reducedMotion
+		v8 = not (reducedMotion or state3)
 
 		if v8 then
 			if travelDistance > 0 then
-				v8 = props.requiresOverflow ~= true or overflows
+				v8 = overflows or props.marqueeShortTitlesEnabled == true
 			else
 				v8 = false
 			end
 		end
 	end
 
-	local v9 = v8 and not state3
-	local v10 = v8 and state3 and props.holdForNextLoop == true
+	if props.holdForNextLoop == true then
+		if state3 then
+			if playStatus == MarqueePlayStatus.Idle then
+				state3 = false
+			else
+				state3 = not reducedMotion
 
-	local v11 = v9 and playStatus == MarqueePlayStatus.Playing
-	local v12 = v9 or v10
-	local sizefull0autoytextalignxcentertexttruncateendcontentdefault = not v12 and overflows
+				if state3 then
+					if travelDistance > 0 then
+						state3 = overflows or props.marqueeShortTitlesEnabled == true
+					else
+						state3 = false
+					end
+				end
+			end
+		end
+	else
+		state3 = false
+	end
+
+	local v9 = v8 and playStatus == MarqueePlayStatus.Playing
+	local v10 = v8 or state3
+	local sizefull0autoytextalignxcentertexttruncateendcontentdefault = not v10 and overflows
 
 	React.useEffect(function()
+		local current = ref.current
 		ref.current = 0
-		ref2.current = false
-		v7(0)
+		ref2.current = 0
+		ref3.current = false
+		v7(current)
 		setState3(false)
-	end, { props.text, v4, reducedMotion, props.runId })
+		local current2 = ref4.current
 
-	local v13 = React.useCallback(function(p: number)
-		if not v11 then
+		if current2 ~= nil then
+			current2(current)
+		end
+	end, { props.text, v4, reducedMotion, props.runId, ref4 })
+
+	local v11 = React.useCallback(function(p: number)
+		if not v9 then
 			return
 		end
 
-		local v13 = MarqueeTextMotion.advance(
-			{ offset = v6:getValue(), loopsCompleted = ref.current, finished = false },
+		local v11 = MarqueeTextMotion.advance(
+			{ offset = v6:getValue(), loopsCompleted = ref2.current, finished = false },
 			travelDistance,
 			v3,
 			p,
 			v4
 		)
 
-		ref.current = v13.loopsCompleted
+		ref2.current = v11.loopsCompleted
 
-		if v13.finished then
-			if ref2.current then
+		if v11.finished then
+			if ref3.current then
 				return
 			end
 
-			ref2.current = true
+			ref3.current = true
 			v7(0)
 			setState3(true)
 
@@ -138,31 +166,50 @@ local function MarqueeText(props)
 				props.onFinished()
 			end
 		else
-			v7(v13.offset)
+			v7(v11.offset)
+			local current = ref4.current
+
+			if current ~= nil then
+				current(v11.offset)
+			end
 		end
-	end, { v11, travelDistance, v3, v4, props.onFinished, v6 })
+	end, { v9, travelDistance, v3, v4, props.onFinished, v6, ref4 })
 
 	React.useEffect(function()
-		if not v11 then
+		if not v9 then
 			return function() end
 		end
 
-		local connection = heartbeat:Connect(v13)
+		local connection = heartbeat:Connect(v11)
 		return function()
 			connection:Disconnect()
 		end
-	end, { v11, heartbeat, v13 })
+	end, { v9, heartbeat, v11 })
 
-	local v14 = v5 == Enum.TextDirection.RightToLeft
+	React.useEffect(function()
+		return function()
+			if ref3.current then
+				return
+			end
+
+			local current = ref4.current
+
+			if current ~= nil then
+				current(v6:getValue())
+			end
+		end
+	end, { v6, ref4 })
+
+	local v12 = v5 == Enum.TextDirection.RightToLeft
 
 	local mapped = v6:map(function(p: number)
-		if not v12 then
+		if not v10 then
 			return UDim2.fromOffset(0, 0)
 		end
 
 		local signedOffset = MarqueeTextMotion.signedOffset(p, v5)
 
-		if v14 then
+		if v12 then
 			return UDim2.new(1, signedOffset, 0, 0)
 		end
 
@@ -170,32 +217,32 @@ local function MarqueeText(props)
 	end)
 	local content
 
-	if v12 then
-		local v15 = travelDistance + state
+	if v10 then
+		local v13 = travelDistance + state
 		local createElement = React.createElement
-		local v16 = {
-			Size = UDim2.fromOffset(v15, 0),
+		local v14 = {
+			Size = UDim2.fromOffset(v13, 0),
 			tag = "auto-y no-clip",
 			AnchorPoint = 0,
 			Position = 0
 		}
 		local anchorPoint
 
-		if v14 then
+		if v12 then
 			anchorPoint = Vector2.new(1, 0)
 		else
 			anchorPoint = Vector2.new(0, 0)
 		end
 
-		v16.AnchorPoint = anchorPoint
-		v16.Position = mapped
-		content = createElement(View, v16, {
-			Leading = renderCopy(props.text, fontStyle, not v14 and 0 or travelDistance, state),
-			Trailing = renderCopy(props.text, fontStyle, v14 and 0 or travelDistance, state)
+		v14.AnchorPoint = anchorPoint
+		v14.Position = mapped
+		content = createElement(View, v14, {
+			Leading = renderCopy(props.text, fontStyle, not v12 and 0 or travelDistance, state),
+			Trailing = renderCopy(props.text, fontStyle, v12 and 0 or travelDistance, state)
 		})
 	else
 		local createElement = React.createElement
-		local v15 = {
+		local v13 = {
 			Text = props.text,
 			fontStyle = fontStyle,
 			TextTruncate = 0,
@@ -210,12 +257,12 @@ local function MarqueeText(props)
 			textTruncate = Enum.TextTruncate.None
 		end
 
-		v15.TextTruncate = textTruncate
-		v15.tag = {
+		v13.TextTruncate = textTruncate
+		v13.tag = {
 			["size-full-0 auto-y text-align-x-center text-truncate-end content-default"] = sizefull0autoytextalignxcentertexttruncateendcontentdefault,
 			["size-full-0 auto-y text-align-x-center content-default"] = not sizefull0autoytextalignxcentertexttruncateendcontentdefault
 		}
-		content = createElement(Text, v15)
+		content = createElement(Text, v13)
 	end
 
 	return React.createElement(View, {

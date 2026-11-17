@@ -28,6 +28,17 @@ else
 	useRefetchOnlineFriendsOnPresenceEvent = nil
 end
 
+local SharedFlags = require(parent.SharedFlags)
+local FFlagUserListHideNotJoinableJoin = SharedFlags.FFlagUserListHideNotJoinableJoin
+local isPioneerLaunch
+
+if FFlagUserListHideNotJoinableJoin then
+	local PioneerUtils = require(parent.PioneerUtils)
+	isPioneerLaunch = PioneerUtils.isPioneerLaunch
+else
+	isPioneerLaunch = nil
+end
+
 local User = UserList.Enums.EntityType.User
 
 local function ignoreRowSelection() end
@@ -41,6 +52,7 @@ local function createJoinCtaConfig(p, onActivated)
 		supportedActions = { "JoinExperience" },
 		primaryCtaMinWidth = GameInviteConstants.Layout.JoinCtaMinWidth,
 		primaryCtaMaxWidth = GameInviteConstants.Layout.JoinCtaMaxWidth,
+		enableJoinabilityCheck = FFlagUserListHideNotJoinableJoin and isPioneerLaunch() and true or nil,
 		join = {
 			onActivated = onActivated,
 			isVisible = isJoinVisible,

@@ -152,8 +152,16 @@ function DocumentParser:parse(value: string)
 	while v2 ~= -1 do
 		self:parseLine(sub(value, v + 1, v2), v)
 
-		if v2 + 1 < #value and byte(value, v2 + 1) == 13 and byte(value, v2 + 1 + 1) == 10 then
-			v = v2 + 2
+		if v2 + 1 < #value then
+			if byte(value, v2 + 1) == 13 then
+				if byte(value, v2 + 1 + 1) == 10 then
+					v = v2 + 2
+				else
+					v = v2 + 1
+				end
+			else
+				v = v2 + 1
+			end
 		else
 			v = v2 + 1
 		end

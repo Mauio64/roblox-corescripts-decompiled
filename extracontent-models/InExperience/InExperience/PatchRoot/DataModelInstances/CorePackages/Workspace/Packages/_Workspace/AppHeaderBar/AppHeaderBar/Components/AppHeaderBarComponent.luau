@@ -1,8 +1,6 @@
 local parent = script.Parent.Parent
 local parent2 = parent.Parent
 
-local TextService = game:GetService("TextService")
-
 local React = require(parent2.React)
 local UIBlox = require(parent2.UIBlox)
 local Cryo = require(parent2.Cryo)
@@ -18,7 +16,6 @@ local UtilityActionIcon = UIBlox.App.Button.UtilityActionIcon
 local SharedFlags = require(parent2.SharedFlags)
 
 local FFlagEnableConsoleRobloxLogo = SharedFlags.FFlagEnableConsoleRobloxLogo
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local defineFastFlag = game:DefineFastFlag("AppHeaderBarUseSizeFull", false)
 local FFlagEnableClassicThemeHeaderBackground = SharedFlags.FFlagEnableClassicThemeHeaderBackground
 local AppHeaderBarClassicThemeBackground
@@ -64,55 +61,26 @@ local function BarTitle(props)
 
 	local size = React.useMemo(function()
 		local vector2 = Vector2.new(1e999, 1e999)
-		local v3
+		local textSize = GetTextSize(title, titleFont.FontSize, titleFont.Font, vector2, {
+			addTemporaryPadding = false
+		})
 
-		if FoundationFontFaceMigration then
-			v3 = GetTextSize(title, titleFont.FontSize, titleFont.Font, vector2, {
-				addTemporaryPadding = false
-			})
-		else
-			v3 = TextService:GetTextSize(title, titleFont.FontSize, titleFont.Font, vector2)
-		end
-
-		return UDim2.fromOffset(v3.X + 2, v3.Y + tokens.Size.Size_50 * 2)
+		return UDim2.fromOffset(textSize.X + 2, textSize.Y + tokens.Size.Size_50 * 2)
 	end, { title, titleFont.FontSize, titleFont.Font, tokens })
 
-	local createElement = React.createElement
-
-	local v3 = {
+	return React.createElement("TextLabel", {
 		LayoutOrder = layoutOrder,
 		Size = size,
 		BackgroundTransparency = 1,
 		Text = title,
-		Font = 0,
-		FontFace = 0,
-		TextSize = 0,
-		LineHeight = 0,
-		TextColor3 = 0,
-		TextTransparency = 0,
-		TextXAlignment = 0,
+		FontFace = normalizeFontFace(titleFont.Font),
+		TextSize = titleFont.FontSize,
+		LineHeight = titleFont.LineHeight,
+		TextColor3 = v2.Color3,
+		TextTransparency = v2.Transparency,
+		TextXAlignment = Enum.TextXAlignment.Left,
 		TextWrapped = true
-	}
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = titleFont.Font
-	end
-
-	v3.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(titleFont.Font)
-	end
-
-	v3.FontFace = fontFace
-	v3.TextSize = titleFont.FontSize
-	v3.LineHeight = titleFont.LineHeight
-	v3.TextColor3 = v2.Color3
-	v3.TextTransparency = v2.Transparency
-	v3.TextXAlignment = Enum.TextXAlignment.Left
-	return createElement("TextLabel", v3, Cryo.Dictionary.join(props.children or {}, {
+	}, Cryo.Dictionary.join(props.children or {}, {
 		Padding = React.createElement("UIPadding", {
 			PaddingTop = UDim.new(0, tokens.Size.Size_50),
 			PaddingBottom = UDim.new(0, tokens.Size.Size_50)

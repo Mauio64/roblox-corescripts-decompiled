@@ -26,15 +26,7 @@ else
 	ExpChatEventReceiver = nil
 end
 
-local SharedFlags = require(parent.SharedFlags)
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
-local FriendsChatEventReceiverConnector
-
-if FFlagExpChatEnableFriendsTab then
-	FriendsChatEventReceiverConnector = require(script.Parent.FriendsChatEventReceiverConnector)
-else
-	FriendsChatEventReceiverConnector = nil
-end
+local FriendsChatEventReceiverConnector = require(script.Parent.FriendsChatEventReceiverConnector)
 
 local ShortcutNavReceiver = require(script.Parent.ShortcutNav.ShortcutNavReceiver)
 
@@ -123,47 +115,39 @@ function extended.render(p)
 		eventReceiver = Roact.createElement(ExpChatEventReceiver)
 	end
 
-	local friendsChatEventReceiver
-
-	if FFlagExpChatEnableFriendsTab then
-		friendsChatEventReceiver = Roact.createElement(FriendsChatEventReceiverConnector)
-	end
-
-	local shortcutNavReceiver
-
-	if FFlagExpChatEnableFriendsTab then
-		shortcutNavReceiver = Roact.createElement(ShortcutNavReceiver)
-	end
-
+	local children = {
+		eventReceiver = eventReceiver,
+		friendsChatEventReceiver = Roact.createElement(FriendsChatEventReceiverConnector),
+		shortcutNavReceiver = Roact.createElement(ShortcutNavReceiver),
+		presetChatEmojiTabExposureLogger = 0,
+		container = 0
+	}
 	local presetChatEmojiTabExposureLogger
 
 	if ExpChatPresetChatEmojiTabExperimentation.isExperimentEnabled then
 		presetChatEmojiTabExposureLogger = Roact.createElement(PresetChatEmojiTabExposureLogger)
 	end
 
+	children.presetChatEmojiTabExposureLogger = presetChatEmojiTabExposureLogger
+
+	children.container = Roact.createElement(AppContainer, {
+		isChatInputBarVisible = p.props.isChatInputBarVisible,
+		isChatWindowVisible = p.props.isChatWindowVisible,
+		isChannelBarVisible = p.props.isChannelBarVisible,
+		getIconVoiceIndicator = p.props.getIconVoiceIndicator,
+		onClickedVoiceIndicator = p.props.onClickedVoiceIndicator,
+		onClickedCameraIndicator = p.props.onClickedCameraIndicator,
+		selfViewListenerChanged = p.props.selfViewListenerChanged,
+		getPermissions = p.props.getPermissions,
+		displayCameraDeniedToast = p.props.displayCameraDeniedToast,
+		isCamEnabledForUserAndPlace = p.props.isCamEnabledForUserAndPlace,
+		isCameraOnlyUser = p.props.isCameraOnlyUser,
+		isVoiceServiceInitialized = p.props.isVoiceServiceInitialized,
+		isSpatialUIEnabled = p.props.isSpatialUIEnabled
+	})
 	return (createElement(storeProvider, v, {
 		localization = createElement2(provider, v2, {
-			gameLocalization = createElement3(provider2, v3, {
-				eventReceiver = eventReceiver,
-				friendsChatEventReceiver = friendsChatEventReceiver,
-				shortcutNavReceiver = shortcutNavReceiver,
-				presetChatEmojiTabExposureLogger = presetChatEmojiTabExposureLogger,
-				container = Roact.createElement(AppContainer, {
-					isChatInputBarVisible = p.props.isChatInputBarVisible,
-					isChatWindowVisible = p.props.isChatWindowVisible,
-					isChannelBarVisible = p.props.isChannelBarVisible,
-					getIconVoiceIndicator = p.props.getIconVoiceIndicator,
-					onClickedVoiceIndicator = p.props.onClickedVoiceIndicator,
-					onClickedCameraIndicator = p.props.onClickedCameraIndicator,
-					selfViewListenerChanged = p.props.selfViewListenerChanged,
-					getPermissions = p.props.getPermissions,
-					displayCameraDeniedToast = p.props.displayCameraDeniedToast,
-					isCamEnabledForUserAndPlace = p.props.isCamEnabledForUserAndPlace,
-					isCameraOnlyUser = p.props.isCameraOnlyUser,
-					isVoiceServiceInitialized = p.props.isVoiceServiceInitialized,
-					isSpatialUIEnabled = p.props.isSpatialUIEnabled
-				})
-			})
+			gameLocalization = createElement3(provider2, v3, children)
 		})
 	}))
 end
@@ -184,8 +168,9 @@ if getFFlagExpChatTelemetryEventTrigger() then
 					end
 
 					local state = p.props.store:getState()
+					local allTextChannels = state.TextChannels and state.TextChannels.allTextChannels or {}
 					TextChatService:SendExpChatLoadSuccess(v, {
-						preset_bitmap = computePresetBitmap(state.TextChannels and state.TextChannels.allTextChannels or {})
+						preset_bitmap = computePresetBitmap(allTextChannels)
 					})
 				end)
 			else

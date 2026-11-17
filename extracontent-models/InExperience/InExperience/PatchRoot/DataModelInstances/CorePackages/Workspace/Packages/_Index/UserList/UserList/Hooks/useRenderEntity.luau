@@ -11,9 +11,7 @@ local EntityRow = UserRow.EntityRow
 local SharedFlags = require(parent.SharedFlags)
 local FFlagUserListCtaIntegrationEnabled = SharedFlags.FFlagUserListCtaIntegrationEnabled
 local SharedFlags2 = require(parent.SharedFlags)
-local FFlagAddStatusIndicatorToBaseRow = SharedFlags2.FFlagAddStatusIndicatorToBaseRow
-local SharedFlags3 = require(parent.SharedFlags)
-local FFlagUserListSurfaceExtensions = SharedFlags3.FFlagUserListSurfaceExtensions
+local FFlagUserListSurfaceExtensions = SharedFlags2.FFlagUserListSurfaceExtensions
 
 local function useRenderEntity(data)
 	local onActivated = data.onActivated
@@ -90,14 +88,7 @@ local function useRenderEntity(data)
 				v2.contextualInfo = props.contextualInfo
 				v2.loadingState = props.loadingState
 				v2.presence = props.presence
-				local shouldShowNewIndicator
-
-				if FFlagAddStatusIndicatorToBaseRow then
-					shouldShowNewIndicator = props.shouldShowNewIndicator
-				end
-
-				v2.shouldShowNewIndicator = shouldShowNewIndicator
-
+				v2.shouldShowNewIndicator = props.shouldShowNewIndicator
 				v2.trailingContent = props.trailingContent
 				v2.configs = configs
 				v2.layoutMode = layoutMode

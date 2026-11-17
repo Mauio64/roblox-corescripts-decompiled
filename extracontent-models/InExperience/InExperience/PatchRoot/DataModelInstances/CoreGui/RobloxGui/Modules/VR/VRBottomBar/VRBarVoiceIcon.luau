@@ -37,11 +37,12 @@ local function mapLevelToIcon(iconStyle) -- 1 equivalent call inferred from this
 			return default:GetIcon("Unmuted0", iconStyle)
 		end
 
-		if item == Constants.VOICE_STATE.TALKING then
-			return default:GetIcon("Unmuted" .. tostring(math.floor(0.5 + 5 * item2) * 20), iconStyle)
+		if item ~= Constants.VOICE_STATE.TALKING then
+			return default:GetIcon("Error", iconStyle)
 		end
 
-		return default:GetIcon("Error", iconStyle)
+		local v = math.floor(0.5 + 5 * item2) * 20
+		return default:GetIcon("Unmuted" .. tostring(v), iconStyle)
 	end
 end
 

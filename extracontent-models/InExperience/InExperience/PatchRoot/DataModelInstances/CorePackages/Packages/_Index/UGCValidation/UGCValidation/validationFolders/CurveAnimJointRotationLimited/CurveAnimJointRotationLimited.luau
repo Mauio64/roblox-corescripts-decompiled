@@ -8,70 +8,96 @@ local getFIntUGCValidateMaxAnimationFPS = require(parent.flags.getFIntUGCValidat
 
 local GetFStringUGCValidateMaxJointRotationPerPart = require(script.Parent.GetFStringUGCValidateMaxJointRotationPerPart)
 
-return {
-	categories = { ValidationEnums.UploadCategory.ANIMATION },
-	requiredData = {
-		ValidationEnums.SharedDataMember.curveAnimations,
-		ValidationEnums.SharedDataMember.curveAnimComputedFrames
-	},
-	expectedFailures = {},
-	prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable },
-	run = function(object, p)
-		local curveAnimComputedFrames = p.curveAnimComputedFrames
-		local animLength = curveAnimComputedFrames.animLength
-		local tracks = curveAnimComputedFrames.tracks
-		local v = 1 / getFIntUGCValidateMaxAnimationFPS()
+local CurveAnimJointRotationLimited = {}
 
-		local v2 = {}
+CurveAnimJointRotationLimited.categories = { ValidationEnums.UploadCategory.ANIMATION }
+CurveAnimJointRotationLimited.requiredData = {
+	ValidationEnums.SharedDataMember.curveAnimations,
+	ValidationEnums.SharedDataMember.curveAnimComputedFrames
+}
 
-		for k, track in tracks do
-			if not track.rot then
-				continue
-			end
+CurveAnimJointRotationLimited.expectedFailures = {}
+CurveAnimJointRotationLimited.prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable }
 
-			local bodyPart = tostring(k)
+local function validateCurveAnimClip(object, curveAnimComputedFrame)
+	local fullName = curveAnimComputedFrame.animation and curveAnimComputedFrame.animation:GetFullName()
+	local animLength = curveAnimComputedFrame.animLength
+	local tracks = curveAnimComputedFrame.tracks
+	local v = 1 / getFIntUGCValidateMaxAnimationFPS()
 
-			if not v2[bodyPart] then
-				v2[bodyPart] = GetFStringUGCValidateMaxJointRotationPerPart.asNumber(bodyPart)
-			end
+	local v2 = {}
 
-			local v3 = v2[bodyPart]
-			local total = 0
+	for k, track in tracks do
+		if not track.rot then
+			continue
+		end
 
-			while total <= animLength do
-				local _, v4 = track.rot:GetRotationAtTime(total):ToAxisAngle()
-				local v5 = math.deg((math.abs(v4)))
+		local bodyPart = tostring(k)
 
-				if v3 < v5 then
-					object:fail(ErrorSourceStrings.Keys.CurveAnim_JointRotationExceeded, {
-						time = string.format("%.2f", total),
-						bodyPart = bodyPart,
-						rotation = string.format("%.2f", v5),
-						maxRotation = tostring(v3)
-					})
+		if not v2[bodyPart] then
+			v2[bodyPart] = GetFStringUGCValidateMaxJointRotationPerPart.asNumber(bodyPart)
+		end
 
-					return
-				end
+		local v3 = v2[bodyPart]
+		local total = 0
 
-				total += v
-			end
-
-			if not (animLength >= 0) then
-				continue
-			end
-
-			local _, v4 = track.rot:GetRotationAtTime(animLength):ToAxisAngle()
+		while total <= animLength do
+			local _, v4 = track.rot:GetRotationAtTime(total):ToAxisAngle()
 			local v5 = math.deg((math.abs(v4)))
 
 			if v3 < v5 then
-				object:fail(ErrorSourceStrings.Keys.CurveAnim_JointRotationExceeded, {
-					time = string.format("%.2f", animLength),
+				local v6 = {
+					time = string.format("%.2f", total),
 					bodyPart = bodyPart,
 					rotation = string.format("%.2f", v5),
 					maxRotation = tostring(v3)
-				})
-				break
+				}
+
+				if fullName then
+					v6.animationName = fullName
+				end
+
+				object:fail(
+					ErrorSourceStrings.Keys.CurveAnim_JointRotationExceeded,
+					v6,
+					curveAnimComputedFrame.animation
+				)
+
+				return
 			end
+
+			total += v
+		end
+
+		if not (animLength >= 0) then
+			continue
+		end
+
+		local _, v4 = track.rot:GetRotationAtTime(animLength):ToAxisAngle()
+		local v5 = math.deg((math.abs(v4)))
+
+		if v3 < v5 then
+			local v6 = {
+				time = string.format("%.2f", animLength),
+				bodyPart = bodyPart,
+				rotation = string.format("%.2f", v5),
+				maxRotation = tostring(v3)
+			}
+
+			if fullName then
+				v6.animationName = fullName
+			end
+
+			object:fail(ErrorSourceStrings.Keys.CurveAnim_JointRotationExceeded, v6, curveAnimComputedFrame.animation)
+			break
 		end
 	end
-}
+end
+
+function CurveAnimJointRotationLimited.run(p, p2)
+	for _, curveAnimComputedFrame in p2.curveAnimComputedFrames do
+		validateCurveAnimClip(p, curveAnimComputedFrame)
+	end
+end
+
+return CurveAnimJointRotationLimited

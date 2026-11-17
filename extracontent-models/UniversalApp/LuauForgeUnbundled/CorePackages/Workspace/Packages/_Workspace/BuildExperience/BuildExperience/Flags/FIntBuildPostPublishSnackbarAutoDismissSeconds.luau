@@ -1,1 +1,0 @@
-return game:DefineFastInt("BuildPostPublishSnackbarAutoDismissSeconds", 8)

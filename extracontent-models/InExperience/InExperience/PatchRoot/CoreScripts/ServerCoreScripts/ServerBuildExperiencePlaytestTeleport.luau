@@ -4,8 +4,6 @@ local Players = game:GetService("Players")
 local RobloxReplicatedStorage = game:GetService("RobloxReplicatedStorage")
 local TeleportService = game:GetService("TeleportService")
 
-local defineFastFlag = game:DefineFastFlag("BuildPlaytestReservedServerId", false)
-
 local v = nil
 local v2 = {}
 
@@ -61,12 +59,6 @@ buildExperiencePlaytestTeleport.OnServerEvent:Connect(function(object, value)
 	end
 
 	local teleportOptions = Instance.new("TeleportOptions")
-
-	if defineFastFlag then
-		teleportOptions.ReservedServerId = HttpService:GenerateGUID(false)
-	else
-		teleportOptions.ShouldReserveServer = true
-	end
-
+	teleportOptions.ReservedServerId = HttpService:GenerateGUID(false)
 	TeleportService:TeleportAsync(value, { object }, teleportOptions)
 end)

@@ -23,7 +23,9 @@ local FFlagEditProfileFramesImpression = EditProfile.Flags.FFlagEditProfileFrame
 local SharedFlags3 = require(parent.SharedFlags)
 local FFlagSignalsNavP3hMisc = SharedFlags3.FFlagSignalsNavP3hMisc
 local SharedFlags4 = require(parent.SharedFlags)
-local FFlagSplitPaneProfileEditFillPane = SharedFlags4.FFlagSplitPaneProfileEditFillPane
+local FFlagProfilePlatformExitStandaloneEditor = SharedFlags4.FFlagProfilePlatformExitStandaloneEditor
+local SharedFlags5 = require(parent.SharedFlags)
+local FFlagSplitPaneProfileEditFillPane = SharedFlags5.FFlagSplitPaneProfileEditFillPane
 local SplitPane
 
 if FFlagSplitPaneProfileEditFillPane then
@@ -103,14 +105,26 @@ local function EditProfileImageContainer(p)
 		v7 = false
 	end
 
+	local closeProfileRoute
+
+	if FFlagProfilePlatformExitStandaloneEditor then
+		closeProfileRoute = v.navigateTo.closeProfileRoute
+	else
+		closeProfileRoute = nil
+	end
+
 	local onClose = React.useCallback(function()
-		closeProfilePictureEditor(p.navigation)
-	end, { p.navigation })
+		if closeProfileRoute then
+			closeProfileRoute()
+		else
+			closeProfilePictureEditor(p.navigation)
+		end
+	end, { p.navigation, closeProfileRoute })
 
 	local onSaveSuccess = React.useCallback(function()
 		showEditProfileImageToast.showSaveSuccessToast(v5)
-		closeProfilePictureEditor(p.navigation)
-	end, { v5, p.navigation })
+		onClose()
+	end, { v5, onClose })
 
 	local onOpenEmoteDetails = React.useCallback(function(p2: string)
 		local navigateTo = v.navigateTo
@@ -183,30 +197,36 @@ local function EditProfileImageContainer(p)
 	local createElement2 = React.createElement
 
 	local createElement3 = React.createElement
+	local v9 = {
+		mode = mode,
+		onClose = onClose,
+		onSaveSuccess = onSaveSuccess,
+		onOpenEmoteDetails = onOpenEmoteDetails,
+		onPrepareRecommendedEmotePurchase = onPrepareRecommendedEmotePurchase,
+		onShopForMoreEmotes = onShopForMoreEmotes,
+		onPromptR15Upgrade = onPromptR15Upgrade,
+		accountRigType = 0,
+		renderRecommendedEmotePurchaseFooter = 0,
+		containerSize = 0
+	}
 	local accountRigType
 
 	if FFlagEditProfileImageR15UpgradePrompt then
 		accountRigType = v.accountRigType
 	end
 
+	v9.accountRigType = accountRigType
+
+	v9.renderRecommendedEmotePurchaseFooter = renderRecommendedEmotePurchaseFooter
+
 	if not (FFlagSplitPaneProfileEditFillPane and v7) then
 		vector2 = nil
 	end
 
-	local v9 = {
+	v9.containerSize = vector2
+	local v10 = {
 		Content = createElement2(View, { tag = "size-full-full" }, {
-			EditProfileImage = createElement3(EditProfileImage, {
-				mode = mode,
-				onClose = onClose,
-				onSaveSuccess = onSaveSuccess,
-				onOpenEmoteDetails = onOpenEmoteDetails,
-				onPrepareRecommendedEmotePurchase = onPrepareRecommendedEmotePurchase,
-				onShopForMoreEmotes = onShopForMoreEmotes,
-				onPromptR15Upgrade = onPromptR15Upgrade,
-				accountRigType = accountRigType,
-				renderRecommendedEmotePurchaseFooter = renderRecommendedEmotePurchaseFooter,
-				containerSize = vector2
-			})
+			EditProfileImage = createElement3(EditProfileImage, v9)
 		}),
 		DetailsInputBlocker = 0
 	}
@@ -220,8 +240,8 @@ local function EditProfileImageContainer(p)
 		})
 	end
 
-	v9.DetailsInputBlocker = detailsInputBlocker
-	return createElement(View, v8, v9)
+	v10.DetailsInputBlocker = detailsInputBlocker
+	return createElement(View, v8, v10)
 end
 
 return EditProfileImageContainer

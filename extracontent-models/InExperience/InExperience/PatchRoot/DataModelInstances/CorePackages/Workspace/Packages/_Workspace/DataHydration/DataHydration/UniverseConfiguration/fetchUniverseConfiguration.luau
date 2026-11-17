@@ -11,12 +11,12 @@ require(script.Parent.UniverseConfigurationStoreTypes)
 local fetch = HttpClient.fetch
 local asPromise = HttpClient.asPromise
 
-local function summaryUrl(baseUrl: string, p: number) -- 1 equivalent call inferred from this helper
-	return ("%s/v1/universes/%d"):format(baseUrl, p)
+local function summaryUrl(p: string, p2: number) -- 1 equivalent call inferred from this helper
+	return ("%s/v1/universes/%d"):format(p, p2)
 end
 
-local function configurationUrl(baseUrl: string, p: number) -- 1 equivalent call inferred from this helper
-	return ("%s/v1/universes/%d/configuration"):format(baseUrl, p)
+local function configurationUrl(p: string, p2: number) -- 1 equivalent call inferred from this helper
+	return ("%s/v1/universes/%d/configuration"):format(p, p2)
 end
 
 local function patchConfigurationUrl(p: string, p2: number) -- 1 equivalent call inferred from this helper
@@ -27,7 +27,7 @@ local function teamCreateUrl(p: string, p2: number) -- 2 equivalent calls inferr
 	return ("%s/v1/universes/%d/teamcreate"):format(p, p2)
 end
 
-local function resolveBase(options) -- 2 equivalent calls inferred from this helper
+local function resolveBase(options) -- 5 equivalent calls inferred from this helper
 	local v = options or {}
 	return v.network, v.baseUrl or UrlBase.new("develop")
 end
@@ -39,11 +39,11 @@ end
 local FetchUniverseConfiguration = {}
 
 function FetchUniverseConfiguration.fetchSummary(p: number, options)
-	local v = options or {}
+	local base, v = resolveBase(options) -- inferred equivalent call
 	return asPromise((fetch({
-		network = v.network,
+		network = base,
 		method = "GET",
-		url = summaryUrl(v.baseUrl or UrlBase.new("develop"), p), -- inferred equivalent call
+		url = summaryUrl(v, p), -- inferred equivalent call
 		analyticsKey = "universe-configuration.get-summary",
 		legacy = true,
 		decode = function(p2)
@@ -53,11 +53,11 @@ function FetchUniverseConfiguration.fetchSummary(p: number, options)
 end
 
 function FetchUniverseConfiguration.fetchConfiguration(p: number, options)
-	local v = options or {}
+	local base, v = resolveBase(options) -- inferred equivalent call
 	return asPromise((fetch({
-		network = v.network,
+		network = base,
 		method = "GET",
-		url = configurationUrl(v.baseUrl or UrlBase.new("develop"), p), -- inferred equivalent call
+		url = configurationUrl(v, p), -- inferred equivalent call
 		analyticsKey = "universe-configuration.get-configuration",
 		legacy = true,
 		decode = function(p2)
@@ -86,11 +86,11 @@ function FetchUniverseConfiguration.patchConfiguration(p: number, body, options)
 end
 
 function FetchUniverseConfiguration.fetchTeamCreate(p: number, options)
-	local v = options or {}
+	local base, v = resolveBase(options) -- inferred equivalent call
 	return asPromise((fetch({
-		network = v.network,
+		network = base,
 		method = "GET",
-		url = teamCreateUrl(v.baseUrl or UrlBase.new("develop"), p), -- inferred equivalent call
+		url = teamCreateUrl(v, p), -- inferred equivalent call
 		analyticsKey = "universe-configuration.get-team-create",
 		legacy = true,
 		decode = function(p2)

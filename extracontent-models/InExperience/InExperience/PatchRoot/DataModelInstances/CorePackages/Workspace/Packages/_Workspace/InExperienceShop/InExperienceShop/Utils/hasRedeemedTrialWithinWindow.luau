@@ -10,13 +10,7 @@ local function hasRedeemedTrialWithinWindow(items): boolean
 	for _, item in items do
 		local endTime = item.endTime
 
-		if endTime == nil then
-			continue
-		end
-
-		local v = endTime.UnixTimestamp - unixTimestamp
-
-		if v >= 0 and v < FIntRedeemedTrialBlueDotMaxSecondsUntilEnd then
+		if endTime ~= nil and unixTimestamp < endTime.UnixTimestamp + FIntRedeemedTrialBlueDotMaxSecondsUntilEnd then
 			return true
 		end
 	end

@@ -5,6 +5,7 @@ local Foundation = require(parent.Foundation)
 local React = require(parent.React)
 local Motion = require(parent.Motion)
 
+local Button = Foundation.Button
 local IconButton = Foundation.IconButton
 local SegmentedControl = Foundation.SegmentedControl
 local Text = Foundation.Text
@@ -19,6 +20,8 @@ require(script.Parent.LibraryWorldCutout.useLibraryWorldCutoutViewModel)
 local releaseFocusWithin = require(BuildExperience.utils.releaseFocusWithin)
 local useTypedQueryBinding = require(script.Parent.useTypedQueryBinding)
 local useHardwareInsets = require(BuildExperience.Components.ChatSheet.useHardwareInsets)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagBuildExperienceLibrary = SharedFlags.FFlagBuildExperienceLibrary
 
 local v = {
 	Top = { UDim2.fromOffset(-10000, -10000), UDim2.new(1, 20000, 0, 10000) },
@@ -199,7 +202,7 @@ local function LibraryExperienceView(props)
 	local createElement4 = React.createElement
 	local icon
 
-	if onBack == nil then
+	if onBack == nil and not FFlagBuildExperienceLibrary then
 		icon = IconName.X
 	else
 		icon = IconName.ChevronLargeLeft
@@ -215,7 +218,7 @@ local function LibraryExperienceView(props)
 		testId = 0
 	}
 
-	local function fn2() -- 3 equivalent calls inferred from this helper
+	local function fn2() -- 4 equivalent calls inferred from this helper
 		releaseFocusWithin(ref2.current)
 	end
 
@@ -259,7 +262,8 @@ local function LibraryExperienceView(props)
 			}
 		),
 		Title = 0,
-		Search = 0
+		Search = 0,
+		SelectAll = 0
 	}
 	local title2
 
@@ -319,6 +323,23 @@ local function LibraryExperienceView(props)
 	end
 
 	v12.Search = search
+	local selectAll
+
+	if props.isOpen and props.onSelectAll ~= nil and props.selectAllLabel ~= nil then
+		selectAll = React.createElement(Button, {
+			LayoutOrder = 4,
+			text = props.selectAllLabel,
+			onActivated = function()
+				fn2() -- inferred equivalent call
+				props.onSelectAll()
+			end,
+			size = InputSize.Medium,
+			variant = ButtonVariant.Utility,
+			testId = "Library.Experience.SelectAll"
+		})
+	end
+
+	v12.SelectAll = selectAll
 	children2.Header = createElement2(View, v10, v12)
 	local modeRow
 

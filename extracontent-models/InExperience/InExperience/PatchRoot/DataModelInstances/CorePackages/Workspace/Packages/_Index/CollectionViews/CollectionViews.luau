@@ -49,6 +49,7 @@ CollectionViews.CollectionItemSize = CollectionViewTypes.CollectionItemSize
 CollectionViews.useCollectionLayout = require(script.CollectionLayoutStore.useCollectionLayout)
 CollectionViews.CollectionLayoutStoreProvider = require(script.CollectionLayoutStore.CollectionLayoutStoreProvider)
 CollectionViews.CollectionLayoutStoreContext = require(script.CollectionLayoutStore.CollectionLayoutStoreContext)
+CollectionViews.createColumnSpanCollectionLayoutStore = require(script.CollectionLayoutStore.createColumnSpanCollectionLayoutStore)
 local CollectionBreakpointConfig = require(script.CollectionLayoutStore.CollectionBreakpointConfig)
 CollectionViews.getItemsPerRow = CollectionBreakpointConfig.getItemsPerRow
 CollectionViews.getMainCollectionLayoutStore = require(script.CollectionLayoutStore.getMainCollectionLayoutStore)

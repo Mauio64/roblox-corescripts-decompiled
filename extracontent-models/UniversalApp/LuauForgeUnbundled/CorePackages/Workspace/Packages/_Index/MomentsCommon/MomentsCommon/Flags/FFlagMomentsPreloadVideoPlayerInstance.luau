@@ -1,2 +1,0 @@
-return game:DefineFastFlag("MomentsPreloadVideoPlayerInstance", false)
-	and game:GetEngineFeature("VideoPlayerPreloadSupported")

@@ -6,6 +6,7 @@ require(parent.DataHydration)
 local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
 local FFlagAXM41AllCategoriesToTaxonomy = AvatarExperienceFlags.FFlagAXM41AllCategoriesToTaxonomy
 local FFlagAXSduiCatalogSearchShowWidgets = AvatarExperienceFlags.FFlagAXSduiCatalogSearchShowWidgets
+local FFlagAXSduiCatalogTaxonomyFromServer = AvatarExperienceFlags.FFlagAXSduiCatalogTaxonomyFromServer
 
 local HttpService = game:GetService("HttpService")
 
@@ -139,7 +140,11 @@ local function createMapMarketplaceCategoryToCatalogCategory()
 		v5.SearchUuid = searchUuid
 		local taxonomyUuid
 
-		if FFlagAXM41AllCategoriesToTaxonomy and data.taxonomyId ~= nil and data.taxonomyId ~= "" then
+		if
+			(FFlagAXSduiCatalogTaxonomyFromServer or FFlagAXM41AllCategoriesToTaxonomy)
+			and data.taxonomyId ~= nil
+			and data.taxonomyId ~= ""
+		then
 			taxonomyUuid = data.taxonomyId
 		end
 

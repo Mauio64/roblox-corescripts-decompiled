@@ -15,11 +15,11 @@ local SduiInGameFriendsData = require(ServerDrivenUi.DataStore.SduiInGameFriends
 
 local SharedFlags = require(parent.SharedFlags)
 local FFlagLuaAppFixInlineSignalsReactPattern = SharedFlags.FFlagLuaAppFixInlineSignalsReactPattern
-local SharedFlags2 = require(parent.SharedFlags)
-local FFlagLuaAppSduiGameTileMetadataFontStyle = SharedFlags2.FFlagLuaAppSduiGameTileMetadataFontStyle
 
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagSduiGameTileUseFooterComponentAsDefault = SharedFlags2.FFlagSduiGameTileUseFooterComponentAsDefault
 local SharedFlags3 = require(parent.SharedFlags)
-local FFlagSduiGameTileUseFooterComponentAsDefault = SharedFlags3.FFlagSduiGameTileUseFooterComponentAsDefault
+local FFlagSduiActiveFriendsFooterTreatment = SharedFlags3.FFlagSduiActiveFriendsFooterTreatment
 
 local function SduiGameTileFooter(props)
 	local getInGameFriendsByGame = SduiInGameFriendsData.getInGameFriendsByGame
@@ -53,33 +53,28 @@ local function SduiGameTileFooter(props)
 	end
 
 	if (props.isSelected or props.isHovered) and props.ageRatingText and props.ageRatingText ~= "" then
-		local createElement = React.createElement
-		local v2 = {
+		return React.createElement(SduiTileFooter, {
 			leftText = props.ageRatingText,
 			analyticsContext = props.analyticsContext,
-			fontStyle = 0,
+			fontStyle = props.metadataFontStyle,
 			testId = "--sdui-game-tile-footer-age-rating"
-		}
-		local fontStyle
+		})
+	end
 
-		if FFlagLuaAppSduiGameTileMetadataFontStyle then
-			fontStyle = props.metadataFontStyle
+	if v then
+		if FFlagSduiActiveFriendsFooterTreatment and props.activeFriendsFooterComponent then
+			return props.activeFriendsFooterComponent
 		end
 
-		v2.fontStyle = fontStyle
-		return createElement(SduiTileFooter, v2)
+		return React.createElement(SduiGameTileActiveFriendsFooter, {
+			placeId = props.placeId,
+			universeId = props.universeId,
+			sduiContext = props.sduiContext,
+			analyticsContext = props.analyticsContext,
+			testId = "--sdui-game-tile-footer-active-friends",
+			hideBorder = true
+		})
 	else
-		if v then
-			return React.createElement(SduiGameTileActiveFriendsFooter, {
-				placeId = props.placeId,
-				universeId = props.universeId,
-				sduiContext = props.sduiContext,
-				analyticsContext = props.analyticsContext,
-				testId = "--sdui-game-tile-footer-active-friends",
-				hideBorder = true
-			})
-		end
-
 		if
 			FFlagSduiGameTileUseFooterComponentAsDefault and props.useFooterComponentAsDefault
 			or not props.ratingText
@@ -104,24 +99,15 @@ local function SduiGameTileFooter(props)
 			iconsstatusgamespeopleplaying_small = Images["icons/status/games/people-playing_small"]
 		end
 
-		local createElement = React.createElement
-		local v2 = {
+		return React.createElement(SduiTileFooter, {
 			sduiContext = props.sduiContext,
 			leftText = ratingText,
 			leftIcon = iconsstatusgamesrating_small,
 			rightText = rightText,
 			rightIcon = iconsstatusgamespeopleplaying_small,
-			fontStyle = 0,
+			fontStyle = props.metadataFontStyle,
 			testId = "--sdui-game-tile-footer-rating"
-		}
-		local fontStyle
-
-		if FFlagLuaAppSduiGameTileMetadataFontStyle then
-			fontStyle = props.metadataFontStyle
-		end
-
-		v2.fontStyle = fontStyle
-		return createElement(SduiTileFooter, v2)
+		})
 	end
 end
 

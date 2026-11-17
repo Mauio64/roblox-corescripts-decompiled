@@ -147,113 +147,109 @@ local function resolvePath(value: string?, data)
 		return nil, nil
 	end
 
-	local v3, name, v4
+	local name, v3
 
 	if v2.Parent == nil then
-		v3 = v2
-		name = v3.Name
+		name = v2.Name
 
 		if name == "" then
-			v4 = "%00"
+			v3 = "%00"
 		else
-			v4 = name:gsub("%%", "%%25"):gsub("%.", "%%2E"):gsub("%[", "%%5B"):gsub("%]", "%%5D")
+			v3 = name:gsub("%%", "%%25"):gsub("%.", "%%2E"):gsub("%[", "%%5B"):gsub("%]", "%%5D")
 		end
 	else
-		v3 = v2
 		local flag = true
 
-		for _, v5 in getChildPathEntries(v2.Parent) do
-			if v5.instance == v3 then
-				v4 = v5.segment
+		for _, v4 in getChildPathEntries(v2.Parent) do
+			if v4.instance == v2 then
+				v3 = v4.segment
 				flag = false
 				break
 			end
 		end
 
 		if flag then
-			name = v3.Name
+			name = v2.Name
 
 			if name == "" then
-				v4 = "%00"
+				v3 = "%00"
 			else
-				v4 = name:gsub("%%", "%%25"):gsub("%.", "%%2E"):gsub("%[", "%%5B"):gsub("%]", "%%5D")
+				v3 = name:gsub("%%", "%%25"):gsub("%.", "%%2E"):gsub("%[", "%%5B"):gsub("%]", "%%5D")
 			end
 		end
 	end
 
-	local v5
+	local v4
 
 	for i = 2, #v do
-		local pathSegment2, v6 = parsePathSegment(v[i]) -- inferred equivalent call
+		local pathSegment2, v5 = parsePathSegment(v[i]) -- inferred equivalent call
 
 		if v2 == data.players and pathSegment2 == "LocalPlayer" then
 			v2 = data.localPlayer
-			v5 = v2
+			v4 = v2
 		else
 			local success, children = pcall(v2.GetChildren, v2)
 			local count = 0
-			v5 = nil
+			v4 = nil
 
-			for _, v7 in (not success or typeof(children) ~= "table") and {} or children do
-				if v7.Name ~= pathSegment2 then
+			for _, v6 in (not success or typeof(children) ~= "table") and {} or children do
+				if v6.Name ~= pathSegment2 then
 					continue
 				end
 
 				count += 1
 
-				if count == v6 then
-					v5 = v7
+				if count == v5 then
+					v4 = v6
 					break
 				end
 			end
 		end
 
-		if v5 == nil then
+		if v4 == nil then
 			return nil, nil
 		end
 
-		if v5 == data.localPlayer then
-			v4 = `{v4}.LocalPlayer`
+		if v4 == data.localPlayer then
+			v3 = `{v3}.LocalPlayer`
 		else
-			local v7, name2, v8
+			local name2, v6
 
-			if v5.Parent == nil then
-				v7 = v5
-				name2 = v7.Name
+			if v4.Parent == nil then
+				name2 = v4.Name
 
 				if name2 == "" then
-					v8 = "%00"
+					v6 = "%00"
 				else
-					v8 = name2:gsub("%%", "%%25"):gsub("%.", "%%2E"):gsub("%[", "%%5B"):gsub("%]", "%%5D")
+					v6 = name2:gsub("%%", "%%25"):gsub("%.", "%%2E"):gsub("%[", "%%5B"):gsub("%]", "%%5D")
 				end
 			else
-				v7 = v5
 				local flag = true
 
-				for _, v9 in getChildPathEntries(v5.Parent) do
-					if v9.instance == v7 then
-						v8 = v9.segment
+				for _, v7 in getChildPathEntries(v4.Parent) do
+					if v7.instance == v4 then
+						v6 = v7.segment
 						flag = false
 						break
 					end
 				end
 
 				if flag then
-					name2 = v7.Name
+					name2 = v4.Name
 
 					if name2 == "" then
-						v8 = "%00"
+						v6 = "%00"
 					else
-						v8 = name2:gsub("%%", "%%25"):gsub("%.", "%%2E"):gsub("%[", "%%5B"):gsub("%]", "%%5D")
+						v6 = name2:gsub("%%", "%%25"):gsub("%.", "%%2E"):gsub("%[", "%%5B"):gsub("%]", "%%5D")
 					end
 				end
 			end
 
-			v4 = appendPathSegment(v4, v8) -- inferred equivalent call
+			v3 = appendPathSegment(v3, v6) -- inferred equivalent call
 		end
 	end
 
-	return v5, v4
+	return v4, v3
 end
 
 local function getDisplayPath(p, p2)

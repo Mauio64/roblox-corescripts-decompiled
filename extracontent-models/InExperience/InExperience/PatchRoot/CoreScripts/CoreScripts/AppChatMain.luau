@@ -31,7 +31,7 @@ local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local GetFFlagIsSquadEnabled = SharedFlags.GetFFlagIsSquadEnabled
 local ChatChromeIntegration
 
-if SharedFlags.FFlagExpChatEnableFriendsTab and enabled then
+if enabled then
 	ChatChromeIntegration = require(RobloxGui.Modules.Chrome.Integrations.ExpChat.ChatChromeIntegration)
 end
 

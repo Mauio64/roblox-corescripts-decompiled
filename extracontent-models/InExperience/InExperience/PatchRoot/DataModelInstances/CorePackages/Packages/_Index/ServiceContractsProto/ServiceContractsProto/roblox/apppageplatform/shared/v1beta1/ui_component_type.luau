@@ -21,6 +21,8 @@ v.UiComponentType = {
 			return "UI_COMPONENT_TYPE_VARIABLE_ITEM_WIDTH_CAROUSEL"
 		elseif p == 15 then
 			return "UI_COMPONENT_TYPE_OPTION_SELECTOR_COLLECTION"
+		elseif p == 17 then
+			return "UI_COMPONENT_TYPE_COLLECTION_SLOTS_LAYOUT"
 		elseif p == 100 then
 			return "UI_COMPONENT_TYPE_TILE"
 		elseif p == 101 then
@@ -213,6 +215,10 @@ v.UiComponentType = {
 			return "UI_COMPONENT_TYPE_SHEET"
 		elseif p == 284 then
 			return "UI_COMPONENT_TYPE_EXPANDABLE_LIST_ITEM"
+		elseif p == 285 then
+			return "UI_COMPONENT_TYPE_STATUS_BADGE"
+		elseif p == 286 then
+			return "UI_COMPONENT_TYPE_MURAL_SECTION"
 		elseif p == 300 then
 			return "UI_COMPONENT_TYPE_FOCUS_NAV_ACTIONS"
 		elseif p == 400 then
@@ -282,6 +288,8 @@ v.UiComponentType = {
 			return 14
 		elseif p == "UI_COMPONENT_TYPE_OPTION_SELECTOR_COLLECTION" then
 			return 15
+		elseif p == "UI_COMPONENT_TYPE_COLLECTION_SLOTS_LAYOUT" then
+			return 17
 		elseif p == "UI_COMPONENT_TYPE_TILE" then
 			return 100
 		elseif p == "UI_COMPONENT_TYPE_GAME_TILE" then
@@ -474,6 +482,10 @@ v.UiComponentType = {
 			return 283
 		elseif p == "UI_COMPONENT_TYPE_EXPANDABLE_LIST_ITEM" then
 			return 284
+		elseif p == "UI_COMPONENT_TYPE_STATUS_BADGE" then
+			return 285
+		elseif p == "UI_COMPONENT_TYPE_MURAL_SECTION" then
+			return 286
 		elseif p == "UI_COMPONENT_TYPE_FOCUS_NAV_ACTIONS" then
 			return 300
 		elseif p == "UI_COMPONENT_TYPE_FRAGMENT" then
@@ -543,6 +555,8 @@ v.UiComponentType = {
 			return "UI_COMPONENT_TYPE_VARIABLE_ITEM_WIDTH_CAROUSEL"
 		elseif p == "UI_COMPONENT_TYPE_OPTION_SELECTOR_COLLECTION" then
 			return "UI_COMPONENT_TYPE_OPTION_SELECTOR_COLLECTION"
+		elseif p == "UI_COMPONENT_TYPE_COLLECTION_SLOTS_LAYOUT" then
+			return "UI_COMPONENT_TYPE_COLLECTION_SLOTS_LAYOUT"
 		elseif p == "UI_COMPONENT_TYPE_TILE" then
 			return "UI_COMPONENT_TYPE_TILE"
 		elseif p == "UI_COMPONENT_TYPE_GAME_TILE" then
@@ -735,6 +749,10 @@ v.UiComponentType = {
 			return "UI_COMPONENT_TYPE_SHEET"
 		elseif p == "UI_COMPONENT_TYPE_EXPANDABLE_LIST_ITEM" then
 			return "UI_COMPONENT_TYPE_EXPANDABLE_LIST_ITEM"
+		elseif p == "UI_COMPONENT_TYPE_STATUS_BADGE" then
+			return "UI_COMPONENT_TYPE_STATUS_BADGE"
+		elseif p == "UI_COMPONENT_TYPE_MURAL_SECTION" then
+			return "UI_COMPONENT_TYPE_MURAL_SECTION"
 		elseif p == "UI_COMPONENT_TYPE_FOCUS_NAV_ACTIONS" then
 			return "UI_COMPONENT_TYPE_FOCUS_NAV_ACTIONS"
 		elseif p == "UI_COMPONENT_TYPE_FRAGMENT" then

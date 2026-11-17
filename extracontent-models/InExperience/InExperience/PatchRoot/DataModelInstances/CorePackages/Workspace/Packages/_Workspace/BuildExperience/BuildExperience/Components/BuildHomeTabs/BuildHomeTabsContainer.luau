@@ -5,6 +5,7 @@ require(parent.Foundation)
 local React = require(parent.React)
 
 local FFlagBuildExperienceFoundationTabs = require(BuildExperience.Flags.FFlagBuildExperienceFoundationTabs)
+local FFlagBuildExperienceHomeTelemetry = require(BuildExperience.Flags.FFlagBuildExperienceHomeTelemetry)
 
 local BuildHomeTabsView = require(script.Parent.BuildHomeTabsView)
 require(BuildExperience.Stores.GetSearchQueryStore.createSearchQueryStore)
@@ -33,38 +34,47 @@ local function BuildHomeTabsContainer(props)
 		isFocused = props.isFocused
 	})
 
-	local v = useBuildHomeTabsViewModel({
+	local v = {
 		tabStore = props.tabStore,
-		searchQueryStore = props.searchQueryStore
-	})
+		searchQueryStore = props.searchQueryStore,
+		isFocused = 0
+	}
+	local isFocused
+
+	if FFlagBuildExperienceHomeTelemetry then
+		isFocused = props.isFocused
+	end
+
+	v.isFocused = isFocused
+	local v2 = useBuildHomeTabsViewModel(v)
 	local tabsFillBehavior
 
 	if FFlagBuildExperienceFoundationTabs then
 		tabsFillBehavior = useBuildHomeTabsFillBehavior()
 	end
 
-	local v2 = usePreviewsTabViewModel({ results = results })
+	local v3 = usePreviewsTabViewModel({ results = results })
 
 	return React.createElement(BuildHomeTabsView, {
 		LayoutOrder = props.LayoutOrder,
-		showTabs = v.showTabs,
-		activeTab = v.activeTab,
-		tabs = v.tabs,
-		onTabActivated = v.onTabActivated,
-		pageOffset = v.pageOffset,
-		tabOrder = v.tabOrder,
+		showTabs = v2.showTabs,
+		activeTab = v2.activeTab,
+		tabs = v2.tabs,
+		onTabActivated = v2.onTabActivated,
+		pageOffset = v2.pageOffset,
+		tabOrder = v2.tabOrder,
 		tabsFillBehavior = tabsFillBehavior,
 		gamesContent = props.gamesContent,
 		previewsContent = React.createElement(PreviewsTabView, {
-			rows = v2.rows,
-			listStatus = v2.listStatus,
-			loadError = v2.loadError,
-			isLoadingMore = v2.isLoadingMore,
-			failedLoadMore = v2.failedLoadMore,
-			refresh = v2.refresh,
-			loadMoreIfNeeded = v2.loadMoreIfNeeded,
-			retryLoadMore = v2.retryLoadMore,
-			emptyText = v2.emptyText,
+			rows = v3.rows,
+			listStatus = v3.listStatus,
+			loadError = v3.loadError,
+			isLoadingMore = v3.isLoadingMore,
+			failedLoadMore = v3.failedLoadMore,
+			refresh = v3.refresh,
+			loadMoreIfNeeded = v3.loadMoreIfNeeded,
+			retryLoadMore = v3.retryLoadMore,
+			emptyText = v3.emptyText,
 			filterHeader = React.createElement(MyCreationsFilterContainer, {
 				LayoutOrder = 0,
 				filterStore = previewsFilterStore,

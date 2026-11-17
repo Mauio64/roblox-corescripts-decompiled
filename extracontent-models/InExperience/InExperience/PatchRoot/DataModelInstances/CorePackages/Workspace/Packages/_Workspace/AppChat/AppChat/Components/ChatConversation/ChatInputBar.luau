@@ -5,7 +5,6 @@ local UserInputService = game:GetService("UserInputService")
 local SocialLibraries = require(AppChat.SocialLibraries)
 local React = require(parent.React)
 local Foundation = require(parent.Foundation)
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local Style = require(parent.Style)
 local GetTextSize = Style.GetTextSize
 local AppCommonLib = require(parent.AppCommonLib)
@@ -61,12 +60,8 @@ local v = {
 	moreMenuEnabled = false
 }
 
-local function heightOfNLines(count: number, font, p, value: number?)
-	if FoundationFontFaceMigration then
-		return GetTextSize(string.rep("A\n", count - 1), p, font, Vector2.new(value or 10000, 10000)).Y
-	end
-
-	return Text.GetTextHeight(string.rep("A\n", count - 1), font, p, value)
+local function heightOfNLines(count: number, font, p, state: number?) -- 2 equivalent calls inferred from this helper
+	return GetTextSize(string.rep("A\n", count - 1), p, font, Vector2.new(state or 10000, 10000)).Y
 end
 
 local function ChatInputBar(p)
@@ -112,21 +107,14 @@ local function ChatInputBar(p)
 
 	local v4 = Foundation.Hooks.useTokens()
 	local v5 = useStyle()
-	local font
-
-	if FoundationFontFaceMigration then
-		font = v4.Typography.BodyLarge.Font
-	else
-		font = v5.Font.Body.Font
-	end
-
+	local font = v4.Typography.BodyLarge.Font
 	local v6 = v5.Font.BaseSize * v5.Font.Body.RelativeSize
 
 	local v7 = React.useMemo(function()
-		return heightOfNLines(4, font, v6, state)
+		return heightOfNLines(4, font, v6, state) -- inferred equivalent call
 	end, { font, v6, state })
 	local v8 = React.useMemo(function()
-		return heightOfNLines(1, font, v6)
+		return heightOfNLines(1, font, v6) -- inferred equivalent call
 	end, { font, v6 })
 
 	local v9 = useKeystrokeCollection({
@@ -217,21 +205,15 @@ local function ChatInputBar(p)
 	})
 
 	local v13 = React.useCallback(function(p2: string, p3: number)
-		local v13
+		local y = GetTextSize(p2, v6, v4.Typography.BodyLarge.Font, Vector2.new(p3, 10000)).Y
 
-		if FoundationFontFaceMigration then
-			v13 = GetTextSize(p2, v6, v4.Typography.BodyLarge.Font, Vector2.new(p3, 10000)).Y
-		else
-			v13 = Text.GetTextHeight(p2, font, v6, p3)
-		end
-
-		local v14 = v6 + math.min(v13, v7)
+		local v13 = v6 + math.min(y, v7)
 
 		if union.onHeightChanged then
-			union.onHeightChanged(v14)
+			union.onHeightChanged(v13)
 		end
 
-		return v14
+		return v13
 	end, { v4, v7, union.onHeightChanged, font, v6 })
 
 	local textChangedCallback = React.useCallback(function(current: string)

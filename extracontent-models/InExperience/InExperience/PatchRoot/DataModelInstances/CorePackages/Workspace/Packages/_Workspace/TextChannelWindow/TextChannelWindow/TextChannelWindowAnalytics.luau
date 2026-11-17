@@ -49,20 +49,9 @@ local emitter = SocialLuaAnalytics.Telemetry.createEmitter({
 	end
 })
 
-local v = { "addOSInfo", "addSessionInfo", "addPlaceId", "addUniverseId" }
-
-local defineFastFlag = game:DefineFastFlag("TextChannelWindowExcludeStandardizedFieldsFromCounters", false)
-
 local function passthroughCounterBackend()
-	local standardizedFields
-
-	if not defineFastFlag then
-		standardizedFields = v
-	end
-
 	return {
 		type = "RobloxTelemetryCounter",
-		standardizedFields = standardizedFields,
 		format = function(p, p2)
 			local clone = table.clone(p)
 			clone.enable_protected_chat = tostring(p2.enableProtectedChat)
@@ -70,110 +59,57 @@ local function passthroughCounterBackend()
 		end
 	}
 end
-
-local new = SocialLuaAnalytics.Telemetry.new
-local standardizedFields
-
-if not defineFastFlag then
-	standardizedFields = v
-end
-
 local function format(p, p2)
 	local clone = table.clone(p)
 	clone.enable_protected_chat = tostring(p2.enableProtectedChat)
 	return clone
 end
 
-local mount = new({
-	name = "TextChannelWindowMount",
-	description = "Mount outcome per occurrence. result = success | failed | deferred.",
-	lastUpdated = { 26, 7, 7 },
-	backendsList = {
-		{
-			type = "RobloxTelemetryCounter",
-			standardizedFields = standardizedFields,
-			format = format
-		}
-	},
-	throttlingThousandths = game:DefineFastInt("TCWMountCountThrottlePerMyriad", 10000)
-})
-
-local new2 = SocialLuaAnalytics.Telemetry.new
-local standardizedFields2
-
-if not defineFastFlag then
-	standardizedFields2 = v
-end
-
-local send = new2({
-	name = "TextChannelWindowSend",
-	description = "Send outcome per occurrence. result = success | failure.",
-	lastUpdated = { 26, 7, 7 },
-	backendsList = {
-		{
-			type = "RobloxTelemetryCounter",
-			standardizedFields = standardizedFields2,
-			format = format
-		}
-	},
-	throttlingThousandths = game:DefineFastInt("TCWSendCountThrottlePerMyriad", 10000)
-})
-
-local new3 = SocialLuaAnalytics.Telemetry.new
-local standardizedFields3
-
-if not defineFastFlag then
-	standardizedFields3 = v
-end
-
 TextChannelWindowAnalytics.Counters = {
-	Mount = mount,
-	Send = send,
-	MessageReceived = new3({
+	Mount = SocialLuaAnalytics.Telemetry.new({
+		name = "TextChannelWindowMount",
+		description = "Mount outcome per occurrence. result = success | failed | deferred.",
+		lastUpdated = { 26, 7, 7 },
+		backendsList = {
+			{ type = "RobloxTelemetryCounter", format = format }
+		},
+		throttlingThousandths = game:DefineFastInt("TCWMountCountThrottlePerMyriad", 10000)
+	}),
+	Send = SocialLuaAnalytics.Telemetry.new({
+		name = "TextChannelWindowSend",
+		description = "Send outcome per occurrence. result = success | failure.",
+		lastUpdated = { 26, 7, 7 },
+		backendsList = {
+			{ type = "RobloxTelemetryCounter", format = format }
+		},
+		throttlingThousandths = game:DefineFastInt("TCWSendCountThrottlePerMyriad", 10000)
+	}),
+	MessageReceived = SocialLuaAnalytics.Telemetry.new({
 		name = "TextChannelWindowMessageReceived",
 		description = "Receive outcome by TextChatMessage.Status.",
 		lastUpdated = { 26, 7, 7 },
 		backendsList = {
-			{
-				type = "RobloxTelemetryCounter",
-				standardizedFields = standardizedFields3,
-				format = format
-			}
+			{ type = "RobloxTelemetryCounter", format = format }
 		},
 		throttlingThousandths = game:DefineFastInt("TCWMessageReceivedCountThrottlePerMyriad", 1000)
 	})
 }
 
-game:SetFlagVersion("TextChannelWindowCountersEnabled", 2)
-local defineFastFlag2 = game:DefineFastFlag("TextChannelWindowCountersEnabled", false)
-
-local v2 = nil
-
-function TextChannelWindowAnalytics._setCountersEnabledForTesting(flag: boolean?)
-	v2 = flag
-end
-
 function TextChannelWindowAnalytics.emit(p, p2)
-	local v3 = if v2 == nil then defineFastFlag2 else v2
-
-	if not v3 then
-		return
-	end
-
 	emitter.emit(p, p2)
 end
 
-local defineFastFlag3 = game:DefineFastFlag("TextChannelWindowEventStreamEnabled", false)
+local defineFastFlag = game:DefineFastFlag("TextChannelWindowEventStreamEnabled", false)
 
-local defineFastFlag4 = game:DefineFastFlag("TextChannelWindowMessageRenderedEnabled", false)
+local defineFastFlag2 = game:DefineFastFlag("TextChannelWindowMessageRenderedEnabled", false)
 local defineFastInt = game:DefineFastInt("TextChannelWindowMessageRenderedPermyriad", 0)
 
 function TextChannelWindowAnalytics.getFFlagExpChatTelemetryEnabled()
-	return defineFastFlag3 and game:GetEngineFeature("ExpChatTelemetryEventTrigger")
+	return defineFastFlag and game:GetEngineFeature("ExpChatTelemetryEventTrigger")
 end
 
 function TextChannelWindowAnalytics.getFFlagExpChatUseUpdatedMessageRendered()
-	return defineFastFlag4 and game:GetEngineFeature("ExpChatAddMessageRenderedSurfaceFields")
+	return defineFastFlag2 and game:GetEngineFeature("ExpChatAddMessageRenderedSurfaceFields")
 end
 
 function TextChannelWindowAnalytics.shouldSendMessageRenderedTelemetry(): boolean

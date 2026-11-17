@@ -12,6 +12,7 @@ local SharedFlags = require(parent.SharedFlags)
 local FFlagExpChatAutocompleteOptimization = SharedFlags.FFlagExpChatAutocompleteOptimization
 
 local FFlagExpChatAutocompleteLazyBuild = require(ChatUIPrimitives.Flags.FFlagExpChatAutocompleteLazyBuild)
+local FFlagExpChatMemoizeAutocompleteCallback = require(ChatUIPrimitives.Flags.FFlagExpChatMemoizeAutocompleteCallback)
 
 local v = {
 	activated = false,
@@ -91,7 +92,7 @@ local function useChatAutocompleteEngine(p, p2)
 		end
 	end, { p.current, p2 })
 
-	local function spliceResult(p3: number) -- 2 equivalent calls inferred from this helper
+	local function spliceResultImpl(p3: number)
 		local current = ref3.current
 		local result = current.results[p3]
 		local current2 = p.current
@@ -110,9 +111,13 @@ local function useChatAutocompleteEngine(p, p2)
 		setState(v)
 	end
 
-	local function commitSelection(p3: number)
+	if FFlagExpChatMemoizeAutocompleteCallback then
+		spliceResultImpl = React.useCallback(spliceResultImpl, { p })
+	end
+
+	local function commitSelectionImpl(p3: number)
 		ref2.current = true
-		spliceResult(p3) -- inferred equivalent call
+		spliceResultImpl(p3)
 		task.defer(function()
 			ref2.current = false
 			local current = p.current
@@ -121,6 +126,10 @@ local function useChatAutocompleteEngine(p, p2)
 				current:CaptureFocus()
 			end
 		end)
+	end
+
+	if FFlagExpChatMemoizeAutocompleteCallback then
+		commitSelectionImpl = React.useCallback(commitSelectionImpl, { spliceResultImpl, p })
 	end
 
 	React.useEffect(function()
@@ -273,7 +282,8 @@ local function useChatAutocompleteEngine(p, p2)
 		end
 	end, {})
 
-	local interceptSend = React.useCallback(function(object, flag: boolean): boolean
+	local useCallback = React.useCallback
+	local function fn(object, flag: boolean): boolean
 		if not flag then
 			return false
 		end
@@ -285,7 +295,7 @@ local function useChatAutocompleteEngine(p, p2)
 		end
 
 		ref2.current = true
-		spliceResult(current.selectedIndex) -- inferred equivalent call
+		spliceResultImpl(current.selectedIndex)
 		task.defer(function()
 			ref2.current = false
 
@@ -294,7 +304,15 @@ local function useChatAutocompleteEngine(p, p2)
 			end
 		end)
 		return true
-	end, {})
+	end
+
+	local v3
+
+	if FFlagExpChatMemoizeAutocompleteCallback then
+		v3 = spliceResultImpl
+	end
+
+	local interceptSend = useCallback(fn, { v3 })
 
 	local dismiss = React.useCallback(function()
 		setState(v)
@@ -320,7 +338,7 @@ local function useChatAutocompleteEngine(p, p2)
 		renderEntry = internalProviders.renderEntry,
 		onTextChanged = onTextChanged,
 		setSelectedIndex = setSelectedIndex,
-		commitSelection = commitSelection,
+		commitSelection = commitSelectionImpl,
 		interceptSend = interceptSend,
 		dismiss = dismiss
 	}

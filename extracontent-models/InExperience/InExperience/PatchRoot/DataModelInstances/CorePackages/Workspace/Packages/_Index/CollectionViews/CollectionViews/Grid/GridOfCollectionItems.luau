@@ -7,6 +7,10 @@ local calculateRelativeColumnGap = require(CollectionViews.Grid.calculateRelativ
 
 local defineFastFlag = game:DefineFastFlag("LuaAppFixCollectionGridWindowAbsoluteCanvasSize", false)
 local defineFastFlag2 = game:DefineFastFlag("LuaAppGridReuseUnchangedTileElements", false)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppCollectionGridRemeasureOnMove = SharedFlags.FFlagLuaAppCollectionGridRemeasureOnMove
+
+local defineFastInt = game:DefineFastInt("LuaAppCollectionGridScrollSettleMs", 150)
 
 local v = {
 	maxNumRows = 1e999,
@@ -36,6 +40,7 @@ local function GridOfCollectionItems(p)
 
 	React.useEffect(function()
 		local connections = {}
+		local thread = nil
 
 		if joined.verticalScrollingFrameRef and joined.verticalScrollingFrameRef.current and ref.current then
 			local current = ref.current
@@ -82,7 +87,8 @@ local function GridOfCollectionItems(p)
 						v14 = v13 + math.min(v12, joined.bufferRowsAboveScreen)
 					end
 
-					v11 = math.min(v2, v10 + math.max(1, v14) - 1)
+					local v15 = math.max(1, v14)
+					v11 = math.min(v2, v10 + v15 - 1)
 				end
 
 				setState(v10)
@@ -112,7 +118,39 @@ local function GridOfCollectionItems(p)
 				current2:GetPropertyChangedSignal(defineFastFlag and "AbsoluteCanvasSize" or "CanvasSize"):Connect(updateWindowParams)
 			)
 
-			table.insert(connections, current2:GetPropertyChangedSignal("CanvasPosition"):Connect(updateRowsToRender))
+			if FFlagLuaAppCollectionGridRemeasureOnMove then
+				local v5 = defineFastInt / 1000
+				local lastTime = 0
+				local function onSettleTimer()
+					local v6 = v5 - (os.clock() - lastTime)
+
+					if v6 > 0 then
+						thread = task.delay(v6, onSettleTimer)
+						return
+					end
+
+					thread = nil
+
+					if current.Parent and current2.Parent then
+						updateWindowParams()
+					end
+				end
+
+				table.insert(connections, current2:GetPropertyChangedSignal("CanvasPosition"):Connect(function()
+					lastTime = os.clock()
+
+					if not thread then
+						thread = task.delay(v5, onSettleTimer)
+					end
+
+					updateRowsToRender()
+				end))
+			else
+				table.insert(
+					connections,
+					current2:GetPropertyChangedSignal("CanvasPosition"):Connect(updateRowsToRender)
+				)
+			end
 
 			updateWindowParams()
 		else
@@ -122,6 +160,11 @@ local function GridOfCollectionItems(p)
 		end
 
 		return function()
+			if FFlagLuaAppCollectionGridRemeasureOnMove and thread then
+				task.cancel(thread)
+				thread = nil
+			end
+
 			for _, connection in connections do
 				connection:Disconnect()
 			end

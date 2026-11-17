@@ -59,28 +59,29 @@ local function initExtents() -- 2 equivalent calls inferred from this helper
 	return Vector3.new(1e999, 1e999, 1e999), Vector3.new(-1e999, -1e999, -1e999)
 end
 
-local function recursiveCalculateExtents(vector3: Vector3, vector3_2: Vector3, instance, cframe: CFrame, value: string?)
+local function recursiveCalculateExtents(vector3: Vector3, vector3_2: Vector3, instance, inverse: CFrame, value: string?)
 	value = value or ""
 	assert(value, "indent is non-nil. Silence type checker.")
 	local v = value .. "  "
 
 	for _, part in pairs(instance:GetChildren()) do
 		if part:IsA("BasePart") then
-			vector3, vector3_2 = growExtentsToInclude(vector3, vector3_2, part, cframe)
+			vector3, vector3_2 = growExtentsToInclude(vector3, vector3_2, part, inverse)
 		end
 
-		vector3, vector3_2 = recursiveCalculateExtents(vector3, vector3_2, part, cframe, v)
+		vector3, vector3_2 = recursiveCalculateExtents(vector3, vector3_2, part, inverse, v)
 	end
 
 	return vector3, vector3_2
 end
 
 function CharacterUtility.CalculateModelExtents(p, cframe: CFrame)
+	local inverse = cframe:Inverse()
 	local v, v2 = recursiveCalculateExtents(
 		Vector3.new(1e999, 1e999, 1e999),
 		Vector3.new(-1e999, -1e999, -1e999),
 		p,
-		cframe:Inverse(),
+		inverse,
 		"  "
 	)
 	return v, v2

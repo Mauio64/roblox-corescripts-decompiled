@@ -78,8 +78,6 @@ local LayoutMode = UserList.Enums.LayoutMode
 
 local function onFewestInteractionsSelection() end
 local FFlagFixScalingOnFriendsLanding = require(FriendsLanding.Flags.FFlagFixScalingOnFriendsLanding)
-
-local FFlagEnableFriendsLandingFilterChipsOnConsole = require(FriendsLanding.Flags.FFlagEnableFriendsLandingFilterChipsOnConsole)
 local FFlagFriendsPageUserListCtaEnabled = require(FriendsLanding.Flags.FFlagFriendsPageUserListCtaEnabled)
 local FriendsLandingCtaConfig
 
@@ -439,46 +437,40 @@ local function FriendsLandingPage(props)
 		showMoreFrame = 0,
 		additionalPadding = 0
 	}
-	local filterByButton
 
-	if not (v7 and not FFlagEnableFriendsLandingFilterChipsOnConsole) then
-		local createElement5 = React.createElement
-		local v31 = {
-			analytics = analytics,
-			filter = v2.filter,
-			friendCount = 0,
-			isDisabled = 0,
-			layoutOrder = 2,
-			onActivated = 0,
-			maxWidth = 0,
-			canAccessTrustedContacts = 0
-		}
+	local createElement5 = React.createElement
+	local v31 = {
+		analytics = analytics,
+		filter = v2.filter,
+		friendCount = 0,
+		isDisabled = 0,
+		layoutOrder = 2,
+		onActivated = 0,
+		maxWidth = 0,
+		canAccessTrustedContacts = 0
+	}
 
-		if v2.filter == filterStates.All then
-			friendCount = totalFriendCount
-		end
-
-		v31.friendCount = friendCount
-
-		v31.isDisabled = totalFriendCount == 0
-
-		if not FFlagConnectionManagementChips then
-			onActivated = v15
-		end
-
-		v31.onActivated = onActivated
-
-		v31.maxWidth = FFlagConnectionManagementChips and 640 or nil
-
-		if not FFlagConnectionManagementChips then
-			state = nil
-		end
-
-		v31.canAccessTrustedContacts = state
-		filterByButton = createElement5(FilterByButton, v31)
+	if v2.filter == filterStates.All then
+		friendCount = totalFriendCount
 	end
 
-	children2.filterByButton = filterByButton
+	v31.friendCount = friendCount
+	v31.isDisabled = totalFriendCount == 0
+
+	if not FFlagConnectionManagementChips then
+		onActivated = v15
+	end
+
+	v31.onActivated = onActivated
+
+	v31.maxWidth = FFlagConnectionManagementChips and 640 or nil
+
+	if not FFlagConnectionManagementChips then
+		state = nil
+	end
+
+	v31.canAccessTrustedContacts = state
+	children2.filterByButton = createElement5(FilterByButton, v31)
 	local noResultsView
 
 	if v17 then
@@ -500,8 +492,8 @@ local function FriendsLandingPage(props)
 	local userListLayoutAdaptor
 
 	if FFlagFriendsPageUserListEnabled and not (v17 or v16) then
-		local createElement5 = React.createElement
-		local v31 = {
+		local createElement6 = React.createElement
+		local v32 = {
 			layoutOrder = 6,
 			layoutMode = LayoutMode.Vertical,
 			header = { title = v.peopleYouMayKnow },
@@ -518,10 +510,10 @@ local function FriendsLandingPage(props)
 			ctaConfig = FriendsLandingCtaConfig
 		end
 
-		v31.ctaConfig = ctaConfig
-		v31.hasMore = hasMore
-		v31.onLoadMore = v18
-		userListLayoutAdaptor = createElement5(UserListLayoutAdaptor, v31)
+		v32.ctaConfig = ctaConfig
+		v32.hasMore = hasMore
+		v32.onLoadMore = v18
+		userListLayoutAdaptor = createElement6(UserListLayoutAdaptor, v32)
 	end
 
 	children2.UserListLayoutAdaptor = userListLayoutAdaptor

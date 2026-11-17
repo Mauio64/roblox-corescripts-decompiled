@@ -13,6 +13,7 @@ local Logger = require(script.Parent.Logger)
 local getCurrentRoute = require(script.Parent.Utils.getCurrentRoute)
 local ChatSearchBox = require(script.Parent.ChatSearchBox)
 local CheckAndOpenChatPushUpsell = require(script.Parent.CheckAndOpenChatPushUpsell)
+local ChatLandingPrompts = require(script.Parent.ChatLandingPrompts)
 
 local resetForSquadLobbyForCompactMode = require(AppChat.Utils.resetForSquadLobbyForCompactMode)
 
@@ -25,6 +26,7 @@ local SharedFlags3 = require(parent.SharedFlags)
 local GetFFlagEnablePushNotificationsUpsellModalChat = SharedFlags3.GetFFlagEnablePushNotificationsUpsellModalChat
 local SharedFlags4 = require(parent.SharedFlags)
 local FFlagEnableHeaderBarButtonsUpdate = SharedFlags4.FFlagEnableHeaderBarButtonsUpdate
+local FFlagChatPushUpsellPromptsEnabled = SharedFlags4.FFlagChatPushUpsellPromptsEnabled
 local GetTopBarStore = require(AppChat.Stores.GetTopBarStore)
 
 local FFlagAppChatIxpScreenExposure = require(AppChat.Flags.FFlagAppChatIxpScreenExposure)
@@ -242,7 +244,19 @@ function extended.render(props)
 				})
 			end
 
-			if GetFFlagEnablePushNotificationsUpsellModalChat() then
+			local renderPrompts = FFlagChatPushUpsellPromptsEnabled
+				and notNil.getScreenProps("renderChatLandingPrompts", nil)
+
+			if renderPrompts then
+				return Roact.createFragment({
+					element,
+					ChatLandingPrompts = Roact.createElement(ChatLandingPrompts, {
+						renderPrompts = renderPrompts
+					})
+				})
+			end
+
+			if GetFFlagEnablePushNotificationsUpsellModalChat() and not FFlagChatPushUpsellPromptsEnabled then
 				return Roact.createFragment({
 					element,
 					CheckAndOpenChatPushUpsell = Roact.createElement(CheckAndOpenChatPushUpsell)

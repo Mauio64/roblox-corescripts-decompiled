@@ -28,9 +28,11 @@ else
 end
 
 local SharedFlags = require(parent.SharedFlags)
-local FFlagUserSearchUseThisIsYou = SharedFlags.FFlagUserSearchUseThisIsYou
+local FFlagUserSearchUsePreviousUsernameMatch = SharedFlags.FFlagUserSearchUsePreviousUsernameMatch
 local SharedFlags2 = require(parent.SharedFlags)
-local FFlagUserSearchClassmatesInsight = SharedFlags2.FFlagUserSearchClassmatesInsight
+local FFlagUserSearchUseThisIsYou = SharedFlags2.FFlagUserSearchUseThisIsYou
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagUserSearchClassmatesInsight = SharedFlags3.FFlagUserSearchClassmatesInsight
 
 local iconsstatusplayerfriend = Images["icons/status/player/friend"]
 local iconsstatusplayerfollowing = Images["icons/status/player/following"]
@@ -83,77 +85,85 @@ return function(data)
 		end
 
 		return { text = text2 }, ContextualInfoTypes.IsMyself
-	end
-
-	if fn(data.previousUsernames, data.searchKeyword) then
-		return { text = v2.newUsername }, ContextualInfoTypes.PreviousUsername
-	end
-
-	if v.status == Enum.FriendStatus.Friend then
-		if data.shouldUseCompactTiles then
-			local v4
-
-			if FFlagUserSearchPresenceStoreMigration then
-				v4 = data.userPresence and data.userPresence.userPresenceType == presenceType.InGame
-			else
-				v4 = data.userPresence and data.userPresence.userPresenceType == PresenceType.InGame
-			end
-
-			if v4 and data.userPresence and data.userPresence.lastLocation and data.userPresence.universeId then
-				return { text = data.userPresence.lastLocation }, ContextualInfoTypes.ExperienceLastLocation
-			end
-		end
-
-		local text2
-
-		if shouldUseCompactTiles then
-			text2 = v2.friend
-		else
-			text2 = v2.youAreFriends
-		end
-
-		local icon
-
-		if not shouldUseCompactTiles2 then
-			icon = iconsstatusplayerfriend
-		end
-
-		return { text = text2, icon = icon }, ContextualInfoTypes.Friend
-	elseif v.following == true then
-		local text2
-
-		if shouldUseCompactTiles then
-			text2 = v2.following
-		else
-			text2 = v2.youAreFollowing
-		end
-
-		local icon
-
-		if not shouldUseCompactTiles2 then
-			icon = iconsstatusplayerfollowing
-		end
-
-		return { text = text2, icon = icon }, ContextualInfoTypes.Following
 	else
-		if profileInsight then
-			if v3 > 0 then
-				local icon
+		local v4
 
-				if not shouldUseCompactTiles2 then
-					icon = iconsstatusplayerfriend
+		if FFlagUserSearchUsePreviousUsernameMatch then
+			v4 = data.isPreviousUsernameMatch
+		else
+			v4 = fn(data.previousUsernames, data.searchKeyword)
+		end
+
+		if v4 then
+			return { text = v2.newUsername }, ContextualInfoTypes.PreviousUsername
+		end
+
+		if v.status == Enum.FriendStatus.Friend then
+			if data.shouldUseCompactTiles then
+				local v5
+
+				if FFlagUserSearchPresenceStoreMigration then
+					v5 = data.userPresence and data.userPresence.userPresenceType == presenceType.InGame
+				else
+					v5 = data.userPresence and data.userPresence.userPresenceType == PresenceType.InGame
 				end
 
-				return { text = text, icon = icon }, ContextualInfoTypes.MutualFriends
-			elseif profileInsight.isOfflineFrequents then
-				return { text = v2.frequents }, ContextualInfoTypes.Frequents
+				if v5 and data.userPresence and data.userPresence.lastLocation and data.userPresence.universeId then
+					return { text = data.userPresence.lastLocation }, ContextualInfoTypes.ExperienceLastLocation
+				end
 			end
-		end
 
-		if FFlagUserSearchClassmatesInsight and profileInsight and profileInsight.isClassmate then
-			return { text = v2.classmates }, ContextualInfoTypes.Classmates
-		end
+			local text2
 
-		return nil, nil
+			if shouldUseCompactTiles then
+				text2 = v2.friend
+			else
+				text2 = v2.youAreFriends
+			end
+
+			local icon
+
+			if not shouldUseCompactTiles2 then
+				icon = iconsstatusplayerfriend
+			end
+
+			return { text = text2, icon = icon }, ContextualInfoTypes.Friend
+		elseif v.following == true then
+			local text2
+
+			if shouldUseCompactTiles then
+				text2 = v2.following
+			else
+				text2 = v2.youAreFollowing
+			end
+
+			local icon
+
+			if not shouldUseCompactTiles2 then
+				icon = iconsstatusplayerfollowing
+			end
+
+			return { text = text2, icon = icon }, ContextualInfoTypes.Following
+		else
+			if profileInsight then
+				if v3 > 0 then
+					local icon
+
+					if not shouldUseCompactTiles2 then
+						icon = iconsstatusplayerfriend
+					end
+
+					return { text = text, icon = icon }, ContextualInfoTypes.MutualFriends
+				elseif profileInsight.isOfflineFrequents then
+					return { text = v2.frequents }, ContextualInfoTypes.Frequents
+				end
+			end
+
+			if FFlagUserSearchClassmatesInsight and profileInsight and profileInsight.isClassmate then
+				return { text = v2.classmates }, ContextualInfoTypes.Classmates
+			end
+
+			return nil, nil
+		end
 	end
 end

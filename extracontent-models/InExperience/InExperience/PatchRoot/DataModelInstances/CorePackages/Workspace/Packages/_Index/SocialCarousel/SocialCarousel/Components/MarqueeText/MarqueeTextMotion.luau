@@ -5,7 +5,7 @@ local function advanceMarquee(data, p: number, p2: number, p3: number, p4: numbe
 		return { offset = 0, loopsCompleted = data.loopsCompleted, finished = true }
 	end
 
-	if p2 <= 0 or p3 <= 0 then
+	if p2 <= 0 or p3 <= 0 or p <= data.offset then
 		return data
 	end
 

@@ -99,7 +99,15 @@ function class:isTooltipActive(): boolean
 	self._dailyCount = dailyCount
 	self._totalCount = totalCount
 
-	if defineFastInt <= self._dailyCount or defineFastInt <= self._totalCount or not self:tooltipSeenTimeHelper(v) then
+	if defineFastInt <= self._dailyCount then
+		return false
+	end
+
+	if defineFastInt <= self._totalCount then
+		return false
+	end
+
+	if not self:tooltipSeenTimeHelper(v) then
 		return false
 	end
 

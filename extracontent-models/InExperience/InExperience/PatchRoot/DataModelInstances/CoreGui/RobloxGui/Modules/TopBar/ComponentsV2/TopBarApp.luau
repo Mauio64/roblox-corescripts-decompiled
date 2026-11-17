@@ -11,6 +11,15 @@ local chrome = parent.Parent.Chrome
 local Constants = require(parent.Constants)
 local ExperienceAgeRatingPolicy = require(parent.ExperienceAgeRatingPolicy)
 local ExperienceAgeRatingBadge = require(CorePackages.Workspace.Packages.InExperienceTopBar.ExperienceAgeRatingBadge)
+local InExperienceCloudPlay = CorePackages.Workspace.Packages.InExperienceCloudPlay
+local FFlagEnableRestyleTopBar = require(InExperienceCloudPlay.FFlagEnableRestyleTopBar)
+local RestyleTimer
+
+if FFlagEnableRestyleTopBar then
+	RestyleTimer = require(presentation.RestyleTimer)
+else
+	RestyleTimer = nil
+end
 
 local InExperienceTopBar = require(CorePackages.Workspace.Packages.InExperienceTopBar)
 local FFlagExperienceAgeRatingBadge = InExperienceTopBar.Flags.FFlagExperienceAgeRatingBadge
@@ -31,6 +40,7 @@ local UniversalAppPolicy = require(CorePackages.Workspace.Packages.UniversalAppP
 local FFlagAddMenuNavigationToggleDialog = SharedFlags.FFlagAddMenuNavigationToggleDialog
 local FFlagGamepadNavigationDialogABTest = require(parent.Flags.FFlagGamepadNavigationDialogABTest)
 local FFlagEnablePlaytestModeUnibar = SharedFlags.FFlagEnablePlaytestModeUnibar
+local FFlagUseUIOverlayForCloudPlay = SharedFlags.FFlagUseUIOverlayForCloudPlay
 local FFlagEnableTeamTestLua = SharedFlags.FFlagEnableTeamTestLua
 local FFlagAddTraversalBackButton = Traversal.Flags.FFlagAddTraversalBackButton
 local GetFFlagEnableCrossExpVoice = SharedFlags.GetFFlagEnableCrossExpVoice
@@ -56,6 +66,8 @@ local isPioneerLaunch = PioneerUtils.isPioneerLaunch
 
 local v3 = isSideSheetEnabled and (FFlagShowSwitchServerButton or isPioneerLaunch())
 local ShopGlobalIcon = InExperienceShop.ShopGlobalIcon
+local FFlagEnableFreeTrialTopBarChip = InExperienceShop.FFlagEnableFreeTrialTopBarChip
+local FreeTrialChipHost = require(presentation.FreeTrialChipHost)
 local FFlagTopBarShopIconV2 = require(parent.Flags.FFlagTopBarShopIconV2)
 local ShopIcon
 
@@ -408,7 +420,8 @@ local function TopBarApp(_)
 				menuRef = ref
 			}) }),
 		ShopIcon = 0,
-		ShopGlobalIcon = 0
+		ShopGlobalIcon = 0,
+		RestyleTimer = 0
 	}
 	local shopIcon
 
@@ -438,6 +451,16 @@ local function TopBarApp(_)
 	end
 
 	v18.ShopGlobalIcon = shopGlobalIcon
+	local restyleTimer
+
+	if FFlagEnableRestyleTopBar and FFlagUseUIOverlayForCloudPlay then
+		restyleTimer = React.createElement(RestyleTimer, {
+			buttonSize = buttonSize,
+			layoutOrder = 4
+		})
+	end
+
+	v18.RestyleTimer = restyleTimer
 	local v19 = createElement(View, v17, v18)
 
 	local createElement2 = React.createElement
@@ -563,20 +586,33 @@ local function TopBarApp(_)
 		buildPillMenu = React.createElement(BuildPillMenuPortalHost)
 	end
 
-	children.TopBarFrame = createElement5(View, v21, {
+	local v23 = {
 		TopLeftFrame = v19,
 		TopRightFrame = createElement6(View, v22, {
 			BuildPillMenu = buildPillMenu,
 			HealthBar = React.createElement(HealthBar)
+		}),
+		FreeTrialChipHost = 0
+	}
+	local freeTrialChipHost
+
+	if FFlagEnableFreeTrialTopBarChip then
+		freeTrialChipHost = React.createElement(FreeTrialChipHost, {
+			position = UDim2.new(1, -v12, 0, v14),
+			size = UDim2.new(0.5, -v12, 0, buttonSize),
+			visible = v9
 		})
-	})
+	end
+
+	v23.FreeTrialChipHost = freeTrialChipHost
+	children.TopBarFrame = createElement5(View, v21, v23)
 	local vrBottomBar
 
 	if VRService.VREnabled then
 		vrBottomBar = React.createElement(VoiceStateContext.Provider, {}, {
 			VRBottomBar = VoiceStateContext.withVoiceState(function(p)
 				local createElement7 = React.createElement
-				local v23 = {
+				local v24 = {
 					voiceChatServiceManager = default,
 					voiceEnabled = p.voiceEnabled,
 					voiceState = p.voiceState,
@@ -588,8 +624,8 @@ local function TopBarApp(_)
 					showBadgeOver = v5
 				end
 
-				v23.showBadgeOver12 = showBadgeOver
-				return createElement7(v4, v23)
+				v24.showBadgeOver12 = showBadgeOver
+				return createElement7(v4, v24)
 			end)
 		})
 	end

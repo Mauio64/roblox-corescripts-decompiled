@@ -265,7 +265,7 @@ function extended.UpdateState(p, p2, p3)
 	end
 end
 
-local function OnNewProfilingData(state, p, serializedData: string?)
+local function OnNewProfilingData(state, state2, serializedData: string?)
 	state.serializedData = serializedData
 	state.data = ScriptProfilerService:DeserializeJSON(serializedData)
 
@@ -280,9 +280,9 @@ local function OnNewProfilingData(state, p, serializedData: string?)
 	end
 
 	local v = state.data and #state.data.Nodes or 0
-	local v2 = p.data and #p.data.Nodes or 0
+	local v2 = state2.data and #state2.data.Nodes or 0
 	local expandedNodes2 = table.create(v, false)
-	local expandedNodes = p.expandedNodes
+	local expandedNodes = state2.expandedNodes
 	table.move(expandedNodes, 1, v2, 1, expandedNodes2)
 	state.expandedNodes = expandedNodes2
 end

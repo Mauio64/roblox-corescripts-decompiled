@@ -36,9 +36,11 @@ local AnalyticsServiceV2 = require(EditProfile.Analytics.AnalyticsServiceV2)
 local SharedFlags = require(parent.SharedFlags)
 local FFlagAXEnableProfileTab = SharedFlags.FFlagAXEnableProfileTab
 local SharedFlags2 = require(parent.SharedFlags)
-local FFlagAXPPEReturnToEntrySurface = SharedFlags2.FFlagAXPPEReturnToEntrySurface
+local FFlagSplitPaneFullBleedEditProfile = SharedFlags2.FFlagSplitPaneFullBleedEditProfile
 local SharedFlags3 = require(parent.SharedFlags)
-local FFlagEditProfileImageV2Enabled = SharedFlags3.FFlagEditProfileImageV2Enabled
+local FFlagAXPPEReturnToEntrySurface = SharedFlags3.FFlagAXPPEReturnToEntrySurface
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagEditProfileImageV2Enabled = SharedFlags4.FFlagEditProfileImageV2Enabled
 local FocusNavigationUtils = require(parent.FocusNavigationUtils)
 local ReactFocusNavigation = require(parent.ReactFocusNavigation)
 
@@ -136,6 +138,21 @@ local function EditProfileLandingContainer(p)
 	end, { v2 })
 
 	local fullBleed = FFlagAXEnableProfileTab and p.navigation.getParam("fullBleed") == true
+	local fullBleed2
+
+	if FFlagSplitPaneFullBleedEditProfile then
+		local useContext = React.useContext
+		local SplitPane = require(parent.SplitPane)
+		local v4 = useContext(SplitPane.PaneHostContext)
+
+		if v4 == nil then
+			fullBleed2 = fullBleed
+		else
+			fullBleed2 = not v4.isFullScreen
+		end
+	else
+		fullBleed2 = fullBleed
+	end
 
 	local function fn()
 		AnalyticsServiceV2.sendDisplayNameModalOpened()
@@ -269,7 +286,7 @@ local function EditProfileLandingContainer(p)
 
 	local v11 = {
 		userId = userId,
-		fullBleed = fullBleed,
+		fullBleed = fullBleed2,
 		onClose = onClose,
 		username = username,
 		displayName = displayName,

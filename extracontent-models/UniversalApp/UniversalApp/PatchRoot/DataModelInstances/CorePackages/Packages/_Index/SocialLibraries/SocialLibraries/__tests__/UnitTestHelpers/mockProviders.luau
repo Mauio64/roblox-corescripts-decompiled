@@ -15,7 +15,9 @@ return function(p, options)
 	local v = options or {}
 	local store2 = v.store or store
 
-	local children = mockStyle((v.mockNavigation or mockNavigation)(p))
+	local mockNavigation2 = v.mockNavigation or mockNavigation
+
+	local children = mockStyle(mockNavigation2(p))
 
 	return roact.createElement(RoactRodux.StoreProvider, { store = store2 }, { children = children })
 end

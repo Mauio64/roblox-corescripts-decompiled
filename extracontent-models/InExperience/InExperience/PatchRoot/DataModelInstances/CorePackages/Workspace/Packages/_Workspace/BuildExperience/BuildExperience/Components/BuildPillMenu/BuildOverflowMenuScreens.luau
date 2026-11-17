@@ -26,6 +26,8 @@ local TitleDescriptionPage = require(BuildExperience.Components.TitleDescription
 local MediaSelectionPage = require(BuildExperience.Components.MediaSelectionPage.MediaSelectionPage)
 local MonetizationPageContainer = require(BuildExperience.Components.MonetizationPage.MonetizationPageContainer)
 local FFlagBuildPublishNavigationSheet = require(BuildExperience.Flags.FFlagBuildPublishNavigationSheet)
+local FFlagBuildExperiencePageImpressions = require(BuildExperience.Flags.FFlagBuildExperiencePageImpressions)
+local useBuildPageImpression = require(BuildExperience.Telemetry.useBuildPageImpression)
 local BuildNavigationParams = require(BuildExperience.utils.BuildNavigationParams)
 local GameInfoUtils = require(BuildExperience.utils.GameInfoUtils)
 require(BuildExperience.Stores.GetBuildOverflowMenuStore.createBuildOverflowMenuStore)
@@ -34,6 +36,8 @@ local useOnScreenKeyboardVisible = require(BuildExperience.utils.useOnScreenKeyb
 
 local useTokens = Foundation.Hooks.useTokens
 local FFlagBuildExperienceMonetizationNativeUI = require(BuildExperience.Flags.FFlagBuildExperienceMonetizationNativeUI)
+local FFlagBuildExperienceEventContextTelemetry = require(BuildExperience.Flags.FFlagBuildExperienceEventContextTelemetry)
+local FFlagBuildExperienceChatOpenId = require(BuildExperience.Flags.FFlagBuildExperienceChatOpenId)
 
 local screens = {
 	BuildPublish = "BuildPublish",
@@ -58,19 +62,28 @@ if FFlagBuildExperienceAnalytics then
 	v.stats = screens.BuildStats
 end
 
-local function normalizeTarget(data) -- 8 equivalent calls inferred from this helper
+local function normalizeTarget(data)
 	if data == nil then
 		return nil
 	end
 
-	return {
+	local v2 = {
 		universeId = data.universeId,
 		placeId = data.placeId,
 		sessionId = data.sessionId,
 		experienceName = data.experienceName,
 		gameIcon = data.gameIcon,
-		isNewGameTarget = data.isNewGameTarget
+		isNewGameTarget = data.isNewGameTarget,
+		chatOpenId = 0
 	}
+	local chatOpenId
+
+	if FFlagBuildExperienceChatOpenId then
+		chatOpenId = data.chatOpenId
+	end
+
+	v2.chatOpenId = chatOpenId
+	return v2
 end
 
 local function getTargetWithGameInfo(target, p, loading: string)
@@ -165,7 +178,12 @@ local function ConfigurationScreen(p, page: string, testId: string)
 	local loading = useLocalization({ loading = LocalizationStrings.BUILD_MENU_LOADING }).loading
 	local navigation = p.navigation
 	local screenProps = p.screenProps or {}
-	local target = normalizeTarget(BuildNavigationParams.getTarget(navigation) or screenProps.target) -- inferred equivalent call
+	local target = normalizeTarget(BuildNavigationParams.getTarget(navigation) or screenProps.target)
+
+	if FFlagBuildExperiencePageImpressions then
+		useBuildPageImpression(page, target)
+	end
+
 	local useGameInfo = GameInfoUtils.useGameInfo
 	local v2
 
@@ -177,6 +195,22 @@ local function ConfigurationScreen(p, page: string, testId: string)
 	local targetWithGameInfo = getTargetWithGameInfo(target, v3, loading)
 	local state, setState = React.useState(false)
 	local state2, setState2 = React.useState(false)
+
+	if FFlagBuildExperiencePageImpressions then
+		local v4
+
+		if state2 then
+			if targetWithGameInfo == nil then
+				v4 = false
+			else
+				v4 = targetWithGameInfo.placeId ~= nil
+			end
+		else
+			v4 = state2
+		end
+
+		useBuildPageImpression("version-history", targetWithGameInfo, v4)
+	end
 
 	local onClose = React.useCallback(function()
 		if screenProps.onClose then
@@ -401,7 +435,11 @@ end
 function BuildOverflowMenuScreens.BuildMonetizationScreen(props)
 	local navigation = props.navigation
 	local screenProps = props.screenProps or {}
-	local target = normalizeTarget(BuildNavigationParams.getTarget(navigation) or screenProps.target) -- inferred equivalent call
+	local target = normalizeTarget(BuildNavigationParams.getTarget(navigation) or screenProps.target)
+
+	if FFlagBuildExperiencePageImpressions then
+		useBuildPageImpression("monetization", target)
+	end
 
 	local subPageDismiss = resolveSubPageDismiss(navigation, screenProps.onClose) -- inferred equivalent call
 	local onComposerActivated
@@ -450,7 +488,11 @@ function BuildOverflowMenuScreens.BuildStatsScreen(p)
 	local stats = useLocalization({ stats = LocalizationStrings.BUILD_MENU_STATS }).stats
 	local navigation = p.navigation
 	local screenProps = p.screenProps or {}
-	local target = normalizeTarget(BuildNavigationParams.getTarget(navigation) or screenProps.target) -- inferred equivalent call
+	local target = normalizeTarget(BuildNavigationParams.getTarget(navigation) or screenProps.target)
+
+	if FFlagBuildExperiencePageImpressions then
+		useBuildPageImpression("stats", target)
+	end
 
 	local onClose = React.useCallback(function()
 		if screenProps.onClose then
@@ -475,15 +517,36 @@ function BuildOverflowMenuScreens.BuildStatsScreen(p)
 	local pageContent
 
 	if target ~= nil then
-		pageContent = React.createElement(OverflowMenuPageShell, {
+		local createElement = React.createElement
+
+		local createElement2 = React.createElement
+		local v2 = {
+			universeId = target.universeId,
+			placeId = 0,
+			conversationId = 0,
+			onOpenChat = 0
+		}
+		local placeId
+
+		if FFlagBuildExperienceEventContextTelemetry then
+			placeId = target.placeId
+		end
+
+		v2.placeId = placeId
+		local conversationId
+
+		if FFlagBuildExperienceEventContextTelemetry then
+			conversationId = target.sessionId
+		end
+
+		v2.conversationId = conversationId
+		v2.onOpenChat = onOpenChat
+		pageContent = createElement(OverflowMenuPageShell, {
 			title = stats,
 			testId = "BuildPage.stats.Page",
 			onClose = onClose,
 			scrollPerformanceIntervalName = "LuaApp_Build_Stats_Scroll",
-			content = React.createElement(AnalyticsOverview, {
-				universeId = target.universeId,
-				onOpenChat = onOpenChat
-			})
+			content = createElement2(AnalyticsOverview, v2)
 		})
 	end
 
@@ -499,7 +562,11 @@ function BuildOverflowMenuScreens.BuildAudienceScreen(p)
 
 	local navigation = p.navigation
 	local screenProps = p.screenProps or {}
-	local target = normalizeTarget(BuildNavigationParams.getTarget(navigation) or screenProps.target) -- inferred equivalent call
+	local target = normalizeTarget(BuildNavigationParams.getTarget(navigation) or screenProps.target)
+
+	if FFlagBuildExperiencePageImpressions then
+		useBuildPageImpression("audience", target)
+	end
 
 	local onClose = React.useCallback(function()
 		navigation.goBack()
@@ -528,7 +595,7 @@ end
 function BuildOverflowMenuScreens.BuildPrivateInvitesPickerScreen(p)
 	local navigation = p.navigation
 	local screenProps = p.screenProps or {}
-	local target = normalizeTarget(BuildNavigationParams.getTarget(navigation) or screenProps.target) -- inferred equivalent call
+	local target = normalizeTarget(BuildNavigationParams.getTarget(navigation) or screenProps.target)
 
 	local v2 = React.useCallback(function()
 		if screenProps.onClose then
@@ -553,7 +620,7 @@ function BuildOverflowMenuScreens.BuildPlaytestInviteManagementScreen(p)
 	local pageTitle = useLocalization({ pageTitle = LocalizationStrings.PRIVATE_INVITES_PAGE_TITLE }).pageTitle
 	local navigation = p.navigation
 	local screenProps = p.screenProps or {}
-	local target = normalizeTarget(BuildNavigationParams.getTarget(navigation) or screenProps.target) -- inferred equivalent call
+	local target = normalizeTarget(BuildNavigationParams.getTarget(navigation) or screenProps.target)
 	local state, setState = React.useState(false)
 
 	local onClose = React.useCallback(function()
@@ -605,7 +672,12 @@ end
 function BuildOverflowMenuScreens.BuildTitleDescriptionScreen(p)
 	local navigation = p.navigation
 	local screenProps = p.screenProps or {}
-	local target = normalizeTarget(BuildNavigationParams.getTarget(navigation) or screenProps.target) -- inferred equivalent call
+	local target = normalizeTarget(BuildNavigationParams.getTarget(navigation) or screenProps.target)
+
+	if FFlagBuildExperiencePageImpressions then
+		useBuildPageImpression("title-description", target)
+	end
+
 	local hideBottomBar = useOnScreenKeyboardVisible()
 	local pageContent
 
@@ -630,7 +702,12 @@ end
 function BuildOverflowMenuScreens.BuildVersionTitleDescriptionScreen(p)
 	local navigation = p.navigation
 	local screenProps = p.screenProps or {}
-	local target = normalizeTarget(BuildNavigationParams.getTarget(navigation) or screenProps.target) -- inferred equivalent call
+	local target = normalizeTarget(BuildNavigationParams.getTarget(navigation) or screenProps.target)
+
+	if FFlagBuildExperiencePageImpressions then
+		useBuildPageImpression("version-title-description", target)
+	end
+
 	local hideBottomBar = useOnScreenKeyboardVisible()
 	local pageContent
 
@@ -658,6 +735,10 @@ function BuildOverflowMenuScreens.BuildMediaSelectionScreen(p)
 	local navigation = p.navigation
 	local screenProps = p.screenProps or {}
 	local target = BuildNavigationParams.getTarget(navigation)
+
+	if FFlagBuildExperiencePageImpressions then
+		useBuildPageImpression("media-selection", target)
+	end
 
 	local subPageDismiss = resolveSubPageDismiss(navigation, screenProps.onClose) -- inferred equivalent call
 	local pageContent

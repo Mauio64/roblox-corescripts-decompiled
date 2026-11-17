@@ -19,9 +19,10 @@ local function matchAllRegex(input: string, object)
 	end
 
 	local v2 = utf8.offset(input, index)
+	local v3 = input:sub(v2 + #matchedText)
 	return {
 		{ index = v2, input = input, matchedText = matchedText, capturedGroups = capturedGroups },
-		unpack((matchAllRegex(input:sub(v2 + #matchedText), object)))
+		unpack((matchAllRegex(v3, object)))
 	}
 end
 

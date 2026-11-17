@@ -118,9 +118,12 @@ local SharedFlags13 = require(parent2.SharedFlags)
 local GetFFlagCheckUniversePlaceBeforeSuspending = SharedFlags13.GetFFlagCheckUniversePlaceBeforeSuspending
 local SharedFlags14 = require(parent2.SharedFlags)
 local FFlagEnablePartyVoiceChangersInLua = SharedFlags14.FFlagEnablePartyVoiceChangersInLua
+local SharedFlags15 = require(parent2.SharedFlags)
+local FFlagReactiveVoiceRestrictionsUFR = SharedFlags15.FFlagReactiveVoiceRestrictionsUFR
 local FFlagSkipVoiceInTeamCreateViewer = require(Flags.FFlagSkipVoiceInTeamCreateViewer)
 local GetFFlagCoreMicManagerRefactor = require(Flags.GetFFlagCoreMicManagerRefactor)
 local GetFFlagMicConsumerRegistry = require(Flags.GetFFlagMicConsumerRegistry)
+local FFlagMicSyncVoiceDeviceAcrossRejoin = require(Flags.FFlagMicSyncVoiceDeviceAcrossRejoin)
 local MicInputManager
 
 if GetFFlagCoreMicManagerRefactor() then
@@ -1114,7 +1117,11 @@ function CoreVoiceManager:userAndPlaceCanUseVoice()
 		end
 
 		task.spawn(function()
-			self:FetchAgeVerificationOverlay()
+			local ageVerificationOverlay = self:FetchAgeVerificationOverlay()
+
+			if FFlagReactiveVoiceRestrictionsUFR then
+				self:emit("OnJoinAgeVerificationOverlayFetched", ageVerificationOverlay)
+			end
 		end)
 	end
 
@@ -1751,22 +1758,27 @@ function CoreVoiceManager:SetupParticipantListeners()
 			local v6 = joined == Enum.VoiceChatState.Joining
 			local v7 = joined == Enum.VoiceChatState.Leaving
 			local v8 = joined == Enum.VoiceChatState.Ended
-			local isPublishPaused = self.service:IsPublishPaused()
+			local localMuted = self.service:IsPublishPaused()
 
-			if isPublishPaused == self.localMuted or v5 or v6 or v7 or v8 then
+			if FFlagMicSyncVoiceDeviceAcrossRejoin then
+				self:_registerVoiceChatConsumerOnJoined(joined)
+				v6, localMuted = self:_applyVoiceRejoinMicState(joined, v6, localMuted)
+			end
+
+			if localMuted == self.localMuted or v5 or v6 or v7 or v8 then
 				if v6 or v7 or v8 then
 					self.localMuted = nil
 				end
 			else
-				self.localMuted = isPublishPaused
-				self.muteChanged:Fire(isPublishPaused)
+				self.localMuted = localMuted
+				self.muteChanged:Fire(localMuted)
 			end
 
 			if
 				GetFFlagVoiceChatClientRewriteMasterLua()
 				and joined == Enum.VoiceChatState.Joined
 				and self.isInCall
-				and isPublishPaused ~= self.callMutedState
+				and localMuted ~= self.callMutedState
 			then
 				log:debug("In call, setting local muted to call muted state {}", self.callMutedState)
 				self:ToggleMic("InitInCall")
@@ -2783,6 +2795,56 @@ end
 function CoreVoiceManager:_reportJoinFailed(p, p2)
 	self.Analytics:reportVoiceChatJoinResult(false, p, p2)
 	self:emit("OnReportJoinFailed", p)
+end
+
+function CoreVoiceManager:_registerVoiceChatConsumerOnJoined(p)
+	if not GetFFlagMicConsumerRegistry() or not GetFFlagCoreMicManagerRefactor() or p ~= Enum.VoiceChatState.Joined then
+		return
+	end
+
+	local localPlayer = Players.LocalPlayer
+	local micManager = self.micManager
+	local device
+
+	if localPlayer then
+		device = localPlayer:FindFirstChildOfClass("AudioDeviceInput")
+	end
+
+	micManager:RegisterConsumer({ id = "voice_chat", consumerType = "VoiceChat", device = device })
+end
+
+function CoreVoiceManager:_applyVoiceRejoinMicState(p, flag: boolean, flag2: boolean)
+	if self.localMuted ~= nil then
+		self._mutedBeforeRejoin = self.localMuted
+	end
+
+	local selected = p == Enum.VoiceChatState.JoiningRetry or flag
+
+	if selected then
+		self.localMuted = nil
+		self:_syncLocalAudioDeviceActive()
+		return selected, flag2
+	else
+		if p ~= Enum.VoiceChatState.Joined then
+			return selected, flag2
+		end
+
+		local mutedBeforeRejoin = self._mutedBeforeRejoin == true
+		self._mutedBeforeRejoin = nil
+
+		if not mutedBeforeRejoin or flag2 ~= false or not GetFFlagCoreMicManagerRefactor() then
+			return selected, flag2
+		end
+
+		if not VoiceChatService.UseNewAudioApi then
+			self.service:PublishPause(true)
+		end
+
+		self.localMuted = true
+		self.muteChanged:Fire(true)
+		self:_syncLocalAudioDeviceActive()
+		return selected, true
+	end
 end
 
 function CoreVoiceManager:_syncLocalAudioDeviceActive()

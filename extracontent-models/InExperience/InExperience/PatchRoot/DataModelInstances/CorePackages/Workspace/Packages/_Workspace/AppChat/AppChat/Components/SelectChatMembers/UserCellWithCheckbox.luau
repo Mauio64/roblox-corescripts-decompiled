@@ -5,11 +5,8 @@ local FFlagAppChatUseProfileFrameThumbnail = require(AppChat.Flags.FFlagAppChatU
 local React = require(parent.React)
 local Foundation = require(parent.Foundation)
 local SignalsReact = require(parent.SignalsReact)
-local AppCommonLib = require(parent.AppCommonLib)
-local Text = AppCommonLib.Text
 local Style = require(parent.Style)
 local GetTextSize = Style.GetTextSize
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local useSignalState = SignalsReact.useSignalState
 
@@ -46,37 +43,20 @@ return React.memo(function(p)
 	end, { p.userId })
 
 	local v6 = React.useMemo(function()
-		local v6
+		local textSize = GetTextSize(v, v3.Typography.TitleLarge.FontSize, v3.Typography.TitleLarge.Font, Vector2.zero)
 
-		if FoundationFontFaceMigration then
-			v6 = GetTextSize(v, v3.Typography.TitleLarge.FontSize, v3.Typography.TitleLarge.Font, Vector2.zero)
-		else
-			v6 = Text.GetTextBounds(v, v3.Typography.TitleLarge.Font, v3.Typography.TitleLarge.FontSize, Vector2.zero)
-		end
-
-		return UDim2.fromOffset(v6.X, v6.Y)
+		return UDim2.fromOffset(textSize.X, textSize.Y)
 	end, { v3.Typography.TitleLarge.Font, v3.Typography.TitleLarge.FontSize })
 
 	local v7 = React.useMemo(function()
-		local v7
+		local textSize = GetTextSize(
+			"Roblox Studio",
+			v3.Typography.CaptionMedium.FontSize,
+			v3.Typography.CaptionMedium.Font,
+			Vector2.zero
+		)
 
-		if FoundationFontFaceMigration then
-			v7 = GetTextSize(
-				"Roblox Studio",
-				v3.Typography.CaptionMedium.FontSize,
-				v3.Typography.CaptionMedium.Font,
-				Vector2.zero
-			)
-		else
-			v7 = Text.GetTextBounds(
-				"Roblox Studio",
-				v3.Typography.CaptionMedium.Font,
-				v3.Typography.CaptionMedium.FontSize,
-				Vector2.zero
-			)
-		end
-
-		return UDim2.fromOffset(v7.X, v7.Y)
+		return UDim2.fromOffset(textSize.X, textSize.Y)
 	end, { v3.Typography.CaptionMedium.Font, v3.Typography.CaptionMedium.FontSize })
 
 	local state = nil

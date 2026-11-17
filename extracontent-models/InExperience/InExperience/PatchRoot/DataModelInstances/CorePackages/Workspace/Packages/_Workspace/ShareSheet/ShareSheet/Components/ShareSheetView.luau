@@ -9,28 +9,20 @@ local Divider = Foundation.Divider
 local Sheet = Foundation.Sheet
 local Text = Foundation.Text
 local View = Foundation.View
-local useOverlay = Foundation.Hooks.useOverlay
-local useScaledValue = Foundation.Hooks.useScaledValue
-local useTokens = Foundation.Hooks.useTokens
 
 local FFlagShareSheetDesktopReadiness = require(ShareSheet.Flags.FFlagShareSheetDesktopReadiness)
-local SharedFlags = require(parent.SharedFlags)
-local FFlagShareSheetFriendsSort = SharedFlags.FFlagShareSheetFriendsSort
-local FFlagShareSheetPeoplePickerEnabled = require(ShareSheet.Flags.FFlagShareSheetPeoplePickerEnabled)
-
-local FFlagShareSheetUseFoundationCenterSheetHeightFix = require(ShareSheet.Flags.FFlagShareSheetUseFoundationCenterSheetHeightFix)
+local FFlagShareSheetOmitsEmptyActions = require(ShareSheet.Flags.FFlagShareSheetOmitsEmptyActions)
 
 local ShareSheetConstants = require(ShareSheet.ShareSheetConstants)
 local FIntShareSheetPeoplePickerEnabledSnapPointHundredthsPercent = ShareSheetConstants.FIntShareSheetPeoplePickerEnabledSnapPointHundredthsPercent
-local getCenterSheetHeight = require(script.Parent.getCenterSheetHeight)
 local PeoplePicker = require(ShareSheet.Components.PeoplePicker)
 local ShareSheetActionRow = require(script.Parent.ShareSheetActionRow)
+local useMeasuredRows = require(script.Parent.useMeasuredRows)
 local ShareSheetSocialRow = require(script.Parent.ShareSheetSocialRow)
 local ShareSendRow = require(script.Parent.ShareSendRow)
 require(ShareSheet.Recipients.Recipient)
 require(ShareSheet.Recipients.RecipientSource)
 local ShareSheetTelemetry = require(ShareSheet.telemetry.ShareSheetTelemetry)
-require(ShareSheet.Types)
 
 local function setDefaultContentScrollingFrameRef(p)
 	if p then
@@ -46,64 +38,33 @@ local function setPeoplePickerContentScrollingFrameRef(p)
 	end
 end
 
-local function useOverlaySize()
-	local v = useOverlay()
-	local state, setState = React.useState(Vector2.zero)
-
-	if v then
-		state = v.AbsoluteSize
-	end
-
-	React.useLayoutEffect(function()
-		if v == nil then
-			return
-		end
-
-		local function updateSize()
-			local absoluteSize = v.AbsoluteSize
-			setState(function(p)
-				return if p == absoluteSize then p else absoluteSize
-			end)
-		end
-
-		local absoluteSizeChangedConnection = v:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateSize)
-		return function()
-			absoluteSizeChangedConnection:Disconnect()
-		end
-	end, { v })
-
-	return state
-end
-
 local function ShareSheetView(props)
-	local v, v2, v3
+	local v = next(props.selectedConversationIds) ~= nil or props.isSending == true
+	local peoplePicker = props.peoplePicker
+	local isPeoplePickerDisplayed = props.isPeoplePickerDisplayed
+	local v2
 
-	if not FFlagShareSheetUseFoundationCenterSheetHeightFix then
-		v2 = useTokens()
-		v = useOverlaySize()
-		v3 = useScaledValue(600)
+	if FFlagShareSheetOmitsEmptyActions then
+		v2 = v or not isPeoplePickerDisplayed
 	end
 
-	local v4 = next(props.selectedConversationIds) ~= nil or props.isSending == true
+	local v3
 
-	local snapPoints = nil
-	local centerSheetHeight = nil
-	local peoplePicker, v5
+	if FFlagShareSheetDesktopReadiness then
+		v3 = useMeasuredRows()
+	end
 
-	if FFlagShareSheetPeoplePickerEnabled then
-		peoplePicker = props.peoplePicker
-		v5 = props.isPeoplePickerDisplayed == true
+	local v4
 
-		if v5 then
-			centerSheetHeight = FIntShareSheetPeoplePickerEnabledSnapPointHundredthsPercent / 10000
-			snapPoints = { centerSheetHeight }
+	if FFlagShareSheetDesktopReadiness then
+		v4 = v3.isLayoutReady and not (isPeoplePickerDisplayed or v)
+	end
 
-			if not FFlagShareSheetUseFoundationCenterSheetHeightFix then
-				centerSheetHeight = getCenterSheetHeight(v.Y, v2.Margin.Medium * 2, v3, centerSheetHeight)
-			end
-		end
-	else
-		v5 = false
+	local centerSheetHeight, snapPoints
+
+	if isPeoplePickerDisplayed then
+		centerSheetHeight = FIntShareSheetPeoplePickerEnabledSnapPointHundredthsPercent / 10000
+		snapPoints = { centerSheetHeight }
 	end
 
 	local onClose = React.useCallback(function()
@@ -112,12 +73,7 @@ local function ShareSheetView(props)
 
 	local createElement = React.createElement
 	local root = Sheet.Root
-
-	if not FFlagShareSheetPeoplePickerEnabled then
-		centerSheetHeight = nil
-	end
-
-	local v6 = {
+	local v5 = {
 		centerSheetHeight = centerSheetHeight,
 		isOpen = props.isOpen,
 		onClose = onClose,
@@ -131,24 +87,19 @@ local function ShareSheetView(props)
 		size = DialogSize.Large
 	end
 
-	v6.size = size
-
-	if not FFlagShareSheetPeoplePickerEnabled then
-		snapPoints = nil
-	end
-
-	v6.snapPoints = snapPoints
+	v5.size = size
+	v5.snapPoints = snapPoints
 
 	local createElement2 = React.createElement
 	local header = Sheet.Header
-	local v7
+	local v6
 
-	if FFlagShareSheetPeoplePickerEnabled and v5 then
-		v7 = {
+	if isPeoplePickerDisplayed then
+		v6 = {
 			Picker = React.createElement(PeoplePicker.PeoplePickerHeader, peoplePicker.headerProps)
 		}
 	else
-		v7 = {
+		v6 = {
 			Title = React.createElement(Text, {
 				LayoutOrder = 1,
 				Text = props.shareLabel,
@@ -159,8 +110,8 @@ local function ShareSheetView(props)
 
 	local children = {
 		Header = createElement2(header, {
-			hasCloseAffordance = not FFlagShareSheetPeoplePickerEnabled or not v5
-		}, v7),
+			hasCloseAffordance = not isPeoplePickerDisplayed
+		}, v6),
 		Content = 0,
 		Actions = 0
 	}
@@ -169,55 +120,74 @@ local function ShareSheetView(props)
 	local content = Sheet.Content
 	local scrollingFrameRef
 
-	if FFlagShareSheetPeoplePickerEnabled and v5 then
+	if isPeoplePickerDisplayed then
 		scrollingFrameRef = setPeoplePickerContentScrollingFrameRef
 	else
 		scrollingFrameRef = setDefaultContentScrollingFrameRef
 	end
 
 	local createElement4 = React.createElement
+
+	local v7 = {
+		tag = {
+			["col size-full"] = isPeoplePickerDisplayed,
+			["col size-full-0 auto-y"] = not isPeoplePickerDisplayed,
+			["gap-xlarge"] = not isPeoplePickerDisplayed
+		},
+		onAbsoluteSizeChanged = 0
+	}
+	local onAbsoluteSizeChanged
+
+	if FFlagShareSheetDesktopReadiness and not isPeoplePickerDisplayed then
+		onAbsoluteSizeChanged = v3.onAbsoluteSizeChanged
+	end
+
+	v7.onAbsoluteSizeChanged = onAbsoluteSizeChanged
 	local v8
 
-	if FFlagShareSheetPeoplePickerEnabled and v5 then
+	if isPeoplePickerDisplayed then
 		v8 = {
 			PeoplePicker = React.createElement(PeoplePicker.PeoplePickerList, peoplePicker.listProps)
 		}
 	else
-		v8 = { SocialRow = 0, RowDivider = 0, ActionsRow = 0 }
+		v8 = { SocialRow = 0, RowDivider = 0, ActionRow = 0 }
 		local socialRow
 
-		if props.shouldShowSocialRow then
+		if FFlagShareSheetDesktopReadiness and props.shouldShowSocialRow and not v3.isLayoutReady then
+			socialRow = React.createElement(
+				View,
+				{
+					tag = "col gap-small size-full-0 auto-y",
+					LayoutOrder = 1,
+					testId = "share-sheet-rows-loading"
+				},
+				{
+					Tile = React.createElement(View, { tag = "size-full-1700", LayoutOrder = 1 }),
+					Label = React.createElement(Text, {
+						tag = "size-full-0 auto-y text-body-small",
+						Text = " ",
+						LayoutOrder = 2
+					})
+				}
+			)
+		elseif props.shouldShowSocialRow then
 			local createElement5 = React.createElement
-			local conversationEligibility
-
-			if not FFlagShareSheetFriendsSort then
-				conversationEligibility = props.conversationEligibility
-			end
-
-			local socialRowRecipients
-
-			if FFlagShareSheetFriendsSort then
-				socialRowRecipients = props.socialRowRecipients
-			end
-
 			local v9 = {
-				conversationEligibility = conversationEligibility,
-				socialRowRecipients = socialRowRecipients,
+				socialRowRecipients = props.socialRowRecipients,
 				isLoading = props.isSocialRowLoading,
 				onConversationActivated = props.onConversationActivated,
-				onMoreActivated = 0,
-				selectedConversationIds = 0,
+				onMoreActivated = props.onMoreActivated,
+				selectedConversationIds = props.selectedConversationIds,
+				rowLayout = 0,
 				LayoutOrder = 1
 			}
-			local onMoreActivated
+			local rowLayout
 
-			if FFlagShareSheetPeoplePickerEnabled then
-				onMoreActivated = props.onMoreActivated
+			if FFlagShareSheetDesktopReadiness then
+				rowLayout = v3.layout
 			end
 
-			v9.onMoreActivated = onMoreActivated
-
-			v9.selectedConversationIds = props.selectedConversationIds
+			v9.rowLayout = rowLayout
 			socialRow = createElement5(ShareSheetSocialRow, v9)
 		end
 
@@ -232,68 +202,59 @@ local function ShareSheetView(props)
 		end
 
 		v8.RowDivider = rowDivider
-		local actionsRow
+		local actionRow
 
-		if not FFlagShareSheetPeoplePickerEnabled then
-			if v4 then
-				actionsRow = React.createElement(ShareSendRow, {
-					isLoading = props.isSending,
-					label = props.sendLabel,
-					LayoutOrder = 3,
-					messagePlaceholder = props.messagePlaceholder,
-					onActivated = props.onSendActivated,
-					onFocusGained = props.onComposerFocused
-				})
-			else
-				actionsRow = React.createElement(ShareSheetActionRow, {
-					canShare = props.canShareLink,
-					context = props.context,
-					LayoutOrder = 3,
-					recipientSource = props.recipientSource,
-					telemetryId = props.telemetryId,
-					url = props.url
-				})
-			end
+		if FFlagShareSheetDesktopReadiness and v4 then
+			actionRow = React.createElement(ShareSheetActionRow, {
+				canShare = props.canShareLink,
+				context = props.context,
+				recipientSource = props.recipientSource,
+				telemetryId = props.telemetryId,
+				url = props.url,
+				rowLayout = v3.layout,
+				LayoutOrder = 3
+			})
 		end
 
-		v8.ActionsRow = actionsRow
+		v8.ActionRow = actionRow
 	end
 
 	children.Content = createElement3(content, {
 		scrollingFrameRef = scrollingFrameRef,
-		isContentFullBleed = not FFlagShareSheetPeoplePickerEnabled or not v5
-	}, {
-		ContentLayout = createElement4(View, {
-			tag = {
-				["col size-full"] = FFlagShareSheetPeoplePickerEnabled and v5,
-				["col size-full-0 auto-y"] = not (FFlagShareSheetPeoplePickerEnabled and v5),
-				["gap-xlarge"] = not FFlagShareSheetPeoplePickerEnabled or not v5
-			}
-		}, v8)
-	})
+		isContentFullBleed = not isPeoplePickerDisplayed
+	}, { ContentLayout = createElement4(View, v7, v8) })
+	local v9
+
+	if FFlagShareSheetDesktopReadiness then
+		v9 = v
+	else
+		v9 = not FFlagShareSheetOmitsEmptyActions or v2
+	end
+
 	local actions2
 
-	if FFlagShareSheetPeoplePickerEnabled then
+	if v9 then
 		local createElement5 = React.createElement
 		local actions = Sheet.Actions
 		local footer
 
-		if v4 then
+		if v then
 			footer = React.createElement(ShareSendRow, {
 				isLoading = props.isSending,
 				label = props.sendLabel,
 				messagePlaceholder = props.messagePlaceholder,
 				onActivated = props.onSendActivated,
-				onFocusGained = props.onComposerFocused,
-				shouldFillButton = false
+				onFocusGained = props.onComposerFocused
 			})
-		elseif not v5 then
+		elseif not (FFlagShareSheetDesktopReadiness or isPeoplePickerDisplayed) then
 			footer = React.createElement(ShareSheetActionRow, {
 				canShare = props.canShareLink,
 				context = props.context,
 				recipientSource = props.recipientSource,
 				telemetryId = props.telemetryId,
-				url = props.url
+				url = props.url,
+				rowLayout = nil,
+				LayoutOrder = nil
 			})
 		end
 
@@ -301,7 +262,7 @@ local function ShareSheetView(props)
 	end
 
 	children.Actions = actions2
-	return createElement(root, v6, children)
+	return createElement(root, v5, children)
 end
 
 return ShareSheetView

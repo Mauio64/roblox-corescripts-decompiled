@@ -19,31 +19,23 @@ local FFlagRobloxPlusEnableNewFeatureList = require(RobloxSubscriptionPurchaseAp
 local FFlagRobloxPlusTrialDiscountTiming = require(RobloxSubscriptionPurchaseApp.Flags.FFlagRobloxPlusTrialDiscountTiming)
 local SharedFlags = require(parent.SharedFlags)
 local FFlagEnablePlusReferralLandingSheet = SharedFlags.FFlagEnablePlusReferralLandingSheet
+local FFlagRobloxPlusAppIconBenefit = require(RobloxSubscriptionPurchaseApp.Flags.FFlagRobloxPlusAppIconBenefit)
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagAppIconSelectionPage = SharedFlags2.FFlagAppIconSelectionPage
+local UniversalAppPolicy
+
+if FFlagRobloxPlusAppIconBenefit then
+	UniversalAppPolicy = require(parent.UniversalAppPolicy)
+else
+	UniversalAppPolicy = nil
+end
 
 local Array = LuauPolyfill.Array
 
-local View = Foundation.View
-local Text = Foundation.Text
-local Icon = Foundation.Icon
-local IconName = Foundation.Enums.IconName
-local IconSize = Foundation.Enums.IconSize
+local FeatureRow = require(script.Parent.FeatureRow)
 
-local function FeatureRow(props)
-	return React.createElement(
-		View,
-		{
-			tag = "row auto-y size-full-0 align-y-center align-x-left gap-medium",
-			LayoutOrder = props.layoutOrder
-		},
-		{
-			Icon = React.createElement(Icon, { name = props.iconName, size = IconSize.Medium }),
-			FeatureText = React.createElement(Text, {
-				Text = props.text,
-				tag = "size-full-0 auto-y text-body-medium content-default text-align-x-left"
-			})
-		}
-	)
-end
+local View = Foundation.View
+local IconName = Foundation.Enums.IconName
 
 local function getVirtualTransactionDiscounts(featureConfig)
 	if not (featureConfig and featureConfig.VirtualTransactionDiscounts) then
@@ -125,7 +117,11 @@ local function RobloxSubscriptionFeatureList(props)
 		trialUnlockDays = getTrialUnlockDays(v3, v6 and v6.PeriodIndex, periodType)
 	end
 
-	local v8 = useLocalization({
+	local v8 = FFlagRobloxPlusAppIconBenefit
+		and FFlagAppIconSelectionPage
+		and UniversalAppPolicy.getAppFeaturePolicies().getShowAppIconSetting()
+
+	local v9 = useLocalization({
 		baseVirtualTransactionDiscountText = {
 			"Feature.RobloxSubscription.Label.BlackbirdVTDiscountFirst",
 			discountPercent = virtualTransactionDiscounts and virtualTransactionDiscounts.DiscountPercent or 0
@@ -143,14 +139,14 @@ local function RobloxSubscriptionFeatureList(props)
 			"Feature.RobloxSubscription.Description.Benefit.DiscountV3",
 			trialUnlockDays = trialUnlockDays
 		} or nil,
-		customizeFeatureText = "Feature.RobloxSubscription.Description.Benefit.Customize"
+		customizeFeatureText = v8 and "Feature.RobloxSubscription.Description.Benefit.CustomizeWithAppIcon" or "Feature.RobloxSubscription.Description.Benefit.Customize"
 	})
 
-	local v9 = {}
+	local v10 = {}
 
 	local function addRow(iconName, text) -- 8 equivalent calls inferred from this helper
-		table.insert(v9, FeatureRow({
-			layoutOrder = #v9 + 1,
+		table.insert(v10, FeatureRow({
+			layoutOrder = #v10 + 1,
 			iconName = iconName,
 			text = text
 		}))
@@ -159,64 +155,64 @@ local function RobloxSubscriptionFeatureList(props)
 	if FFlagRobloxPlusEnableNewFeatureList then
 		if props.noPurchaseMethodRequired then
 			if virtualTransactionDiscounts then
-				addRow(IconName.Tag, v8.baseVirtualTransactionDiscountText) -- inferred equivalent call
+				addRow(IconName.Tag, v9.baseVirtualTransactionDiscountText) -- inferred equivalent call
 			end
 		else
 			if virtualTransactionDiscounts and v6 then
 				local tag = IconName.Tag
-				local v10
+				local v11
 
 				if v4 then
-					v10 = v8.discountFeatureTextV3
+					v11 = v9.discountFeatureTextV3
 				else
-					v10 = v8.discountFeatureText
+					v11 = v9.discountFeatureText
 				end
 
-				addRow(tag, v10) -- inferred equivalent call
+				addRow(tag, v11) -- inferred equivalent call
 			elseif virtualTransactionDiscounts and not v6 then
-				addRow(IconName.Tag, v8.baseVirtualTransactionDiscountText) -- inferred equivalent call
+				addRow(IconName.Tag, v9.baseVirtualTransactionDiscountText) -- inferred equivalent call
 			end
 
-			addRow(IconName.PaintBrush, v8.customizeFeatureText) -- inferred equivalent call
+			addRow(IconName.PaintBrush, v9.customizeFeatureText) -- inferred equivalent call
 		end
 	else
 		if virtualTransactionDiscounts and typeof(virtualTransactionDiscounts.DiscountPercent) == "number" then
-			local v10
+			local v11
 
 			if defineFastFlag then
-				v10 = IconName.Tag
+				v11 = IconName.Tag
 			else
-				v10 = IconName.TagSparkle
+				v11 = IconName.TagSparkle
 			end
 
-			addRow(v10, v8.baseVirtualTransactionDiscountText) -- inferred equivalent call
+			addRow(v11, v9.baseVirtualTransactionDiscountText) -- inferred equivalent call
 		end
 
 		if v6 and typeof(v6.DiscountPercent) == "number" and not props.noPurchaseMethodRequired then
-			local v10
+			local v11
 
 			if defineFastFlag then
-				v10 = IconName.TagArrowUp
+				v11 = IconName.TagArrowUp
 			else
-				v10 = IconName.TagSparkleArrowUp
+				v11 = IconName.TagSparkleArrowUp
 			end
 
-			addRow(v10, v8.nextVirtualTransactionDiscountText) -- inferred equivalent call
+			addRow(v11, v9.nextVirtualTransactionDiscountText) -- inferred equivalent call
 		end
 	end
 
 	if v7 and typeof(v7.DiscountPercent) == "number" then
-		addRow(IconName.Controller, v8.privateServerDiscountText) -- inferred equivalent call
+		addRow(IconName.Controller, v9.privateServerDiscountText) -- inferred equivalent call
 	end
 
 	if featureConfig and featureConfig.IsRobuxTransferEnabled then
-		addRow(IconName.Robux, v8.robuxTransfersText) -- inferred equivalent call
+		addRow(IconName.Robux, v9.robuxTransfersText) -- inferred equivalent call
 	end
 
 	return React.createElement(View, {
 		tag = FFlagEnablePlusReferralLandingSheet and props.compact and "col auto-y size-full-0 align-x-left gap-small padding-top-small" or "col auto-y size-full-0 align-x-left gap-medium padding-top-large",
 		LayoutOrder = props.layoutOrder
-	}, v9)
+	}, v10)
 end
 
 return RobloxSubscriptionFeatureList

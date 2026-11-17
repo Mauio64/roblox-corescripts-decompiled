@@ -11,8 +11,6 @@ local getSupportedActionsForProfileType = require(ProfilePlatform.Hooks.getSuppo
 local FFlagProfilePlatformEnableFavoriteExperiences = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableFavoriteExperiences)
 local SharedFlags = require(parent.SharedFlags)
 local FFlagProfilePlatformEnableInventory = SharedFlags.FFlagProfilePlatformEnableInventory
-
-local FFlagProfilePlatformEnableSendPlayedTogetherContextToProfilePlatformService = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableSendPlayedTogetherContextToProfilePlatformService)
 local SharedFlags2 = require(parent.SharedFlags)
 local FFlagProfilePlatformEnableStore = SharedFlags2.FFlagProfilePlatformEnableStore
 local FFlagProfilePlatformEnableVR = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableVR)
@@ -88,19 +86,13 @@ return function(p, data)
 			v3.excludeContextualActions = data and data.isSelfView and true or nil
 		end
 
-		v2 = { nil, nil, nil, nil, nil }
-		local v4 = { component = Enums.Components.UserProfileHeader, context = 0 }
-		local context
-
-		if FFlagProfilePlatformEnableSendPlayedTogetherContextToProfilePlatformService then
-			context = v[p]
-		elseif p == SocialCommon.Enums.ContextualInfoTypes.MutualFriends then
-			context = Enums.ContextualTypes.MutualFriends
-		end
-
-		v4.context = context
-
-		v2[1], v2[2], v2[3], v2[4], v2[5] = v4, { component = Enums.Components.SocialLinks }, { component = Enums.Components.About }, { component = Enums.Components.CurrentlyWearing }, v3
+		v2 = {
+			{ component = Enums.Components.UserProfileHeader, context = v[p] },
+			{ component = Enums.Components.SocialLinks },
+			{ component = Enums.Components.About },
+			{ component = Enums.Components.CurrentlyWearing },
+			v3
+		}
 
 		table.insert(v2, { component = Enums.Components.ProfileBackground })
 

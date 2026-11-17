@@ -400,6 +400,14 @@ local function createCreationController(data)
 	end
 
 	local function dismiss()
+		if
+			FFlagMomentsRenderCreatePostStatus
+			and host.canDismissCreationFlow ~= nil
+			and not host.canDismissCreationFlow()
+		then
+			return
+		end
+
 		local v8
 
 		if FFlagMomentsCreateAvatarPosts then

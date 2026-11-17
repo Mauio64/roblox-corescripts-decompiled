@@ -6,7 +6,6 @@ local getSduiTelemetryHandlerNameRegistry = SduiCoreSystem.getSduiTelemetryHandl
 local SharedFlags = require(parent.SharedFlags)
 local FFlagSduiSearchPeoplePlayerTileTelemetry = SharedFlags.FFlagSduiSearchPeoplePlayerTileTelemetry
 local FFlagSduiSocialUpsellButtonClickTelemetry = SharedFlags.FFlagSduiSocialUpsellButtonClickTelemetry
-
 local function registerSocialActionTelemetryHandlers()
 	getSduiTelemetryHandlerNameRegistry().registerTelemetryHandlers({
 		PlayerTileClick = FFlagSduiSearchPeoplePlayerTileTelemetry and {
@@ -18,7 +17,12 @@ local function registerSocialActionTelemetryHandlers()
 			lazyHandler = function()
 				return require(script.Parent.SduiSocialUpsellButtonClickTelemetryHandler)
 			end
-		} or nil
+		} or nil,
+		SocialProofTextClick = {
+			lazyHandler = function()
+				return require(script.Parent.SduiSocialProofTextClickTelemetryHandler)
+			end
+		}
 	})
 end
 

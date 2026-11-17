@@ -28,6 +28,12 @@ end
 
 local Message = {}
 
+function Message.markHistorical(p)
+	local clone = table.clone(p)
+	clone.isHistorical = true
+	return clone
+end
+
 function Message.createSystemMessage(content: string, p: string?)
 	return {
 		messageId = p or HttpService:GenerateGUID(false),

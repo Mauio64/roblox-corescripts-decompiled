@@ -20,6 +20,7 @@ local gradientTransparency = require(script.Parent.gradientTransparency)
 local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
 local FFlagAXCategoryMenuVisualFixes = AvatarExperienceFlags.FFlagAXCategoryMenuVisualFixes
 local FFlagAXFixScrollingFrameGradientOverlap = AvatarExperienceFlags.FFlagAXFixScrollingFrameGradientOverlap
+local FFlagAXTabGroupScrollOnlyWhenClipped = AvatarExperienceFlags.FFlagAXTabGroupScrollOnlyWhenClipped
 
 local v = { dampingRatio = 1, frequency = 5 }
 
@@ -111,39 +112,51 @@ local function ScrollingFrameWithIndicators(props, ref)
 		v4 = v3
 	end
 
-	local v5, v6 = useAnimatedBinding(0)
-	local v7, v8 = useAnimatedBinding(0)
-	local v9, v10 = React.useBinding(0)
-	local v11, v12 = useAnimatedBinding(0)
+	local v5 = v2.Size.Size_300 * 2
+
+	local v6, v7 = useAnimatedBinding(0)
+	local v8, v9 = useAnimatedBinding(0)
+	local v10, v11 = React.useBinding(0)
+	local v12, v13 = useAnimatedBinding(0)
 	local state, setState = React.useState(false)
-	local v13
+	local v14
 
 	if FFlagAXCategoryMenuVisualFixes then
-		v13 = shouldShowScrollArrowsForInputType((Responsive.useLastInput()))
+		v14 = shouldShowScrollArrowsForInputType((Responsive.useLastInput()))
 	else
-		v13 = nil
+		v14 = nil
 	end
 
-	local v14, v15 = useAnimatedBinding(0)
+	local v15, v16
+
+	if FFlagAXTabGroupScrollOnlyWhenClipped then
+		local ref2 = React.useRef(nil)
+
+		v15 = React.useCallback(function()
+			ref2.current = nil
+		end, {})
+		v16 = ref2
+	else
+		v16 = nil
+	end
+
+	local v17, v18 = useAnimatedBinding(0, v15)
 	local ref2 = React.useRef(nil)
 
 	local canvasPosition = React.useMemo(function()
-		return v14:map(getCanvasPosition)
+		return v17:map(getCanvasPosition)
 	end, {})
 
 	local transparency = React.useMemo(function()
-		return React.joinBindings({ v5, v7, v9 }):map(makeGradientTransparency( -- inferred equivalent call
-			v2.Size.Size_300 * 2,
-			backgroundTransparency
-		))
-	end, { v2, backgroundTransparency })
+		return React.joinBindings({ v6, v8, v10 }):map(makeGradientTransparency(v5, backgroundTransparency)) -- inferred equivalent call
+	end, FFlagAXTabGroupScrollOnlyWhenClipped and { v5, backgroundTransparency } or { v2, backgroundTransparency })
 
 	local groupTransparency = React.useMemo(function()
-		return React.joinBindings({ v7, v11 }):map(makeButtonTransparency)
+		return React.joinBindings({ v8, v12 }):map(makeButtonTransparency)
 	end, {})
 
 	local groupTransparency2 = React.useMemo(function()
-		return React.joinBindings({ v5, v11 }):map(makeButtonTransparency)
+		return React.joinBindings({ v6, v12 }):map(makeButtonTransparency)
 	end, {})
 
 	local visible = React.useMemo(function()
@@ -158,8 +171,12 @@ local function ScrollingFrameWithIndicators(props, ref)
 		local current = ref2.current
 
 		if current then
-			v15(ReactOtter.instant(current.CanvasPosition.X))
-			v15(makeOtterSpringValue(current.AbsoluteCanvasSize.X - current.AbsoluteSize.X, v))
+			v18(ReactOtter.instant(current.CanvasPosition.X))
+			v18(makeOtterSpringValue(current.AbsoluteCanvasSize.X - current.AbsoluteSize.X, v))
+
+			if FFlagAXTabGroupScrollOnlyWhenClipped and v16 then
+				v16.current = current.AbsoluteCanvasSize.X - current.AbsoluteSize.X
+			end
 		end
 	end, {})
 
@@ -167,72 +184,84 @@ local function ScrollingFrameWithIndicators(props, ref)
 		local current = ref2.current
 
 		if current then
-			v15(ReactOtter.instant(current.CanvasPosition.X))
-			v15(makeOtterSpringValue(0, v))
+			v18(ReactOtter.instant(current.CanvasPosition.X))
+			v18(makeOtterSpringValue(0, v))
+
+			if FFlagAXTabGroupScrollOnlyWhenClipped and v16 then
+				v16.current = 0
+			end
 		end
 	end, {})
 
 	local function onMouseEnter()
-		if FFlagAXCategoryMenuVisualFixes and not v13 then
+		if FFlagAXCategoryMenuVisualFixes and not v14 then
 			return
 		end
 
-		v12(makeOtterSpringValue(1, v))
+		v13(makeOtterSpringValue(1, v))
 		setState(true)
 	end
 
 	local function onMouseLeave()
-		if FFlagAXCategoryMenuVisualFixes and not v13 then
+		if FFlagAXCategoryMenuVisualFixes and not v14 then
 			return
 		end
 
-		v12(makeOtterSpringValue(0, v))
+		v13(makeOtterSpringValue(0, v))
 		setState(false)
 	end
 
 	if FFlagAXCategoryMenuVisualFixes then
 		React.useEffect(function()
-			if not v13 then
-				v12(ReactOtter.instant(0))
+			if not v14 then
+				v13(ReactOtter.instant(0))
 				setState(false)
 			end
-		end, { v13 })
+		end, { v14 })
 	end
 
 	local function onCanvasChanged(data)
-		v6(makeOtterSpringValue(scrollingFrameCanScrollLeft(data) and 1 or 0, v)) -- inferred equivalent call
+		v7(makeOtterSpringValue(scrollingFrameCanScrollLeft(data) and 1 or 0, v)) -- inferred equivalent call
 
-		v8(makeOtterSpringValue(scrollingFrameCanScrollRight(data) and 1 or 0, v)) -- inferred equivalent call
+		v9(makeOtterSpringValue(scrollingFrameCanScrollRight(data) and 1 or 0, v)) -- inferred equivalent call
 	end
 
 	local function onSizeChanged(p)
-		v10(p.AbsoluteSize.X)
+		v11(p.AbsoluteSize.X)
 	end
 
 	React.useEffect(function()
 		local current = ref2.current
 
 		if current then
-			local v16 = scrollingFrameCanScrollLeft(current) and 1 or 0 -- inferred equivalent call
-			v6(ReactOtter.instant(v16))
-			local v17 = scrollingFrameCanScrollRight(current) and 1 or 0 -- inferred equivalent call
-			v8(ReactOtter.instant(v17))
+			local v19 = scrollingFrameCanScrollLeft(current) and 1 or 0 -- inferred equivalent call
+			v7(ReactOtter.instant(v19))
+			local v20 = scrollingFrameCanScrollRight(current) and 1 or 0 -- inferred equivalent call
+			v9(ReactOtter.instant(v20))
 		end
 	end, {})
 
 	if FFlagAXCategoryMenuVisualFixes then
-		local scrollToOffset = React.useCallback(function(p: number)
-			local current = ref2.current
+		local scrollToOffset = React.useCallback(function(current: number)
+			local current2 = ref2.current
 
-			if current then
-				v15(ReactOtter.instant(current.CanvasPosition.X))
-				v15(makeOtterSpringValue(p, v))
+			if current2 then
+				v18(ReactOtter.instant(current2.CanvasPosition.X))
+				v18(makeOtterSpringValue(current, v))
+
+				if FFlagAXTabGroupScrollOnlyWhenClipped and v16 then
+					v16.current = current
+				end
 			end
 		end, {})
 
 		local setOffset = React.useCallback(function(p: number)
 			if ref2.current then
-				v15(ReactOtter.instant(p))
+				v18(ReactOtter.instant(p))
+
+				if FFlagAXTabGroupScrollOnlyWhenClipped and v16 then
+					v16.current = nil
+				end
 			end
 		end, {})
 
@@ -242,15 +271,21 @@ local function ScrollingFrameWithIndicators(props, ref)
 				setOffset = setOffset,
 				getScrollingFrame = function()
 					return ref2.current
+				end,
+				getScrollTarget = function()
+					return if v16 then v16.current else nil
+				end,
+				getObscuredEdgeInset = function()
+					return v5 * 2
 				end
 			}
-		end, { scrollToOffset, setOffset })
+		end, FFlagAXTabGroupScrollOnlyWhenClipped and { scrollToOffset, setOffset, v5 } or { scrollToOffset, setOffset })
 	end
 
 	local size_1000 = v2.Size.Size_1000
 	local fixedTabHeight = getFixedTabHeight(v2)
 
-	local v16 = v3 + fixedTabHeight + v4
+	local v19 = v3 + fixedTabHeight + v4
 
 	local createElement = React.createElement
 	local size
@@ -269,7 +304,7 @@ local function ScrollingFrameWithIndicators(props, ref)
 		automaticSize = Enum.AutomaticSize.Y
 	end
 
-	local v17 = {
+	local v20 = {
 		Size = size,
 		AutomaticSize = automaticSize,
 		ClipsDescendants = not FFlagAXCategoryMenuVisualFixes and nil,
@@ -286,7 +321,7 @@ local function ScrollingFrameWithIndicators(props, ref)
 	local size2
 
 	if FFlagAXCategoryMenuVisualFixes then
-		size2 = UDim2.new(1, 0, 0, v16)
+		size2 = UDim2.new(1, 0, 0, v19)
 	else
 		size2 = UDim2.fromScale(1, 0)
 	end
@@ -305,7 +340,7 @@ local function ScrollingFrameWithIndicators(props, ref)
 		automaticSize2 = Enum.AutomaticSize.Y
 	end
 
-	local v18 = {
+	local v21 = {
 		["ClipsDescendants"] = nil,
 		["ClipsDescendants"] = nil,
 		["ClipsDescendants"] = nil,
@@ -332,22 +367,22 @@ local function ScrollingFrameWithIndicators(props, ref)
 		elasticBehavior = Enum.ElasticBehavior.Always
 	end
 
-	v18.ElasticBehavior = elasticBehavior
+	v21.ElasticBehavior = elasticBehavior
 
-	v18.ScrollingDirection = Enum.ScrollingDirection.X
-	v18.CanvasPosition = canvasPosition
+	v21.ScrollingDirection = Enum.ScrollingDirection.X
+	v21.CanvasPosition = canvasPosition
 
-	v18[React.Change.AbsoluteSize] = onSizeChanged
-	v18[React.Change.CanvasSize] = onCanvasChanged
-	v18[React.Change.AbsoluteCanvasSize] = onCanvasChanged
-	v18[React.Change.CanvasPosition] = onCanvasChanged
-	v18[React.Event.MouseEnter] = onMouseEnter
-	v18[React.Event.MouseLeave] = onMouseLeave
-	v18.ref = ref2
-	local v19
+	v21[React.Change.AbsoluteSize] = onSizeChanged
+	v21[React.Change.CanvasSize] = onCanvasChanged
+	v21[React.Change.AbsoluteCanvasSize] = onCanvasChanged
+	v21[React.Change.CanvasPosition] = onCanvasChanged
+	v21[React.Event.MouseEnter] = onMouseEnter
+	v21[React.Event.MouseLeave] = onMouseLeave
+	v21.ref = ref2
+	local v22
 
 	if FFlagAXCategoryMenuVisualFixes then
-		v19 = {
+		v22 = {
 			FocusCursorInset = React.createElement("UIPadding", {
 				PaddingTop = UDim.new(0, v3),
 				PaddingBottom = UDim.new(0, v4),
@@ -357,16 +392,16 @@ local function ScrollingFrameWithIndicators(props, ref)
 			Content = React.createElement(React.Fragment, nil, props.children)
 		}
 	else
-		v19 = React.createElement(React.Fragment, nil, props.children)
+		v22 = React.createElement(React.Fragment, nil, props.children)
 	end
 
 	local children = {
-		ScrollingFrame = createElement2("ScrollingFrame", v18, v19),
+		ScrollingFrame = createElement2("ScrollingFrame", v21, v22),
 		OverlayFrame = 0
 	}
 
 	local createElement3 = React.createElement
-	local v20 = {
+	local v23 = {
 		Size = UDim2.fromScale(1, 1),
 		ZIndex = 2,
 		BorderSizePixel = 0,
@@ -424,8 +459,8 @@ local function ScrollingFrameWithIndicators(props, ref)
 		icon = icon2,
 		onActivated = onActivated
 	}))
-	children.OverlayFrame = createElement3("Frame", v20, children2)
-	return createElement("Frame", v17, children)
+	children.OverlayFrame = createElement3("Frame", v23, children2)
+	return createElement("Frame", v20, children)
 end
 
 return React.forwardRef(ScrollingFrameWithIndicators)

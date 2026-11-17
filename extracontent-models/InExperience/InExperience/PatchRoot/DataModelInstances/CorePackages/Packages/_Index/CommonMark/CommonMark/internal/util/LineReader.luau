@@ -36,20 +36,16 @@ function LineReader:readLine()
 	if lineBreak == -1 then
 		self._position = self._limit
 		return line(self, sub(input, position + 1, self._limit), nil)
-	end
-
-	if byte(input, lineBreak + 1) == 10 then
+	elseif byte(input, lineBreak + 1) == 10 then
 		self._position = lineBreak + 1
 		return line(self, sub(input, position + 1, lineBreak), "\n")
-	end
-
-	if byte(input, lineBreak + 1 + 1) == 10 then
+	elseif byte(input, lineBreak + 1 + 1) == 10 then
 		self._position = lineBreak + 2
 		return line(self, sub(input, position + 1, lineBreak), "\r\n")
+	else
+		self._position = lineBreak + 1
+		return line(self, sub(input, position + 1, lineBreak), "\r")
 	end
-
-	self._position = lineBreak + 1
-	return line(self, sub(input, position + 1, lineBreak), "\r")
 end
 
 function LineReader:getLineTerminator()

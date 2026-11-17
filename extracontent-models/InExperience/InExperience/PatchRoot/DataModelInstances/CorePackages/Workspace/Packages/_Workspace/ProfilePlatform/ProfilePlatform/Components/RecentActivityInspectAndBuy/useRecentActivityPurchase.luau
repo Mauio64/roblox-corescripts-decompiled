@@ -67,11 +67,12 @@ local function useRecentActivityPurchase(data)
 			return
 		end
 
-		if v == nil or not (v < purchaseData.totalPrice) then
-			setState2(true)
-		else
+		if v ~= nil and v < purchaseData.totalPrice then
 			setState3(true)
+			return
 		end
+
+		setState2(true)
 	end, { purchaseData, localUserId, v })
 
 	local onCancelPurchase = React.useCallback(function()

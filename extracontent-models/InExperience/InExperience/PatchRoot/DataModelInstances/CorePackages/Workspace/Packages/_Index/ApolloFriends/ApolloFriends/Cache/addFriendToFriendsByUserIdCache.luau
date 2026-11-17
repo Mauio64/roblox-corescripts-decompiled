@@ -17,13 +17,13 @@ local function addFriendToFriendsByUserIdCache(p, data)
 		id = p.cache:identify({ __typename = "AllFriendsPage" }),
 		fields = {
 			allFriendsByUserId = function(_, p2, _)
-				if p2.targetUserId ~= data.targetUserId then
-					return p2
+				if p2.targetUserId == data.targetUserId then
+					return (Cryo.Dictionary.join(p2, {
+						friends = utils.mergeListsWithoutDuplicates(p2.friends, { friendInCache }, "__ref")
+					}))
 				end
 
-				return (Cryo.Dictionary.join(p2, {
-					friends = utils.mergeListsWithoutDuplicates(p2.friends, { friendInCache }, "__ref")
-				}))
+				return p2
 			end
 		}
 	})

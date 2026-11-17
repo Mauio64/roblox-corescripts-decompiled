@@ -20,6 +20,8 @@ local OverlayProvider = Foundation.OverlayProvider
 local useOverlay = Foundation.Hooks.useOverlay
 
 local BuildOverflowMenuScreens = require(script.Parent.BuildOverflowMenuScreens)
+local FFlagBuildExperiencePageImpressions = require(BuildExperience.Flags.FFlagBuildExperiencePageImpressions)
+local useBuildPageImpression = require(BuildExperience.Telemetry.useBuildPageImpression)
 local FFlagBuildExperienceMonetizationNativeUI = require(BuildExperience.Flags.FFlagBuildExperienceMonetizationNativeUI)
 local FFlagBuildExperienceModelPicker = require(BuildExperience.Flags.FFlagBuildExperienceModelPicker)
 local PrivateInvitesPickerContainer = require(BuildExperience.Components.PrivateInvitesPicker.PrivateInvitesPickerContainer)
@@ -143,6 +145,11 @@ end
 
 local function BuildCreatorCreditScreen(p)
 	local screenProps = p.screenProps
+
+	if FFlagBuildExperiencePageImpressions then
+		useBuildPageImpression("creator-credit-ai-usage", screenProps.target)
+	end
+
 	local pageTitle = useLocalization({ pageTitle = LocalizationStrings.CREATOR_CREDIT_PAGE_TITLE }).pageTitle
 
 	local onClose = React.useCallback(function()
@@ -412,7 +419,7 @@ local function BuildPillMenuPageHost(props)
 	}
 
 	if state == nil then
-		if props.activePage.type == "invitePicker" then
+		if FFlagBuildExperiencePageImpressions or props.activePage.type == "invitePicker" then
 			page = nil
 		end
 	else

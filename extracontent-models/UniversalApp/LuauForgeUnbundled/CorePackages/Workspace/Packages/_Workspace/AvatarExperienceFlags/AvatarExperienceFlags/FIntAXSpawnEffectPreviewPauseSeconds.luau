@@ -1,1 +1,0 @@
-return game:DefineFastInt("AXSpawnEffectPreviewPauseSeconds", 0)

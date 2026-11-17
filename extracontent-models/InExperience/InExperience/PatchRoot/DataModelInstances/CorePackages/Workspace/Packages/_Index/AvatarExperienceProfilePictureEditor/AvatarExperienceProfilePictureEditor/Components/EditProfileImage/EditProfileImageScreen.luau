@@ -5,7 +5,10 @@ local RoactNavigation = require(parent.RoactNavigation)
 local RoactUtils = require(parent.RoactUtils)
 local EditProfileImage = require(script.Parent.EditProfileImage)
 local Enums = require(AvatarExperienceProfilePictureEditor.Common.Enums)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagNavigationCallbackParam = SharedFlags.FFlagNavigationCallbackParam
 local closeProfilePictureEditor = require(AvatarExperienceProfilePictureEditor.Utils.closeProfilePictureEditor)
+local leaveEditProfileImage = require(AvatarExperienceProfilePictureEditor.Utils.leaveEditProfileImage)
 local showEditProfileImageToast = require(AvatarExperienceProfilePictureEditor.Utils.showEditProfileImageToast)
 
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
@@ -14,13 +17,22 @@ local function EditProfileImageScreen(props)
 	local v = useDispatch()
 
 	local onClose = React.useCallback(function()
-		closeProfilePictureEditor(props.navigation)
-	end, { props.navigation })
+		if FFlagNavigationCallbackParam then
+			leaveEditProfileImage(props.navigation, props.onReturn)
+		else
+			closeProfilePictureEditor(props.navigation)
+		end
+	end, { props.navigation, props.onReturn })
 
 	local onSaveSuccess = React.useCallback(function()
 		showEditProfileImageToast.showSaveSuccessToast(v)
-		closeProfilePictureEditor(props.navigation)
-	end, { v, props.navigation })
+
+		if FFlagNavigationCallbackParam then
+			leaveEditProfileImage(props.navigation, props.onReturn)
+		else
+			closeProfilePictureEditor(props.navigation)
+		end
+	end, { v, props.navigation, props.onReturn })
 	local mode
 
 	if props.navigation.getParam then

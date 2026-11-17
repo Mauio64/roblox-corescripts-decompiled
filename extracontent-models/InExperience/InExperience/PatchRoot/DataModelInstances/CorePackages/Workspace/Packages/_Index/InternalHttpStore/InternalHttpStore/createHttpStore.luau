@@ -3,6 +3,7 @@ local parent = script.Parent
 local parent2 = parent.Parent
 
 local Signals = require(parent2.Signals)
+local FFlagDisableLegacyReportToDiag = require(parent2.SharedFlags.FFlagDisableLegacyReportToDiag)
 
 local HttpSessionTracker = require(parent.HttpSessionTracker)
 local createFetchSignal = require(parent.createFetchSignal)
@@ -24,24 +25,33 @@ local function createHTTPStore()
 			local fetchSignal, v2 = createFetchSignal(p2)
 
 			local cancelRequestHandler = createCancelRequestHandler(fetchSignal)
+			local v3
 
-			local networkStatsHandler = createNetworkStatsHandler(cancelRequestHandler)
+			if FFlagDisableLegacyReportToDiag then
+				v3 = nil
+			else
+				v3 = createNetworkStatsHandler(cancelRequestHandler)
+			end
 
 			local grafanaLoggingHandler = createGrafanaLoggingHandler(cancelRequestHandler)
 			local fn
 
 			if p then
 				local effect = Signals.createEffect(function(p3)
-					local v3 = cancelRequestHandler(p3)
+					local v4 = cancelRequestHandler(p3)
 
-					if v3.status == "Success" or v3.status == "Failed" then
+					if v4.status == "Success" or v4.status == "Failed" then
 						v[p] = nil
 					end
 				end)
 
 				fn = function()
 					effect()
-					networkStatsHandler()
+
+					if v3 then
+						v3()
+					end
+
 					grafanaLoggingHandler()
 					v2()
 
@@ -51,7 +61,10 @@ local function createHTTPStore()
 				v[p] = { getFetchSignal = cancelRequestHandler, cancelRequest = fn }
 			else
 				fn = function()
-					networkStatsHandler()
+					if v3 then
+						v3()
+					end
+
 					grafanaLoggingHandler()
 					v2()
 				end

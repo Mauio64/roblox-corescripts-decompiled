@@ -66,12 +66,16 @@ local function ExperienceDetailsConnectionsPlayedChip(p)
 		local rootPlaceId = v3 and v3.rootPlaceId
 
 		if rootPlaceId then
-			gameConnectionsPlayedChipClicked({
-				uid = tostring(Players.LocalPlayer and Players.LocalPlayer.UserId),
-				universeId = universeId,
-				placeId = tostring(rootPlaceId),
-				totalConnections = v4
-			}, "ExperienceDetailsConnectionsPlayedChip")
+			local userId = Players.LocalPlayer and Players.LocalPlayer.UserId
+			gameConnectionsPlayedChipClicked(
+				{
+					uid = tostring(userId),
+					universeId = universeId,
+					placeId = tostring(rootPlaceId),
+					totalConnections = v4
+				},
+				"ExperienceDetailsConnectionsPlayedChip"
+			)
 		end
 
 		local v6 = { name = AppPage.SocialProofVerticalUserListSheet, extraProps = 0 }

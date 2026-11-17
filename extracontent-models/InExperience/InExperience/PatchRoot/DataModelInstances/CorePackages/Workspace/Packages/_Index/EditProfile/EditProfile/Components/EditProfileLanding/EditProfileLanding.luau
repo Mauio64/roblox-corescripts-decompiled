@@ -19,12 +19,15 @@ local UserTile = require(parent.UserTile)
 local EditComponentRow = require(EditProfile.BaseComponents.EditComponentRow)
 local EditProfileHeaderBar = require(EditProfile.BaseComponents.EditProfileHeaderBar)
 local TextKeys = require(EditProfile.Common.TextKeys)
+local FFlagEditProfileAlignBioTranslationKeys = require(EditProfile.Flags.FFlagEditProfileAlignBioTranslationKeys)
 local SharedFlags = require(parent.SharedFlags)
 local FFlagAXEnableProfileTab = SharedFlags.FFlagAXEnableProfileTab
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagSplitPaneFullBleedEditProfile = SharedFlags2.FFlagSplitPaneFullBleedEditProfile
 
 local function EditProfileLanding(props)
 	local v = useProfileCardWidth()
-	local sizefullfull = FFlagAXEnableProfileTab and props.fullBleed == true
+	local sizefullfull = (FFlagAXEnableProfileTab or FFlagSplitPaneFullBleedEditProfile) and props.fullBleed == true
 	local displayNameLabel
 
 	if props.isPolicyEnabled then
@@ -33,17 +36,28 @@ local function EditProfileLanding(props)
 		displayNameLabel = TextKeys.DisplayName
 	end
 
-	local v2 = useLocalization({
+	local v2 = {
 		TopBarTitle = TextKeys.Title,
 		UsernameLabel = TextKeys.Username,
 		DisplayNameLabel = displayNameLabel,
-		BioLabel = TextKeys.About,
-		BioPlaceholder = TextKeys.AboutPlaceholder
-	})
+		BioLabel = 0,
+		BioPlaceholder = 0
+	}
+	local bioLabel
+
+	if FFlagEditProfileAlignBioTranslationKeys then
+		bioLabel = TextKeys.Bio
+	else
+		bioLabel = TextKeys.About
+	end
+
+	v2.BioLabel = bioLabel
+	v2.BioPlaceholder = TextKeys.AboutPlaceholder
+	local v3 = useLocalization(v2)
 
 	local createElement = React.createElement
-	local v3 = {
-		tag = FFlagAXEnableProfileTab and {
+	local v4 = {
+		tag = (FFlagAXEnableProfileTab or FFlagSplitPaneFullBleedEditProfile) and {
 			["col items-start bg-surface-0"] = true,
 			["position-top-right anchor-top-right"] = not sizefullfull,
 			["size-full-full"] = sizefullfull
@@ -56,18 +70,18 @@ local function EditProfileLanding(props)
 		size = UDim2.new(0, v, 1, 0)
 	end
 
-	v3.Size = size
-	local v4 = {
+	v4.Size = size
+	local v5 = {
 		TopBar = React.createElement(EditProfileHeaderBar, {
 			onClose = props.onClose,
-			headerText = v2.TopBarTitle
+			headerText = v3.TopBarTitle
 		}),
 		EditableComponents = 0
 	}
 
 	local createElement2 = React.createElement
 
-	local v5 = {
+	local v6 = {
 		AvatarEditRow = React.createElement(View, { tag = "size-full-2400", LayoutOrder = 1 }, {
 			AvatarContainer = React.createElement(
 				View,
@@ -103,9 +117,9 @@ local function EditProfileLanding(props)
 
 	local createElement3 = React.createElement
 
-	local v6 = {
+	local v7 = {
 		EditDisplayNameRow = React.createElement(EditComponentRow, {
-			label = v2.DisplayNameLabel,
+			label = v3.DisplayNameLabel,
 			currentValue = props.displayName,
 			onActivated = props.areNamesLoading and function() end or props.settingButtonOnActivated.displayName,
 			layoutOrder = 1,
@@ -113,7 +127,7 @@ local function EditProfileLanding(props)
 			forwardRef = props.firstItemRef
 		}),
 		UsernameEditRow = React.createElement(EditComponentRow, {
-			label = v2.UsernameLabel,
+			label = v3.UsernameLabel,
 			currentValue = props.username,
 			onActivated = props.settingButtonOnActivated.username,
 			layoutOrder = 2,
@@ -123,8 +137,8 @@ local function EditProfileLanding(props)
 	}
 
 	local createElement4 = React.createElement
-	local v7 = {
-		label = v2.BioLabel,
+	local v8 = {
+		label = v3.BioLabel,
 		currentValue = 0,
 		onActivated = 0,
 		layoutOrder = 3,
@@ -133,26 +147,26 @@ local function EditProfileLanding(props)
 	local currentValue
 
 	if props.bioText == "" or props.bioText == nil then
-		currentValue = v2.BioPlaceholder
+		currentValue = v3.BioPlaceholder
 	else
 		currentValue = props.bioText
 	end
 
-	v7.currentValue = currentValue
+	v8.currentValue = currentValue
 
-	v7.onActivated = props.settingButtonOnActivated.bio
+	v8.onActivated = props.settingButtonOnActivated.bio
 
-	v7.shouldShimmer = props.isBioLoading
-	v6.BioEditRow = createElement4(EditComponentRow, v7)
-	v5.TextComponentsList = createElement3(
+	v8.shouldShimmer = props.isBioLoading
+	v7.BioEditRow = createElement4(EditComponentRow, v8)
+	v6.TextComponentsList = createElement3(
 		View,
 		{ tag = "col size-full-0 auto-y bg-surface-100 radius-medium", LayoutOrder = 2 },
-		v6
+		v7
 	)
-	v4.EditableComponents = createElement2(View, {
+	v5.EditableComponents = createElement2(View, {
 		tag = "col padding-xlarge gap-xxlarge size-full-0 auto-y"
-	}, v5)
-	return createElement(View, v3, v4)
+	}, v6)
+	return createElement(View, v4, v5)
 end
 
 return EditProfileLanding

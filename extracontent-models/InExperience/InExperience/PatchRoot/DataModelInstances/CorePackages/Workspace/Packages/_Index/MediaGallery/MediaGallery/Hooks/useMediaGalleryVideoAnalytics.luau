@@ -17,7 +17,7 @@ local reportWarning = DiscoveryAnalytics.Points.reportWarning
 local SharedFlags = require(parent.SharedFlags)
 local FFlagLuaAppDiscoveryMomentVideoTelemetry = SharedFlags.FFlagLuaAppDiscoveryMomentVideoTelemetry
 
-local function useMediaGalleryVideoAnalytics(p: string, rootPlaceId: string, p2)
+local function useMediaGalleryVideoAnalytics(p: string, rootPlaceId: string?, p2)
 	local reportVideoPlay = React.useCallback(function(p3: number?, value: string?)
 		if not (p3 and p2) then
 			return

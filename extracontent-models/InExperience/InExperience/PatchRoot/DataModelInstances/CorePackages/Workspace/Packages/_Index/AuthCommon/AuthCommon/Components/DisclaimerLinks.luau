@@ -6,9 +6,6 @@ local RoactRodux = require(parent.RoactRodux)
 local UIBlox = require(parent.UIBlox)
 local Foundation = require(parent.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
-local AppCommonLib = require(parent.AppCommonLib)
-local Text = AppCommonLib.Text
 local LinkButton = UIBlox.App.Button.LinkButton
 local ContextualMenu = UIBlox.App.Menu.ContextualMenu
 local MenuDirection = UIBlox.App.Menu.MenuDirection
@@ -186,51 +183,22 @@ function extended.render(data)
 				v6 = "<b>" .. data2.privacyPolicyText .. "</b>"
 			end
 
-			local font = props.Font.Header2.Font
-			local v7
+			local v7 = GetTextSize(" ", baseSize, props.Tokens.Typography.TitleLarge.Font, Vector2.new(10000, 10000)).X / 2
 
-			if FoundationFontFaceMigration then
-				v7 = GetTextSize(" ", baseSize, props.Tokens.Typography.TitleLarge.Font, Vector2.new(10000, 10000)).X / 2
-			else
-				v7 = Text.GetTextWidth(" ", font, baseSize) / 2
-			end
-
-			local v8
-
-			if FoundationFontFaceMigration then
-				v8 = GetTextSize("-", baseSize, props.Tokens.Typography.TitleLarge.Font, Vector2.new(10000, 10000)).X
-			else
-				v8 = Text.GetTextWidth("-", font, baseSize)
-			end
-
-			local y
-
-			if FoundationFontFaceMigration then
-				y = GetTextSize(
-					data2.privacyPolicyText,
-					baseSize,
-					props.Tokens.Typography.TitleLarge.Font,
-					Vector2.new(10000, 10000)
-				).Y
-			end
-
-			local v9
-
-			if FoundationFontFaceMigration then
-				v9 = y + v2
-			else
-				v9 = Text.GetTextHeight(data2.privacyPolicyText, font, baseSize) + v2
-			end
+			local x = GetTextSize("-", baseSize, props.Tokens.Typography.TitleLarge.Font, Vector2.new(10000, 10000)).X
+			local y = GetTextSize(
+				data2.privacyPolicyText,
+				baseSize,
+				props.Tokens.Typography.TitleLarge.Font,
+				Vector2.new(10000, 10000)
+			).Y
+			local v8 = y + v2
 
 			if isDualLayout then
-				if FoundationFontFaceMigration then
-					v9 = 2 * (y + 2 * v2)
-				else
-					v9 = 2 * (Text.GetTextHeight(data2.privacyPolicyText, font, baseSize) + 2 * v2)
-				end
+				v8 = 2 * (y + 2 * v2)
 			end
 
-			local v10 = isDualLayout and "Frame" or FitChildren.FitFrame
+			local v9 = isDualLayout and "Frame" or FitChildren.FitFrame
 
 			local function fn()
 				return {
@@ -252,7 +220,7 @@ function extended.render(data)
 					return {}
 				end
 
-				local v11 = {
+				local v10 = {
 					TermsAuditContent = RegisterAuditContent and v5 and Roact.createElement(RegisterAuditContent, {
 						translationKey = translationKey,
 						translatedSourceString = v5
@@ -266,7 +234,7 @@ function extended.render(data)
 
 				if privacyAuditContent then
 					local createElement = Roact.createElement
-					local v12 = { translationKey = translationKey2, translatedSourceString = 0 }
+					local v11 = { translationKey = translationKey2, translatedSourceString = 0 }
 					local translatedSourceString
 
 					if isDualLayout then
@@ -275,29 +243,29 @@ function extended.render(data)
 						translatedSourceString = data2.privacyPolicyText
 					end
 
-					v12.translatedSourceString = translatedSourceString
-					privacyAuditContent = createElement(RegisterAuditContent, v12)
+					v11.translatedSourceString = translatedSourceString
+					privacyAuditContent = createElement(RegisterAuditContent, v11)
 				end
 
-				v11.PrivacyAuditContent = privacyAuditContent
+				v10.PrivacyAuditContent = privacyAuditContent
 
-				v11.TermsLinkAuditContent = RegisterAdditionalAuditContent
+				v10.TermsLinkAuditContent = RegisterAdditionalAuditContent
 					and Roact.createElement(RegisterAdditionalAuditContent, {
 						contentKey = "termsLink",
 						value = urlBuilder.static.about.terms()
 					})
 
-				v11.PrivacyLinkAuditContent = RegisterAdditionalAuditContent
+				v10.PrivacyLinkAuditContent = RegisterAdditionalAuditContent
 					and Roact.createElement(RegisterAdditionalAuditContent, {
 						contentKey = "privacyLink",
 						value = urlBuilder.static.about.privacy()
 					})
-				return v11
+				return v10
 			end
 
 			local function fn3()
 				local createElement = Roact.createElement
-				local v11 = {
+				local v10 = {
 					Padding = UDim.new(0, v7),
 					SortOrder = Enum.SortOrder.LayoutOrder,
 					FillDirection = 0,
@@ -312,7 +280,7 @@ function extended.render(data)
 					fillDirection = Enum.FillDirection.Horizontal
 				end
 
-				v11.FillDirection = fillDirection
+				v10.FillDirection = fillDirection
 				local horizontalAlignment
 
 				if isDualLayout then
@@ -321,11 +289,11 @@ function extended.render(data)
 					horizontalAlignment = Enum.HorizontalAlignment.Center
 				end
 
-				v11.HorizontalAlignment = horizontalAlignment
+				v10.HorizontalAlignment = horizontalAlignment
 
-				v11.VerticalAlignment = Enum.VerticalAlignment.Center
-				local v12 = {
-					UIListLayout = createElement("UIListLayout", v11),
+				v10.VerticalAlignment = Enum.VerticalAlignment.Center
+				local v11 = {
+					UIListLayout = createElement("UIListLayout", v10),
 					ContextualMenu = 0,
 					TermsOfUse = 0,
 					Hyphen = 0,
@@ -374,12 +342,12 @@ function extended.render(data)
 					})
 				end
 
-				v12.ContextualMenu = contextualMenu
+				v11.ContextualMenu = contextualMenu
 				local termsOfUse
 
 				if not isDualLayout then
 					local createElement2 = Roact.createElement
-					local v13 = {
+					local v12 = {
 						text = v5,
 						size = 0,
 						fontStyle = "Header2",
@@ -397,57 +365,36 @@ function extended.render(data)
 						size = UDim2.new(0, 0, 1, 0)
 					end
 
-					v13.size = size
+					v12.size = size
 
-					v13.onActivated = data.openTermsLink
-					v13.colorStyleDefault = v4
-					v13.colorStyleHover = v4
-					termsOfUse = createElement2(LinkButton, v13)
+					v12.onActivated = data.openTermsLink
+					v12.colorStyleDefault = v4
+					v12.colorStyleHover = v4
+					termsOfUse = createElement2(LinkButton, v12)
 				end
 
-				v12.TermsOfUse = termsOfUse
+				v11.TermsOfUse = termsOfUse
 				local hyphen
 
 				if not isDualLayout then
-					local createElement2 = Roact.createElement
-					local v13 = {
+					hyphen = Roact.createElement("TextLabel", {
 						BackgroundTransparency = 1,
 						Text = " ",
-						Size = UDim2.new(0, v8, 1, 0),
-						Font = 0,
-						FontFace = 0,
-						TextColor3 = 0,
-						TextTransparency = 0,
-						TextSize = 0,
+						Size = UDim2.new(0, x, 1, 0),
+						FontFace = normalizeFontFace(props.Tokens.Typography.TitleLarge.Font),
+						TextColor3 = props.Theme.TextEmphasis.Color,
+						TextTransparency = props.Theme.TextEmphasis.Transparency,
+						TextSize = baseSize,
 						LayoutOrder = 2
-					}
-					local font2
-
-					if not FoundationFontFaceMigration then
-						font2 = font
-					end
-
-					v13.Font = font2
-					local fontFace
-
-					if FoundationFontFaceMigration then
-						fontFace = normalizeFontFace(props.Tokens.Typography.TitleLarge.Font)
-					end
-
-					v13.FontFace = fontFace
-
-					v13.TextColor3 = props.Theme.TextEmphasis.Color
-					v13.TextTransparency = props.Theme.TextEmphasis.Transparency
-					v13.TextSize = baseSize
-					hyphen = createElement2("TextLabel", v13)
+					})
 				end
 
-				v12.Hyphen = hyphen
+				v11.Hyphen = hyphen
 				local privacyPolicy
 
 				if not isDualLayout then
 					local createElement2 = Roact.createElement
-					local v13 = {
+					local v12 = {
 						text = v6,
 						size = 0,
 						fontStyle = "Header2",
@@ -465,16 +412,16 @@ function extended.render(data)
 						size = UDim2.new(0, 0, 1, 0)
 					end
 
-					v13.size = size
+					v12.size = size
 
-					v13.onActivated = data.openPrivacyLink
-					v13.colorStyleDefault = v4
-					v13.colorStyleHover = v4
-					privacyPolicy = createElement2(LinkButton, v13)
+					v12.onActivated = data.openPrivacyLink
+					v12.colorStyleDefault = v4
+					v12.colorStyleHover = v4
+					privacyPolicy = createElement2(LinkButton, v12)
 				end
 
-				v12.PrivacyPolicy = privacyPolicy
-				return v12
+				v11.PrivacyPolicy = privacyPolicy
+				return v11
 			end
 
 			if data.props.variant == DisclaimerLinksVariant.Foundation and not (isDualLayout or v3) then
@@ -541,18 +488,18 @@ function extended.render(data)
 					fitAxis = FitChildren.FitAxis.Width
 				end
 
-				local v11 = {
+				local v10 = {
 					fitAxis = fitAxis,
-					Size = UDim2.new(1, 0, 0, v9),
+					Size = UDim2.new(1, 0, 0, v8),
 					BackgroundTransparency = 1,
 					LayoutOrder = layoutOrder
 				}
 
 				if GetFFlagEnableAuditForSinglePageSignUp() then
-					return Roact.createElement(v10, v11, Cryo.Dictionary.join(fn3(), fn2()))
+					return Roact.createElement(v9, v10, Cryo.Dictionary.join(fn3(), fn2()))
 				end
 
-				return Roact.createElement(v10, v11, fn3())
+				return Roact.createElement(v9, v10, fn3())
 			end
 		end)
 	end)

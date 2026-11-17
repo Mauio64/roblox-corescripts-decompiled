@@ -6,6 +6,7 @@ local React = require(parent.React)
 local ReactUtils = require(parent.ReactUtils)
 
 local FFlagMomentsCommentRowRedesign = require(Moments.Flags.FFlagMomentsCommentRowRedesign)
+local FFlagMomentsCommentRowTrailingReaction = require(Moments.Flags.FFlagMomentsCommentRowTrailingReaction)
 local FFlagMomentsCommentsAttachSheetScroller = require(Moments.Flags.FFlagMomentsCommentsAttachSheetScroller)
 local ImageWithSkeleton = require(Moments.Components.ImageWithSkeleton)
 local CommentActionsMenu = require(script.Parent.CommentActionsMenu)
@@ -49,6 +50,14 @@ local function CommentRowView(props)
 		v2 = actionsMenu.anchorRef ~= nil
 	end
 
+	local v3
+
+	if actionsMenu == nil then
+		v3 = false
+	else
+		v3 = not v2
+	end
+
 	local state, setState = React.useState(nil)
 	local ref = useComposedRef(props.gestureRef, setState)
 	local anchorRef = React.useMemo(function()
@@ -60,38 +69,48 @@ local function CommentRowView(props)
 		image = getRbxThumb(ThumbnailType.AvatarHeadShot, props.avatarUserId, ThumbnailSize.Medium)
 	end
 
-	local v3
+	local v4
 
 	if FFlagMomentsCommentRowRedesign then
-		v3 = v.Typography.TitleMedium
+		v4 = v.Typography.TitleMedium
 	else
-		v3 = v.Typography.TitleSmall
+		v4 = v.Typography.TitleSmall
 	end
 
-	local lineHeights = getLineHeights(v3)
+	local lineHeights = getLineHeights(v4)
+
+	local v5 = FFlagMomentsCommentRowTrailingReaction and (v3 or props.showReactionControl == true)
+	local state2, setState2 = React.useState(0)
+	local onAbsoluteSizeChanged = React.useCallback(function(p)
+		setState2(p.AbsoluteSize.X)
+	end, {})
 	local udim
 
 	if FFlagMomentsCommentsAttachSheetScroller then
-		local v4
+		local v6
 
 		if FFlagMomentsCommentRowRedesign then
-			v4 = v.Size.Size_800
+			v6 = v.Size.Size_800
 		else
-			v4 = v.Size.Size_700
+			v6 = v.Size.Size_700
 		end
 
-		local v5 = v4 + v.Gap.Medium
+		local v7 = v6 + v.Gap.Medium
 
-		if actionsMenu ~= nil and not v2 then
-			v5 += v.Size.Size_600 + v.Gap.Medium
+		if FFlagMomentsCommentRowTrailingReaction then
+			if v5 then
+				v7 += state2 + v.Gap.Medium
+			end
+		elseif actionsMenu ~= nil and not v2 then
+			v7 += v.Size.Size_600 + v.Gap.Medium
 		end
 
-		udim = UDim2.new(1, -v5, 0, 0)
+		udim = UDim2.new(1, -v7, 0, 0)
 	end
 
 	local createElement = React.createElement
 	local view = Foundation.View
-	local v4 = {
+	local v6 = {
 		tag = "size-full-0 auto-y",
 		LayoutOrder = props.LayoutOrder,
 		GroupTransparency = props.GroupTransparency,
@@ -106,9 +125,11 @@ local function CommentRowView(props)
 		})
 	end
 
+	local v7 = { Highlight = highlight, Content = 0, RowActionsMenu = 0, DeleteConfirmation = 0 }
+
 	local createElement2 = React.createElement
 	local view2 = Foundation.View
-	local v5 = {
+	local v8 = {
 		tag = {
 			["row gap-medium size-full-0 auto-y padding-x-small padding-top-small"] = true,
 			["padding-bottom-small"] = FFlagMomentsCommentRowRedesign or not props.showReactionControl
@@ -126,22 +147,22 @@ local function CommentRowView(props)
 		onActivated = noop
 	end
 
-	v5.onActivated = onActivated
+	v8.onActivated = onActivated
 	local onStateChanged
 
 	if props.isGestureSurfaceActive then
 		onStateChanged = props.onContentStateChanged
 	end
 
-	v5.onStateChanged = onStateChanged
-	v5.stateLayer = props.isGestureSurfaceActive and { affordance = StateLayerAffordance.None } or nil
-	v5.selection = { Selectable = false }
+	v8.onStateChanged = onStateChanged
+	v8.stateLayer = props.isGestureSurfaceActive and { affordance = StateLayerAffordance.None } or nil
+	v8.selection = { Selectable = false }
 
-	v5.testId = `moments-comment-row-content-{props.commentId}`
+	v8.testId = `moments-comment-row-content-{props.commentId}`
 
 	local createElement3 = React.createElement
 	local view3 = Foundation.View
-	local v6 = {
+	local v9 = {
 		tag = {
 			["size-800-800"] = FFlagMomentsCommentRowRedesign,
 			["size-700-700"] = not FFlagMomentsCommentRowRedesign
@@ -157,9 +178,9 @@ local function CommentRowView(props)
 		testId = `moments-comment-avatar-{props.commentId}`
 	end
 
-	v6.testId = testId
+	v9.testId = testId
 	local children = {
-		Avatar = createElement3(view3, v6, {
+		Avatar = createElement3(view3, v9, {
 			Image = React.createElement(ImageWithSkeleton, {
 				Image = image,
 				Size = UDim2.fromScale(1, 1),
@@ -168,12 +189,13 @@ local function CommentRowView(props)
 			})
 		}),
 		TextColumn = 0,
-		ActionsMenu = 0
+		ActionsMenu = 0,
+		Trailing = 0
 	}
 
 	local createElement4 = React.createElement
 	local view4 = Foundation.View
-	local v7 = {
+	local v10 = {
 		tag = {
 			["col auto-y"] = true,
 			fill = not FFlagMomentsCommentsAttachSheetScroller,
@@ -187,7 +209,7 @@ local function CommentRowView(props)
 
 	local createElement5 = React.createElement
 	local view5 = Foundation.View
-	local v8 = {
+	local v11 = {
 		tag = {
 			["col size-full-0 auto-y"] = true,
 			["gap-xxsmall"] = FFlagMomentsCommentRowRedesign,
@@ -199,7 +221,7 @@ local function CommentRowView(props)
 
 	local createElement6 = React.createElement
 	local view6 = Foundation.View
-	local v10 = {
+	local v12 = {
 		tag = "row align-y-center gap-xsmall size-full-0 auto-y clip",
 		LayoutOrder = 1,
 		testId = `moments-comment-metadata-{props.commentId}`
@@ -271,7 +293,7 @@ local function CommentRowView(props)
 	end
 
 	local children2 = {
-		Header = createElement6(view6, v10, {
+		Header = createElement6(view6, v12, {
 			Author = author,
 			Separator = separator,
 			Timestamp = timestamp,
@@ -284,7 +306,7 @@ local function CommentRowView(props)
 
 	local createElement7 = React.createElement
 	local text = Foundation.Text
-	local v11 = {
+	local v13 = {
 		tag = "size-full-0 auto-y text-body-medium text-wrap text-align-x-left",
 		LayoutOrder = 2,
 		Text = props.bodyText or props.text,
@@ -304,12 +326,12 @@ local function CommentRowView(props)
 		end
 	end
 
-	v11.textStyle = textStyle
+	v13.textStyle = textStyle
 
-	v11.ref = props.bodyRef
-	v11.onAbsoluteSizeChanged = props.onBodyAbsoluteSizeChanged
-	v11.testId = `moments-comment-body-{props.commentId}`
-	children2.Body = createElement7(text, v11)
+	v13.ref = props.bodyRef
+	v13.onAbsoluteSizeChanged = props.onBodyAbsoluteSizeChanged
+	v13.testId = `moments-comment-body-{props.commentId}`
+	children2.Body = createElement7(text, v13)
 	local bodyMeasure
 
 	if props.bodyMeasureRef ~= nil then
@@ -324,8 +346,8 @@ local function CommentRowView(props)
 	end
 
 	children2.BodyMeasure = bodyMeasure
-	local v12 = {
-		MainContent = createElement5(view5, v8, children2),
+	local v14 = {
+		MainContent = createElement5(view5, v11, children2),
 		Reaction = 0,
 		Footer = 0
 	}
@@ -343,7 +365,7 @@ local function CommentRowView(props)
 		})
 	end
 
-	v12.Reaction = reaction
+	v14.Reaction = reaction
 	local footer
 
 	if
@@ -352,15 +374,19 @@ local function CommentRowView(props)
 	then
 		local createElement8 = React.createElement
 		local view7 = Foundation.View
-		local v9 = {
-			tag = "row align-y-center gap-small size-full-0 auto-y",
+		local v15 = {
+			tag = {
+				["row align-y-center gap-small"] = true,
+				["size-full-0 auto-y"] = not FFlagMomentsCommentRowTrailingReaction,
+				["size-full-600"] = FFlagMomentsCommentRowTrailingReaction
+			},
 			LayoutOrder = 2,
 			testId = `moments-comment-footer-{props.commentId}`
 		}
 
 		local createElement9 = React.createElement
 		local view8 = Foundation.View
-		local v13 = {
+		local v16 = {
 			tag = {
 				["row align-y-center fill gap-small auto-y clip"] = true,
 				wrap = translationToggle ~= nil
@@ -390,8 +416,8 @@ local function CommentRowView(props)
 			})
 		end
 
-		local v14 = {
-			Metadata = createElement9(view8, v13, {
+		local v17 = {
+			Metadata = createElement9(view8, v16, {
 				Timestamp = timestamp2,
 				HeaderAction = headerAction2,
 				TranslationToggle = translationToggle2
@@ -400,7 +426,7 @@ local function CommentRowView(props)
 		}
 		local reaction2
 
-		if props.showReactionControl then
+		if not (FFlagMomentsCommentRowTrailingReaction or not props.showReactionControl) then
 			reaction2 = React.createElement(CommentReactionButton, {
 				commentId = props.commentId,
 				isReactionSelected = props.isReactionSelected == true,
@@ -412,15 +438,15 @@ local function CommentRowView(props)
 			})
 		end
 
-		v14.Reaction = reaction2
-		footer = createElement8(view7, v9, v14)
+		v17.Reaction = reaction2
+		footer = createElement8(view7, v15, v17)
 	end
 
-	v12.Footer = footer
-	children.TextColumn = createElement4(view4, v7, v12)
+	v14.Footer = footer
+	children.TextColumn = createElement4(view4, v10, v14)
 	local actionsMenu2
 
-	if not (actionsMenu == nil or v2) then
+	if not (FFlagMomentsCommentRowTrailingReaction or actionsMenu == nil or v2) then
 		actionsMenu2 = React.createElement(CommentActionsMenu, {
 			commentId = props.commentId,
 			items = actionsMenu.items,
@@ -432,12 +458,80 @@ local function CommentRowView(props)
 	end
 
 	children.ActionsMenu = actionsMenu2
-	local v9 = {
-		Highlight = highlight,
-		Content = createElement2(view2, v5, children),
-		RowActionsMenu = 0,
-		DeleteConfirmation = 0
-	}
+	local trailing
+
+	if v5 then
+		local createElement8 = React.createElement
+		local view7 = Foundation.View
+
+		if not FFlagMomentsCommentsAttachSheetScroller then
+			onAbsoluteSizeChanged = nil
+		end
+
+		local v15 = {
+			tag = "col align-x-right self-stretch auto-x",
+			LayoutOrder = 3,
+			onAbsoluteSizeChanged = onAbsoluteSizeChanged,
+			testId = `moments-comment-trailing-{props.commentId}`
+		}
+		local actionsMenu3
+
+		if not (actionsMenu == nil or v2) then
+			actionsMenu3 = React.createElement(CommentActionsMenu, {
+				commentId = props.commentId,
+				items = actionsMenu.items,
+				isOpen = actionsMenu.isOpen,
+				onButtonActivated = actionsMenu.onButtonActivated,
+				onClose = actionsMenu.onClose,
+				LayoutOrder = 1
+			})
+		end
+
+		local reactionTopSpacer
+
+		if props.showReactionControl then
+			reactionTopSpacer = React.createElement(Foundation.View, {
+				tag = "grow",
+				Size = UDim2.fromOffset(0, not v3 and 0 or v.Gap.XSmall),
+				LayoutOrder = 2
+			})
+		end
+
+		local reaction2
+
+		if props.showReactionControl then
+			reaction2 = React.createElement(CommentReactionButton, {
+				commentId = props.commentId,
+				isReactionSelected = props.isReactionSelected == true,
+				isReactionDisabled = props.isReactionDisabled == true,
+				reactionCountLabel = props.reactionCountLabel or "0",
+				isReactionCountHidden = props.isReactionCountHidden,
+				onReactionActivated = props.onReactionActivated or noop,
+				rightInset = (v.Size.Size_600 - v.Size.Size_400) / 2,
+				LayoutOrder = 3
+			})
+		end
+
+		local reactionBottomSpacer
+
+		if props.showReactionControl then
+			reactionBottomSpacer = React.createElement(Foundation.View, {
+				tag = "fill",
+				Size = UDim2.fromOffset(0, not v3 and 0 or v.Size.Size_600 + v.Gap.XSmall),
+				LayoutOrder = 4
+			})
+		end
+
+		trailing = createElement8(view7, v15, {
+			ActionsMenu = actionsMenu3,
+			ReactionTopSpacer = reactionTopSpacer,
+			Reaction = reaction2,
+			ReactionBottomSpacer = reactionBottomSpacer
+		})
+	end
+
+	children.Trailing = trailing
+	v7.Content = createElement2(view2, v8, children)
 	local rowActionsMenu
 
 	if not (actionsMenu == nil or not v2 or state == nil) then
@@ -451,7 +545,7 @@ local function CommentRowView(props)
 		})
 	end
 
-	v9.RowActionsMenu = rowActionsMenu
+	v7.RowActionsMenu = rowActionsMenu
 	local deleteConfirmation2
 
 	if deleteConfirmation ~= nil then
@@ -462,8 +556,8 @@ local function CommentRowView(props)
 		})
 	end
 
-	v9.DeleteConfirmation = deleteConfirmation2
-	return createElement(view, v4, v9)
+	v7.DeleteConfirmation = deleteConfirmation2
+	return createElement(view, v6, v7)
 end
 
 return CommentRowView

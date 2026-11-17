@@ -1,1 +1,0 @@
-return game:DefineFastFlag("AXPartialPageModalBackgroundShim2", false)

@@ -1,1 +1,0 @@
-return game:DefineFastFlag("AXDurables2Option4", false)

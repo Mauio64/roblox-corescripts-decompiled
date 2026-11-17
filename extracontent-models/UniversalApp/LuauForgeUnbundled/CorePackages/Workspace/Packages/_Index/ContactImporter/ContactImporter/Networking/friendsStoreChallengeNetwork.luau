@@ -1,1 +1,0 @@
-return require("@game/CorePackages/Workspace/Packages/_Workspace/ContactImporter/GenericChallenges").Middleware.ChallengeRequestWrapper(require("@game/CorePackages/Workspace/Packages/_Workspace/ContactImporter/DataHydration").Friends.httpRequest)

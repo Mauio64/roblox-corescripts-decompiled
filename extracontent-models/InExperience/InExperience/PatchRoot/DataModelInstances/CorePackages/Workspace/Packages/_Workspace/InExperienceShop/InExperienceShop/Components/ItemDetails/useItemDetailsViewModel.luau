@@ -9,6 +9,7 @@ local useLocalization = Localization.Hooks.useLocalization
 local SharedFlags = require(parent.SharedFlags)
 local AbuseVector = require(parent.GenericAbuseReporting.AbuseVector)
 local FFlagLuaAppEnableGamePassFreeTrials = require(InExperienceShop.Flags.FFlagLuaAppEnableGamePassFreeTrials)
+local FFlagEnableFreeTrialTopBarChip = require(InExperienceShop.Flags.FFlagEnableFreeTrialTopBarChip)
 local FFlagEnableGamePassTrialUnifiedLogging = require(InExperienceShop.Flags.FFlagEnableGamePassTrialUnifiedLogging)
 
 local initiateShopItemPurchase = require(InExperienceShop.initiateShopItemPurchase)
@@ -145,7 +146,14 @@ local function useItemDetailsViewModel(data)
 		end
 	end, { item.id, item.itemType, v8 })
 
-	local v9 = useGamePassTrialRedemption(item.id, v8)
+	local id2 = item.id
+	local v9
+
+	if FFlagEnableFreeTrialTopBarChip then
+		v9 = item.thumbnail
+	end
+
+	local v10 = useGamePassTrialRedemption(id2, v8, v9)
 
 	if FFlagEnableGamePassTrialUnifiedLogging then
 		local ref = React.useRef(nil)
@@ -176,7 +184,7 @@ local function useItemDetailsViewModel(data)
 		return { abuseVector = AbuseVector.DeveloperProduct, targetId = item.id }
 	end, { item.id, item.itemType })
 
-	local v10 = useShopReportOverflow.useShopReportOverflow({
+	local v11 = useShopReportOverflow.useShopReportOverflow({
 		isReportingEnabled = fFlagEnableReportingFlowForExperienceShop,
 		buildReportSession = buildReportSession
 	})
@@ -196,9 +204,9 @@ local function useItemDetailsViewModel(data)
 			return
 		end
 
-		local v11 = x < Constants.COMPACT_BREAKPOINT_WIDTH
+		local v12 = x < Constants.COMPACT_BREAKPOINT_WIDTH
 		setState(function(p2)
-			return if p2 == v11 then p2 else v11
+			return if p2 == v12 then p2 else v12
 		end)
 	end, {})
 
@@ -209,24 +217,24 @@ local function useItemDetailsViewModel(data)
 		price = item.price,
 		isOwned = isOwned,
 		showTry = showTry,
-		isActionLoading = v9.isActionLoading,
-		isActionDisabled = v9.isActionDisabled,
+		isActionLoading = v10.isActionLoading,
+		isActionDisabled = v10.isActionDisabled,
 		isBuyDisabled = data.disableBuy == true,
 		description = item.description,
 		creator = item.creator,
 		categoryLabel = categoryLabel,
 		updated = updated,
 		isCompact = state,
-		isOverflowMenuOpen = v10.isOverflowMenuOpen,
-		isReportingEnabled = v10.isReportingEnabled,
-		reportSession = v10.reportSession,
+		isOverflowMenuOpen = v11.isOverflowMenuOpen,
+		isReportingEnabled = v11.isReportingEnabled,
+		reportSession = v11.reportSession,
 		onClose = data.onClose,
 		onBuyActivated = onBuyActivated,
-		onTryActivated = v9.onTryActivated,
-		onOverflowActivated = v10.onOverflowActivated,
-		onOverflowMenuClosed = v10.onOverflowMenuClosed,
-		onMenuItemActivated = v10.onMenuItemActivated,
-		onReportClose = v10.onReportClose,
+		onTryActivated = v10.onTryActivated,
+		onOverflowActivated = v11.onOverflowActivated,
+		onOverflowMenuClosed = v11.onOverflowMenuClosed,
+		onMenuItemActivated = v11.onMenuItemActivated,
+		onReportClose = v11.onReportClose,
 		onAbsoluteSizeChanged = onAbsoluteSizeChanged
 	}
 end

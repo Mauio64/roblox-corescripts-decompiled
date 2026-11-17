@@ -2,8 +2,6 @@ local parent = script:FindFirstAncestor("GameTile").Parent
 local React = require(parent.React)
 local Foundation = require(parent.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local Style = require(parent.Style)
 local Colors = Style.Colors
 local LightTheme = Style.Themes.LightTheme
@@ -27,15 +25,13 @@ local function GameTileOverlayTextPill(props)
 		return GetTextSize(props.text, fontSize_300, font, Vector2.new(1e999, 1e999))
 	end, { props.text, fontSize_300, font })
 
-	local createElement = React.createElement
-	local v3 = {
+	return React.createElement("Frame", {
 		BackgroundColor3 = Colors.White,
 		BackgroundTransparency = 0.1,
 		Position = props.Position,
 		AnchorPoint = props.AnchorPoint,
 		AutomaticSize = Enum.AutomaticSize.XY
-	}
-	local v4 = {
+	}, {
 		Corner = React.createElement("UICorner", { CornerRadius = UDim.new(1, 0) }),
 		UIPadding = React.createElement("UIPadding", {
 			PaddingTop = UDim.new(0, size_150),
@@ -43,56 +39,31 @@ local function GameTileOverlayTextPill(props)
 			PaddingBottom = UDim.new(0, size_150),
 			PaddingRight = UDim.new(0, size_200)
 		}),
-		TextLabel = 0
-	}
+		TextLabel = React.createElement("TextLabel", {
+			BackgroundTransparency = 1,
+			Size = UDim2.fromOffset(v2.X, v2.Y),
+			Text = props.text,
+			TextColor3 = LightTheme.TextEmphasis.Color3,
+			FontFace = normalizeFontFace(font),
+			TextSize = fontSize_300,
+			TextXAlignment = Enum.TextXAlignment.Center,
+			TextYAlignment = Enum.TextYAlignment.Center,
+			TextWrapped = false,
+			TextTruncate = Enum.TextTruncate.AtEnd
+		}, {
+			UISizeConstraint = React.createElement("UISizeConstraint", {
+				MaxSize = props.maxWidthBinding:map(function(p: number)
+					local v3 = p - size_200 * 2
 
-	local createElement2 = React.createElement
-	local v5 = {
-		BackgroundTransparency = 1,
-		Size = UDim2.fromOffset(v2.X, v2.Y),
-		Text = props.text,
-		TextColor3 = LightTheme.TextEmphasis.Color3,
-		Font = 0,
-		FontFace = 0,
-		TextSize = 0,
-		TextXAlignment = 0,
-		TextYAlignment = 0,
-		TextWrapped = false,
-		TextTruncate = 0
-	}
-	local font2
+					if v3 > 0 then
+						return (Vector2.new(v3, v2.Y))
+					end
 
-	if not FoundationFontFaceMigration then
-		font2 = font
-	end
-
-	v5.Font = font2
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(font)
-	end
-
-	v5.FontFace = fontFace
-	v5.TextSize = fontSize_300
-	v5.TextXAlignment = Enum.TextXAlignment.Center
-	v5.TextYAlignment = Enum.TextYAlignment.Center
-
-	v5.TextTruncate = Enum.TextTruncate.AtEnd
-	v4.TextLabel = createElement2("TextLabel", v5, {
-		UISizeConstraint = React.createElement("UISizeConstraint", {
-			MaxSize = props.maxWidthBinding:map(function(p: number)
-				local v6 = p - size_200 * 2
-
-				if v6 > 0 then
-					return (Vector2.new(v6, v2.Y))
-				end
-
-				return nil
-			end)
+					return nil
+				end)
+			})
 		})
 	})
-	return createElement("Frame", v3, v4)
 end
 
 return GameTileOverlayTextPill

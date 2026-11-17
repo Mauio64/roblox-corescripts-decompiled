@@ -1,14 +1,14 @@
-local parent = script:FindFirstAncestor("GenericChallenges").Parent
+local GenericChallenges = script:FindFirstAncestor("GenericChallenges")
+local parent = GenericChallenges.Parent
 
 local HttpService = game:GetService("HttpService")
 
 local React = require(parent.React)
-local AuthCommon = require(parent.AuthCommon)
-local Base64 = AuthCommon.Utils.Base64
 
 local RoCaptchaChallengeView = require(script.Parent.RoCaptchaChallengeView)
 local RoCaptchaChallengeEvent = require(script.Parent.RoCaptchaChallengeEvent)
 local RoCaptchaChallengeContext = require(script.Parent.RoCaptchaChallengeContext)
+require(GenericChallenges.Types.ChallengeMetadata)
 
 local ExperienceService = require(parent.ExperienceService)
 local experienceService = ExperienceService.ExperienceService
@@ -23,12 +23,13 @@ local function RoCaptchaChallenge(props)
 	local challengeId = props.challengeId
 
 	local v = React.useMemo(function()
-		local decoded = Base64.Decode(props.challengeMetadata)
-		local success, result = pcall(function()
-			return HttpService:JSONDecode(decoded)
-		end)
+		local challengeMetadata = props.challengeMetadata
 
-		return success and result and tonumber(result.challengePlaceId) or nil
+		if challengeMetadata then
+			return (tonumber(challengeMetadata.challengePlaceId))
+		end
+
+		return nil
 	end, { props.challengeMetadata })
 
 	local ref = React.useRef(props.onChallengeFailed)

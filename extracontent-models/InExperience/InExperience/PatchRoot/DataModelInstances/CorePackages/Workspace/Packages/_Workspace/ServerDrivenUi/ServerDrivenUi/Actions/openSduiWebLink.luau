@@ -42,14 +42,15 @@ local function openSduiWebLink(p, name: string, titleKey: string?, callback)
 	local success2, result2 = pcall(function()
 		linkingProtocol:isURLRegistered(result):andThen(function(p2)
 			if p2 then
-				if linkingProtocol:isInternalDlicEnabled() then
-					linkingProtocol:detectDeeplinkIntent((linkingProtocol:createInternalDlic(
-						result,
-						DeepLinkSource.LuaInternal
-					)))
-				else
+				if not linkingProtocol:isInternalDlicEnabled() then
 					linkingProtocol:detectURL(result)
+					return
 				end
+
+				linkingProtocol:detectDeeplinkIntent((linkingProtocol:createInternalDlic(
+					result,
+					DeepLinkSource.LuaInternal
+				)))
 			else
 				if not isWebViewSupported() then -- inferred equivalent call
 					p.dependencies.logger.reportCounter(SduiCounterName.WebViewNotSupportedForLink, {

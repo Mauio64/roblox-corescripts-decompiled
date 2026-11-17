@@ -25,25 +25,25 @@ end
 
 return {
 	fetchGamePassTrialAvailabilities = function(p: number)
-		if not FFlagLuaAppEnableGamePassFreeTrials or not RunService:IsStudio() or game.GameId ~= 0 then
-			return asPromise((fetch({
-				method = "GET",
-				url = trialAvailabilitiesUrl(p), -- inferred equivalent call
-				analyticsKey = "game-pass-trial-availabilities.get",
-				decode = function(p2)
-					if typeof(p2) ~= "table" or typeof(p2.trialAvailabilities) ~= "table" then
-						error("fetchGamePassTrialAvailabilities: malformed response, expected { trialAvailabilities = ... }")
-					end
+		if FFlagLuaAppEnableGamePassFreeTrials and RunService:IsStudio() and game.GameId == 0 then
+			ShopDebugLogger.logLazy(function()
+				return "fetchGamePassTrialAvailabilities: skipped unpublished Studio universeId=" .. tostring(p)
+			end)
 
-					return parseGamePassTrialAvailabilities(p2.trialAvailabilities)
-				end
-			})))
+			return Promise.resolve(emptyAvailabilities())
 		end
 
-		ShopDebugLogger.logLazy(function()
-			return "fetchGamePassTrialAvailabilities: skipped unpublished Studio universeId=" .. tostring(p)
-		end)
+		return asPromise((fetch({
+			method = "GET",
+			url = trialAvailabilitiesUrl(p), -- inferred equivalent call
+			analyticsKey = "game-pass-trial-availabilities.get",
+			decode = function(p2)
+				if typeof(p2) ~= "table" or typeof(p2.trialAvailabilities) ~= "table" then
+					error("fetchGamePassTrialAvailabilities: malformed response, expected { trialAvailabilities = ... }")
+				end
 
-		return Promise.resolve(emptyAvailabilities())
+				return parseGamePassTrialAvailabilities(p2.trialAvailabilities)
+			end
+		})))
 	end
 }

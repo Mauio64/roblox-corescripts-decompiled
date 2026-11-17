@@ -12,7 +12,6 @@ local Foundation = require(parent.Foundation)
 local useStyle = uiBlox.Core.Style.useStyle
 local useTokens = Foundation.Hooks.useTokens
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local constants = require(NotificationsCommon.constants)
 local useNotificationCardState = require(context.useNotificationCardState)
 local useNotificationCardData = require(context.useNotificationCardData)
@@ -31,28 +30,9 @@ local timestampHeight = constants.TimestampHeight
 
 return function()
 	local v = useStyle()
-	local v2
-
-	if FoundationFontFaceMigration then
-		v2 = useTokens()
-	end
-
-	local textSize
-
-	if FoundationFontFaceMigration then
-		textSize = v2.Typography.CaptionLarge.FontSize
-	else
-		textSize = v.Font.BaseSize * v.Font.CaptionHeader.RelativeSize
-	end
-
-	local textSize2
-
-	if FoundationFontFaceMigration then
-		textSize2 = v2.Typography.BodySmall.FontSize
-	else
-		textSize2 = v.Font.BaseSize * v.Font.CaptionBody.RelativeSize
-	end
-
+	local v2 = useTokens()
+	local fontSize = v2.Typography.CaptionLarge.FontSize
+	local fontSize2 = v2.Typography.BodySmall.FontSize
 	local v3 = useNotificationCardData()
 	local cardSize = v3.cardSize
 	local readOnly = v3.readOnly
@@ -64,70 +44,27 @@ return function()
 	local v4 = useNotificationCardState("textBody")
 	local v5 = v4 and v4[1]
 
-	local v6 = v5 and v5.title
+	local v6 = v5 and v5.title and {
+		Text = v5.title,
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		TextSize = fontSize,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		LayoutOrder = 1,
+		FontFace = normalizeFontFace(v2.Typography.CaptionLarge.Font),
+		TextColor3 = v.Theme.TextEmphasis.Color
+	}
 
-	if v6 then
-		v6 = {
-			Text = v5.title,
-			Size = UDim2.new(1, 0, 0, 0),
-			AutomaticSize = Enum.AutomaticSize.Y,
-			TextSize = textSize,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			LayoutOrder = 1,
-			Font = 0,
-			FontFace = 0,
-			TextColor3 = 0
-		}
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = v.Font.CaptionHeader.Font
-		end
-
-		v6.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(v2.Typography.CaptionLarge.Font)
-		end
-
-		v6.FontFace = fontFace
-
-		v6.TextColor3 = v.Theme.TextEmphasis.Color
-	end
-
-	local v7 = v5 and v5.label
-
-	if v7 then
-		v7 = {
-			Text = v5.label,
-			Size = UDim2.new(1, 0, 0, 0),
-			AutomaticSize = Enum.AutomaticSize.Y,
-			TextSize = textSize2,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			LayoutOrder = 2,
-			Font = 0,
-			FontFace = 0,
-			TextColor3 = 0
-		}
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = v.Font.CaptionBody.Font
-		end
-
-		v7.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(v2.Typography.BodySmall.Font)
-		end
-
-		v7.FontFace = fontFace
-
-		v7.TextColor3 = v.Theme.TextEmphasis.Color
-	end
-
+	local v7 = v5 and v5.label and {
+		Text = v5.label,
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		TextSize = fontSize2,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		LayoutOrder = 2,
+		FontFace = normalizeFontFace(v2.Typography.BodySmall.Font),
+		TextColor3 = v.Theme.TextEmphasis.Color
+	}
 	local v8
 
 	if readOnly then
@@ -136,40 +73,19 @@ return function()
 		v8 = -(metaActionsWidth + defaultTextContentPadding)
 	end
 
-	local v9 = notificationPayload and notificationPayload.timestamp
-
-	if v9 then
-		v9 = {
-			Text = { text = notificationPayload.timestamp },
-			Size = UDim2.new(0, timestampWidth + defaultTextContentPadding, 0, timestampHeight),
-			TextSize = textSize,
-			AutomaticSize = Enum.AutomaticSize.Y,
-			TextXAlignment = Enum.TextXAlignment.Right,
-			AnchorPoint = Vector2.new(1, 0),
-			Position = UDim2.new(1, v8, 0, 0),
-			LayoutOrder = 2,
-			Font = 0,
-			FontFace = 0,
-			TextColor3 = 0,
-			TextTransparency = 0
-		}
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = v.Font.CaptionHeader.Font
-		end
-
-		v9.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(v2.Typography.CaptionLarge.Font)
-		end
-
-		v9.FontFace = fontFace
-
-		v9.TextColor3 = v.Theme.TextEmphasis.Color
-	end
+	local v9 = notificationPayload and notificationPayload.timestamp and {
+		Text = { text = notificationPayload.timestamp },
+		Size = UDim2.new(0, timestampWidth + defaultTextContentPadding, 0, timestampHeight),
+		TextSize = fontSize,
+		AutomaticSize = Enum.AutomaticSize.Y,
+		TextXAlignment = Enum.TextXAlignment.Right,
+		AnchorPoint = Vector2.new(1, 0),
+		Position = UDim2.new(1, v8, 0, 0),
+		LayoutOrder = 2,
+		FontFace = normalizeFontFace(v2.Typography.CaptionLarge.Font),
+		TextColor3 = v.Theme.TextEmphasis.Color,
+		TextTransparency = 0
+	}
 
 	local createElement = react.createElement
 	local v10 = {

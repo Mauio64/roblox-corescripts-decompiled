@@ -38,6 +38,8 @@ local SduiCollectionItem = require(ServerDrivenUi.Content.Collections.SduiCollec
 local SduiCollectionGridRevealRows = require(ServerDrivenUi.Content.Collections.SduiCollectionGridRevealRows)
 local SduiSharedContent = require(parent.SduiSharedContent)
 local useCollectionAnalyticsContext = SduiSharedContent.useCollectionAnalyticsContext
+local DiscoveryAnalytics = require(parent.DiscoveryAnalytics)
+local createGameDwellObserver = DiscoveryAnalytics.Dwell.createGameDwellObserver
 
 local SharedFlags2 = require(parent.SharedFlags)
 local FFlagLuaAppLayoutParamsInContext = SharedFlags2.FFlagLuaAppLayoutParamsInContext
@@ -49,6 +51,8 @@ local SharedFlags5 = require(parent.SharedFlags)
 local FFlagSduiPreferredTextSizeLineBudgets = SharedFlags5.FFlagSduiPreferredTextSizeLineBudgets
 local SharedFlags6 = require(parent.SharedFlags)
 local FFlagSduiCollectionGridRevealRows = SharedFlags6.FFlagSduiCollectionGridRevealRows
+local SharedFlags7 = require(parent.SharedFlags)
+local FFlagLuaAppSduiGameDwell = SharedFlags7.FFlagLuaAppSduiGameDwell
 
 local function cellSizeFromSpan(spanOverride, p: number, p2: number) -- 1 equivalent call inferred from this helper
 	local colSpan = spanOverride.colSpan or 1
@@ -117,10 +121,10 @@ local function SduiCollectionGrid(props)
 	end
 
 	local v4 = useCollectionLayout(props.collectionItemSize)
-	local itemsPerRow = v4.itemsPerRow
+	local itemsPerRow2 = v4.itemsPerRow
 
 	if not v2 then
-		itemsPerRow = v3.numColumns
+		itemsPerRow2 = v3.numColumns
 	end
 
 	local v5
@@ -145,7 +149,7 @@ local function SduiCollectionGrid(props)
 	local parentAnalyticsContext, v8 = useCollectionAnalyticsContext(
 		props.analyticsContext,
 		v7,
-		itemsPerRow,
+		itemsPerRow2,
 		count,
 		sduiContext,
 		props.startRow,
@@ -168,6 +172,77 @@ local function SduiCollectionGrid(props)
 
 	local impressionsTag = props.impressionsTag
 		or getImpressionsTag(props.index, v8.current, sduiContext, props.debugName)
+	local visibilityObserver
+
+	if FFlagLuaAppSduiGameDwell then
+		local current = v8.current
+		local dwellLoggingEnabled = props.dwellLoggingEnabled == true
+		local useMemo = React.useMemo
+		local function fn()
+			if dwellLoggingEnabled then
+				return (createGameDwellObserver({
+					pageContext = sduiContext.routeName or sduiContext.appPage,
+					getCollectionData = function()
+						return v8.current
+					end,
+					getItemData = function(p: number)
+						return ref2.current[p]
+					end,
+					collectionItemSize = props.collectionItemSize
+				}))
+			end
+
+			return nil
+		end
+
+		local routeName = sduiContext.routeName
+		local appPage = sduiContext.appPage
+
+		local collectionItemSize = props.collectionItemSize
+		local collectionId
+
+		if current then
+			collectionId = current.collectionId
+		end
+
+		local collectionPosition
+
+		if current then
+			collectionPosition = current.collectionPosition
+		end
+
+		local collectionComponentType
+
+		if current then
+			collectionComponentType = current.collectionComponentType
+		end
+
+		local itemsPerRow
+
+		if current then
+			itemsPerRow = current.itemsPerRow
+		end
+
+		local v10
+
+		if current then
+			v10 = current.startRowNumber
+		end
+
+		visibilityObserver = useMemo(fn, {
+			dwellLoggingEnabled,
+			routeName,
+			appPage,
+			v8,
+			ref2,
+			collectionItemSize,
+			collectionId,
+			collectionPosition,
+			collectionComponentType,
+			itemsPerRow,
+			v10
+		})
+	end
 
 	local sendImpressions = React.useCallback(function(list)
 		if items == nil or #items == 0 then
@@ -534,7 +609,7 @@ local function SduiCollectionGrid(props)
 			sduiContext = props.sduiContext,
 			analyticsContext = props.analyticsContext,
 			itemCount = #items,
-			itemsPerRow = itemsPerRow,
+			itemsPerRow = itemsPerRow2,
 			maxNumRows = props.maxNumRows,
 			initialFeedVisibleRows = props.initialFeedVisibleRows,
 			visibleRowsPerReveal = props.visibleRowsPerReveal,
@@ -560,23 +635,41 @@ local function SduiCollectionGrid(props)
 		local wrappedComponent
 
 		if props.shouldUseFrameBoundsForImpressions then
-			wrappedComponent = React.createElement(FrameBoundsImpressionsTracker, {
+			local createElement3 = React.createElement
+			local v14 = {
 				parentRef = ref,
 				pageContext = sduiContext.routeName or sduiContext.appPage,
 				impressionsTag = impressionsTag,
 				scrollViewPositionChangedSignal = scrollViewPositionChangedSignal,
 				sendImpressions = sendImpressions,
-				dataUpdatedTimestamp = props.sduiContext.dataUpdatedTimestamp
-			})
+				dataUpdatedTimestamp = props.sduiContext.dataUpdatedTimestamp,
+				visibilityObserver = 0
+			}
+
+			if not FFlagLuaAppSduiGameDwell then
+				visibilityObserver = nil
+			end
+
+			v14.visibilityObserver = visibilityObserver
+			wrappedComponent = createElement3(FrameBoundsImpressionsTracker, v14)
 		else
-			wrappedComponent = React.createElement(ScreenSizeImpressionsTracker, {
+			local createElement3 = React.createElement
+			local v14 = {
 				parentRef = ref,
 				pageContext = sduiContext.routeName or sduiContext.appPage,
 				impressionsTag = impressionsTag,
 				scrollViewPositionChangedSignal = scrollViewPositionChangedSignal,
 				sendImpressions = sendImpressions,
-				dataUpdatedTimestamp = props.sduiContext.dataUpdatedTimestamp
-			})
+				dataUpdatedTimestamp = props.sduiContext.dataUpdatedTimestamp,
+				visibilityObserver = 0
+			}
+
+			if not FFlagLuaAppSduiGameDwell then
+				visibilityObserver = nil
+			end
+
+			v14.visibilityObserver = visibilityObserver
+			wrappedComponent = createElement3(ScreenSizeImpressionsTracker, v14)
 		end
 
 		v13.wrappedComponent = wrappedComponent

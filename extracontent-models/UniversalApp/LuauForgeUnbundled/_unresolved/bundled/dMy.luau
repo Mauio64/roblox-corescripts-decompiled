@@ -1,2 +1,0 @@
-return game:DefineFastFlag("UseUpdatedBackgroundSceneSettingsOnMobile1", false)
-	and game:GetEngineFeature("EnabledAXUpdatedBackgroundSceneSettings")

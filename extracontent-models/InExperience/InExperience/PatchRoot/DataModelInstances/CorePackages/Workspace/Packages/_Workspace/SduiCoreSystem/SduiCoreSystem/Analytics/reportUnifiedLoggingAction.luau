@@ -39,11 +39,16 @@ local function reportUnifiedLoggingAction(p, p2, data)
 
 	assert(v, "collectionAnalyticsData must exist")
 
-	UnifiedLogging.SendItemActionEvent.sendFromServerDrivenUi(
-		p.dependencies.eventIngest,
+	local sendFromServerDrivenUi = UnifiedLogging.SendItemActionEvent.sendFromServerDrivenUi
+	local eventIngest = p.dependencies.eventIngest
+
+	local itemPosition = v2.itemPosition
+	local v3 = v
+	sendFromServerDrivenUi(
+		eventIngest,
 		v2,
-		v2.itemPosition,
-		v,
+		itemPosition,
+		v3,
 		p.appPage,
 		v.collectionId,
 		v.contentType,

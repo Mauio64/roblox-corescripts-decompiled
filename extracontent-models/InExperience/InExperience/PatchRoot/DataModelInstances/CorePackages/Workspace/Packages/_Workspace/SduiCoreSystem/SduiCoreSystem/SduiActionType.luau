@@ -98,7 +98,9 @@ return {
 	PlayWithRewardAd = "PlayWithRewardAd",
 	ShowToast = "ShowToast",
 	JoinCommunity = "JoinCommunity",
+	ClaimEventItem = "ClaimEventItem",
 	OpenGroupPane = "OpenGroupPane",
+	OpenAccountSettings = "OpenAccountSettings",
 	ActionSequence = "ActionSequence",
 	SubmitCustomFormResponse = "SubmitCustomFormResponse",
 	RefreshCustomFormResults = "RefreshCustomFormResults"

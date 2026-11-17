@@ -10,7 +10,6 @@ local React = require(parent.React)
 local UIBlox = require(parent.UIBlox)
 local Foundation = require(parent.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local Images = UIBlox.App.ImageSet.Images
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
@@ -102,46 +101,20 @@ return (React.forwardRef(function(props, ref)
 	end
 
 	v6.CloseButton = closeButton
-	local children = {
+	return createElement(Interactable, v4, {
 		AvatarContainer = createElement2("Frame", v5, v6),
-		DisplayName = 0
-	}
-
-	local createElement3 = React.createElement
-	local v7 = {
-		AnchorPoint = Vector2.new(0.5, 1),
-		AutomaticSize = Enum.AutomaticSize.Y,
-		Position = UDim2.fromScale(0.5, 1),
-		Size = UDim2.fromOffset(Constants.FRIEND_MENU_CARD_SIZE, 0),
-		BackgroundTransparency = 1,
-		Font = 0,
-		FontFace = 0,
-		Text = 0,
-		TextColor3 = 0,
-		TextSize = 0,
-		TextTransparency = 0,
-		TextTruncate = 0
-	}
-	local font2
-
-	if not FoundationFontFaceMigration then
-		font2 = font.Footer.Font
-	end
-
-	v7.Font = font2
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(v2.Tokens.Typography.CaptionSmall.Font)
-	end
-
-	v7.FontFace = fontFace
-
-	v7.Text = props.displayName
-	v7.TextColor3 = theme.TextDefault.Color
-	v7.TextSize = font.BaseSize * font.Footer.RelativeSize
-	v7.TextTransparency = theme.TextDefault.Transparency
-	v7.TextTruncate = Enum.TextTruncate.AtEnd
-	children.DisplayName = createElement3("TextLabel", v7)
-	return createElement(Interactable, v4, children)
+		DisplayName = React.createElement("TextLabel", {
+			AnchorPoint = Vector2.new(0.5, 1),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			Position = UDim2.fromScale(0.5, 1),
+			Size = UDim2.fromOffset(Constants.FRIEND_MENU_CARD_SIZE, 0),
+			BackgroundTransparency = 1,
+			FontFace = normalizeFontFace(v2.Tokens.Typography.CaptionSmall.Font),
+			Text = props.displayName,
+			TextColor3 = theme.TextDefault.Color,
+			TextSize = font.BaseSize * font.Footer.RelativeSize,
+			TextTransparency = theme.TextDefault.Transparency,
+			TextTruncate = Enum.TextTruncate.AtEnd
+		})
+	})
 end))

@@ -1,4 +1,5 @@
-local parent = script:FindFirstAncestor("ShareSheet").Parent
+local ShareSheet = script:FindFirstAncestor("ShareSheet")
+local parent = ShareSheet.Parent
 
 local Foundation = require(parent.Foundation)
 local Motion = require(parent.Motion)
@@ -15,6 +16,8 @@ local usePreferences = Foundation.Hooks.usePreferences
 local useTokens = Foundation.Hooks.useTokens
 local userTile = UserTile.UserTile
 local LayoutMode = UserTile.LayoutMode
+
+local FFlagShareSheetDesktopReadiness = require(ShareSheet.Flags.FFlagShareSheetDesktopReadiness)
 
 local function AnimatedIcon(p)
 	local v = useTokens()
@@ -55,19 +58,39 @@ end
 
 local function ShareSheetItemView(props)
 	local v = useTokens()
+	local udim
+
+	if FFlagShareSheetDesktopReadiness then
+		udim = UDim2.fromOffset(props.width, props.width)
+	end
 
 	local createElement = React.createElement
 	local v2 = {
-		tag = "col align-x-center gap-small size-1700-0 auto-y",
-		LayoutOrder = props.LayoutOrder,
+		tag = {
+			["col align-x-center gap-small auto-y"] = true,
+			["size-1700-0"] = not FFlagShareSheetDesktopReadiness
+		},
+		Size = 0,
+		LayoutOrder = 0,
 		testId = "share-sheet-item-view"
 	}
+	local size
+
+	if FFlagShareSheetDesktopReadiness then
+		size = UDim2.fromOffset(props.width, 0)
+	end
+
+	v2.Size = size
+	v2.LayoutOrder = props.LayoutOrder
 	local content
 
 	if props.primaryUserId then
 		local createElement2 = React.createElement
 		local v3 = {
-			tag = "size-full-1700",
+			tag = {
+				["size-full-1700"] = not FFlagShareSheetDesktopReadiness
+			},
+			Size = udim,
 			LayoutOrder = 1,
 			testId = props.secondUserId and "share-sheet-item-avatar-pile" or "share-sheet-item-avatar"
 		}
@@ -101,7 +124,11 @@ local function ShareSheetItemView(props)
 		content = createElement2(View, v3, v4)
 	else
 		content = React.createElement(View, {
-			tag = "align-x-center align-y-center size-full-1700 radius-circle bg-shift-300",
+			tag = {
+				["align-x-center align-y-center radius-circle bg-shift-300"] = true,
+				["size-full-1700"] = not FFlagShareSheetDesktopReadiness
+			},
+			Size = udim,
 			LayoutOrder = 1,
 			testId = "share-sheet-item",
 			onActivated = props.onActivated,

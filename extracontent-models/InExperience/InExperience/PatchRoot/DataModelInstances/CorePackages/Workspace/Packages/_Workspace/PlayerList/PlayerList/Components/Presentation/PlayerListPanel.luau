@@ -178,26 +178,26 @@ local function PlayerListPanelContent(props)
 	local openCloseOffset = props.openCloseOffset
 	local v13 = isSmallTouchDevice and openCloseOffset ~= nil
 	local scale = React.useMemo(function()
-		if not v13 or openCloseOffset == nil then
-			return nil
+		if v13 and openCloseOffset ~= nil then
+			return React.joinBindings({ openCloseOffset, v11 }):map(function(list)
+				local item = list[1]
+				local item2 = list[2]
+				return (1 + (MENU_ZOOM_CLOSED_SCALE - 1) * item) * (1 - (1 - PANEL_RECESS_SCALE) * item2)
+			end)
 		end
 
-		return React.joinBindings({ openCloseOffset, v11 }):map(function(list)
-			local item = list[1]
-			local item2 = list[2]
-			return (1 + (MENU_ZOOM_CLOSED_SCALE - 1) * item) * (1 - (1 - PANEL_RECESS_SCALE) * item2)
-		end)
+		return nil
 	end, { v13, openCloseOffset, v11 })
 	local groupTransparency = React.useMemo(function()
-		if not v13 or openCloseOffset == nil then
-			return nil
+		if v13 and openCloseOffset ~= nil then
+			return React.joinBindings({ openCloseOffset, v11 }):map(function(list)
+				local item = list[1]
+				local item2 = list[2]
+				return 1 - (1 - item) * (1 - PANEL_RECESS_TRANSPARENCY * item2)
+			end)
 		end
 
-		return React.joinBindings({ openCloseOffset, v11 }):map(function(list)
-			local item = list[1]
-			local item2 = list[2]
-			return 1 - (1 - item) * (1 - PANEL_RECESS_TRANSPARENCY * item2)
-		end)
+		return nil
 	end, { v13, openCloseOffset, v11 })
 
 	local transparency = React.useMemo(function()
@@ -353,23 +353,23 @@ local function PlayerListPanelContent(props)
 
 	local element2 = React.createElement(Foundation.Divider, { LayoutOrder = 2 })
 
-	if FFlagPlayerListReskin then
-		return renderWithSlideAndZoomDecorations(TabbedLeaderboardBody, {
-			serverBody = React.createElement(View, { LayoutOrder = 4, tag = "col fill size-full-0" }, v15),
-			panelHeader = element,
-			panelDivider = element2,
-			panelProps = panelProps
-		}, {}, props.slidePosition, v7.panelWidth, v7.panelHeight, zoomDecorations)
+	if not FFlagPlayerListReskin then
+		return renderWithSlideAndZoomDecorations(View, panelProps, {
+			Header = element,
+			HeaderDivider = element2,
+			LeaderboardBody = React.createElement(View, {
+				LayoutOrder = 3,
+				tag = "col fill size-full-0"
+			}, v15)
+		}, props.slidePosition, v7.panelWidth, v7.panelHeight, zoomDecorations)
 	end
 
-	return renderWithSlideAndZoomDecorations(View, panelProps, {
-		Header = element,
-		HeaderDivider = element2,
-		LeaderboardBody = React.createElement(View, {
-			LayoutOrder = 3,
-			tag = "col fill size-full-0"
-		}, v15)
-	}, props.slidePosition, v7.panelWidth, v7.panelHeight, zoomDecorations)
+	return renderWithSlideAndZoomDecorations(TabbedLeaderboardBody, {
+		serverBody = React.createElement(View, { LayoutOrder = 4, tag = "col fill size-full-0" }, v15),
+		panelHeader = element,
+		panelDivider = element2,
+		panelProps = panelProps
+	}, {}, props.slidePosition, v7.panelWidth, v7.panelHeight, zoomDecorations)
 end
 
 local function PlayerListPanel(props)

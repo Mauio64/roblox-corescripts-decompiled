@@ -7,61 +7,43 @@ local CurveAnimationHierarchyUtils = require(parent.util.CurveAnimationHierarchy
 local CurveAnimBoneHierarchyUtils = require(parent.util.CurveAnimBoneHierarchyUtils)
 local CurveAnimTranslationUtils = require(parent.util.CurveAnimTranslationUtils)
 
-local getFFlagUGCValidateAnimPartsRotationOnly = require(parent.flags.getFFlagUGCValidateAnimPartsRotationOnly)
-local getFFlagUGCValidateAnimTranslationThreshold = require(parent.flags.getFFlagUGCValidateAnimTranslationThreshold)
-
 local defineFastInt = game:DefineFastInt("UGCValidateBodyPartTranslationMaxDistanceHundredths", 100)
 
 local defineFastInt2 = game:DefineFastInt("UGCValidateLowerTorsoTranslationMaxDistanceHundredths", 200)
 
-local CurveAnimPartsRotateOnlyIfBones = {}
+return {
+	categories = { ValidationEnums.UploadCategory.EMOTE_ANIMATION, ValidationEnums.UploadCategory.ANIMATION },
+	requiredData = { ValidationEnums.SharedDataMember.curveAnimations },
+	conditionalData = {},
+	expectedFailures = {},
+	prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable },
+	run = function(object, p)
+		local v = p.uploadCategory == ValidationEnums.UploadCategory.ANIMATION
 
-CurveAnimPartsRotateOnlyIfBones.categories = { ValidationEnums.UploadCategory.EMOTE_ANIMATION }
+		local v2 = defineFastInt / 100
+		local v3 = defineFastInt2 / 100
 
-if getFFlagUGCValidateAnimPartsRotationOnly() then
-	table.insert(CurveAnimPartsRotateOnlyIfBones.categories, ValidationEnums.UploadCategory.ANIMATION)
-end
+		for _, folder in p.curveAnimations do
+			if not v then
+				local v4 = false
 
-CurveAnimPartsRotateOnlyIfBones.requiredData = { ValidationEnums.SharedDataMember.curveAnimations }
+				for _, folder2 in folder:GetDescendants() do
+					if folder2:IsA("Folder") and CurveAnimBoneHierarchyUtils.isBoneFolderName(folder2.Name) then
+						v4 = true
+						break
+					end
+				end
 
-if getFFlagUGCValidateAnimPartsRotationOnly() then
-	CurveAnimPartsRotateOnlyIfBones.conditionalData = {}
-else
-	CurveAnimPartsRotateOnlyIfBones.conditionalData = { ValidationEnums.SharedDataMember.curveAnimBoneData }
-end
-
-CurveAnimPartsRotateOnlyIfBones.expectedFailures = {}
-CurveAnimPartsRotateOnlyIfBones.prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable }
-
-function CurveAnimPartsRotateOnlyIfBones.run(object, p)
-	local v = getFFlagUGCValidateAnimPartsRotationOnly()
-		and p.uploadCategory == ValidationEnums.UploadCategory.ANIMATION
-
-	local v2 = defineFastInt / 100
-	local v3 = defineFastInt2 / 100
-
-	for _, folder in p.curveAnimations do
-		if not v then
-			local v4 = false
-
-			for _, folder2 in folder:GetDescendants() do
-				if folder2:IsA("Folder") and CurveAnimBoneHierarchyUtils.isBoneFolderName(folder2.Name) then
-					v4 = true
-					break
+				if not v4 then
+					continue
 				end
 			end
 
-			if not v4 then
-				continue
-			end
-		end
+			for _, folder2 in folder:GetDescendants() do
+				if not (folder2:IsA("Folder") and CurveAnimationHierarchyUtils.isBodyPartFolderNameValid(folder2.Name)) then
+					continue
+				end
 
-		for _, folder2 in folder:GetDescendants() do
-			if not (folder2:IsA("Folder") and CurveAnimationHierarchyUtils.isBodyPartFolderNameValid(folder2.Name)) then
-				continue
-			end
-
-			if getFFlagUGCValidateAnimTranslationThreshold() then
 				local v4
 
 				if folder2.Name == "LowerTorso" then
@@ -82,19 +64,7 @@ function CurveAnimPartsRotateOnlyIfBones.run(object, p)
 						maxDistance = string.format("%.3f", v4)
 					})
 				end
-			elseif CurveAnimTranslationUtils.positionHasKeyframes(folder2) then
-				if v then
-					object:fail(ErrorSourceStrings.Keys.CurveAnim_BodyPartHasPosition, {
-						bodyPartName = folder2.Name
-					})
-				else
-					object:fail(ErrorSourceStrings.Keys.CurveAnim_BodyPartWithBoneHasPosition, {
-						bodyPartName = folder2.Name
-					})
-				end
 			end
 		end
 	end
-end
-
-return CurveAnimPartsRotateOnlyIfBones
+}

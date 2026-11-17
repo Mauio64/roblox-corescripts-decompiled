@@ -1,12 +1,7 @@
 local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
 local parent = FriendsLanding.Parent
 local SharedFlags = require(parent.SharedFlags)
-local v = SharedFlags.FFlagFontFaceSocialFriends
-
-if v then
-	local Foundation = require(parent.Foundation)
-	v = Foundation.Utility.Flags.FoundationFontFaceMigration
-end
+local FFlagFontFaceSocialFriends = SharedFlags.FFlagFontFaceSocialFriends
 
 local dependencies = require(FriendsLanding.dependencies)
 
@@ -38,7 +33,7 @@ local preloadAsset = FoundationCloudAssets.preloadAsset
 
 local defineFastFlag = game:DefineFastFlag("MigrateNoFriendsViewToFoundation", false)
 
-local v2 = {
+local v = {
 	layoutOrder = 0,
 	pageLoadingTimeReport = nil,
 	pageRenderReport = nil,
@@ -55,18 +50,18 @@ local function loadFoundationCloudAsset(p: string) -- 1 equivalent call inferred
 end
 
 local function NoFriendsView(options)
-	local joined = dash.join(v2, options or {})
-	local v3 = defineFastFlag and "pictograms/collaborators" or nil
-	local image, v4
+	local joined = dash.join(v, options or {})
+	local v2 = defineFastFlag and "pictograms/collaborators" or nil
+	local image, v3
 
 	if defineFastFlag then
-		image, v4 = loadFoundationCloudAsset(v3) -- inferred equivalent call
+		image, v3 = loadFoundationCloudAsset(v2) -- inferred equivalent call
 	end
 
-	local v5
+	local v4
 
 	if defineFastFlag then
-		v5 = v4 / 3
+		v4 = v3 / 3
 	end
 
 	react.useEffect(function()
@@ -79,23 +74,23 @@ local function NoFriendsView(options)
 		end
 	end, {})
 
-	local v6 = useLocalization({
+	local v5 = useLocalization({
 		addFriendsBtn = joined.addFriendsBtnLabelKey,
 		noFriendsText = joined.noFriendsTextLabelKey,
 		noFriendsHeader = joined.noFriendsHeaderKey
 	})
 
-	local v7 = useStyle()
-	local v8 = useTokens()
+	local v6 = useStyle()
+	local v7 = useTokens()
 	local createElement = react.createElement
-	local v9 = {
+	local v8 = {
 		Size = UDim2.fromScale(1, 1),
 		LayoutOrder = joined.layoutOrder,
 		BackgroundTransparency = 1
 	}
 
 	local createElement2 = react.createElement
-	local v10 = { Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1 }
+	local v9 = { Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1 }
 
 	local children = {
 		SidePadding = react.createElement("UIPadding", {
@@ -120,8 +115,8 @@ local function NoFriendsView(options)
 	if defineFastFlag then
 		imagelabel = react.createElement(Image, {
 			Image = image,
-			imageStyle = v8.Color.Content.Emphasis,
-			Size = UDim2.fromOffset(v5.X, v5.Y),
+			imageStyle = v7.Color.Content.Emphasis,
+			Size = UDim2.fromOffset(v4.X, v4.Y),
 			LayoutOrder = 1
 		})
 	else
@@ -137,11 +132,11 @@ local function NoFriendsView(options)
 	children.Imagelabel = imagelabel
 	local headerlabel
 
-	if joined.noFriendsHeaderKey and v6.noFriendsHeader then
+	if joined.noFriendsHeaderKey and v5.noFriendsHeader then
 		headerlabel = react.createElement(styledTextLabel, {
-			text = v6.noFriendsHeader,
-			fontStyle = v7.Font.Header1,
-			colorStyle = v7.Theme.TextEmphasis,
+			text = v5.noFriendsHeader,
+			fontStyle = v6.Font.Header1,
+			colorStyle = v6.Theme.TextEmphasis,
 			automaticSize = Enum.AutomaticSize.Y,
 			size = UDim2.new(1, 0, 0, 0),
 			textXAlignment = Enum.TextXAlignment.Center,
@@ -153,7 +148,7 @@ local function NoFriendsView(options)
 	children.Headerlabel = headerlabel
 
 	local createElement3 = react.createElement
-	local v11 = {
+	local v10 = {
 		AutomaticSize = Enum.AutomaticSize.Y,
 		TextWrapped = true,
 		BackgroundTransparency = 1,
@@ -168,25 +163,25 @@ local function NoFriendsView(options)
 	}
 	local font
 
-	if not v then
+	if not FFlagFontFaceSocialFriends then
 		font = AppFonts.default:getDefault()
 	end
 
-	v11.Font = font
+	v10.Font = font
 	local fontFace
 
-	if v then
-		fontFace = normalizeFontFace(v7.Tokens.Typography.BodySmall.Font)
+	if FFlagFontFaceSocialFriends then
+		fontFace = normalizeFontFace(v6.Tokens.Typography.BodySmall.Font)
 	end
 
-	v11.FontFace = fontFace
+	v10.FontFace = fontFace
 
-	v11.Size = UDim2.new(1, 0, 0, 0)
-	v11.Text = v6.noFriendsText
-	v11.TextColor3 = v7.Theme.TextMuted.Color
-	v11.TextSize = v7.Font.Header2.RelativeSize * v7.Font.BaseSize
-	v11.TextTransparency = v7.Theme.TextMuted.Transparency
-	children.Textlabel = createElement3("TextLabel", v11)
+	v10.Size = UDim2.new(1, 0, 0, 0)
+	v10.Text = v5.noFriendsText
+	v10.TextColor3 = v6.Theme.TextMuted.Color
+	v10.TextSize = v6.Font.Header2.RelativeSize * v6.Font.BaseSize
+	v10.TextTransparency = v6.Theme.TextMuted.Transparency
+	children.Textlabel = createElement3("TextLabel", v10)
 
 	children.Padding = react.createElement("Frame", {
 		LayoutOrder = 4,
@@ -197,12 +192,12 @@ local function NoFriendsView(options)
 	children.AddFriendsButton = joined.addFriendsBtnEnabled and react.createElement(button, {
 		buttonType = buttonType.PrimarySystem,
 		layoutOrder = 5,
-		text = v6.addFriendsBtn,
+		text = v5.addFriendsBtn,
 		standardSize = standardButtonSize.Regular,
 		onActivated = joined.openAddFriendsPage
 	})
-	return createElement("Frame", v9, {
-		IndicatorInner = createElement2("Frame", v10, children)
+	return createElement("Frame", v8, {
+		IndicatorInner = createElement2("Frame", v9, children)
 	})
 end
 

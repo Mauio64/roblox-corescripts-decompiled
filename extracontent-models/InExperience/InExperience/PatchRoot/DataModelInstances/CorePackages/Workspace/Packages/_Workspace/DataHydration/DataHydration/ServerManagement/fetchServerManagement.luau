@@ -11,7 +11,7 @@ require(script.Parent.ServerManagementStoreTypes)
 local fetch = HttpClient.fetch
 local asPromise = HttpClient.asPromise
 
-local function resolveBase(options) -- 1 equivalent call inferred from this helper
+local function resolveBase(options) -- 3 equivalent calls inferred from this helper
 	local v = options or {}
 	return v.network, v.baseUrl or UrlBase.APIS
 end
@@ -23,11 +23,11 @@ end
 local FetchServerManagement = {}
 
 function FetchServerManagement.fetchListRestartStatuses(p: number, options)
-	local v = options or {}
+	local base, v = resolveBase(options) -- inferred equivalent call
 	return asPromise((fetch({
-		network = v.network,
+		network = base,
 		method = "GET",
-		url = ("%s%s/universes/%d/restarts"):format(v.baseUrl or UrlBase.APIS, "/server-management/v1", p),
+		url = ("%s%s/universes/%d/restarts"):format(v, "/server-management/v1", p),
 		analyticsKey = "server-management.list-restart-statuses",
 		decode = function(p2)
 			return p2
@@ -36,11 +36,11 @@ function FetchServerManagement.fetchListRestartStatuses(p: number, options)
 end
 
 function FetchServerManagement.fetchForecastRestart(p: number, options)
-	local v = options or {}
+	local base, v = resolveBase(options) -- inferred equivalent call
 	return asPromise((fetch({
-		network = v.network,
+		network = base,
 		method = "GET",
-		url = ("%s%s/universes/%d/restarts:forecast"):format(v.baseUrl or UrlBase.APIS, "/server-management/v1", p),
+		url = ("%s%s/universes/%d/restarts:forecast"):format(v, "/server-management/v1", p),
 		analyticsKey = "server-management.forecast-restart",
 		decode = function(p2)
 			return p2

@@ -2,7 +2,7 @@ local RealtimeEventNames = require(script.Parent.RealtimeEventNames)
 local RealtimeTelemetryActionList = require(script.Parent.RealtimeTelemetryActionList)
 local realtimeTelemetryEmitter = require(script.Parent.realtimeTelemetryEmitter)
 
-local function emit(p, p2, callback) -- 19 equivalent calls inferred from this helper
+local function emit(p, p2, callback) -- 21 equivalent calls inferred from this helper
 	(callback or realtimeTelemetryEmitter.emit)(p, p2)
 end
 
@@ -128,6 +128,22 @@ end
 
 function ReportMomentsRealtimeEvent.reportMomentsGenerateText(status: string, callback)
 	emit(RealtimeTelemetryActionList[RealtimeEventNames.MomentsGenerateText], { status = status }, callback) -- inferred equivalent call
+end
+
+function ReportMomentsRealtimeEvent.reportMomentsPostInsightsRequest(query: string, status: string, callback)
+	emit( -- inferred equivalent call
+		RealtimeTelemetryActionList[RealtimeEventNames.MomentsPostInsightsRequest],
+		{ query = query, status = status },
+		callback
+	)
+end
+
+function ReportMomentsRealtimeEvent.reportMomentsPostInsightsRequestLatency(query: string, status: string, statValue: number, callback)
+	emit( -- inferred equivalent call
+		RealtimeTelemetryActionList[RealtimeEventNames.MomentsPostInsightsRequestLatency],
+		{ query = query, status = status, statValue = statValue },
+		callback
+	)
 end
 
 return ReportMomentsRealtimeEvent

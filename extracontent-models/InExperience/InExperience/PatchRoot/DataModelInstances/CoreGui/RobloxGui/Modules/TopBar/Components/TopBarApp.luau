@@ -75,6 +75,7 @@ local Chrome2 = require(CorePackages.Workspace.Packages.Chrome)
 local Enabled = Chrome2.Enabled
 local PlaytestModeThemeProvider = require(Chrome.ChromeShared.Unibar.PlaytestModeThemeProvider)
 local FFlagEnablePlaytestModeUnibar = SharedFlags.FFlagEnablePlaytestModeUnibar
+local FFlagUseUIOverlayForCloudPlay = SharedFlags.FFlagUseUIOverlayForCloudPlay
 
 local FFlagEnableUISelector = CoreGuiCommon2.Flags.FFlagEnableUISelector
 
@@ -97,7 +98,9 @@ local v = InExperienceShop.FFlagEnableExperienceShopGlobalIcon and FFlagEnableIn
 
 local FFlagCenterInExperienceShopWindow = InExperienceShop.FFlagCenterInExperienceShopWindow
 local FFlagExperienceShopNewIconography = InExperienceShop.FFlagExperienceShopNewIconography
+local FFlagEnableFreeTrialTopBarChip = InExperienceShop.FFlagEnableFreeTrialTopBarChip
 local ShopGlobalIcon = InExperienceShop.ShopGlobalIcon
+local FreeTrialChipHost = require(Presentation.FreeTrialChipHost)
 local FFlagTopBarShopIconV2 = require(script.Parent.Parent.Flags.FFlagTopBarShopIconV2)
 local ShopIcon
 
@@ -114,6 +117,16 @@ local InExperienceTopBar = require(CorePackages.Workspace.Packages.InExperienceT
 local FFlagExperienceAgeRatingBadge = InExperienceTopBar.Flags.FFlagExperienceAgeRatingBadge
 local v2 = FFlagExperienceAgeRatingBadge and FFlagShowGameAgeRating
 local ExperienceAgeRatingBadge = require(CorePackages.Workspace.Packages.InExperienceTopBar.ExperienceAgeRatingBadge)
+local InExperienceCloudPlay = CorePackages.Workspace.Packages.InExperienceCloudPlay
+local FFlagEnableRestyleTopBar = require(InExperienceCloudPlay.FFlagEnableRestyleTopBar)
+local RestyleTimer
+
+if FFlagEnableRestyleTopBar then
+	RestyleTimer = require(Presentation.RestyleTimer)
+else
+	RestyleTimer = nil
+end
+
 local ExperienceAgeRatingPolicy = require(script.Parent.Parent.ExperienceAgeRatingPolicy)
 
 local SharedExperimentDefinition = require(CorePackages.Workspace.Packages.SharedExperimentDefinition)
@@ -453,6 +466,22 @@ function extended:init()
 		end
 	end
 
+	if FFlagEnableFreeTrialTopBarChip then
+		local v6 = not GamepadConnector or GamepadConnector:getShowTopBar():get()
+		local binding3, setFreeTrialShowTopBar = React.createBinding(v6)
+		self.freeTrialShowTopBar = binding3
+		self.setFreeTrialShowTopBar = setFreeTrialShowTopBar
+
+		local v7 = not FFlagAddUILessMode
+			or FIntAddUILessModeVariant == 0
+			or not (self.uiLessStore and self.uiLessStore.getUILessModeEnabled(false))
+			or self.uiLessStore.getUIVisible(false)
+
+		local binding4, setFreeTrialUiVisible = React.createBinding(v7)
+		self.freeTrialUiVisible = binding4
+		self.setFreeTrialUiVisible = setFreeTrialUiVisible
+	end
+
 	function self.onCloseBtnStateChange(_, p)
 		self.setCloseButtonState(p)
 	end
@@ -547,6 +576,25 @@ function extended:didMount()
 		end)
 	end
 
+	if FFlagEnableFreeTrialTopBarChip then
+		if GamepadConnector then
+			local showTopBar = GamepadConnector:getShowTopBar()
+			self.freeTrialShowTopBarConnection = showTopBar:connect(function()
+				self.setFreeTrialShowTopBar(showTopBar:get())
+			end, true)
+		end
+
+		if FFlagAddUILessMode and FIntAddUILessModeVariant ~= 0 and self.uiLessStore then
+			self.freeTrialUiVisibleEffect = Signals.createEffect(function(p)
+				if self.uiLessStore.getUILessModeEnabled(p) then
+					self.setFreeTrialUiVisible(self.uiLessStore.getUIVisible(p))
+				else
+					self.setFreeTrialUiVisible(true)
+				end
+			end)
+		end
+	end
+
 	if Enabled() then
 		local Service = require(Chrome.Service)
 		self.orderAlignmentConnection = Service:orderAlignment():connect(function()
@@ -588,6 +636,16 @@ function extended:willUnmount()
 
 	if self.ageRatingSpatialConnection then
 		self.ageRatingSpatialConnection:Disconnect()
+	end
+
+	if FFlagEnableFreeTrialTopBarChip then
+		if self.freeTrialShowTopBarConnection then
+			self.freeTrialShowTopBarConnection:disconnect()
+		end
+
+		if self.freeTrialUiVisibleEffect then
+			self.freeTrialUiVisibleEffect()
+		end
 	end
 
 	if Enabled() then
@@ -830,6 +888,29 @@ function extended:renderWithStyle(p)
 		v18 = not menuOpen
 	end
 
+	local visible3
+
+	if FFlagEnableFreeTrialTopBarChip then
+		local mapped = Roact.joinBindings({
+			showTopBar = self.freeTrialShowTopBar,
+			uiVisible = self.freeTrialUiVisible
+		}):map(function(p2)
+			return p2.showTopBar and p2.uiVisible
+		end)
+
+		if FFlagTopBarSignalizeMenuOpen then
+			visible3 = Roact.joinBindings({ menu = v18, controls = mapped }):map(function(p2)
+				return p2.menu and p2.controls
+			end)
+		else
+			visible3 = mapped:map(function(p2)
+				return v18 and p2
+			end)
+		end
+	else
+		visible3 = v18
+	end
+
 	local udim = UDim2.new(0, 0, 0, v11)
 	local v19 = v10 - v11
 	local udim2 = UDim2.new(0, v9, 0, 0)
@@ -952,6 +1033,7 @@ function extended:renderWithStyle(p)
 		LegacyCloseMenu = 0,
 		SongbirdDebugAudio = 0,
 		UnibarLeftFrame = 0,
+		FreeTrialChipHost = 0,
 		UnibarRightFrame = 0,
 		TopBarFrame = 0
 	}
@@ -1340,7 +1422,8 @@ function extended:renderWithStyle(p)
 						UnibarFrame = self:renderUnibarFrame(enabled2, eligible)
 					}),
 					ShopIcon = 0,
-					AgeRating = 0
+					AgeRating = 0,
+					RestyleTimer = 0
 				}
 
 				local createElement7 = React.createElement
@@ -1362,6 +1445,47 @@ function extended:renderWithStyle(p)
 				children3.ShopIcon = createElement7(ShopIcon, v25)
 
 				children3.AgeRating = ageRating
+				local restyleTimer
+
+				if FFlagEnableRestyleTopBar and FFlagUseUIOverlayForCloudPlay then
+					local createElement8 = React.createElement
+					local v26 = {
+						tag = "auto-xy",
+						LayoutOrder = 4,
+						padding = { left = UDim.new(0, leftGap) }
+					}
+
+					local createElement9 = React.createElement
+					local v27 = {
+						buttonSize = Constants3.TopBarButtonHeight * self.state.UiScale,
+						followsUILessMode = true,
+						onAreaChanged = 0,
+						onAreaRemoved = 0
+					}
+					local onAreaChanged3
+
+					if FFlagTopBarSignalizeKeepOutAreas then
+						onAreaChanged3 = self.keepOutAreasStore.setKeepOutArea
+					else
+						onAreaChanged3 = self.props.setKeepOutArea
+					end
+
+					v27.onAreaChanged = onAreaChanged3
+					local onAreaRemoved
+
+					if FFlagTopBarSignalizeKeepOutAreas then
+						onAreaRemoved = self.keepOutAreasStore.removeKeepOutArea
+					else
+						onAreaRemoved = self.props.removeKeepOutArea
+					end
+
+					v27.onAreaRemoved = onAreaRemoved
+					restyleTimer = createElement8(View, v26, {
+						Timer = createElement9(RestyleTimer, v27)
+					})
+				end
+
+				children3.RestyleTimer = restyleTimer
 				topBarLeftContainer = createElement5(View, { tag = "row auto-xy" }, children3)
 			else
 				local createElement5 = React.createElement
@@ -1463,6 +1587,7 @@ function extended:renderWithStyle(p)
 			}),
 			ShopGlobalIcon = 0,
 			AgeRating = 0,
+			RestyleTimer = 0,
 			HealthBar = 0
 		}
 		local shopGlobalIcon
@@ -1507,6 +1632,48 @@ function extended:renderWithStyle(p)
 		end
 
 		children3.AgeRating = ageRating
+		local restyleTimer
+
+		if FFlagEnableRestyleTopBar and FFlagUseUIOverlayForCloudPlay and not v4 then
+			local createElement7 = React.createElement
+			local v26 = {
+				tag = "auto-xy",
+				LayoutOrder = 4,
+				padding = { left = UDim.new(0, leftGap) }
+			}
+
+			local createElement8 = React.createElement
+			local v27 = {
+				buttonSize = Constants3.TopBarButtonHeight * self.state.UiScale,
+				followsUILessMode = true,
+				layoutOrder = 4,
+				onAreaChanged = 0,
+				onAreaRemoved = 0
+			}
+			local onAreaChanged2
+
+			if FFlagTopBarSignalizeKeepOutAreas then
+				onAreaChanged2 = self.keepOutAreasStore.setKeepOutArea
+			else
+				onAreaChanged2 = self.props.setKeepOutArea
+			end
+
+			v27.onAreaChanged = onAreaChanged2
+			local onAreaRemoved
+
+			if FFlagTopBarSignalizeKeepOutAreas then
+				onAreaRemoved = self.keepOutAreasStore.removeKeepOutArea
+			else
+				onAreaRemoved = self.props.removeKeepOutArea
+			end
+
+			v27.onAreaRemoved = onAreaRemoved
+			restyleTimer = createElement7(View, v26, {
+				Timer = createElement8(RestyleTimer, v27)
+			})
+		end
+
+		children3.RestyleTimer = restyleTimer
 		local healthBar2
 
 		if not enabled then
@@ -1519,6 +1686,18 @@ function extended:renderWithStyle(p)
 	end
 
 	children.UnibarLeftFrame = unibarLeftFrame
+	local freeTrialChipHost
+
+	if FFlagEnableFreeTrialTopBarChip then
+		freeTrialChipHost = React.createElement(FreeTrialChipHost, {
+			position = UDim2.new(1, -v9, 0, v11),
+			size = UDim2.new(0.5, -v9, 0, Constants3.TopBarButtonHeight * self.state.UiScale),
+			zIndex = 2,
+			visible = visible3
+		})
+	end
+
+	children.FreeTrialChipHost = freeTrialChipHost
 	local unibarRightFrame
 
 	if Unibar and v6 == Enum.HorizontalAlignment.Right then

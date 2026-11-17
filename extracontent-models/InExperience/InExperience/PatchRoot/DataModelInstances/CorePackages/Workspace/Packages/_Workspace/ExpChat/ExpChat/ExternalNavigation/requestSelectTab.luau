@@ -8,7 +8,7 @@ local GetChannelTabsStore = require(ExpChat.Stores.GetChannelTabsStore)
 
 local FFlagExpChatUseChannelTabsStore = SharedFlags.FFlagExpChatUseChannelTabsStore
 
-local function requestSelectTab(p: string): boolean
+local function requestSelectTab(p: string, flag: boolean?): boolean
 	local store = ExpChatShared.context.store
 
 	if store == nil then
@@ -26,7 +26,7 @@ local function requestSelectTab(p: string): boolean
 		return false
 	end
 
-	channelTabsStore.setTargetChannel(p, false)
+	channelTabsStore.setTargetChannel(p, false, flag)
 	return true
 end
 

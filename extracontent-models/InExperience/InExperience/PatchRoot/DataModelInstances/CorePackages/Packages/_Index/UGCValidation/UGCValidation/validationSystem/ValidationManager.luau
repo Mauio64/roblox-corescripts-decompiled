@@ -16,6 +16,7 @@ local getFFlagDebugAllowHRDUploadOnBundleBackend = require(parent.flags.getFFlag
 
 local getEngineFeatureEngineUGCValidateInstanceTreesEquivalent = require(parent.flags.getEngineFeatureEngineUGCValidateInstanceTreesEquivalent)
 local getFFlagUGCValidationAllowFullVaas = require(parent.flags.getFFlagUGCValidationAllowFullVaas)
+local getFFlagUGCValidateAQSRequiresOnlySummary = require(parent.flags.getFFlagUGCValidateAQSRequiresOnlySummary)
 local getFFlagDebugUGCDisableAssetQualityChecks = require(parent.flags.getFFlagDebugUGCDisableAssetQualityChecks)
 
 local getEngineFeatureEngineDebugUGCValidationViaLocalRCC = require(parent.flags.getEngineFeatureEngineDebugUGCValidationViaLocalRCC)
@@ -125,6 +126,12 @@ local function initRunVariables(uploadCategory: string, consumerConfig)
 		}
 	end
 
+	if getFFlagUGCValidateAQSRequiresOnlySummary() and #result2 > 0 and consumerConfig.aqFetchStage == "scene" then
+		for _, v5 in RecreateSceneFromEditables.requiredData do
+			result[v5] = true
+		end
+	end
+
 	for k, v5 in result3 do
 		for k2, _ in v5.prereqs do
 			if result3[k2] == nil then
@@ -147,6 +154,14 @@ local function fetchQualityResults(state, p)
 
 		if state.consumerConfig.aqFetchStage == "scene" then
 			success, result = pcall(function()
+				if getFFlagUGCValidateAQSRequiresOnlySummary() then
+					for _, v7 in RecreateSceneFromEditables.requiredData do
+						if state[v7] == FetchAllDesiredData.DATA_FETCH_FAILURE then
+							error(`Missing scene data: {v7}`)
+						end
+					end
+				end
+
 				v6 = RecreateSceneFromEditables.createModelForGltfExport(state)
 				v5 = AssetQualityService:GenerateAssetQualityGltfFromInstanceAsync(v6)
 			end)

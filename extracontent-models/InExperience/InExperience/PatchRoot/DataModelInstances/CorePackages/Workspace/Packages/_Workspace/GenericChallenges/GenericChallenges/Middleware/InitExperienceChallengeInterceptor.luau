@@ -3,6 +3,7 @@ local RenderNativeChallenge = require(script.Parent.RenderNativeChallenge)
 local FFlagEnableRenderNativeChallenge = require(script.Parent.Flags.FFlagEnableRenderNativeChallenge)
 local GenericChallenges = script:FindFirstAncestor("GenericChallenges")
 local ChallengeType = require(GenericChallenges.Types.ChallengeType)
+local decodeChallengeMetadata = require(GenericChallenges.Utils.decodeChallengeMetadata)
 local parent = GenericChallenges.Parent
 local AuthCommon = require(parent.AuthCommon)
 local Base64 = AuthCommon.Utils.Base64
@@ -13,27 +14,31 @@ local GenericChallengeService = game:GetService("GenericChallengeService")
 local defineFastFlag = game:DefineFastFlag("FFlagEnableMutexOnGenericChallengeInterceptorMount", false)
 local v = false
 
-function challengeRequiredEventHandler(p: string, p2: string, p3: string)
+function challengeRequiredEventHandler(p: string, p2: string, genericChallengeMetadata: string)
 	if FFlagEnableRenderNativeChallenge and RenderNativeChallenge.canRenderNativeChallenge(p2) then
-		RenderNativeChallenge.render({ challengeId = p, challengeType = p2, challengeMetadata = p3 })
+		RenderNativeChallenge.render({
+			challengeId = p,
+			challengeType = p2,
+			challengeMetadata = decodeChallengeMetadata(genericChallengeMetadata)
+		})
 	else
 		RenderChallenge({
 			challengeType = ChallengeType.Generic,
 			challengeParameters = {
 				genericChallengeId = p,
 				genericChallengeType = p2,
-				genericChallengeMetadata = p3
+				genericChallengeMetadata = genericChallengeMetadata
 			},
 			callbacks = {
 				OnChallengeLoadFailed = function(_)
 					GenericChallengeService:SignalChallengeLoaded(p, false)
 				end,
-				OnChallengeCompleted = function(p4)
-					if p4.data.metadata ~= nil then
+				OnChallengeCompleted = function(p3)
+					if p3.data.metadata ~= nil then
 						GenericChallengeService:SignalChallengeCompleted(
 							p,
 							p2,
-							(Base64.Encode(HttpService:JSONEncode(p4.data.metadata)))
+							(Base64.Encode(HttpService:JSONEncode(p3.data.metadata)))
 						)
 					end
 				end,

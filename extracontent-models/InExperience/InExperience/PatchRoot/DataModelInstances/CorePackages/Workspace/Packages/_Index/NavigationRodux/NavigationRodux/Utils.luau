@@ -6,6 +6,8 @@ local Navigation = require(parent.Navigation)
 local getActiveRoutes = Navigation.getActiveRoutes
 local RobloxAppEnums = require(parent.RobloxAppEnums)
 local AppPage = RobloxAppEnums.AppPage
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAppIaHomeSubTab = SharedFlags.FFlagAppIaHomeSubTab
 
 require(NavigationRodux.types)
 local Constants = require(NavigationRodux.Constants)
@@ -37,6 +39,27 @@ Utils.getLegacyPageFromRoactNavigationRoute = getLegacyPageFromRoactNavigationRo
 
 function Utils.getLegacyRouteFromRoactNavigationState(p)
 	return Cryo.List.map(Cryo.List.filter(getActiveRoutes(p), legacyRouteFilter), getLegacyPageFromRoactNavigationRoute)
+end
+
+function Utils.getLegacyHistoryFromRoactNavigationState(p)
+	local legacyHistory = {}
+
+	for i = 1, p.index do
+		local v = p.routes[i]
+
+		if v.routes and v.routeName == Constants.TempRnSwitchNavigatorName then
+			v = v.routes[v.index]
+		end
+
+		if FFlagAppIaHomeSubTab and v.routes and v.routeName == Constants.HomeContainerName then
+			v = v.routes[v.index]
+		end
+
+		local legacyPageFromRoactNavigationRoute = getLegacyPageFromRoactNavigationRoute(v)
+		legacyHistory[i] = Cryo.List.join(legacyHistory[i - 1] or {}, { legacyPageFromRoactNavigationRoute })
+	end
+
+	return legacyHistory
 end
 
 function Utils.getCurrentTabName(data)

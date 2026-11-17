@@ -164,15 +164,15 @@ local function CollectionCarousel(props)
 	local v8 = useCarouselScrollingBinding(ref, joined.enableHoverOverflow == true)
 	local v9 = columnGap * 0.5
 	local size = React.useMemo(function()
-		if not joined.enableHoverOverflow then
-			return nil
+		if joined.enableHoverOverflow then
+			return React.joinBindings({ itemSizeBinding, v8 }):map(function(list)
+				local item = list[1]
+				local item2 = list[2]
+				return UDim2.new(1, item2 and 0 or -v9 * 2, 0, item.Y)
+			end)
 		end
 
-		return React.joinBindings({ itemSizeBinding, v8 }):map(function(list)
-			local item = list[1]
-			local item2 = list[2]
-			return UDim2.new(1, item2 and 0 or -v9 * 2, 0, item.Y)
-		end)
+		return nil
 	end, { itemSizeBinding, v8, v9, joined.enableHoverOverflow })
 	local position = React.useMemo(function()
 		if joined.enableHoverOverflow then

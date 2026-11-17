@@ -1,4 +1,5 @@
 local RobloxSubscriptionPurchaseApp = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp")
+local parent = RobloxSubscriptionPurchaseApp.Parent
 
 local completeRobloxSubscriptionUpsellFlow = require(RobloxSubscriptionPurchaseApp.Actions.completeRobloxSubscriptionUpsellFlow)
 local useNativePurchaseFinishedListener = require(RobloxSubscriptionPurchaseApp.Hooks.useNativePurchaseFinishedListener)
@@ -6,6 +7,9 @@ local useNativePurchaseFinishedListener = require(RobloxSubscriptionPurchaseApp.
 local FFlagEnableHeadlessSubscriptionNativePurchaseCancelCallback = require(RobloxSubscriptionPurchaseApp.Flags.FFlagEnableHeadlessSubscriptionNativePurchaseCancelCallback)
 local useRobloxSubscriptionChangedListener = require(RobloxSubscriptionPurchaseApp.Hooks.useRobloxSubscriptionChangedListener)
 local useSubscriptionPollingTimeoutGuard = require(RobloxSubscriptionPurchaseApp.Hooks.useSubscriptionPollingTimeoutGuard)
+local useMembershipConfigChangePoller = require(RobloxSubscriptionPurchaseApp.Hooks.useMembershipConfigChangePoller)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagPlusMembershipConfigChangeCheck = SharedFlags.FFlagPlusMembershipConfigChangeCheck
 local useHeadlessSubscriptionErrorCompletion = require(RobloxSubscriptionPurchaseApp.Hooks.useHeadlessSubscriptionErrorCompletion)
 
 local function RobloxSubscriptionHeadlessListenerHost(): nil
@@ -19,6 +23,11 @@ local function RobloxSubscriptionHeadlessListenerHost(): nil
 
 	useRobloxSubscriptionChangedListener()
 	useSubscriptionPollingTimeoutGuard()
+
+	if FFlagPlusMembershipConfigChangeCheck then
+		useMembershipConfigChangePoller()
+	end
+
 	useHeadlessSubscriptionErrorCompletion()
 	return nil
 end

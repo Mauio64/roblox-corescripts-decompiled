@@ -20,7 +20,8 @@ function class.new(data)
 		session_id = (data == nil or data.session_id == nil) and "" or data.session_id,
 		vertical_type = 0,
 		global_session_id = 0,
-		client_capabilities = 0
+		client_capabilities = 0,
+		guided_search_context = 0
 	}
 	local vertical_type
 
@@ -40,6 +41,13 @@ function class.new(data)
 	end
 
 	v2.client_capabilities = client_capabilities2
+	local guided_search_context
+
+	if not (data == nil or data.guided_search_context == nil) then
+		guided_search_context = data.guided_search_context
+	end
+
+	v2.guided_search_context = guided_search_context
 	return (setmetatable(v2, class))
 end
 
@@ -73,6 +81,12 @@ function class:encode()
 	if self.client_capabilities ~= nil then
 		local encoded = self.client_capabilities:encode()
 		local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+	end
+
+	if self.guided_search_context ~= nil then
+		local encoded = self.guided_search_context:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 6, proto.wireTypes.lengthDelimited)
 		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 	end
 
@@ -115,6 +129,10 @@ function class.decode(buf: buffer)
 				local v5
 				v5, v2 = proto.readBuffer(buf, v2)
 				result.client_capabilities = client_capabilities.ClientCapabilities.decode(v5)
+			elseif v3 == 6 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.guided_search_context = v.GuidedSearchContext.decode(v5)
 			else
 				local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -166,6 +184,10 @@ function class:jsonEncode()
 
 	if self.client_capabilities ~= nil then
 		v2.clientCapabilities = self.client_capabilities:jsonEncode()
+	end
+
+	if self.guided_search_context ~= nil then
+		v2.guidedSearchContext = self.guided_search_context:jsonEncode()
 	end
 
 	return v2
@@ -230,6 +252,14 @@ function class.jsonDecode(data)
 		v2.client_capabilities = client_capabilities.ClientCapabilities.jsonDecode(data.clientCapabilities)
 	end
 
+	if data.guided_search_context ~= nil then
+		v2.guided_search_context = v.GuidedSearchContext.jsonDecode(data.guided_search_context)
+	end
+
+	if data.guidedSearchContext ~= nil then
+		v2.guided_search_context = v.GuidedSearchContext.jsonDecode(data.guidedSearchContext)
+	end
+
 	return v2
 end
 
@@ -245,7 +275,240 @@ typeRegistry.default:register(v.GetSearchResultsPageRequest)
 local class2 = {}
 class2.__index = class2
 
-function class2.new(data)
+function class2.new(p)
+	return (setmetatable({
+		selected_option = (p == nil or p.selected_option == nil) and "" or p.selected_option,
+		suggestions = (p == nil or p.suggestions == nil) and {} or p.suggestions
+	}, class2))
+end
+
+function class2:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
+
+	if self.selected_option ~= nil and self.selected_option ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.selected_option)
+	end
+
+	if self.suggestions ~= nil and #self.suggestions > 0 then
+		for _, suggestion in self.suggestions do
+			local encoded = suggestion:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+		end
+	end
+
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
+end
+
+function class2.decode(buf: buffer)
+	local result = class2.new()
+	local v2 = 0
+
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
+
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.selected_option = buffer.tostring(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				table.insert(result.suggestions, v.GuidedSearchSuggestion.decode(v5))
+			else
+				local varInt, v5 = proto.readVarInt(buf, v2)
+
+				v2 = v5 + varInt
+			end
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
+		else
+			error("Unsupported wire type: " .. v4)
+		end
+	end
+
+	return result
+end
+
+function class2:jsonEncode()
+	local v2 = {}
+
+	if self.selected_option ~= nil and self.selected_option ~= "" then
+		v2.selectedOption = self.selected_option
+	end
+
+	if self.suggestions == nil or not (#self.suggestions > 0) then
+		return v2
+	end
+
+	local suggestions = {}
+
+	for _, suggestion in self.suggestions do
+		table.insert(suggestions, suggestion:jsonEncode())
+	end
+
+	v2.suggestions = suggestions
+
+	return v2
+end
+
+function class2.jsonDecode(data)
+	local v2 = class2.new()
+
+	if data.selected_option ~= nil then
+		v2.selected_option = data.selected_option
+	end
+
+	if data.selectedOption ~= nil then
+		v2.selected_option = data.selectedOption
+	end
+
+	if data.suggestions == nil then
+		return v2
+	end
+
+	local suggestions = {}
+
+	for _, suggestion in data.suggestions do
+		table.insert(suggestions, v.GuidedSearchSuggestion.jsonDecode(suggestion))
+	end
+
+	v2.suggestions = suggestions
+
+	return v2
+end
+
+class2.descriptor = {
+	name = "GuidedSearchContext",
+	fullName = "roblox.apppageplatform.search.v1beta1.GuidedSearchContext"
+}
+
+v.GuidedSearchContext = class2
+
+typeRegistry.default:register(v.GuidedSearchContext)
+
+local class3 = {}
+class3.__index = class3
+
+function class3.new(p)
+	return (setmetatable({
+		id = (p == nil or p.id == nil) and "" or p.id,
+		query = (p == nil or p.query == nil) and "" or p.query
+	}, class3))
+end
+
+function class3:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
+
+	if self.id ~= nil and self.id ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.id)
+	end
+
+	if self.query ~= nil and self.query ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.query)
+	end
+
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
+end
+
+function class3.decode(buf: buffer)
+	local result = class3.new()
+	local v2 = 0
+
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
+
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.id = buffer.tostring(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.query = buffer.tostring(v5)
+			else
+				local varInt, v5 = proto.readVarInt(buf, v2)
+
+				v2 = v5 + varInt
+			end
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
+		else
+			error("Unsupported wire type: " .. v4)
+		end
+	end
+
+	return result
+end
+
+function class3:jsonEncode()
+	local v2 = {}
+
+	if self.id ~= nil and self.id ~= "" then
+		v2.id = self.id
+	end
+
+	if self.query ~= nil and self.query ~= "" then
+		v2.query = self.query
+	end
+
+	return v2
+end
+
+function class3.jsonDecode(p)
+	local v2 = class3.new()
+
+	if p.id ~= nil then
+		v2.id = p.id
+	end
+
+	if p.query ~= nil then
+		v2.query = p.query
+	end
+
+	return v2
+end
+
+class3.descriptor = {
+	name = "GuidedSearchSuggestion",
+	fullName = "roblox.apppageplatform.search.v1beta1.GuidedSearchSuggestion"
+}
+
+v.GuidedSearchSuggestion = class3
+
+typeRegistry.default:register(v.GuidedSearchSuggestion)
+
+local class4 = {}
+class4.__index = class4
+
+function class4.new(data)
 	local v2 = {
 		page_entries = (data == nil or data.page_entries == nil) and {} or data.page_entries,
 		hydration_data = 0,
@@ -261,10 +524,10 @@ function class2.new(data)
 	v2.hydration_data = hydration_data
 	v2.templates = (data == nil or data.templates == nil) and {} or data.templates
 	v2.localized_literals = (data == nil or data.localized_literals == nil) and {} or data.localized_literals
-	return (setmetatable(v2, class2))
+	return (setmetatable(v2, class4))
 end
 
-function class2:encode()
+function class4:encode()
 	local v2 = buffer.create(0)
 	local v3 = 0
 
@@ -314,8 +577,8 @@ function class2:encode()
 	return buf
 end
 
-function class2.decode(buf: buffer)
-	local result = class2.new()
+function class4.decode(buf: buffer)
+	local result = class4.new()
 	local v2 = 0
 
 	while v2 < buffer.len(buf) do
@@ -369,7 +632,7 @@ function class2.decode(buf: buffer)
 	return result
 end
 
-function class2:jsonEncode()
+function class4:jsonEncode()
 	local v2 = {}
 
 	if self.page_entries ~= nil and #self.page_entries > 0 then
@@ -411,8 +674,8 @@ function class2:jsonEncode()
 	return v2
 end
 
-function class2.jsonDecode(data)
-	local v2 = class2.new()
+function class4.jsonDecode(data)
+	local v2 = class4.new()
 
 	if data.page_entries ~= nil then
 		local page_entries = {}
@@ -477,19 +740,19 @@ function class2.jsonDecode(data)
 	return v2
 end
 
-class2.descriptor = {
+class4.descriptor = {
 	name = "GetSearchResultsPageResponse",
 	fullName = "roblox.apppageplatform.search.v1beta1.GetSearchResultsPageResponse"
 }
 
-v.GetSearchResultsPageResponse = class2
+v.GetSearchResultsPageResponse = class4
 
 typeRegistry.default:register(v.GetSearchResultsPageResponse)
 
-local class3 = {}
-class3.__index = class3
+local class5 = {}
+class5.__index = class5
 
-function class3.new(p)
+function class5.new(p)
 	local v2 = {
 		key = (p == nil or p.key == nil) and "" or p.key,
 		value = 0
@@ -501,10 +764,10 @@ function class3.new(p)
 	end
 
 	v2.value = v3
-	return (setmetatable(v2, class3))
+	return (setmetatable(v2, class5))
 end
 
-function class3:encode()
+function class5:encode()
 	local v2 = buffer.create(0)
 	local v3 = 0
 
@@ -524,8 +787,8 @@ function class3:encode()
 	return buf
 end
 
-function class3.decode(buf: buffer)
-	local result = class3.new()
+function class5.decode(buf: buffer)
+	local result = class5.new()
 	local v2 = 0
 
 	while v2 < buffer.len(buf) do
@@ -563,7 +826,7 @@ function class3.decode(buf: buffer)
 	return result
 end
 
-function class3:jsonEncode()
+function class5:jsonEncode()
 	local v2 = {}
 
 	if self.key ~= nil and self.key ~= "" then
@@ -577,8 +840,8 @@ function class3:jsonEncode()
 	return v2
 end
 
-function class3.jsonDecode(p)
-	local v2 = class3.new()
+function class5.jsonDecode(p)
+	local v2 = class5.new()
 
 	if p.key ~= nil then
 		v2.key = p.key
@@ -591,26 +854,26 @@ function class3.jsonDecode(p)
 	return v2
 end
 
-class3.descriptor = {
+class5.descriptor = {
 	name = "GetSearchResultsPageResponse_TemplatesEntry",
 	fullName = "roblox.apppageplatform.search.v1beta1.TemplatesEntry"
 }
 
-v.GetSearchResultsPageResponse_TemplatesEntry = class3
+v.GetSearchResultsPageResponse_TemplatesEntry = class5
 
 typeRegistry.default:register(v.GetSearchResultsPageResponse_TemplatesEntry)
 
-local class4 = {}
-class4.__index = class4
+local class6 = {}
+class6.__index = class6
 
-function class4.new(p)
+function class6.new(p)
 	return (setmetatable({
 		key = (p == nil or p.key == nil) and "" or p.key,
 		value = (p == nil or p.value == nil) and "" or p.value
-	}, class4))
+	}, class6))
 end
 
-function class4:encode()
+function class6:encode()
 	local v2 = buffer.create(0)
 	local v3 = 0
 
@@ -629,8 +892,8 @@ function class4:encode()
 	return buf
 end
 
-function class4.decode(buf: buffer)
-	local result = class4.new()
+function class6.decode(buf: buffer)
+	local result = class6.new()
 	local v2 = 0
 
 	while v2 < buffer.len(buf) do
@@ -668,7 +931,7 @@ function class4.decode(buf: buffer)
 	return result
 end
 
-function class4:jsonEncode()
+function class6:jsonEncode()
 	local v2 = {}
 
 	if self.key ~= nil and self.key ~= "" then
@@ -682,8 +945,8 @@ function class4:jsonEncode()
 	return v2
 end
 
-function class4.jsonDecode(p)
-	local v2 = class4.new()
+function class6.jsonDecode(p)
+	local v2 = class6.new()
 
 	if p.key ~= nil then
 		v2.key = p.key
@@ -696,12 +959,12 @@ function class4.jsonDecode(p)
 	return v2
 end
 
-class4.descriptor = {
+class6.descriptor = {
 	name = "GetSearchResultsPageResponse_LocalizedLiteralsEntry",
 	fullName = "roblox.apppageplatform.search.v1beta1.LocalizedLiteralsEntry"
 }
 
-v.GetSearchResultsPageResponse_LocalizedLiteralsEntry = class4
+v.GetSearchResultsPageResponse_LocalizedLiteralsEntry = class6
 
 typeRegistry.default:register(v.GetSearchResultsPageResponse_LocalizedLiteralsEntry)
 
@@ -749,6 +1012,8 @@ v.SearchResultsPageVerticalType = {
 
 return {
 	GetSearchResultsPageRequest = v.GetSearchResultsPageRequest,
+	GuidedSearchContext = v.GuidedSearchContext,
+	GuidedSearchSuggestion = v.GuidedSearchSuggestion,
 	GetSearchResultsPageResponse = v.GetSearchResultsPageResponse,
 	SearchResultsPageVerticalType = v.SearchResultsPageVerticalType
 }

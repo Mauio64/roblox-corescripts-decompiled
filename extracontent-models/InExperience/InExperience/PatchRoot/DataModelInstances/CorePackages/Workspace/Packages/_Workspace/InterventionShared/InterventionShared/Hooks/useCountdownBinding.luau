@@ -26,7 +26,8 @@ local function useCountdownBinding(p: number?, value: string?)
 			return 0
 		end
 
-		local v4 = math.max(p - DateTime.now().UnixTimestamp, 0)
+		local now = DateTime.now()
+		local v4 = math.max(p - now.UnixTimestamp, 0)
 		local v5
 
 		if FFlagAppChatReactiveFeatureRestrictions and v ~= nil and v4 >= 86400 then

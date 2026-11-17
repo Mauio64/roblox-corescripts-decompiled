@@ -10,13 +10,8 @@ local View = Foundation.View
 local Button = Foundation.Button
 local InputSize = Enums.InputSize
 
-local SharedFlags = require(parent.SharedFlags)
-local FFlagUserListFooterViewMore = SharedFlags.FFlagUserListFooterViewMore
-
 local function UserListFooter(props)
-	local v = useLocalization({
-		showMore = FFlagUserListFooterViewMore and "Feature.Friends.Action.ViewMore" or "Feature.Friends.Action.ShowMore"
-	})
+	local v = useLocalization({ showMore = "Feature.Friends.Action.ViewMore" })
 
 	local createElement = React.createElement
 	local v2 = {

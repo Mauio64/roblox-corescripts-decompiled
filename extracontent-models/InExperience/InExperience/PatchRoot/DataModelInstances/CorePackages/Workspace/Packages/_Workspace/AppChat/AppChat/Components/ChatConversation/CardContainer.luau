@@ -93,7 +93,8 @@ local function CardContainer(props)
 			analyticsInfo = { moduleLocation = v5.chatPlacement },
 			anchorPoint = 0,
 			position = 0,
-			cards = 0
+			cards = 0,
+			conversationId = 0
 		}
 		local anchorPoint
 
@@ -114,6 +115,7 @@ local function CardContainer(props)
 
 		v9.position = position
 		v9.cards = props.cards
+		v9.conversationId = props.conversationId
 		cards = createElement2(view2, v8, createElement3(Cards, v9))
 	end
 

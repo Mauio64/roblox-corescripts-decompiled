@@ -1,5 +1,7 @@
 local Flags = require(script:FindFirstAncestor("ViewRecyclerRoblox").Flags)
-local FFlagViewRecyclerReact08 = Flags.FFlagViewRecyclerReact08
+local FFlagViewRecyclerReact084 = Flags.FFlagViewRecyclerReact084
+local Flags2 = require(script:FindFirstAncestor("ViewRecyclerRoblox").Flags)
+local FFlagViewRecyclerReact08 = Flags2.FFlagViewRecyclerReact08
 local ViewRecyclerRoblox = script:FindFirstAncestor("ViewRecyclerRoblox")
 require(ViewRecyclerRoblox.Parent.ViewRecycler)
 
@@ -57,11 +59,11 @@ return {
 			end,
 			present = function(p, p2, callback2)
 				v2 = true
+				local success, result
 
-				local success = nil
-				local result = nil
-
-				if FFlagViewRecyclerReact08 then
+				if FFlagViewRecyclerReact084 then
+					success, result = pcall(callback2)
+				elseif FFlagViewRecyclerReact08 then
 					success, result = pcall(callback2)
 				else
 					callback2()
@@ -69,9 +71,20 @@ return {
 
 				v2 = false
 				v3 = p
+				local v4
 
-				if FFlagViewRecyclerReact08 and not success then
-					error(result, 0)
+				if FFlagViewRecyclerReact084 then
+					v4 = not success
+				else
+					v4 = FFlagViewRecyclerReact08
+				end
+
+				if v4 then
+					if FFlagViewRecyclerReact084 then
+						error(result, 0)
+					elseif not success then
+						error(result, 0)
+					end
 				end
 
 				if p2 == 0 then

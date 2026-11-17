@@ -140,8 +140,7 @@ local function createAudioPlaybackStore(p)
 				end)
 			elseif isPlaying and not v6 then
 				v2(function(p3)
-					local v7 = { v4 }
-					return Cryo.List.join(p3, v7)
+					return Cryo.List.join(p3, { v4 })
 				end)
 			end
 		end

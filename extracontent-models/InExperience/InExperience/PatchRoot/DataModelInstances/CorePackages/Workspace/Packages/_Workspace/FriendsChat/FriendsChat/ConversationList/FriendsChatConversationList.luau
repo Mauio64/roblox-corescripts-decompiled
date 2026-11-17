@@ -10,12 +10,13 @@ local Promise = require(parent.Promise)
 local useLocalization = Localization.Hooks.useLocalization
 
 local AppChat = require(parent.AppChat)
-
-local FFlagAppChatUseUltimateListConversationList = require(parent.AppChat.FFlagAppChatUseUltimateListConversationList)
 local useConversationSearch = require(parent.AppChat.useConversationSearch)
+local ChatPlacementContext = require(parent.AppChat.ChatPlacementContext)
 local searchIntroducedConversationIds = require(parent.AppChat.searchIntroducedConversationIds)
 
 local FFlagFriendsChatServerSideConversationSearch = require(FriendsChat.Flags.FFlagFriendsChatServerSideConversationSearch)
+
+local FFlagFriendsChatUseViewRecyclerConversationList = require(FriendsChat.Flags.FFlagFriendsChatUseViewRecyclerConversationList)
 local SharedFlags = require(parent.SharedFlags)
 local FFlagFriendsChatConversationListFocusNav = SharedFlags.FFlagFriendsChatConversationListFocusNav
 local SharedFlags2 = require(parent.SharedFlags)
@@ -37,6 +38,7 @@ local LayoutConstants = require(FriendsChat.LayoutConstants)
 local useChatSearchSession = require(parent.AppChat.useChatSearchSession)
 local useChatSearchResultsTelemetry = require(parent.AppChat.useChatSearchResultsTelemetry)
 local FFlagAppChatSearchSessionTelemetry = require(parent.AppChat.FFlagAppChatSearchSessionTelemetry)
+local FFlagAppChatSearchSendPlacement = require(parent.AppChat.FFlagAppChatSearchSendPlacement)
 
 local useFriendsChatLandingTelemetry = require(script.Parent.Parent.Telemetry.ChatLanding.useFriendsChatLandingTelemetry)
 local getLandingEmptyStateType = require(script.Parent.Parent.Telemetry.ChatLanding.getLandingEmptyStateType)
@@ -50,11 +52,10 @@ local InputSize = Foundation.Enums.InputSize
 local Text = Foundation.Text
 local View = Foundation.View
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local useTextSizeOffset = Foundation.Hooks.useTextSizeOffset
 local useTokens = Foundation.Hooks.useTokens
 
-local ConversationListUltimate = AppChat.Components.ChatLanding.ConversationListUltimate
+local ConversationListViewRecycler = AppChat.Components.ChatLanding.ConversationListViewRecycler
 local ConversationRow = AppChat.Components.ChatLanding.ConversationRow
 local getConversationTitle = ExpChatConversationListAdapter.getConversationTitle
 local useConversationList = AppChat.Hooks.useConversationList
@@ -72,7 +73,7 @@ local defineFastInt6 = game:DefineFastInt("FriendsChatConversationListWindowSize
 local FFlagFriendsChatScaleConversationRowHeight = require(FriendsChat.Flags.FFlagFriendsChatScaleConversationRowHeight)
 local FFlagFriendsChatLandingTelemetryFields = require(FriendsChat.Flags.FFlagFriendsChatLandingTelemetryFields)
 
-local v = not FFlagAppChatUseUltimateListConversationList
+local v = not FFlagFriendsChatUseViewRecyclerConversationList
 local v2 = defineFastInt4 / 1000
 local v3 = {
 	dampingRatio = 1,
@@ -263,7 +264,13 @@ local function FriendsChatConversationList(props)
 	local v18
 
 	if FFlagFriendsChatServerSideConversationSearch then
-		v18 = useConversationSearch(state, visible)
+		local v19
+
+		if FFlagAppChatSearchSendPlacement then
+			v19 = ChatPlacementContext.Enum.InExperienceFriendsTab
+		end
+
+		v18 = useConversationSearch(state, visible, v19)
 
 		if FFlagAppChatSearchSessionTelemetry then
 			useChatSearchResultsTelemetry(v18)
@@ -499,8 +506,8 @@ local function FriendsChatConversationList(props)
 
 	local list
 
-	if FFlagAppChatUseUltimateListConversationList then
-		list = React.createElement(ConversationListUltimate, {
+	if FFlagFriendsChatUseViewRecyclerConversationList then
+		list = React.createElement(ConversationListViewRecycler, {
 			key = listKey,
 			Size = UDim2.fromScale(1, 1),
 			entryHeight = conversationRowHeight,
@@ -510,11 +517,13 @@ local function FriendsChatConversationList(props)
 			oldestConversationIsFetched = oldestConversationIsFetched,
 			isWideMode = false,
 			showScrollbarOnScroll = true,
+			scrollbarThickness = defineFastInt5,
 			onScrollUpdate = v28,
 			rowProps = { showBackground = false, localUserId = props.localUserId },
 			localUserId = props.localUserId,
 			showHeaderEntries = false,
 			shouldLogHeaderEntryExposures = false,
+			shouldLogPerfExposure = false,
 			onActivated = onActivated,
 			fireConversationClickedEvent = v20.fireConversationClickedEvent,
 			fireConversationImpressionEvent = v20.fireConversationImpressionEvent
@@ -650,48 +659,32 @@ local function FriendsChatConversationList(props)
 			size = IconSize.Small,
 			style = getColorStyle(v5.Color.Content.Default.Color3, transparency) -- inferred equivalent call
 		}),
-		SearchBox = 0,
+		SearchBox = React.createElement("TextBox", {
+			Name = "FriendsChatConversationListSearchBox",
+			BackgroundTransparency = 1,
+			SelectionImageObject = selectionImageObject,
+			ClearTextOnFocus = false,
+			ClipsDescendants = true,
+			FontFace = normalizeFontFace(v5.Typography.BodySmall.Font),
+			LineHeight = v5.Typography.BodySmall.LineHeight,
+			LayoutOrder = 2,
+			PlaceholderColor3 = v5.Color.Content.Muted.Color3,
+			PlaceholderText = v21.searchPlaceholder,
+			Size = UDim2.new(0, 0, 1, 0),
+			Text = state,
+			TextColor3 = v5.Color.Content.Emphasis.Color3,
+			TextSize = v5.Typography.BodySmall.FontSize,
+			TextTransparency = textTransparency2,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextYAlignment = Enum.TextYAlignment.Center,
+			[React.Event.Focused] = v24,
+			[React.Event.FocusLost] = v25,
+			[React.Change.Text] = v29
+		}, {
+			Flex = React.createElement("UIFlexItem", { FlexMode = Enum.UIFlexMode.Fill })
+		}),
 		ClearButton = 0
 	}
-
-	local createElement5 = React.createElement
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = v5.Typography.BodySmall.Font
-	end
-
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(v5.Typography.BodySmall.Font)
-	end
-
-	v59.SearchBox = createElement5("TextBox", {
-		Name = "FriendsChatConversationListSearchBox",
-		BackgroundTransparency = 1,
-		SelectionImageObject = selectionImageObject,
-		ClearTextOnFocus = false,
-		ClipsDescendants = true,
-		Font = font,
-		FontFace = fontFace,
-		LineHeight = v5.Typography.BodySmall.LineHeight,
-		LayoutOrder = 2,
-		PlaceholderColor3 = v5.Color.Content.Muted.Color3,
-		PlaceholderText = v21.searchPlaceholder,
-		Size = UDim2.new(0, 0, 1, 0),
-		Text = state,
-		TextColor3 = v5.Color.Content.Emphasis.Color3,
-		TextSize = v5.Typography.BodySmall.FontSize,
-		TextTransparency = textTransparency2,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		TextYAlignment = Enum.TextYAlignment.Center,
-		[React.Event.Focused] = v24,
-		[React.Event.FocusLost] = v25,
-		[React.Change.Text] = v29
-	}, {
-		Flex = React.createElement("UIFlexItem", { FlexMode = Enum.UIFlexMode.Fill })
-	})
 	local clearButton
 
 	if v19 then
@@ -720,23 +713,23 @@ local function FriendsChatConversationList(props)
 		})
 	})
 
-	local createElement6 = React.createElement
-	local v65 = {
+	local createElement5 = React.createElement
+	local v62 = {
 		Name = "ListArea",
 		BorderSizePixel = 0,
 		LayoutOrder = 2,
 		Size = UDim2.new(1, 0, 1, -size_1200)
 	}
 
-	local createElement7 = React.createElement
-	local v68 = {
+	local createElement6 = React.createElement
+	local v65 = {
 		Name = "ListContent",
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		GroupTransparency = groupTransparency,
 		Size = UDim2.fromScale(1, 1)
 	}
-	local v69 = {
+	local v66 = {
 		ListWrapper = React.createElement("Frame", {
 			Name = "FriendsChatConversationListWrapper",
 			BackgroundTransparency = 1,
@@ -777,9 +770,9 @@ local function FriendsChatConversationList(props)
 			or nil
 	end
 
-	v69.Status = status
-	children.ListArea = createElement6(View, v65, {
-		ListContent = createElement7("CanvasGroup", v68, v69)
+	v66.Status = status
+	children.ListArea = createElement5(View, v62, {
+		ListContent = createElement6("CanvasGroup", v65, v66)
 	})
 	return (createElement("Frame", v30, children))
 end

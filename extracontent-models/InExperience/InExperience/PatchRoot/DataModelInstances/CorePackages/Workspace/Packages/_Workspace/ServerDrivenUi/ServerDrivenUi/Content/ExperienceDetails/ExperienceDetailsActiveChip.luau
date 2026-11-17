@@ -37,8 +37,9 @@ local function ExperienceDetailsActiveCountChip(p)
 		local rootPlaceId = v and v.rootPlaceId
 
 		if rootPlaceId then
+			local userId = Players.LocalPlayer and Players.LocalPlayer.UserId
 			gameDetailsSubpage({
-				uid = tostring(Players.LocalPlayer and Players.LocalPlayer.UserId),
+				uid = tostring(userId),
 				universeId = universeId,
 				placeId = tostring(rootPlaceId),
 				subpage = "Servers",

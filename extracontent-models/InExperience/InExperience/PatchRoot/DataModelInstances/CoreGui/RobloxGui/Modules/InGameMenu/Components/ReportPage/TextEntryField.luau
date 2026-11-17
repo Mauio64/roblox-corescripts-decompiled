@@ -1,4 +1,3 @@
-local TextService = game:GetService("TextService")
 local CorePackages = game:GetService("CorePackages")
 
 local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
@@ -16,7 +15,6 @@ local Images = UIBlox.App.ImageSet.Images
 local Foundation = require(CorePackages.Packages.Foundation)
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagCoreUiMigrateUIBloxToFoundation = SharedFlags.FFlagCoreUiMigrateUIBloxToFoundation
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
 local v
 
@@ -81,25 +79,19 @@ function extended:calculateNeedsRescroll(p, p2)
 		local v3 = p3.text:sub(1, data.cursorPosition - 1)
 		local v4 = p2.RelativeSize * p.Font.BaseSize
 		local vector2 = Vector2.new(p3.textBoxWidth, 10000)
-		local v5
+		local textSize = GetTextSize(v3, v4, p.Tokens.Typography.BodyLarge.Font, vector2, {
+			addTemporaryPadding = false
+		})
 
-		if FoundationFontFaceMigration then
-			v5 = GetTextSize(v3, v4, p.Tokens.Typography.BodyLarge.Font, vector2, {
-				addTemporaryPadding = false
-			})
-		else
-			v5 = TextService:GetTextSize(v3, v4, p2.Font, vector2)
-		end
-
-		if v5.Y > data.scrollingFrameHeight + data.canvasPosition then
+		if textSize.Y > data.scrollingFrameHeight + data.canvasPosition then
 			return {
-				canvasPosition = v5.Y - data.scrollingFrameHeight
+				canvasPosition = textSize.Y - data.scrollingFrameHeight
 			}
 		end
 
-		if v5.Y - v4 < data.canvasPosition then
+		if textSize.Y - v4 < data.canvasPosition then
 			return {
-				canvasPosition = v5.Y - v4
+				canvasPosition = textSize.Y - v4
 			}
 		end
 
@@ -108,149 +100,104 @@ function extended:calculateNeedsRescroll(p, p2)
 end
 
 function extended:renderWithSelectionCursor(callback)
-	return withFoundationOrUIBloxStyle(function(p)
-		local tokens
-
-		if FoundationFontFaceMigration then
-			tokens = p
-		end
-
+	return withFoundationOrUIBloxStyle(function(tokens)
 		return {
 			Tokens = tokens,
 			Theme = {
 				TextDefault = {
-					Color = p.Color.Content.Default.Color3,
-					Transparency = p.Color.Content.Default.Transparency
+					Color = tokens.Color.Content.Default.Color3,
+					Transparency = tokens.Color.Content.Default.Transparency
 				},
 				BackgroundMuted = {
-					Color = p.Color.Surface.Surface_200.Color3,
-					Transparency = p.Color.Surface.Surface_200.Transparency
+					Color = tokens.Color.Surface.Surface_200.Color3,
+					Transparency = tokens.Color.Surface.Surface_200.Transparency
 				}
 			},
 			Font = {
 				BaseSize = 1,
 				Body = {
-					Font = p.Typography.BodyLarge.Font,
-					RelativeSize = p.Typography.BodyLarge.FontSize
+					Font = tokens.Typography.BodyLarge.Font,
+					RelativeSize = tokens.Typography.BodyLarge.FontSize
 				}
 			}
 		}
 	end, function(props)
 		local textDefault = props.Theme.TextDefault
 		local body = props.Font.Body
-		local v3
 
-		if FoundationFontFaceMigration then
-			v3 = GetTextSize(
-				self.props.text,
-				body.RelativeSize * props.Font.BaseSize,
-				props.Tokens.Typography.BodyLarge.Font,
-				Vector2.new(self.state.textBoxWidth, 10000),
-				{ addTemporaryPadding = false }
-			)
-		else
-			v3 = TextService:GetTextSize(
-				self.props.text,
-				body.RelativeSize * props.Font.BaseSize,
-				body.Font,
-				Vector2.new(self.state.textBoxWidth, 10000)
-			)
-		end
+		local textSize = GetTextSize(
+			self.props.text,
+			body.RelativeSize * props.Font.BaseSize,
+			props.Tokens.Typography.BodyLarge.Font,
+			Vector2.new(self.state.textBoxWidth, 10000),
+			{ addTemporaryPadding = false }
+		)
 
 		local imageRectSize = component_assetscircle_17.ImageRectSize
 		local imageRectOffset = component_assetscircle_17.ImageRectOffset
 		local x = imageRectSize.X
 		local halfX = x / 2
 
-		local createElement = Roact.createElement
-		local v4 = {
-			Size = UDim2.new(1, -24, 1, -44),
-			AnchorPoint = Vector2.new(0.5, 0),
-			Position = UDim2.new(0.5, 0, 0, 7),
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			CanvasSize = UDim2.new(1, -24, 0, v3.Y),
-			ScrollBarThickness = 8,
-			VerticalScrollBarInset = Enum.ScrollBarInset.Always,
-			CanvasPosition = Vector2.new(0, self.state.canvasPosition),
-			Selectable = false,
-			[Roact.Change.CanvasPosition] = function(p)
-				self:setState({ canvasPosition = p.CanvasPosition.Y })
-			end,
-			[Roact.Change.AbsoluteSize] = function(p)
-				self:setState({ scrollingFrameHeight = p.AbsoluteSize.Y }, function()
-					self:calculateNeedsRescroll(props, body)
-				end)
-			end
-		}
-
-		local createElement2 = Roact.createElement
-		local v5 = {
-			["Size"] = nil,
-			["Size"] = nil,
-			["Size"] = nil,
-			["Size"] = nil,
-			["Size"] = nil,
-			["Size"] = nil,
-			Size = UDim2.new(1, -2, 1, 0),
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			Position = UDim2.new(0.5, 0, 0.5, 0),
-			Text = self.props.text,
-			ClearTextOnFocus = false,
-			TextEditable = self.props.enabled,
-			BackgroundTransparency = 1,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			TextYAlignment = Enum.TextYAlignment.Top,
-			TextColor3 = textDefault.Color,
-			TextTransparency = textDefault.Transparency
-		}
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = body.Font
-		end
-
-		v5.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(props.Tokens.Typography.BodyLarge.Font)
-		end
-
-		v5.FontFace = fontFace
-		v5.TextSize = body.RelativeSize * props.Font.BaseSize
-		v5.TextWrapped = true
-		v5.SelectionImageObject = callback(v2.InputFields)
-
-		v5[Roact.Ref] = self.textBoxRef
-
-		v5[Roact.Change.Text] = function(state)
-			if utf8.len(utf8.nfcnormalize(state.Text)) > self.props.maxTextLength then
-				local v6 = utf8.offset(state.Text, self.props.maxTextLength + 1) - 1
-				state.Text = string.sub(state.Text, 1, v6)
-			else
-				self.props.textChanged(state.Text)
-				self:setState({ cursorPosition = state.CursorPosition }, function()
-					self:calculateNeedsRescroll(props, body)
-				end)
-			end
-		end
-
-		v5[Roact.Change.AbsoluteSize] = function(p)
-			self:setState({ textBoxWidth = p.AbsoluteSize.X }, function()
-				self:calculateNeedsRescroll(props, body)
-			end)
-		end
-
-		v5[Roact.Change.CursorPosition] = function(p)
-			self:setState({ cursorPosition = p.CursorPosition }, function()
-				self:calculateNeedsRescroll(props, body)
-			end)
-		end
-
 		local children = {
-			ScrollingFrame = createElement("ScrollingFrame", v4, {
-				TextBox = createElement2("TextBox", v5, {
+			ScrollingFrame = Roact.createElement("ScrollingFrame", {
+				Size = UDim2.new(1, -24, 1, -44),
+				AnchorPoint = Vector2.new(0.5, 0),
+				Position = UDim2.new(0.5, 0, 0, 7),
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				CanvasSize = UDim2.new(1, -24, 0, textSize.Y),
+				ScrollBarThickness = 8,
+				VerticalScrollBarInset = Enum.ScrollBarInset.Always,
+				CanvasPosition = Vector2.new(0, self.state.canvasPosition),
+				Selectable = false,
+				[Roact.Change.CanvasPosition] = function(p)
+					self:setState({ canvasPosition = p.CanvasPosition.Y })
+				end,
+				[Roact.Change.AbsoluteSize] = function(p)
+					self:setState({ scrollingFrameHeight = p.AbsoluteSize.Y }, function()
+						self:calculateNeedsRescroll(props, body)
+					end)
+				end
+			}, {
+				TextBox = Roact.createElement("TextBox", {
+					Size = UDim2.new(1, -2, 1, 0),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Position = UDim2.new(0.5, 0, 0.5, 0),
+					Text = self.props.text,
+					ClearTextOnFocus = false,
+					TextEditable = self.props.enabled,
+					BackgroundTransparency = 1,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextYAlignment = Enum.TextYAlignment.Top,
+					TextColor3 = textDefault.Color,
+					TextTransparency = textDefault.Transparency,
+					FontFace = normalizeFontFace(props.Tokens.Typography.BodyLarge.Font),
+					TextSize = body.RelativeSize * props.Font.BaseSize,
+					TextWrapped = true,
+					SelectionImageObject = callback(v2.InputFields),
+					[Roact.Ref] = self.textBoxRef,
+					[Roact.Change.Text] = function(state)
+						if utf8.len(utf8.nfcnormalize(state.Text)) > self.props.maxTextLength then
+							local v3 = utf8.offset(state.Text, self.props.maxTextLength + 1) - 1
+							state.Text = string.sub(state.Text, 1, v3)
+						else
+							self.props.textChanged(state.Text)
+							self:setState({ cursorPosition = state.CursorPosition }, function()
+								self:calculateNeedsRescroll(props, body)
+							end)
+						end
+					end,
+					[Roact.Change.AbsoluteSize] = function(p)
+						self:setState({ textBoxWidth = p.AbsoluteSize.X }, function()
+							self:calculateNeedsRescroll(props, body)
+						end)
+					end,
+					[Roact.Change.CursorPosition] = function(p)
+						self:setState({ cursorPosition = p.CursorPosition }, function()
+							self:calculateNeedsRescroll(props, body)
+						end)
+					end
+				}, {
 					PlaceholderText = Roact.createElement(ThemedTextLabel, {
 						themeKey = "TextDefault",
 						fontKey = "Body",

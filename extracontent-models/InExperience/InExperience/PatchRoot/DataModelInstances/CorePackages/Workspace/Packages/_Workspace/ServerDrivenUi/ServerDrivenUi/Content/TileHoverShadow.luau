@@ -24,7 +24,8 @@ local function TileHoverShadow(props)
 		end
 
 		local function update() -- 1 equivalent call inferred from this helper
-			v6((math.max(0, current.AbsoluteSize.Y - v4)))
+			local y = current.AbsoluteSize.Y
+			v6((math.max(0, y - v4)))
 		end
 
 		update() -- inferred equivalent call

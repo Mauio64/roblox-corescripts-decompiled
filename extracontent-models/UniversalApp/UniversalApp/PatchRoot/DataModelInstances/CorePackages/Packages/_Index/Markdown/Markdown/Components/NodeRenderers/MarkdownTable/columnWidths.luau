@@ -72,9 +72,11 @@ function ColumnWidths.measureColumnContentWidths(p, p2, state)
 
 		for k, child2 in child.children do
 			local v3 = child.name .. getContentKey(child2)
-			local v4 = cellWidths[v3]
-				or v[v3]
-				or measureUnwrappedWidth(Dash.filter(v2.processChildren(child2, v2), isInlineElement))
+			local v4 = cellWidths[v3] or v[v3]
+
+			if not v4 then
+				v4 = measureUnwrappedWidth(Dash.filter(v2.processChildren(child2, v2), isInlineElement))
+			end
 
 			cellWidths[v3] = v4
 			columnContentWidths[k] = math.max(columnContentWidths[k] or 0, v4)

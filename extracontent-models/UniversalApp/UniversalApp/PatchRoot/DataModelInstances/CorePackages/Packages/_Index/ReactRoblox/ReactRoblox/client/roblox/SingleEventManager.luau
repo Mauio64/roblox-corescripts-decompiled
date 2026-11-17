@@ -47,8 +47,8 @@ function SingleEventManager:_connect(p, object, p2)
 				if self._status == "Enabled" then
 					self._listeners[p](self._instance, ...)
 				elseif self._status == "Suspended" then
-					local v = { p, select("#", ...), ... }
-					table.insert(self._suspendedEventQueue, v)
+					local v = select("#", ...)
+					table.insert(self._suspendedEventQueue, { p, v, ... })
 				end
 			end)
 		end

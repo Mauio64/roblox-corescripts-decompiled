@@ -11,7 +11,6 @@ local EnumScreens = require(parent.AppChat.EnumScreens)
 local GetChatModerationStatusDataHydration = require(parent.AppChat.GetChatModerationStatusDataHydration)
 local InExperienceAppChatModal = require(parent.AppChat.InExperienceAppChatModal)
 local IXPNavigationUtils = require(parent.AppChat.IXPNavigationUtils)
-local getFFlagAppChatEnableRootedNavigation = require(parent.AppChat.getFFlagAppChatEnableRootedNavigation)
 
 local Localization = require(parent.Localization)
 local LocalizationProvider = Localization.LocalizationProvider
@@ -44,7 +43,6 @@ local ExpChatPerfTracker = ChatUIPrimitives.Telemetry.ExpChatPerfTracker
 
 local SharedFlags = require(parent.SharedFlags)
 local FFlagAppChatReactiveFeatureRestrictions = SharedFlags.FFlagAppChatReactiveFeatureRestrictions
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
 local FFlagFriendsChatConversationListFocusNav = SharedFlags.FFlagFriendsChatConversationListFocusNav
 
 local FFlagFriendsChatFocusInputOnConversationActivated = require(script.Parent.Flags.FFlagFriendsChatFocusInputOnConversationActivated)
@@ -52,30 +50,59 @@ local FFlagFriendsChatIxpScreenExposure = require(script.Parent.Flags.FFlagFrien
 local FStringFriendsChatLandingPageIxpLayer = require(script.Parent.Flags.FStringFriendsChatLandingPageIxpLayer)
 
 local FStringFriendsChatConversationPageIxpLayer = require(script.Parent.Flags.FStringFriendsChatConversationPageIxpLayer)
+local FFlagFriendsChatIxpParallelScreenLayers = require(script.Parent.Flags.FFlagFriendsChatIxpParallelScreenLayers)
+
+local FStringFriendsChatLandingConversationRowsIxpLayer = require(script.Parent.Flags.FStringFriendsChatLandingConversationRowsIxpLayer)
+
+local FStringFriendsChatLandingConversationListIxpLayer = require(script.Parent.Flags.FStringFriendsChatLandingConversationListIxpLayer)
+
+local FStringFriendsChatLandingPerformanceIxpLayer = require(script.Parent.Flags.FStringFriendsChatLandingPerformanceIxpLayer)
+
+local FStringFriendsChatConversationComposerIxpLayer = require(script.Parent.Flags.FStringFriendsChatConversationComposerIxpLayer)
+
+local FStringFriendsChatConversationMessagesIxpLayer = require(script.Parent.Flags.FStringFriendsChatConversationMessagesIxpLayer)
+
+local FStringFriendsChatConversationPerformanceIxpLayer = require(script.Parent.Flags.FStringFriendsChatConversationPerformanceIxpLayer)
 
 local exposureHandler = IXPNavigationUtils.createExposureHandler(FStringFriendsChatLandingPageIxpLayer)
 local exposureHandler2 = IXPNavigationUtils.createExposureHandler(FStringFriendsChatConversationPageIxpLayer)
 
+local v = FFlagFriendsChatIxpParallelScreenLayers
+	and {
+		IXPNavigationUtils.createExposureHandler(FStringFriendsChatLandingConversationRowsIxpLayer),
+		IXPNavigationUtils.createExposureHandler(FStringFriendsChatLandingConversationListIxpLayer),
+		IXPNavigationUtils.createExposureHandler(FStringFriendsChatLandingPerformanceIxpLayer)
+	}
+	or {}
+
+local v2 = FFlagFriendsChatIxpParallelScreenLayers
+	and {
+		IXPNavigationUtils.createExposureHandler(FStringFriendsChatConversationComposerIxpLayer),
+		IXPNavigationUtils.createExposureHandler(FStringFriendsChatConversationMessagesIxpLayer),
+		IXPNavigationUtils.createExposureHandler(FStringFriendsChatConversationPerformanceIxpLayer)
+	}
+	or {}
+
 local function FriendsChatMainContent(props)
 	useFriendsChatVisibilityTelemetry()
 
-	local v = useChatWindowSettings()
-	local v2 = React.useMemo(function()
+	local v3 = useChatWindowSettings()
+	local v4 = React.useMemo(function()
 		return {
-			BackgroundColor3 = v.ChatWindowBackgroundColor3,
-			BackgroundTransparency = v.ChatWindowBackgroundTransparency
+			BackgroundColor3 = v3.ChatWindowBackgroundColor3,
+			BackgroundTransparency = v3.ChatWindowBackgroundTransparency
 		}
-	end, { v })
+	end, { v3 })
 
 	local chatModerationStatusDataHydration = GetChatModerationStatusDataHydration(false)
 	local friendsChatNavigationStore = GetFriendsChatNavigationStore(false)
 	local friendsChatRealtimeStore = GetFriendsChatRealtimeStore(false)
-	local v3
+	local v5
 
 	if FFlagFriendsChatConversationListFocusNav then
-		v3 = React.useContext(ReactFocusNavigation.FocusNavigationContext)
+		v5 = React.useContext(ReactFocusNavigation.FocusNavigationContext)
 	else
-		v3 = nil
+		v5 = nil
 	end
 
 	if FFlagAppChatReactiveFeatureRestrictions then
@@ -86,7 +113,7 @@ local function FriendsChatMainContent(props)
 		friendsChatRealtimeStore.markFriendsTabEntered()
 	end, { friendsChatRealtimeStore })
 	React.useEffect(function()
-		if FFlagExpChatEnableFriendsTab and not FFlagAppChatReactiveFeatureRestrictions then
+		if not FFlagAppChatReactiveFeatureRestrictions then
 			chatModerationStatusDataHydration.getUserStatus()
 		end
 	end, { chatModerationStatusDataHydration })
@@ -115,19 +142,27 @@ local function FriendsChatMainContent(props)
 
 		if ref.current ~= current then
 			ref.current = current
-			local v4
+			local v6
 
 			if current then
-				v4 = exposureHandler2
+				v6 = exposureHandler2
 			else
-				v4 = exposureHandler
+				v6 = exposureHandler
 			end
 
-			pcall(v4)
+			pcall(v6)
+
+			if FFlagFriendsChatIxpParallelScreenLayers then
+				local v7 = if current then v2 else v
+
+				for _, callback in v7 do
+					pcall(callback)
+				end
+			end
 		end
 	end
 
-	local chatWindowSettings = props.chatWindowSettings or v2
+	local chatWindowSettings = props.chatWindowSettings or v4
 	local parentLayoutOrder = props.parentLayoutOrder or 1
 	local localPlayer = Players.LocalPlayer
 	local userId
@@ -146,31 +181,31 @@ local function FriendsChatMainContent(props)
 			friendsChatRealtimeStore.setActiveConversationId(nil)
 		end
 	end, { friendsChatRealtimeStore, conversationId })
-	local v4
+	local v6
 
 	if FFlagFriendsChatConversationListFocusNav then
-		v4 = React.useCallback(function(): boolean
-			return v3 ~= nil and v3.focusedGuiObject:getValue() ~= nil
-		end, { v3 })
+		v6 = React.useCallback(function(): boolean
+			return v5 ~= nil and v5.focusedGuiObject:getValue() ~= nil
+		end, { v5 })
 	else
-		v4 = nil
+		v6 = nil
 	end
 
 	local onConversationActivated = React.useCallback(function(p: string)
-		if FFlagFriendsChatConversationListFocusNav and v4() or FFlagFriendsChatFocusInputOnConversationActivated then
+		if FFlagFriendsChatConversationListFocusNav and v6() or FFlagFriendsChatFocusInputOnConversationActivated then
 			friendsChatNavigationStore.requestFocusInputBar()
 		end
 
 		friendsChatNavigationStore.setSelectedConversationId(p)
-	end, { friendsChatNavigationStore, v4 })
+	end, { friendsChatNavigationStore, v6 })
 
 	local onBack = React.useCallback(function()
-		if FFlagFriendsChatConversationListFocusNav and v4() then
+		if FFlagFriendsChatConversationListFocusNav and v6() then
 			friendsChatNavigationStore.requestFocusConversationList()
 		end
 
 		friendsChatNavigationStore.setSelectedConversationId(nil)
-	end, { friendsChatNavigationStore, v4 })
+	end, { friendsChatNavigationStore, v6 })
 
 	local onOpenDetails = React.useCallback(function(conversationId2: string)
 		ChatSessionRefCount.reserve()
@@ -206,36 +241,25 @@ local function FriendsChatMainContent(props)
 			})
 		})
 	else
-		local createElement = React.createElement
-
-		local createElement2 = React.createElement
-		local v5 = {
-			conversationId = conversationId,
-			parentLayoutOrder = parentLayoutOrder,
-			chatWindowSettings = chatWindowSettings,
-			transparencyValue = props.transparencyValue,
-			textTransparency = props.textTransparency,
-			isSpatialUIEnabled = props.isSpatialUIEnabled,
-			isChannelBarVisible = props.isChannelBarVisible,
-			onHovered = props.onHovered,
-			onUnhovered = props.onUnhovered,
-			onAbsoluteSizeChanged = props.onAbsoluteSizeChanged,
-			onAbsolutePositionChanged = props.onAbsolutePositionChanged,
-			onBack = onBack,
-			onOpenDetails = 0,
-			onFriendPlaceholderConversationCreated = 0
-		}
-
-		if not getFFlagAppChatEnableRootedNavigation() then
-			onOpenDetails = nil
-		end
-
-		v5.onOpenDetails = onOpenDetails
-		v5.onFriendPlaceholderConversationCreated = onFriendPlaceholderConversationCreated
-		content = createElement(FriendsChatConversationTelemetryProviders, {
+		content = React.createElement(FriendsChatConversationTelemetryProviders, {
 			conversationId = conversationId
 		}, {
-			ConversationWindow = createElement2(FriendsChatConversationWindow, v5)
+			ConversationWindow = React.createElement(FriendsChatConversationWindow, {
+				conversationId = conversationId,
+				parentLayoutOrder = parentLayoutOrder,
+				chatWindowSettings = chatWindowSettings,
+				transparencyValue = props.transparencyValue,
+				textTransparency = props.textTransparency,
+				isSpatialUIEnabled = props.isSpatialUIEnabled,
+				isChannelBarVisible = props.isChannelBarVisible,
+				onHovered = props.onHovered,
+				onUnhovered = props.onUnhovered,
+				onAbsoluteSizeChanged = props.onAbsoluteSizeChanged,
+				onAbsolutePositionChanged = props.onAbsolutePositionChanged,
+				onBack = onBack,
+				onOpenDetails = onOpenDetails,
+				onFriendPlaceholderConversationCreated = onFriendPlaceholderConversationCreated
+			})
 		})
 	end
 
@@ -256,32 +280,24 @@ local function FriendsChatMain(p)
 
 	useAppChatUpdateSession()
 
-	local v = React.useMemo(function()
-		local placement
-
-		if FFlagExpChatEnableFriendsTab then
-			placement = ChatPlacementContext.Enum.InExperienceFriendsTab
-		else
-			placement = ChatPlacementContext.Enum.InExperienceDefault
-		end
-
+	local v3 = React.useMemo(function()
 		return {
 			context = "platformChat",
 			locale = robloxLocaleId,
 			entryPoint = SocialCommon.Enums.ChatEntryPointNames.ExperienceChatTabBar,
 			userId = userId,
-			placement = placement,
+			placement = ChatPlacementContext.Enum.InExperienceFriendsTab,
 			playSessionId = playSessionId,
 			currentSquadId = nil
 		}
 	end, { robloxLocaleId, userId, playSessionId })
 
-	local v2, v3 = useGetAndSetRef(v)
+	local v4, v5 = useGetAndSetRef(v3)
 	React.useEffect(function()
-		v3(v)
-	end, { v, v3 })
+		v5(v3)
+	end, { v3, v5 })
 
-	return React.createElement(AppTelemetryLayer.Provider, { value = v2 }, {
+	return React.createElement(AppTelemetryLayer.Provider, { value = v4 }, {
 		Content = React.createElement(FriendsChatMainContent, p)
 	})
 end

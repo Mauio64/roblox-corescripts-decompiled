@@ -26,6 +26,7 @@ local FFlagRefactorMenuConfirmationButtons = require(RobloxGui.Modules.Settings.
 local defineFastFlag = game:DefineFastFlag("RepositionDropDownScrim", false)
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagUIScaleEngineOptions = SharedFlags.FFlagUIScaleEngineOptions
+local FFlagUIScaleSliderImprovements = require(RobloxGui.Modules.Settings.Flags.FFlagUIScaleSliderImprovements)
 
 local Chrome = RobloxGui.Modules.Chrome
 local Chrome2 = require(CorePackages.Workspace.Packages.Chrome)
@@ -1726,6 +1727,11 @@ local function CreateNewSlider(p, p2, p3, text, text2)
 
 	local v7 = nil
 
+	local v8 = false
+	local v9 = false
+
+	local v10 = nil
+
 	local guid = HttpService:GenerateGUID(false)
 
 	if v4 <= 0 then
@@ -1737,7 +1743,7 @@ local function CreateNewSlider(p, p2, p3, text, text2)
 		return
 	end
 
-	local v8 = text or text2
+	local v11 = text or text2
 
 	local valueChanged = Instance.new("BindableEvent")
 	valueChanged.Name = "ValueChanged"
@@ -1760,7 +1766,7 @@ local function CreateNewSlider(p, p2, p3, text, text2)
 	}
 	local automaticSize
 
-	if v8 then
+	if v11 then
 		automaticSize = Enum.AutomaticSize.Y
 	end
 
@@ -1771,7 +1777,7 @@ local function CreateNewSlider(p, p2, p3, text, text2)
 	v3.SliderFrame = create(slider)
 	local parent2
 
-	if v8 then
+	if v11 then
 		parent2 = Create("Frame")({
 			Name = "StepsAndButtonsContainer",
 			Size = UDim2.new(1, 0, 0, 50),
@@ -1864,7 +1870,7 @@ local function CreateNewSlider(p, p2, p3, text, text2)
 		Parent = 0
 	}
 
-	local parent3 = if v8 then parent2 else v3.SliderFrame
+	local parent3 = if v11 then parent2 else v3.SliderFrame
 	stepsContainer.Parent = parent3
 	v3.StepsContainer = create2(stepsContainer)
 
@@ -1883,7 +1889,7 @@ local function CreateNewSlider(p, p2, p3, text, text2)
 		Parent = 0
 	}
 
-	local parent4 = if v8 then parent2 else v3.SliderFrame
+	local parent4 = if v11 then parent2 else v3.SliderFrame
 	leftButton.Parent = parent4
 	local parent5 = create3(leftButton)
 
@@ -1902,14 +1908,14 @@ local function CreateNewSlider(p, p2, p3, text, text2)
 		Parent = 0
 	}
 
-	if not v8 then
+	if not v11 then
 		parent2 = v3.SliderFrame
 	end
 
 	rightButton.Parent = parent2
 	local parent6 = create4(rightButton)
 
-	local v9 = Create("ImageLabel")({
+	local v12 = Create("ImageLabel")({
 		Name = "LeftButton",
 		BackgroundTransparency = 1,
 		AnchorPoint = Vector2.new(0.5, 0.5),
@@ -1921,7 +1927,7 @@ local function CreateNewSlider(p, p2, p3, text, text2)
 		ImageColor3 = isTouchInput() and color4 or color3 -- inferred equivalent call
 	})
 
-	local v10 = Create("ImageLabel")({
+	local v13 = Create("ImageLabel")({
 		Name = "RightButton",
 		BackgroundTransparency = 1,
 		AnchorPoint = Vector2.new(0.5, 0.5),
@@ -1941,13 +1947,13 @@ local function CreateNewSlider(p, p2, p3, text, text2)
 			p4.ImageColor3 = color4
 		end
 
-		addHoverState(parent5, v9, fn, fn2)
-		addHoverState(parent6, v10, fn, fn2)
+		addHoverState(parent5, v12, fn, fn2)
+		addHoverState(parent6, v13, fn, fn2)
 	end
 
 	v3.Steps = {}
 
-	local v11 = 1 / v4
+	local v14 = 1 / v4
 
 	for i = 1, v4 do
 		local parent = Create("ImageButton")({
@@ -1958,8 +1964,8 @@ local function CreateNewSlider(p, p2, p3, text, text2)
 			AutoButtonColor = false,
 			Active = false,
 			AnchorPoint = Vector2.new(0, 0.5),
-			Position = UDim2.new((i - 1) * v11, 2, 0.5, 0),
-			Size = UDim2.new(v11, -4, 0, 24),
+			Position = UDim2.new((i - 1) * v14, 2, 0.5, 0),
+			Size = UDim2.new(v14, -4, 0, 24),
 			Image = "",
 			ZIndex = 3,
 			Selectable = false,
@@ -2017,7 +2023,7 @@ local function CreateNewSlider(p, p2, p3, text, text2)
 			end
 
 			if FFlagUIScaleEngineOptions and v7 then
-				if v7[i] or i == value then
+				if v7[i] or i == value and not FFlagUIScaleSliderImprovements then
 					v3.Steps[i].BackgroundTransparency = 0
 					v3.Steps[i].BackgroundColor3 = color
 				end
@@ -2032,29 +2038,29 @@ local function CreateNewSlider(p, p2, p3, text, text2)
 	end
 
 	local function updateEnabledArrows() -- 3 equivalent calls inferred from this helper
-		local v12 = false
-		local v13 = false
+		local v15 = false
+		local v16 = false
 
-		for k, v14 in v7 do
-			if not v14 then
+		for k, v17 in v7 do
+			if not v17 then
 				continue
 			end
 
-			v12 = v12 or k < value
-			v13 = v13 or value < k
+			v15 = v15 or k < value
+			v16 = v16 or value < k
 		end
 
-		parent5.Visible = v6 and v12
-		parent6.Visible = v6 and v13
+		parent5.Visible = v6 and v15
+		parent6.Visible = v6 and v16
 	end
 
 	local function setCurrentStep(value2, p4)
 		if FFlagUIScaleEngineOptions and v7 and not p4 and value2 ~= value then
 			value2 = math.clamp(value2, 1, v4)
-			local v12 = if value2 < value then -1 else 1
+			local v15 = if value2 < value then -1 else 1
 
 			while not v7[value2] do
-				value2 += v12
+				value2 += v15
 
 				if value2 < 1 or v4 < value2 then
 					return
@@ -2095,11 +2101,30 @@ local function CreateNewSlider(p, p2, p3, text, text2)
 
 			lastTime = tick()
 
-			if valueChanged2 then
+			if FFlagUIScaleSliderImprovements and v8 then
+				v9 = true
+			elseif valueChanged2 then
 				valueChanged2:fire(value)
 			else
 				valueChanged:Fire(value)
 			end
+		end
+	end
+
+	local function endDeferredValueChanged() -- 3 equivalent calls inferred from this helper
+		v8 = false
+		v10 = nil
+
+		if not v9 then
+			return
+		end
+
+		v9 = false
+
+		if valueChanged2 then
+			valueChanged2:fire(value)
+		else
+			valueChanged:Fire(value)
 		end
 	end
 
@@ -2117,7 +2142,7 @@ local function CreateNewSlider(p, p2, p3, text, text2)
 		end
 	end
 
-	local function mouseDownFunc(input, p4, p5) -- 2 equivalent calls inferred from this helper
+	local function mouseDownFunc(input, p4, p5)
 		if
 			not v6
 			or FFlagUIScaleEngineOptions and v7 and not (p5 or v7[p4])
@@ -2129,6 +2154,27 @@ local function CreateNewSlider(p, p2, p3, text, text2)
 
 		if usesSelectedObject() and not VRService.VREnabled then -- inferred equivalent call
 			GuiService.SelectedCoreObject = v3.SliderFrame
+		end
+
+		if FFlagUIScaleSliderImprovements and input ~= v10 then
+			endDeferredValueChanged() -- inferred equivalent call
+			local v15 = FFlagUIScaleEngineOptions
+
+			if v15 then
+				if v7 == nil then
+					v15 = false
+				else
+					v15 = not (p5 or VRService.VREnabled)
+				end
+			end
+
+			v8 = v15
+
+			if not v8 then
+				input = nil
+			end
+
+			v10 = input
 		end
 
 		if VRService.VREnabled then
@@ -2175,6 +2221,10 @@ local function CreateNewSlider(p, p2, p3, text, text2)
 				v5 = 0
 				inputEndedConnection:Disconnect()
 				inputChangedConnection:Disconnect()
+
+				if FFlagUIScaleSliderImprovements and v8 then
+					endDeferredValueChanged() -- inferred equivalent call
+				end
 			end)
 		end
 
@@ -2242,11 +2292,11 @@ local function CreateNewSlider(p, p2, p3, text, text2)
 				filler:Destroy()
 			end
 
-			local v12 = v6 and p4[k]
+			local v15 = v6 and p4[k]
 
 			step.BackgroundTransparency = (p4[k] or k == value) and 0 or 0.8
-			step.Active = VRService.VREnabled and v12
-			step.Selectable = VRService.VREnabled and v12
+			step.Active = VRService.VREnabled and v15
+			step.Selectable = VRService.VREnabled and v15
 		end
 
 		hideSelection()
@@ -2269,8 +2319,8 @@ local function CreateNewSlider(p, p2, p3, text, text2)
 	function v3:SetZIndex(zIndex)
 		parent5.ZIndex = zIndex
 		parent6.ZIndex = zIndex
-		v9.ZIndex = zIndex
-		v10.ZIndex = zIndex
+		v12.ZIndex = zIndex
+		v13.ZIndex = zIndex
 
 		for i = 1, #v3.Steps do
 			v3.Steps[i].ZIndex = zIndex
@@ -2294,13 +2344,13 @@ local function CreateNewSlider(p, p2, p3, text, text2)
 	end
 
 	parent5.InputBegan:Connect(function(input)
-		mouseDownFunc(input, value - 1, true) -- inferred equivalent call
+		mouseDownFunc(input, value - 1, true)
 	end)
 	parent5.InputEnded:Connect(function(input)
 		mouseUpFunc(input) -- inferred equivalent call
 	end)
 	parent6.InputBegan:Connect(function(input)
-		mouseDownFunc(input, value + 1, true) -- inferred equivalent call
+		mouseDownFunc(input, value + 1, true)
 	end)
 	parent6.InputEnded:Connect(function(input)
 		mouseUpFunc(input) -- inferred equivalent call
@@ -2318,9 +2368,9 @@ local function CreateNewSlider(p, p2, p3, text, text2)
 
 			for i = 1, v4 do
 				if FFlagUIScaleEngineOptions and v7 then
-					local v12 = v6 and v7[i]
-					v3.Steps[i].Selectable = v12
-					v3.Steps[i].Active = v12
+					local v15 = v6 and v7[i]
+					v3.Steps[i].Selectable = v15
+					v3.Steps[i].Active = v15
 				else
 					v3.Steps[i].Selectable = v6
 					v3.Steps[i].Active = v6
@@ -2382,9 +2432,9 @@ local function CreateNewSlider(p, p2, p3, text, text2)
 		end
 	end
 
-	local v12 = true
+	local v15 = true
 
-	local v13 = {
+	local v16 = {
 		[Enum.KeyCode.Thumbstick1] = true,
 		[Enum.KeyCode.DPadLeft] = -1,
 		[Enum.KeyCode.DPadRight] = 1,
@@ -2398,7 +2448,7 @@ local function CreateNewSlider(p, p2, p3, text, text2)
 	UserInputService.InputBegan:Connect(function(input)
 		if
 			not v6
-			or not v12
+			or not v15
 			or input.UserInputType ~= Enum.UserInputType.Gamepad1 and input.UserInputType ~= Enum.UserInputType.Keyboard
 		then
 			return
@@ -2410,10 +2460,14 @@ local function CreateNewSlider(p, p2, p3, text, text2)
 			return
 		end
 
-		if v13[input.KeyCode] == -1 then
+		if FFlagUIScaleSliderImprovements and v8 and v16[input.KeyCode] then
+			endDeferredValueChanged() -- inferred equivalent call
+		end
+
+		if v16[input.KeyCode] == -1 then
 			v5 = -1
 			setCurrentStep(value - 1)
-		elseif v13[input.KeyCode] == 1 then
+		elseif v16[input.KeyCode] == 1 then
 			v5 = 1
 			setCurrentStep(value + 1)
 		end
@@ -2429,7 +2483,7 @@ local function CreateNewSlider(p, p2, p3, text, text2)
 
 		local selectedCoreObject = GuiService.SelectedCoreObject
 
-		if selectedCoreObject and selectedCoreObject:IsDescendantOf(v3.SliderFrame.Parent) and v13[input.KeyCode] then
+		if selectedCoreObject and selectedCoreObject:IsDescendantOf(v3.SliderFrame.Parent) and v16[input.KeyCode] then
 			v5 = 0
 		end
 	end)
@@ -2440,7 +2494,7 @@ local function CreateNewSlider(p, p2, p3, text, text2)
 			return
 		end
 
-		if not v12 then
+		if not v15 then
 			v5 = 0
 			return
 		end
@@ -2487,7 +2541,7 @@ local function CreateNewSlider(p, p2, p3, text, text2)
 	end)
 
 	v3.SliderFrame.AncestryChanged:Connect(function(_, parent)
-		v12 = parent
+		v15 = parent
 	end)
 
 	setCurrentStep(value)

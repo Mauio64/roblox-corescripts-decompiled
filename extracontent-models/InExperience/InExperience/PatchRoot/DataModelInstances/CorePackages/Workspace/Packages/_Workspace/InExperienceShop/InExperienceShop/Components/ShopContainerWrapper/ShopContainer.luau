@@ -46,10 +46,15 @@ local function ShopContainer(p)
 			submitFreeTrialBlueDot.dismiss()
 		end
 
+		local NotificationsOrchestrator = require(parent.NotificationsOrchestrator)
+		NotificationsOrchestrator.setInExperienceShopOpen(true)
 		task.spawn(function()
 			ShopDebugLogger.log("ShopContainer: calling onShopOpened")
 			v2.onShopOpened()
 		end)
+		return function()
+			NotificationsOrchestrator.setInExperienceShopOpen(false)
+		end
 	end, { v2.onShopOpened, v2.getCategories })
 
 	local v3 = useShopViewModel(p)

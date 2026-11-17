@@ -195,7 +195,13 @@ function class.new(data)
 		is_community_licensed = data.is_community_licensed
 	end
 
-	return (setmetatable({
+	local summary
+
+	if not (data == nil or data.summary == nil) then
+		summary = data.summary
+	end
+
+	local v2 = {
 		id = id,
 		name = name,
 		description = description,
@@ -226,8 +232,11 @@ function class.new(data)
 		creation_source = creation_source,
 		promotional_text = promotional_text,
 		moment_video_asset_id = moment_video_asset_id,
-		is_community_licensed = is_community_licensed
-	}, class))
+		is_community_licensed = is_community_licensed,
+		summary = summary,
+		tags = (data == nil or data.tags == nil) and {} or data.tags
+	}
+	return (setmetatable(v2, class))
 end
 
 function class.encode(data)
@@ -389,6 +398,18 @@ function class.encode(data)
 		v2, v3 = proto.writeVarInt(v4, v5, data.is_community_licensed and 1 or 0)
 	end
 
+	if data.summary ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 32, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.summary)
+	end
+
+	if data.tags ~= nil and #data.tags > 0 then
+		for _, tag in data.tags do
+			local v4, v5 = proto.writeTag(v2, v3, 33, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeString(v4, v5, tag)
+		end
+	end
+
 	local buf = buffer.create(v3)
 	buffer.copy(buf, 0, v2, 0, v3)
 	return buf
@@ -532,6 +553,14 @@ function class.decode(buf: buffer)
 				local v5
 				v5, v2 = proto.readBuffer(buf, v2)
 				result.promotional_text = buffer.tostring(v5)
+			elseif v3 == 32 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.summary = buffer.tostring(v5)
+			elseif v3 == 33 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				table.insert(result.tags, buffer.tostring(v5))
 			else
 				local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -677,6 +706,22 @@ function class.jsonEncode(data)
 	if data.is_community_licensed ~= nil then
 		v2.isCommunityLicensed = data.is_community_licensed
 	end
+
+	if data.summary ~= nil then
+		v2.summary = data.summary
+	end
+
+	if data.tags == nil or not (#data.tags > 0) then
+		return v2
+	end
+
+	local tags = {}
+
+	for _, tag in data.tags do
+		table.insert(tags, tag)
+	end
+
+	v2.tags = tags
 
 	return v2
 end
@@ -919,6 +964,22 @@ function class.jsonDecode(data)
 	if data.isCommunityLicensed ~= nil then
 		v2.is_community_licensed = data.isCommunityLicensed
 	end
+
+	if data.summary ~= nil then
+		v2.summary = data.summary
+	end
+
+	if data.tags == nil then
+		return v2
+	end
+
+	local tags = {}
+
+	for _, tag in data.tags do
+		table.insert(tags, tag)
+	end
+
+	v2.tags = tags
 
 	return v2
 end

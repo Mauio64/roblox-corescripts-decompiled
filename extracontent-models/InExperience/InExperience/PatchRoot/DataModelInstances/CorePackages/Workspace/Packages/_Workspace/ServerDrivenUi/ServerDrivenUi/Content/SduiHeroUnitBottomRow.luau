@@ -5,7 +5,6 @@ local React = require(parent.React)
 local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local SharedFlags = require(parent.SharedFlags)
 local FFlagLuaAppAlignHeroUnitBottomRowCtaButton = SharedFlags.FFlagLuaAppAlignHeroUnitBottomRowCtaButton
@@ -33,24 +32,24 @@ local function SduiHeroUnitBottomRow(props)
 		color3 = v.Color.Extended.Gray.Gray_400.Color3
 	end
 
-	local fontSize, size_400, v3, v4, fontFace
+	local fontSize, size_400, v3, fontFace, fontFace2
 
 	if FFlagLuaAppHeroUnitSecondaryLabelText then
 		fontSize = v2.FontSize
 		size_400 = v.Size.Size_400
 		v3 = v.Size.Size_2500 * 3
-		v4 = React.useMemo(function()
+		fontFace = React.useMemo(function()
 			return (normalizeFontFace(v2.Font))
 		end, { v2.Font })
-		fontFace = React.useMemo(function()
-			local v5 = v4
-			return Font.new(v5.Family, Enum.FontWeight.SemiBold, v5.Style)
-		end, { v4 })
+		fontFace2 = React.useMemo(function()
+			local v4 = fontFace
+			return Font.new(v4.Family, Enum.FontWeight.SemiBold, v4.Style)
+		end, { fontFace })
 	else
 		fontSize = nil
 		size_400 = nil
+		fontFace2 = nil
 		fontFace = nil
-		v4 = nil
 		v3 = nil
 	end
 
@@ -73,130 +72,87 @@ local function SduiHeroUnitBottomRow(props)
 			return nil
 		end
 
-		if FFlagLuaAppHeroUnitSecondaryLabelText then
-			local labelText = props.labelText
-			local secondaryLabelText = props.secondaryLabelText
-			local textSize = fontSize
-			local v5 = size_400
-			local createElement = React.createElement
-			local v6 = {
-				AutomaticSize = Enum.AutomaticSize.Y,
-				Size = UDim2.new(1, 0, 0, 0),
-				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
-				AnchorPoint = Vector2.new(1, 1),
-				Position = UDim2.new(1, 0, 1, 0)
-			}
-			local v7 = {
-				UIListLayout = React.createElement("UIListLayout", {
-					FillDirection = Enum.FillDirection.Vertical,
-					HorizontalAlignment = Enum.HorizontalAlignment.Right,
-					SortOrder = Enum.SortOrder.LayoutOrder
-				}),
-				MaturityLabel = 0,
-				SecondaryLabel = 0
-			}
-			local maturityLabel
-
-			if labelText and labelText ~= "" then
-				maturityLabel = React.createElement("TextLabel", {
-					AutomaticSize = Enum.AutomaticSize.X,
-					Size = UDim2.new(0, 0, 0, v2.FontSize * v2.LineHeight),
-					BackgroundTransparency = 1,
-					LayoutOrder = 1,
-					Text = labelText,
-					TextSize = v2.FontSize,
-					FontFace = fontFace,
-					TextColor3 = color3,
-					TextXAlignment = Enum.TextXAlignment.Right,
-					TextTruncate = Enum.TextTruncate.SplitWord
-				})
-			end
-
-			v7.MaturityLabel = maturityLabel
-			local secondaryLabel
-
-			if secondaryLabelText and secondaryLabelText ~= "" then
-				local createElement2 = React.createElement
-				local v8 = {
-					AutomaticSize = Enum.AutomaticSize.Y,
-					Size = UDim2.new(1, 0, 0, v5),
-					BackgroundTransparency = 1,
-					LayoutOrder = 2,
-					Text = secondaryLabelText,
-					TextSize = textSize,
-					LineHeight = v2.LineHeight,
-					Font = 0,
-					FontFace = 0,
-					TextColor3 = 0,
-					TextXAlignment = 0,
-					TextWrapped = true,
-					TextTruncate = 0
-				}
-				local font
-
-				if not FoundationFontFaceMigration then
-					font = v2.Font
-				end
-
-				v8.Font = font
-				local fontFace2
-
-				if FoundationFontFaceMigration then
-					fontFace2 = v4
-				end
-
-				v8.FontFace = fontFace2
-				v8.TextColor3 = color3
-				v8.TextXAlignment = Enum.TextXAlignment.Right
-
-				v8.TextTruncate = Enum.TextTruncate.SplitWord
-				secondaryLabel = createElement2("TextLabel", v8, {
-					UISizeConstraint = React.createElement("UISizeConstraint", {
-						MaxSize = Vector2.new(v3, (math.max(v5, textSize * v2.LineHeight * 2)))
-					})
-				})
-			end
-
-			v7.SecondaryLabel = secondaryLabel
-			return createElement("Frame", v6, v7)
-		else
-			local createElement = React.createElement
-			local v5 = {
+		if not FFlagLuaAppHeroUnitSecondaryLabelText then
+			return React.createElement("TextLabel", {
 				AutomaticSize = Enum.AutomaticSize.X,
 				Size = UDim2.new(0, 0, 0, v2.FontSize * v2.LineHeight),
 				BackgroundTransparency = 1,
 				Text = props.labelText,
 				TextSize = v2.FontSize,
-				Font = 0,
-				FontFace = 0,
-				TextColor3 = 0,
-				TextXAlignment = 0,
-				TextTruncate = 0,
-				AnchorPoint = 0,
-				Position = 0
-			}
-			local font
-
-			if not FoundationFontFaceMigration then
-				font = v2.Font
-			end
-
-			v5.Font = font
-			local fontFace2
-
-			if FoundationFontFaceMigration then
-				fontFace2 = normalizeFontFace(v2.Font)
-			end
-
-			v5.FontFace = fontFace2
-			v5.TextColor3 = color3
-			v5.TextXAlignment = Enum.TextXAlignment.Right
-			v5.TextTruncate = Enum.TextTruncate.SplitWord
-			v5.AnchorPoint = Vector2.new(1, 1)
-			v5.Position = UDim2.new(1, 0, 1, 0)
-			return createElement("TextLabel", v5)
+				FontFace = normalizeFontFace(v2.Font),
+				TextColor3 = color3,
+				TextXAlignment = Enum.TextXAlignment.Right,
+				TextTruncate = Enum.TextTruncate.SplitWord,
+				AnchorPoint = Vector2.new(1, 1),
+				Position = UDim2.new(1, 0, 1, 0)
+			})
 		end
+
+		local labelText = props.labelText
+		local secondaryLabelText = props.secondaryLabelText
+		local textSize = fontSize
+		local v4 = size_400
+		local createElement = React.createElement
+		local v5 = {
+			AutomaticSize = Enum.AutomaticSize.Y,
+			Size = UDim2.new(1, 0, 0, 0),
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			AnchorPoint = Vector2.new(1, 1),
+			Position = UDim2.new(1, 0, 1, 0)
+		}
+		local v6 = {
+			UIListLayout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				HorizontalAlignment = Enum.HorizontalAlignment.Right,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			MaturityLabel = 0,
+			SecondaryLabel = 0
+		}
+		local maturityLabel
+
+		if labelText and labelText ~= "" then
+			maturityLabel = React.createElement("TextLabel", {
+				AutomaticSize = Enum.AutomaticSize.X,
+				Size = UDim2.new(0, 0, 0, v2.FontSize * v2.LineHeight),
+				BackgroundTransparency = 1,
+				LayoutOrder = 1,
+				Text = labelText,
+				TextSize = v2.FontSize,
+				FontFace = fontFace2,
+				TextColor3 = color3,
+				TextXAlignment = Enum.TextXAlignment.Right,
+				TextTruncate = Enum.TextTruncate.SplitWord
+			})
+		end
+
+		v6.MaturityLabel = maturityLabel
+		local secondaryLabel
+
+		if secondaryLabelText and secondaryLabelText ~= "" then
+			secondaryLabel = React.createElement("TextLabel", {
+				AutomaticSize = Enum.AutomaticSize.Y,
+				Size = UDim2.new(1, 0, 0, v4),
+				BackgroundTransparency = 1,
+				LayoutOrder = 2,
+				Text = secondaryLabelText,
+				TextSize = textSize,
+				LineHeight = v2.LineHeight,
+				FontFace = fontFace,
+				TextColor3 = color3,
+				TextXAlignment = Enum.TextXAlignment.Right,
+				TextWrapped = true,
+				TextTruncate = Enum.TextTruncate.SplitWord
+			}, {
+				UISizeConstraint = React.createElement("UISizeConstraint", {
+					MaxSize = Vector2.new(v3, (math.max(v4, textSize * v2.LineHeight * 2)))
+				})
+			})
+		end
+
+		v6.SecondaryLabel = secondaryLabel
+		return createElement("Frame", v5, v6)
 	end
 
 	local rightLabelContent = props.rightLabelContent
@@ -207,34 +163,34 @@ local function SduiHeroUnitBottomRow(props)
 		secondaryLabelText = props.secondaryLabelText
 	end
 
+	local v4
+
+	if FFlagLuaAppHeroUnitSecondaryLabelText then
+		v4 = fontSize
+	end
+
 	local v5
 
 	if FFlagLuaAppHeroUnitSecondaryLabelText then
-		v5 = fontSize
+		v5 = size_400
 	end
 
 	local v6
 
 	if FFlagLuaAppHeroUnitSecondaryLabelText then
-		v6 = size_400
+		v6 = v3
 	end
 
 	local v7
 
 	if FFlagLuaAppHeroUnitSecondaryLabelText then
-		v7 = v3
+		v7 = fontFace
 	end
 
 	local v8
 
 	if FFlagLuaAppHeroUnitSecondaryLabelText then
-		v8 = v4
-	end
-
-	local v9
-
-	if FFlagLuaAppHeroUnitSecondaryLabelText then
-		v9 = fontFace
+		v8 = fontFace2
 	end
 
 	local label = useMemo(fn, {
@@ -243,15 +199,15 @@ local function SduiHeroUnitBottomRow(props)
 		v2,
 		color3,
 		secondaryLabelText,
+		v4,
 		v5,
 		v6,
 		v7,
-		v8,
-		v9
+		v8
 	})
 
 	local createElement = React.createElement
-	local v10 = {
+	local v9 = {
 		["Size"] = UDim2.new(1, 0, 0, v.Size.Size_1000),
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
@@ -261,16 +217,16 @@ local function SduiHeroUnitBottomRow(props)
 	}
 
 	local tag = React.Tag
-	local v11
+	local v10
 
 	if props.testId then
-		v11 = `data-testid={props.testId}`
+		v10 = `data-testid={props.testId}`
 	end
 
-	v10[tag] = v11
+	v9[tag] = v10
 
 	local createElement2 = React.createElement
-	local v12 = {
+	local v11 = {
 		FillDirection = Enum.FillDirection.Horizontal,
 		VerticalAlignment = Enum.VerticalAlignment.Bottom,
 		HorizontalAlignment = Enum.HorizontalAlignment.Left,
@@ -285,9 +241,9 @@ local function SduiHeroUnitBottomRow(props)
 		itemLineAlignment = Enum.ItemLineAlignment.Center
 	end
 
-	v12.ItemLineAlignment = itemLineAlignment
+	v11.ItemLineAlignment = itemLineAlignment
 	local children = {
-		UIListLayout = createElement2("UIListLayout", v12),
+		UIListLayout = createElement2("UIListLayout", v11),
 		CTAButtonContainer = 0,
 		LabelContainer = 0
 	}
@@ -323,7 +279,7 @@ local function SduiHeroUnitBottomRow(props)
 			Label = label
 		}
 	)
-	return createElement("Frame", v10, children)
+	return createElement("Frame", v9, children)
 end
 
 return React.memo(SduiHeroUnitBottomRow)

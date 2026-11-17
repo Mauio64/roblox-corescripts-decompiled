@@ -261,10 +261,8 @@ local function purchaseItem()
 					local v8
 
 					if FFlagEnablePurchasePayloadInExperienceShop then
-						v8 = mergeOfferIdsIntoPurchasePayload(
-							state2.productPayload and state2.productPayload.purchasePayload,
-							v6
-						)
+						local purchasePayload = state2.productPayload and state2.productPayload.purchasePayload
+						v8 = mergeOfferIdsIntoPurchasePayload(purchasePayload, v6)
 					end
 
 					if not FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow then

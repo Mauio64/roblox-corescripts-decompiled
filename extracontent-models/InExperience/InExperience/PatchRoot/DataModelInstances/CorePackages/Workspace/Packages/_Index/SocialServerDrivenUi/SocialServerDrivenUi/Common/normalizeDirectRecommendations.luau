@@ -1,12 +1,11 @@
 local parent = script:FindFirstAncestor("SocialServerDrivenUi").Parent
 
 require(parent.PYMKCarousel)
-local RecommendationsStore = require(parent.RecommendationsStore)
 local FriendsRecommendations = require(parent.DataHydration.FriendsRecommendations)
 local ContextType = FriendsRecommendations.Enums.ContextType
 local FFlagShowClassmatesOnPYMK = require(parent.SharedFlags.FFlagShowClassmatesOnPYMK)
 
-local RecommendationType = RecommendationsStore.FriendRecommendations.RecommendationType
+local RecommendationType = FriendsRecommendations.FriendRecommendations.RecommendationType
 
 local function normalizeDirectRecommendations(items, p)
 	local directRecommendations = {}

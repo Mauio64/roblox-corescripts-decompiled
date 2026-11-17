@@ -1,1 +1,0 @@
-return game:DefineFastFlag("UFRImprovements4", false)

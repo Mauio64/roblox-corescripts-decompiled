@@ -42,15 +42,13 @@ function Oklab.toColor3(vector3: Vector3)
 end
 
 function Oklab.lerp(color: Color3, color2: Color3, p: number)
-	local clamped = vector.clamp(
-		toSrgb(vector.lerp(
-			fromSrgb(vector.create(color.R, color.G, color.B)), -- inferred equivalent call
-			fromSrgb(vector.create(color2.R, color2.G, color2.B)), -- inferred equivalent call
-			p
-		)),
-		Vector3.new(0, 0, 0),
-		Vector3.new(1, 1, 1)
+	local lerped = vector.lerp(
+		fromSrgb(vector.create(color.R, color.G, color.B)), -- inferred equivalent call
+		fromSrgb(vector.create(color2.R, color2.G, color2.B)), -- inferred equivalent call
+		p
 	)
+
+	local clamped = vector.clamp(toSrgb(lerped), Vector3.new(0, 0, 0), Vector3.new(1, 1, 1))
 	return Color3.new(clamped.x, clamped.y, clamped.z)
 end
 

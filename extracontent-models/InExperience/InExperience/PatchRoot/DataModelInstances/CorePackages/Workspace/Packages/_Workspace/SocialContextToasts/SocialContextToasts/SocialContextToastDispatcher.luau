@@ -29,20 +29,17 @@ local Http = require(parent.Http)
 local DEPRECATED_FriendsGetFriendStatuses = Http.Requests.DEPRECATED_FriendsGetFriendStatuses
 
 local SharedFlags2 = require(parent.SharedFlags)
-local GetFFlagSocialContextToastEventStream = SharedFlags2.GetFFlagSocialContextToastEventStream
+local GetFFlagEnableReferredPlayerJoinRemoteEvent = SharedFlags2.GetFFlagEnableReferredPlayerJoinRemoteEvent
 
 local SharedFlags3 = require(parent.SharedFlags)
-local GetFFlagEnableReferredPlayerJoinRemoteEvent = SharedFlags3.GetFFlagEnableReferredPlayerJoinRemoteEvent
-
+local GetFFlagEnableReferredPlayerJoinRemoteEventForAll = SharedFlags3.GetFFlagEnableReferredPlayerJoinRemoteEventForAll
 local SharedFlags4 = require(parent.SharedFlags)
-local GetFFlagEnableReferredPlayerJoinRemoteEventForAll = SharedFlags4.GetFFlagEnableReferredPlayerJoinRemoteEventForAll
+local GetFIntMaxReferredPlayerJoinToasts = SharedFlags4.GetFIntMaxReferredPlayerJoinToasts
 local SharedFlags5 = require(parent.SharedFlags)
-local GetFIntMaxReferredPlayerJoinToasts = SharedFlags5.GetFIntMaxReferredPlayerJoinToasts
-local SharedFlags6 = require(parent.SharedFlags)
-local FFlagEnablePartyNudgeAfterJoin = SharedFlags6.FFlagEnablePartyNudgeAfterJoin
+local FFlagEnablePartyNudgeAfterJoin = SharedFlags5.FFlagEnablePartyNudgeAfterJoin
 
-local SharedFlags7 = require(parent.SharedFlags)
-local FFlagShowFriendJoinedYouToastForNonReferredJoins = SharedFlags7.FFlagShowFriendJoinedYouToastForNonReferredJoins
+local SharedFlags6 = require(parent.SharedFlags)
+local FFlagShowFriendJoinedYouToastForNonReferredJoins = SharedFlags6.FFlagShowFriendJoinedYouToastForNonReferredJoins
 
 local defineFastInt = game:DefineFastInt("SocialContextToastDelay", 10)
 
@@ -104,16 +101,13 @@ local function showYouJoinedFriendsToast(services, callback, followUserId, ids, 
 	end
 
 	services.analytics.Diag:reportCounter(SocialContextToastDiagKeys.YouJoinedFriends, 1)
-
-	if GetFFlagSocialContextToastEventStream() then
-		SocialContextToastEvents(services.eventIngest, {
-			toastType = ToastTypes.YouJoinedFriends,
-			friendId = table.concat(ids, ","),
-			universeId = gameId,
-			placeId = placeId,
-			actionType = SocialContextToastAnalyticsActionTypes.Shown
-		})
-	end
+	SocialContextToastEvents(services.eventIngest, {
+		toastType = ToastTypes.YouJoinedFriends,
+		friendId = table.concat(ids, ","),
+		universeId = gameId,
+		placeId = placeId,
+		actionType = SocialContextToastAnalyticsActionTypes.Shown
+	})
 
 	if followUserId > 0 and p then
 		ids = Cryo.List.removeValue(ids, followUserId)
@@ -137,16 +131,13 @@ local function handleFollowedPlayerDisconnected(services, callback, followUserId
 
 		if tostring(universeId) == tostring(gameId) then
 			analytics.Diag:reportCounter(SocialContextToastDiagKeys.FollowedFriendInOtherPlace, 1)
-
-			if GetFFlagSocialContextToastEventStream() then
-				SocialContextToastEvents(services.eventIngest, {
-					toastType = ToastTypes.FriendInNonRootPlace,
-					friendId = tostring(followUserId),
-					universeId = gameId,
-					placeId = placeId,
-					actionType = SocialContextToastAnalyticsActionTypes.Shown
-				})
-			end
+			SocialContextToastEvents(services.eventIngest, {
+				toastType = ToastTypes.FriendInNonRootPlace,
+				friendId = tostring(followUserId),
+				universeId = gameId,
+				placeId = placeId,
+				actionType = SocialContextToastAnalyticsActionTypes.Shown
+			})
 
 			return getNames(services.apolloClient, { followUserId }):andThen(function(list)
 				if #list == 0 then
@@ -161,29 +152,23 @@ local function handleFollowedPlayerDisconnected(services, callback, followUserId
 			end)
 		elseif universeId == nil then
 			analytics.Diag:reportCounter(SocialContextToastDiagKeys.FollowedFriendNotInGame, 1)
+			SocialContextToastEvents(services.eventIngest, {
+				toastType = ToastTypes.InviteBack,
+				friendId = tostring(followUserId),
+				universeId = gameId,
+				placeId = placeId,
+				actionType = SocialContextToastAnalyticsActionTypes.Shown
+			})
 
-			if GetFFlagSocialContextToastEventStream() then
+			local function onInviteBackButtonClick()
+				analytics.Diag:reportCounter(SocialContextToastDiagKeys.InviteBackButtonClicked, 1)
 				SocialContextToastEvents(services.eventIngest, {
 					toastType = ToastTypes.InviteBack,
 					friendId = tostring(followUserId),
 					universeId = gameId,
 					placeId = placeId,
-					actionType = SocialContextToastAnalyticsActionTypes.Shown
+					actionType = SocialContextToastAnalyticsActionTypes.ButtonClicked
 				})
-			end
-
-			local function onInviteBackButtonClick()
-				analytics.Diag:reportCounter(SocialContextToastDiagKeys.InviteBackButtonClicked, 1)
-
-				if GetFFlagSocialContextToastEventStream() then
-					SocialContextToastEvents(services.eventIngest, {
-						toastType = ToastTypes.InviteBack,
-						friendId = tostring(followUserId),
-						universeId = gameId,
-						placeId = placeId,
-						actionType = SocialContextToastAnalyticsActionTypes.ButtonClicked
-					})
-				end
 
 				PostSendExperienceInvite(
 					services.networking,
@@ -214,16 +199,13 @@ local function handleFollowedPlayerDisconnected(services, callback, followUserId
 			end)
 		else
 			analytics.Diag:reportCounter(SocialContextToastDiagKeys.FollowedFriendInOtherUniverse, 1)
-
-			if GetFFlagSocialContextToastEventStream() then
-				SocialContextToastEvents(services.eventIngest, {
-					toastType = ToastTypes.FollowYourFriend,
-					friendId = tostring(followUserId),
-					universeId = gameId,
-					placeId = placeId,
-					actionType = SocialContextToastAnalyticsActionTypes.Shown
-				})
-			end
+			SocialContextToastEvents(services.eventIngest, {
+				toastType = ToastTypes.FollowYourFriend,
+				friendId = tostring(followUserId),
+				universeId = gameId,
+				placeId = placeId,
+				actionType = SocialContextToastAnalyticsActionTypes.Shown
+			})
 
 			local function closeCallback(p2)
 				if not p2 then
@@ -232,16 +214,13 @@ local function handleFollowedPlayerDisconnected(services, callback, followUserId
 				end
 
 				analytics.Diag:reportCounter(SocialContextToastDiagKeys.ConfirmLeaveGameButtonClicked, 1)
-
-				if GetFFlagSocialContextToastEventStream() then
-					SocialContextToastEvents(services.eventIngest, {
-						toastType = "LeaveGameConfirmationModal",
-						friendId = tostring(followUserId),
-						universeId = gameId,
-						placeId = placeId,
-						actionType = SocialContextToastAnalyticsActionTypes.ButtonClicked
-					})
-				end
+				SocialContextToastEvents(services.eventIngest, {
+					toastType = "LeaveGameConfirmationModal",
+					friendId = tostring(followUserId),
+					universeId = gameId,
+					placeId = placeId,
+					actionType = SocialContextToastAnalyticsActionTypes.ButtonClicked
+				})
 
 				JoinExperience(
 					string.format("roblox://userid=%s&placeid=%s", tostring(followUserId), userPresence.placeId),
@@ -251,16 +230,13 @@ local function handleFollowedPlayerDisconnected(services, callback, followUserId
 
 			local function onJoinFriendButtonClick()
 				analytics.Diag:reportCounter(SocialContextToastDiagKeys.JoinFriendButtonClicked, 1)
-
-				if GetFFlagSocialContextToastEventStream() then
-					SocialContextToastEvents(services.eventIngest, {
-						toastType = ToastTypes.FollowYourFriend,
-						friendId = tostring(followUserId),
-						universeId = gameId,
-						placeId = placeId,
-						actionType = SocialContextToastAnalyticsActionTypes.ButtonClicked
-					})
-				end
+				SocialContextToastEvents(services.eventIngest, {
+					toastType = ToastTypes.FollowYourFriend,
+					friendId = tostring(followUserId),
+					universeId = gameId,
+					placeId = placeId,
+					actionType = SocialContextToastAnalyticsActionTypes.ButtonClicked
+				})
 
 				callback(SetConfirmationModal(true, closeCallback))
 			end
@@ -359,16 +335,13 @@ function SocialContextToastDispatcher(data)
 
 			if success and result then
 				analytics.Diag:reportCounter(SocialContextToastDiagKeys.YouWereFollowed, 1)
-
-				if GetFFlagSocialContextToastEventStream() then
-					SocialContextToastEvents(services.eventIngest, {
-						toastType = ToastTypes.FriendJoinedYou,
-						friendId = tostring(playerByUserId.UserId),
-						universeId = data.gameId,
-						placeId = data.placeId,
-						actionType = SocialContextToastAnalyticsActionTypes.Shown
-					})
-				end
+				SocialContextToastEvents(services.eventIngest, {
+					toastType = ToastTypes.FriendJoinedYou,
+					friendId = tostring(playerByUserId.UserId),
+					universeId = data.gameId,
+					placeId = data.placeId,
+					actionType = SocialContextToastAnalyticsActionTypes.Shown
+				})
 
 				local v2 = { playerByUserId.UserId }
 				getNames(services.apolloClient, v2):andThen(function(list)

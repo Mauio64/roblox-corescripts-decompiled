@@ -1,1 +1,0 @@
-return game:DefineFastFlag("AXBlockMakeupEquipR6", false)

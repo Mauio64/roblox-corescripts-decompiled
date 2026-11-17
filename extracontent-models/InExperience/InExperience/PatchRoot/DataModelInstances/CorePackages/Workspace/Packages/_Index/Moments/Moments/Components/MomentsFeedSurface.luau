@@ -10,20 +10,30 @@ local ColorMode = Foundation.Enums.ColorMode
 
 local Feed = require(Moments.Components.Feed)
 local Constants = require(Moments.Constants)
+local MomentsHostContext = require(Moments.MomentsHostContext)
 local SharedFlags = require(parent.SharedFlags)
 local FFlagMomentsRenderAvatarPostsInFeed = SharedFlags.FFlagMomentsRenderAvatarPostsInFeed
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagProfileRenderAvatarMoments = SharedFlags2.FFlagProfileRenderAvatarMoments
 
 local feed = Feed.Feed
 
 local function MomentsFeedSurface(props)
 	local bottomInset = props.bottomInset or 0
+	local v
+
+	if FFlagProfileRenderAvatarMoments then
+		v = MomentsHostContext.useMomentsHost()
+	end
+
+	local v2 = v == nil or v.isTopShell ~= false
 
 	local backgroundStyle = FFlagMomentsRenderAvatarPostsInFeed and { Transparency = 1 } or nil
 
 	local element = React.createElement(feed, {
 		source = props.source,
-		active = props.active,
-		playbackActive = props.playbackActive,
+		active = not (FFlagProfileRenderAvatarMoments and not v2) and props.active,
+		playbackActive = not (FFlagProfileRenderAvatarMoments and not v2) and props.playbackActive,
 		telemetry = props.telemetry,
 		inactiveDestination = props.inactiveDestination,
 		controllerRef = props.controllerRef,

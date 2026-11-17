@@ -103,12 +103,16 @@ local function ExperienceDetailsConnectionsPlayedTextRow(props)
 
 	local onActivated = React.useCallback(function()
 		if rootPlaceId then
-			gameConnectionsPlayedChipClicked({
-				uid = tostring(Players.LocalPlayer and Players.LocalPlayer.UserId),
-				universeId = universeId,
-				placeId = tostring(rootPlaceId),
-				totalConnections = v6
-			}, "ExperienceDetailsConnectionsPlayedChip")
+			local userId = Players.LocalPlayer and Players.LocalPlayer.UserId
+			gameConnectionsPlayedChipClicked(
+				{
+					uid = tostring(userId),
+					universeId = universeId,
+					placeId = tostring(rootPlaceId),
+					totalConnections = v6
+				},
+				"ExperienceDetailsConnectionsPlayedChip"
+			)
 		end
 
 		local v8 = { name = AppPage.SocialProofVerticalUserListSheet, extraProps = 0 }

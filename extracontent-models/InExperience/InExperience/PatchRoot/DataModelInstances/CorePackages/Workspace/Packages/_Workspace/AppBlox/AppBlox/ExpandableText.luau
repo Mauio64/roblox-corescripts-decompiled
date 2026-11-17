@@ -15,8 +15,6 @@ local SignalsReact = require(parent.SignalsReact)
 local TextSize = require(parent.TextSize)
 local Cryo = require(parent.Cryo)
 
-local defineFastFlag = game:DefineFastFlag("LuaAppExpandableTextNewLineStrip", true)
-
 local v = { Selectable = true }
 local function fn() end
 
@@ -51,14 +49,7 @@ local function calculateBlankLineAdjustedHeight(p: number, compactNumberOfLines:
 end
 
 local function ExpandableText(props)
-	local text
-
-	if defineFastFlag then
-		text = (props.text or ""):gsub("[\r\n]+$", "")
-	else
-		text = props.text
-	end
-
+	local text = (props.text or ""):gsub("[\r\n]+$", "")
 	local v3 = SignalsReact.useSignalState(function(p)
 		return TextSize.getTextSizeStore(p).getTextSizeOffset(p)
 	end)

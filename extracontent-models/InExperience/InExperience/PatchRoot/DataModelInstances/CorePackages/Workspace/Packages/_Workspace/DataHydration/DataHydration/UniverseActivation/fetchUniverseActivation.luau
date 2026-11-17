@@ -11,8 +11,8 @@ require(script.Parent.UniverseActivationStoreTypes)
 local fetch = HttpClient.fetch
 local asPromise = HttpClient.asPromise
 
-local function eligibilityUrl(baseUrl: string, p: number) -- 1 equivalent call inferred from this helper
-	return ("%s/v1/universes/%d/activation-eligibility"):format(baseUrl, p)
+local function eligibilityUrl(p: string, p2: number) -- 1 equivalent call inferred from this helper
+	return ("%s/v1/universes/%d/activation-eligibility"):format(p, p2)
 end
 
 local function activateUrl(p: string, p2: number) -- 1 equivalent call inferred from this helper
@@ -27,7 +27,7 @@ local function v2ConfigurationUrl(p: string, p2: number) -- 2 equivalent calls i
 	return ("%s/v2/universes/%d/configuration"):format(p, p2)
 end
 
-local function resolveBase(options) -- 3 equivalent calls inferred from this helper
+local function resolveBase(options) -- 5 equivalent calls inferred from this helper
 	local v = options or {}
 	return v.network, v.baseUrl or UrlBase.new("develop")
 end
@@ -39,11 +39,11 @@ end
 local FetchUniverseActivation = {}
 
 function FetchUniverseActivation.fetchEligibility(p: number, options)
-	local v = options or {}
+	local base, v = resolveBase(options) -- inferred equivalent call
 	return asPromise((fetch({
-		network = v.network,
+		network = base,
 		method = "GET",
-		url = eligibilityUrl(v.baseUrl or UrlBase.new("develop"), p), -- inferred equivalent call
+		url = eligibilityUrl(v, p), -- inferred equivalent call
 		analyticsKey = "universe-activation.get-eligibility",
 		legacy = true,
 		decode = function(p2)
@@ -89,11 +89,11 @@ function FetchUniverseActivation.deactivate(p: number, options)
 end
 
 function FetchUniverseActivation.fetchAudiences(p: number, options)
-	local v = options or {}
+	local base, v = resolveBase(options) -- inferred equivalent call
 	return asPromise((fetch({
-		network = v.network,
+		network = base,
 		method = "GET",
-		url = v2ConfigurationUrl(v.baseUrl or UrlBase.new("develop"), p), -- inferred equivalent call
+		url = v2ConfigurationUrl(v, p), -- inferred equivalent call
 		analyticsKey = "universe-activation.get-audiences",
 		legacy = true,
 		decode = function(p2)

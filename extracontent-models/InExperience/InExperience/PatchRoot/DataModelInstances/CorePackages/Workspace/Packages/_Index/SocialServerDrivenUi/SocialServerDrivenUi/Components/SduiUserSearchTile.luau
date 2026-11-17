@@ -110,13 +110,22 @@ local function SduiUserSearchTile(props)
 	end
 
 	local createElement = React.createElement
+	local user = {
+		id = userId,
+		name = props.name or "",
+		displayName = props.displayName or "",
+		previousUsernames = not SharedFlags.FFlagUserSearchUsePreviousUsernameMatch and (props.previousUsernames or {}) or nil,
+		isPreviousUsernameMatch = 0
+	}
+	local isPreviousUsernameMatch
+
+	if SharedFlags.FFlagUserSearchUsePreviousUsernameMatch then
+		isPreviousUsernameMatch = props.isPreviousUsernameMatch
+	end
+
+	user.isPreviousUsernameMatch = isPreviousUsernameMatch
 	local v5 = {
-		user = {
-			id = userId,
-			name = props.name or "",
-			displayName = props.displayName or "",
-			previousUsernames = props.previousUsernames or {}
-		},
+		user = user,
 		index = props.index or 0,
 		size = UDim2.fromScale(1, 1),
 		searchParameters = { searchKeyword = searchKeyword },

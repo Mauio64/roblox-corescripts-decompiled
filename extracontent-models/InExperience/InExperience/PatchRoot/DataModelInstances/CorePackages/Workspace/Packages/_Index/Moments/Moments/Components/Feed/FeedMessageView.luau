@@ -5,6 +5,8 @@ local FoundationCloudAssets = require(parent.FoundationCloudAssets)
 local MomentsCommon = require(parent.MomentsCommon)
 local React = require(parent.React)
 
+local FFlagMomentsParentTimeLimit = MomentsCommon.Flags.FFlagMomentsParentTimeLimit
+
 local Button = Foundation.Button
 local Icon = Foundation.Icon
 local Image = Foundation.Image
@@ -49,6 +51,8 @@ local function renderGraphic(props, emphasis)
 		ZIndex = 2
 	})
 
+	local frameRadiusTag = FFlagMomentsParentTimeLimit and props.frameRadiusTag or "radius-large"
+
 	local createElement = React.createElement
 	local v2 = {
 		LayoutOrder = 1,
@@ -62,7 +66,7 @@ local function renderGraphic(props, emphasis)
 			{ tag = "position-center-center anchor-center-center", Size = UDim2.fromOffset(94, 94) },
 			{
 				TiltFrame = React.createElement(View, {
-					tag = "position-center-center anchor-center-center stroke-standard stroke-default radius-large",
+					tag = `position-center-center anchor-center-center stroke-standard stroke-default {frameRadiusTag}`,
 					Size = UDim2.fromOffset(115, 115),
 					Rotation = -15,
 					testId = "--moments-feed-message--tilt-frame",

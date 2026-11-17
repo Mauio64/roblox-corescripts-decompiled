@@ -6,8 +6,6 @@ local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 local CurveAnimBoneHierarchyUtils = require(parent.util.CurveAnimBoneHierarchyUtils)
 local CurveAnimTranslationUtils = require(parent.util.CurveAnimTranslationUtils)
 
-local getFFlagUGCValidateAnimTranslationThreshold = require(parent.flags.getFFlagUGCValidateAnimTranslationThreshold)
-
 local defineFastInt = game:DefineFastInt("UGCValidateBoneTranslationMaxDistanceHundredths", 100)
 
 return {
@@ -25,22 +23,16 @@ return {
 					continue
 				end
 
-				if getFFlagUGCValidateAnimTranslationThreshold() then
-					local translationExceedsThreshold, v2 = CurveAnimTranslationUtils.translationExceedsThreshold(
-						folder2,
-						v
-					)
+				local translationExceedsThreshold, v2 = CurveAnimTranslationUtils.translationExceedsThreshold(
+					folder2,
+					v
+				)
 
-					if translationExceedsThreshold then
-						object:fail(ErrorSourceStrings.Keys.CurveAnim_BoneTranslationExceedsThreshold, {
-							boneName = folder2.Name,
-							distance = string.format("%.3f", v2),
-							maxDistance = string.format("%.3f", v)
-						})
-					end
-				elseif CurveAnimTranslationUtils.positionHasKeyframes(folder2) then
-					object:fail(ErrorSourceStrings.Keys.CurveAnim_BonePositionNotAllowed, {
-						boneName = folder2.Name
+				if translationExceedsThreshold then
+					object:fail(ErrorSourceStrings.Keys.CurveAnim_BoneTranslationExceedsThreshold, {
+						boneName = folder2.Name,
+						distance = string.format("%.3f", v2),
+						maxDistance = string.format("%.3f", v)
 					})
 				end
 			end

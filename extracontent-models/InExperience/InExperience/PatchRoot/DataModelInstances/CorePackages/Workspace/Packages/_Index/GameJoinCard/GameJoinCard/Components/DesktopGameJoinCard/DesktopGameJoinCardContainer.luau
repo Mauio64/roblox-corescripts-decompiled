@@ -65,6 +65,8 @@ local FFlagConsoleOpenGameJoinCard = SharedFlags.FFlagConsoleOpenGameJoinCard
 local FFlagEnableSplitPane = SharedFlags.FFlagEnableSplitPane
 local FFlagEnableOnScreenAPIIntegration = SharedFlags.FFlagEnableOnScreenAPIIntegration
 local FFlagGameJoinCardAnalyticsCardId = SharedFlags.FFlagGameJoinCardAnalyticsCardId
+local fFlagSocialCarouselInGameTileInstantJoin = SharedFlags.FFlagSocialCarouselInGameTileInstantJoin
+	or SharedFlags.FFlagSocialCarouselInGameTextInstantJoin
 local FFlagJoinabilityCTARefactor = SharedFlags.FFlagJoinabilityCTARefactor
 local FFlagJoinUserCTAsIxpEnabled = SharedFlags.FFlagJoinUserCTAsIxpEnabled
 local FStringJoinUserCTAsIxpLayer = SharedFlags.FStringJoinUserCTAsIxpLayer
@@ -144,14 +146,18 @@ local function DesktopGameJoinCardContainer(props)
 			connection:Disconnect()
 		end
 	end, { gameIconUrl })
+	local v2
 
-	local onAgeCheckCompletion = useAgeCheckCompletionLogger(universeId)
-	local v2 = useJoinUserInExperience(props.userId, {
-		isHomePageCarousel = true,
-		homepageCarouselAbsolutePosition = props.homepageCarouselAbsolutePosition,
-		presence = props.presence,
-		onAgeCheckCompletion = onAgeCheckCompletion
-	})
+	if fFlagSocialCarouselInGameTileInstantJoin and props.experienceUtilities then
+		v2 = props.experienceUtilities
+	else
+		v2 = useJoinUserInExperience(props.userId, {
+			isHomePageCarousel = true,
+			homepageCarouselAbsolutePosition = props.homepageCarouselAbsolutePosition,
+			presence = props.presence,
+			onAgeCheckCompletion = useAgeCheckCompletionLogger(universeId)
+		})
+	end
 
 	local v3 = {
 		userId = props.userId,

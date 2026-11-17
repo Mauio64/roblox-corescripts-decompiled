@@ -210,7 +210,7 @@ local function DialogContent(props)
 		Backdrop = React.createElement("Frame", {
 			Size = UDim2.fromScale(1, 1),
 			BackgroundColor3 = v.Color.Common.Backdrop.Color3,
-			BackgroundTransparency = v.Color.Common.Backdrop.Transparency,
+			BackgroundTransparency = 0,
 			BorderSizePixel = 0,
 			ZIndex = 1,
 			[React.Change.AbsoluteSize] = function(p)
@@ -283,7 +283,12 @@ local function RoCaptchaChallengeView(props)
 
 	return React.createElement(
 		"ScreenGui",
-		{ ZIndexBehavior = Enum.ZIndexBehavior.Sibling, DisplayOrder = 200, IgnoreGuiInset = true },
+		{
+			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+			DisplayOrder = 200,
+			IgnoreGuiInset = true,
+			OnTopOfCoreBlur = true
+		},
 		{
 			FoundationRoot = React.createElement(FoundationProvider, { colorMode = ColorMode.Dark }, {
 				FocusNavigationProvider = React.createElement(

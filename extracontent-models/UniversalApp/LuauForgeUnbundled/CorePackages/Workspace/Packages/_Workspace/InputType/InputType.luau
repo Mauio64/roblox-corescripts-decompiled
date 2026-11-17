@@ -1,1 +1,0 @@
-return { InputTypeConstants = require("@game/CorePackages/Workspace/Packages/_Workspace/InputType/InputType/InputTypeConstants"), getInputGroup = require("@game/CorePackages/Workspace/Packages/_Workspace/InputType/InputType/getInputGroup") }

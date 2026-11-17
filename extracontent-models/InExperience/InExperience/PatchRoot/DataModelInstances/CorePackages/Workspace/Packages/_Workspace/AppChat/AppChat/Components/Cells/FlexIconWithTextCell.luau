@@ -10,7 +10,6 @@ local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local BaseCell = require(script.Parent.BaseCell)
 
@@ -44,12 +43,7 @@ local function FlexIconWithTextCell(p)
 	local style = union.style
 	local theme = style.Theme
 	local font = style.Font
-	local v2
-
-	if FoundationFontFaceMigration then
-		v2 = useTokens()
-	end
-
+	local v2 = useTokens()
 	local v3 = union.primaryIcon == nil
 
 	local createElement = React.createElement
@@ -130,79 +124,36 @@ local function FlexIconWithTextCell(p)
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			VerticalAlignment = Enum.VerticalAlignment.Center
 		}),
-		titleText = 0,
+		titleText = React.createElement("TextLabel", {
+			Size = UDim2.new(1, v3 and 0 or -union.iconCellWidth, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			Text = union.Text,
+			TextSize = font.Header2.RelativeSize * font.BaseSize,
+			FontFace = normalizeFontFace(v2.Typography.TitleLarge.Font),
+			TextColor3 = theme.TextEmphasis.Color,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextTruncate = Enum.TextTruncate.AtEnd,
+			TextWrapped = true,
+			BackgroundTransparency = 1,
+			LayoutOrder = 2
+		}),
 		subTitleText = 0
 	}
-
-	local createElement4 = React.createElement
-	local v10 = {
-		Size = UDim2.new(1, v3 and 0 or -union.iconCellWidth, 0, 0),
-		AutomaticSize = Enum.AutomaticSize.Y,
-		Text = union.Text,
-		TextSize = font.Header2.RelativeSize * font.BaseSize,
-		Font = 0,
-		FontFace = 0,
-		TextColor3 = 0,
-		TextXAlignment = 0,
-		TextTruncate = 0,
-		TextWrapped = true,
-		BackgroundTransparency = 1,
-		LayoutOrder = 2
-	}
-	local font2
-
-	if not FoundationFontFaceMigration then
-		font2 = font.Header2.Font
-	end
-
-	v10.Font = font2
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(v2.Typography.TitleLarge.Font)
-	end
-
-	v10.FontFace = fontFace
-
-	v10.TextColor3 = theme.TextEmphasis.Color
-	v10.TextXAlignment = Enum.TextXAlignment.Left
-	v10.TextTruncate = Enum.TextTruncate.AtEnd
-	v9.titleText = createElement4("TextLabel", v10)
 	local subTitleText
 
 	if union.SubTitleText then
-		local createElement5 = React.createElement
-		local v5 = {
+		subTitleText = React.createElement("TextLabel", {
 			Size = UDim2.new(1, v3 and 0 or -union.iconCellWidth, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
 			Text = union.SubTitleText,
 			TextSize = font.BodySmall.RelativeSize * font.BaseSize,
-			Font = 0,
-			FontFace = 0,
-			TextColor3 = 0,
-			TextXAlignment = 0,
+			FontFace = normalizeFontFace(v2.Typography.BodySmall.Font),
+			TextColor3 = theme.TextDefault.Color,
+			TextXAlignment = Enum.TextXAlignment.Left,
 			TextWrapped = true,
 			BackgroundTransparency = 1,
 			LayoutOrder = 3
-		}
-		local font3
-
-		if not FoundationFontFaceMigration then
-			font3 = font.BodySmall.Font
-		end
-
-		v5.Font = font3
-		local fontFace2
-
-		if FoundationFontFaceMigration then
-			fontFace2 = normalizeFontFace(v2.Typography.BodySmall.Font)
-		end
-
-		v5.FontFace = fontFace2
-
-		v5.TextColor3 = theme.TextDefault.Color
-		v5.TextXAlignment = Enum.TextXAlignment.Left
-		subTitleText = createElement5("TextLabel", v5)
+		})
 	end
 
 	v9.subTitleText = subTitleText

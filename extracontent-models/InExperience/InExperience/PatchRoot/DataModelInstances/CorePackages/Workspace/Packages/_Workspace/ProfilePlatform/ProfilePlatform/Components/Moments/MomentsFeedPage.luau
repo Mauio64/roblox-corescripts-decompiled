@@ -22,6 +22,18 @@ local FFlagAbuseReportSubmissionTargetV4 = SharedFlags.FFlagAbuseReportSubmissio
 local FFlagMomentsServeEDPVideos = SharedFlags.FFlagMomentsServeEDPVideos
 local FFlagAbuseReportAttributes = SharedFlags.FFlagAbuseReportAttributes
 local FFlagProfileRenderAvatarMoments = SharedFlags.FFlagProfileRenderAvatarMoments
+local FFlagProfileMomentsFeedAboveSplitPane = SharedFlags.FFlagProfileMomentsFeedAboveSplitPane
+local splitPaneStore
+
+if FFlagProfileMomentsFeedAboveSplitPane then
+	local SplitPane = require(parent.SplitPane)
+	splitPaneStore = SplitPane.SplitPaneStore
+else
+	splitPaneStore = nil
+end
+
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
 
 local View = Foundation.View
 local IconButton = Foundation.IconButton
@@ -212,9 +224,25 @@ local function MomentsFeedPageImmersive()
 	end
 
 	local v4 = useScreenSize()
+	local v5
 
-	return React.createElement(View, {
-		Size = UDim2.fromOffset(v4.X, v4.Y),
+	if FFlagProfileMomentsFeedAboveSplitPane then
+		v5 = useSignalState(splitPaneStore.getStore().getIsSplitPaneActive)
+	else
+		v5 = false
+	end
+
+	local createElement = React.createElement
+	local size
+
+	if v5 then
+		size = UDim2.fromScale(1, 1)
+	else
+		size = UDim2.fromOffset(v4.X, v4.Y)
+	end
+
+	return createElement(View, {
+		Size = size,
 		backgroundStyle = FFlagProfileRenderAvatarMoments and { Transparency = 1 } or nil,
 		tag = {
 			["bg-surface-0"] = not FFlagProfileRenderAvatarMoments

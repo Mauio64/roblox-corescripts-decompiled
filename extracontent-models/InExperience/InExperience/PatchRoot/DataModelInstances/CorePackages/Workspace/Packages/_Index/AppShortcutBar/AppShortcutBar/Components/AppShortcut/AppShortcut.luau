@@ -1,15 +1,12 @@
 local AppShortcutBar = script:FindFirstAncestor("AppShortcutBar")
 local parent = AppShortcutBar.Parent
 
-local TextService = game:GetService("TextService")
-
 local React = require(parent.React)
 local Foundation = require(parent.Foundation)
 local UIBlox = require(parent.UIBlox)
 local ReactFocusNavigation = require(parent.ReactFocusNavigation)
 local Style = require(parent.Style)
 local GetTextSize = Style.GetTextSize
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local useStyle = UIBlox.Core.Style.useStyle
 local useTokens = Foundation.Hooks.useTokens
@@ -125,18 +122,13 @@ function AppShortcut(p)
 		local xSmall = v2.Gap.XSmall
 		local labelMedium = v2.Typography.LabelMedium
 		local vector2 = Vector2.new(1e999, 1e999)
-		local v6
 
-		if FoundationFontFaceMigration then
-			v6 = GetTextSize(item.text, math.floor(labelMedium.FontSize), labelMedium.Font, vector2, {
-				addTemporaryPadding = false
-			})
-		else
-			v6 = TextService:GetTextSize(item.text, math.floor(labelMedium.FontSize), labelMedium.Font, vector2)
-		end
+		local textSize = GetTextSize(item.text, math.floor(labelMedium.FontSize), labelMedium.Font, vector2, {
+			addTemporaryPadding = false
+		})
 
-		local v7 = v4 + xSmall + v6.X
-		return UDim2.new(0, v7, 1, 0)
+		local v6 = v4 + xSmall + textSize.X
+		return UDim2.new(0, v6, 1, 0)
 	end, { v2, v4, item.text })
 
 	local size2 = React.useMemo(function()
@@ -226,12 +218,6 @@ function AppShortcut(p)
 		v7 = v2
 	end
 
-	local v8
-
-	if FoundationFontFaceMigration then
-		v8 = v2.Size.Size_900
-	end
-
 	local renderIcon = useCallback(fn, {
 		hasProgress,
 		progress,
@@ -242,7 +228,7 @@ function AppShortcut(p)
 		v5,
 		v3,
 		v6,
-		v8
+		v2.Size.Size_900
 	})
 
 	local onActivated = useOnShortcutActivated(item)

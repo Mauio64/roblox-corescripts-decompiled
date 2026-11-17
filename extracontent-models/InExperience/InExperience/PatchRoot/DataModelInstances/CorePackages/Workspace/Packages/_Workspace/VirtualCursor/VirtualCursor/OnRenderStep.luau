@@ -99,10 +99,14 @@ local function handleScrollingFrame(scrollingFrame, p, p2): boolean
 		scrollingFrame.CanvasPosition += Vector2.new(sign(v9) * v5, 0)
 		Interface:SetArrow(sign(v9), 0)
 		return true
-	elseif abs2(v11.x) >= abs2(v11.y) and v7 then
-		scrollingFrame.CanvasPosition += Vector2.new(0, sign(v10) * v5)
-		Interface:SetArrow(0, (sign(v10)))
-		return true
+	else
+		local v12 = abs2(v11.x)
+
+		if abs2(v11.y) <= v12 and v7 then
+			scrollingFrame.CanvasPosition += Vector2.new(0, sign(v10) * v5)
+			Interface:SetArrow(0, (sign(v10)))
+			return true
+		end
 	end
 
 	return false

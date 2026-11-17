@@ -11,7 +11,7 @@ require(script.Parent.ExperienceQuestionnaireStoreTypes)
 local fetch = HttpClient.fetch
 local asPromise = HttpClient.asPromise
 
-local function resolveBase(options) -- 1 equivalent call inferred from this helper
+local function resolveBase(options) -- 2 equivalent calls inferred from this helper
 	local v = options or {}
 	return v.network, v.baseUrl or UrlBase.APIS
 end
@@ -21,11 +21,11 @@ local function resolveMutatingNetwork(options) -- 1 equivalent call inferred fro
 end
 
 local function get(options, p: string, analyticsKey: string)
-	local v = options or {}
+	local base, v = resolveBase(options) -- inferred equivalent call
 	return asPromise((fetch({
-		network = v.network,
+		network = base,
 		method = "GET",
-		url = (v.baseUrl or UrlBase.APIS) .. "/experience-questionnaire/v1" .. p,
+		url = v .. "/experience-questionnaire/v1" .. p,
 		analyticsKey = analyticsKey,
 		decode = function(p2)
 			return p2

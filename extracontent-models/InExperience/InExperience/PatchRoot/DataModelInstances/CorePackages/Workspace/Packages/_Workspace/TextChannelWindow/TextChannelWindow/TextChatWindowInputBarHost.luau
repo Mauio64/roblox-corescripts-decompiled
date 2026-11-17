@@ -35,6 +35,9 @@ local FFlagDebugExpChatTextChannelWindowStaticExpressions = require(script.Paren
 local FFlagExpChatTextChannelWindowMessageComposer = require(script.Parent.Flags.FFlagExpChatTextChannelWindowMessageComposer)
 
 local FFlagExpChatTCWRestoreSendSelectionGatedByInputMode = require(script.Parent.Flags.FFlagExpChatTCWRestoreSendSelectionGatedByInputMode)
+
+local FFlagExpChatTextChannelWindowQuickWordsNonDirect = require(script.Parent.Flags.FFlagExpChatTextChannelWindowQuickWordsNonDirect)
+local isDirectChatChannel = require(script.Parent.isDirectChatChannel)
 local getDebugExpressionCatalog = require(script.Parent.TextChannelWindowExpressionTray.getDebugExpressionCatalog)
 local sendExpression = require(script.Parent.TextChannelWindowExpressionTray.sendExpression)
 local useTextChannelWindowComposerViewModel = require(script.Parent.useTextChannelWindowComposerViewModel)
@@ -185,19 +188,46 @@ local function TextChatWindowInputBarHost(props)
 	local sendExpression2 = React.useCallback(function(p)
 		return sendExpression(p, targetChannel, v7)
 	end, { targetChannel, v7 })
+
+	local v11 = FFlagExpChatTextChannelWindowQuickWordsNonDirect
+		and not FFlagExpChatTextChannelWindowExpressionTrayEmoji
+
+	if v11 then
+		if targetChannel == nil then
+			v11 = false
+		else
+			v11 = isDirectChatChannel(targetChannel)
+		end
+	end
+
 	local expressionTray
 
 	if FFlagExpChatTextChannelWindowExpressionTray and FFlagExpChatComposerFigmaParity then
 		expressionTray = {
 			sendExpression = sendExpression2,
 			canLocalUserChat = v7,
-			canSend = v3 and targetChannel ~= nil,
-			onKeyboardActivated = v10.focus,
-			footerText = v5.presetDisclaimer,
+			canSend = 0,
+			onKeyboardActivated = 0,
+			footerText = 0,
 			focusNavEnabled = 0,
 			onOpenChanged = 0,
 			catalogResource = 0
 		}
+		local canSend
+
+		if v3 then
+			if targetChannel == nil then
+				canSend = false
+			else
+				canSend = not v11
+			end
+		else
+			canSend = v3
+		end
+
+		expressionTray.canSend = canSend
+		expressionTray.onKeyboardActivated = v10.focus
+		expressionTray.footerText = v5.presetDisclaimer
 		expressionTray.focusNavEnabled = focusNavEnabled == true and FFlagExpChatTextChannelWindowFocusNav
 		local onOpenChanged
 
@@ -238,7 +268,7 @@ local function TextChatWindowInputBarHost(props)
 	end
 
 	if FFlagExpChatTextChannelWindowMessageComposer then
-		local v11 = useTextChannelWindowComposerViewModel({
+		local v12 = useTextChannelWindowComposerViewModel({
 			canChat = v8,
 			canChatFreely = v7,
 			targetChannel = targetChannel,
@@ -251,11 +281,11 @@ local function TextChatWindowInputBarHost(props)
 			fontFace = props.fontFace
 		})
 
-		return React.createElement(MessageComposer, v11)
+		return React.createElement(MessageComposer, v12)
 	end
 
 	local createElement = React.createElement
-	local v11 = {
+	local v12 = {
 		onSend = onSend,
 		canLocalUserChat = v8,
 		textSize = v.Typography.CaptionMedium.FontSize,
@@ -276,8 +306,8 @@ local function TextChatWindowInputBarHost(props)
 		selectionImageObject = props.selectionCursor
 	end
 
-	v11.selectionImageObject = selectionImageObject
-	return createElement(ChatInputBarView, v11)
+	v12.selectionImageObject = selectionImageObject
+	return createElement(ChatInputBarView, v12)
 end
 
 return React.memo(TextChatWindowInputBarHost)

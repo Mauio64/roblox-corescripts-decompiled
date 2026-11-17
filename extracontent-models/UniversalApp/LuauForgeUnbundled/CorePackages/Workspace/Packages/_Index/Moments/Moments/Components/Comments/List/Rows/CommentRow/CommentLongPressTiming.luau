@@ -1,1 +1,0 @@
-return { HOLD_SECONDS = 0.35, CHARGE_DELAY_SECONDS = 0.1 }

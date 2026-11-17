@@ -6,6 +6,8 @@ local AppNavBar = require(parent.AppNavBar)
 local Foundation = require(parent.Foundation)
 local CentralOverlay = require(parent.CentralOverlay)
 local RobloxAppEnums = require(parent.RobloxAppEnums)
+local LocalUserIdStore = require(parent.LocalUserIdStore)
+local localUserIdStore = LocalUserIdStore.LocalUserIdStore
 local SignalsReact = require(parent.SignalsReact)
 local SduiSharedUtilities = require(parent.SduiSharedUtilities)
 local SharedFlags = require(parent.SharedFlags)
@@ -24,6 +26,7 @@ local View = Foundation.View
 
 local Logger = require(ServerTriggeredModals.Logger)
 local reportPromptImpression = require(ServerTriggeredModals.reportPromptImpression)
+local logPromptModalSkipped = require(ServerTriggeredModals.logPromptModalSkipped)
 local ServerTriggeredModalImpressions = require(parent.ServerTriggeredModalImpressions)
 local sendModalImpressionEvent = ServerTriggeredModalImpressions.sendModalImpressionEvent
 local fetchPrompts = require(ServerTriggeredModals.SduiV2.fetchPrompts)
@@ -32,6 +35,15 @@ local PromptStyle = require(ServerTriggeredModals.SduiV2.PromptStyle)
 local usePromptEntries = require(ServerTriggeredModals.SduiV2.usePromptEntries)
 local useModalSignalStore = require(ServerTriggeredModals.SignalStores.useModalSignalStore)
 local FFlagPromptsActionEventLogging = require(ServerTriggeredModals.Flags.FFlagPromptsActionEventLogging)
+local FFlagPromptsModalSkipTelemetry = require(ServerTriggeredModals.Flags.FFlagPromptsModalSkipTelemetry)
+local FFlagPlusUpsellSheetHomePrompt = require(ServerTriggeredModals.Flags.FFlagPlusUpsellSheetHomePrompt)
+local PlusUpsellSheetPrompt
+
+if FFlagPlusUpsellSheetHomePrompt then
+	PlusUpsellSheetPrompt = require(script.Parent.Parent.PlusUpsellSheetPrompt)
+else
+	PlusUpsellSheetPrompt = nil
+end
 
 local getEntryPointSurfaceConfig = require(script.Parent.getEntryPointSurfaceConfig)
 local getHomepagePromptsClientAttributes = require(script.Parent.Parent.getHomepagePromptsClientAttributes)
@@ -54,8 +66,11 @@ local FFlagHomepagePromptsHandlerPassClientAttributes = SharedFlags.FFlagHomepag
 local FFlagPromptsEdpOpenReplaceOnFetch = SharedFlags.FFlagPromptsEdpOpenReplaceOnFetch
 local FFlagPromptsHandlerFetchOncePerSession = SharedFlags.FFlagPromptsHandlerFetchOncePerSession
 local FIntPromptsHandlerSessionTimeoutMs = SharedFlags.FIntPromptsHandlerSessionTimeoutMs
+local FFlagChatPushUpsellPromptsEnabled = SharedFlags.FFlagChatPushUpsellPromptsEnabled
 
 local v = {}
+
+local currentUserIds = {}
 
 local function parsePromptStyles(fStringHomePromptsHandlerPromptStyles: string)
 	local result = {}
@@ -65,6 +80,29 @@ local function parsePromptStyles(fStringHomePromptsHandlerPromptStyles: string)
 	end
 
 	return if #result ~= 0 then result else nil
+end
+
+local function claimAppSessionRequest(entryPoint, configKey: string): boolean -- 2 equivalent calls inferred from this helper
+	if not FFlagChatPushUpsellPromptsEnabled or entryPoint ~= PromptsEntryPoint.ChatLandingOpen then
+		return true
+	end
+
+	local currentUserId = localUserIdStore.getCurrentUserId(false)
+
+	if currentUserIds[configKey] == currentUserId then
+		return false
+	end
+
+	currentUserIds[configKey] = currentUserId
+	return true
+end
+
+local function forwardsClientAttributes(entryPoint) -- 2 equivalent calls inferred from this helper
+	if FFlagEdpGameLeavePromptsHandlerEnabled or FFlagEdpOpenPromptsHandlerEnabled then
+		return true
+	end
+
+	return FFlagChatPushUpsellPromptsEnabled and entryPoint == PromptsEntryPoint.ChatLandingOpen
 end
 
 local function getHomepagePromptStyles(p)
@@ -92,7 +130,7 @@ local function PromptsHandler(props)
 		v4 = nil
 	end
 
-	local v5 = useModalSignalStore()
+	local modalSignalStore = useModalSignalStore()
 	local universeId
 
 	if
@@ -112,12 +150,12 @@ local function PromptsHandler(props)
 		replaceOnFetch = nil
 	end
 
-	local v6
+	local v5
 
 	if FFlagPushNotificationsUpsellPassClientAttributesToPrompts then
-		v6 = getHomepagePromptsClientAttributes.use(entryPoint, props.clientAttributes)
+		v5 = getHomepagePromptsClientAttributes.use(entryPoint, props.clientAttributes)
 	else
-		v6 = nil
+		v5 = nil
 	end
 
 	local surfaceConfig = React.useMemo(function()
@@ -128,11 +166,11 @@ local function PromptsHandler(props)
 		return getEntryPointSurfaceConfig(entryPoint)
 	end, (FFlagEdpGameLeavePromptsHandlerEnabled or FFlagEdpOpenPromptsHandlerEnabled) and { entryPoint, universeId } or { entryPoint })
 
-	local v7 = SignalsReact.useSignalState(v5.getHasShownGetter(entryPoint))
-	local v8 = SignalsReact.useSignalState(v5.getMetadataGetter(entryPoint))
+	local v6 = SignalsReact.useSignalState(modalSignalStore.getHasShownGetter(entryPoint))
+	local v7 = SignalsReact.useSignalState(modalSignalStore.getMetadataGetter(entryPoint))
 
 	local clientAttributes2 = nil
-	local v9
+	local v8
 
 	if FFlagHomepagePromptsHandlerPassClientAttributes then
 		clientAttributes2 = React.useMemo(function()
@@ -145,13 +183,10 @@ local function PromptsHandler(props)
 				and entryPoint == PromptsEntryPoint.HomepageLaunch
 				and (not (FFlagEdpGameLeavePromptsHandlerEnabled or FFlagEdpOpenPromptsHandlerEnabled) or props.clientAttributes == nil)
 			then
-				return v6
+				return v5
 			end
 
-			if
-				(FFlagEdpGameLeavePromptsHandlerEnabled or FFlagEdpOpenPromptsHandlerEnabled)
-				and props.clientAttributes ~= nil
-			then
+			if forwardsClientAttributes(entryPoint) and props.clientAttributes ~= nil then -- inferred equivalent call
 				return props.clientAttributes
 			end
 
@@ -160,11 +195,11 @@ local function PromptsHandler(props)
 			end
 
 			return nil
-		end, { entryPoint, v6, props.clientAttributes, v2 })
+		end, { entryPoint, v5, props.clientAttributes, v2 })
 
 		local useMemo = React.useMemo
 		local function fn()
-			local v10 = {
+			local v9 = {
 				entryPoint = entryPoint,
 				surfaceKey = surfaceConfig.surfaceKey,
 				configKey = surfaceConfig.configKey,
@@ -181,34 +216,29 @@ local function PromptsHandler(props)
 				replaceOnFetch2 = replaceOnFetch
 			end
 
-			v10.replaceOnFetch = replaceOnFetch2
+			v9.replaceOnFetch = replaceOnFetch2
 			local promptStyles
 
 			if fFlagLuaAppEnableSduiHomePage and entryPoint == PromptsEntryPoint.HomepageLaunch then
 				promptStyles = parsePromptStyles(SharedFlags.FStringHomePromptsHandlerPromptStyles)
 			end
 
-			v10.promptStyles = promptStyles
-			return v10
+			v9.promptStyles = promptStyles
+			return v9
 		end
 
+		local v9 = clientAttributes2
 		local v10
 
 		if FFlagPromptsEdpOpenReplaceOnFetch then
 			v10 = replaceOnFetch
 		end
 
-		v9 = useMemo(fn, {
-			entryPoint,
-			surfaceConfig,
-			clientAttributes2,
-			fFlagLuaAppEnableSduiHomePage,
-			v10
-		})
+		v8 = useMemo(fn, { entryPoint, surfaceConfig, v9, fFlagLuaAppEnableSduiHomePage, v10 })
 	else
 		local useMemo = React.useMemo
 		local function fn()
-			local v10 = {
+			local v9 = {
 				entryPoint = entryPoint,
 				surfaceKey = surfaceConfig.surfaceKey,
 				configKey = surfaceConfig.configKey,
@@ -221,80 +251,81 @@ local function PromptsHandler(props)
 			}
 			local clientAttributes
 
-			if FFlagEdpGameLeavePromptsHandlerEnabled or FFlagEdpOpenPromptsHandlerEnabled or v2 then
+			if forwardsClientAttributes(entryPoint) or v2 then -- inferred equivalent call
 				clientAttributes = props.clientAttributes
 			end
 
-			v10.clientAttributes = clientAttributes
+			v9.clientAttributes = clientAttributes
 			local replaceOnFetch2
 
 			if FFlagPromptsEdpOpenReplaceOnFetch then
 				replaceOnFetch2 = replaceOnFetch
 			end
 
-			v10.replaceOnFetch = replaceOnFetch2
+			v9.replaceOnFetch = replaceOnFetch2
 			local promptStyles
 
 			if fFlagLuaAppEnableSduiHomePage and entryPoint == PromptsEntryPoint.HomepageLaunch then
 				promptStyles = parsePromptStyles(SharedFlags.FStringHomePromptsHandlerPromptStyles)
 			end
 
-			v10.promptStyles = promptStyles
-			return v10
+			v9.promptStyles = promptStyles
+			return v9
 		end
 
-		local v10
+		local v9
 
 		if
 			FFlagEdpGameLeavePromptsHandlerEnabled
 			or FFlagEdpOpenPromptsHandlerEnabled
+			or FFlagChatPushUpsellPromptsEnabled
 			or FFlagNotificationStreamPromptsHandlerEnabled
 		then
-			v10 = { nil, nil, nil, nil, nil, nil }
+			v9 = { nil, nil, nil, nil, nil, nil }
 
 			local clientAttributes = props.clientAttributes
-			local v11
+			local v10
 
 			if FFlagPromptsEdpOpenReplaceOnFetch then
-				v11 = replaceOnFetch
+				v10 = replaceOnFetch
 			end
 
-			v10[1], v10[2], v10[3], v10[4], v10[5], v10[6] = entryPoint, surfaceConfig, clientAttributes, fFlagLuaAppEnableSduiHomePage, v11, v2
+			v9[1], v9[2], v9[3], v9[4], v9[5], v9[6] = entryPoint, surfaceConfig, clientAttributes, fFlagLuaAppEnableSduiHomePage, v10, v2
 		else
-			v10 = { nil, nil, nil, nil }
-			local v11
+			v9 = { nil, nil, nil, nil }
+			local v10
 
 			if FFlagPromptsEdpOpenReplaceOnFetch then
-				v11 = replaceOnFetch
+				v10 = replaceOnFetch
 			end
 
-			v10[1], v10[2], v10[3], v10[4] = entryPoint, surfaceConfig, fFlagLuaAppEnableSduiHomePage, v11
+			v9[1], v9[2], v9[3], v9[4] = entryPoint, surfaceConfig, fFlagLuaAppEnableSduiHomePage, v10
 		end
 
-		v9 = useMemo(fn, v10)
+		v8 = useMemo(fn, v9)
 	end
 
 	local ref = React.useRef(os.clock() + FIntPromptsHandlerSessionTimeoutMs / 1000)
 
 	if FFlagPushNotificationsUpsellPassClientAttributesToPrompts then
 		React.useEffect(function()
-			local v10
+			local v9
 
 			if entryPoint == PromptsEntryPoint.HomepageLaunch then
-				v10 = not (FFlagEdpGameLeavePromptsHandlerEnabled or FFlagEdpOpenPromptsHandlerEnabled)
+				v9 = not (FFlagEdpGameLeavePromptsHandlerEnabled or FFlagEdpOpenPromptsHandlerEnabled)
 					or props.clientAttributes == nil
 			else
-				v10 = false
+				v9 = false
 			end
 
 			local sessionClientAttribute
 
-			if v10 then
+			if v9 then
 				sessionClientAttribute = getHomepagePromptsClientAttributes.sessionClientAttribute
 			end
 
 			if
-				v10
+				v9
 				and clientAttributes2 == nil
 				and (not FFlagPromptsHandlerFetchOncePerSession or sessionClientAttribute == nil)
 			then
@@ -302,14 +333,14 @@ local function PromptsHandler(props)
 			end
 
 			if FFlagPromptsHandlerFetchOncePerSession and sessionClientAttribute ~= nil then
-				local configKey = v9.configKey
-				local v11
+				local configKey = v8.configKey
+				local v10
 
 				if clientAttributes2 then
-					v11 = clientAttributes2[sessionClientAttribute]
+					v10 = clientAttributes2[sessionClientAttribute]
 				end
 
-				if v11 == nil then
+				if v10 == nil then
 					if v[configKey] ~= nil then
 						return
 					end
@@ -317,7 +348,7 @@ local function PromptsHandler(props)
 					local thread = task.delay(math.max(0, ref.current - os.clock()), function()
 						if v[configKey] == nil then
 							v[configKey] = false
-							fetchPrompts(v9, true)
+							fetchPrompts(v8, true)
 						end
 					end)
 					return function()
@@ -326,53 +357,61 @@ local function PromptsHandler(props)
 				end
 
 				if v[configKey] == false then
-					v[configKey] = v11
+					v[configKey] = v10
 					return
 				end
 
-				if v[configKey] == v11 then
+				if v[configKey] == v10 then
 					return
 				end
 
-				v[configKey] = v11
-				fetchPrompts(v9, true)
+				v[configKey] = v10
+				fetchPrompts(v8, true)
 			else
-				local v11
+				if not claimAppSessionRequest(entryPoint, v8.configKey) then -- inferred equivalent call
+					return
+				end
+
+				local v10
 
 				if FFlagEdpOpenPromptsHandlerEnabled then
-					v11 = v10 or entryPoint == PromptsEntryPoint.ExperienceDetailsPageOpen
+					v10 = v9 or entryPoint == PromptsEntryPoint.ExperienceDetailsPageOpen
 				end
 
-				if v2 or not FFlagEdpOpenPromptsHandlerEnabled and v10 or FFlagEdpOpenPromptsHandlerEnabled and v11 then
-					fetchPrompts(v9, true)
+				if v2 or not FFlagEdpOpenPromptsHandlerEnabled and v9 or FFlagEdpOpenPromptsHandlerEnabled and v10 then
+					fetchPrompts(v8, true)
 				else
-					fetchPrompts(v9)
+					fetchPrompts(v8)
 				end
 			end
-		end, { entryPoint, v9, props.clientAttributes, clientAttributes2, v2 })
+		end, { entryPoint, v8, props.clientAttributes, clientAttributes2, v2 })
 	else
 		local useEffect = React.useEffect
 		local function fn()
-			local v10
-
-			if FFlagEdpOpenPromptsHandlerEnabled then
-				v10 = entryPoint == PromptsEntryPoint.ExperienceDetailsPageOpen
+			if not claimAppSessionRequest(entryPoint, v8.configKey) then -- inferred equivalent call
+				return
 			end
 
-			fetchPrompts(v9, (v2 or FFlagEdpOpenPromptsHandlerEnabled and v10) and true or nil)
+			local v9
+
+			if FFlagEdpOpenPromptsHandlerEnabled then
+				v9 = entryPoint == PromptsEntryPoint.ExperienceDetailsPageOpen
+			end
+
+			fetchPrompts(v8, (v2 or FFlagEdpOpenPromptsHandlerEnabled and v9) and true or nil)
 		end
 
-		local v10
+		local v9
 
-		if FFlagEdpOpenPromptsHandlerEnabled then
-			v10 = entryPoint
+		if FFlagEdpOpenPromptsHandlerEnabled or FFlagChatPushUpsellPromptsEnabled then
+			v9 = entryPoint
 		end
 
-		useEffect(fn, { v9, v10, v2 })
+		useEffect(fn, { v8, v9, v2 })
 	end
 
-	local v10 = usePromptEntries(surfaceConfig.configKey, PromptStyle.Modal)
-	local v11 = v10[1]
+	local v9 = usePromptEntries(surfaceConfig.configKey, PromptStyle.Modal)
+	local v10 = v9[1]
 	local ref2
 
 	if FFlagSduiDismissPromptAction then
@@ -389,45 +428,65 @@ local function PromptsHandler(props)
 		ref3 = nil
 	end
 
-	React.useEffect(function()
-		if v7 or v8 then
-			return
-		end
-
-		if
-			v11 == nil
-			or v11.config == nil
-			or v11.identifier == nil
-			or v11.robloxComponentType == nil
-			or v11.title == nil
+	local useEffect = React.useEffect
+	local function fn()
+		if v6 then
+			if FFlagPromptsModalSkipTelemetry then
+				logPromptModalSkipped.logAll(logPromptModalSkipped.Reason.AlreadyShown, entryPoint, v9)
+			end
+		elseif v7 then
+			if FFlagPromptsModalSkipTelemetry then
+				logPromptModalSkipped.logAll(logPromptModalSkipped.Reason.LegacyMetadata, entryPoint, v9)
+			end
+		elseif
+			v10 == nil
+			or v10.config == nil
+			or v10.identifier == nil
+			or v10.robloxComponentType == nil
+			or v10.title == nil
 		then
-			return
-		end
-
-		v5.setHasShown(entryPoint, true)
-		local sduiPromptModal = CentralOverlayType.SduiPromptModal
-		local v12 = {
-			configKey = surfaceConfig.configKey,
-			appPage = surfaceConfig.appPage,
-			modalId = v11.identifier,
-			modalType = 0
-		}
-		local modalType
-
-		if FFlagPromptsImpressionUsesTitle then
-			modalType = v11.title
+			if FFlagPromptsModalSkipTelemetry and v10 ~= nil then
+				logPromptModalSkipped.log(logPromptModalSkipped.Reason.IncompleteEntry, entryPoint, v10)
+			end
 		else
-			modalType = v11.robloxComponentType
-		end
+			modalSignalStore.setHasShown(entryPoint, true)
 
-		v12.modalType = modalType
-		v3(SetCentralOverlay(sduiPromptModal, v12))
+			if FFlagPromptsModalSkipTelemetry then
+				logPromptModalSkipped.markShown(entryPoint, v10)
+			end
 
-		if FFlagSduiDismissPromptAction then
-			ref2.current = v11.title
-			ref3.current = v11.identifier
+			local sduiPromptModal = CentralOverlayType.SduiPromptModal
+			local v11 = {
+				configKey = surfaceConfig.configKey,
+				appPage = surfaceConfig.appPage,
+				modalId = v10.identifier,
+				modalType = 0
+			}
+			local modalType
+
+			if FFlagPromptsImpressionUsesTitle then
+				modalType = v10.title
+			else
+				modalType = v10.robloxComponentType
+			end
+
+			v11.modalType = modalType
+			v3(SetCentralOverlay(sduiPromptModal, v11))
+
+			if FFlagSduiDismissPromptAction then
+				ref2.current = v10.title
+				ref3.current = v10.identifier
+			end
 		end
-	end, { v7, v8, v3, v5, v11, surfaceConfig, entryPoint })
+	end
+
+	local v11
+
+	if FFlagPromptsModalSkipTelemetry then
+		v11 = v9
+	end
+
+	useEffect(fn, { v6, v7, v3, modalSignalStore, v10, surfaceConfig, entryPoint, v11 })
 
 	if FFlagSduiDismissPromptAction then
 		React.useEffect(function()
@@ -437,7 +496,7 @@ local function PromptsHandler(props)
 				return
 			end
 
-			for _, v12 in v10 do
+			for _, v12 in v9 do
 				if v12.title == current then
 					return
 				end
@@ -456,7 +515,15 @@ local function PromptsHandler(props)
 			then
 				v3(SetCentralOverlay())
 			end
-		end, { v10, v3, v4 })
+		end, { v9, v3, v4 })
+	end
+
+	if FFlagPlusUpsellSheetHomePrompt then
+		PlusUpsellSheetPrompt.usePlusUpsellSheetPrompt({
+			entryPoint = entryPoint,
+			hasShownKey = entryPoint,
+			modalSignalStore = modalSignalStore
+		})
 	end
 
 	local v12 = promptStyle == PromptStyle.SurfaceBanner
@@ -704,5 +771,6 @@ end
 local memo = React.memo(PromptsHandler)
 function memo.resetFetchedSessionsForTests()
 	table.clear(v)
+	table.clear(currentUserIds)
 end
 return memo

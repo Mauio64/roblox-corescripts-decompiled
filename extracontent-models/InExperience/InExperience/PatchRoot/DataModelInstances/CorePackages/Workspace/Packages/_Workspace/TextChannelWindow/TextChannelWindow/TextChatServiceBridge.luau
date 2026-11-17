@@ -1,12 +1,16 @@
 local parent = script:FindFirstAncestor("TextChannelWindow").Parent
 
 local SharedFlags = require(parent.SharedFlags)
+local Message = require(script.Parent.Message)
 local TextChannelWindowAnalytics = require(script.Parent.TextChannelWindowAnalytics)
 local ChatUIPrimitives = require(parent.ChatUIPrimitives)
 local TextChannelWindowPerfTracker = ChatUIPrimitives.Telemetry.TextChannelWindowPerfTracker
 local TextChatServiceIntegration = require(script.Parent.TextChatServiceIntegration)
 require(script.Parent.createChannelMessagesStore)
 local isTextSourceMuted = require(script.Parent.isTextSourceMuted)
+local connectHistoryReplay = require(script.Parent.connectHistoryReplay)
+
+local FFlagExpChatTextChannelWindowHistoryReplay = require(script.Parent.Flags.FFlagExpChatTextChannelWindowHistoryReplay)
 
 local getFFlagExpChatProtectedChatInternalAPIs = SharedFlags.getFFlagExpChatProtectedChatInternalAPIs
 local getFFlagExpChatUseChatMuteStore = require(script.Parent.getFFlagExpChatUseChatMuteStore)
@@ -45,7 +49,7 @@ local function getMessageStatus(p): string
 	return "unknown"
 end
 
-local function createTextChatServiceBridge(folder, p: string, data)
+local function createTextChatServiceBridge(folder, p: string, data, p2)
 	local v = {}
 
 	local function connectChannel(textChannel)
@@ -54,15 +58,15 @@ local function createTextChatServiceBridge(folder, p: string, data)
 		end
 
 		local v2 = textChannel.Name == "RBXSystem"
-		local connections = { (textChannel.MessageReceived:Connect(function(p2)
+		local connections = { (textChannel.MessageReceived:Connect(function(p3)
 				if
-					not (p2.TextSource or v2)
-					or getFFlagExpChatUseChatMuteStore() and p2.TextSource and isTextSourceMuted(p2.TextSource)
+					not (p3.TextSource or v2)
+					or getFFlagExpChatUseChatMuteStore() and p3.TextSource and isTextSourceMuted(p3.TextSource)
 				then
 					return
 				end
 
-				local mapTextChatMessage = TextChatServiceIntegration.mapTextChatMessage(p2, p)
+				local mapTextChatMessage = TextChatServiceIntegration.mapTextChatMessage(p3, p)
 
 				if mapTextChatMessage.content == "" then
 					data.removeMessage(textChannel, mapTextChatMessage.messageId)
@@ -70,12 +74,12 @@ local function createTextChatServiceBridge(folder, p: string, data)
 					data.upsertMessage(textChannel, mapTextChatMessage)
 				end
 
-				if p2.TextSource and tostring(p2.TextSource.UserId) ~= p then
-					TextChannelWindowPerfTracker.startReceiveInterval(p2.MessageId, textChannel.Name)
+				if p3.TextSource and tostring(p3.TextSource.UserId) ~= p then
+					TextChannelWindowPerfTracker.startReceiveInterval(p3.MessageId, textChannel.Name)
 				end
 
 				TextChannelWindowAnalytics.emit(TextChannelWindowAnalytics.Counters.MessageReceived, {
-					status = getMessageStatus(p2),
+					status = getMessageStatus(p3),
 					target_text_channel_category = TextChannelWindowAnalytics.getChannelCategory(textChannel.Name)
 				})
 			end)) }
@@ -139,6 +143,56 @@ local function createTextChatServiceBridge(folder, p: string, data)
 			data.removeChannelEntry(textChannel)
 		end
 	end)
+
+	if FFlagExpChatTextChannelWindowHistoryReplay then
+		local function startHistoryReplay()
+			local function fn(items)
+				local v2 = {}
+
+				for _, item in items do
+					local textChannel = item.TextChannel
+					local textSource = item.TextSource
+
+					if
+						not textChannel
+						or not textSource
+						or getFFlagExpChatUseChatMuteStore() and isTextSourceMuted(textSource)
+					then
+						continue
+					end
+
+					local mapTextChatMessage = TextChatServiceIntegration.mapTextChatMessage(item, p)
+
+					if mapTextChatMessage.content == "" then
+						continue
+					end
+
+					local v3 = v2[textChannel] or {}
+					v2[textChannel] = v3
+					table.insert(v3, Message.markHistorical(mapTextChatMessage))
+				end
+
+				for k, v3 in v2 do
+					data.insertHistorical(k, v3)
+				end
+			end
+			local v2 = { service = folder, defer = 0 }
+			local defer
+
+			if p2 then
+				defer = p2.defer
+			end
+
+			v2.defer = defer
+			connectHistoryReplay(fn, v2)
+		end
+
+		if p2 and p2.whenCanChat then
+			p2.whenCanChat(startHistoryReplay)
+		else
+			startHistoryReplay()
+		end
+	end
 end
 
 return createTextChatServiceBridge

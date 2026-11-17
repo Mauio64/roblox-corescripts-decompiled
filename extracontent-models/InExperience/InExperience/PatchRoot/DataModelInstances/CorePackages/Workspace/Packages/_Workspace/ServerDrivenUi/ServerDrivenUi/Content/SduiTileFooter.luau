@@ -5,7 +5,6 @@ local UIBlox = require(parent.UIBlox)
 local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local TextSize = require(parent.TextSize)
 
@@ -23,18 +22,7 @@ local function SduiTileFooter(props)
 	local v = useTokens()
 
 	local fontStyle = props.fontStyle or v.Typography.BodyMedium
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = fontStyle.Font
-	end
-
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(fontStyle.Font)
-	end
-
+	local fontFace = normalizeFontFace(fontStyle.Font)
 	local textColor = props.textColor or v.Color.Content.Default.Color3
 	local udim
 
@@ -139,7 +127,6 @@ local function SduiTileFooter(props)
 			Text = props.leftText or "",
 			AutomaticSize = Enum.AutomaticSize.X,
 			Size = UDim2.new(0, 0, 0, v2),
-			Font = font,
 			FontFace = fontFace,
 			TextSize = fontStyle.FontSize,
 			TextTransparency = 0,
@@ -194,7 +181,6 @@ local function SduiTileFooter(props)
 				Text = props.rightText or "",
 				AutomaticSize = Enum.AutomaticSize.X,
 				Size = UDim2.new(0, 0, 0, v2),
-				Font = font,
 				FontFace = fontFace,
 				TextSize = fontStyle.FontSize,
 				TextTransparency = 0,
@@ -232,7 +218,6 @@ local function SduiTileFooter(props)
 			LayoutOrder = layoutOrder,
 			ZIndex = zIndex,
 			Text = props.leftText or "",
-			Font = font,
 			FontFace = fontFace,
 			TextSize = fontStyle.FontSize,
 			TextTransparency = 0,

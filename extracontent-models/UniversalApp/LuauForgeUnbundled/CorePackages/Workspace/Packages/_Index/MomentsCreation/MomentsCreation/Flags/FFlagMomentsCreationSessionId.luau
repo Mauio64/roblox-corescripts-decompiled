@@ -1,2 +1,0 @@
-return game:DefineFastFlag("MomentsCreationSessionId", false)
-	and game:GetEngineFeature("MomentsCreatePostPublishTracking")

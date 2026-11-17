@@ -47,13 +47,13 @@ local OmniRecommendationsContentType = DiscoveryTypes.OmniRecommendationsContent
 local SharedFlags2 = require(parent.SharedFlags)
 local FStringLuaAppAdPreferencesUrl = SharedFlags2.FStringLuaAppAdPreferencesUrl
 local SharedFlags3 = require(parent.SharedFlags)
-local FFlagLuaAppEnableHomepageOneByTwoTile = SharedFlags3.FFlagLuaAppEnableHomepageOneByTwoTile
+local FFlagLuaAppEnableNxMRoduxApportioning = SharedFlags3.FFlagLuaAppEnableNxMRoduxApportioning
 
 local function useCreatorName(universeId: string)
 	local v = useDispatch()
 	local v2 = useRoactService(RoactNetworking)
 
-	if FFlagLuaAppEnableHomepageOneByTwoTile then
+	if FFlagLuaAppEnableNxMRoduxApportioning then
 		local v3
 
 		if universeId == nil then
@@ -183,7 +183,7 @@ local function WhyThisAdModal(props)
 	}
 	local sponsoredDisclosureNoUniverse
 
-	if FFlagLuaAppEnableHomepageOneByTwoTile then
+	if FFlagLuaAppEnableNxMRoduxApportioning then
 		sponsoredDisclosureNoUniverse = {
 			getSponsoredDisclosureNoUniverseTranslationKey(props.sponsoredUserCohort), -- inferred equivalent call
 			PayerName = props.payerName
@@ -219,7 +219,7 @@ local function WhyThisAdModal(props)
 	local v5 = nil
 	local text
 
-	if FFlagLuaAppEnableHomepageOneByTwoTile then
+	if FFlagLuaAppEnableNxMRoduxApportioning then
 		local v6 = props.contentType == OmniRecommendationsContentType.AdLink
 		local v7
 

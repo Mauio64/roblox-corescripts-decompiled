@@ -1,1 +1,0 @@
-return game:DefineFastFlag("AXMarketplaceLicensing2", false)

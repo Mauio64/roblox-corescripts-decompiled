@@ -1,0 +1,6 @@
+local FFlagDataHydrationAccountReset = require(script.Parent.FFlagDataHydrationAccountReset)
+local FFlagProfileInsightsKeyByRankingStrategy = require(script.Parent.FFlagProfileInsightsKeyByRankingStrategy)
+
+return game:DefineFastFlag("TrustedFriendCandidatesSection", false)
+	and FFlagDataHydrationAccountReset
+	and FFlagProfileInsightsKeyByRankingStrategy

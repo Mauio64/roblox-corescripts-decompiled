@@ -11,11 +11,12 @@ local RobuxTransferFlowEventName = require(CurrencyTransfers.Enums.RobuxTransfer
 local logCurrencyTransferCounter = require(CurrencyTransfers.Utils.logCurrencyTransferCounter)
 local logRobuxTransferFlowEvent = require(CurrencyTransfers.Utils.logRobuxTransferFlowEvent)
 
-local function handleTransferBlock(data, p, p2: string?, p3)
+local function handleTransferBlock(data, p, p2: string?, p3, flag: boolean?)
 	local setPromptState = data.setPromptState
 	local setAmpRecourseActions = data.setAmpRecourseActions
 	local setAmpFeatureCheck = data.setAmpFeatureCheck
 	local setTransferRetryOrigin = data.setTransferRetryOrigin
+	local setFreeTransfersExhausted = data.setFreeTransfersExhausted
 	local setRecipient = data.setRecipient
 	local getRecipient = data.getRecipient
 	local getTransferRequestId = data.getTransferRequestId
@@ -39,6 +40,7 @@ local function handleTransferBlock(data, p, p2: string?, p3)
 			setTransferRetryOrigin(p3)
 		end
 
+		setFreeTransfersExhausted(flag == true)
 		setPromptState(PromptState.TransferBlocked)
 	end
 

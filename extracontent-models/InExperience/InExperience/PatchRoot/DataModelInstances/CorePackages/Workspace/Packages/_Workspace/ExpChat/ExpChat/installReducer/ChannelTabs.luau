@@ -31,7 +31,6 @@ local SetChannelUnreadStatus = require(Actions.SetChannelUnreadStatus)
 local FFlagExpChatUnreadTabIndicatorV2Window = require(ExpChat.Flags.FFlagExpChatUnreadTabIndicatorV2Window)
 
 local getFFlagExpChatFixChannelTabsMidExperienceToggle = require(ExpChat.Flags.getFFlagExpChatFixChannelTabsMidExperienceToggle)
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
 local FFlagExpChatFriendsTabRequireDefaultChannels = SharedFlags.FFlagExpChatFriendsTabRequireDefaultChannels
 local GetFFlagTextChatEnableUniverseChatTabs = ExpChatShared.Flags.GetFFlagTextChatEnableUniverseChatTabs
 
@@ -42,6 +41,10 @@ local shouldSuppressUnreadForTabMetadata = require(ExpChat.shouldSuppressUnreadF
 local isGlobalTabFirst = require(ExpChat.isGlobalTabFirst)
 local getDefaultTabName = require(ExpChat.getDefaultTabName)
 local FFlagExpChatGlobalTabDefault = require(ExpChat.Flags.FFlagExpChatGlobalTabDefault)
+local FFlagExpChatStickyTabs = SharedFlags.FFlagExpChatStickyTabs
+
+local isUserSelectedTabTracked = require(ExpChat.isUserSelectedTabTracked)
+local canReplaceUserSelectedTab = require(ExpChat.canReplaceUserSelectedTab)
 
 local function insertTabAndReorder(items, p)
 	local joined = { [p.Name] = p }
@@ -57,11 +60,7 @@ local function insertTabAndReorder(items, p)
 end
 
 local function hasFriendsTab(p): boolean -- 2 equivalent calls inferred from this helper
-	if FFlagExpChatEnableFriendsTab then
-		return p[FriendsChatTabName] ~= nil
-	end
-
-	return false
+	return p[FriendsChatTabName] ~= nil
 end
 
 local function priorityTabCount(p) -- 3 equivalent calls inferred from this helper
@@ -157,7 +156,7 @@ local function removeChannelTab(data, p: string)
 	}
 	local hasUserSelectedTab
 
-	if FFlagExpChatGlobalTabDefault then
+	if isUserSelectedTabTracked() then
 		hasUserSelectedTab = data.hasUserSelectedTab
 	end
 
@@ -165,52 +164,8 @@ local function removeChannelTab(data, p: string)
 	return v2
 end
 
-local function onChannelRemoved(data, textChannel)
-	if FFlagExpChatEnableFriendsTab then
-		return removeChannelTab(data, textChannel.Name)
-	end
-
-	local allChannelTab = data.allChannelTabs[textChannel.Name]
-
-	if allChannelTab == nil then
-		return data
-	end
-
-	local joined = removeTabAndReorder(data.allChannelTabs, allChannelTab)
-	local selectedTabName
-
-	if allChannelTab.Name == data.selectedTabName then
-		if FFlagExpChatGlobalTabDefault then
-			selectedTabName = getDefaultTabName(joined)
-		else
-			selectedTabName = joined.RBXGeneral and "RBXGeneral" or nil
-		end
-	else
-		selectedTabName = data.selectedTabName
-	end
-
-	if selectedTabName and joined[selectedTabName] then
-		joined = dictionary.join(joined, {
-			[selectedTabName] = dictionary.join(joined[selectedTabName], {
-				HasUnreadMessages = false
-			})
-		})
-	end
-
-	local v2 = {
-		allChannelTabs = joined,
-		selectedTabName = selectedTabName,
-		channelTabsConfigurationEnabled = data.channelTabsConfigurationEnabled,
-		hasUserSelectedTab = 0
-	}
-	local hasUserSelectedTab
-
-	if FFlagExpChatGlobalTabDefault then
-		hasUserSelectedTab = data.hasUserSelectedTab
-	end
-
-	v2.hasUserSelectedTab = hasUserSelectedTab
-	return v2
+local function onChannelRemoved(p, textChannel) -- 2 equivalent calls inferred from this helper
+	return removeChannelTab(p, textChannel.Name)
 end
 
 local function handleIncomingMessageReceived(p, data)
@@ -303,7 +258,7 @@ local function pruneNonSpecialTabs(allChannelTabs)
 end
 
 local function isDefaultTabOnlyMode(p) -- 2 equivalent calls inferred from this helper
-	return (GetFFlagTextChatEnableUniverseChatTabs() or FFlagExpChatFriendsTabRequireDefaultChannels and FFlagExpChatEnableFriendsTab)
+	return (GetFFlagTextChatEnableUniverseChatTabs() or FFlagExpChatFriendsTabRequireDefaultChannels)
 		and not p.channelTabsConfigurationEnabled
 end
 
@@ -385,7 +340,7 @@ local v2 = {
 
 		local hasUserSelectedTab
 
-		if FFlagExpChatGlobalTabDefault then
+		if isUserSelectedTabTracked() then
 			hasUserSelectedTab = data.hasUserSelectedTab
 		end
 
@@ -396,43 +351,43 @@ local v2 = {
 			hasUserSelectedTab = hasUserSelectedTab
 		}
 	end,
-	[LocalTextChannelParticipantAdded.name] = function(p, p2)
-		local name = p2.textChannel.Name
+	[LocalTextChannelParticipantAdded.name] = function(data, p)
+		local name = p.textChannel.Name
 
 		v:trace("LocalTextChannelParticipantAdded dispatched: {}", name)
 
 		if
-			p.allChannelTabs[name] ~= nil
+			data.allChannelTabs[name] ~= nil
 			or name == "RBXSystem"
-			or not shouldRenderTextChannelInDefaultWindow(p2.textChannel, getTextChannelDisplayMode())
+			or not shouldRenderTextChannelInDefaultWindow(p.textChannel, getTextChannelDisplayMode())
 		then
-			return p
+			return data
 		end
 
-		if isDefaultTabOnlyMode(p) and name ~= "RBXGeneral" then -- inferred equivalent call
-			return p
+		if isDefaultTabOnlyMode(data) and name ~= "RBXGeneral" then -- inferred equivalent call
+			return data
 		end
 
 		local tabIndex
 
 		if name == "RBXGeneral" then
 			if FFlagExpChatGlobalTabDefault then
-				local allChannelTabs = p.allChannelTabs
+				local allChannelTabs = data.allChannelTabs
 				tabIndex = FFlagExpChatGlobalTabDefault and isGlobalTabFirst() and allChannelTabs.RBXGlobal and 2 or 1
 			else
 				tabIndex = 1
 			end
 		elseif GetFFlagTextChatEnableUniverseChatTabs() and name == "RBXGlobal" then
 			if FFlagExpChatGlobalTabDefault then
-				local allChannelTabs = p.allChannelTabs
+				local allChannelTabs = data.allChannelTabs
 				tabIndex = FFlagExpChatGlobalTabDefault and isGlobalTabFirst() and 1
 					or allChannelTabs.RBXGeneral and 2
 					or 1
 			else
-				tabIndex = p.allChannelTabs.RBXGeneral and 2 or 1
+				tabIndex = data.allChannelTabs.RBXGeneral and 2 or 1
 			end
 		else
-			local allChannelTabs = p.allChannelTabs
+			local allChannelTabs = data.allChannelTabs
 			tabIndex = priorityTabCount(allChannelTabs) + 1 -- inferred equivalent call
 		end
 
@@ -440,60 +395,71 @@ local v2 = {
 
 		v2.Type = "TextChat"
 
-		local allChannelTabs = insertTabAndReorder(p.allChannelTabs, v2)
+		local allChannelTabs = insertTabAndReorder(data.allChannelTabs, v2)
 
 		if GetFFlagTextChatEnableUniverseChatTabs() then
-			local selectedTabName = p.selectedTabName
+			local selectedTabName = data.selectedTabName
+
+			local v3 = canReplaceUserSelectedTab(data.hasUserSelectedTab)
 
 			if
-				selectedTabName == "RBXGlobal"
+				v3
+				and selectedTabName == "RBXGlobal"
 				and name == "RBXGeneral"
 				and not (FFlagExpChatGlobalTabDefault and isGlobalTabFirst())
 			then
 				selectedTabName = "RBXGeneral"
-			elseif
-				FFlagExpChatEnableFriendsTab
-				and selectedTabName == FriendsChatTabName
-				and (name == "RBXGeneral" or name == "RBXGlobal")
-			then
+			elseif v3 and selectedTabName == FriendsChatTabName and (name == "RBXGeneral" or name == "RBXGlobal") then
 				selectedTabName = name
 			end
 
-			return dictionary.join(p, {
+			return dictionary.join(data, {
 				allChannelTabs = allChannelTabs,
 				selectedTabName = selectedTabName
 			})
-		elseif FFlagExpChatEnableFriendsTab and name == "RBXGeneral" and p.selectedTabName == FriendsChatTabName then
-			return dictionary.join(p, {
+		elseif
+			name == "RBXGeneral"
+			and data.selectedTabName == FriendsChatTabName
+			and canReplaceUserSelectedTab(data.hasUserSelectedTab)
+		then
+			return dictionary.join(data, {
 				allChannelTabs = allChannelTabs,
 				selectedTabName = "RBXGeneral"
 			})
 		else
-			return dictionary.join(p, { allChannelTabs = allChannelTabs })
+			return dictionary.join(data, { allChannelTabs = allChannelTabs })
 		end
 	end,
 	[LocalTextChannelParticipantRemoved.name] = function(p, p2)
 		v:trace("LocalTextChannelParticipantRemoved dispatched: {}", p2.textChannel.Name)
-		return onChannelRemoved(p, p2.textChannel)
+		return onChannelRemoved(p, p2.textChannel) -- inferred equivalent call
 	end,
 	[TextChannelRemoved.name] = function(p, p2)
 		v:trace("TextChannelRemoved dispatched: {}", p2.textChannel.Name)
-		return onChannelRemoved(p, p2.textChannel)
+		return onChannelRemoved(p, p2.textChannel) -- inferred equivalent call
 	end,
-	[TargetTextChannelPropertyChanged.name] = function(p, p2)
+	[TargetTextChannelPropertyChanged.name] = function(p, data)
 		v:trace("TargetTextChannelPropertyChanged dispatched")
-		local v2
+		local name
 
-		if p2.textChannel then
-			v2 = p2.textChannel.Name
+		if data.textChannel then
+			name = data.textChannel.Name
 		end
 
-		return selectTextChannelTabByName(p, v2, p2.shouldReorderTabs)
+		if not FFlagExpChatStickyTabs then
+			return selectTextChannelTabByName(p, name, data.shouldReorderTabs)
+		end
+
+		if data.isUserInitiated then
+			p = dictionary.join(p, { hasUserSelectedTab = true })
+		end
+
+		return selectTextChannelTabByName(p, name, data.shouldReorderTabs)
 	end,
 	[TextChatChannelSelected.name] = function(p, p2)
 		v:trace("TextChatChannelSelected dispatched: {}", p2.channelName)
 
-		if FFlagExpChatGlobalTabDefault then
+		if isUserSelectedTabTracked() then
 			return selectTextChannelTabByName(
 				dictionary.join(p, { hasUserSelectedTab = true }),
 				p2.channelName,
@@ -565,7 +531,7 @@ v2[UniverseChatChannelAdded.name] = function(data, p)
 			and not data.hasUserSelectedTab
 		then
 			selectedTabName = p.channelName
-		elseif FFlagExpChatEnableFriendsTab and selectedTabName == FriendsChatTabName then
+		elseif selectedTabName == FriendsChatTabName and canReplaceUserSelectedTab(data.hasUserSelectedTab) then
 			selectedTabName = p.channelName
 		end
 	else
@@ -579,10 +545,6 @@ v2[UniverseChatChannelAdded.name] = function(data, p)
 end
 
 v2[FriendsChatChannelAdded.name] = function(p, p2)
-	if not FFlagExpChatEnableFriendsTab then
-		return p
-	end
-
 	v:trace("FriendsChatChannelAdded dispatched: {}", p2.channelName)
 
 	if p.allChannelTabs[p2.channelName] ~= nil then
@@ -611,20 +573,16 @@ v2[FriendsChatChannelAdded.name] = function(p, p2)
 end
 
 v2[FriendsChatChannelRemoved.name] = function(p, p2)
-	if not FFlagExpChatEnableFriendsTab then
-		return p
-	end
-
 	v:trace("FriendsChatChannelRemoved dispatched: {}", p2.channelName)
 	return removeChannelTab(p, p2.channelName)
 end
 
 v2[FriendsChatChannelSelected.name] = function(p, p2)
-	if not FFlagExpChatEnableFriendsTab then
-		return p
-	end
-
 	v:trace("FriendsChatChannelSelected dispatched: {}", p2.channelName)
+
+	if FFlagExpChatStickyTabs then
+		return dictionary.join(p, { selectedTabName = p2.channelName, hasUserSelectedTab = true })
+	end
 
 	return dictionary.join(p, { selectedTabName = p2.channelName })
 end
@@ -651,7 +609,7 @@ v2[UniverseChatChannelSelected.name] = function(p, p2)
 	local allChannelTab = p.allChannelTabs[p2.channelName]
 
 	if allChannelTab == nil then
-		if FFlagExpChatGlobalTabDefault then
+		if isUserSelectedTabTracked() then
 			return dictionary.join(p, {
 				selectedTabName = p2.channelName,
 				hasUserSelectedTab = p2.isUserInitiated and true or nil
@@ -666,7 +624,7 @@ v2[UniverseChatChannelSelected.name] = function(p, p2)
 			[p2.channelName] = dictionary.join(allChannelTab, { HasUnreadMessages = false })
 		}),
 		selectedTabName = p2.channelName,
-		hasUserSelectedTab = FFlagExpChatGlobalTabDefault and p2.isUserInitiated and true or nil
+		hasUserSelectedTab = isUserSelectedTabTracked() and p2.isUserInitiated and true or nil
 	})
 end
 

@@ -27,6 +27,7 @@ local useBuildPromptChipRequests = require(BuildExperience.Chat.useBuildPromptCh
 local useBuildPromptDraft = require(BuildExperience.Chat.useBuildPromptDraft)
 local useChatSessionCore = require(BuildExperience.Chat.useChatSessionCore)
 local sendBuildExperienceEvent = require(BuildExperience.Telemetry.sendBuildExperienceEvent)
+local FFlagBuildExperienceChatOpenId = require(BuildExperience.Flags.FFlagBuildExperienceChatOpenId)
 local GetBuildPromptChipsStore = require(BuildExperience.Stores.GetBuildPromptChipsStore)
 local GetBuildOverflowMenuStore = require(BuildExperience.Stores.GetBuildOverflowMenuStore)
 local GetCreatorAgentResumeStore = require(BuildExperience.Stores.GetCreatorAgentResumeStore)
@@ -301,6 +302,63 @@ local function usePromptChipViewModel(data, target, flag: boolean)
 	}
 end
 
+local function useChatOpen(target)
+	local ref = React.useRef(nil)
+
+	if target.chatOpenId ~= nil then
+		ref.current = target.chatOpenId
+	end
+
+	local current = ref.current
+
+	if current ~= nil then
+		CreatorAgentChat.chatOpenTelemetry.open(current, target.universeId)
+
+		if target.universeId ~= nil then
+			CreatorAgentChat.chatOpenTelemetry.setUniverseId(current, target.universeId)
+		end
+	end
+
+	React.useEffect(function()
+		if current == nil then
+			return nil
+		end
+
+		local current2 = current
+		return function()
+			CreatorAgentChat.chatOpenTelemetry.close(current2)
+		end
+	end, { current })
+	return current
+end
+
+local function useChatOpenSessionLink(chatOpenId: string?, target, currentSessionId: string?)
+	local ref = React.useRef(nil)
+	local v4 = currentSessionId or target.sessionId
+
+	if chatOpenId ~= nil then
+		CreatorAgentChat.chatOpenTelemetry.setSessionId(chatOpenId, v4)
+	end
+
+	React.useEffect(function()
+		if chatOpenId == nil or v4 == nil then
+			return
+		end
+
+		local current = ref.current
+
+		if current == nil or current.chatOpenId ~= chatOpenId or current.sessionId ~= v4 then
+			ref.current = { chatOpenId = chatOpenId, sessionId = v4 }
+			sendBuildExperienceEvent("CHAT_SESSION_LINKED", {
+				universeId = target.universeId,
+				placeId = target.placeId,
+				conversationId = v4,
+				chatOpenId = chatOpenId
+			})
+		end
+	end, { chatOpenId, v4 })
+end
+
 local function useBuildChatPageViewModel(data)
 	local v4 = useTokens()
 	local v5 = useUniverseSummary(data.target.universeId)
@@ -440,8 +498,17 @@ local function useBuildChatPageViewModel(data)
 		v9 = false
 	end
 
-	local target = React.useMemo(function()
-		local v10 = {
+	local v10
+
+	if FFlagBuildExperienceChatOpenId then
+		v10 = useChatOpen(data.target)
+	else
+		v10 = nil
+	end
+
+	local useMemo = React.useMemo
+	local function fn()
+		local v11 = {
 			universeId = data.target.universeId,
 			placeId = data.target.placeId,
 			sessionId = data.target.sessionId,
@@ -449,7 +516,8 @@ local function useBuildChatPageViewModel(data)
 			isNewGameTarget = data.target.isNewGameTarget,
 			modelSelectionDraftId = 0,
 			creatorName = 0,
-			gameIcon = 0
+			gameIcon = 0,
+			chatOpenId = 0
 		}
 		local modelSelectionDraftId
 
@@ -457,32 +525,60 @@ local function useBuildChatPageViewModel(data)
 			modelSelectionDraftId = data.target.modelSelectionDraftId
 		end
 
-		v10.modelSelectionDraftId = modelSelectionDraftId
+		v11.modelSelectionDraftId = modelSelectionDraftId
 
-		v10.creatorName = data.target.creatorName
-		v10.gameIcon = data.target.gameIcon
-		return v10
-	end, {
-		data.target.universeId,
-		data.target.placeId,
-		data.target.sessionId,
-		data.target.experienceName,
-		data.target.isNewGameTarget,
-		data.target.modelSelectionDraftId,
-		data.target.creatorName,
-		data.target.gameIcon,
-		v5
+		v11.creatorName = data.target.creatorName
+		v11.gameIcon = data.target.gameIcon
+		local chatOpenId
+
+		if FFlagBuildExperienceChatOpenId then
+			chatOpenId = v10
+		end
+
+		v11.chatOpenId = chatOpenId
+		return v11
+	end
+
+	local universeId = data.target.universeId
+	local placeId = data.target.placeId
+	local sessionId = data.target.sessionId
+	local experienceName = data.target.experienceName
+	local isNewGameTarget2 = data.target.isNewGameTarget
+	local modelSelectionDraftId = data.target.modelSelectionDraftId
+	local creatorName = data.target.creatorName
+	local gameIcon = data.target.gameIcon
+	local v11
+
+	if FFlagBuildExperienceChatOpenId then
+		v11 = v10
+	end
+
+	local target = useMemo(fn, {
+		universeId,
+		placeId,
+		sessionId,
+		experienceName,
+		isNewGameTarget2,
+		modelSelectionDraftId,
+		creatorName,
+		gameIcon,
+		v5,
+		v11
 	})
 
 	local useCallback = React.useCallback
-	local function fn(data2)
+	local function fn2(data2)
 		if FFlagBuildExperienceModelPicker and target.modelSelectionDraftId ~= nil then
 			GetBuildModelSelectionStore(false).promoteDraft(target.modelSelectionDraftId, data2.universeId)
 		end
 
+		if FFlagBuildExperienceChatOpenId and target.chatOpenId ~= nil then
+			CreatorAgentChat.chatOpenTelemetry.setUniverseId(target.chatOpenId, data2.universeId)
+		end
+
 		if data.onNavigateToResolvedTarget ~= nil then
 			local onNavigateToResolvedTarget = data.onNavigateToResolvedTarget
-			local v10 = {
+			local v12 = {
 				universeId = data2.universeId,
 				placeId = data2.placeId,
 				sessionId = data2.sessionId,
@@ -490,37 +586,51 @@ local function useBuildChatPageViewModel(data)
 				isNewGameTarget = target.isNewGameTarget,
 				modelSelectionDraftId = 0,
 				creatorName = 0,
-				gameIcon = 0
+				gameIcon = 0,
+				chatOpenId = 0
 			}
-			local modelSelectionDraftId
+			local modelSelectionDraftId2
 
 			if FFlagBuildExperienceModelPicker then
-				modelSelectionDraftId = target.modelSelectionDraftId
+				modelSelectionDraftId2 = target.modelSelectionDraftId
 			end
 
-			v10.modelSelectionDraftId = modelSelectionDraftId
+			v12.modelSelectionDraftId = modelSelectionDraftId2
 
-			v10.creatorName = target.creatorName
-			v10.gameIcon = target.gameIcon
-			onNavigateToResolvedTarget(v10)
+			v12.creatorName = target.creatorName
+			v12.gameIcon = target.gameIcon
+			local chatOpenId
+
+			if FFlagBuildExperienceChatOpenId then
+				chatOpenId = target.chatOpenId
+			end
+
+			v12.chatOpenId = chatOpenId
+			onNavigateToResolvedTarget(v12)
 		end
 	end
 
-	local v10
+	local v12
 
 	if FFlagBuildExperienceModelPicker then
-		v10 = { data.onNavigateToResolvedTarget, target }
+		v12 = { data.onNavigateToResolvedTarget, target }
 	else
-		v10 = {
-			data.onNavigateToResolvedTarget,
-			target.experienceName,
-			target.isNewGameTarget,
-			target.creatorName,
-			target.gameIcon
-		}
+		v12 = { nil, nil, nil, nil, nil, nil }
+		local onNavigateToResolvedTarget = data.onNavigateToResolvedTarget
+		local experienceName2 = target.experienceName
+		local isNewGameTarget3 = target.isNewGameTarget
+		local creatorName2 = target.creatorName
+		local gameIcon2 = target.gameIcon
+		local v13
+
+		if FFlagBuildExperienceChatOpenId then
+			v13 = target.chatOpenId
+		end
+
+		v12[1], v12[2], v12[3], v12[4], v12[5], v12[6] = onNavigateToResolvedTarget, experienceName2, isNewGameTarget3, creatorName2, gameIcon2, v13
 	end
 
-	local onProjectResolved = useCallback(fn, v10)
+	local onProjectResolved = useCallback(fn2, v12)
 
 	local state11, setState11 = React.useState({ count = 0, reason = nil })
 
@@ -534,25 +644,25 @@ local function useBuildChatPageViewModel(data)
 			end)
 		end
 	end, {})
-	local v11
+	local v13
 
 	if FFlagBuildAdUpsell then
-		v11 = GetAdUpsellEventStore(false)
+		v13 = GetAdUpsellEventStore(false)
 	else
-		v11 = nil
+		v13 = nil
 	end
 
 	local onAssistantTurnCompleted
 
 	if FFlagBuildAdUpsell then
 		onAssistantTurnCompleted = React.useCallback(function(p)
-			if v11 ~= nil then
-				v11.reportAssistantTurnCompleted(p)
+			if v13 ~= nil then
+				v13.reportAssistantTurnCompleted(p)
 			end
-		end, { v11 })
+		end, { v13 })
 	end
 
-	local v12 = {
+	local v14 = {
 		universeId = data.target.universeId,
 		placeId = data.target.placeId,
 		sessionId = data.target.sessionId,
@@ -565,32 +675,36 @@ local function useBuildChatPageViewModel(data)
 		onAssistantTurnCompleted = 0,
 		sendMessageWhen = 0
 	}
-	local modelSelectionDraftId
+	local modelSelectionDraftId2
 
 	if FFlagBuildExperienceModelPicker then
-		modelSelectionDraftId = target.modelSelectionDraftId
+		modelSelectionDraftId2 = target.modelSelectionDraftId
 	end
 
-	v12.modelSelectionDraftId = modelSelectionDraftId
-	v12.onProjectResolved = onProjectResolved
+	v14.modelSelectionDraftId = modelSelectionDraftId2
+	v14.onProjectResolved = onProjectResolved
 
 	if FFlagBuildExperienceModelPicker then
 		onPromptFailure = nil
 	end
 
-	v12.onPromptFailure = onPromptFailure
-	v12.trackAdUpsellTurns = FFlagBuildAdUpsell
-	v12.onAssistantTurnCompleted = onAssistantTurnCompleted
-	v12.sendMessageWhen = not isChatReadOnly
-	local v13 = useChatSessionCore(v12)
+	v14.onPromptFailure = onPromptFailure
+	v14.trackAdUpsellTurns = FFlagBuildAdUpsell
+	v14.onAssistantTurnCompleted = onAssistantTurnCompleted
+	v14.sendMessageWhen = not isChatReadOnly
+	local v15 = useChatSessionCore(v14)
 
-	local isChatEmpty = #v13.messages == 0
-	local v14 = usePromptChipViewModel(v13, data.target, isChatReadOnly)
-	local promptChips = v14.promptChips
-	local isPromptChipsLoading = v14.isPromptChipsLoading
-	local onPromptChipActivated = v14.onPromptChipActivated
-	local onPromptChipExhausted = v14.onPromptChipExhausted
-	local onComposerChanged = v14.onComposerChanged
+	if FFlagBuildExperienceChatOpenId then
+		useChatOpenSessionLink(v10, data.target, v15.currentSessionId)
+	end
+
+	local isChatEmpty = #v15.messages == 0
+	local v16 = usePromptChipViewModel(v15, data.target, isChatReadOnly)
+	local promptChips = v16.promptChips
+	local isPromptChipsLoading = v16.isPromptChipsLoading
+	local onPromptChipActivated = v16.onPromptChipActivated
+	local onPromptChipExhausted = v16.onPromptChipExhausted
+	local onComposerChanged = v16.onComposerChanged
 	local modelPicker
 
 	if FFlagBuildExperienceModelPicker then
@@ -598,9 +712,9 @@ local function useBuildChatPageViewModel(data)
 			data.target.universeId,
 			data.target.modelSelectionDraftId,
 			data.modelPicker,
-			v13.modelSessionModels,
-			v13.hasPreparedModelSession,
-			v13.internalTesting
+			v15.modelSessionModels,
+			v15.hasPreparedModelSession,
+			v15.internalTesting
 		)
 	end
 
@@ -614,43 +728,43 @@ local function useBuildChatPageViewModel(data)
 				return
 			end
 
-			v13.setComposerText(initialPrompt)
+			v15.setComposerText(initialPrompt)
 
-			if v13.sendMessage() then
+			if v15.sendMessage() then
 				ref2.current = true
 			end
-		end, { data.initialPrompt, v13.sendMessage, v13.setComposerText })
+		end, { data.initialPrompt, v15.sendMessage, v15.setComposerText })
 	end
 
 	if FFlagBuildExperienceMonetizationNativeUI then
-		local universeId = data.target.universeId
-		local sessionId = data.target.sessionId
-		local setPrefilledComposerText = v13.setPrefilledComposerText
-		local sendMessage = v13.sendMessage
+		local universeId2 = data.target.universeId
+		local sessionId2 = data.target.sessionId
+		local setPrefilledComposerText = v15.setPrefilledComposerText
+		local sendMessage = v15.sendMessage
 		local isFocused = data.isFocused ~= false
-		local v15
+		local v17
 
 		if FFlagBuildExperienceDeveloperProductContext then
-			v15 = v13
+			v17 = v15
 		end
 
-		useBuildPromptDraft(universeId, sessionId, setPrefilledComposerText, sendMessage, isFocused, v15)
+		useBuildPromptDraft(universeId2, sessionId2, setPrefilledComposerText, sendMessage, isFocused, v17)
 	elseif FFlagBuildExperienceManageDevProduct then
-		local universeId = data.target.universeId
-		local sessionId = data.target.sessionId
-		local setPrefilledComposerText = v13.setPrefilledComposerText
-		local sendMessage = v13.sendMessage
-		local v15
+		local universeId2 = data.target.universeId
+		local sessionId2 = data.target.sessionId
+		local setPrefilledComposerText = v15.setPrefilledComposerText
+		local sendMessage = v15.sendMessage
+		local v17
 
 		if FFlagBuildExperienceDeveloperProductContext then
-			v15 = v13
+			v17 = v15
 		end
 
-		useBuildPromptDraft(universeId, sessionId, setPrefilledComposerText, sendMessage, nil, v15)
+		useBuildPromptDraft(universeId2, sessionId2, setPrefilledComposerText, sendMessage, nil, v17)
 	end
 
-	local v15 = useChatPlaytestFooter(v13, "BuildChatPlaytestCta")
-	local subagentTaskState = v13.subagentTaskState
+	local v17 = useChatPlaytestFooter(v15, "BuildChatPlaytestCta")
+	local subagentTaskState = v15.subagentTaskState
 	local hasTaskGroups
 
 	if subagentTaskState == nil then
@@ -659,21 +773,21 @@ local function useBuildChatPageViewModel(data)
 		hasTaskGroups = #subagentTaskState.groups > 0
 	end
 
-	local v16 = false
+	local v18 = false
 
-	for _, message in v13.messages do
+	for _, message in v15.messages do
 		if message.kind == "user_message" then
-			v16 = true
+			v18 = true
 			break
 		end
 	end
 
-	local v17
+	local v19
 
 	if state3 == permissionsProtocol.Status.DENIED then
-		v17 = not state4 and (not state7 or state8)
+		v19 = not state4 and (not state7 or state8)
 	else
-		v17 = false
+		v19 = false
 	end
 
 	local ref2 = React.useRef(false)
@@ -683,7 +797,7 @@ local function useBuildChatPageViewModel(data)
 			return function() end
 		end
 
-		local isAssistantResponding = v17 and v16 and v13.isAssistantResponding
+		local isAssistantResponding = v19 and v18 and v15.isAssistantResponding
 
 		if isAssistantResponding and not state8 then
 			setState8(true)
@@ -694,32 +808,32 @@ local function useBuildChatPageViewModel(data)
 		end
 
 		return function() end
-	end, { v17, v16, v13.isAssistantResponding, state7, state8 })
+	end, { v19, v18, v15.isAssistantResponding, state7, state8 })
 
 	React.useEffect(function()
-		local universeId = data.target.universeId
-		local v18 = ref2.current and not v13.isAssistantResponding
-		ref2.current = v13.isAssistantResponding
+		local universeId2 = data.target.universeId
+		local v20 = ref2.current and not v15.isAssistantResponding
+		ref2.current = v15.isAssistantResponding
 
-		if not v18 or universeId == nil or universeId == 0 then
+		if not v20 or universeId2 == nil or universeId2 == 0 then
 			return function() end
 		end
 
 		if FFlagBuildAdUpsell then
 			task.defer(function()
 				if ref.current then
-					fetchCachedUniverseSummary(universeId) -- inferred equivalent call
+					fetchCachedUniverseSummary(universeId2) -- inferred equivalent call
 				end
 			end)
 		else
-			fetchCachedUniverseSummary(universeId) -- inferred equivalent call
+			fetchCachedUniverseSummary(universeId2) -- inferred equivalent call
 		end
 
 		return function() end
-	end, { data.target.universeId, v13.isAssistantResponding })
+	end, { data.target.universeId, v15.isAssistantResponding })
 
 	local useEffect = React.useEffect
-	local function fn2()
+	local function fn3()
 		if FFlagBuildExperienceMonetizationNativeUI and data.isFocused == false then
 			return
 		end
@@ -734,56 +848,56 @@ local function useBuildChatPageViewModel(data)
 		end
 	end
 
-	local v18
+	local v20
 
 	if FFlagBuildExperienceMonetizationNativeUI then
-		v18 = {
+		v20 = {
 			creatorAgentResumeStore,
 			data.target.universeId or false,
 			data.target.sessionId or false,
 			data.isFocused ~= false
 		}
 	else
-		v18 = { creatorAgentResumeStore, data.target.universeId, data.target.sessionId }
+		v20 = { creatorAgentResumeStore, data.target.universeId, data.target.sessionId }
 	end
 
-	useEffect(fn2, v18)
+	useEffect(fn3, v20)
 
-	local v19 = React.useCallback(function()
-		if v13.textBoxRef.current then
-			v13.textBoxRef.current.releaseFocus()
+	local v21 = React.useCallback(function()
+		if v15.textBoxRef.current then
+			v15.textBoxRef.current.releaseFocus()
 		end
-	end, { v13.textBoxRef })
+	end, { v15.textBoxRef })
 
 	local onOpenCreatorCreditPage = React.useCallback(function()
-		v19()
+		v21()
 
 		if data.onOpenCreatorCreditPage ~= nil then
 			data.onOpenCreatorCreditPage()
 		end
-	end, { v19, data.onOpenCreatorCreditPage })
+	end, { v21, data.onOpenCreatorCreditPage })
 
 	if data.onOpenCreatorCreditPage == nil then
 		onOpenCreatorCreditPage = nil
 	end
 
-	local v20
+	local v22
 
 	if FFlagEnableBuildAdPromotion then
-		v20 = React.useCallback(function()
-			v19()
+		v22 = React.useCallback(function()
+			v21()
 
 			if data.onOpenGetUsersPage ~= nil then
 				data.onOpenGetUsersPage()
 			end
-		end, { v19, data.onOpenGetUsersPage })
+		end, { v21, data.onOpenGetUsersPage })
 	end
 
 	if data.onOpenGetUsersPage == nil then
-		v20 = nil
+		v22 = nil
 	end
 
-	local v21 = {
+	local v23 = {
 		namedTier = FFlagBuildExperienceModelPicker and modelPicker and modelPicker.selectedId == "advanced" and not (modelPicker.internalTesting and modelPicker.internalTesting.isSelected) and "advanced" or nil,
 		onOpenCreatorCreditPage = onOpenCreatorCreditPage,
 		outOfCreditsPromptFailureCount = 0,
@@ -793,92 +907,92 @@ local function useBuildChatPageViewModel(data)
 	local count
 
 	if FFlagBuildExperienceModelPicker then
-		if v13.fundingFailure then
-			count = v13.fundingFailure.count
+		if v15.fundingFailure then
+			count = v15.fundingFailure.count
 		end
 	else
 		count = state11.count
 	end
 
-	v21.outOfCreditsPromptFailureCount = count
+	v23.outOfCreditsPromptFailureCount = count
 	local reason
 
 	if FFlagBuildExperienceModelPicker then
-		if v13.fundingFailure then
-			reason = v13.fundingFailure.reason
+		if v15.fundingFailure then
+			reason = v15.fundingFailure.reason
 		end
 	else
 		reason = state11.reason
 	end
 
-	v21.outOfCreditsPromptFailureReason = reason
+	v23.outOfCreditsPromptFailureReason = reason
 
-	v21.isAssistantResponding = v13.isAssistantResponding
-	local v22 = useCreatorCreditChatUpsellViewModel(v21)
+	v23.isAssistantResponding = v15.isAssistantResponding
+	local v24 = useCreatorCreditChatUpsellViewModel(v23)
 
-	local v23 = (FFlagBuildAdUpsell or FFlagEnableBuildAdPromotion)
+	local v25 = (FFlagBuildAdUpsell or FFlagEnableBuildAdPromotion)
 		and GameConfigurationLabels.getAudience(v5) == UniverseConfiguration.PrivacyType.Public
-	local sessionId
+	local sessionId2
 
 	if FFlagBuildAdUpsell or FFlagBuildExperienceLibrary then
-		sessionId = getResolvedSessionId(v13.messages, data.target.sessionId, data.target.universeId)
+		sessionId2 = getResolvedSessionId(v15.messages, data.target.sessionId, data.target.universeId)
 	else
-		sessionId = nil
+		sessionId2 = nil
 	end
 
-	local v24
+	local v26
 
 	if FFlagBuildAdUpsell then
-		v24 = useAdUpsellChatViewModel({
-			messages = v13.messages,
-			isHistoryExhausted = v13.isHistoryExhausted,
-			sessionId = sessionId,
-			isPublic = v23,
+		v26 = useAdUpsellChatViewModel({
+			messages = v15.messages,
+			isHistoryExhausted = v15.isHistoryExhausted,
+			sessionId = sessionId2,
+			isPublic = v25,
 			isPageVisible = data.isFocused ~= false,
 			universeId = data.target.universeId
 		})
 	else
-		v24 = v2
+		v26 = v2
 	end
 
-	local v25
+	local v27
 
 	if FFlagBuildAgentAdCampaignCard then
-		v25 = useAgentAdCampaignChatViewModel({
+		v27 = useAgentAdCampaignChatViewModel({
 			universeId = data.target.universeId,
-			sessionId = sessionId,
+			sessionId = sessionId2,
 			isPageVisible = data.isFocused ~= false
 		})
 	else
-		v25 = v3
+		v27 = v3
 	end
 
 	local onClose = React.useCallback(function()
-		v19()
+		v21()
 		data.onClose()
-	end, { v19, data.onClose })
+	end, { v21, data.onClose })
 
 	local onOverflowMenuAction = React.useCallback(function(p)
 		if p.type == "openPage" then
-			v19()
+			v21()
 
 			if data.onOpenConfigurationPage then
 				data.onOpenConfigurationPage(p.page)
 			end
 		elseif p.type == "openInvitePicker" then
-			v19()
+			v21()
 
 			if data.onOpenInvitePicker then
 				data.onOpenInvitePicker()
 			end
 		elseif p.type == "openInviteManagement" then
-			v19()
+			v21()
 
 			if data.onOpenInviteManagement then
 				data.onOpenInviteManagement()
 			end
 		end
-	end, { v19, data.onOpenConfigurationPage, data.onOpenInvitePicker, data.onOpenInviteManagement })
+	end, { v21, data.onOpenConfigurationPage, data.onOpenInvitePicker, data.onOpenInviteManagement })
 	local onPublish
 
 	if FFlagBuildExperiencePlaytestCardPublishCta then
@@ -888,190 +1002,190 @@ local function useBuildChatPageViewModel(data)
 	end
 
 	local onOpenLibrary = React.useCallback(function()
-		v19()
+		v21()
 
 		if data.onOpenLibrary ~= nil then
-			data.onOpenLibrary(sessionId)
+			data.onOpenLibrary(sessionId2)
 		end
-	end, { v19, data.onOpenLibrary, sessionId })
+	end, { v21, data.onOpenLibrary, sessionId2 })
 
 	local onPlayActivated = React.useCallback(function()
 		sendBuildExperienceEvent(
 			FFlagBuildEventsUpdate1 and "PLAYTEST_CLICK" or "PLAY_CLICK",
-			{ universeId = data.target.universeId, placeId = v13.playtestPlaceId },
+			{ universeId = data.target.universeId, placeId = v15.playtestPlaceId },
 			FFlagBuildEventsUpdate1 and { context = "app_header" } or nil
 		)
 
-		if v13.launchPlaytest then
-			v13.launchPlaytest("BuildChatPage")
+		if v15.launchPlaytest then
+			v15.launchPlaytest("BuildChatPage")
 		end
-	end, { v13.launchPlaytest, v13.playtestPlaceId, data.target.universeId })
+	end, { v15.launchPlaytest, v15.playtestPlaceId, data.target.universeId })
 
 	local onOpenAgentsPage = React.useCallback(function()
-		v19()
+		v21()
 		data.onOpenAgentsPage(subagentTaskState or v)
-	end, { v19, data.onOpenAgentsPage, subagentTaskState })
+	end, { v21, data.onOpenAgentsPage, subagentTaskState })
 
 	local onChipActivated = React.useCallback(function(p: string)
-		v19()
+		v21()
 		setState(p)
-	end, { v19 })
+	end, { v21 })
 
-	local v26 = {}
-	v26.target = target
-	v26.agentSpecVersion = v13.agentSpecVersion
-	v26.setAgentSpecVersion = v13.setAgentSpecVersion
-	v26.keyboardOverlap = keyboardOverlap
-	v26.onPageMetricsChanged = onPageMetricsChanged
-	v26.selectedChipGroupName = state
-	v26.onChipActivated = onChipActivated
+	local v28 = {}
+	v28.target = target
+	v28.agentSpecVersion = v15.agentSpecVersion
+	v28.setAgentSpecVersion = v15.setAgentSpecVersion
+	v28.keyboardOverlap = keyboardOverlap
+	v28.onPageMetricsChanged = onPageMetricsChanged
+	v28.selectedChipGroupName = state
+	v28.onChipActivated = onChipActivated
 
-	function v26.onChipBottomSheetClose()
+	function v28.onChipBottomSheetClose()
 		setState(nil)
 	end
 
-	v26.onClose = onClose
-	v26.onOpenLibrary = onOpenLibrary
-	v26.isLibraryDisabled = FFlagBuildExperienceLibrary and (data.target.universeId == nil or v9)
-	v26.onOverflowMenuAction = onOverflowMenuAction
-	v26.onPlayActivated = onPlayActivated
-	v26.onOpenAgentsPage = onOpenAgentsPage
-	v26.onOpenCreatorCreditPage = onOpenCreatorCreditPage
-	v26.onOpenGetUsersPage = v20
-	v26.isUniversePublic = v23
-	v26.buildOverflowMenuStore = buildOverflowMenuStore
-	v26.messages = v13.messages
-	v26.localToolActions = v13.localToolActions
+	v28.onClose = onClose
+	v28.onOpenLibrary = onOpenLibrary
+	v28.isLibraryDisabled = FFlagBuildExperienceLibrary and (data.target.universeId == nil or v9)
+	v28.onOverflowMenuAction = onOverflowMenuAction
+	v28.onPlayActivated = onPlayActivated
+	v28.onOpenAgentsPage = onOpenAgentsPage
+	v28.onOpenCreatorCreditPage = onOpenCreatorCreditPage
+	v28.onOpenGetUsersPage = v22
+	v28.isUniversePublic = v25
+	v28.buildOverflowMenuStore = buildOverflowMenuStore
+	v28.messages = v15.messages
+	v28.localToolActions = v15.localToolActions
 	local answerForm
 
 	if FFlagBuildExperienceAnswerForm then
-		answerForm = v13.answerForm
+		answerForm = v15.answerForm
 	end
 
-	v26.answerForm = answerForm
+	v28.answerForm = answerForm
 	local onSubmitAnswerText
 
 	if FFlagBuildExperienceAnswerForm then
-		onSubmitAnswerText = v13.submitAnswerText
+		onSubmitAnswerText = v15.submitAnswerText
 	end
 
-	v26.onSubmitAnswerText = onSubmitAnswerText
-	v26.clockBinding = v13.clockBinding
-	v26.onPlaytest = v15.onPlaytest
+	v28.onSubmitAnswerText = onSubmitAnswerText
+	v28.clockBinding = v15.clockBinding
+	v28.onPlaytest = v17.onPlaytest
 
 	if data.onOpenConfigurationPage == nil then
 		onPublish = nil
 	end
 
-	v26.onPublish = onPublish
-	v26.isPlaytestLoading = v15.isPlaytestLoading
-	v26.isPlaytestDisabled = isPlaytestDisabled
+	v28.onPublish = onPublish
+	v28.isPlaytestLoading = v17.isPlaytestLoading
+	v28.isPlaytestDisabled = isPlaytestDisabled
 	local showPushNotificationsUpsell
 
 	if engineFeature then
-		showPushNotificationsUpsell = state8 and v17
+		showPushNotificationsUpsell = state8 and v19
 	else
-		showPushNotificationsUpsell = v17
+		showPushNotificationsUpsell = v19
 	end
 
-	v26.showPushNotificationsUpsell = showPushNotificationsUpsell
+	v28.showPushNotificationsUpsell = showPushNotificationsUpsell
 
-	v26.isPushNotificationsRequestPending = state5
-	v26.shouldOpenPushNotificationsSettings = state6
-	v26.onNotifyMe = onNotifyMe
-	v26.onOpenPushNotificationsSettings = onOpenPushNotificationsSettings
-	v26.onNotNow = onNotNow
-	v26.showBuyMoreRobuxCard = v22.showBuyMoreRobuxCard
-	v26.buyMoreRobuxCardTitle = v22.buyMoreRobuxCardTitle
-	v26.buyMoreRobuxCardDescription = v22.buyMoreRobuxCardDescription
-	v26.buyMoreRobuxCardPrimaryActionText = v22.buyMoreRobuxCardPrimaryActionText
-	v26.onBuyMoreRobuxCardPrimaryAction = v22.onBuyMoreRobuxCardPrimaryAction
-	v26.buyMoreRobuxCardSecondaryActionText = v22.buyMoreRobuxCardSecondaryActionText
-	v26.onBuyMoreRobuxCardSecondaryAction = v22.onBuyMoreRobuxCardSecondaryAction
-	v26.adUpsellCards = v24.adUpsellCards
-	v26.adUpsellCongratsAnchorIndex = v24.adUpsellCongratsAnchorIndex
-	v26.adUpsellFreePromotionsRemaining = v24.adUpsellFreePromotionsRemaining
-	v26.isAdUpsellCreatePending = v24.isAdUpsellCreatePending
-	v26.isAdUpsellCreateDisabled = isAdUpsellCreateDisabled
-	v26.isAdCampaignSheetOpen = v24.isAdCampaignSheetOpen
-	v26.hasAdCampaignCreateError = v24.hasAdCampaignCreateError
-	v26.adCampaignCreateErrorKind = v24.adCampaignCreateErrorKind
-	v26.adCampaignDurationDays = v24.adCampaignDurationDays
-	v26.adCampaignEstimatedPriceRobux = v24.adCampaignEstimatedPriceRobux
-	v26.adCampaignOffers = v24.adCampaignOffers
-	v26.adCampaignRunStartTimeMs = v24.adCampaignRunStartTimeMs
-	v26.adCampaignRunEndTimeMs = v24.adCampaignRunEndTimeMs
-	v26.isAdCampaignCreatedToastVisible = v24.isAdCampaignCreatedToastVisible
-	v26.onAdCampaignCreatedToastDismiss = v24.onAdCampaignCreatedToastDismiss
-	v26.onAdUpsellCreate = v24.onAdUpsellCreate
-	v26.onAdUpsellDismiss = v24.onAdUpsellDismiss
-	v26.onAdUpsellImpression = v24.onAdUpsellImpression
-	v26.onAdCampaignSheetClose = v24.onAdCampaignSheetClose
-	v26.onAdCampaignSheetCreate = v24.onAdCampaignSheetCreate
-	v26.isAgentAdCampaignSheetOpen = v25.isSheetOpen
-	v26.isAgentAdCampaignCreatePending = v25.isCreatePending
-	v26.hasAgentAdCampaignCreateError = v25.hasCreateError
-	v26.agentAdCampaignCreateErrorKind = v25.createErrorKind
-	v26.agentAdCampaignOffers = v25.campaignOffers
-	v26.agentAdCampaignRunStartTimeMs = v25.runStartTimeMs
-	v26.onAgentAdCampaignOfferSelected = v25.onOfferSelected
-	v26.getAgentAdCampaignCardState = v25.getCardState
+	v28.isPushNotificationsRequestPending = state5
+	v28.shouldOpenPushNotificationsSettings = state6
+	v28.onNotifyMe = onNotifyMe
+	v28.onOpenPushNotificationsSettings = onOpenPushNotificationsSettings
+	v28.onNotNow = onNotNow
+	v28.showBuyMoreRobuxCard = v24.showBuyMoreRobuxCard
+	v28.buyMoreRobuxCardTitle = v24.buyMoreRobuxCardTitle
+	v28.buyMoreRobuxCardDescription = v24.buyMoreRobuxCardDescription
+	v28.buyMoreRobuxCardPrimaryActionText = v24.buyMoreRobuxCardPrimaryActionText
+	v28.onBuyMoreRobuxCardPrimaryAction = v24.onBuyMoreRobuxCardPrimaryAction
+	v28.buyMoreRobuxCardSecondaryActionText = v24.buyMoreRobuxCardSecondaryActionText
+	v28.onBuyMoreRobuxCardSecondaryAction = v24.onBuyMoreRobuxCardSecondaryAction
+	v28.adUpsellCards = v26.adUpsellCards
+	v28.adUpsellCongratsAnchorIndex = v26.adUpsellCongratsAnchorIndex
+	v28.adUpsellFreePromotionsRemaining = v26.adUpsellFreePromotionsRemaining
+	v28.isAdUpsellCreatePending = v26.isAdUpsellCreatePending
+	v28.isAdUpsellCreateDisabled = isAdUpsellCreateDisabled
+	v28.isAdCampaignSheetOpen = v26.isAdCampaignSheetOpen
+	v28.hasAdCampaignCreateError = v26.hasAdCampaignCreateError
+	v28.adCampaignCreateErrorKind = v26.adCampaignCreateErrorKind
+	v28.adCampaignDurationDays = v26.adCampaignDurationDays
+	v28.adCampaignEstimatedPriceRobux = v26.adCampaignEstimatedPriceRobux
+	v28.adCampaignOffers = v26.adCampaignOffers
+	v28.adCampaignRunStartTimeMs = v26.adCampaignRunStartTimeMs
+	v28.adCampaignRunEndTimeMs = v26.adCampaignRunEndTimeMs
+	v28.isAdCampaignCreatedToastVisible = v26.isAdCampaignCreatedToastVisible
+	v28.onAdCampaignCreatedToastDismiss = v26.onAdCampaignCreatedToastDismiss
+	v28.onAdUpsellCreate = v26.onAdUpsellCreate
+	v28.onAdUpsellDismiss = v26.onAdUpsellDismiss
+	v28.onAdUpsellImpression = v26.onAdUpsellImpression
+	v28.onAdCampaignSheetClose = v26.onAdCampaignSheetClose
+	v28.onAdCampaignSheetCreate = v26.onAdCampaignSheetCreate
+	v28.isAgentAdCampaignSheetOpen = v27.isSheetOpen
+	v28.isAgentAdCampaignCreatePending = v27.isCreatePending
+	v28.hasAgentAdCampaignCreateError = v27.hasCreateError
+	v28.agentAdCampaignCreateErrorKind = v27.createErrorKind
+	v28.agentAdCampaignOffers = v27.campaignOffers
+	v28.agentAdCampaignRunStartTimeMs = v27.runStartTimeMs
+	v28.onAgentAdCampaignOfferSelected = v27.onOfferSelected
+	v28.getAgentAdCampaignCardState = v27.getCardState
 	local isAgentAdCampaignCreateDisabled
 
 	if isAdUpsellCreateDisabled then
 		isAgentAdCampaignCreateDisabled = v3.isCreateDisabled
 	else
-		isAgentAdCampaignCreateDisabled = v25.isCreateDisabled
+		isAgentAdCampaignCreateDisabled = v27.isCreateDisabled
 	end
 
-	v26.isAgentAdCampaignCreateDisabled = isAgentAdCampaignCreateDisabled
+	v28.isAgentAdCampaignCreateDisabled = isAgentAdCampaignCreateDisabled
 
-	v26.agentAdCampaignAttemptedOption = v25.attemptedOption
+	v28.agentAdCampaignAttemptedOption = v27.attemptedOption
 
 	if isAdUpsellCreateDisabled then
-		v20 = nil
+		v22 = nil
 	end
 
-	v26.onAgentAdCampaignActive = v20
-	v26.onAgentAdCampaignSheetClose = v25.onSheetClose
-	v26.onAgentAdCampaignSheetCreate = v25.onSheetCreate
-	v26.isAdUpsellVisible = data.isFocused ~= false
-	v26.isChatEmpty = isChatEmpty
-	v26.isHistoryLoading = v13.isHistoryLoading or v8
-	v26.isNewGameTarget = isNewGameTarget
-	v26.hasPublishedTurn = v13.hasPublishedTurn
-	v26.hasPublishedVersion = v5 ~= nil and v5.isActive
-	v26.hasTaskGroups = hasTaskGroups
-	v26.taskState = subagentTaskState
-	v26.scrollingFrameRef = v13.setScrollingFrame
-	v26.anchorScrollToInstance = v13.anchorScrollToInstance
-	v26.onChatViewportChanged = onChatViewportChanged
-	v26.isChatScrollable = state2
-	v26.modelPicker = modelPicker
-	v26.composerText = v13.composerText
-	v26.composerErrorText = v13.composerErrorText
-	v26.onComposerChanged = onComposerChanged
-	v26.promptChips = promptChips
-	v26.isPromptChipsLoading = isPromptChipsLoading
-	v26.onPromptChipActivated = onPromptChipActivated
-	v26.onPromptChipExhausted = onPromptChipExhausted
-	v26.composerImages = v13.composerImages
-	v26.onComposerImagesChanged = v13.setComposerImages
-	v26.onRetryComposerImage = v13.retryComposerImage
-	v26.composerResourceAttachments = v13.composerResourceAttachments
-	v26.onRemoveComposerResourceAttachment = v13.removeComposerResourceAttachmentAtIndex
-	v26.isComposerSendBlocked = v13.isComposerSendBlocked
-	v26.textBoxRef = v13.textBoxRef
-	v26.isAssistantResponding = v13.isAssistantResponding
-	v26.canStopAssistantResponse = v13.canStopAssistantResponse
-	v26.canSendWhileResponding = v13.canSendWhileResponding
-	v26.isChatReadOnly = isChatReadOnly
-	v26.chatPermissions = chatPermissions
-	v26.onSend = v13.sendMessage
-	v26.onStop = v13.stopAssistantResponse
-	v26.statusChipGap = v4.Gap.Small
-	v26.paddingBottom = v4.Padding.Small + keyboardOverlap
-	return v26
+	v28.onAgentAdCampaignActive = v22
+	v28.onAgentAdCampaignSheetClose = v27.onSheetClose
+	v28.onAgentAdCampaignSheetCreate = v27.onSheetCreate
+	v28.isAdUpsellVisible = data.isFocused ~= false
+	v28.isChatEmpty = isChatEmpty
+	v28.isHistoryLoading = v15.isHistoryLoading or v8
+	v28.isNewGameTarget = isNewGameTarget
+	v28.hasPublishedTurn = v15.hasPublishedTurn
+	v28.hasPublishedVersion = v5 ~= nil and v5.isActive
+	v28.hasTaskGroups = hasTaskGroups
+	v28.taskState = subagentTaskState
+	v28.scrollingFrameRef = v15.setScrollingFrame
+	v28.anchorScrollToInstance = v15.anchorScrollToInstance
+	v28.onChatViewportChanged = onChatViewportChanged
+	v28.isChatScrollable = state2
+	v28.modelPicker = modelPicker
+	v28.composerText = v15.composerText
+	v28.composerErrorText = v15.composerErrorText
+	v28.onComposerChanged = onComposerChanged
+	v28.promptChips = promptChips
+	v28.isPromptChipsLoading = isPromptChipsLoading
+	v28.onPromptChipActivated = onPromptChipActivated
+	v28.onPromptChipExhausted = onPromptChipExhausted
+	v28.composerImages = v15.composerImages
+	v28.onComposerImagesChanged = v15.setComposerImages
+	v28.onRetryComposerImage = v15.retryComposerImage
+	v28.composerResourceAttachments = v15.composerResourceAttachments
+	v28.onRemoveComposerResourceAttachment = v15.removeComposerResourceAttachmentAtIndex
+	v28.isComposerSendBlocked = v15.isComposerSendBlocked
+	v28.textBoxRef = v15.textBoxRef
+	v28.isAssistantResponding = v15.isAssistantResponding
+	v28.canStopAssistantResponse = v15.canStopAssistantResponse
+	v28.canSendWhileResponding = v15.canSendWhileResponding
+	v28.isChatReadOnly = isChatReadOnly
+	v28.chatPermissions = chatPermissions
+	v28.onSend = v15.sendMessage
+	v28.onStop = v15.stopAssistantResponse
+	v28.statusChipGap = v4.Gap.Small
+	v28.paddingBottom = v4.Padding.Small + keyboardOverlap
+	return v28
 end
 
 return useBuildChatPageViewModel

@@ -589,11 +589,7 @@ function SduiPropUtils.generateFormatStringPropValue(data, p, data2, p2, callbac
 
 				v3 = v3 and substituteFormatArg(v3, k, v8) -- inferred equivalent call
 			else
-				v3 = v3
-
-				if v3 then
-					v3 = substituteFormatArg(v3, k, tostring(data3)) -- inferred equivalent call
-				end
+				v3 = v3 and substituteFormatArg(v3, k, tostring(data3)) -- inferred equivalent call
 			end
 		end
 
@@ -641,15 +637,9 @@ function SduiPropUtils.generateConditionalPropValue(p, p2, data, p3, p4, callbac
 				return nil, v2
 			end
 
-			local v3, v4 = callback(
-				v and v.kind and v.kind.type,
-				v and v.kind and v.kind.value,
-				p2,
-				p4,
-				data,
-				p3,
-				callback2
-			)
+			local kind = v and v.kind and v.kind.type
+			local value = v and v.kind and v.kind.value
+			local v3, v4 = callback(kind, value, p2, p4, data, p3, callback2)
 
 			if v4 ~= PropResultCategory.PropSignal then
 				return v3, v2

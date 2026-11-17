@@ -3,6 +3,8 @@ local parent = CurrencyTransfers.Parent
 local SharedFlags = require(parent.SharedFlags)
 
 local GetFFlagCurrencyTransferUseBackendTransferLimits = require(CurrencyTransfers.Flags.GetFFlagCurrencyTransferUseBackendTransferLimits)
+
+local FFlagCurrencyTransferNoFreeTransfersRemainingUpsell = require(CurrencyTransfers.Flags.FFlagCurrencyTransferNoFreeTransfersRemainingUpsell)
 local FFlagShowRemainingTransfersForNonPlus = require(CurrencyTransfers.Flags.FFlagShowRemainingTransfersForNonPlus)
 
 require(CurrencyTransfers.Stores.createTransferStore)
@@ -90,8 +92,15 @@ local function initiateTransfer(data)
 
 		if typeof(data2) ~= "table" or not data2.errorMessage then
 			handleTransferError(data, nil)
-		elseif
-			data2.failureReason == FailureReason.AmpRecourseAvailable
+
+			return
+		end
+
+		local v2 = FFlagCurrencyTransferNoFreeTransfersRemainingUpsell
+			and data2.failureReason == FailureReason.NoFreeTransfersRemaining
+
+		if
+			(data2.failureReason == FailureReason.AmpRecourseAvailable or v2)
 			and data2.ampRecourseActions
 			and data2.ampFeatureCheck
 		then
@@ -99,7 +108,8 @@ local function initiateTransfer(data)
 				data,
 				data2.ampRecourseActions,
 				data2.ampFeatureCheck,
-				TransferRetryOrigin.InitiateTransfer
+				TransferRetryOrigin.InitiateTransfer,
+				v2
 			)
 		else
 			handleTransferError(data, data2)

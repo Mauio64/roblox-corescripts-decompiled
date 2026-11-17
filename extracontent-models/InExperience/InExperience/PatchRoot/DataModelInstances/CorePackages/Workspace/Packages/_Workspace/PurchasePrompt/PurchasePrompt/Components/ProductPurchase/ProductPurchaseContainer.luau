@@ -155,6 +155,8 @@ local FFlagBlackbirdUpsellGateResaleAndTimedOption = require(PurchasePrompt.Flag
 local FFlagSetMenuOnPurchasePrompt = require(PurchasePrompt.Flags.FFlagSetMenuOnPurchasePrompt)
 local FFlagSkipBuyDelayForExperienceShop = require(PurchasePrompt.Flags.FFlagSkipBuyDelayForExperienceShop)
 
+local FFlagPurchasePromptIgnoreConfirmWhilePurchaseInProgress = require(PurchasePrompt.Flags.FFlagPurchasePromptIgnoreConfirmWhilePurchaseInProgress)
+
 local SharedFlags14 = require(parent.SharedFlags)
 local FFlagLuaAppsEnablePromptVIPServerPurchase = SharedFlags14.FFlagLuaAppsEnablePromptVIPServerPurchase
 
@@ -347,7 +349,11 @@ function extended:init()
 	end
 
 	function self.getConfirmButtonAction(p, p2, p3)
-		if p == PromptState.None or not isRelevantRequestType(p2) then
+		if
+			p == PromptState.None
+			or not isRelevantRequestType(p2)
+			or FFlagPurchasePromptIgnoreConfirmWhilePurchaseInProgress and p == PromptState.PurchaseInProgress
+		then
 			return nil
 		end
 
@@ -365,6 +371,10 @@ function extended:init()
 			end
 
 			return self.props.onBuy
+		end
+
+		if FFlagPurchasePromptIgnoreConfirmWhilePurchaseInProgress and p == PromptState.UpsellInProgress then
+			return nil
 		end
 
 		if p == PromptState.RobuxUpsell or p == PromptState.UpsellInProgress or p == PromptState.LeaveRobloxWarning then

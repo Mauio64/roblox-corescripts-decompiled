@@ -1,1 +1,0 @@
-return game:DefineFastInt("AXUnifiedEventCounterImpressionFlushSeconds", 30)

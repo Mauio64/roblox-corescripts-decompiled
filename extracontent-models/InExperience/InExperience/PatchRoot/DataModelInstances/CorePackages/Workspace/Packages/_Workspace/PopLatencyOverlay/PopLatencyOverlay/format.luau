@@ -529,115 +529,114 @@ return {
 		local v20 = v19 < 3 and 3 or v19
 		local v21 = colorTag(color3, "Roblox TURN/STUN UDP Latency Monitor") -- inferred equivalent call
 		local v22 = colorTag(color4, v18) -- inferred equivalent call
-		table.insert(v14, v21 .. " " .. v22 .. string.rep(" ", v20) .. colorTag(color4, v16)) -- inferred equivalent call
+		local v23 = string.rep(" ", v20)
+		table.insert(v14, v21 .. " " .. v22 .. v23 .. colorTag(color4, v16)) -- inferred equivalent call
 		table.insert(v14, separator(v11))
 
-		local v23 = "%" .. 8 .. "s"
-		local v24 = "%-3s %-10s" .. v23 .. " " .. v23 .. " " .. v23 .. "   " .. ("%-" .. 11 .. "s") .. "   " .. ("%-" .. v12 .. "s") .. "   "
-		local v25 = escapeRich(string.format(v24, "#", "PoP", "Med RTT", "Avg RTT", "Last RTT", "Loss/Jit", "TURN VIP")) -- inferred equivalent call
-		local v26
+		local v24 = "%" .. 8 .. "s"
+		local v25 = "%-3s %-10s" .. v24 .. " " .. v24 .. " " .. v24 .. "   " .. ("%-" .. 11 .. "s") .. "   " .. ("%-" .. v12 .. "s") .. "   "
+		local v26 = escapeRich(string.format(v25, "#", "PoP", "Med RTT", "Avg RTT", "Last RTT", "Loss/Jit", "TURN VIP")) -- inferred equivalent call
+		local v27
 
 		if v17 then
-			v26 = glyphPad(15) -- inferred equivalent call
+			v27 = glyphPad(15) -- inferred equivalent call
 		else
-			v26 = string.rep(" ", 15)
+			v27 = string.rep(" ", 15)
 		end
 
-		table.insert(
-			v14,
-			colorTag(color5, v25 .. "Bar" .. v26 .. "   Trend" .. (not v10 and "" or glyphPad(7) .. "   Δ v6")) -- inferred equivalent call
-		)
+		local v28 = v26 .. "Bar" .. v27 .. "   Trend" .. (not v10 and "" or glyphPad(7) .. "   Δ v6") -- inferred equivalent call
+		table.insert(v14, colorTag(color5, v28))
 		table.insert(v14, separator(v11))
-		local v27 = 1
+		local v29 = 1
 
-		for _, v28 in ipairs(v6) do
-			renderPopRows(v14, v28, colorTag(color4, escapeRich(string.format("%2d.", v27))), true, v12, v17) -- inferred equivalent call
-			v27 += 1
+		for _, v30 in ipairs(v6) do
+			renderPopRows(v14, v30, colorTag(color4, escapeRich(string.format("%2d.", v29))), true, v12, v17) -- inferred equivalent call
+			v29 += 1
 		end
 
-		for _, v28 in ipairs(v7) do
-			renderPopRows(v14, v28, colorTag(color10, " — "), false, v12, v17) -- inferred equivalent call
+		for _, v30 in ipairs(v7) do
+			renderPopRows(v14, v30, colorTag(color10, " — "), false, v12, v17) -- inferred equivalent call
 		end
 
 		if #v4 > 0 then
 			table.insert(v14, colorTag(color4, escapeRich("debug — public STUN servers, not Roblox PoPs"))) -- inferred equivalent call
 
-			for _, v28 in ipairs(v8) do
-				renderPopRows(v14, v28, colorTag(color4, " · "), true, v12, v17) -- inferred equivalent call
+			for _, v30 in ipairs(v8) do
+				renderPopRows(v14, v30, colorTag(color4, " · "), true, v12, v17) -- inferred equivalent call
 			end
 
-			for _, v28 in ipairs(v9) do
-				renderPopRows(v14, v28, colorTag(color10, " — "), false, v12, v17) -- inferred equivalent call
+			for _, v30 in ipairs(v9) do
+				renderPopRows(v14, v30, colorTag(color10, " — "), false, v12, v17) -- inferred equivalent call
 			end
 		end
 
 		table.insert(v14, separator(v11))
 		local count = 0
 		local total = 0
-		local v28 = nil
-		local v29 = nil
+		local v30 = nil
+		local v31 = nil
 		local popCode = nil
 		local popCode2 = nil
 
-		for _, v30 in ipairs(v6) do
+		for _, v32 in ipairs(v6) do
 			count += 1
-			local __sort = v30.__sort
+			local __sort = v32.__sort
 			total += __sort
 
-			if not v28 or __sort < v28 then
-				popCode = tostring(v30.popCode)
-				v28 = __sort
+			if not v30 or __sort < v30 then
+				popCode = tostring(v32.popCode)
+				v30 = __sort
 			end
 
-			if not (not v29 or v29 < __sort) then
+			if not (not v31 or v31 < __sort) then
 				continue
 			end
 
-			popCode2 = tostring(v30.popCode)
-			v29 = __sort
+			popCode2 = tostring(v32.popCode)
+			v31 = __sort
 		end
 
-		local v30 = count > 0 and total / count or 0
-		local v31 = #v7
-		local v32 = {}
+		local v32 = count > 0 and total / count or 0
+		local v36 = #v7
+		local v37 = {}
 
 		if popCode then
-			table.insert(v32, "best " .. colorTag(color7, string.format("%s %.1fms", popCode, v28))) -- inferred equivalent call
+			table.insert(v37, "best " .. colorTag(color7, string.format("%s %.1fms", popCode, v30))) -- inferred equivalent call
 		end
 
 		if popCode2 then
-			table.insert(v32, "worst " .. colorTag(color9, string.format("%s %.1fms", popCode2, v29))) -- inferred equivalent call
+			table.insert(v37, "worst " .. colorTag(color9, string.format("%s %.1fms", popCode2, v31))) -- inferred equivalent call
 		end
 
 		if count > 0 then
-			table.insert(v32, "avg " .. colorTag(color8, string.format("%.1fms", v30))) -- inferred equivalent call
+			table.insert(v37, "avg " .. colorTag(color8, string.format("%.1fms", v32))) -- inferred equivalent call
 		end
 
-		local v37 = string.format("%d ok   ", count)
-		table.insert(v32, v37 .. colorTag(color10, string.format("%d timeout", v31))) -- inferred equivalent call
+		local v38 = string.format("%d ok   ", count)
+		table.insert(v37, v38 .. colorTag(color10, string.format("%d timeout", v36))) -- inferred equivalent call
 		local count2 = 0
 		local count3 = 0
 
-		for _, v38 in ipairs(v5) do
-			if not v38.v6 or v38.v6.debug then
+		for _, v39 in ipairs(v5) do
+			if not v39.v6 or v39.v6.debug then
 				continue
 			end
 
 			count2 += 1
 
-			if v38.v6.rttMs and v38.v6.rttMs >= 0 then
+			if v39.v6.rttMs and v39.v6.rttMs >= 0 then
 				count3 += 1
 			end
 		end
 
 		if count2 > 0 then
 			table.insert(
-				v32,
+				v37,
 				"v6 " .. colorTag(count3 > 0 and color7 or color9, string.format("%d/%d ok", count3, count2)) -- inferred equivalent call
 			)
 		end
 
-		table.insert(v14, (table.concat(v32, "   │   ")))
+		table.insert(v14, (table.concat(v37, "   │   ")))
 
 		return table.concat(v14, "\n")
 	end

@@ -3,6 +3,9 @@ local parent = AppChat.Parent
 
 local AppChatNetworking = require(parent.AppChatNetworking)
 local Promise = require(parent.Promise)
+local FFlagDisableLegacyReportToDiag = require(parent.SharedFlags.FFlagDisableLegacyReportToDiag)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAppChatEnableReactions = SharedFlags.FFlagAppChatEnableReactions
 
 local Constants = require(AppChat.Constants)
 local reportToDiagByCountryCode = require(AppChat.Utils.reportToDiagByCountryCode)
@@ -11,6 +14,7 @@ local v = Logger:new(script.Name)
 local FFlagAppChatPerfTracking = require(AppChat.Flags.FFlagAppChatPerfTracking)
 local FFlagAppChatMessageTTIMilestones = require(AppChat.Flags.FFlagAppChatMessageTTIMilestones)
 local AppChatPerfTracker = require(AppChat.Telemetry.AppChatPerfTracker)
+local GetMessageReactionsStore = require(AppChat.Stores.GetMessageReactionsStore)
 
 local function fn(p) -- 1 equivalent call inferred from this helper
 	local v2 = tick() - p
@@ -58,8 +62,10 @@ return function(conversationId: string, flag: boolean, p: number)
 
 		table.insert(
 			v2,
-			object:dispatch(AppChatNetworking.rodux.GetNewerMessages.API(conversationId)):andThen(function()
-				fn(p) -- inferred equivalent call
+			object:dispatch(AppChatNetworking.rodux.GetNewerMessages.API(conversationId)):andThen(function(p2)
+				if not FFlagDisableLegacyReportToDiag then
+					fn(p) -- inferred equivalent call
+				end
 
 				if v3 then
 					local v4 = { conversationId = conversationId }
@@ -75,6 +81,10 @@ return function(conversationId: string, flag: boolean, p: number)
 						AppChatPerfTracker.Milestone.PrimaryDataReady.Subphase.ResponseReceived,
 						v4
 					)
+				end
+
+				if FFlagAppChatEnableReactions and p2.responseBody then
+					GetMessageReactionsStore(false).ingestMessageReactions(p2.responseBody.messages)
 				end
 			end):catch(function(p2)
 				v:error(`AppChatNetworking failure in GetNewerMessages: {tostring(p2)}`)

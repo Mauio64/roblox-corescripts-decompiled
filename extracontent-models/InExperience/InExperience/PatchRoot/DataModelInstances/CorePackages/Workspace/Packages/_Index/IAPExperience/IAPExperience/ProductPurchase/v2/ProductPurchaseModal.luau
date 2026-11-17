@@ -2,7 +2,6 @@ local parent = script.Parent.Parent.Parent
 local parent2 = parent.Parent
 
 local React = require(parent2.React)
-local TextService = game:GetService("TextService")
 local Style = require(parent2.Style)
 local GetTextSize = Style.GetTextSize
 
@@ -11,7 +10,6 @@ local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 
 local Foundation = require(parent2.Foundation)
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local Text = Foundation.Text
 local useTokens = Foundation.Hooks.useTokens
 local useTextSizeOffset = Foundation.Hooks.useTextSizeOffset
@@ -90,18 +88,13 @@ local function ProductPurchaseModal(props)
 	end, { props })
 
 	local v6 = React.useMemo(function()
-		local lineHeight = captionSmall.LineHeight
-		local v6
-
-		if FoundationFontFaceMigration then
-			v6 = GetTextSize(text2, captionSmall.FontSize, captionSmall.Font, Vector2.new(state, 1e999), {
-				addTemporaryPadding = false
-			}).Y
-		else
-			v6 = TextService:GetTextSize(text2, captionSmall.FontSize, captionSmall.Font, Vector2.new(state, 1e999)).Y
-		end
-
-		return lineHeight * v6
+		return captionSmall.LineHeight * GetTextSize(
+			text2,
+			captionSmall.FontSize,
+			captionSmall.Font,
+			Vector2.new(state, 1e999),
+			{ addTemporaryPadding = false }
+		).Y
 	end, { state, v5, text2 })
 
 	local createElement = React.createElement

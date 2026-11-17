@@ -8,7 +8,6 @@ local Button = Foundation.Button
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local InputSize = Foundation.Enums.InputSize
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local HeaderBar = UIBlox.App.Bar.HeaderBar
 local IconButton = UIBlox.App.Button.IconButton
@@ -18,46 +17,21 @@ local withStyle = UIBlox.Style.withStyle
 
 local function renderHeaderBarCenter(titleText) -- 1 equivalent call inferred from this helper
 	return function()
-		return withStyle(function(props)
-			local theme = props.Theme
-			local font = props.Font
+		return withStyle(function(p)
+			local theme = p.Theme
 
-			local createElement = React.createElement
-			local v = {
+			return React.createElement("TextLabel", {
 				Text = titleText,
-				Font = 0,
-				FontFace = 0,
-				TextColor3 = 0,
-				TextTransparency = 0,
+				FontFace = normalizeFontFace(p.Tokens.Typography.TitleLarge.Font),
+				TextColor3 = theme.TextEmphasis.Color,
+				TextTransparency = theme.TextEmphasis.Transparency,
 				TextSize = 20,
 				TextWrapped = true,
-				TextXAlignment = 0,
-				TextYAlignment = 0,
-				Size = 0,
+				TextXAlignment = Enum.TextXAlignment.Center,
+				TextYAlignment = Enum.TextYAlignment.Center,
+				Size = UDim2.new(1, 0, 1, 0),
 				BackgroundTransparency = 1
-			}
-			local font2
-
-			if not FoundationFontFaceMigration then
-				font2 = font.Header2.Font
-			end
-
-			v.Font = font2
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(props.Tokens.Typography.TitleLarge.Font)
-			end
-
-			v.FontFace = fontFace
-
-			v.TextColor3 = theme.TextEmphasis.Color
-			v.TextTransparency = theme.TextEmphasis.Transparency
-
-			v.TextXAlignment = Enum.TextXAlignment.Center
-			v.TextYAlignment = Enum.TextYAlignment.Center
-			v.Size = UDim2.new(1, 0, 1, 0)
-			return createElement("TextLabel", v)
+			})
 		end)
 	end
 end

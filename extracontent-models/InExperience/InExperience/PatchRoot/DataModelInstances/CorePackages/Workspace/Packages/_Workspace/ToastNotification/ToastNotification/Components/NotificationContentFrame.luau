@@ -19,7 +19,6 @@ local React = require(parent3.React)
 local Foundation = require(parent3.Foundation)
 local useTokens = Foundation.Hooks.useTokens
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local defaultContentPadding = constants.DefaultContentPadding
 local defaultTextContentPadding = constants.DefaultTextContentPadding
@@ -31,28 +30,9 @@ local isUserThumbnail = toastNotificationHelper.isUserThumbnail
 
 return function(props)
 	local v = useStyle()
-	local v2
-
-	if FoundationFontFaceMigration then
-		v2 = useTokens()
-	end
-
-	local textSize
-
-	if FoundationFontFaceMigration then
-		textSize = v2.Typography.CaptionLarge.FontSize
-	else
-		textSize = v.Font.BaseSize * v.Font.CaptionHeader.RelativeSize
-	end
-
-	local textSize2
-
-	if FoundationFontFaceMigration then
-		textSize2 = v2.Typography.BodySmall.FontSize
-	else
-		textSize2 = v.Font.BaseSize * v.Font.CaptionBody.RelativeSize
-	end
-
+	local v2 = useTokens()
+	local fontSize = v2.Typography.CaptionLarge.FontSize
+	local fontSize2 = v2.Typography.BodySmall.FontSize
 	local cardSize = useNotificationCardData().cardSize
 	local v3
 
@@ -86,68 +66,28 @@ return function(props)
 
 	local v5 = v4 and v4[1]
 
-	local v6 = v5 and v5.title
+	local v6 = v5 and v5.title and {
+		Text = v5.title,
+		MaxSize = Vector2.new(1e999, fontSize * 2),
+		Size = UDim2.new(1, 0, 0, 0),
+		TextSize = fontSize,
+		AutomaticSize = Enum.AutomaticSize.Y,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		LayoutOrder = 1,
+		FontFace = normalizeFontFace(v2.Typography.CaptionLarge.Font),
+		TextColor3 = v.Theme.TextEmphasis.Color
+	}
 
-	if v6 then
-		v6 = {
-			Text = v5.title,
-			MaxSize = Vector2.new(1e999, textSize * 2),
-			Size = UDim2.new(1, 0, 0, 0),
-			TextSize = textSize,
-			AutomaticSize = Enum.AutomaticSize.Y,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			LayoutOrder = 1,
-			Font = 0,
-			FontFace = 0,
-			TextColor3 = 0
-		}
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = v.Font.CaptionHeader.Font
-		end
-
-		v6.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(v2.Typography.CaptionLarge.Font)
-		end
-
-		v6.FontFace = fontFace
-
-		v6.TextColor3 = v.Theme.TextEmphasis.Color
-	end
-
-	local v7 = v5 and v5.label
-
-	if v7 then
-		v7 = {
-			Text = v5.label,
-			MaxSize = Vector2.new(1e999, textSize2 * 2),
-			Size = UDim2.new(1, 0, 0, 0),
-			TextSize = textSize2,
-			AutomaticSize = Enum.AutomaticSize.Y,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			LayoutOrder = 2,
-			Font = 0,
-			FontFace = 0
-		}
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = v.Font.CaptionBody.Font
-		end
-
-		v7.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(v2.Typography.BodySmall.Font)
-		end
-
-		v7.FontFace = fontFace
-	end
+	local v7 = v5 and v5.label and {
+		Text = v5.label,
+		MaxSize = Vector2.new(1e999, fontSize2 * 2),
+		Size = UDim2.new(1, 0, 0, 0),
+		TextSize = fontSize2,
+		AutomaticSize = Enum.AutomaticSize.Y,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		LayoutOrder = 2,
+		FontFace = normalizeFontFace(v2.Typography.BodySmall.Font)
+	}
 
 	local v8 = useNotificationCardData()
 	cardSize = v8.cardSize

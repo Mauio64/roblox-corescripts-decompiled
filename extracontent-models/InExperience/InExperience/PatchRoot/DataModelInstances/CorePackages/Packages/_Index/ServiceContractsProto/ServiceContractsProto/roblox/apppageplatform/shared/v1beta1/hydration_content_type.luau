@@ -83,6 +83,8 @@ v.HydrationContentType = {
 			return "HYDRATION_CONTENT_TYPE_BUY_ROBUX_BONUS_ITEM"
 		elseif p == 38 then
 			return "HYDRATION_CONTENT_TYPE_USER_LIBRARY_SAVED_STATE"
+		elseif p == 39 then
+			return "HYDRATION_CONTENT_TYPE_GAME_PASS_VOTE"
 		end
 
 		return nil
@@ -166,6 +168,8 @@ v.HydrationContentType = {
 			return 37
 		elseif p == "HYDRATION_CONTENT_TYPE_USER_LIBRARY_SAVED_STATE" then
 			return 38
+		elseif p == "HYDRATION_CONTENT_TYPE_GAME_PASS_VOTE" then
+			return 39
 		end
 
 		return p
@@ -249,6 +253,8 @@ v.HydrationContentType = {
 			return "HYDRATION_CONTENT_TYPE_BUY_ROBUX_BONUS_ITEM"
 		elseif p == "HYDRATION_CONTENT_TYPE_USER_LIBRARY_SAVED_STATE" then
 			return "HYDRATION_CONTENT_TYPE_USER_LIBRARY_SAVED_STATE"
+		elseif p == "HYDRATION_CONTENT_TYPE_GAME_PASS_VOTE" then
+			return "HYDRATION_CONTENT_TYPE_GAME_PASS_VOTE"
 		end
 
 		return nil

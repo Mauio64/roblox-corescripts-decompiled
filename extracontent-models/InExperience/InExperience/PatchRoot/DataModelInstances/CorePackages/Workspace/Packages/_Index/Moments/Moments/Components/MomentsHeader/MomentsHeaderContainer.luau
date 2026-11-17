@@ -8,7 +8,8 @@ local useMomentsHeaderViewModel = require(script.Parent.useMomentsHeaderViewMode
 
 local function MomentsHeaderContainer(props)
 	local animateWithImmersiveChrome = props.animateWithImmersiveChrome == true
-	local v = useMomentsHeaderViewModel(props, animateWithImmersiveChrome, props.showHamburger ~= false)
+	local showHamburger = props.showHamburger ~= false
+	local v = useMomentsHeaderViewModel(props, animateWithImmersiveChrome, showHamburger)
 
 	local element = React.createElement(MomentsHeaderView, v)
 

@@ -100,11 +100,11 @@ local function fn(k, list, data)
 end
 
 local function fn2(k, p) -- 1 equivalent call inferred from this helper
-	if k == "friendRequestOriginSource" then
-		return v[p == FriendRequestOriginSource.QrCode and "qrCode" or p == FriendRequestOriginSource.PhoneContactImporter and "contacts" or p == FriendRequestOriginSource.PlayerSearch and "search" or nil]
+	if k ~= "friendRequestOriginSource" then
+		return v[k]
 	end
 
-	return v[k]
+	return v[p == FriendRequestOriginSource.QrCode and "qrCode" or p == FriendRequestOriginSource.PhoneContactImporter and "contacts" or p == FriendRequestOriginSource.PlayerSearch and "search" or nil]
 end
 
 local function useProfileInsightsToIconsAndTexts(p)

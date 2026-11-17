@@ -5,10 +5,11 @@ local Roact = require(parent.Roact)
 local ArgCheck = require(parent.ArgCheck)
 local t = require(parent.t)
 local SharedFlags = require(parent.SharedFlags)
+local Constants = require(script.Parent.Constants)
 
 local FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions = SharedFlags.FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions
 
-local Constants = require(script.Parent.Constants)
+local FFlagLuaAppSduiGameDwell = SharedFlags.FFlagLuaAppSduiGameDwell
 
 local extended = Roact.PureComponent:extend("ImpressionsDetectorWithoutNavigation")
 
@@ -24,6 +25,7 @@ local v = {
 	filterImpressionFunc = 0,
 	onImpressionsDetected = 0,
 	skipZeroSizes = 0,
+	visibilityObserver = 0,
 	isFocused = 0,
 	navigation = 0
 }
@@ -38,6 +40,13 @@ v.viewPortFillBounds = viewPortFillBounds
 v.filterImpressionFunc = t.optional(t.callback)
 v.onImpressionsDetected = t.union(t.callback, t.table)
 v.skipZeroSizes = t.optional(t.boolean)
+local visibilityObserver
+
+if FFlagLuaAppSduiGameDwell then
+	visibilityObserver = t.optional(t.table)
+end
+
+v.visibilityObserver = visibilityObserver
 
 v.isFocused = t.optional(t.boolean)
 v.navigation = t.optional(t.table)
@@ -49,6 +58,20 @@ function extended:init()
 	self.isMounted = false
 	self.lastImpressionTick = nil
 	self.nextImpressionTick = nil
+
+	if FFlagLuaAppSduiGameDwell then
+		self.visibilityObserverCleanup = nil
+	end
+end
+
+if FFlagLuaAppSduiGameDwell then
+	function extended:_attachVisibilityObserver()
+		if self.props.visibilityObserver then
+			self.visibilityObserverCleanup = self.props.visibilityObserver.attach(function()
+				self:_requestImpressions()
+			end, self.props.scanDebounceSeconds)
+		end
+	end
 end
 
 function extended:_boundingBoxIntersectsView(p): boolean
@@ -167,12 +190,20 @@ function extended:_calculateImpressions()
 		local current = self.props.parentRef.current
 
 		if current == nil or not self:_boundingBoxIntersectsView(current) then
+			if FFlagLuaAppSduiGameDwell and self.props.visibilityObserver then
+				self.props.visibilityObserver.sample({}, current ~= nil)
+			end
+
 			return
 		end
 	end
 
-	local tagged = CollectionService:GetTagged(self.props.impressionsTag)
-	local attributes = {}
+	local impressionsTag = self.props.impressionsTag
+
+	local attributes = FFlagLuaAppSduiGameDwell and self.props.visibilityObserver and {} or nil
+
+	local tagged = CollectionService:GetTagged(impressionsTag)
+	local attributes2 = {}
 
 	for _, guiObject in ipairs(tagged) do
 		local attribute = guiObject:GetAttribute(Constants.ItemIndex)
@@ -181,16 +212,22 @@ function extended:_calculateImpressions()
 			continue
 		end
 
-		if not (self.props.filterImpressionFunc == nil or self.props.filterImpressionFunc(attribute)) then
-			continue
+		if FFlagLuaAppSduiGameDwell and attributes then
+			table.insert(attributes, attribute)
 		end
 
-		table.insert(attributes, attribute)
+		if self.props.filterImpressionFunc == nil or self.props.filterImpressionFunc(attribute) then
+			table.insert(attributes2, attribute)
+		end
 	end
 
-	if #attributes > 0 then
+	if FFlagLuaAppSduiGameDwell and attributes then
+		self.props.visibilityObserver.sample(attributes, true)
+	end
+
+	if #attributes2 > 0 then
 		ArgCheck.assert(self.props.onImpressionsDetected ~= nil)
-		self.props.onImpressionsDetected(attributes)
+		self.props.onImpressionsDetected(attributes2)
 	end
 end
 
@@ -227,6 +264,11 @@ end
 
 function extended:didMount()
 	self.isMounted = true
+
+	if FFlagLuaAppSduiGameDwell then
+		self:_attachVisibilityObserver()
+	end
+
 	self:_requestImpressions()
 
 	if self.props.onRequestImpressionsSignal then
@@ -239,13 +281,33 @@ end
 function extended:willUnmount()
 	self.isMounted = false
 
+	if FFlagLuaAppSduiGameDwell and self.visibilityObserverCleanup then
+		self.visibilityObserverCleanup("teardown")
+		self.visibilityObserverCleanup = nil
+	end
+
 	if self.onRequestImpressionsConnection ~= nil then
 		self.onRequestImpressionsConnection:disconnect()
 		self.onRequestImpressionsConnection = nil
 	end
 end
 
-function extended:didUpdate(_, _)
+function extended:didUpdate(p, _)
+	if FFlagLuaAppSduiGameDwell then
+		if p.visibilityObserver == self.props.visibilityObserver then
+			if self.props.visibilityObserver and p.isFocused ~= self.props.isFocused then
+				self.props.visibilityObserver.focusChanged(self.props.isFocused ~= false)
+			end
+		else
+			if self.visibilityObserverCleanup then
+				self.visibilityObserverCleanup("collectionReplaced")
+				self.visibilityObserverCleanup = nil
+			end
+
+			self:_attachVisibilityObserver()
+		end
+	end
+
 	self:_requestImpressions()
 end
 

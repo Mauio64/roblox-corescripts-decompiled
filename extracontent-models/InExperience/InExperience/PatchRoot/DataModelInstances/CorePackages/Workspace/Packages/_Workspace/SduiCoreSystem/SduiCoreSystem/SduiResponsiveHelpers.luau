@@ -35,12 +35,14 @@ local devicePerformanceValue = nil
 local v3 = nil
 
 local function getDevicePerformanceValue()
-	if devicePerformanceValue == nil then
-		if defineFastString == "" then
-			devicePerformanceValue = v2[UserInputService:GetDeviceLevel()] or 3
-		else
-			devicePerformanceValue = v[defineFastString] or 3
-		end
+	if devicePerformanceValue ~= nil then
+		return devicePerformanceValue
+	end
+
+	if defineFastString == "" then
+		devicePerformanceValue = v2[UserInputService:GetDeviceLevel()] or 3
+	else
+		devicePerformanceValue = v[defineFastString] or 3
 	end
 
 	return devicePerformanceValue

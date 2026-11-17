@@ -1,18 +1,26 @@
+local parent = script:FindFirstAncestor("TimeToInteractiveTracker").Parent
+
 require(script.Parent.Parent.types)
 
 local now = require(script.Parent.Parent.Parent.Utils.now)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppNavTTIMeasurementV2 = SharedFlags.FFlagLuaAppNavTTIMeasurementV2
 
-return function(callback)
+return function(callback, p)
 	local set = {}
 
-	return function(p: string, flag: boolean?)
-		callback(function(p2)
-			local v = p2[p]
+	return function(p2: string, flag: boolean?)
+		if FFlagLuaAppNavTTIMeasurementV2 and p then
+			p[p2] = nil
+		end
+
+		callback(function(p3)
+			local v = p3[p2]
 
 			local startTime = now()
 
-			local clone = table.clone(p2)
-			clone[p] = {
+			local clone = table.clone(p3)
+			clone[p2] = {
 				startTime = startTime,
 				endTime = nil,
 				deltaMs = nil,
@@ -21,8 +29,8 @@ return function(callback)
 			}
 
 			if flag then
-				clone[p].metadata.coldStart = not set[p]
-				set[p] = true
+				clone[p2].metadata.coldStart = not set[p2]
+				set[p2] = true
 			end
 
 			return clone

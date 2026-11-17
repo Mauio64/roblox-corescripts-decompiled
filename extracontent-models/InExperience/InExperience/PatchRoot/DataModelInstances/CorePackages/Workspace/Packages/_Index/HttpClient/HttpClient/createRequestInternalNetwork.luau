@@ -2,7 +2,6 @@ local HttpService = game:GetService("HttpService")
 
 require(script.Parent.types)
 local FFlagHttpClientMrRouterHeaders = require(script.Parent.Flags.FFlagHttpClientMrRouterHeaders)
-local FFlagHttpClientRetryExtensions = require(script.Parent.Flags.FFlagHttpClientRetryExtensions)
 local MrRouterHeaders
 
 if FFlagHttpClientMrRouterHeaders then
@@ -29,10 +28,10 @@ end
 local function createRequestInternalNetwork(p)
 	local v
 
-	if FFlagHttpClientRetryExtensions then
-		v = not (p == nil) and p.transportFailuresAsResponses
+	if p == nil then
+		v = false
 	else
-		v = nil
+		v = p.transportFailuresAsResponses
 	end
 
 	return {
@@ -43,22 +42,14 @@ local function createRequestInternalNetwork(p)
 				headers = MrRouterHeaders.injectMrRouterHeaders(data.headers)
 			end
 
-			local v2 = {
+			local internal = HttpService:RequestInternal({
 				Url = data.url,
 				Method = data.method,
 				Headers = headers,
 				Body = data.body,
 				OnMessage = data.onMessage,
-				Priority = 0
-			}
-			local priority
-
-			if FFlagHttpClientRetryExtensions then
-				priority = data.priority
-			end
-
-			v2.Priority = priority
-			local internal = HttpService:RequestInternal(v2)
+				Priority = data.priority
+			})
 
 			local flag = false
 
@@ -69,7 +60,7 @@ local function createRequestInternalNetwork(p)
 
 				flag = true
 
-				if typeof(value) == "table" and (flag2 or FFlagHttpClientRetryExtensions and v) then
+				if typeof(value) == "table" and (flag2 or v) then
 					local stats
 
 					if typeof(value.Stats) == "table" then
@@ -84,7 +75,7 @@ local function createRequestInternalNetwork(p)
 						end
 					end
 
-					local v3 = {
+					local v2 = {
 						statusCode = tonumber(value.StatusCode) or 0,
 						responseBody = value.Body,
 						headers = toLowerKeyedHeaders(value.Headers),
@@ -94,13 +85,13 @@ local function createRequestInternalNetwork(p)
 					}
 					local wasTransportFailure
 
-					if FFlagHttpClientRetryExtensions and v then
+					if v then
 						wasTransportFailure = not flag2
 					end
 
-					v3.wasTransportFailure = wasTransportFailure
-					callback(true, v3)
-				elseif FFlagHttpClientRetryExtensions and v then
+					v2.wasTransportFailure = wasTransportFailure
+					callback(true, v2)
+				elseif v then
 					callback(false, (tostring(value or "RequestInternal failed")))
 				else
 					callback(false, (tostring(value and value.StatusMessage or "RequestInternal failed")))

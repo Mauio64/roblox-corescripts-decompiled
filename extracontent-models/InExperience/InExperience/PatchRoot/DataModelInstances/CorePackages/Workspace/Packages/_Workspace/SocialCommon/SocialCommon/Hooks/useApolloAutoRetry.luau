@@ -7,12 +7,14 @@ local config = LuaSocialLibrariesDeps.SocialLibraries.config({})
 local StatusCodesToRetry = require(script.Parent.StatusCodesToRetry)
 
 local function shouldRetryRequest(object) -- 2 equivalent calls inferred from this helper
-	if object.error then
-		local deepValue = config.Dictionary.getDeepValue(object, "error.graphQLErrors")
+	if not object.error then
+		return false
+	end
 
-		if deepValue and deepValue[1] then
-			return StatusCodesToRetry[config.Dictionary.getDeepValue(deepValue[1], "extensions.status")] or false
-		end
+	local deepValue = config.Dictionary.getDeepValue(object, "error.graphQLErrors")
+
+	if deepValue and deepValue[1] then
+		return StatusCodesToRetry[config.Dictionary.getDeepValue(deepValue[1], "extensions.status")] or false
 	end
 
 	return false

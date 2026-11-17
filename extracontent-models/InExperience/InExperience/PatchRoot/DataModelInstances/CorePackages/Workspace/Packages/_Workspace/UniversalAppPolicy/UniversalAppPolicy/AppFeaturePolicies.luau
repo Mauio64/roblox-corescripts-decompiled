@@ -78,7 +78,6 @@ local FFlagFriendsChatEnableConversationConsent = SharedFlags.FFlagFriendsChatEn
 local FFlagFriendsChatDiscloseUpdateSecondVersion = SharedFlags.FFlagFriendsChatDiscloseUpdateSecondVersion
 local FFlagFriendsChatHasFriendsGate = SharedFlags.FFlagFriendsChatHasFriendsGate
 local FFlagAddPinExperienceTargetDestinationGUACPolicy = SharedFlags.FFlagAddPinExperienceTargetDestinationGUACPolicy
-local FFlagFlyoutSidePanelUseAppPolicy = SharedFlags.FFlagFlyoutSidePanelUseAppPolicy
 local FFlagFlyoutGateLearnPlace = SharedFlags.FFlagFlyoutGateLearnPlace
 
 game:DefineFastFlag("BehaviorCollectionControlEnabled", false)
@@ -653,6 +652,13 @@ local function AppFeaturePolicies(rawPolicy)
 		getBlockVNGU12SignUpOnClientSide = function()
 			return rawPolicy.BlockVNGU12SignUpOnClientSide or false
 		end,
+		getMetaSignupMinimumAge = function()
+			if IsVRAppBuild() then
+				return tonumber(rawPolicy.MetaSignupMinimumAge) or 10
+			end
+
+			return nil
+		end,
 		getUseAgeInput = function()
 			return rawPolicy.UseAgeInput or false
 		end,
@@ -1019,6 +1025,9 @@ local function AppFeaturePolicies(rawPolicy)
 
 			return rawPolicy.MomentsFeatureList
 		end,
+		getShowInContextPersonalizedRecommendationsMomentsFeed = function()
+			return rawPolicy.showInContextPersonalizedRecommendationsMomentsFeed or false
+		end,
 		getSupportCenterEnabled = GetFFlagEnableSupportCenter() and function()
 			return rawPolicy.SupportCenterEnabled or false
 		end or nil,
@@ -1075,11 +1084,7 @@ local function AppFeaturePolicies(rawPolicy)
 			return rawPolicy.PinExperienceTargetDestination or "HomeScreen"
 		end or nil,
 		getFlyoutSidePanelEnabled = function()
-			if FFlagFlyoutSidePanelUseAppPolicy then
-				return rawPolicy.FlyoutSidePanelEnabled or false
-			end
-
-			return false
+			return rawPolicy.FlyoutSidePanelEnabled or false
 		end,
 		getLearnPlaceEnabled = function()
 			return not FFlagFlyoutGateLearnPlace or rawPolicy.LearnPlaceEnabled or false

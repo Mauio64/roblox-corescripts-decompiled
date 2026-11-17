@@ -5,6 +5,8 @@ local Constants = require(parent.Constants)
 
 return function(value: number)
 	return function(object)
-		object:dispatch(CarouselIndexSelected((math.clamp(value, 1, #object:getState()[Constants.RoduxKey].Captures))))
+		local captures = object:getState()[Constants.RoduxKey].Captures
+
+		object:dispatch(CarouselIndexSelected((math.clamp(value, 1, #captures))))
 	end
 end

@@ -344,24 +344,57 @@ local function BottomSheet(p, p2)
 			end
 		end
 	end, { snapPoints, v17, v16, v19 })
+	local v23
+
+	if Flags.FoundationBottomSheetKeepsSnapPoint then
+		v23 = React.useCallback(function()
+			local snapPoint = snapPoints[ref.current]
+
+			if snapPoint ~= nil and not (v9 <= v7(snapPoint)) then
+				local current = 1
+
+				for k, snapPoint2 in snapPoints do
+					if v7(snapPoint2) > v7(snapPoints[current]) then
+						current = k
+					end
+				end
+
+				ref.current = current
+
+				if ref3.current then
+					ref3.current(snapPoints[current], current)
+				end
+			end
+		end, { snapPoints, v7, v9 })
+	else
+		v23 = nil
+	end
 
 	React.useEffect(function()
 		if v3 then
+			local v24
+
+			if Flags.FoundationBottomSheetKeepsSnapPoint and snapPoints[ref.current] ~= nil then
+				v24 = ref.current
+			else
+				v24 = v2.defaultSnapPointIndex
+			end
+
 			if reducedMotion then
-				v18(v2.defaultSnapPointIndex)
+				v18(v24)
 				v10(Otter.instant(0))
 			else
-				v17(v2.defaultSnapPointIndex)
+				v17(v24)
 				v10(Otter.ease(0, { duration = v4.Time.Time_100 }))
 			end
 
-			local v23 = v9 <= v7(snapPoints[v2.defaultSnapPointIndex])
+			local v25 = v9 <= v7(snapPoints[v24])
 
-			if Flags.FoundationSheetReversedContent and not v23 then
-				v23 = ref7.current
+			if Flags.FoundationSheetReversedContent and not v25 then
+				v25 = ref7.current
 			end
 
-			v12(v23)
+			v12(v25)
 		end
 
 		return function()
@@ -415,10 +448,15 @@ local function BottomSheet(p, p2)
 				v12(true)
 			end
 
-			if v20() or ref2.current then
-				v12(true)
-			else
+			if not (v20() or ref2.current) then
 				v22()
+				return
+			end
+
+			v12(true)
+
+			if Flags.FoundationBottomSheetKeepsSnapPoint and not ref2.current then
+				v23()
 			end
 		end)
 
@@ -428,7 +466,7 @@ local function BottomSheet(p, p2)
 			inputBeganConnection:Disconnect()
 			inputEndedConnection:Disconnect()
 		end
-	end, { v3, v22, v21, v14, v20, v13 })
+	end, { v3, v22, v21, v14, v20, v13, v23 })
 
 	local ref14 = React.useRef(nil)
 	local state4, setState4 = React.useState(nil)
@@ -440,7 +478,7 @@ local function BottomSheet(p, p2)
 		return { close = v19 }
 	end, {})
 
-	local v23 = React.useMemo(function()
+	local v24 = React.useMemo(function()
 		return {
 			actionsHeight = actionsHeight,
 			setActionsHeight = setActionsHeight,
@@ -489,7 +527,7 @@ local function BottomSheet(p, p2)
 	})
 
 	local createElement = React.createElement
-	local v24 = {
+	local v25 = {
 		ZIndex = 5,
 		backgroundStyle = v4.Color.Content.Muted,
 		Position = 0,
@@ -497,19 +535,19 @@ local function BottomSheet(p, p2)
 		tag = "align-y-center size-1000-100 padding-y-small radius-small",
 		testId = 0
 	}
-	local v25
+	local v26
 
 	if hasFullBleed then
-		v25 = v4.Padding.Small
+		v26 = v4.Padding.Small
 	else
-		v25 = -v4.Padding.XSmall
+		v26 = -v4.Padding.XSmall
 	end
 
-	v24.Position = UDim2.new(0.5, 0, 0, v25)
-	v24.AnchorPoint = Vector2.new(0.5, 0)
+	v25.Position = UDim2.new(0.5, 0, 0, v26)
+	v25.AnchorPoint = Vector2.new(0.5, 0)
 
-	v24.testId = `{v2.testId}--gripper`
-	local element = createElement(View, v24, {
+	v25.testId = `{v2.testId}--gripper`
+	local element = createElement(View, v25, {
 		TouchTarget = React.createElement(View, {
 			tag = "size-1000-600",
 			stateLayer = { affordance = StateLayerAffordance.None },
@@ -519,9 +557,9 @@ local function BottomSheet(p, p2)
 				if Flags.FoundationSheetReversedContent and ref7.current and ref6.current then
 					local current = ref6.current
 
-					local v26 = math.max(0, current.AbsoluteCanvasSize.Y - current.AbsoluteWindowSize.Y)
-					v11(v26)
-					current.CanvasPosition = Vector2.new(0, v26)
+					local v27 = math.max(0, current.AbsoluteCanvasSize.Y - current.AbsoluteWindowSize.Y)
+					v11(v27)
+					current.CanvasPosition = Vector2.new(0, v27)
 					current:ResetScrollVelocity()
 				elseif ref6.current then
 					v11(0)
@@ -535,21 +573,21 @@ local function BottomSheet(p, p2)
 					return
 				end
 
-				local v26 = ref.current % #snapPoints + 1
+				local v27 = ref.current % #snapPoints + 1
 
 				if reducedMotion then
-					v18(v26)
+					v18(v27)
 				else
-					v17(v26)
+					v17(v27)
 				end
 
-				local v27 = v9 <= v7(snapPoints[v26])
+				local v28 = v9 <= v7(snapPoints[v27])
 
-				if Flags.FoundationSheetReversedContent and not v27 then
-					v27 = ref7.current
+				if Flags.FoundationSheetReversedContent and not v28 then
+					v28 = ref7.current
 				end
 
-				v12(v27)
+				v12(v28)
 			end
 		})
 	})
@@ -558,7 +596,7 @@ local function BottomSheet(p, p2)
 		local createPortal = ReactRoblox.createPortal
 		local createElement2 = React.createElement
 
-		local v26 = {
+		local v27 = {
 			ZIndex = owner.zIndex,
 			ref = ref15,
 			selection = Types.nonSelectable,
@@ -568,7 +606,7 @@ local function BottomSheet(p, p2)
 		}
 
 		local createElement3 = React.createElement
-		local v27 = {
+		local v28 = {
 			Size = UDim2.fromScale(1, 1),
 			CanvasSize = UDim2.new(1, 0, 1, v9 + bottom),
 			ClipsDescendants = false,
@@ -578,20 +616,20 @@ local function BottomSheet(p, p2)
 			ref = ref5,
 			[React.Change.CanvasPosition] = function(p3)
 				ref4.current = p3.CanvasPosition.Y
-				local v27
+				local v28
 
 				if Flags.FoundationSheetReversedContent and contentRevealOffset then
-					v27 = contentRevealOffset:getValue()
+					v28 = contentRevealOffset:getValue()
 				end
 
 				setSheetHeightAvailable(ref4.current - bottom - v4.Margin.Small)
 
-				if Flags.FoundationSheetReversedContent and contentRevealOffset and v27 then
+				if Flags.FoundationSheetReversedContent and contentRevealOffset and v28 then
 					local current = ref6.current
-					local v28 = contentRevealOffset:getValue() - v27
+					local v29 = contentRevealOffset:getValue() - v28
 
-					if ref7.current and current and v28 ~= 0 then
-						current.CanvasPosition = Vector2.new(0, current.CanvasPosition.Y + v28)
+					if ref7.current and current and v29 ~= 0 then
+						current.CanvasPosition = Vector2.new(0, current.CanvasPosition.Y + v29)
 					end
 				end
 
@@ -604,7 +642,7 @@ local function BottomSheet(p, p2)
 		}
 
 		local createElement4 = React.createElement
-		local v28 = {
+		local v29 = {
 			Size = UDim2.new(1, 0, 1, 200 - v9 - bottom),
 			Position = UDim2.new(0, 0, 1, -v9),
 			ZIndex = 3
@@ -625,8 +663,8 @@ local function BottomSheet(p, p2)
 			automaticSize = Enum.AutomaticSize.Y
 		end
 
-		local v29 = {
-			SheetContainer = createElement4(View, v28, {
+		local v30 = {
+			SheetContainer = createElement4(View, v29, {
 				Sheet = createElement5(View, {
 					Size = size,
 					AutomaticSize = automaticSize,
@@ -644,7 +682,7 @@ local function BottomSheet(p, p2)
 					GripperContainer = React.createElement("Folder", nil, { Gripper = element }),
 					Content = React.createElement(
 						SheetContext.Provider,
-						{ value = v23 },
+						{ value = v24 },
 						React.createElement(ElevationOwnerScope, { owner = owner }, v2.children)
 					)
 				})
@@ -676,7 +714,7 @@ local function BottomSheet(p, p2)
 			})
 		end
 
-		v29.Shadow = shadow
+		v30.Shadow = shadow
 		local backdrop
 
 		if Flags.FoundationBottomSheetInternalBackdrop then
@@ -708,8 +746,8 @@ local function BottomSheet(p, p2)
 			})
 		end
 
-		v29.Backdrop = backdrop
-		return (createPortal(createElement2(View, v26, createElement3("ScrollingFrame", v27, v29)), v3))
+		v30.Backdrop = backdrop
+		return (createPortal(createElement2(View, v27, createElement3("ScrollingFrame", v28, v30)), v3))
 	end
 
 	return v3

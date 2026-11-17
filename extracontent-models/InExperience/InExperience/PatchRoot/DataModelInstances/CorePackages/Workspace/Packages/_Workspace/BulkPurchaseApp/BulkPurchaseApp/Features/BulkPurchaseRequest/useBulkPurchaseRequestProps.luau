@@ -174,14 +174,16 @@ local function useBulkPurchaseRequestProps()
 			BuyRobuxInExperience.openBuyRobux({}, function(url: string)
 				if defineFastFlag2 then
 					WebViewUtils.openWebViewSession(url, "")
-				elseif defineFastFlag then
-					BrowserService:SendCommand((HttpService:JSONEncode({
-						command = "open",
-						url = url
-					})))
-				else
-					BrowserService:OpenBrowserWindow(url)
+					return
 				end
+
+				if not defineFastFlag then
+					BrowserService:OpenBrowserWindow(url)
+
+					return
+				end
+
+				BrowserService:SendCommand((HttpService:JSONEncode({ command = "open", url = url })))
 			end, "BulkPurchase.onRobuxUpsell")
 		elseif defineFastFlag2 then
 			WebViewUtils.openWebViewSession(getRobuxStoreUrl(), "")

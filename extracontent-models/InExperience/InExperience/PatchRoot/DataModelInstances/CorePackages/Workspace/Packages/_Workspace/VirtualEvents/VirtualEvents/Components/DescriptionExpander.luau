@@ -2,39 +2,28 @@ local VirtualEvents = script:FindFirstAncestor("VirtualEvents")
 
 local React = require(VirtualEvents.Parent.React)
 local Foundation = require(VirtualEvents.Parent.Foundation)
-local AppCommonLib = require(VirtualEvents.Parent.AppCommonLib)
-local Text = AppCommonLib.Text
 local Style = require(VirtualEvents.Parent.Style)
 local GetTextSize = Style.GetTextSize
 local useAnimation = require(VirtualEvents.Hooks.useAnimation)
 
-local text = Foundation.Text
+local Text = Foundation.Text
 local useTokens = Foundation.Hooks.useTokens
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local function DescriptionExpander(props)
 	local v = useTokens()
 	local bodyLarge = v.Typography.BodyLarge
 
 	local state, setState = React.useState(0)
-	local function updateDescriptionHeight(p, description)
-		local v2
-
-		if FoundationFontFaceMigration then
-			v2 = GetTextSize(description, bodyLarge.FontSize, bodyLarge.Font, Vector2.new(p, 1e999)).Y
-		else
-			v2 = Text.GetTextHeight(description, bodyLarge.Font, bodyLarge.FontSize, p)
-		end
-
-		setState(v2)
+	local function updateDescriptionHeight(p, description) -- 2 equivalent calls inferred from this helper
+		setState(GetTextSize(description, bodyLarge.FontSize, bodyLarge.Font, Vector2.new(p, 1e999)).Y)
 	end
 
 	local v2 = React.useCallback(function(p)
-		updateDescriptionHeight(p.AbsoluteSize.X, props.description)
+		updateDescriptionHeight(p.AbsoluteSize.X, props.description) -- inferred equivalent call
 	end, { props.description })
 
 	React.useEffect(function()
-		updateDescriptionHeight(props.width, props.description)
+		updateDescriptionHeight(props.width, props.description) -- inferred equivalent call
 	end, { props.description, props.width })
 
 	local endOffset = props.isExpanded and math.min(state, props.maxHeight) or math.min(state, 40)
@@ -59,7 +48,7 @@ local function DescriptionExpander(props)
 		ScrollingEnabled = props.maxHeight + 10 < state,
 		ScrollBarThickness = 0
 	}, {
-		Text = React.createElement(text, {
+		Text = React.createElement(Text, {
 			Size = UDim2.new(1, 0, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
 			Text = props.description,
@@ -85,7 +74,7 @@ local function DescriptionExpander(props)
 			props.setIsExpanded(true)
 		end
 	}, {
-		Text = React.createElement(text, {
+		Text = React.createElement(Text, {
 			Size = UDim2.new(1, 0, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
 			BackgroundTransparency = 1,

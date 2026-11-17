@@ -30,18 +30,14 @@ local defineFastFlag7 = game:DefineFastFlag("HiddenFriendsSortHeaderAddSubTabDep
 local SharedFlags3 = require(parent.SharedFlags)
 local FFlagAppIaHomeSubTab = SharedFlags3.FFlagAppIaHomeSubTab
 local SharedFlags4 = require(parent.SharedFlags)
-local FFlagEnableChartsInFlyout = SharedFlags4.FFlagEnableChartsInFlyout
+local FFlagEnableSubTabOverride = SharedFlags4.FFlagEnableSubTabOverride
+local SharedFlags5 = require(parent.SharedFlags)
+local FFlagSubTabHideChartsForNonArgo = SharedFlags5.FFlagSubTabHideChartsForNonArgo
+local SharedFlags6 = require(parent.SharedFlags)
+local FFlagEnableChartsInFlyout = SharedFlags6.FFlagEnableChartsInFlyout
 
 local defineFastInt7 = game:DefineFastInt("FlyoutAmpGatedVariant", 2)
-local SharedFlags5 = require(parent.SharedFlags)
-local FFlagFlyoutSidePanelUseAppPolicy = SharedFlags5.FFlagFlyoutSidePanelUseAppPolicy
-local UniversalAppPolicy
-
-if FFlagFlyoutSidePanelUseAppPolicy then
-	UniversalAppPolicy = require(parent.UniversalAppPolicy)
-else
-	UniversalAppPolicy = nil
-end
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
 
 local v = nil
 local variant = nil
@@ -79,7 +75,7 @@ local function getVariant() -- 7 equivalent calls inferred from this helper
 		return variant
 	end
 
-	if FFlagFlyoutSidePanelUseAppPolicy and UniversalAppPolicy.getAppFeaturePolicies().getFlyoutSidePanelEnabled() then
+	if UniversalAppPolicy.getAppFeaturePolicies().getFlyoutSidePanelEnabled() then
 		variant = defineFastInt7
 	else
 		variant = getIXPVariant()
@@ -89,51 +85,82 @@ local function getVariant() -- 7 equivalent calls inferred from this helper
 end
 
 local function isFlyoutSidePanelEnabled(): boolean -- 2 equivalent calls inferred from this helper
-	local v2
-
-	if FFlagFlyoutSidePanelUseAppPolicy then
-		v2 = getVariant() -- inferred equivalent call
-	else
-		v2 = getIXPVariant()
-	end
-
-	return v2 ~= defineFastInt2
+	return getVariant() ~= defineFastInt2 -- inferred equivalent call
 end
 
 local function isRobloxLogoEnabled(): boolean
-	local v2
-
-	if FFlagFlyoutSidePanelUseAppPolicy then
-		v2 = getVariant() -- inferred equivalent call
-	else
-		v2 = getIXPVariant()
-	end
-
-	return v2 ~= defineFastInt2
+	return getVariant() ~= defineFastInt2 -- inferred equivalent call
 end
 
 local function isProfileEntryRemoved(): boolean -- 1 equivalent call inferred from this helper
-	local v2
+	local variant2 = getVariant() -- inferred equivalent call
 
-	if FFlagFlyoutSidePanelUseAppPolicy then
-		v2 = getVariant() -- inferred equivalent call
-	else
-		v2 = getIXPVariant()
-	end
-
-	if defineFastFlag4 and v2 == defineFastInt4 then
+	if
+		defineFastFlag4 and variant2 == defineFastInt4
+		or defineFastFlag5 and (variant2 == defineFastInt3 or variant2 == defineFastInt5)
+	then
 		return false
 	end
 
-	return (not defineFastFlag5 or v2 ~= defineFastInt3 and v2 ~= defineFastInt5) and v2 ~= defineFastInt2
+	return variant2 ~= defineFastInt2
 end
 
-local function isChartsInFlyoutEnabled() -- 2 equivalent calls inferred from this helper
+local function isChartsInFlyoutEnabled() -- 3 equivalent calls inferred from this helper
 	return FFlagEnableChartsInFlyout and isFlyoutSidePanelEnabled() -- inferred equivalent call
+end
+
+local function isAlternateEntryPointEnabled()
+	local variant2 = getVariant() -- inferred equivalent call
+
+	if not defineFastFlag6 then
+		return variant2 == defineFastInt3 or variant2 == defineFastInt5
+	end
+
+	return isProfileEntryRemoved() and (variant2 == defineFastInt3 or variant2 == defineFastInt5) -- inferred equivalent call
+end
+
+local function isRobuxIconRemoved(): boolean
+	return getVariant() == defineFastInt6 -- inferred equivalent call
+end
+
+local function isScrollAwayEnabled(): boolean
+	return getVariant() ~= defineFastInt2 -- inferred equivalent call
+end
+
+local function isHomeSubTabEnabled(): boolean
+	if FFlagEnableSubTabOverride then
+		return true
+	end
+
+	if isChartsInFlyoutEnabled() then -- inferred equivalent call
+		return false
+	end
+
+	if FFlagSubTabRemoveFlyoutDependency then
+		return true
+	end
+
+	local variant2 = getVariant() -- inferred equivalent call
+
+	return variant2 == defineFastInt3 or variant2 == defineFastInt4
+end
+
+local function isChartsInSubTab(): boolean
+	local v2 = FFlagSubTabHideChartsForNonArgo
+
+	if not v2 then
+		v2 = isChartsInFlyoutEnabled() -- inferred equivalent call
+	end
+
+	return not v2
 end
 
 local function isFriendsSortHeaderHiddenInFlyoutIxp()
 	if FFlagHiddenFriendsSortHeaderRemoveFlyoutDependency then
+		if FFlagEnableSubTabOverride then
+			return not defineFastFlag2
+		end
+
 		if isChartsInFlyoutEnabled() then -- inferred equivalent call
 			return false
 		end
@@ -148,66 +175,6 @@ local function isFriendsSortHeaderHiddenInFlyoutIxp()
 	return isFlyoutSidePanelEnabled() and not defineFastFlag2 -- inferred equivalent call
 end
 
-local function isAlternateEntryPointEnabled()
-	local v2
-
-	if FFlagFlyoutSidePanelUseAppPolicy then
-		v2 = getVariant() -- inferred equivalent call
-	else
-		v2 = getIXPVariant()
-	end
-
-	if not defineFastFlag6 then
-		return v2 == defineFastInt3 or v2 == defineFastInt5
-	end
-
-	return isProfileEntryRemoved() and (v2 == defineFastInt3 or v2 == defineFastInt5) -- inferred equivalent call
-end
-
-local function isRobuxIconRemoved(): boolean
-	local v2
-
-	if FFlagFlyoutSidePanelUseAppPolicy then
-		v2 = getVariant() -- inferred equivalent call
-	else
-		v2 = getIXPVariant()
-	end
-
-	return v2 == defineFastInt6
-end
-
-local function isScrollAwayEnabled(): boolean
-	local v2
-
-	if FFlagFlyoutSidePanelUseAppPolicy then
-		v2 = getVariant() -- inferred equivalent call
-	else
-		v2 = getIXPVariant()
-	end
-
-	return v2 ~= defineFastInt2
-end
-
-local function isHomeSubTabEnabled(): boolean
-	if isChartsInFlyoutEnabled() then -- inferred equivalent call
-		return false
-	end
-
-	if FFlagSubTabRemoveFlyoutDependency then
-		return true
-	end
-
-	local v2
-
-	if FFlagFlyoutSidePanelUseAppPolicy then
-		v2 = getVariant() -- inferred equivalent call
-	else
-		v2 = getIXPVariant()
-	end
-
-	return v2 == defineFastInt3 or v2 == defineFastInt4
-end
-
 return {
 	isFlyoutSidePanelEnabled = isFlyoutSidePanelEnabled,
 	isRobloxLogoEnabled = isRobloxLogoEnabled,
@@ -217,5 +184,6 @@ return {
 	isRobuxIconRemoved = isRobuxIconRemoved,
 	isScrollAwayEnabled = isScrollAwayEnabled,
 	isHomeSubTabEnabled = isHomeSubTabEnabled,
+	isChartsInSubTab = isChartsInSubTab,
 	isChartsInFlyoutEnabled = isChartsInFlyoutEnabled
 }

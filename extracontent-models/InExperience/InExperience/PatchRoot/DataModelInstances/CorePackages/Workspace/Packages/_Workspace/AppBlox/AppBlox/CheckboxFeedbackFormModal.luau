@@ -38,7 +38,6 @@ local urlBuilder = UrlBuilder.UrlBuilder
 
 local FFlagLuaAppMakeDisclaimerOptInForFeedbackForm = SharedFlags.FFlagLuaAppMakeDisclaimerOptInForFeedbackForm
 local FFlagLuaAppNotInterestedFeedbackFormTelemetry = SharedFlags.FFlagLuaAppNotInterestedFeedbackFormTelemetry
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local defineFastFlag = game:DefineFastFlag("LuaAppCheckboxFeedbackFormTitleTextWrapping", false)
 
@@ -220,52 +219,34 @@ local function CheckboxFeedbackFormModal(props)
 	local otherTextBoxContainer
 
 	if v7 then
-		local createElement3 = React.createElement
-		local v13 = {
+		otherTextBoxContainer = React.createElement("Frame", {
 			AutomaticSize = Enum.AutomaticSize.Y,
 			BackgroundColor3 = v2.Color.Shift.Shift_200.Color3,
 			BackgroundTransparency = v2.Color.Shift.Shift_200.Transparency,
 			BorderSizePixel = 0,
 			LayoutOrder = 2,
 			Size = UDim2.fromScale(1, 0)
-		}
-
-		local createElement4 = React.createElement
-		local v14 = {}
-		v14.AutomaticSize = Enum.AutomaticSize.Y
-		v14.BackgroundTransparency = 1
-		v14.ClearTextOnFocus = false
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = v2.Typography.CaptionMedium.Font
-		end
-
-		v14.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(v2.Typography.CaptionMedium.Font)
-		end
-
-		v14.FontFace = fontFace
-
-		v14.LineHeight = v2.LineHeight.LineHeight_140
-		v14.MultiLine = true
-		v14.PlaceholderColor3 = v2.Color.Content.Muted.Color3
-		v14.PlaceholderText = v3.otherPlaceholderText
-		v14.Size = UDim2.new(1, 0, 0, v2.Size.Size_1000)
-		v14.Text = ref.current
-		v14.TextColor3 = v2.Color.Content.Default.Color3
-		v14.TextSize = v2.Typography.CaptionMedium.FontSize
-		v14.TextTransparency = v2.Color.Content.Default.Transparency
-		v14.TextTruncate = Enum.TextTruncate.SplitWord
-		v14.TextWrapped = true
-		v14.TextXAlignment = Enum.TextXAlignment.Left
-		v14.TextYAlignment = Enum.TextYAlignment.Top
-		v14[React.Change.Text] = v9
-		otherTextBoxContainer = createElement3("Frame", v13, {
-			InputBox = createElement4("TextBox", v14, {
+		}, {
+			InputBox = React.createElement("TextBox", {
+				AutomaticSize = Enum.AutomaticSize.Y,
+				BackgroundTransparency = 1,
+				ClearTextOnFocus = false,
+				FontFace = normalizeFontFace(v2.Typography.CaptionMedium.Font),
+				LineHeight = v2.LineHeight.LineHeight_140,
+				MultiLine = true,
+				PlaceholderColor3 = v2.Color.Content.Muted.Color3,
+				PlaceholderText = v3.otherPlaceholderText,
+				Size = UDim2.new(1, 0, 0, v2.Size.Size_1000),
+				Text = ref.current,
+				TextColor3 = v2.Color.Content.Default.Color3,
+				TextSize = v2.Typography.CaptionMedium.FontSize,
+				TextTransparency = v2.Color.Content.Default.Transparency,
+				TextTruncate = Enum.TextTruncate.SplitWord,
+				TextWrapped = true,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				TextYAlignment = Enum.TextYAlignment.Top,
+				[React.Change.Text] = v9
+			}, {
 				UISizeConstraint = React.createElement("UISizeConstraint", {
 					MaxSize = Vector2.new(1e999, v2.Size.Size_3000)
 				})

@@ -13,8 +13,9 @@ local SharedFlags = require(parent.SharedFlags)
 local FFlagSocialCarouselShareQREnabled = SharedFlags.FFlagSocialCarouselShareQREnabled
 local SharedFlags2 = require(parent.SharedFlags)
 local FFlagSocialCarouselInGameTitleMarquee = SharedFlags2.FFlagSocialCarouselInGameTitleMarquee
+local FFlagSocialCarouselXXSmallTiles = require(SocialCarousel.Flags.FFlagSocialCarouselXXSmallTiles)
 
-local function renderUserTile(p, p2: number, itemSize: UDim2, selectionOrder: number?, onTileContentChanged, playStatus, onMarqueeFinished, marqueeRunId: number?, onManualMarqueeStart, onManualMarqueeEnd, marqueeOnFocusEnabled: boolean?)
+local function renderUserTile(p, p2: number, itemSize: UDim2, selectionOrder: number?, onTileContentChanged, _: boolean?, playStatus, onMarqueeFinished, marqueeRunId: number?, onManualMarqueeStart, onManualMarqueeEnd, marqueeOnFocusEnabled: boolean?, marqueeShortTitlesEnabled: boolean?)
 	local v = {
 		item = p,
 		index = p2,
@@ -30,6 +31,7 @@ local function renderUserTile(p, p2: number, itemSize: UDim2, selectionOrder: nu
 		v.onManualMarqueeStart = onManualMarqueeStart
 		v.onManualMarqueeEnd = onManualMarqueeEnd
 		v.marqueeOnFocusEnabled = marqueeOnFocusEnabled
+		v.marqueeShortTitlesEnabled = marqueeShortTitlesEnabled
 	end
 
 	return React.createElement(UserTile, v)
@@ -39,11 +41,18 @@ return {
 	[Tile.Friend] = renderUserTile,
 	[Tile.Recommendation] = renderUserTile,
 	[Tile.FriendRequest] = renderUserTile,
-	[Tile.AddFriends] = function(_, p: number, itemSize: UDim2, selectionOrder: number?, _)
-		return React.createElement(AddFriendsTile, {
+	[Tile.AddFriends] = function(_, p: number, itemSize: UDim2, selectionOrder: number?, _, isCompact: boolean?)
+		local createElement = React.createElement
+
+		if not FFlagSocialCarouselXXSmallTiles then
+			isCompact = nil
+		end
+
+		return createElement(AddFriendsTile, {
 			index = p,
 			itemSize = itemSize,
-			selectionOrder = selectionOrder
+			selectionOrder = selectionOrder,
+			isCompact = isCompact
 		})
 	end,
 	[Tile.FriendsHint] = function(_, p: number, itemSize: UDim2, selectionOrder: number?, _)
@@ -53,19 +62,33 @@ return {
 			selectionOrder = selectionOrder
 		})
 	end,
-	[Tile.StartSquad] = function(p, p2: number, itemSize: UDim2, selectionOrder: number?, _)
-		return React.createElement(StartSquadTile, {
+	[Tile.StartSquad] = function(p, p2: number, itemSize: UDim2, selectionOrder: number?, _, isCompact: boolean?)
+		local createElement = React.createElement
+
+		if not FFlagSocialCarouselXXSmallTiles then
+			isCompact = nil
+		end
+
+		return createElement(StartSquadTile, {
 			index = p2,
 			item = p,
 			itemSize = itemSize,
-			selectionOrder = selectionOrder
+			selectionOrder = selectionOrder,
+			isCompact = isCompact
 		})
 	end,
-	[Tile.ShareQR] = FFlagSocialCarouselShareQREnabled and function(_, p: number, itemSize: UDim2, selectionOrder: number?, _)
-		return React.createElement(ShareQRTile, {
+	[Tile.ShareQR] = FFlagSocialCarouselShareQREnabled and function(_, p: number, itemSize: UDim2, selectionOrder: number?, _, isCompact: boolean?)
+		local createElement = React.createElement
+
+		if not FFlagSocialCarouselXXSmallTiles then
+			isCompact = nil
+		end
+
+		return createElement(ShareQRTile, {
 			index = p,
 			itemSize = itemSize,
-			selectionOrder = selectionOrder
+			selectionOrder = selectionOrder,
+			isCompact = isCompact
 		})
 	end or nil,
 	[Tile.Skeleton] = function(_, p: number, itemSize: UDim2, _: number?, _)

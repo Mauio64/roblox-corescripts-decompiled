@@ -19,7 +19,6 @@ local PlaceVersionHistory = require(parent.DataHydration.PlaceVersionHistory)
 local UniverseConfiguration = require(parent.DataHydration.UniverseConfiguration)
 local UniverseActivation = require(parent.DataHydration.UniverseActivation)
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
-local FFlagBuildPostPublishShareDismissible = require(BuildExperience.Flags.FFlagBuildPostPublishShareDismissible)
 
 local FIntBuildPostPublishSnackbarAutoDismissSeconds = require(BuildExperience.Flags.FIntBuildPostPublishSnackbarAutoDismissSeconds)
 local FriendsOnlyShareDialog = require(BuildExperience.Components.ShareAudience.FriendsOnlyShareDialog)
@@ -46,10 +45,10 @@ local PopoverSide = Foundation.Enums.PopoverSide
 local PrivacyType = UniverseConfiguration.PrivacyType
 
 local FFlagEnableShareSheet = SharedFlags.FFlagEnableShareSheet
-local FFlagShareSheetFriendsSort = SharedFlags.FFlagShareSheetFriendsSort
 local FFlagBuildPublishNavigationSheet = require(BuildExperience.Flags.FFlagBuildPublishNavigationSheet)
 local FFlagBuildAdUpsell = require(BuildExperience.Flags.FFlagBuildAdUpsell)
 local FFlagBuildExperiencePlaytestCardPublishCta = require(BuildExperience.Flags.FFlagBuildExperiencePlaytestCardPublishCta)
+local FFlagBuildExperienceActionOutcomeTelemetry = require(BuildExperience.Flags.FFlagBuildExperienceActionOutcomeTelemetry)
 local GetAdUpsellEventStore
 
 if FFlagBuildAdUpsell then
@@ -66,15 +65,18 @@ local OpenGameDetails = GameDetail.OpenGameDetails
 
 local Debug = CreatorAgentChat.debug
 local sendBuildExperienceEvent = require(BuildExperience.Telemetry.sendBuildExperienceEvent)
+local ConfigurationActionTelemetry = require(BuildExperience.Telemetry.ConfigurationActionTelemetry)
 local sharePublishedExperience = require(BuildExperience.utils.sharePublishedExperience)
 local sharePublishedExperience2 = sharePublishedExperience.sharePublishedExperience
 local useSharePublishedExperience = sharePublishedExperience.useSharePublishedExperience
-local ShareSheet = require(parent.ShareSheet)
-local UniversalShareSheet = ShareSheet.UniversalShareSheet
+local Action = ConfigurationActionTelemetry.Action
+local Context = ConfigurationActionTelemetry.Context
+local FailureReason = ConfigurationActionTelemetry.FailureReason
+local Stage = ConfigurationActionTelemetry.Stage
 
 local v = {}
 
-local function isPublishedVersion(p): boolean -- 3 equivalent calls inferred from this helper
+local function isPublishedVersion(p): boolean -- 4 equivalent calls inferred from this helper
 	if typeof(p) ~= "table" then
 		return false
 	end
@@ -95,6 +97,44 @@ local function buildPublicAudiences(options)
 	return publicAudiences
 end
 
+local function getPublishFailure(err, stage)
+	local v2
+
+	if type(err) == "table" then
+		v2 = err
+	end
+
+	if v2 == nil or v2.stage ~= GameConfigurationActions.PublishFailureStage.SetAudience then
+		local reason
+
+		if v2 == nil or v2.responseCode ~= 16 then
+			reason = FailureReason.RequestFailed
+		else
+			reason = FailureReason.AccountTooNew
+		end
+
+		return { reason = reason, stage = stage, error = err }
+	else
+		local publishedVersion = isPublishedVersion(v2.publishResult) -- inferred equivalent call
+		local reason
+
+		if publishedVersion then
+			reason = FailureReason.AudienceNotPublic
+		else
+			reason = FailureReason.RequestFailed
+		end
+
+		local v3 = { reason = reason, stage = Stage.SetAudience, error = 0 }
+
+		if v2.cause ~= nil then
+			err = v2.cause
+		end
+
+		v3.error = err
+		return v3
+	end
+end
+
 local function PreviewButton(props)
 	local preview = useLocalization({ preview = LocalizationStrings.GAME_CONFIGURATION_PREVIEW }).preview
 	local v2 = useStore()
@@ -102,6 +142,11 @@ local function PreviewButton(props)
 
 	local onPreview = props.onPreview
 	local onActivated = React.useCallback(function()
+		if FFlagBuildExperienceActionOutcomeTelemetry then
+			local v4 = { context = Context.PublishFooter }
+			sendBuildExperienceEvent("PREVIEW_CLICK", props.telemetryIds, v4)
+		end
+
 		local rootNavigation = getRootNavigation(v3)
 		OpenGameDetails(tostring(props.target.universeId), getGameDetailsNavigation(rootNavigation), {
 			source = "BuildExperiencePublish"
@@ -110,7 +155,7 @@ local function PreviewButton(props)
 		if onPreview then
 			onPreview()
 		end
-	end, { v3, props.target.universeId, v2, onPreview })
+	end, { v3, props.target.universeId, v2, onPreview, props.telemetryIds })
 
 	return React.createElement(Button, {
 		text = preview,
@@ -140,12 +185,12 @@ local function PublishFooter(props)
 	local accountTooNewError = v2.accountTooNewError
 	local creatorHub = v2.creatorHub
 	local linkCopied = v2.linkCopied
-	local text = v2.publish
+	local publish = v2.publish
 	local publishAudienceError = v2.publishAudienceError
 	local publishError = v2.publishError
 	local publishSuccess = v2.publishSuccess
 	local share = v2.share
-	local updateRating = v2.updateRating
+	local text = v2.updateRating
 	local v3 = useSharePublishedExperience(props.target.universeId)
 	local v4 = SignalsReact.useSignalState(PlaceVersionHistory.getPlaceVersionHistoryStore)
 	local v5 = SignalsReact.useSignalState(UniverseConfiguration.getUniverseConfigurationStore)
@@ -179,23 +224,34 @@ local function PublishFooter(props)
 		v15 = false
 	end
 
+	local telemetryIds
+
+	if FFlagBuildExperienceActionOutcomeTelemetry then
+		telemetryIds = React.useMemo(function()
+			return {
+				universeId = props.target.universeId,
+				placeId = props.target.placeId,
+				conversationId = props.target.sessionId
+			}
+		end, { props.target.universeId, props.target.placeId, props.target.sessionId })
+	else
+		telemetryIds = nil
+	end
+
 	local onClose = React.useCallback(function()
 		setState2("")
 		setState3(nil)
 	end, {})
+	React.useEffect(function()
+		if state2 == "" then
+			return nil
+		end
 
-	if FFlagBuildPostPublishShareDismissible then
-		React.useEffect(function()
-			if state2 == "" then
-				return nil
-			end
-
-			local thread = task.delay(FIntBuildPostPublishSnackbarAutoDismissSeconds, setState2, "")
-			return function()
-				task.cancel(thread)
-			end
-		end, { state2 })
-	end
+		local thread = task.delay(FIntBuildPostPublishSnackbarAutoDismissSeconds, setState2, "")
+		return function()
+			task.cancel(thread)
+		end
+	end, { state2 })
 
 	local onShare = React.useCallback(function()
 		if props.target.placeId == nil then
@@ -205,44 +261,46 @@ local function PublishFooter(props)
 		setState3(nil)
 
 		if FFlagEnableShareSheet then
-			local placeId = props.target.placeId
-			local v16
+			v3(props.target.placeId)
+			return
+		end
 
-			if FFlagShareSheetFriendsSort then
-				v16 = UniversalShareSheet.RecipientSource.OneToOneFriends
-			end
+		local v16 = sharePublishedExperience2(props.target.placeId)
 
-			v3(placeId, v16)
-		else
-			local v16 = sharePublishedExperience2(props.target.placeId)
-
-			if v16 ~= nil and v16.copiedToClipboard and linkCopied ~= nil then
-				setState2(linkCopied)
-			end
+		if v16 ~= nil and v16.copiedToClipboard and linkCopied ~= nil then
+			setState2(linkCopied)
 		end
 	end, { linkCopied, props.target.placeId, v3 })
 
 	local onActivated = React.useCallback(function()
-		if FFlagBuildPostPublishShareDismissible then
-			setState2("")
+		if FFlagBuildExperienceActionOutcomeTelemetry then
+			ConfigurationActionTelemetry.sendClick(Action.Share, telemetryIds, Context.PublishSnackbar, {
+				audience = tostring(audience)
+			})
 		end
+
+		setState2("")
 
 		if audience == PrivacyType.FriendsOnly then
 			setState3("friends")
 		elseif audience == PrivacyType.Public then
 			onShare()
 		end
-	end, { audience, onShare })
+	end, { audience, onShare, telemetryIds })
 
 	local onCancel = React.useCallback(function()
 		setState3(nil)
 	end, {})
 
 	local onActivated2 = React.useCallback(function()
+		if FFlagBuildExperienceActionOutcomeTelemetry then
+			ConfigurationActionTelemetry.sendClick(Action.UpdateRating, telemetryIds, Context.PublishFooter)
+		end
+
 		v14(GameConfigurationActions.getExperienceQuestionnaireUrl(props.target.universeId), creatorHub, function()
 			refreshPublishEligibility(props.target.universeId)
 		end)
-	end, { creatorHub, v14, props.target.universeId })
+	end, { creatorHub, v14, props.target.universeId, telemetryIds })
 
 	local useCallback = React.useCallback
 	local function fn()
@@ -297,8 +355,8 @@ local function PublishFooter(props)
 
 		setState(true)
 		onClose()
-		local v16 = "save_and_publish"
-		local v17 = false
+		local stage = Stage.SaveAndPublish
+		local v16 = false
 		local function recordSuccessfulPublish(p) -- 1 equivalent call inferred from this helper
 			if not isPublishedVersion(p) then -- inferred equivalent call
 				return
@@ -308,42 +366,42 @@ local function PublishFooter(props)
 				props.target.universeId,
 				props.target.sessionId,
 				p.version,
-				v17
+				v16
 			)
 		end
-		local function publish(p)
-			v16 = "save_and_publish"
-			local v18 = p or v8
+		local function publish2(p)
+			stage = Stage.SaveAndPublish
+			local v17 = p or v8
 
 			if FFlagBuildAdUpsell then
-				v17 = true
+				v16 = true
 			end
 
 			local publishExperience = GameConfigurationActions.publishExperience
-			local v19 = {
+			local v18 = {
 				universeId = props.target.universeId,
 				placeId = placeId,
 				title = title,
 				description = description,
-				isActive = v18 ~= nil and v18.isActive == true,
+				isActive = v17 ~= nil and v17.isActive == true,
 				audiences = 0
 			}
-			local v20
+			local v19
 
-			if v18 then
-				v20 = v18.audiences
+			if v17 then
+				v19 = v17.audiences
 			end
 
-			v19.audiences = buildPublicAudiences(v20)
-			return publishExperience(v19)
+			v18.audiences = buildPublicAudiences(v19)
+			return publishExperience(v18)
 		end
 
 		local function startPublish() -- 1 equivalent call inferred from this helper
 			if v10 == nil then
-				return publish()
+				return publish2()
 			end
 
-			v16 = "refresh_eligibility"
+			stage = Stage.RefreshEligibility
 			return v10.refreshEligibility(props.target.universeId):andThen(function()
 				if
 					ContentMaturityUtils.isSealBroken(props.target.universeId)
@@ -364,39 +422,39 @@ local function PublishFooter(props)
 					)
 				end
 
-				v16 = "refresh_summary"
+				stage = Stage.RefreshSummary
 
 				return v5.refreshSummary(props.target.universeId):andThen(function(p)
-					return publish(p)
+					return publish2(p)
 				end)
 			end)
 		end
 
 		local draft = GetVersionInformationStore().getDraft()
-		local v18
+		local v17
 
 		if draft == nil or draft.placeId ~= placeId then
-			v18 = v4.fetchPageHistory(placeId):andThen(selectVersionNotes, function()
+			v17 = v4.fetchPageHistory(placeId):andThen(selectVersionNotes, function()
 				local draft2 = GetVersionInformationStore().getDraft()
 
 				if draft2 == nil or draft2.placeId ~= placeId then
 					return
 				end
 
-				local v19
+				local v18
 
 				if draft2.title ~= "" then
-					v19 = draft2.title
+					v18 = draft2.title
 				end
 
-				title = v19
-				local v20
+				title = v18
+				local v19
 
 				if draft2.description ~= "" then
-					v20 = draft2.description
+					v19 = draft2.description
 				end
 
-				description = v20
+				description = v19
 			end):andThen(startPublish)
 		else
 			local draft2 = GetVersionInformationStore().getDraft()
@@ -411,58 +469,65 @@ local function PublishFooter(props)
 				end
 			end
 
-			v18 = startPublish() -- inferred equivalent call
+			v17 = startPublish() -- inferred equivalent call
 		end
 
-		v18:andThen(function(p)
+		v17:andThen(function(p)
 			if p == v then
-				return
+				if FFlagBuildExperienceActionOutcomeTelemetry then
+					ConfigurationActionTelemetry.sendFailure(Action.Publish, telemetryIds, {
+						reason = FailureReason.RatingRequired,
+						stage = stage,
+						error = nil
+					})
+				end
+			else
+				if not isPublishedVersion(p) then -- inferred equivalent call
+					error({
+						errorMessage = "save_and_publish expected status=success and a non-empty version; " .. `got status={tostring(p.status)}, version={tostring(p.version)}`
+					})
+				end
+
+				if FFlagBuildExperienceActionOutcomeTelemetry then
+					ConfigurationActionTelemetry.sendSuccess(Action.Publish, telemetryIds, nil, {
+						version = tostring(p.version)
+					})
+				end
+
+				if FFlagBuildAdUpsell then
+					recordSuccessfulPublish(p) -- inferred equivalent call
+				end
+
+				GetVersionInformationStore().clearDraft(placeId)
+				v4.fetchHistory(placeId)
+
+				if FFlagBuildExperiencePlaytestCardPublishCta then
+					v4.fetchLiveVersion(placeId)
+				end
+
+				setState2(publishSuccess)
 			end
-
-			if not isPublishedVersion(p) then -- inferred equivalent call
-				error({
-					errorMessage = "save_and_publish expected status=success and a non-empty version; " .. `got status={tostring(p.status)}, version={tostring(p.version)}`
-				})
-			end
-
-			if FFlagBuildAdUpsell then
-				recordSuccessfulPublish(p) -- inferred equivalent call
-			end
-
-			GetVersionInformationStore().clearDraft(placeId)
-			v4.fetchHistory(placeId)
-
-			if FFlagBuildExperiencePlaytestCardPublishCta then
-				v4.fetchLiveVersion(placeId)
-			end
-
-			setState2(publishSuccess)
 		end):catch(function(data)
-			local v19 = typeof(data) == "table"
+			local v18 = typeof(data) == "table"
 
-			local v20 = v19 and data.stage == GameConfigurationActions.PublishFailureStage.SetAudience
+			local v19 = v18
+				and data.stage == GameConfigurationActions.PublishFailureStage.SetAudience
+				and isPublishedVersion(data.publishResult) -- inferred equivalent call
+
+			local v20 = v18 and data.responseCode == 16
 			local v21
 
+			if v19 then
+				v21 = publishAudienceError
+			else
+				v21 = publishError
+			end
+
 			if v20 then
-				v21 = isPublishedVersion(data.publishResult) -- inferred equivalent call
-			else
-				v21 = v20
+				v21 = accountTooNewError
 			end
 
-			local v22 = v19 and data.responseCode == 16
-			local v23
-
-			if v21 then
-				v23 = publishAudienceError
-			else
-				v23 = publishError
-			end
-
-			if v22 then
-				v23 = accountTooNewError
-			end
-
-			if v21 then
+			if v19 then
 				GetVersionInformationStore().clearDraft(placeId)
 				v4.fetchHistory(placeId)
 
@@ -471,16 +536,17 @@ local function PublishFooter(props)
 				end
 			end
 
+			local publishFailure = getPublishFailure(data, stage)
 			local log = Debug.log
 			local errorMessage
 
-			if v19 and data.errorMessage ~= nil then
+			if v18 and data.errorMessage ~= nil then
 				errorMessage = tostring(data.errorMessage)
 			else
 				errorMessage = tostring(data)
 			end
 
-			local v24 = {
+			local v22 = {
 				errorMessage = errorMessage,
 				placeId = placeId,
 				responseCode = 0,
@@ -489,25 +555,20 @@ local function PublishFooter(props)
 			}
 			local responseCode
 
-			if v19 then
+			if v18 then
 				responseCode = data.responseCode
 			end
 
-			v24.responseCode = responseCode
-			local stage
+			v22.responseCode = responseCode
+			v22.stage = publishFailure.stage
+			v22.universeId = props.target.universeId
+			log("warn", "build_experience publish failed", v22)
 
-			if v20 then
-				stage = GameConfigurationActions.PublishFailureStage.SetAudience
-			else
-				stage = v16
+			if FFlagBuildExperienceActionOutcomeTelemetry then
+				ConfigurationActionTelemetry.sendFailure(Action.Publish, telemetryIds, publishFailure)
 			end
 
-			v24.stage = stage
-
-			v24.universeId = props.target.universeId
-			log("warn", "build_experience publish failed", v24)
-
-			setState2(v23)
+			setState2(v21)
 		end):finally(function()
 			setState(false)
 		end)
@@ -533,7 +594,8 @@ local function PublishFooter(props)
 		accountTooNewError,
 		publishAudienceError,
 		publishError,
-		publishSuccess
+		publishSuccess,
+		telemetryIds
 	})
 
 	local formatted = `{props.testId}.actions`
@@ -547,40 +609,16 @@ local function PublishFooter(props)
 	end
 
 	local v19 = not FFlagBuildCheckGamePermissions or v18.canPublish
-	local ref
+	local ref = React.useRef(nil)
+	local v20 = Foundation.Hooks.useTokens()
+	local ref2 = useClosableFocusRoot({
+		surfaceIdentifier = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum.PopUp,
+		isOpen = state2 ~= "",
+		onClose = onClose
+	})
 
-	if FFlagBuildPostPublishShareDismissible then
-		ref = React.useRef(nil)
-	end
-
-	local v20
-
-	if FFlagBuildPostPublishShareDismissible then
-		v20 = Foundation.Hooks.useTokens()
-	end
-
-	local ref2
-
-	if FFlagBuildPostPublishShareDismissible then
-		ref2 = useClosableFocusRoot({
-			surfaceIdentifier = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum.PopUp,
-			isOpen = state2 ~= "",
-			onClose = onClose
-		})
-	end
-
-	local v21
-
-	if FFlagBuildPostPublishShareDismissible then
-		v21 = Responsive.usePreferredInput() == Responsive.Input.Directional
-	end
-
+	local v21 = Responsive.usePreferredInput() == Responsive.Input.Directional
 	local createElement = React.createElement
-
-	if not FFlagBuildPostPublishShareDismissible then
-		ref2 = nil
-	end
-
 	local v22 = {
 		LayoutOrder = 1,
 		ref = ref2,
@@ -591,24 +629,18 @@ local function PublishFooter(props)
 	}
 	local onClose2
 
-	if FFlagBuildPostPublishShareDismissible then
-		if not v21 then
-			onClose2 = onClose
-		end
-	elseif not v15 then
+	if not v21 then
 		onClose2 = onClose
 	end
 
 	v22.onClose = onClose2
-
 	v22.testId = `{props.testId}.publish-snackbar`
 	local element = createElement(Snackbar, v22)
 
 	local createElement2 = React.createElement
-	local publishSnackbar
 
-	if FFlagBuildPostPublishShareDismissible then
-		publishSnackbar = React.createElement(Popover.Root, {
+	local v23 = {
+		PublishSnackbar = React.createElement(Popover.Root, {
 			isOpen = state2 ~= "",
 			testId = `{props.testId}.publish-snackbar-popover`
 		}, {
@@ -620,32 +652,20 @@ local function PublishFooter(props)
 				selectionGroup = false,
 				side = PopoverSide.Top
 			}, { Snackbar = element })
-		})
-	end
-
-	local publishSnackbarWrapper
-
-	if not (FFlagBuildPostPublishShareDismissible or state2 == "") then
-		publishSnackbarWrapper = React.createElement(
-			View,
-			{ LayoutOrder = 1, tag = "row align-x-center size-full-0 auto-y padding-x-large" },
-			{ PublishSnackbar = element }
-		)
-	end
+		}),
+		Actions = 0,
+		FriendsOnlyShareDialog = 0
+	}
 
 	local createElement3 = React.createElement
 
-	if not FFlagBuildPostPublishShareDismissible then
-		ref = nil
-	end
-
 	local createElement4 = React.createElement
 
-	if v13 then
-		text = updateRating
+	if not v13 then
+		text = publish
 	end
 
-	local v23 = {
+	local v24 = {
 		text = text,
 		size = InputSize.Medium,
 		variant = ButtonVariant.Emphasis,
@@ -662,37 +682,33 @@ local function PublishFooter(props)
 		onActivated2 = v17
 	end
 
-	v23.onActivated = onActivated2
-	v23.width = UDim.new(1, 0)
+	v24.onActivated = onActivated2
+	v24.width = UDim.new(1, 0)
 
-	v23.testId = `{formatted}-publish`
-	local v24 = { Publish = createElement4(Button, v23), Preview = 0 }
+	v24.testId = `{formatted}-publish`
+	local v25 = { Publish = createElement4(Button, v24), Preview = 0 }
 	local preview
 
 	if props.showPreviewButton ~= false then
 		preview = React.createElement(PreviewButton, {
 			target = props.target,
 			actionsTestId = formatted,
-			onPreview = props.onPreview
+			onPreview = props.onPreview,
+			telemetryIds = telemetryIds
 		})
 	end
 
-	v24.Preview = preview
-	local v25 = {
-		PublishSnackbar = publishSnackbar,
-		PublishSnackbarWrapper = publishSnackbarWrapper,
-		Actions = createElement3(
-			View,
-			{
-				LayoutOrder = 2,
-				ref = ref,
-				tag = "row gap-small size-full-0 auto-y padding-y-medium",
-				testId = formatted
-			},
-			v24
-		),
-		FriendsOnlyShareDialog = 0
-	}
+	v25.Preview = preview
+	v23.Actions = createElement3(
+		View,
+		{
+			LayoutOrder = 2,
+			ref = ref,
+			tag = "row gap-small size-full-0 auto-y padding-y-medium",
+			testId = formatted
+		},
+		v25
+	)
 	local friendsOnlyShareDialog
 
 	if state3 == "friends" and audience == PrivacyType.FriendsOnly then
@@ -702,14 +718,14 @@ local function PublishFooter(props)
 		})
 	end
 
-	v25.FriendsOnlyShareDialog = friendsOnlyShareDialog
+	v23.FriendsOnlyShareDialog = friendsOnlyShareDialog
 	return createElement2(View, {
 		LayoutOrder = 3,
 		tag = {
 			["col gap-small size-full-0 auto-y"] = true,
 			["bg-surface-0"] = not FFlagBuildPublishNavigationSheet
 		}
-	}, v25)
+	}, v23)
 end
 
 return PublishFooter

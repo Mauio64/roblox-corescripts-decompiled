@@ -18,7 +18,6 @@ local IconSize = Foundation.Enums.IconSize
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagCoreUiMigrateUIBloxToFoundation = SharedFlags.FFlagCoreUiMigrateUIBloxToFoundation
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local parent = script.Parent.Parent
 local withLocalization = require(parent.Localization.withLocalization)
@@ -115,30 +114,24 @@ function extended:focus()
 end
 
 function extended.render(data)
-	return withFoundationOrUIBloxStyle(function(p)
-		local tokens
-
-		if FoundationFontFaceMigration then
-			tokens = p
-		end
-
+	return withFoundationOrUIBloxStyle(function(tokens)
 		return {
 			Tokens = tokens,
 			Theme = {
 				TextEmphasis = {
-					Color = p.Color.Content.Emphasis.Color3,
-					Transparency = p.Color.Content.Emphasis.Transparency
+					Color = tokens.Color.Content.Emphasis.Color3,
+					Transparency = tokens.Color.Content.Emphasis.Transparency
 				},
 				TextDefault = {
-					Color = p.Color.Content.Default.Color3,
-					Transparency = p.Color.Content.Default.Transparency
+					Color = tokens.Color.Content.Default.Color3,
+					Transparency = tokens.Color.Content.Default.Transparency
 				}
 			},
 			Font = {
 				BaseSize = 1,
 				Body = {
-					Font = p.Typography.BodyLarge.Font,
-					RelativeSize = p.Typography.BodyLarge.FontSize
+					Font = tokens.Typography.BodyLarge.Font,
+					RelativeSize = tokens.Typography.BodyLarge.FontSize
 				}
 			}
 		}
@@ -235,91 +228,39 @@ function extended.render(data)
 
 			v3.SearchImage = searchImage
 
-			local createElement4 = Roact.createElement
-			local v4 = {
-				["LayoutOrder"] = nil,
-				["LayoutOrder"] = nil,
-				["LayoutOrder"] = nil,
-				["LayoutOrder"] = nil,
-				["LayoutOrder"] = nil,
-				["LayoutOrder"] = nil,
-				["LayoutOrder"] = nil,
-				["LayoutOrder"] = nil,
-				["LayoutOrder"] = nil,
-				["LayoutOrder"] = nil,
-				["LayoutOrder"] = nil,
-				["LayoutOrder"] = nil,
-				["LayoutOrder"] = nil,
-				["LayoutOrder"] = nil,
+			v3.SearchInput = Roact.createElement("TextBox", {
 				LayoutOrder = 2,
 				BackgroundTransparency = 1,
-				Size = UDim2.new(1, -28, 0, 20)
-			}
-			local font
-
-			if not FoundationFontFaceMigration then
-				font = body2.Font
-			end
-
-			v4.Font = font
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(data2.Tokens.Typography.BodyLarge.Font)
-			end
-
-			v4.FontFace = fontFace
-
-			v4.Text = data.props.text or ""
-			v4.TextInputType = textInputType
-			v4.TextSize = textSize2
-			v4.TextColor3 = data2.Theme.TextEmphasis.Color
-			v4.TextXAlignment = Enum.TextXAlignment.Left
-			v4.PlaceholderText = p.search
-			v4.PlaceholderColor3 = data2.Theme.TextDefault.Color
-			v4.ClearTextOnFocus = false
-			v4.ClipsDescendants = true
-			v4[Roact.Change.Text] = data.searchTextChanged
-			v4[Roact.Event.Focused] = data.searchBoxFocused
-			v4[Roact.Event.FocusLost] = data.onFocusLost
-			v4[Roact.Ref] = data.textboxRef
-			v4[Roact.Event.TouchTap] = data.onTextboxTouchTap
-			v3.SearchInput = createElement4("TextBox", v4)
+				Size = UDim2.new(1, -28, 0, 20),
+				FontFace = normalizeFontFace(data2.Tokens.Typography.BodyLarge.Font),
+				Text = data.props.text or "",
+				TextInputType = textInputType,
+				TextSize = textSize2,
+				TextColor3 = data2.Theme.TextEmphasis.Color,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				PlaceholderText = p.search,
+				PlaceholderColor3 = data2.Theme.TextDefault.Color,
+				ClearTextOnFocus = false,
+				ClipsDescendants = true,
+				[Roact.Change.Text] = data.searchTextChanged,
+				[Roact.Event.Focused] = data.searchBoxFocused,
+				[Roact.Event.FocusLost] = data.onFocusLost,
+				[Roact.Ref] = data.textboxRef,
+				[Roact.Event.TouchTap] = data.onTextboxTouchTap
+			})
 			v.SearchContainer = createElement3("Frame", v2, v3)
 			children.SearchBorder = createElement2("Frame", onAbsoluteSizeChangedsByAbsoluteSize, v)
 
-			local createElement5 = Roact.createElement
-			local searchCancelsByActivated = {
-				["LayoutOrder"] = nil,
-				["LayoutOrder"] = nil,
-				["LayoutOrder"] = nil,
-				["LayoutOrder"] = nil,
-				["LayoutOrder"] = nil,
-				["LayoutOrder"] = nil,
+			children.CancelButton = Roact.createElement("TextButton", {
 				LayoutOrder = 2,
 				BackgroundTransparency = 1,
-				Size = UDim2.fromOffset(57, 20)
-			}
-			local font2
-
-			if not FoundationFontFaceMigration then
-				font2 = body.Font
-			end
-
-			searchCancelsByActivated.Font = font2
-			local fontFace2
-
-			if FoundationFontFaceMigration then
-				fontFace2 = normalizeFontFace(data2.Tokens.Typography.BodyLarge.Font)
-			end
-
-			searchCancelsByActivated.FontFace = fontFace2
-
-			searchCancelsByActivated.TextSize = textSize
-			searchCancelsByActivated.Text = p.cancel
-			searchCancelsByActivated.TextColor3 = data2.Theme.TextEmphasis.Color
-			searchCancelsByActivated[Roact.Event.Activated] = data.searchCancel
-			children.CancelButton = createElement5("TextButton", searchCancelsByActivated)
+				Size = UDim2.fromOffset(57, 20),
+				FontFace = normalizeFontFace(data2.Tokens.Typography.BodyLarge.Font),
+				TextSize = textSize,
+				Text = p.cancel,
+				TextColor3 = data2.Theme.TextEmphasis.Color,
+				[Roact.Event.Activated] = data.searchCancel
+			})
 			return createElement("CanvasGroup", forwardRefsByRef, children)
 		end)
 	end)

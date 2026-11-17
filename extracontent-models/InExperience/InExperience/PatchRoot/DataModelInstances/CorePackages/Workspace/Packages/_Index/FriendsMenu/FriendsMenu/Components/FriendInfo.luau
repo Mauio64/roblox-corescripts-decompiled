@@ -7,7 +7,6 @@ local Foundation = require(parent.Foundation)
 local Radius = Foundation.Enums.Radius
 local Skeleton = Foundation.Skeleton
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local UserLib = require(parent.UserLib)
 local UserModel = UserLib.Models.UserModel
@@ -82,109 +81,65 @@ return function(props)
 			LayoutOrder = 1
 		})
 	elseif FFlagEnableBlackbirdCheck and v5 then
-		local createElement = React.createElement
-		local v6 = {
-			Size = UDim2.new(1, 0, 0, textSize),
-			AutomaticSize = Enum.AutomaticSize.Y,
-			BackgroundTransparency = 1,
-			LayoutOrder = 1
-		}
-
-		local children = {
-			Layout = React.createElement("UIListLayout", {
-				FillDirection = Enum.FillDirection.Horizontal,
-				VerticalAlignment = Enum.VerticalAlignment.Center,
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				Padding = UDim.new(0, 4)
-			}),
-			DisplayName = 0,
-			SubscriptionBadge = 0
-		}
-
-		local createElement2 = React.createElement
-		local v7 = {
-			Size = UDim2.new(0, 0, 0, textSize),
-			AutomaticSize = Enum.AutomaticSize.XY,
-			Text = friend.displayName,
-			TextSize = textSize,
-			TextColor3 = theme.TextEmphasis.Color,
-			TextTransparency = theme.TextEmphasis.Transparency,
-			Font = 0,
-			FontFace = 0,
-			BackgroundTransparency = 1,
-			TextXAlignment = 0,
-			TextWrapped = false,
-			TextTruncate = 0,
-			LayoutOrder = 1
-		}
-		local font2
-
-		if not FoundationFontFaceMigration then
-			font2 = font.Header2.Font
-		end
-
-		v7.Font = font2
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(v2.Tokens.Typography.TitleLarge.Font)
-		end
-
-		v7.FontFace = fontFace
-
-		v7.TextXAlignment = Enum.TextXAlignment.Left
-
-		v7.TextTruncate = Enum.TextTruncate.AtEnd
-		children.DisplayName = createElement2("TextLabel", v7, {
-			UIFlexItem = React.createElement("UIFlexItem", { FlexMode = Enum.UIFlexMode.Shrink })
-		})
-
-		children.SubscriptionBadge = React.createElement(Foundation.Icon, {
-			name = Foundation.Enums.IconName.RobloxPlus,
-			size = Foundation.Enums.IconSize.Small,
-			style = {
-				Color3 = theme.TextEmphasis.Color,
-				Transparency = theme.TextEmphasis.Transparency
+		displayName = React.createElement(
+			"Frame",
+			{
+				Size = UDim2.new(1, 0, 0, textSize),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				BackgroundTransparency = 1,
+				LayoutOrder = 1
 			},
-			LayoutOrder = 2
-		})
-		displayName = createElement("Frame", v6, children)
+			{
+				Layout = React.createElement("UIListLayout", {
+					FillDirection = Enum.FillDirection.Horizontal,
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					Padding = UDim.new(0, 4)
+				}),
+				DisplayName = React.createElement("TextLabel", {
+					Size = UDim2.new(0, 0, 0, textSize),
+					AutomaticSize = Enum.AutomaticSize.XY,
+					Text = friend.displayName,
+					TextSize = textSize,
+					TextColor3 = theme.TextEmphasis.Color,
+					TextTransparency = theme.TextEmphasis.Transparency,
+					FontFace = normalizeFontFace(v2.Tokens.Typography.TitleLarge.Font),
+					BackgroundTransparency = 1,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextWrapped = false,
+					TextTruncate = Enum.TextTruncate.AtEnd,
+					LayoutOrder = 1
+				}, {
+					UIFlexItem = React.createElement("UIFlexItem", {
+						FlexMode = Enum.UIFlexMode.Shrink
+					})
+				}),
+				SubscriptionBadge = React.createElement(Foundation.Icon, {
+					name = Foundation.Enums.IconName.RobloxPlus,
+					size = Foundation.Enums.IconSize.Small,
+					style = {
+						Color3 = theme.TextEmphasis.Color,
+						Transparency = theme.TextEmphasis.Transparency
+					},
+					LayoutOrder = 2
+				})
+			}
+		)
 	else
-		local createElement = React.createElement
-		local v6 = {
+		displayName = React.createElement("TextLabel", {
 			Size = UDim2.new(1, 0, 0, textSize),
 			AutomaticSize = Enum.AutomaticSize.Y,
 			Text = friend.displayName,
 			TextSize = textSize,
 			TextColor3 = theme.TextEmphasis.Color,
 			TextTransparency = theme.TextEmphasis.Transparency,
-			Font = 0,
-			FontFace = 0,
+			FontFace = normalizeFontFace(v2.Tokens.Typography.TitleLarge.Font),
 			BackgroundTransparency = 1,
-			TextXAlignment = 0,
+			TextXAlignment = Enum.TextXAlignment.Left,
 			TextWrapped = true,
-			TextTruncate = 0,
+			TextTruncate = Enum.TextTruncate.AtEnd,
 			LayoutOrder = 1
-		}
-		local font2
-
-		if not FoundationFontFaceMigration then
-			font2 = font.Header2.Font
-		end
-
-		v6.Font = font2
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(v2.Tokens.Typography.TitleLarge.Font)
-		end
-
-		v6.FontFace = fontFace
-
-		v6.TextXAlignment = Enum.TextXAlignment.Left
-
-		v6.TextTruncate = Enum.TextTruncate.AtEnd
-		displayName = createElement("TextLabel", v6)
+		})
 	end
 
 	local createElement = React.createElement
@@ -249,33 +204,14 @@ return function(props)
 			TextSize = textSize2,
 			TextColor3 = theme.TextEmphasis.Color,
 			TextTransparency = theme.TextEmphasis.Transparency,
-			Font = 0,
-			FontFace = 0,
+			FontFace = normalizeFontFace(v2.Tokens.Typography.BodySmall.Font),
 			BackgroundTransparency = 1,
-			TextXAlignment = 0,
+			TextXAlignment = Enum.TextXAlignment.Left,
 			TextWrapped = true,
-			TextTruncate = 0,
+			TextTruncate = Enum.TextTruncate.AtEnd,
 			LayoutOrder = 2,
 			OpenTypeFeatures = 0
 		}
-		local font2
-
-		if not FoundationFontFaceMigration then
-			font2 = font.CaptionBody.Font
-		end
-
-		v10.Font = font2
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(v2.Tokens.Typography.BodySmall.Font)
-		end
-
-		v10.FontFace = fontFace
-
-		v10.TextXAlignment = Enum.TextXAlignment.Left
-
-		v10.TextTruncate = Enum.TextTruncate.AtEnd
 		local openTypeFeatures
 
 		if GetFFlagLuaAppEnableOpenTypeSupport() then

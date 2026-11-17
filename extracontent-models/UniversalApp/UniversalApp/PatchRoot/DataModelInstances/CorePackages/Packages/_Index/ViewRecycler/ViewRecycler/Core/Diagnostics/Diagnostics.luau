@@ -1,3 +1,5 @@
+local Flags = require(script:FindFirstAncestor("ViewRecycler").Flags)
+local FFlagViewRecyclerReact084 = Flags.FFlagViewRecyclerReact084
 local frozen = table.freeze({
 	RangeChanged = "rangeChanged",
 	PoolChanged = "poolChanged",
@@ -19,7 +21,8 @@ local frozen3 = table.freeze({
 local frozen4 = table.freeze({
 	Data = "data",
 	Measurement = "measurement",
-	ProgrammaticScroll = "programmaticScroll"
+	ProgrammaticScroll = "programmaticScroll",
+	Policy = FFlagViewRecyclerReact084 and "policy" or nil
 })
 
 return table.freeze({

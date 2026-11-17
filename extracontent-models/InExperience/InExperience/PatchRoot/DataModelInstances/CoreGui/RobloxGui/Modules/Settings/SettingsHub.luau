@@ -3867,15 +3867,17 @@ local function CreateSettingsHub()
 				end
 			end
 
+			local fn9 = v3.isInExperienceUIVREnabled and function(p3, p4, p5)
+				if children.SettingsUIDelegate:isInputEventNeededBySettings(p3, p4, p5) then
+					return Enum.ContextActionResult.Pass
+				end
+
+				return nil
+			end or function() end
+
 			ContextActionService:BindCoreAction(
 				"RbxSettingsHubStopCharacter",
-				v3.isInExperienceUIVREnabled and function(p3, p4, p5)
-					if children.SettingsUIDelegate:isInputEventNeededBySettings(p3, p4, p5) then
-						return Enum.ContextActionResult.Pass
-					end
-
-					return nil
-				end or function() end,
+				fn9,
 				false,
 				Enum.PlayerActions.CharacterForward,
 				Enum.PlayerActions.CharacterBackward,

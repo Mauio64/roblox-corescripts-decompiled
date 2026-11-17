@@ -20,6 +20,16 @@ local transitionToError = require(RobloxSubscriptionPurchaseApp.Actions.transiti
 local FFlagRobloxPlusAmpSubscriptionCheck = require(RobloxSubscriptionPurchaseApp.Flags.FFlagRobloxPlusAmpSubscriptionCheck)
 local SharedFlags = require(parent.SharedFlags)
 local FFlagEnablePlusReferralLandingSheet = SharedFlags.FFlagEnablePlusReferralLandingSheet
+
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagPlusSubscribeDeepLinkIncludeUpgrades = SharedFlags2.FFlagPlusSubscribeDeepLinkIncludeUpgrades
+local FFlagTTOnboardingSheet = require(RobloxSubscriptionPurchaseApp.Flags.FFlagTTOnboardingSheet)
+local RobloxPlusSheetKind = require(RobloxSubscriptionPurchaseApp.Enums.RobloxPlusSheetKind)
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagPlusMembershipConfigChangeCheck = SharedFlags3.FFlagPlusMembershipConfigChangeCheck
+local getRobloxSubscriptionMembershipConfig = require(RobloxSubscriptionPurchaseApp.Network.getRobloxSubscriptionMembershipConfig)
+local resetPerFlowState = require(RobloxSubscriptionPurchaseApp.Actions.resetPerFlowState)
+local RobloxSubscriptionSignals = require(RobloxSubscriptionPurchaseApp.Store.RobloxSubscriptionSignals)
 local fetchReferralEligibility = require(RobloxSubscriptionPurchaseApp.Network.fetchReferralEligibility)
 local ErrorReason = require(RobloxSubscriptionPurchaseApp.Enums.ErrorReason)
 local ReferralIneligibilityReason = require(RobloxSubscriptionPurchaseApp.Enums.ReferralIneligibilityReason)
@@ -36,6 +46,10 @@ function initiateRobloxSubscriptionPurchaseInternal(p)
 
 	local v = RobloxSubscriptionStore.get()
 
+	if FFlagPlusMembershipConfigChangeCheck then
+		resetPerFlowState()
+	end
+
 	local purchaseUIOptions = v.getPurchaseUIOptions()
 
 	local v2 = getAppFeaturePolicies().getDisableBlackbirdEntrypoints()
@@ -46,6 +60,11 @@ function initiateRobloxSubscriptionPurchaseInternal(p)
 
 	if v2 then
 		transitionToError(ErrorReason.UnsupportedPlatform, "initiateRobloxSubscriptionPurchaseInternal")
+		return
+	end
+
+	if FFlagTTOnboardingSheet and purchaseUIOptions and purchaseUIOptions.sheetKind == RobloxPlusSheetKind.TT then
+		v.setPromptState(PromptState.SubscriptionPurchaseUIReady)
 		return
 	end
 
@@ -70,33 +89,49 @@ function initiateRobloxSubscriptionPurchaseInternal(p)
 
 	local v4
 
-	if FFlagRobloxSubscriptionProductsDirectFetch then
-		v4 = getRobloxSubscriptionProductsDirect(v3)
-	else
-		v4 = getRobloxSubscriptionProducts()
+	if FFlagPlusSubscribeDeepLinkIncludeUpgrades and FFlagRobloxSubscriptionProductsDirectFetch then
+		v4 = v.getPurchaseFlowOptions().includeUpgrades == true
 	end
 
-	local v5 = { paymentSession, v4 }
+	local v5
 
-	if FFlagRobloxPlusAmpSubscriptionCheck then
-		table.insert(v5, getAmpFeatureAccess())
+	if FFlagRobloxSubscriptionProductsDirectFetch then
+		v5 = getRobloxSubscriptionProductsDirect(v3, v4)
+	else
+		v5 = getRobloxSubscriptionProducts()
+	end
+
+	local v6 = FFlagRobloxPlusAmpSubscriptionCheck and not v4
+	local v7 = { paymentSession, v5 }
+
+	if v6 then
+		table.insert(v7, getAmpFeatureAccess())
 	end
 
 	if FFlagEnablePlusReferralLandingSheet and v3 then
-		table.insert(v5, fetchReferralEligibility(v3))
+		table.insert(v7, fetchReferralEligibility(v3))
 	end
 
-	Promise.all(v5):andThen(function(list)
+	local v8
+
+	if FFlagPlusMembershipConfigChangeCheck and v4 and RobloxSubscriptionSignals.get().getHasRobloxSubscription() then
+		table.insert(v7, getRobloxSubscriptionMembershipConfig())
+		v8 = #v7
+	else
+		v8 = nil
+	end
+
+	Promise.all(v7):andThen(function(list)
 		local item = list[1]
 		local item2 = list[2]
 
-		if FFlagRobloxPlusAmpSubscriptionCheck and list[3] == AmpAccessResponse.Granted then
+		if v6 and list[3] == AmpAccessResponse.Granted then
 			transitionToError(ErrorReason.AlreadySubscribed, "initiateRobloxSubscriptionPurchaseInternal")
 			return
 		end
 
 		if FFlagEnablePlusReferralLandingSheet and v3 then
-			local item3 = list[FFlagRobloxPlusAmpSubscriptionCheck and 4 or 3]
+			local item3 = list[v6 and 4 or 3]
 
 			if not item3.eligible then
 				transitionToError(
@@ -107,6 +142,17 @@ function initiateRobloxSubscriptionPurchaseInternal(p)
 			end
 		end
 
+		if v8 then
+			local item3 = list[v8]
+
+			if item3 == nil then
+				transitionToError(ErrorReason.GenericError, "initiateRobloxSubscriptionPurchaseInternal")
+				return
+			end
+
+			v.setMembershipConfigSnapshot(item3)
+		end
+
 		v.setPaymentSessionId(item)
 
 		if not (#item2 > 0) then
@@ -114,8 +160,8 @@ function initiateRobloxSubscriptionPurchaseInternal(p)
 			return
 		end
 
-		local v6 = item2[1]
-		v.setRobloxSubscriptionProduct(v6)
+		local v9 = item2[1]
+		v.setRobloxSubscriptionProduct(v9)
 
 		v.setPromptState(PromptState.SubscriptionPurchaseUIReady)
 	end, function(_)

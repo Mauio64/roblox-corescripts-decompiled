@@ -1,5 +1,4 @@
 local GameInvite = script:FindFirstAncestor("GameInvite")
-local TextService = game:GetService("TextService")
 local Components = GameInvite.Components
 local Context = GameInvite.Context
 local parent = GameInvite.Parent
@@ -12,7 +11,6 @@ local Foundation = require(parent.Foundation)
 local Style = require(parent.Style)
 local GetTextSize = Style.GetTextSize
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local UniversalAppPolicy = require(parent.UniversalAppPolicy)
 local NotificationsCommon = require(parent.NotificationsCommon)
 local DeviceInfo = NotificationsCommon.DeviceInfo
@@ -59,9 +57,9 @@ local v = {
 	copyLink = "Feature.SocialShare.Action.CopyLink"
 }
 
-local function fn(data, flag: boolean, flag2: boolean)
+local function fn(data, console: boolean, flag: boolean)
 	if GetFFlagEnableGameInviteModalVRSupport() then
-		local v2 = not IsVRAppBuild() and flag2 and not flag and data and data.isCoreScript
+		local v2 = not IsVRAppBuild() and flag and not console and data and data.isCoreScript
 
 		if v2 then
 			if data.serverType == "StandardServer" then
@@ -73,7 +71,7 @@ local function fn(data, flag: boolean, flag2: boolean)
 
 		return v2
 	else
-		local v2 = not flag and flag2 and data and data.isCoreScript
+		local v2 = not console and flag and data and data.isCoreScript
 
 		if v2 then
 			if data.serverType == "StandardServer" then
@@ -115,35 +113,25 @@ return function(props)
 	local desktopDevice = DeviceInfo.isDesktopDevice()
 	local v9 = fn(v4, DeviceInfo.isConsole(), v7)
 	local isFullSize = desktopDevice and not isFullWidth
-	local textSize = v2.Font.BaseSize * v2.Font.Header2.RelativeSize
-	local textSize2 = v2.Font.BaseSize * v2.Font.Body.RelativeSize
-	local v10
+	local textSize2 = v2.Font.BaseSize * v2.Font.Header2.RelativeSize
+	local textSize3 = v2.Font.BaseSize * v2.Font.Body.RelativeSize
 
-	if FoundationFontFaceMigration then
-		v10 = GetTextSize(
-			localizedStrings.copyLink,
-			textSize,
-			v2.Tokens.Typography.TitleLarge.Font,
-			Vector2.new(300 - TitleIconSize, 1e999),
-			{ addTemporaryPadding = false }
-		)
-	else
-		v10 = TextService:GetTextSize(
-			localizedStrings.copyLink,
-			textSize,
-			v2.Font.Header2.Font,
-			Vector2.new(300 - TitleIconSize, 1e999)
-		)
-	end
+	local textSize = GetTextSize(
+		localizedStrings.copyLink,
+		textSize2,
+		v2.Tokens.Typography.TitleLarge.Font,
+		Vector2.new(300 - TitleIconSize, 1e999),
+		{ addTemporaryPadding = false }
+	)
 
 	local total = 0
 	local udim
 
 	if v9 then
 		if desktopDevice and isFullSize then
-			local v11 = math.ceil(v10.X) + 10
-			udim = UDim2.new(0, v11, 1, 0)
-			total += v11
+			local v10 = math.ceil(textSize.X) + 10
+			udim = UDim2.new(0, v10, 1, 0)
+			total += v10
 		else
 			udim = UDim2.new(0, TitleIconSize, 0, TitleIconSize)
 			total += TitleIconSize
@@ -177,7 +165,7 @@ return function(props)
 		fn4() -- inferred equivalent call
 	end
 
-	local v11 = React.useMemo(function()
+	local v10 = React.useMemo(function()
 		local children = {
 			UIPadding = React.createElement("UIPadding", {
 				PaddingLeft = UDim.new(0, SidePadding),
@@ -194,13 +182,13 @@ return function(props)
 		}
 
 		local createElement = React.createElement
-		local v11 = {
+		local v10 = {
 			Size = UDim2.new(0, total, 1, 0),
 			LayoutOrder = 0,
 			BackgroundTransparency = 1
 		}
 
-		local v12 = {
+		local v11 = {
 			UIListLayout = React.createElement("UIListLayout", {
 				FillDirection = Enum.FillDirection.Horizontal,
 				SortOrder = Enum.SortOrder.LayoutOrder,
@@ -224,48 +212,29 @@ return function(props)
 			})
 		end
 
-		v12.CloseButton = closeButton
-		children.LeftActionContainer = createElement("Frame", v11, v12)
+		v11.CloseButton = closeButton
+		children.LeftActionContainer = createElement("Frame", v10, v11)
 
-		local createElement2 = React.createElement
-		local v13 = {
+		children.Title = React.createElement("TextLabel", {
 			BackgroundTransparency = 1,
 			Text = text,
-			TextSize = textSize,
+			TextSize = textSize2,
 			TextWrapped = true,
 			TextXAlignment = Enum.TextXAlignment.Center,
 			TextColor3 = v2.Theme.TextEmphasis.Color,
-			Font = 0,
-			FontFace = 0,
-			Size = 0,
+			FontFace = normalizeFontFace(v2.Tokens.Typography.TitleLarge.Font),
+			Size = UDim2.new(1, total * 2 * -1, 1, 0),
 			LayoutOrder = 1
-		}
-		local font
+		})
 
-		if not FoundationFontFaceMigration then
-			font = v2.Font.Header2.Font
-		end
-
-		v13.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(v2.Tokens.Typography.TitleLarge.Font)
-		end
-
-		v13.FontFace = fontFace
-
-		v13.Size = UDim2.new(1, total * 2 * -1, 1, 0)
-		children.Title = createElement2("TextLabel", v13)
-
-		local createElement3 = React.createElement
-		local v14 = {
+		local createElement2 = React.createElement
+		local v12 = {
 			Size = UDim2.new(0, total, 1, 0),
 			LayoutOrder = 2,
 			BackgroundTransparency = 1
 		}
 
-		local v15 = {
+		local v13 = {
 			UIListLayout = React.createElement("UIListLayout", {
 				FillDirection = Enum.FillDirection.Horizontal,
 				SortOrder = Enum.SortOrder.LayoutOrder,
@@ -292,9 +261,9 @@ return function(props)
 			}) or nil
 		end
 
-		v15.SearchButton = searchButton
+		v13.SearchButton = searchButton
 
-		v15.ShareGameInviteLink = v9
+		v13.ShareGameInviteLink = v9
 			and React.createElement(ShareGameInviteLink, {
 				layoutOrder = 1,
 				isDesktop = desktopDevice,
@@ -302,12 +271,12 @@ return function(props)
 				size = udim
 			})
 			or nil
-		children.RightActionContainer = createElement3("Frame", v14, v15)
+		children.RightActionContainer = createElement2("Frame", v12, v13)
 		return children
 	end, { state, isFullSize, v8, v9, desktopDevice, text })
 
-	local v12 = React.useMemo(function()
-		local v12 = {
+	local v11 = React.useMemo(function()
+		return {
 			UIListLayout = React.createElement("UIListLayout", {
 				FillDirection = Enum.FillDirection.Horizontal,
 				SortOrder = Enum.SortOrder.LayoutOrder,
@@ -323,41 +292,23 @@ return function(props)
 					GameInviteAnalyticsManager:onSearchFocused()
 				end
 			}),
-			CancelButton = 0
+			CancelButton = React.createElement("TextButton", {
+				LayoutOrder = 1,
+				BackgroundTransparency = 1,
+				AnchorPoint = Vector2.new(1, 0.5),
+				Position = UDim2.new(1, 0, 0.5, 0),
+				Size = UDim2.new(0, 100, 1, 0),
+				TextSize = textSize3,
+				TextColor3 = v2.Theme.UIDefault.Color,
+				Text = localizedStrings.cancelText,
+				FontFace = normalizeFontFace(v2.Tokens.Typography.BodyLarge.Font),
+				[React.Event.Activated] = fn4
+			})
 		}
-
-		local createElement = React.createElement
-		local v13 = {}
-		v13.LayoutOrder = 1
-		v13.BackgroundTransparency = 1
-		v13.AnchorPoint = Vector2.new(1, 0.5)
-		v13.Position = UDim2.new(1, 0, 0.5, 0)
-		v13.Size = UDim2.new(0, 100, 1, 0)
-		v13.TextSize = textSize2
-		v13.TextColor3 = v2.Theme.UIDefault.Color
-		v13.Text = localizedStrings.cancelText
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = v2.Font.Body.Font
-		end
-
-		v13.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(v2.Tokens.Typography.BodyLarge.Font)
-		end
-
-		v13.FontFace = fontFace
-
-		v13[React.Event.Activated] = fn4
-		v12.CancelButton = createElement("TextButton", v13)
-		return v12
 	end, { state })
 
 	if state then
-		v11 = v12
+		v10 = v11
 	end
 
 	return React.createElement("Frame", {
@@ -366,5 +317,5 @@ return function(props)
 		LayoutOrder = props.layoutOrder,
 		Position = UDim2.new(0, 0, 1, 0),
 		Size = props.size
-	}, v11)
+	}, v10)
 end

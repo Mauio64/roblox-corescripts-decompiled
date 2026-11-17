@@ -93,16 +93,15 @@ local function AvatarPartGrid(props)
 	React.useEffect(function()
 		if props.humanoidModel then
 			setState(getItems(props.humanoidModel:Clone(), props.name))
-			return
+		else
+			local v = {}
+
+			for i = 1, 6 do
+				v[i] = {}
+			end
+
+			setState(v)
 		end
-
-		local v = {}
-
-		for i = 1, 6 do
-			v[i] = {}
-		end
-
-		setState(v)
 	end, { props.humanoidModel })
 
 	React.useEffect(function()

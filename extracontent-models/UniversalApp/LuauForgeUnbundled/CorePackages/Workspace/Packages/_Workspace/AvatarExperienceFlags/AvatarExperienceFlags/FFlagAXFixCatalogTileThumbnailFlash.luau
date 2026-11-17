@@ -1,1 +1,0 @@
-return game:DefineFastFlag("AXFixCatalogTileThumbnailFlash3", false)

@@ -29,7 +29,6 @@ local positioning = require(script.Parent.Parent.positioning)
 local useArrowPosition = require(script.Parent.useArrowPosition)
 local useElevation = require(Foundation.Providers.Elevation.useElevation)
 require(Foundation.Components.Popover.useFloating)
-local usePanelSizing = require(script.Parent.usePanelSizing)
 local usePluginAnchor = require(script.Parent.usePluginAnchor)
 local useTokens = require(Foundation.Providers.Style.useTokens)
 local withDefaults = require(Foundation.Utility.withDefaults)
@@ -42,7 +41,7 @@ local ElevationOwnerScope = ElevationProvider.ElevationOwnerScope
 require(Foundation.Providers.StudioPanels.Types)
 local v
 
-if Flags.FoundationPopoverPluginOverlayMeasurement and Flags.FoundationPluginShadowSize then
+if Flags.FoundationPluginShadowSize then
 	v = Constants.PLUGIN_SHADOW_SIZE
 else
 	v = Constants.SHADOW_SIZE
@@ -65,19 +64,8 @@ local function PopoverContentPlugin(p, p2)
 	local v4 = withDefaults(p, v2)
 
 	local v5 = usePanelsContext()
-	local v6
-
-	if Flags.FoundationPopoverPluginOverlayMeasurement then
-		v6 = React.useContext(PluginPopoverParentContext)
-	end
-
-	local parentPopoverId
-
-	if Flags.FoundationPopoverPluginOverlayMeasurement then
-		parentPopoverId = v6.id
-	else
-		parentPopoverId = React.useContext(PluginPopoverParentContext)
-	end
+	local v6 = React.useContext(PluginPopoverParentContext)
+	local id = v6.id
 
 	local v7 = React.useContext(PopoverContext)
 	local styleSheet = useStyleSheet()
@@ -90,87 +78,52 @@ local function PopoverContentPlugin(p, p2)
 	React.useImperativeHandle(p2, function()
 		return state
 	end, { state })
-	local parent2
 
-	if Flags.FoundationPopoverPluginOverlayMeasurement then
-		parent2 = useOverlay()
-	else
-		parent2 = nil
-	end
+	local parent2 = useOverlay()
 
-	local v9
+	local v9 = React.useMemo(function()
+		local popoverPluginContainer = Instance.new("Frame")
+		popoverPluginContainer.Name = "PopoverPluginContainer"
+		popoverPluginContainer.BackgroundTransparency = 1
+		popoverPluginContainer.BorderSizePixel = 0
+		popoverPluginContainer.ClipsDescendants = false
+		popoverPluginContainer.Position = UDim2.fromOffset(-10000, -10000)
+		return popoverPluginContainer
+	end, {})
+	React.useEffect(function()
+		return function()
+			v9:Destroy()
+		end
+	end, { v9 })
 
-	if Flags.FoundationPopoverPluginOverlayMeasurement then
-		v9 = React.useMemo(function()
-			local popoverPluginContainer = Instance.new("Frame")
-			popoverPluginContainer.Name = "PopoverPluginContainer"
-			popoverPluginContainer.BackgroundTransparency = 1
-			popoverPluginContainer.BorderSizePixel = 0
-			popoverPluginContainer.ClipsDescendants = false
-			popoverPluginContainer.Position = UDim2.fromOffset(-10000, -10000)
-			return popoverPluginContainer
-		end, {})
-	else
-		v9 = nil
-	end
-
-	if Flags.FoundationPopoverPluginOverlayMeasurement then
-		React.useEffect(function()
-			return function()
-				v9:Destroy()
-			end
-		end, { v9 })
-	end
-
-	local size, v10, contentSize, v11, state2, setState2
-
-	if Flags.FoundationPopoverPluginOverlayMeasurement then
-		size, v10 = React.useBinding(UDim2.new())
-		contentSize, v11 = React.useBinding(UDim2.new())
-		state2, setState2 = React.useState(nil)
-	else
-		setState2 = nil
-		state2 = nil
-		v11 = nil
-		v10 = nil
-	end
+	local size, v10 = React.useBinding(UDim2.new())
+	local contentSize, v11 = React.useBinding(UDim2.new())
+	local state2, setState2 = React.useState(nil)
 
 	local size_200 = v8.Size.Size_200
 	local v12 = size_200 * 1.4142135623730951 / 2
 	local backgroundStyle = v4.backgroundStyle or v8.Color.Surface.Surface_100
-	local v13, v14, v15, v16
+	local v13
 
-	if Flags.FoundationPopoverPluginOverlayMeasurement then
-		v13 = if v4.side then v4.side else PopoverSide.Bottom
-		v14 = if v4.align then v4.align else PopoverAlign.Center
-		v15 = type(v13) ~= "table" and 0 or v13.offset
-		v16 = if type(v14) == "table" then v14.offset else 0
+	if v4.side then
+		v13 = v4.side
 	else
-		v13 = nil
-		v15 = nil
-		v16 = nil
+		v13 = PopoverSide.Bottom
 	end
 
+	local v14 = if v4.align then v4.align else PopoverAlign.Center
+	local v15 = type(v13) ~= "table" and 0 or v13.offset
+	local v16 = type(v14) ~= "table" and 0 or v14.offset
 	local v17
 
-	if Flags.FoundationPopoverPluginOverlayMeasurement then
-		v17 = if type(v13) == "table" then v13.position else v13
-
-		if type(v14) == "table" then
-			v14 = v14.position
-		end
+	if type(v13) == "table" then
+		v17 = v13.position
 	else
-		if type(v4.side) == "table" then
-			v17 = v4.side.position
-		else
-			v17 = v4.side or PopoverSide.Bottom
-		end
+		v17 = v13
+	end
 
-		if type(v4.align) == "table" then
-			v14 = v4.align.position
-		else
-			v14 = v4.align or PopoverAlign.Center
-		end
+	if type(v14) == "table" then
+		v14 = v14.position
 	end
 
 	local v18 = v14 == PopoverAlign.Center and 0.5 or v14 == PopoverAlign.End and 1 or 0
@@ -185,80 +138,57 @@ local function PopoverContentPlugin(p, p2)
 		v20 = v4.hasArrow
 	end
 
-	local ready, v21, v22
+	local ready = v7.isOpen and v19.isReady and v6.ready
+	local v21 = ready and parent2 ~= nil
+	local v22 = v21 and state2 == nil
 
-	if Flags.FoundationPopoverPluginOverlayMeasurement then
-		ready = v7.isOpen and v19.isReady and v6.ready
-		v21 = ready and parent2 ~= nil
-		v22 = v21 and state2 == nil
-		React.useEffect(function()
-			if not ready then
-				setState2(nil)
-			end
-		end, { ready })
-	else
-		v22 = nil
-		ready = nil
-		v21 = nil
-	end
+	React.useEffect(function()
+		if not ready then
+			setState2(nil)
+		end
+	end, { ready })
 
-	local onAbsoluteSizeChanged
-
-	if Flags.FoundationPopoverPluginOverlayMeasurement then
-		local useCallback = React.useCallback
-		local function fn(p3)
-			if not (Flags.FoundationPopoverRecomputeContentSize or v22) then
-				return
-			end
-
-			local absoluteSize = p3.AbsoluteSize
-
-			if absoluteSize.X > 0 and absoluteSize.Y > 0 then
-				setState2(absoluteSize)
-			end
+	local useCallback = React.useCallback
+	local function fn(p3)
+		if not (Flags.FoundationPopoverRecomputeContentSize or v22) then
+			return
 		end
 
-		local v23
+		local absoluteSize = p3.AbsoluteSize
 
-		if not Flags.FoundationPopoverRecomputeContentSize then
-			v23 = v22
+		if absoluteSize.X > 0 and absoluteSize.Y > 0 then
+			setState2(absoluteSize)
 		end
-
-		onAbsoluteSizeChanged = useCallback(fn, { v23 })
-	end
-
-	local useMemo = React.useMemo
-	local function fn()
-		local v23
-
-		if Flags.FoundationPopoverPluginOverlayMeasurement then
-			v23 = v13
-		else
-			v23 = v4.side or PopoverSide.Bottom
-		end
-
-		return getPanelPosition(v23, v4.align or PopoverAlign.Start, nil, v, not v20 and 0 or v12)
 	end
 
 	local v23
 
-	if Flags.FoundationPopoverPluginOverlayMeasurement then
-		v23 = v13
-	else
-		v23 = v4.side
+	if not Flags.FoundationPopoverRecomputeContentSize then
+		v23 = v22
 	end
 
-	local position = useMemo(fn, { v23, v4.align, v20, v12 })
+	local onAbsoluteSizeChanged = useCallback(fn, { v23 })
 
-	local registerPanelAsync = React.useCallback(function(p3, p4, callback, p5: number?, p6: string?, flag: boolean?)
-		local registerPopoverAsync = v5.registerPopoverAsync
+	local position = React.useMemo(function()
+		return getPanelPosition(v13, v4.align or PopoverAlign.Start, nil, v, not v20 and 0 or v12)
+	end, { v13, v4.align, v20, v12 })
 
-		if not Flags.FoundationPopoverPluginFocusable then
-			flag = nil
-		end
+	local registerPanelAsync = React.useCallback(
+		function(p3, p4, callback, p5: number?, p6: string?, flag: boolean?, vector2: Vector2?)
+			local registerPopoverAsync = v5.registerPopoverAsync
 
-		return registerPopoverAsync(p3, p4, callback, p5, p6, flag)
-	end, { v5.registerPopoverAsync })
+			if not Flags.FoundationPopoverPluginFocusable then
+				flag = nil
+			end
+
+			if not Flags.FoundationPopoverPluginPoolReclaim then
+				vector2 = nil
+			end
+
+			return registerPopoverAsync(p3, p4, callback, p5, p6, flag, vector2)
+		end,
+		{ v5.registerPopoverAsync }
+	)
 
 	local ref = React.useRef(false)
 	React.useEffect(function()
@@ -283,23 +213,32 @@ local function PopoverContentPlugin(p, p2)
 	end, { v4.onPressedOutside, v7.anchor })
 
 	local depth = relativeIndex == nil and 0 or relativeIndex
-	local isOpen
+	local v24
 
-	if Flags.FoundationPopoverPluginOverlayMeasurement then
-		isOpen = ready
+	if Flags.FoundationPopoverPluginPoolReclaim and state2 then
+		v24 = positioning.calculatePopoverBounds(v17, v15, v16, not v20 and 0 or v12, state2) + Vector2.new(v * 2, v * 2)
 	else
-		isOpen = v7.isOpen and v19.isReady
+		v24 = nil
 	end
 
-	local v24 = {
+	local isOpen
+
+	if Flags.FoundationPopoverPluginPoolReclaim then
+		isOpen = ready and v24 ~= nil
+	else
+		isOpen = ready
+	end
+
+	local v25 = {
 		isOpen = isOpen,
 		onClose = onClose,
 		anchorUri = v19.uri,
 		registerPanelAsync = registerPanelAsync,
 		position = position,
 		depth = depth,
-		parentPopoverId = parentPopoverId,
-		isFocusable = 0
+		parentPopoverId = id,
+		isFocusable = 0,
+		initialSize = 0
 	}
 	local isFocusable
 
@@ -307,20 +246,23 @@ local function PopoverContentPlugin(p, p2)
 		isFocusable = v4.isFocusable
 	end
 
-	v24.isFocusable = isFocusable
-	local v25 = usePanel(v24)
+	v25.isFocusable = isFocusable
+	local initialSize
 
-	if not Flags.FoundationPopoverPluginOverlayMeasurement then
-		size, contentSize = usePanelSizing(v4.side, v4.align, state, not v20 and 0 or v12, v25)
+	if Flags.FoundationPopoverPluginPoolReclaim then
+		initialSize = v24
 	end
+
+	v25.initialSize = initialSize
+	local v26 = usePanel(v25)
 
 	React.useEffect(function()
 		if not Flags.FoundationPopoverClickOutsideInGuiShadow then
 			return
 		end
 
-		if v25 and v25.container and v4.onPressedOutside then
-			local inputBeganConnection = v25.container.InputBegan:Connect(function(input)
+		if v26 and v26.container and v4.onPressedOutside then
+			local inputBeganConnection = v26.container.InputBegan:Connect(function(input)
 				if not (input.UserInputType == Enum.UserInputType.MouseButton1 and state) then
 					return
 				end
@@ -333,120 +275,137 @@ local function PopoverContentPlugin(p, p2)
 				inputBeganConnection:Disconnect()
 			end
 		end
-	end, { v25, state, v4.onPressedOutside })
+	end, { v26, state, v4.onPressedOutside })
+	React.useLayoutEffect(function()
+		if not v22 or state == nil then
+			return
+		end
 
-	if Flags.FoundationPopoverPluginOverlayMeasurement then
-		React.useLayoutEffect(function()
-			if not v22 or state == nil then
-				return
-			end
+		local absoluteSize = state.AbsoluteSize
 
-			local absoluteSize = state.AbsoluteSize
+		if absoluteSize.X > 0 and absoluteSize.Y > 0 then
+			setState2(absoluteSize)
+		end
+	end, { v22, state })
+	local v27
 
-			if absoluteSize.X > 0 and absoluteSize.Y > 0 then
-				setState2(absoluteSize)
-			end
-		end, { v22, state })
-	end
-
-	local v26
-
-	if Flags.FoundationPopoverPluginOverlayMeasurement then
-		v26 = React.useMemo(function()
+	if Flags.FoundationPopoverPluginPoolReclaim then
+		v27 = nil
+	else
+		v27 = React.useMemo(function()
 			if state2 then
 				return positioning.calculatePopoverBounds(v17, v15, v16, not v20 and 0 or v12, state2) + Vector2.new(v * 2, v * 2)
 			end
 
 			return nil
 		end, { state2, v17, v15, v16, v20, v12 })
-	else
-		v26 = nil
 	end
 
-	if Flags.FoundationPopoverPluginOverlayMeasurement then
-		React.useLayoutEffect(function()
-			if state2 == nil or v26 == nil then
-				v11(UDim2.new())
-				v10(UDim2.new())
-			else
-				v11(UDim2.fromOffset(state2.X, state2.Y))
-				v10(UDim2.fromOffset(v26.X, v26.Y))
+	local useLayoutEffect = React.useLayoutEffect
+	local function fn2()
+		local v28
 
-				if v25 then
-					v25.setSizeAsync(v26)
-				end
-			end
-		end, { state2, v26, v25 })
-
-		React.useLayoutEffect(function()
-			if not v21 then
-				v9.Parent = nil
-			elseif v25 and v26 then
-				v9.AutomaticSize = Enum.AutomaticSize.None
-				v9.Size = UDim2.fromOffset(v26.X, v26.Y)
-				v9.Position = UDim2.new()
-				v9.Parent = v25.container
-			else
-				v9.AutomaticSize = Enum.AutomaticSize.XY
-				v9.Size = UDim2.new()
-				v9.Position = UDim2.fromOffset(-10000, -10000)
-				v9.Parent = parent2
-			end
-		end, { v21, parent2, v25, v26, v9 })
-	end
-
-	local v27
-
-	if not (v19.isVirtual or typeof(v7.anchor) ~= "Instance") then
-		v27 = v7.anchor
-	end
-
-	local position2 = useArrowPosition(contentSize, v17, v4.radius, v18, v12, v27)
-	local ready2
-
-	if Flags.FoundationPopoverPluginOverlayMeasurement then
-		if v25 == nil then
-			ready2 = false
+		if Flags.FoundationPopoverPluginPoolReclaim then
+			v28 = v24
 		else
-			ready2 = v26 ~= nil
+			v28 = v27
 		end
-	else
-		ready2 = true
+
+		if state2 == nil or v28 == nil then
+			v11(UDim2.new())
+			v10(UDim2.new())
+		else
+			v11(UDim2.fromOffset(state2.X, state2.Y))
+			v10(UDim2.fromOffset(v28.X, v28.Y))
+
+			if v26 then
+				v26.setSizeAsync(v28)
+			end
+		end
 	end
 
 	local v28
 
-	if Flags.FoundationPopoverPluginOverlayMeasurement then
-		v28 = v21
+	if Flags.FoundationPopoverPluginPoolReclaim then
+		v28 = v24
 	else
-		v28 = v25 ~= nil
+		v28 = v27
+	end
+
+	useLayoutEffect(fn2, { state2, v28, v26 })
+
+	local useLayoutEffect2 = React.useLayoutEffect
+	local function fn3()
+		if not v21 then
+			v9.Parent = nil
+			return
+		end
+
+		local v29
+
+		if Flags.FoundationPopoverPluginPoolReclaim then
+			v29 = v24
+		else
+			v29 = v27
+		end
+
+		if v26 and v29 then
+			v9.AutomaticSize = Enum.AutomaticSize.None
+			v9.Size = UDim2.fromOffset(v29.X, v29.Y)
+			v9.Position = UDim2.new()
+			v9.Parent = v26.container
+		else
+			v9.AutomaticSize = Enum.AutomaticSize.XY
+			v9.Size = UDim2.new()
+			v9.Position = UDim2.fromOffset(-10000, -10000)
+			v9.Parent = parent2
+		end
 	end
 
 	local v29
 
-	if Flags.FoundationPopoverPluginOverlayMeasurement then
-		v29 = v9
-	elseif v25 then
-		v29 = v25.container
+	if Flags.FoundationPopoverPluginPoolReclaim then
+		v29 = v24
+	else
+		v29 = v27
 	end
 
-	local v30
+	useLayoutEffect2(fn3, { v21, parent2, v26, v29, v9 })
+	local anchor
 
-	if Flags.FoundationPopoverPluginOverlayMeasurement then
-		v30 = React.useMemo(function()
-			local id
-
-			if v25 then
-				id = v25.popoverId
-			end
-
-			return { id = id, ready = ready2 }
-		end, { v25, ready2 })
+	if not (v19.isVirtual or typeof(v7.anchor) ~= "Instance") then
+		anchor = v7.anchor
 	end
 
+	local position2 = useArrowPosition(contentSize, v17, v4.radius, v18, v12, anchor)
+	local ready2
+
+	if v26 == nil then
+		ready2 = false
+	else
+		local v30
+
+		if Flags.FoundationPopoverPluginPoolReclaim then
+			v30 = v24
+		else
+			v30 = v27
+		end
+
+		ready2 = v30 ~= nil
+	end
+
+	local v30 = React.useMemo(function()
+		local id2
+
+		if v26 then
+			id2 = v26.popoverId
+		end
+
+		return { id = id2, ready = ready2 }
+	end, { v26, ready2 })
 	local panel
 
-	if v28 and v29 then
+	if v21 and v9 then
 		local createPortal = ReactRoblox.createPortal
 		local createElement = React.createElement
 		local fragment = React.Fragment
@@ -456,28 +415,41 @@ local function PopoverContentPlugin(p, p2)
 		}
 
 		local createElement2 = React.createElement
+		local v32
+
+		if Flags.FoundationPopoverPluginPoolReclaim then
+			v32 = v24
+		else
+			v32 = v27
+		end
+
 		local automaticSize
 
-		if Flags.FoundationPopoverPluginOverlayMeasurement and v26 == nil then
+		if v32 == nil then
 			automaticSize = Enum.AutomaticSize.XY
 		end
 
-		if Flags.FoundationPopoverPluginOverlayMeasurement and v26 == nil then
+		local v60
+
+		if Flags.FoundationPopoverPluginPoolReclaim then
+			v60 = v24
+		else
+			v60 = v27
+		end
+
+		if v60 == nil then
 			size = nil
 		end
 
-		local v32 = {
+		local v57 = {
 			AutomaticSize = automaticSize,
 			Size = size,
 			testId = `{v7.testId}--container`
 		}
-		local v52 = {
+		local v61 = {
 			Shadow = React.createElement(PopoverShadow, {
 				contentSize = contentSize,
-				position = UDim2.fromOffset(
-					v / 2,
-					v / 2 + (Flags.FoundationPopoverPluginOverlayMeasurement and Flags.FoundationPluginShadowSize and 0 or 2)
-				),
+				position = UDim2.fromOffset(v / 2, v / 2 + (Flags.FoundationPluginShadowSize and 0 or 2)),
 				radiusTag = v3[v4.radius],
 				ZIndex = 1,
 				testId = `{v7.testId}--shadow`
@@ -497,48 +469,21 @@ local function PopoverContentPlugin(p, p2)
 			})
 		end
 
-		v52.Arrow = arrow
+		v61.Arrow = arrow
 
-		local createElement3 = React.createElement
-
-		local v54 = {
+		v61.Content = React.createElement(View, {
 			tag = `auto-xy {v3[v4.radius]}`,
 			Position = UDim2.fromOffset(v, v),
 			ref = setState,
-			onAbsoluteSizeChanged = 0,
-			backgroundStyle = 0,
+			onAbsoluteSizeChanged = onAbsoluteSizeChanged,
+			backgroundStyle = backgroundStyle,
 			ZIndex = 3,
-			testId = 0
-		}
-
-		if not Flags.FoundationPopoverPluginOverlayMeasurement then
-			onAbsoluteSizeChanged = nil
-		end
-
-		v54.onAbsoluteSizeChanged = onAbsoluteSizeChanged
-
-		v54.backgroundStyle = backgroundStyle
-
-		v54.testId = `{v7.testId}--content`
-
-		local createElement4 = React.createElement
-		local provider = PluginPopoverParentContext.Provider
-
-		if not Flags.FoundationPopoverPluginOverlayMeasurement then
-			v30 = v25.popoverId
-		end
-
-		v52.Content = createElement3(View, v54, createElement4(provider, { value = v30 }, {
+			testId = `{v7.testId}--content`
+		}, React.createElement(PluginPopoverParentContext.Provider, { value = v30 }, {
 			Nested = React.createElement(ElevationOwnerScope, { owner = owner }, v4.children)
 		}))
-		v31.Container = createElement2(View, v32, v52)
-		local element = createElement(fragment, nil, v31)
-
-		if not Flags.FoundationPopoverPluginOverlayMeasurement then
-			v29 = v25.container
-		end
-
-		panel = createPortal(element, v29)
+		v31.Container = createElement2(View, v57, v61)
+		panel = createPortal(createElement(fragment, nil, v31), v9)
 	end
 
 	return React.createElement(React.Fragment, nil, { Anchor = v19.element, Panel = panel })

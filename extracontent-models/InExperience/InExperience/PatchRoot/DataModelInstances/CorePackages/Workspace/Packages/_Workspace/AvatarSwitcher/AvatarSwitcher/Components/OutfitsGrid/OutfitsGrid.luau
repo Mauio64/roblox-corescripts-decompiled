@@ -49,7 +49,8 @@ local function OutfitsGrid(props)
 	end, { state })
 
 	local onAbsoluteSizeChanged = React.useCallback(function(p)
-		setState((math.max(3, (math.floor(p.AbsoluteSize.X / v)))))
+		local x = p.AbsoluteSize.X
+		setState((math.max(3, (math.floor(x / v)))))
 	end, {})
 
 	return (React.createElement(Foundation.View, {

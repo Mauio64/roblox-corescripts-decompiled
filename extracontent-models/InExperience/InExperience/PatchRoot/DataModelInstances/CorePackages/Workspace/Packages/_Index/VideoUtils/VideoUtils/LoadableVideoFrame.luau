@@ -25,7 +25,7 @@ local FFlagLuaAppEdpMediaGalleryFullScreen = SharedFlags2.FFlagLuaAppEdpMediaGal
 local SharedFlags3 = require(parent.SharedFlags)
 local FFlagLuaAppEdpConsoleMediaGalleryVideo = SharedFlags3.FFlagLuaAppEdpConsoleMediaGalleryVideo
 local SharedFlags4 = require(parent.SharedFlags)
-local FFlagLuaAppEnableHomepageOneByTwoTile = SharedFlags4.FFlagLuaAppEnableHomepageOneByTwoTile
+local FFlagLuaAppEnableNxMRoduxApportioning = SharedFlags4.FFlagLuaAppEnableNxMRoduxApportioning
 
 local SharedFlags5 = require(parent.SharedFlags)
 local FFlagLuaAppHomePageFirstImageLoadObserver = SharedFlags5.FFlagLuaAppHomePageFirstImageLoadObserver
@@ -60,7 +60,7 @@ local function LoadableVideoFrame(props, p)
 		FFlagLuaAppEdpMediaGalleryAutoAdvance
 		or FFlagLuaAppEdpMediaGalleryFullScreen
 		or FFlagLuaAppEdpConsoleMediaGalleryVideo
-		or FFlagLuaAppEnableHomepageOneByTwoTile
+		or FFlagLuaAppEnableNxMRoduxApportioning
 	then
 		ref3 = nil
 	else
@@ -162,7 +162,7 @@ local function LoadableVideoFrame(props, p)
 			FFlagLuaAppEdpMediaGalleryAutoAdvance
 			or FFlagLuaAppEdpMediaGalleryFullScreen
 			or FFlagLuaAppEdpConsoleMediaGalleryVideo
-			or FFlagLuaAppEnableHomepageOneByTwoTile
+			or FFlagLuaAppEnableNxMRoduxApportioning
 		then
 			if typeof(p) == "table" then
 				current = p.current
@@ -221,7 +221,7 @@ local function LoadableVideoFrame(props, p)
 		FFlagLuaAppEdpMediaGalleryAutoAdvance
 		or FFlagLuaAppEdpMediaGalleryFullScreen
 		or FFlagLuaAppEdpConsoleMediaGalleryVideo
-		or FFlagLuaAppEnableHomepageOneByTwoTile
+		or FFlagLuaAppEnableNxMRoduxApportioning
 	then
 		v3 = p
 	else
@@ -275,7 +275,7 @@ local function LoadableVideoFrame(props, p)
 		FFlagLuaAppEdpMediaGalleryAutoAdvance
 		or FFlagLuaAppEdpMediaGalleryFullScreen
 		or FFlagLuaAppEdpConsoleMediaGalleryVideo
-		or FFlagLuaAppEnableHomepageOneByTwoTile
+		or FFlagLuaAppEnableNxMRoduxApportioning
 	then
 		videoFrameRef = p
 	else
@@ -383,7 +383,7 @@ if
 	FFlagLuaAppEdpMediaGalleryAutoAdvance
 	or FFlagLuaAppEdpMediaGalleryFullScreen
 	or FFlagLuaAppEdpConsoleMediaGalleryVideo
-	or FFlagLuaAppEnableHomepageOneByTwoTile
+	or FFlagLuaAppEnableNxMRoduxApportioning
 then
 	return React.forwardRef(LoadableVideoFrame)
 end

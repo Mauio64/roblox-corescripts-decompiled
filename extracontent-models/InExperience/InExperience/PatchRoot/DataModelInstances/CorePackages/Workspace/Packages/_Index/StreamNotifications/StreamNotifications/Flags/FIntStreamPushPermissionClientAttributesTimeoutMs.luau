@@ -1,1 +1,0 @@
-return game:DefineFastInt("StreamPushPermissionClientAttributesTimeoutMs", 1000)

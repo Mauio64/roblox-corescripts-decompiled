@@ -4,7 +4,6 @@ local roact = dependencies.Roact
 local uiBlox = dependencies.UIBlox
 local cryo = dependencies.Cryo
 local Images = require(script.Parent.Images)
-local foundationFontFaceMigration = dependencies.Foundation.Utility.Flags.FoundationFontFaceMigration
 local normalizeFontFace = dependencies.Foundation.Utility.normalizeFontFace
 
 local color = Color3.fromRGB(200, 200, 200)
@@ -24,8 +23,7 @@ function extended.render(p)
 		local placeholderText = p.props.PlaceholderText
 		local theme = p2.Theme
 
-		local createElement = roact.createElement
-		local v = {
+		return roact.createElement("ImageLabel", {
 			ImageRectSize = vector2_2,
 			BackgroundTransparency = 1,
 			Image = Images.buttonStroke.Image,
@@ -35,27 +33,11 @@ function extended.render(p)
 			ScaleType = Enum.ScaleType.Slice,
 			Size = UDim2.new(1, 0, 0, 30),
 			SliceCenter = rect
-		}
-
-		local createElement2 = roact.createElement
-		local font2
-
-		if not foundationFontFaceMigration then
-			font2 = font.Header2.Font
-		end
-
-		local fontFace
-
-		if foundationFontFaceMigration then
-			fontFace = normalizeFontFace(font.Header2.Font)
-		end
-
-		return createElement("ImageLabel", v, {
-			Textbox = createElement2("TextBox", {
+		}, {
+			Textbox = roact.createElement("TextBox", {
 				BackgroundTransparency = 1,
 				ClearTextOnFocus = false,
-				Font = font2,
-				FontFace = fontFace,
+				FontFace = normalizeFontFace(font.Header2.Font),
 				PlaceholderText = placeholderText,
 				PlaceholderColor3 = color,
 				Position = UDim2.new(0, 6, 0, 0),

@@ -34,6 +34,8 @@ local GameTile = require(parent.GameTile)
 local default = GameTile.HoverTileCoordinator.default
 local ZoomAnimatedFrame = GameTile.ZoomAnimatedFrame
 local getGameTileHiddenStore = GameTile.getGameTileHiddenStore
+local GameCollections = require(parent.GameCollections)
+local useTriggerGameTileFeedbackCallbacks = GameCollections.useTriggerGameTileFeedbackCallbacks
 local getOverflowMenuSignalStore = AppBlox.getOverflowMenuSignalStore
 local SduiTile = require(ServerDrivenUi.Content.SduiTile)
 local SduiGameVideoThumbnail = require(ServerDrivenUi.Content.SduiGameVideoThumbnail)
@@ -50,8 +52,9 @@ local SharedFlags2 = require(parent.SharedFlags)
 local FFlagLuaAppSduiVideoThumbnail = SharedFlags2.FFlagLuaAppSduiVideoThumbnail
 local SharedFlags3 = require(parent.SharedFlags)
 local FFlagLuaAppSduiGameTileFeedback = SharedFlags3.FFlagLuaAppSduiGameTileFeedback
+
 local SharedFlags4 = require(parent.SharedFlags)
-local FFlagLuaAppSduiGameTileMetadataFontStyle = SharedFlags4.FFlagLuaAppSduiGameTileMetadataFontStyle
+local FFlagLuaAppSduiGameTileInteractionFeedback = SharedFlags4.FFlagLuaAppSduiGameTileInteractionFeedback
 local SharedFlags5 = require(parent.SharedFlags)
 local FFlagSduiFixSearchTelemetry = SharedFlags5.FFlagSduiFixSearchTelemetry
 
@@ -63,6 +66,11 @@ local FFlagSduiGameTileDirectAction = SharedFlags7.FFlagSduiGameTileDirectAction
 
 local SharedFlags8 = require(parent.SharedFlags)
 local FFlagSduiGameTileUseFooterComponentAsDefault = SharedFlags8.FFlagSduiGameTileUseFooterComponentAsDefault
+
+local SharedFlags9 = require(parent.SharedFlags)
+local FFlagLuaAppSduiGameTileFooterTrailingComponent = SharedFlags9.FFlagLuaAppSduiGameTileFooterTrailingComponent
+local SharedFlags10 = require(parent.SharedFlags)
+local FFlagSduiActiveFriendsFooterTreatment = SharedFlags10.FFlagSduiActiveFriendsFooterTreatment
 local v
 
 if FFlagLuaAppSduiGameTileFeedback then
@@ -121,8 +129,8 @@ local function SduiGameTile(props)
 
 		triggerFeedback = props.sduiContext.dependencies.triggerFeedback
 	else
-		v5 = nil
 		triggerFeedback = nil
+		v5 = nil
 		v4 = nil
 	end
 
@@ -130,6 +138,14 @@ local function SduiGameTile(props)
 	local setDisabledForHold = React.useCallback(function(current2: boolean)
 		ref3.current = current2
 	end, {})
+	local onGuiStateChanged, v6
+
+	if FFlagLuaAppSduiGameTileInteractionFeedback then
+		onGuiStateChanged, v6 = useTriggerGameTileFeedbackCallbacks(triggerFeedback)
+	else
+		v6 = nil
+	end
+
 	local useCallback = React.useCallback
 	local function fn()
 		props.sduiContext.dependencies.logger.reportCounter(
@@ -141,13 +157,13 @@ local function SduiGameTile(props)
 		)
 
 		local function logFailure(p)
-			local v6 = not p and "" or SduiParseHelpers.stringifyValue(p)
+			local v7 = not p and "" or SduiParseHelpers.stringifyValue(p)
 			local stringifyValue = SduiParseHelpers.stringifyValue(props.componentConfig)
 			props.sduiContext.dependencies.logger.reportError(
 				SduiErrors.SduiErrorType.FailedToExecuteAction,
 				{
 					componentType = "GameTile",
-					message = `Error executing GameTile.onActivated error: '{v6}' config: {stringifyValue}`,
+					message = `Error executing GameTile.onActivated error: '{v7}' config: {stringifyValue}`,
 					name = GetInputModeStore(false).getLastInputType(false)
 				},
 				props.sduiContext.appPage
@@ -199,6 +215,10 @@ local function SduiGameTile(props)
 		if not success then
 			logFailure(result)
 		end
+
+		if FFlagLuaAppSduiGameTileInteractionFeedback and v6 then
+			v6()
+		end
 	end
 
 	local onActivated = props.onActivated
@@ -206,10 +226,16 @@ local function SduiGameTile(props)
 	local analyticsContext = props.analyticsContext
 
 	local componentConfig = props.componentConfig
-	local v6
+	local v7
 
 	if FFlagLuaAppSduiVideoThumbnail then
-		v6 = videoPlaybackContext
+		v7 = videoPlaybackContext
+	end
+
+	local v8
+
+	if FFlagLuaAppSduiGameTileInteractionFeedback then
+		v8 = v6
 	end
 
 	local onActivated2 = useCallback(fn, {
@@ -219,7 +245,8 @@ local function SduiGameTile(props)
 		placeId,
 		universeId,
 		componentConfig,
-		v6
+		v7,
+		v8
 	})
 
 	local state, setState = React.useState(false)
@@ -259,15 +286,15 @@ local function SduiGameTile(props)
 	local default2 = default.default
 	local onMouseEnter = React.useCallback(function()
 		if ref4.current == 0 and current then
-			local v7
+			local v9
 
 			if FFlagSduiGameTileEnableHoverInVR then
-				v7 = GetInputModeStore(false).getPreferredInputType(false) == Responsive.Input.Pointer
+				v9 = GetInputModeStore(false).getPreferredInputType(false) == Responsive.Input.Pointer
 			else
-				v7 = GetInputModeStore(false).getLastInputType(false) == Responsive.Input.Pointer
+				v9 = GetInputModeStore(false).getLastInputType(false) == Responsive.Input.Pointer
 			end
 
-			if v7 then
+			if v9 then
 				default2:requestHover(current)
 			end
 		end
@@ -287,21 +314,21 @@ local function SduiGameTile(props)
 	end, { current })
 
 	React.useEffect(function()
-		local v7 = current
-		local v8 = state2
+		local v9 = current
+		local v10 = state2
 
 		local changedConnection = default2.changed:connect(function(p)
-			local v9 = p == current
-			setState2(v9)
+			local v11 = p == current
+			setState2(v11)
 
-			if props.setCustomConditionState and v9 ~= v8 then
-				props.setCustomConditionState("hovered", v9)
+			if props.setCustomConditionState and v11 ~= v10 then
+				props.setCustomConditionState("hovered", v11)
 			end
 
-			v8 = v9
+			v10 = v11
 		end)
 		return function()
-			default2:cancelHover(v7)
+			default2:cancelHover(v9)
 			ref4.current = 0
 
 			if changedConnection ~= nil then
@@ -372,7 +399,7 @@ local function SduiGameTile(props)
 		})
 
 		if FFlagSduiTileDisableLegacyHover or not props.enableLegacyHoverState then
-			local v7 = localizeStrings(props.sduiContext.dependencies.localization, {
+			local v9 = localizeStrings(props.sduiContext.dependencies.localization, {
 				Join = "Common.VisitGame.Label.Play"
 			})
 
@@ -380,7 +407,7 @@ local function SduiGameTile(props)
 				universeId = universeId,
 				placeId = placeId,
 				sduiContext = props.sduiContext,
-				playableText = v7.Join,
+				playableText = v9.Join,
 				hidePlayableIcon = true,
 				height = 40,
 				width = UDim.new(0, 60),
@@ -420,10 +447,10 @@ local function SduiGameTile(props)
 
 	local enableUiBloxButton = props.enableUiBloxButton
 	local openGameDetailsOnPurchaseRequired = props.openGameDetailsOnPurchaseRequired
-	local v7
+	local v9
 
 	if defineFastFlag then
-		v7 = props.disableDefaultPlayButtonOnHover
+		v9 = props.disableDefaultPlayButtonOnHover
 	end
 
 	local ctaButtonComponent2 = useMemo(fn2, {
@@ -437,7 +464,7 @@ local function SduiGameTile(props)
 		onActivatedEffect,
 		enableUiBloxButton,
 		openGameDetailsOnPurchaseRequired,
-		v7
+		v9
 	})
 	local renderLegacyHoverState
 
@@ -505,7 +532,7 @@ local function SduiGameTile(props)
 		end
 
 		local createElement = React.createElement
-		local v8 = {
+		local v10 = {
 			isHovered = state2,
 			isSelected = state,
 			ageRatingText = props.ageRatingText,
@@ -517,7 +544,8 @@ local function SduiGameTile(props)
 			analyticsContext = 0,
 			ratingText = 0,
 			playerCount = 0,
-			metadataFontStyle = 0
+			metadataFontStyle = 0,
+			activeFriendsFooterComponent = 0
 		}
 		local useFooterComponentAsDefault
 
@@ -525,22 +553,23 @@ local function SduiGameTile(props)
 			useFooterComponentAsDefault = props.useFooterComponentAsDefault
 		end
 
-		v8.useFooterComponentAsDefault = useFooterComponentAsDefault
+		v10.useFooterComponentAsDefault = useFooterComponentAsDefault
 
-		v8.sduiContext = props.sduiContext
-		v8.universeId = universeId
-		v8.placeId = placeId
-		v8.analyticsContext = props.analyticsContext
-		v8.ratingText = props.ratingText
-		v8.playerCount = props.playerCount
-		local metadataFontStyle
+		v10.sduiContext = props.sduiContext
+		v10.universeId = universeId
+		v10.placeId = placeId
+		v10.analyticsContext = props.analyticsContext
+		v10.ratingText = props.ratingText
+		v10.playerCount = props.playerCount
+		v10.metadataFontStyle = props.metadataFontStyle
+		local activeFriendsFooterComponent
 
-		if FFlagLuaAppSduiGameTileMetadataFontStyle then
-			metadataFontStyle = props.metadataFontStyle
+		if FFlagSduiActiveFriendsFooterTreatment then
+			activeFriendsFooterComponent = props.activeFriendsFooterComponent
 		end
 
-		v8.metadataFontStyle = metadataFontStyle
-		return createElement(SduiGameTileFooter, v8)
+		v10.activeFriendsFooterComponent = activeFriendsFooterComponent
+		return createElement(SduiGameTileFooter, v10)
 	end
 
 	local ageRatingText = props.ageRatingText
@@ -556,13 +585,14 @@ local function SduiGameTile(props)
 	local analyticsContext3 = props.analyticsContext
 	local ratingText = props.ratingText
 	local playerCount = props.playerCount
-	local v8
+	local metadataFontStyle = props.metadataFontStyle
+	local v10
 
-	if FFlagLuaAppSduiGameTileMetadataFontStyle then
-		v8 = props.metadataFontStyle
+	if FFlagSduiActiveFriendsFooterTreatment then
+		v10 = props.activeFriendsFooterComponent
 	end
 
-	local footerComponent2 = useMemo2(fn3, {
+	local _1_Footer = useMemo2(fn3, {
 		state2,
 		state,
 		universeId,
@@ -575,13 +605,42 @@ local function SduiGameTile(props)
 		analyticsContext3,
 		ratingText,
 		playerCount,
-		v8
+		metadataFontStyle,
+		v10
 	})
+	local footerComponent2
+
+	if FFlagLuaAppSduiGameTileFooterTrailingComponent then
+		footerComponent2 = React.useMemo(function()
+			if props.footerTrailingComponent then
+				return React.createElement(
+					"Frame",
+					{
+						AutomaticSize = Enum.AutomaticSize.Y,
+						BackgroundTransparency = 1,
+						Size = UDim2.fromScale(1, 0)
+					},
+					{
+						UIListLayout = React.createElement("UIListLayout", {
+							FillDirection = Enum.FillDirection.Vertical,
+							SortOrder = Enum.SortOrder.Name,
+							HorizontalFlex = Enum.UIFlexAlignment.Fill
+						}),
+						["1_Footer"] = _1_Footer,
+						["2_FooterTrailing"] = props.footerTrailingComponent
+					}
+				)
+			end
+
+			return _1_Footer
+		end, { props.footerTrailingComponent, _1_Footer })
+	end
+
 	local thumbnailOverflowMenuComponent
 
 	if FFlagLuaAppSduiGameTileFeedback and v4 and props.overflowMenuComponent and not v5 then
 		local createElement = React.createElement
-		local v9 = {
+		local v11 = {
 			componentConfig = props.overflowMenuComponent,
 			debugName = "SduiGameTile.OverflowMenu",
 			directActionComponentConfig = 0,
@@ -599,17 +658,17 @@ local function SduiGameTile(props)
 			directActionComponentConfig = props.directActionComponent
 		end
 
-		v9.directActionComponentConfig = directActionComponentConfig
-		v9.isHovered = state2
-		v9.isSelected = state
-		v9.menuKey = current
-		v9.onMenuOpenChanged = onMenuOpenChanged
-		v9.parentRef = ref2
-		v9.sduiContext = props.sduiContext
-		thumbnailOverflowMenuComponent = createElement(SduiTileOverflowMenu, v9)
+		v11.directActionComponentConfig = directActionComponentConfig
+		v11.isHovered = state2
+		v11.isSelected = state
+		v11.menuKey = current
+		v11.onMenuOpenChanged = onMenuOpenChanged
+		v11.parentRef = ref2
+		v11.sduiContext = props.sduiContext
+		thumbnailOverflowMenuComponent = createElement(SduiTileOverflowMenu, v11)
 	end
 
-	local v9
+	local v11
 
 	if FFlagLuaAppSduiVideoThumbnail and props.videoPlayer and not (FFlagLuaAppSduiGameTileFeedback and v5) then
 		local cornerRadius = props.cornerRadius or v2.Radius.Medium
@@ -625,7 +684,7 @@ local function SduiGameTile(props)
 			})
 		end
 
-		v9 = React.createElement(SduiGameVideoThumbnail, {
+		v11 = React.createElement(SduiGameVideoThumbnail, {
 			sduiContext = props.sduiContext,
 			analyticsContext = props.analyticsContext,
 			videoPlayer = props.videoPlayer,
@@ -677,12 +736,13 @@ local function SduiGameTile(props)
 		local createElement = React.createElement
 
 		local join = Cryo.Dictionary.join
-		local v10 = {
+		local v12 = {
 			ctaButtonComponent = ctaButtonComponent2,
 			onMouseEnter = onMouseEnter,
 			onMouseLeave = onMouseLeave,
 			onSelectionGained = onSelectionGained,
 			onSelectionLost = onSelectionLost,
+			onGuiStateChanged = nil,
 			renderLegacyHoverState = nil,
 			isHovered = nil,
 			imageComponent = 0,
@@ -695,30 +755,41 @@ local function SduiGameTile(props)
 			testId = "--sdui-game-tile"
 		}
 
+		if not FFlagLuaAppSduiGameTileInteractionFeedback then
+			onGuiStateChanged = nil
+		end
+
+		v12.onGuiStateChanged = onGuiStateChanged
+
 		if FFlagSduiTileDisableLegacyHover then
 			renderLegacyHoverState = nil
 		end
 
-		v10.renderLegacyHoverState = renderLegacyHoverState
-		v10.isHovered = state2
-		v10.imageComponent = FFlagLuaAppSduiVideoThumbnail and v9 or props.imageComponent
-		v10.setGuiObject = setGuiObject
-		v10.onActivated = onActivated2
+		v12.renderLegacyHoverState = renderLegacyHoverState
+		v12.isHovered = state2
+		v12.imageComponent = FFlagLuaAppSduiVideoThumbnail and v11 or props.imageComponent
+		v12.setGuiObject = setGuiObject
+		v12.onActivated = onActivated2
 
 		if not (FFlagLuaAppSduiGameTileFeedback and thumbnailOverflowMenuComponent) then
 			onTouchLongPress = nil
 		end
 
-		v10.onTouchLongPress = onTouchLongPress
+		v12.onTouchLongPress = onTouchLongPress
 
 		if not FFlagLuaAppSduiGameTileFeedback then
 			thumbnailOverflowMenuComponent = nil
 		end
 
-		v10.thumbnailOverflowMenuComponent = thumbnailOverflowMenuComponent
-		v10.focusNavActionsComponent = focusNavActionsComponent
-		v10.footerComponent = footerComponent2
-		tile = createElement(SduiTile, join(props, v10))
+		v12.thumbnailOverflowMenuComponent = thumbnailOverflowMenuComponent
+		v12.focusNavActionsComponent = focusNavActionsComponent
+
+		if not FFlagLuaAppSduiGameTileFooterTrailingComponent then
+			footerComponent2 = _1_Footer
+		end
+
+		v12.footerComponent = footerComponent2
+		tile = createElement(SduiTile, join(props, v12))
 	end
 
 	if not enableLegacyHoverState then
@@ -727,7 +798,7 @@ local function SduiGameTile(props)
 
 	local xSmall = v2.Gap.XSmall
 	local createElement = React.createElement
-	local v10 = {
+	local v12 = {
 		isZoomEnabled = state2 and (not FFlagLuaAppSduiGameTileFeedback or not v5),
 		expansionOffsetX = xSmall * 2,
 		expansionOffsetTop = xSmall,
@@ -744,7 +815,7 @@ local function SduiGameTile(props)
 		})
 	end
 
-	return createElement(ZoomAnimatedFrame, v10, { HoverShadow = hoverShadow, Tile = tile })
+	return createElement(ZoomAnimatedFrame, v12, { HoverShadow = hoverShadow, Tile = tile })
 end
 
 return React.memo(SduiGameTile)

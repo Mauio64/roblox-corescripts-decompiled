@@ -7,8 +7,7 @@ local Foundation = require(parent2.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
 local useTokens = Foundation.Hooks.useTokens
 local SharedFlags = require(parent2.SharedFlags)
-local foundationFontFaceMigration = SharedFlags.FFlagFontFacePlayerList
-	and Foundation.Utility.Flags.FoundationFontFaceMigration
+local FFlagFontFacePlayerList = SharedFlags.FFlagFontFacePlayerList
 local FormatStatString = require(parent.Common.FormatStatString)
 local useStyle = UIBlox.Core.Style.useStyle
 local useLayoutValues = require(parent.Common.useLayoutValues)
@@ -21,7 +20,7 @@ return React.memo(function(props)
 	local v2 = useLayoutValues()
 	local v3
 
-	if foundationFontFaceMigration then
+	if FFlagFontFacePlayerList then
 		v3 = useTokens()
 	end
 
@@ -64,21 +63,21 @@ return React.memo(function(props)
 	if v2.IsTenFoot then
 		textSize = v2.StatTextSize
 
-		if foundationFontFaceMigration then
+		if FFlagFontFacePlayerList then
 			v4 = normalizeFontFace(v2.StatFont)
 		else
 			v4 = v2.StatFont
 		end
 
 		if props.isTeamEntry then
-			if foundationFontFaceMigration then
+			if FFlagFontFacePlayerList then
 				v4 = normalizeFontFace(v2.TeamStatFont)
 			else
 				v4 = v2.TeamStatFont
 			end
 		end
 	else
-		if foundationFontFaceMigration then
+		if FFlagFontFacePlayerList then
 			v4 = normalizeFontFace(v3.Typography.CaptionLarge.Font)
 		else
 			v4 = v.Font.CaptionHeader.Font
@@ -110,14 +109,14 @@ return React.memo(function(props)
 		}
 		local font
 
-		if not foundationFontFaceMigration then
+		if not FFlagFontFacePlayerList then
 			font = v4
 		end
 
 		v5.Font = font
 		local fontFace
 
-		if foundationFontFaceMigration then
+		if FFlagFontFacePlayerList then
 			fontFace = v4
 		end
 
@@ -170,14 +169,14 @@ return React.memo(function(props)
 		}
 		local font
 
-		if not foundationFontFaceMigration then
+		if not FFlagFontFacePlayerList then
 			font = v2.TitleStatFont
 		end
 
 		v8.Font = font
 		local fontFace
 
-		if foundationFontFaceMigration then
+		if FFlagFontFacePlayerList then
 			fontFace = normalizeFontFace(v2.TitleStatFont)
 		end
 

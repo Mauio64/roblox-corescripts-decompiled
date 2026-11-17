@@ -1,1 +1,0 @@
-return game:DefineFastString("BuildChatIXPLayer", "Build.Chat.Exposure")

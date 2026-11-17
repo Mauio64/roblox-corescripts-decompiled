@@ -16,8 +16,8 @@ local function getFinishRegistrationUrl() -- 1 equivalent call inferred from thi
 	return string.format("%sv1/passkey/finish-ar-preauth-registration", Url.AUTH_URL)
 end
 
-local function finishARPreauthPasskeyRegistration(callback, postBody)
-	return callback(getFinishRegistrationUrl(), "POST", { postBody = postBody }):andThen(function(p) -- inferred equivalent call
+local function finishARPreauthPasskeyRegistration(callback, jsonEncode)
+	return callback(getFinishRegistrationUrl(), "POST", { postBody = jsonEncode }):andThen(function(p) -- inferred equivalent call
 		return Promise.resolve(p)
 	end, function(p)
 		local body

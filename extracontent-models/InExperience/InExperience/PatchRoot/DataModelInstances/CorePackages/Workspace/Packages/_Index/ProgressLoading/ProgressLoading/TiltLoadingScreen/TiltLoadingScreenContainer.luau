@@ -21,6 +21,8 @@ local SharedFlags3 = require(parent.SharedFlags)
 local FFlagTiltLoadingScreenConsoleHints = SharedFlags3.FFlagTiltLoadingScreenConsoleHints
 local SharedFlags4 = require(parent.SharedFlags)
 local FFlagTiltLoadingScreenEnterExitHold = SharedFlags4.FFlagTiltLoadingScreenEnterExitHold
+local SharedFlags5 = require(parent.SharedFlags)
+local FFlagTiltLoadingScreenDismissOnLoaded = SharedFlags5.FFlagTiltLoadingScreenDismissOnLoaded
 local PioneerUtils = require(parent.PioneerUtils)
 local isPioneerLaunch = PioneerUtils.isPioneerLaunch
 
@@ -71,18 +73,20 @@ local function TiltLoadingScreenContainer(props)
 		return InExperienceLocales.Localization.new(LocalizationService.RobloxLocaleId)
 	end, {})
 
+	local v4 = (not FFlagTiltLoadingScreenDismissOnLoaded or v.isVisible) and true or false
+
 	React.useEffect(function()
-		if isPioneerLaunch() then
+		if not v4 or isPioneerLaunch() then
 			return
 		end
 
 		local contextActionService = props.contextActionService or ContextActionService
-		local v4 = false
+		local v5 = false
 		contextActionService:BindCoreAction("CancelGameLoad", function(_, p)
 			if p == Enum.UserInputState.Begin then
-				v4 = true
-			elseif p == Enum.UserInputState.End and v4 then
-				v4 = false
+				v5 = true
+			elseif p == Enum.UserInputState.End and v5 then
+				v5 = false
 
 				if ref.current then
 					ref.current(false, true)
@@ -93,7 +97,7 @@ local function TiltLoadingScreenContainer(props)
 		return function()
 			contextActionService:UnbindCoreAction("CancelGameLoad")
 		end
-	end, { props.contextActionService })
+	end, { props.contextActionService, v4 })
 	local preferences = React.useMemo(function()
 		return { reducedMotion = reducedMotion }
 	end, { reducedMotion })
@@ -118,7 +122,7 @@ local function TiltLoadingScreenContainer(props)
 	end
 
 	local createElement = React.createElement
-	local v4 = {
+	local v5 = {
 		DisplayOrder = displayOrder,
 		OnTopOfCoreBlur = onTopOfCoreBlur,
 		IgnoreGuiInset = true,
@@ -129,13 +133,13 @@ local function TiltLoadingScreenContainer(props)
 
 	local createElement2 = React.createElement
 	local foundationProvider = Foundation.FoundationProvider
-	local v5 = { colorMode = Foundation.Enums.ColorMode.Dark, preferences = preferences }
+	local v6 = { colorMode = Foundation.Enums.ColorMode.Dark, preferences = preferences }
 
 	local createElement3 = React.createElement
 	local localizationProvider = Localization.LocalizationProvider
 
 	local createElement4 = React.createElement
-	local v6 = {
+	local v7 = {
 		placeId = props.placeId,
 		destinationUniverseId = 0,
 		milestones = 0,
@@ -154,32 +158,32 @@ local function TiltLoadingScreenContainer(props)
 		destinationUniverseId = props.deferredJoin.universeId
 	end
 
-	v6.destinationUniverseId = destinationUniverseId
+	v7.destinationUniverseId = destinationUniverseId
 
 	if not onTopOfCoreBlur then
 		milestones = v.milestones
 	end
 
-	v6.milestones = milestones
-	v6.reducedMotion = reducedMotion
-	v6.isDismissing = v.isDismissing
+	v7.milestones = milestones
+	v7.reducedMotion = reducedMotion
+	v7.isDismissing = v.isDismissing
 	local onEnterComplete
 
 	if not (onTopOfCoreBlur or not FFlagTiltLoadingScreenEnterExitHold) then
 		onEnterComplete = v.onEnterComplete
 	end
 
-	v6.onEnterComplete = onEnterComplete
+	v7.onEnterComplete = onEnterComplete
 
-	v6.isDirectionalInput = isDirectionalInput
-	v6.gamepadCancelIcon = gamepadCancelIcon
-	v6.chromeReveal = v.chromeReveal
-	v6.onCancel = onCancel
-	v6.safeAreaInsets = safeAreaInsets
-	return createElement("ScreenGui", v4, {
-		Foundation = createElement2(foundationProvider, v5, {
+	v7.isDirectionalInput = isDirectionalInput
+	v7.gamepadCancelIcon = gamepadCancelIcon
+	v7.chromeReveal = v.chromeReveal
+	v7.onCancel = onCancel
+	v7.safeAreaInsets = safeAreaInsets
+	return createElement("ScreenGui", v5, {
+		Foundation = createElement2(foundationProvider, v6, {
 			Localization = createElement3(localizationProvider, { localization = localization }, {
-				View = createElement4(TiltLoadingScreenContent, v6)
+				View = createElement4(TiltLoadingScreenContent, v7)
 			})
 		})
 	})

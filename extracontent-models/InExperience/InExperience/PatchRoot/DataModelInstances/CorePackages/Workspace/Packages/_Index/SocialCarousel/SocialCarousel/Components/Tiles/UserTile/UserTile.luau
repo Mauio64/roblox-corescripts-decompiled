@@ -10,6 +10,9 @@ local Foundation = require(parent.Foundation)
 
 local useTokens = Foundation.Hooks.useTokens
 local View = Foundation.View
+local IconButton = Foundation.IconButton
+local ButtonVariant = Foundation.Enums.ButtonVariant
+local InputSize = Foundation.Enums.InputSize
 local convertToFoundationPresenceEnum = SocialCommon.Utils.convertToFoundationPresenceEnum
 local PresenceTypes = SocialCommon.Enums.PresenceTypes
 local Enums = require(SocialCarousel.Common.Enums)
@@ -23,6 +26,12 @@ local SharedFlags2 = require(parent.SharedFlags)
 local FFlagShowRequestsInCarouselForAllUsers = SharedFlags2.FFlagShowRequestsInCarouselForAllUsers
 local SharedFlags3 = require(parent.SharedFlags)
 local FFlagSocialCarouselBuildPresence = SharedFlags3.FFlagSocialCarouselBuildPresence
+local FFlagSocialCarouselXSmallTileText = require(SocialCarousel.Flags.FFlagSocialCarouselXSmallTileText)
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagSocialCarouselInGamePlayIcon = SharedFlags4.FFlagSocialCarouselInGamePlayIcon
+local useXSmallTileTypography = require(SocialCarousel.Hooks.useXSmallTileTypography)
+local MarqueeScrollContext = require(SocialCarousel.Stores.MarqueeSession.MarqueeScrollContext)
+local marqueeScrollContext = MarqueeScrollContext.MarqueeScrollContext
 local MarqueeText
 
 if FFlagSocialCarouselInGameTitleMarquee then
@@ -33,35 +42,51 @@ end
 
 local function UserTileMarqueeListener(data): nil
 	local tileRef = data.tileRef
+	local buttonRef = data.buttonRef
 	local onManualMarqueeStart = data.onManualMarqueeStart
 	local onManualMarqueeEnd = data.onManualMarqueeEnd
 	local friendId = data.friendId
 	local marqueeOnFocusEnabled = data.marqueeOnFocusEnabled
 
 	React.useEffect(function()
-		local guiObject
+		local current
 
-		if tileRef ~= nil then
-			guiObject = tileRef.current
+		if tileRef == nil then
+			current = nil
+		else
+			current = tileRef.current
 		end
 
-		if guiObject == nil or not guiObject:IsA("GuiObject") then
+		if current == nil or not current:IsA("GuiObject") then
 			return
 		end
 
-		if not guiObject:IsA("GuiButton") then
-			for _, button in guiObject:GetDescendants() do
-				if button:IsA("GuiButton") then
-					guiObject = button
-					break
+		current:SetAttribute(Enums.MarqueeFriendIdAttribute, friendId)
+		local v
+
+		if FFlagSocialCarouselInGamePlayIcon and buttonRef ~= nil then
+			v = buttonRef.current
+		end
+
+		if v == nil then
+			if current:IsA("GuiButton") then
+				v = current
+			else
+				v = current
+
+				for _, button in current:GetDescendants() do
+					if button:IsA("GuiButton") then
+						v = button
+						break
+					end
 				end
 			end
 		end
 
-		local mouseEnterConnection = guiObject.MouseEnter:Connect(function()
+		local mouseEnterConnection = v.MouseEnter:Connect(function()
 			onManualMarqueeStart(friendId)
 		end)
-		local mouseLeaveConnection = guiObject.MouseLeave:Connect(function()
+		local mouseLeaveConnection = v.MouseLeave:Connect(function()
 			if onManualMarqueeEnd then
 				onManualMarqueeEnd(friendId)
 			end
@@ -71,14 +96,14 @@ local function UserTileMarqueeListener(data): nil
 		if marqueeOnFocusEnabled then
 			local GuiService = game:GetService("GuiService")
 
-			if GuiService.SelectedCoreObject == guiObject then
+			if GuiService.SelectedCoreObject == v then
 				onManualMarqueeStart(friendId)
 			end
 
-			selectionGainedConnection = guiObject.SelectionGained:Connect(function()
+			selectionGainedConnection = v.SelectionGained:Connect(function()
 				onManualMarqueeStart(friendId)
 			end)
-			selectionLostConnection = guiObject.SelectionLost:Connect(function()
+			selectionLostConnection = v.SelectionLost:Connect(function()
 				if onManualMarqueeEnd then
 					onManualMarqueeEnd(friendId)
 				end
@@ -89,6 +114,7 @@ local function UserTileMarqueeListener(data): nil
 		end
 
 		return function()
+			current:SetAttribute(Enums.MarqueeFriendIdAttribute, nil)
 			mouseEnterConnection:Disconnect()
 			mouseLeaveConnection:Disconnect()
 
@@ -104,12 +130,31 @@ local function UserTileMarqueeListener(data): nil
 				onManualMarqueeEnd(friendId)
 			end
 		end
-	end, { tileRef, onManualMarqueeStart, onManualMarqueeEnd, friendId, marqueeOnFocusEnabled })
+	end, {
+		tileRef,
+		buttonRef,
+		onManualMarqueeStart,
+		onManualMarqueeEnd,
+		friendId,
+		marqueeOnFocusEnabled
+	})
 	return nil
 end
 
 local function UserTile3(props)
 	local v = useTokens()
+	local v2
+
+	if FFlagSocialCarouselXSmallTileText then
+		v2 = useXSmallTileTypography()
+	end
+
+	local ref
+
+	if FFlagSocialCarouselInGamePlayIcon then
+		ref = React.useRef(nil)
+	end
+
 	local userPresenceType
 
 	if props.item.presence == nil then
@@ -121,6 +166,12 @@ local function UserTile3(props)
 	local subtitle = props.contextualText
 
 	if FFlagSocialCarouselInGameTitleMarquee then
+		local v3 = React.useContext(marqueeScrollContext)
+		React.useEffect(function()
+			if v3 ~= nil and props.playStatus == MarqueePlayStatus.Idle then
+				v3.clearCurrentScroll(props.item.id)
+			end
+		end, { v3, props.playStatus, props.item.id })
 		local presence = props.item.presence
 		local lastLocation
 
@@ -128,26 +179,72 @@ local function UserTile3(props)
 			lastLocation = presence.lastLocation
 		end
 
-		if lastLocation ~= nil and lastLocation ~= "" and props.contextualText == lastLocation and MarqueeText then
+		if
+			lastLocation ~= nil
+			and lastLocation ~= ""
+			and props.contextualText == lastLocation
+			and props.playStatus ~= nil
+			and MarqueeText
+		then
 			local onMarqueeFinished = props.onMarqueeFinished
-			subtitle = React.createElement(MarqueeText, {
+			local playStatus
+
+			if props.playStatus == nil then
+				playStatus = MarqueePlayStatus.Idle
+			else
+				playStatus = props.playStatus
+			end
+
+			local id = props.item.id
+			local v4 = playStatus ~= MarqueePlayStatus.Idle
+			local createElement = React.createElement
+			local fontStyle
+
+			if v2 then
+				fontStyle = v2.label
+			else
+				fontStyle = v.Typography.LabelSmall
+			end
+
+			local v5 = {
 				text = lastLocation,
-				playStatus = props.playStatus or MarqueePlayStatus.Idle,
-				fontStyle = v.Typography.LabelSmall,
+				playStatus = playStatus,
+				fontStyle = fontStyle,
 				LayoutOrder = 2,
 				maxLoops = onMarqueeFinished ~= nil and 1 or nil,
 				runId = props.marqueeRunId,
 				holdForNextLoop = onMarqueeFinished ~= nil,
-				requiresOverflow = props.onManualMarqueeStart ~= nil,
-				onFinished = onMarqueeFinished ~= nil and function()
-					onMarqueeFinished(props.item.id)
-				end or nil
-			})
+				marqueeShortTitlesEnabled = props.marqueeShortTitlesEnabled == true,
+				initialOffset = 0,
+				saveOffset = 0,
+				onFinished = 0
+			}
+			local initialOffset
+
+			if not (v3 == nil or not v4) then
+				initialOffset = v3.initialOffsetFor(id)
+			end
+
+			v5.initialOffset = initialOffset
+			v5.saveOffset = v3 ~= nil and v4 and function(p: number)
+				v3.saveOffset(id, p)
+			end or nil
+
+			v5.onFinished = (v3 ~= nil or onMarqueeFinished ~= nil) and function()
+				if v3 ~= nil then
+					v3.clearCurrentScroll(id)
+				end
+
+				if onMarqueeFinished ~= nil then
+					onMarqueeFinished(id)
+				end
+			end or nil
+			subtitle = createElement(MarqueeText, v5)
 		end
 	end
 
 	local createElement = React.createElement
-	local v2 = {
+	local v3 = {
 		tag = "auto-none",
 		Size = props.itemSize,
 		LayoutOrder = props.index,
@@ -162,6 +259,7 @@ local function UserTile3(props)
 	if FFlagSocialCarouselInGameTitleMarquee and props.onManualMarqueeStart ~= nil then
 		marqueeListener = React.createElement(UserTileMarqueeListener, {
 			tileRef = props.tileRef,
+			buttonRef = ref,
 			friendId = props.item.id,
 			onManualMarqueeStart = props.onManualMarqueeStart,
 			onManualMarqueeEnd = props.onManualMarqueeEnd,
@@ -170,13 +268,13 @@ local function UserTile3(props)
 	end
 
 	local createElement2 = React.createElement
-	local v3 = {
+	local v4 = {
 		layoutMode = LayoutMode.compact,
 		userId = props.item.id,
 		title = props.name,
 		subtitle = subtitle,
-		titleStyle = v.Typography.TitleSmall,
-		subtitleStyle = v.Typography.LabelSmall,
+		titleStyle = 0,
+		subtitleStyle = 0,
 		contextualInfo = 0,
 		contextualInfoIcon = 0,
 		contextualInfoStyle = 0,
@@ -185,51 +283,129 @@ local function UserTile3(props)
 		titleIcon = 0,
 		overlayIcon = 0,
 		includeProfileFrame = 0,
-		isRobloxSubscriber = 0
+		isRobloxSubscriber = 0,
+		buttonRef = 0
 	}
+
+	local titleStyle = if v2 then v2.title else v.Typography.TitleSmall
+	v4.titleStyle = titleStyle
+	local subtitleStyle
+
+	if v2 then
+		subtitleStyle = v2.label
+	else
+		subtitleStyle = v.Typography.LabelSmall
+	end
+
+	v4.subtitleStyle = subtitleStyle
 	local contextualInfo
 
 	if FFlagSocialCarouselBuildPresence then
 		contextualInfo = props.contextualInfo
 	end
 
-	v3.contextualInfo = contextualInfo
+	v4.contextualInfo = contextualInfo
 	local contextualInfoIcon
 
 	if FFlagSocialCarouselBuildPresence then
 		contextualInfoIcon = props.contextualInfoIcon
 	end
 
-	v3.contextualInfoIcon = contextualInfoIcon
+	v4.contextualInfoIcon = contextualInfoIcon
 	local contextualInfoStyle
 
 	if FFlagSocialCarouselBuildPresence then
-		contextualInfoStyle = v.Typography.LabelSmall
+		if v2 then
+			contextualInfoStyle = v2.label
+		else
+			contextualInfoStyle = v.Typography.LabelSmall
+		end
 	end
 
-	v3.contextualInfoStyle = contextualInfoStyle
-	v3.userPresenceType = userPresenceType
-	v3.onActivated = props.onActivated
-	v3.titleIcon = props.titleIcon
+	v4.contextualInfoStyle = contextualInfoStyle
+
+	v4.userPresenceType = userPresenceType
+	v4.onActivated = props.onActivated
+	v4.titleIcon = props.titleIcon
 	local overlayIcon
 
 	if FFlagShowRequestsInCarouselForAllUsers then
 		overlayIcon = props.overlayIcon
 	end
 
-	v3.overlayIcon = overlayIcon
-	v3.includeProfileFrame = FFlagFriendsCarouselProfileFrameEnabled
+	v4.overlayIcon = overlayIcon
+	v4.includeProfileFrame = FFlagFriendsCarouselProfileFrameEnabled
 	local isRobloxSubscriber
 
 	if FFlagSocialCarouselShowPlusBadge then
 		isRobloxSubscriber = props.isRobloxSubscriber
 	end
 
-	v3.isRobloxSubscriber = isRobloxSubscriber
-	return createElement(View, v2, {
+	v4.isRobloxSubscriber = isRobloxSubscriber
+	v4.buttonRef = ref
+	local v5 = {
 		MarqueeListener = marqueeListener,
-		Content = createElement2(userTile, v3)
-	})
+		Content = createElement2(userTile, v4),
+		TextTapTarget = 0,
+		AvatarTapTarget = 0,
+		PlayIconOverlay = 0
+	}
+	local textTapTarget
+
+	if FFlagSocialCarouselInGamePlayIcon and props.onTextActivated then
+		textTapTarget = React.createElement(View, {
+			tag = "size-full-full",
+			ZIndex = 2,
+			onActivated = props.onTextActivated,
+			testId = `--social-social-carousel-view-tile-text-{props.item.id}`,
+			stateLayer = { affordance = Foundation.Enums.StateLayerAffordance.None },
+			selection = { Selectable = false }
+		})
+	end
+
+	v5.TextTapTarget = textTapTarget
+	local avatarTapTarget
+
+	if FFlagSocialCarouselInGamePlayIcon and props.onTextActivated then
+		avatarTapTarget = React.createElement(View, {
+			tag = "size-full-full aspect-1-1",
+			ZIndex = 3,
+			onActivated = props.onActivated,
+			testId = `--social-social-carousel-view-tile-avatar-{props.item.id}`,
+			stateLayer = { affordance = Foundation.Enums.StateLayerAffordance.None },
+			selection = { Selectable = false }
+		})
+	end
+
+	v5.AvatarTapTarget = avatarTapTarget
+	local playIconOverlay
+
+	if FFlagSocialCarouselInGamePlayIcon and props.showPlayIcon then
+		playIconOverlay = React.createElement(View, {
+			tag = "size-full-full aspect-1-1",
+			ZIndex = 4
+		}, {
+			PlayIconBackplate = React.createElement(View, {
+				tag = "anchor-center-center size-800-800 radius-circle bg-surface-0",
+				Position = UDim2.new(0.5, 0, 1, -v.Gap.Small)
+			}, {
+				PlayIcon = React.createElement(IconButton, {
+					icon = "play-large",
+					variant = ButtonVariant.Standard,
+					size = InputSize.XSmall,
+					isCircular = true,
+					onActivated = props.onPlayIconActivated or props.onActivated,
+					testId = `--social-social-carousel-iconbutton-play-{props.item.id}`,
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Position = UDim2.fromScale(0.5, 0.5),
+					Selectable = false
+				})
+			})
+		})
+	end
+
+	v5.PlayIconOverlay = playIconOverlay
+	return createElement(View, v3, v5)
 end
 
 return UserTile3

@@ -1,5 +1,3 @@
-local TextService = game:GetService("TextService")
-
 local parent = script:FindFirstAncestor("Gifting").Parent
 
 local React = require(parent.React)
@@ -17,7 +15,6 @@ local IconName = Foundation.Enums.IconName
 local useTextSize = Foundation.Hooks.useTextSize
 local useTextSizeOffset = Foundation.Hooks.useTextSizeOffset
 local useTokens = Foundation.Hooks.useTokens
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local useFocusRoot = FocusNavigationUtils.useFocusRoot
 local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
 local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
@@ -36,50 +33,33 @@ local function useFooterLayout(captionText: string?)
 	end, {})
 	local v3
 
-	if FoundationFontFaceMigration then
-		local v4
-
-		if state > 0 then
-			v4 = captionText
-		end
-
-		v3 = useTextSize(v4, {
-			Font = captionSmall.Font,
-			FontSize = captionSmall.FontSize + v2
-		}, Vector2.new(state, 1e999))
-	else
-		v3 = nil
+	if state > 0 then
+		v3 = captionText
 	end
+
+	local v4 = useTextSize(v3, {
+		Font = captionSmall.Font,
+		FontSize = captionSmall.FontSize + v2
+	}, Vector2.new(state, 1e999))
 
 	local captionHeight = React.useMemo(function()
 		if captionText == nil or state <= 0 then
 			return 0
 		end
 
-		if not FoundationFontFaceMigration then
-			local textSize = TextService:GetTextSize(
-				captionText,
-				captionSmall.FontSize + v2,
-				captionSmall.Font,
-				Vector2.new(state, 1e999)
-			)
-
-			return captionSmall.LineHeight * textSize.Y
-		end
-
 		local lineHeight = captionSmall.LineHeight
-		local v4
+		local v5
 
-		if v3 then
-			v4 = v3.Y
+		if v4 then
+			v5 = v4.Y
 		else
-			v4 = captionSmall.FontSize + v2
+			v5 = captionSmall.FontSize + v2
 		end
 
-		return lineHeight * v4
-	end, { captionText, state, captionSmall, v2, v3 })
+		return lineHeight * v5
+	end, { captionText, state, captionSmall, v2, v4 })
 
-	local v4 = {
+	local v5 = {
 		topInset = v.Padding.Medium - v.Margin.Small,
 		captionHeight = captionHeight,
 		onAbsoluteSizeChanged = 0
@@ -89,8 +69,8 @@ local function useFooterLayout(captionText: string?)
 		onAbsoluteSizeChanged = nil
 	end
 
-	v4.onAbsoluteSizeChanged = onAbsoluteSizeChanged
-	return v4
+	v5.onAbsoluteSizeChanged = onAbsoluteSizeChanged
+	return v5
 end
 
 local navigateBacks = {

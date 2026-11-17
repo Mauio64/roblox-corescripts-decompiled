@@ -20,7 +20,6 @@ local GetFFlagIsSquadEnabled = SharedFlags.GetFFlagIsSquadEnabled
 local getFFlagAppChatRemoveDynamicRequires = require(AppChat.Flags.getFFlagAppChatRemoveDynamicRequires)
 local SharedFlags2 = require(parent.SharedFlags)
 local FFlagEnablePartyQuickStartButton = SharedFlags2.FFlagEnablePartyQuickStartButton
-local getFFlagAppChatEnableRootedNavigation = require(AppChat.Flags.getFFlagAppChatEnableRootedNavigation)
 
 local function getChatDetailsNavigationOptions(p)
 	return ChatDetailsNavigationOptions.getNavigationOptions(p, { tabBarVisible = false })
@@ -49,10 +48,7 @@ local ChatLandingStackNavigatorScreens = {
 	{
 		[EnumScreens.ChatDetails] = {
 			screen = ChatDetailsScreen,
-			navigationOptions = not getFFlagAppChatEnableRootedNavigation() and {
-				backButtonEnabled = true,
-				tabBarVisible = false
-			} or getChatDetailsNavigationOptions
+			navigationOptions = getChatDetailsNavigationOptions
 		}
 	},
 	{

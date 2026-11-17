@@ -17,11 +17,11 @@ local getLegacyRouteFromRoactNavigationState = Utils.getLegacyRouteFromRoactNavi
 local createMockStackState = Navigation.TestUtils.createMockStackState
 local createMockScreenState = Navigation.TestUtils.createMockScreenState
 
-local function createMockReducerStateFromRouteState(p)
+local function createMockReducerStateFromRouteState(mockRouteStateFromPages)
 	return {
-		history = { (getLegacyRouteFromRoactNavigationState(p)) },
-		currentRoute = getCurrentRouteState({ state = p }),
-		roactNavigationState = p,
+		history = { (getLegacyRouteFromRoactNavigationState(mockRouteStateFromPages)) },
+		currentRoute = getCurrentRouteState({ state = mockRouteStateFromPages }),
+		roactNavigationState = mockRouteStateFromPages,
 		lockNavigationActions = false,
 		backNavigationDisableCounter = 0
 	}

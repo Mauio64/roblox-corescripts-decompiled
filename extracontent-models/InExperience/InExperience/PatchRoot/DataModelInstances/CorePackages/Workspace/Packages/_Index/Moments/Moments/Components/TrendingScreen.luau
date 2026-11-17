@@ -29,6 +29,8 @@ local FFlagMomentsNavigationEvent = require(Moments.Flags.FFlagMomentsNavigation
 
 local FFlagMomentsFixRecommendationImpressionLifecycle = require(Moments.Flags.FFlagMomentsFixRecommendationImpressionLifecycle)
 local FFlagMomentsFlushDwellBeforeNavigation = require(Moments.Flags.FFlagMomentsFlushDwellBeforeNavigation)
+
+local FFlagMomentsPersonalizedRecommendationsEntryPoint = require(Moments.Flags.FFlagMomentsPersonalizedRecommendationsEntryPoint)
 local useCreationEntry = require(Moments.Hooks.useCreationEntry)
 local useUploadHost = require(Moments.Hooks.useUploadHost)
 local logCreateIntent = require(Moments.Analytics.logCreateIntent)
@@ -48,6 +50,7 @@ local useMomentsSession = MomentsSessionContext.useMomentsSession
 local createMomentsFeedSource = require(Moments.Stores.GetMomentsStore.createMomentsFeedSource)
 local MomentsFeedType = require(Moments.Enums.MomentsFeedType)
 local FFlagMomentsFollowingFeed = require(Moments.Flags.FFlagMomentsFollowingFeed)
+local FFlagMomentsRecommendationFeedType = require(Moments.Flags.FFlagMomentsRecommendationFeedType)
 local useFeedSelection
 
 if FFlagMomentsFollowingFeed then
@@ -68,12 +71,16 @@ local SignalTracker = require(Moments.SignalTracker)
 local createSignalTracker = SignalTracker.createSignalTracker
 
 local SharedFlags = require(parent.SharedFlags)
+local FFlagMomentsCreateAvatarPosts = SharedFlags.FFlagMomentsCreateAvatarPosts
 local FFlagEnableArgus = SharedFlags.FFlagEnableArgus
 local FFlagMomentsCreationFeatureGate = SharedFlags.FFlagMomentsCreationFeatureGate
 local FFlagMomentsRenderAvatarPostsInFeed = SharedFlags.FFlagMomentsRenderAvatarPostsInFeed
+local FFlagMomentsPostFeedback = SharedFlags.FFlagMomentsPostFeedback
+local FFlagMomentsPostFeedbackIxpEnabled = require(Moments.Flags.FFlagMomentsPostFeedbackIxpEnabled)
 local isStudio = require(parent.MomentsCommon.isStudio)
 local MomentsCommon = require(parent.MomentsCommon)
 local reportModalCovering = MomentsCommon.Media.reportModalCovering
+local accountSettingsCovering = require(Moments.Components.Feed.accountSettingsCovering)
 local GetFFlagArgusStudioMockFeed = require(Moments.Flags.GetFFlagArgusStudioMockFeed)
 local createMockFeedSource = Feed.createMockFeedSource
 local signalTracker
@@ -131,28 +138,42 @@ local function TrendingScreen(p)
 
 	local v6 = useMomentsSession()
 
-	local openOwnMoments = useMomentsHost().openOwnMoments
-	local v7 = useMomentsGating()
-	local platformIntegrationEnabled = v7.isFlyoutEntryEnabled and v7.platformIntegrationEnabled
-	local v8
+	local v7 = useMomentsHost()
+	local openOwnMoments = v7.openOwnMoments
+	local openAvatarMomentsCreation
 
-	if FFlagMomentsCreationFeatureGate then
-		v8 = not (v7 == nil) and v7.isCreationEnabled
+	if FFlagMomentsCreateAvatarPosts then
+		openAvatarMomentsCreation = v7.openAvatarMomentsCreation
 	else
-		v8 = nil
+		openAvatarMomentsCreation = nil
 	end
 
-	local v9 = useCreationEntry()
+	local v8 = useMomentsGating()
+	local platformIntegrationEnabled = v8.isFlyoutEntryEnabled and v8.platformIntegrationEnabled
+	local v9
 
-	local host = useUploadHost({ onExit = v9.onExitCreation, captureSource = v9.captureSource })
+	if FFlagMomentsCreationFeatureGate then
+		v9 = not (v8 == nil) and v8.isCreationEnabled
+	else
+		v9 = nil
+	end
+
+	local v10 = useCreationEntry()
+
+	local host = useUploadHost({
+		onExit = v10.onExitCreation,
+		captureSource = v10.captureSource,
+		postFeedback = FFlagMomentsPostFeedback and true or nil,
+		logsPostFeedbackExposure = FFlagMomentsPostFeedbackIxpEnabled and true or nil
+	})
 
 	React.useEffect(function()
-		local v10 = SessionManager.getSessionId(FunnelEventNames.FunnelTypes.AppNavigation)
+		local v11 = SessionManager.getSessionId(FunnelEventNames.FunnelTypes.AppNavigation)
 			or SessionManager.startSession(FunnelEventNames.FunnelTypes.AppNavigation)
 		fireFunnelAnalyticsEvent(
 			FunnelEventNames.FunnelTypes.AppNavigation,
 			FunnelEventNames.AppNavigationSteps.TrendingScreenView,
-			v10
+			v11
 		)
 	end, {})
 
@@ -160,7 +181,7 @@ local function TrendingScreen(p)
 		setState2(true)
 	end, {})
 
-	local v10 = React.useMemo(function()
+	local v11 = React.useMemo(function()
 		if isStudio() and GetFFlagArgusStudioMockFeed() then
 			return createMockFeedSource()
 		end
@@ -171,35 +192,67 @@ local function TrendingScreen(p)
 		})
 	end, { v6, onDeepLinkedMomentUnavailable })
 
-	local v11 = React.useMemo(function()
-		if FFlagEnableArgus then
-			return createRecommendationTelemetry({
-				getMomentsSessionId = v6.getMomentsSessionId,
-				signalTracker = signalTracker
-			})
+	local v12 = React.useMemo(function()
+		if not FFlagEnableArgus then
+			return nil
 		end
 
-		return nil
+		local v12 = {
+			getMomentsSessionId = v6.getMomentsSessionId,
+			signalTracker = signalTracker,
+			feedType = 0
+		}
+		local feedType
+
+		if FFlagMomentsRecommendationFeedType then
+			feedType = MomentsFeedType.Trending
+		end
+
+		v12.feedType = feedType
+		return createRecommendationTelemetry(v12)
 	end, { v6 })
+	local followingTelemetry
 
-	local v12 = SignalsReact.useSignalState(GetImmersiveChromeStore(false).getOverlayCovering)
+	if FFlagMomentsRecommendationFeedType and FFlagMomentsFollowingFeed then
+		followingTelemetry = React.useMemo(function()
+			if FFlagEnableArgus then
+				return createRecommendationTelemetry({
+					getMomentsSessionId = v6.getMomentsSessionId,
+					signalTracker = signalTracker,
+					feedType = MomentsFeedType.Following
+				})
+			end
 
-	local v13 = SignalsReact.useSignalState(reportModalCovering.getCovering)
-	local active = not (v9.isCreating or v12 or state2 or v13)
+			return nil
+		end, { v6 })
+	end
+
+	local v13 = SignalsReact.useSignalState(GetImmersiveChromeStore(false).getOverlayCovering)
+
+	local v14 = SignalsReact.useSignalState(reportModalCovering.getCovering)
+	local v15
+
+	if FFlagMomentsPersonalizedRecommendationsEntryPoint then
+		v15 = SignalsReact.useSignalState(accountSettingsCovering.getCovering)
+	else
+		v15 = false
+	end
+
+	local active = not (v10.isCreating or v13 or state2 or v14 or v15)
 
 	if FFlagMomentsFixRecommendationImpressionLifecycle then
 		active = active and v3
 	end
 
-	local playbackActive = v3 and not v9.isCreating and not (state2 or v13)
+	local playbackActive = v3 and not (v10.isCreating or state2) and not (v14 or v15)
 	local inactiveDestination
 
 	if FFlagMomentsNavigationEvent then
 		if v5 then
 			inactiveDestination = NavigationDestinationType.ExperienceJoin
-		elseif v9.isCreating then
+		elseif v10.isCreating then
 			inactiveDestination = NavigationDestinationType.Create
-		elseif v13 then
+		elseif v14 then
 			inactiveDestination = NavigationDestinationType.Report
 		elseif not v4 then
 			inactiveDestination = NavigationDestinationType.Exit
@@ -221,25 +274,52 @@ local function TrendingScreen(p)
 			current.flushView(p2)
 		end
 	end, {})
-	local v14
+	local v16
+
+	if FFlagMomentsCreateAvatarPosts then
+		v16 = React.useCallback(function()
+			logCreateIntent(FunnelEventNames.CreationIntentSource.TopBar)
+
+			if FFlagMomentsNavigationEvent then
+				flushView(NavigationDestinationType.Create)
+			end
+
+			if openAvatarMomentsCreation ~= nil then
+				openAvatarMomentsCreation()
+			end
+		end, { flushView, openAvatarMomentsCreation })
+	else
+		v16 = nil
+	end
+
+	if not FFlagMomentsCreateAvatarPosts or openAvatarMomentsCreation == nil then
+		v16 = nil
+	end
+
+	local v17
 
 	if useFeedSelection == nil then
-		v14 = nil
+		v17 = nil
 	else
-		v14 = useFeedSelection({
-			trendingSource = v10,
-			trendingTelemetry = v11,
+		if not FFlagMomentsRecommendationFeedType then
+			followingTelemetry = nil
+		end
+
+		v17 = useFeedSelection({
+			trendingSource = v11,
+			trendingTelemetry = v12,
+			followingTelemetry = followingTelemetry,
 			refreshFeed = refreshFeed,
 			flushView = flushView
 		})
 	end
 
-	if v14 ~= nil then
-		v10 = v14.source
+	if v17 ~= nil then
+		v11 = v17.source
 	end
 
-	if v14 ~= nil then
-		v11 = v14.telemetry
+	if v17 ~= nil then
+		v12 = v17.telemetry
 	end
 
 	React.useEffect(function()
@@ -247,21 +327,21 @@ local function TrendingScreen(p)
 			return nil
 		end
 
-		local v15 = p.navigation.addListener(RoactNavigation.Events.WillBlur, function()
+		local v18 = p.navigation.addListener(RoactNavigation.Events.WillBlur, function()
 			flushView()
 		end)
 		return function()
-			v15.remove()
+			v18.remove()
 		end
 	end, { p.navigation, flushView })
 
 	React.useEffect(function()
 		local reloadPageConnection = RobloxAppEvents.ReloadPage:connect(function(p2)
 			if p2 == AppPage.Moments then
-				if v14 == nil or v14.getSelected() ~= MomentsFeedType.Following then
+				if v17 == nil or v17.getSelected() ~= MomentsFeedType.Following then
 					refreshFeed()
 				else
-					v14.select(MomentsFeedType.Trending)
+					v17.select(MomentsFeedType.Trending)
 				end
 			end
 		end)
@@ -269,32 +349,32 @@ local function TrendingScreen(p)
 		return function()
 			reloadPageConnection:disconnect()
 		end
-	end, { refreshFeed, v14 })
+	end, { refreshFeed, v17 })
 
 	local uploadStore = GetUploadStore(false)
 	local current2 = SignalsReact.useSignalState(uploadStore.getState)
-	local v15 = SignalsReact.useSignalState(uploadStore.getUploadedMoment)
+	local v18 = SignalsReact.useSignalState(uploadStore.getUploadedMoment)
 	React.useEffect(function()
 		if current2 ~= "Success" then
 			ref2.current = current2
 		elseif ref2.current ~= "Success" then
 			ref2.current = current2
 
-			if v14 == nil or v14.getSelected() ~= MomentsFeedType.Following then
+			if v17 == nil or v17.getSelected() ~= MomentsFeedType.Following then
 				local current = ref.current
 
-				if type(v15) == "table" and v15.momentId ~= nil and current ~= nil then
+				if type(v18) == "table" and v18.momentId ~= nil and current ~= nil then
 					getUploadLogger():debug( -- inferred equivalent call
 						"event=feed_prepend_uploaded momentId={} assetId={}",
-						v15.momentId,
-						(tostring(v15.assetId))
+						v18.momentId,
+						(tostring(v18.assetId))
 					)
 
-					current.prependMoment(v15)
+					current.prependMoment(v18)
 				else
 					getUploadLogger():debug( -- inferred equivalent call
 						"event=feed_refresh_after_upload uploadedMoment={} hasController={}",
-						tostring(v15),
+						tostring(v18),
 						(tostring(current ~= nil))
 					)
 
@@ -304,63 +384,72 @@ local function TrendingScreen(p)
 				getUploadLogger():debug("event=feed_upload_skipped_on_following") -- inferred equivalent call
 			end
 		end
-	end, { current2, v15, refreshFeed, v14 })
+	end, { current2, v18, refreshFeed, v17 })
 
 	local onFtuxTooltipDismissed = React.useCallback(function()
 		setState(false)
 		MomentsLocalStorage.setField(MomentsLocalStorageKeys.CreateTooltipSeen, true)
 	end, {})
 
-	local v16 = React.useCallback(function()
+	local v19 = React.useCallback(function()
 		logCreateIntent(FunnelEventNames.CreationIntentSource.TopBar)
-		v9.onCreatePressed()
-	end, { v9.onCreatePressed })
+		v10.onCreatePressed()
+	end, { v10.onCreatePressed })
 
 	local onNavigateToTrending = React.useCallback(function()
 		fireAnalyticsEvent(EventNames.FeedHomeButtonPressed)
 
-		if v14 ~= nil then
-			v14.select(MomentsFeedType.Trending)
+		if v17 ~= nil then
+			v17.select(MomentsFeedType.Trending)
 			return
 		end
 
-		local v17
+		local v20
 
 		if FFlagMomentsNavigationEvent then
-			v17 = NavigationDestinationType.Trending
+			v20 = NavigationDestinationType.Trending
 		end
 
-		refreshFeed(v17)
-	end, { refreshFeed, v14 })
+		refreshFeed(v20)
+	end, { refreshFeed, v17 })
 
 	local onNavigateToMyMoments = React.useCallback(function()
 		fireAnalyticsEvent(EventNames.MyCreationButtonPressed)
 
 		if openOwnMoments ~= nil then
 			if FFlagMomentsFlushDwellBeforeNavigation then
-				local v17
+				local v20
 
 				if FFlagMomentsNavigationEvent then
-					v17 = NavigationDestinationType.MyMoments
+					v20 = NavigationDestinationType.MyMoments
 				end
 
-				flushView(v17)
+				flushView(v20)
 			end
 
 			openOwnMoments()
 		end
 	end, { openOwnMoments, flushView })
 
+	local v20 = React.useCallback(function(p2)
+		if p2 == MomentsFeedType.Trending then
+			onNavigateToTrending()
+		elseif v17 ~= nil then
+			v17.select(p2)
+		end
+	end, { onNavigateToTrending, v17 })
+
 	local useMemo = React.useMemo
 	local function fn()
 		local createElement = React.createElement
-		local v17 = {
+		local v21 = {
 			isBaseScreen = true,
 			showTopScrim = true,
-			showFtuxTooltip = state and v3 and (not FFlagMomentsCreationFeatureGate or v8),
+			showFtuxTooltip = state and v3 and (not FFlagMomentsCreationFeatureGate or v9),
 			showHamburger = platformIntegrationEnabled,
 			onFtuxTooltipDismissed = onFtuxTooltipDismissed,
 			onCreatePressed = nil,
+			onCreateAvatarMomentPressed = nil,
 			onNavigateToTrending = nil,
 			onNavigateToMyMoments = nil,
 			selectedFeedType = 0,
@@ -368,50 +457,65 @@ local function TrendingScreen(p)
 		}
 		local onCreatePressed
 
-		if not (FFlagMomentsCreationFeatureGate and not v8) then
-			onCreatePressed = v16
+		if not (FFlagMomentsCreationFeatureGate and not v9) then
+			onCreatePressed = v19
 		end
 
-		v17.onCreatePressed = onCreatePressed
+		v21.onCreatePressed = onCreatePressed
+		local onCreateAvatarMomentPressed
 
-		v17.onNavigateToTrending = onNavigateToTrending
-		v17.onNavigateToMyMoments = onNavigateToMyMoments
+		if FFlagMomentsCreateAvatarPosts then
+			onCreateAvatarMomentPressed = v16
+		end
+
+		v21.onCreateAvatarMomentPressed = onCreateAvatarMomentPressed
+
+		v21.onNavigateToTrending = onNavigateToTrending
+		v21.onNavigateToMyMoments = onNavigateToMyMoments
 		local selectedFeedType
 
-		if v14 ~= nil then
-			selectedFeedType = v14.selected
+		if v17 ~= nil then
+			selectedFeedType = v17.selected
 		end
 
-		v17.selectedFeedType = selectedFeedType
+		v21.selectedFeedType = selectedFeedType
 		local onFeedTypeSelected
 
-		if v14 ~= nil then
-			onFeedTypeSelected = v14.select
+		if v17 ~= nil then
+			onFeedTypeSelected = v20
 		end
 
-		v17.onFeedTypeSelected = onFeedTypeSelected
-		return createElement(TopBar, v17)
+		v21.onFeedTypeSelected = onFeedTypeSelected
+		return createElement(TopBar, v21)
 	end
 
-	local v17 = if FFlagMomentsCreationFeatureGate then v8 else false
+	local v21 = if FFlagMomentsCreationFeatureGate then v9 else false
+	local v22
+
+	if FFlagMomentsCreateAvatarPosts then
+		v22 = v16
+	end
+
 	local header = useMemo(fn, {
 		state,
 		v3,
-		v17,
+		v21,
 		platformIntegrationEnabled,
 		onFtuxTooltipDismissed,
-		v16,
+		v19,
+		v22,
 		onNavigateToTrending,
 		onNavigateToMyMoments,
-		v14
+		v20,
+		v17
 	})
-	local v18
+	local v23
 
 	if FFlagMomentsFixFeedForDeviceSafeInsets then
-		local v19 = MomentsCommon2.Hooks.useDeviceInsets()
-		v18 = not shouldUseDeviceSafeInsets and 0 or v19.top
+		local v24 = MomentsCommon2.Hooks.useDeviceInsets()
+		v23 = not shouldUseDeviceSafeInsets and 0 or v24.top
 	else
-		v18 = 0
+		v23 = 0
 	end
 
 	local renderFeedContainer = React.useCallback(function(feed)
@@ -422,7 +526,7 @@ local function TrendingScreen(p)
 		local padding = FFlagMomentsFeedAboveNavBar and { bottom = UDim.new(0, v2) } or nil
 
 		local createElement = React.createElement
-		local v19 = {
+		local v24 = {
 			backgroundStyle = FFlagMomentsRenderAvatarPostsInFeed and { Transparency = 1 } or nil,
 			tag = {
 				["size-full"] = not v
@@ -436,37 +540,37 @@ local function TrendingScreen(p)
 		local position
 
 		if v then
-			position = UDim2.fromOffset(0, -v18)
+			position = UDim2.fromOffset(0, -v23)
 		end
 
-		v19.Position = position
+		v24.Position = position
 		local size
 
 		if v then
-			size = UDim2.new(1, 0, 1, v18)
+			size = UDim2.new(1, 0, 1, v23)
 		end
 
-		v19.Size = size
+		v24.Size = size
 
-		v19.padding = padding
-		v19.ZIndex = Constants.DisplayOrder.Feed
+		v24.padding = padding
+		v24.ZIndex = Constants.DisplayOrder.Feed
 		local switchFade
 
-		if not (FeedSwitchFade == nil or v14 == nil) then
-			switchFade = React.createElement(FeedSwitchFade, { feedKey = v14.selected, ZIndex = 2 })
+		if not (FeedSwitchFade == nil or v17 == nil) then
+			switchFade = React.createElement(FeedSwitchFade, { feedKey = v17.selected, ZIndex = 2 })
 		end
 
-		return createElement(View, v19, { Feed = element, SwitchFade = switchFade })
-	end, { v2, v18, v14 })
+		return createElement(View, v24, { Feed = element, SwitchFade = switchFade })
+	end, { v2, v23, v17 })
 
 	local createElement = React.createElement
 
 	local createElement2 = React.createElement
-	local v19 = {
-		source = v10,
+	local v24 = {
+		source = v11,
 		active = active,
 		playbackActive = playbackActive,
-		telemetry = v11,
+		telemetry = v12,
 		inactiveDestination = inactiveDestination,
 		controllerRef = ref,
 		trackSurfaceLoad = true,
@@ -477,20 +581,20 @@ local function TrendingScreen(p)
 	}
 	local emptyState
 
-	if v14 ~= nil then
-		emptyState = v14.emptyState
+	if v17 ~= nil then
+		emptyState = v17.emptyState
 	end
 
-	v19.emptyState = emptyState
+	v24.emptyState = emptyState
 	local caughtUpState
 
-	if v14 ~= nil then
-		caughtUpState = v14.caughtUpState
+	if v17 ~= nil then
+		caughtUpState = v17.caughtUpState
 	end
 
-	v19.caughtUpState = caughtUpState
-	local v20 = {
-		Surface = createElement2(MomentsFeedSurface, v19),
+	v24.caughtUpState = caughtUpState
+	local v25 = {
+		Surface = createElement2(MomentsFeedSurface, v24),
 		MomentUnavailableDialog = 0,
 		CreationFlowOverlay = 0,
 		FtuxOverlay = 0
@@ -505,10 +609,10 @@ local function TrendingScreen(p)
 		})
 	end
 
-	v20.MomentUnavailableDialog = momentUnavailableDialog
+	v25.MomentUnavailableDialog = momentUnavailableDialog
 	local creationFlowOverlay
 
-	if v9.isCreating then
+	if v10.isCreating then
 		creationFlowOverlay = React.createElement(View, {
 			tag = "size-full",
 			ZIndex = Constants.DisplayOrder.Modals
@@ -517,26 +621,26 @@ local function TrendingScreen(p)
 		})
 	end
 
-	v20.CreationFlowOverlay = creationFlowOverlay
+	v25.CreationFlowOverlay = creationFlowOverlay
 	local ftuxOverlay
 
-	if v9.showFtux then
+	if v10.showFtux then
 		ftuxOverlay = React.createElement(View, {
 			tag = "size-full",
 			ZIndex = Constants.DisplayOrder.Modals
 		}, {
-			Screen = React.createElement(FTUXEducationScreen, { onClose = v9.onExitFtux })
+			Screen = React.createElement(FTUXEducationScreen, { onClose = v10.onExitFtux })
 		})
 	end
 
-	v20.FtuxOverlay = ftuxOverlay
+	v25.FtuxOverlay = ftuxOverlay
 	return createElement(View, {
 		backgroundStyle = FFlagMomentsRenderAvatarPostsInFeed and { Transparency = 1 } or nil,
 		tag = {
 			["size-full"] = FFlagMomentsRenderAvatarPostsInFeed,
 			["size-full bg-surface-0"] = not FFlagMomentsRenderAvatarPostsInFeed
 		}
-	}, v20)
+	}, v25)
 end
 
 return TrendingScreen

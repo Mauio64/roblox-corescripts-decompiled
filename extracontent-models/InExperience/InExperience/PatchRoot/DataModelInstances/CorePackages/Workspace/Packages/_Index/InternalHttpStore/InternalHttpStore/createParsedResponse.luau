@@ -14,11 +14,11 @@ local function createParsedResponse(callback, config)
 			return { status = "Success", config = config, response = v.data }
 		end
 
-		if v.status == "error" then
-			return { status = "Failed", config = config, response = v.error }
+		if v.status ~= "error" then
+			return { status = "Fetching", config = config }
 		end
 
-		return { status = "Fetching", config = config }
+		return { status = "Failed", config = config, response = v.error }
 	end)
 end
 

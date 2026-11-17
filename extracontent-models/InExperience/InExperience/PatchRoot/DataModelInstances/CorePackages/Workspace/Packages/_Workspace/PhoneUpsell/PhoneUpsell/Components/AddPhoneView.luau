@@ -10,7 +10,6 @@ local Checkbox = Foundation.Checkbox
 
 local Text = Foundation.Text
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local withStyle = UIBlox.Style.withStyle
 local Localization = require(parent.Localization)
@@ -130,7 +129,7 @@ local function AddPhoneView(p)
 				AutomaticSize = Enum.AutomaticSize.Y,
 				Size = UDim2.new(1, 0, 0, 0)
 			}
-			local children = {
+			local v7 = {
 				ContentPadding = React.createElement("UIPadding", {
 					PaddingTop = UDim.new(0, 12),
 					PaddingBottom = UDim.new(0, 24)
@@ -140,112 +139,63 @@ local function AddPhoneView(p)
 					HorizontalAlignment = Enum.HorizontalAlignment.Center,
 					Padding = UDim.new(0, 6)
 				}),
-				BodyText = 0,
-				PhoneInput = 0,
-				PrivacyText = 0,
+				BodyText = React.createElement("TextLabel", {
+					LayoutOrder = 0,
+					BackgroundTransparency = 1,
+					Text = props.descriptionKey,
+					TextSize = baseSize,
+					TextColor3 = data.Theme.TextDefault.Color,
+					TextTransparency = data.Theme.TextDefault.Transparency,
+					FontFace = normalizeFontFace(data.Tokens.Typography.BodyLarge.Font),
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextWrapped = true,
+					Size = UDim2.new(0, partialPageModalMiddleContentWidth, 0, 0),
+					AutomaticSize = Enum.AutomaticSize.Y
+				}),
+				PhoneInput = React.createElement(TextBoxStateWrapper, {
+					ChildClass = PhoneNumberTextBox,
+					ErrorState = v2.errorMessage ~= "",
+					ErrorText = v2.errorMessage,
+					Size = UDim2.new(1, 0, 0, 36),
+					LayoutOrder = 1,
+					ChildProps = {
+						CountryCode = v2.countryCode,
+						SetCountryCode = v2.setCountryCode,
+						Text = v2.phoneNumber,
+						PlaceholderText = props.phoneNumberKey,
+						Font = data.Font.Body.Font,
+						TextSize = baseSize * relativeSize,
+						TextXAlignment = Enum.TextXAlignment.Left,
+						Color = data.Theme.BackgroundUIContrast.Color,
+						Transparency = data.Theme.BackgroundUIContrast.Transparency,
+						TextColor = data.Theme.TextDefault.Color,
+						PlaceholderColor = data.Theme.UIDefault.Color,
+						TextTransparency = data.Theme.TextDefault.Transparency,
+						ClearTextOnFocus = false,
+						PaddingX = 12,
+						TextInputTypeOverride = v2.usePhoneNumberTextType and Enum.TextInputType.Phone or Enum.TextInputType.Number,
+						onChangeText = v2.onPhoneNumberTextChange,
+						onFocused = v2.onPhoneInputFocus,
+						onFocusLost = noOp,
+						phoneCountryCodeSelectorCallback = v2.onCountryCodeSelectorClick
+					}
+				}),
+				PrivacyText = React.createElement("TextLabel", {
+					LayoutOrder = 2,
+					BackgroundTransparency = 1,
+					Text = props.phonePrivacyDisclaimerKey,
+					TextSize = baseSize * relativeSize2,
+					TextColor3 = data.Theme.TextEmphasis.Color,
+					TextTransparency = data.Theme.TextEmphasis.Transparency,
+					FontFace = normalizeFontFace(data.Tokens.Typography.BodyLarge.Font),
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextWrapped = true,
+					Size = UDim2.new(0, partialPageModalMiddleContentWidth, 0, 24)
+				}),
 				VerificationText = 0,
 				LegalTextContainer = 0,
 				LegalButtonsContainer = 0
 			}
-
-			local createElement3 = React.createElement
-			local v7 = {
-				LayoutOrder = 0,
-				BackgroundTransparency = 1,
-				Text = props.descriptionKey,
-				TextSize = baseSize,
-				TextColor3 = data.Theme.TextDefault.Color,
-				TextTransparency = data.Theme.TextDefault.Transparency,
-				Font = 0,
-				FontFace = 0,
-				TextXAlignment = 0,
-				TextWrapped = true,
-				Size = 0,
-				AutomaticSize = 0
-			}
-			local font
-
-			if not FoundationFontFaceMigration then
-				font = data.Font.Body.Font
-			end
-
-			v7.Font = font
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(data.Tokens.Typography.BodyLarge.Font)
-			end
-
-			v7.FontFace = fontFace
-
-			v7.TextXAlignment = Enum.TextXAlignment.Left
-
-			v7.Size = UDim2.new(0, partialPageModalMiddleContentWidth, 0, 0)
-			v7.AutomaticSize = Enum.AutomaticSize.Y
-			children.BodyText = createElement3("TextLabel", v7)
-
-			children.PhoneInput = React.createElement(TextBoxStateWrapper, {
-				ChildClass = PhoneNumberTextBox,
-				ErrorState = v2.errorMessage ~= "",
-				ErrorText = v2.errorMessage,
-				Size = UDim2.new(1, 0, 0, 36),
-				LayoutOrder = 1,
-				ChildProps = {
-					CountryCode = v2.countryCode,
-					SetCountryCode = v2.setCountryCode,
-					Text = v2.phoneNumber,
-					PlaceholderText = props.phoneNumberKey,
-					Font = data.Font.Body.Font,
-					TextSize = baseSize * relativeSize,
-					TextXAlignment = Enum.TextXAlignment.Left,
-					Color = data.Theme.BackgroundUIContrast.Color,
-					Transparency = data.Theme.BackgroundUIContrast.Transparency,
-					TextColor = data.Theme.TextDefault.Color,
-					PlaceholderColor = data.Theme.UIDefault.Color,
-					TextTransparency = data.Theme.TextDefault.Transparency,
-					ClearTextOnFocus = false,
-					PaddingX = 12,
-					TextInputTypeOverride = v2.usePhoneNumberTextType and Enum.TextInputType.Phone or Enum.TextInputType.Number,
-					onChangeText = v2.onPhoneNumberTextChange,
-					onFocused = v2.onPhoneInputFocus,
-					onFocusLost = noOp,
-					phoneCountryCodeSelectorCallback = v2.onCountryCodeSelectorClick
-				}
-			})
-
-			local createElement4 = React.createElement
-			local v8 = {
-				LayoutOrder = 2,
-				BackgroundTransparency = 1,
-				Text = props.phonePrivacyDisclaimerKey,
-				TextSize = baseSize * relativeSize2,
-				TextColor3 = data.Theme.TextEmphasis.Color,
-				TextTransparency = data.Theme.TextEmphasis.Transparency,
-				Font = 0,
-				FontFace = 0,
-				TextXAlignment = 0,
-				TextWrapped = true,
-				Size = 0
-			}
-			local font2
-
-			if not FoundationFontFaceMigration then
-				font2 = data.Font.Body.Font
-			end
-
-			v8.Font = font2
-			local fontFace2
-
-			if FoundationFontFaceMigration then
-				fontFace2 = normalizeFontFace(data.Tokens.Typography.BodyLarge.Font)
-			end
-
-			v8.FontFace = fontFace2
-
-			v8.TextXAlignment = Enum.TextXAlignment.Left
-
-			v8.Size = UDim2.new(0, partialPageModalMiddleContentWidth, 0, 24)
-			children.PrivacyText = createElement4("TextLabel", v8)
 			local verificationText
 
 			if FFlagHomePhoneVerificationUpsellNewCopy and v2.shouldShowVerificationText then
@@ -256,125 +206,80 @@ local function AddPhoneView(p)
 				})
 			end
 
-			children.VerificationText = verificationText
+			v7.VerificationText = verificationText
 
 			local legalTextContainer = not v2.disableLegalText
 
 			if legalTextContainer then
 				if v2.requireLegalTextCheckbox then
-					local createElement5 = React.createElement
-					local v9 = {
+					legalTextContainer = React.createElement(
+						"Frame",
+						{
+							LayoutOrder = 3,
+							BackgroundTransparency = 1,
+							Size = UDim2.new(0, partialPageModalMiddleContentWidth, 0, 0),
+							AutomaticSize = Enum.AutomaticSize.Y
+						},
+						{
+							UIListLayout = React.createElement("UIListLayout", {
+								FillDirection = Enum.FillDirection.Horizontal,
+								HorizontalAlignment = Enum.HorizontalAlignment.Center,
+								VerticalAlignment = Enum.VerticalAlignment.Center,
+								Padding = UDim.new(0, 6)
+							}),
+							LegalCheckbox = React.createElement(Checkbox, {
+								onActivated = setState,
+								isChecked = state,
+								label = ""
+							}),
+							LegalText = React.createElement("TextLabel", {
+								BackgroundTransparency = 1,
+								Text = props.legalTextKey,
+								TextSize = baseSize * relativeSize2,
+								TextColor3 = data.Theme.TextDefault.Color,
+								TextTransparency = data.Theme.TextDefault.Transparency,
+								FontFace = normalizeFontFace(data.Tokens.Typography.BodyLarge.Font),
+								TextXAlignment = Enum.TextXAlignment.Left,
+								TextWrapped = true,
+								Size = UDim2.new(1, -32, 0, 0),
+								AutomaticSize = Enum.AutomaticSize.Y
+							})
+						}
+					)
+				elseif v2.alwaysShowLegalText or v2.countryCode.prefix == "1" then
+					legalTextContainer = React.createElement("TextLabel", {
 						LayoutOrder = 3,
 						BackgroundTransparency = 1,
+						Text = props.legalTextKey,
+						TextSize = baseSize * relativeSize2,
+						TextColor3 = data.Theme.TextDefault.Color,
+						TextTransparency = data.Theme.TextDefault.Transparency,
+						FontFace = normalizeFontFace(data.Tokens.Typography.BodyLarge.Font),
+						TextXAlignment = Enum.TextXAlignment.Left,
+						TextWrapped = true,
 						Size = UDim2.new(0, partialPageModalMiddleContentWidth, 0, 0),
 						AutomaticSize = Enum.AutomaticSize.Y
-					}
-					local v10 = {
-						UIListLayout = React.createElement("UIListLayout", {
-							FillDirection = Enum.FillDirection.Horizontal,
-							HorizontalAlignment = Enum.HorizontalAlignment.Center,
-							VerticalAlignment = Enum.VerticalAlignment.Center,
-							Padding = UDim.new(0, 6)
-						}),
-						LegalCheckbox = React.createElement(Checkbox, {
-							onActivated = setState,
-							isChecked = state,
-							label = ""
-						}),
-						LegalText = 0
-					}
-
-					local createElement6 = React.createElement
-					local v11 = {
-						BackgroundTransparency = 1,
-						Text = props.legalTextKey,
-						TextSize = baseSize * relativeSize2,
-						TextColor3 = data.Theme.TextDefault.Color,
-						TextTransparency = data.Theme.TextDefault.Transparency,
-						Font = 0,
-						FontFace = 0,
-						TextXAlignment = 0,
-						TextWrapped = true,
-						Size = 0,
-						AutomaticSize = 0
-					}
-					local font3
-
-					if not FoundationFontFaceMigration then
-						font3 = data.Font.Body.Font
-					end
-
-					v11.Font = font3
-					local fontFace3
-
-					if FoundationFontFaceMigration then
-						fontFace3 = normalizeFontFace(data.Tokens.Typography.BodyLarge.Font)
-					end
-
-					v11.FontFace = fontFace3
-
-					v11.TextXAlignment = Enum.TextXAlignment.Left
-
-					v11.Size = UDim2.new(1, -32, 0, 0)
-					v11.AutomaticSize = Enum.AutomaticSize.Y
-					v10.LegalText = createElement6("TextLabel", v11)
-					legalTextContainer = createElement5("Frame", v9, v10)
-				elseif v2.alwaysShowLegalText or v2.countryCode.prefix == "1" then
-					local createElement5 = React.createElement
-					local v9 = {
-						LayoutOrder = 3,
-						BackgroundTransparency = 1,
-						Text = props.legalTextKey,
-						TextSize = baseSize * relativeSize2,
-						TextColor3 = data.Theme.TextDefault.Color,
-						TextTransparency = data.Theme.TextDefault.Transparency,
-						Font = 0,
-						FontFace = 0,
-						TextXAlignment = 0,
-						TextWrapped = true,
-						Size = 0,
-						AutomaticSize = 0
-					}
-					local font3
-
-					if not FoundationFontFaceMigration then
-						font3 = data.Font.Body.Font
-					end
-
-					v9.Font = font3
-					local fontFace3
-
-					if FoundationFontFaceMigration then
-						fontFace3 = normalizeFontFace(data.Tokens.Typography.BodyLarge.Font)
-					end
-
-					v9.FontFace = fontFace3
-
-					v9.TextXAlignment = Enum.TextXAlignment.Left
-
-					v9.Size = UDim2.new(0, partialPageModalMiddleContentWidth, 0, 0)
-					v9.AutomaticSize = Enum.AutomaticSize.Y
-					legalTextContainer = createElement5("TextLabel", v9)
+					})
 				else
 					legalTextContainer = nil
 				end
 			end
 
-			children.LegalTextContainer = legalTextContainer
+			v7.LegalTextContainer = legalTextContainer
 			local legalButtonsContainer
 
 			if v2.countryCode.prefix == "1" then
 				legalButtonsContainer = not v2.disableLegalText
 
 				if legalButtonsContainer then
-					local createElement5 = React.createElement
-					local v9 = {
+					local createElement3 = React.createElement
+					local v8 = {
 						LayoutOrder = 4,
 						BackgroundTransparency = 1,
 						Size = UDim2.new(1, 0, 0, 0),
 						AutomaticSize = Enum.AutomaticSize.Y
 					}
-					local children2 = {
+					local children = {
 						UIListLayout = React.createElement("UIListLayout", {
 							FillDirection = Enum.FillDirection.Horizontal,
 							SortOrder = Enum.SortOrder.LayoutOrder,
@@ -387,8 +292,8 @@ local function AddPhoneView(p)
 						PrivacyPolicyButton = 0
 					}
 
-					local createElement6 = React.createElement
-					local v10 = {
+					local createElement4 = React.createElement
+					local v9 = {
 						text = props.termsOfUseKey,
 						onActivated = v2.onTermsOfUseClick,
 						layoutOrder = 5,
@@ -402,58 +307,37 @@ local function AddPhoneView(p)
 						buttonRef = ref
 					end
 
-					v10.buttonRef = buttonRef
-					children2.TermsOfUseButton = createElement6(LinkButton, v10)
+					v9.buttonRef = buttonRef
+					children.TermsOfUseButton = createElement4(LinkButton, v9)
 
-					local createElement7 = React.createElement
-					local v11 = {
+					children.TextButtonDivider = React.createElement("TextLabel", {
 						LayoutOrder = 6,
 						BackgroundTransparency = 1,
 						Text = "-",
 						TextSize = baseSize * relativeSize2,
 						TextColor3 = data.Theme.TextDefault.Color,
 						TextTransparency = data.Theme.TextDefault.Transparency,
-						Font = 0,
-						FontFace = 0,
-						TextXAlignment = 0,
+						FontFace = normalizeFontFace(data.Tokens.Typography.BodyLarge.Font),
+						TextXAlignment = Enum.TextXAlignment.Center,
 						TextWrapped = true,
-						AutomaticSize = 0
-					}
-					local font3
+						AutomaticSize = Enum.AutomaticSize.XY
+					})
 
-					if not FoundationFontFaceMigration then
-						font3 = data.Font.Body.Font
-					end
-
-					v11.Font = font3
-					local fontFace3
-
-					if FoundationFontFaceMigration then
-						fontFace3 = normalizeFontFace(data.Tokens.Typography.BodyLarge.Font)
-					end
-
-					v11.FontFace = fontFace3
-
-					v11.TextXAlignment = Enum.TextXAlignment.Center
-
-					v11.AutomaticSize = Enum.AutomaticSize.XY
-					children2.TextButtonDivider = createElement7("TextLabel", v11)
-
-					children2.PrivacyPolicyButton = React.createElement(LinkButton, {
+					children.PrivacyPolicyButton = React.createElement(LinkButton, {
 						text = props.privacyPolicyKey,
 						onActivated = v2.onPrivacyPolicyClick,
 						layoutOrder = 7,
 						fontStyle = "CaptionBody"
 					})
-					legalButtonsContainer = createElement5("Frame", v9, children2)
+					legalButtonsContainer = createElement3("Frame", v8, children)
 				end
 			else
 				legalButtonsContainer = false
 			end
 
-			children.LegalButtonsContainer = legalButtonsContainer
+			v7.LegalButtonsContainer = legalButtonsContainer
 			return createElement(PartialPageModal, v5, {
-				Middle = createElement2("Frame", v6, children)
+				Middle = createElement2("Frame", v6, v7)
 			})
 		end)
 	end)

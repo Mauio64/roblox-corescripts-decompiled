@@ -49,9 +49,7 @@ local function createPanel(p)
 	if v3.type == SpatialUIType.SpatialUIPartOnly then
 		local panelPart = createPanelPart(Object.assign({}, v2, v3.spatialPanelProps))
 		return { type = v3.type, panelObject = panelPart }
-	end
-
-	if v3.type == SpatialUIType.SpatialUI then
+	elseif v3.type == SpatialUIType.SpatialUI then
 		local v4 = Object.assign({}, v2, v3.spatialPanelProps)
 		local panelPart = createPanelPart(v4)
 		local surfaceGui = Instance.new("SurfaceGui", CoreGui)

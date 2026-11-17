@@ -254,6 +254,23 @@ local function useCommentsListViewModel(data)
 	local onAddReaction = React.useCallback(function(p: string, p2: string, p3)
 		return commentsListCoordinator.ensureReactionPresent(data.feedItemId, p, p2, p3)
 	end, { commentsListCoordinator, data.feedItemId })
+	local onToggleCommentTranslation
+
+	if FFlagMomentsCommentTranslation then
+		onToggleCommentTranslation = React.useCallback(function(commentId: string)
+			local v17 = v5.getToggledCommentIds(false)[commentId] ~= true
+			v5.toggle(commentId)
+
+			if v16 ~= nil then
+				v16.logEvent(EventNames.MomentCommentTranslationToggled, {
+					commentId = commentId,
+					isTranslationShown = tostring(v17 ~= FFlagMomentsCommentTranslationShownByDefault)
+				})
+			end
+		end, { v5, v16 })
+	else
+		onToggleCommentTranslation = nil
+	end
 
 	local v17 = useMomentsHost()
 	local openMomentCommentReport = v17.openMomentCommentReport
@@ -372,7 +389,7 @@ local function useCommentsListViewModel(data)
 	end
 
 	local row = React.useMemo(function()
-		local v18 = {
+		return {
 			viewerUsername = viewerUsername,
 			feedItemId = data.feedItemId,
 			thumbsUpEmoteId = thumbsUpEmoteId,
@@ -386,22 +403,11 @@ local function useCommentsListViewModel(data)
 			onBlockCommentAuthor = onBlockCommentAuthor,
 			onDeleteComment = onDeleteComment,
 			onToggleCommentExpanded = v4.toggle,
-			onToggleCommentTranslation = 0,
-			onRetryPendingSubmission = 0,
-			onEditPendingSubmission = 0,
-			onRetryLoadMore = 0
+			onToggleCommentTranslation = onToggleCommentTranslation,
+			onRetryPendingSubmission = onRetryPendingSubmission,
+			onEditPendingSubmission = onEditPendingSubmission,
+			onRetryLoadMore = onRetryLoadMore
 		}
-		local onToggleCommentTranslation
-
-		if v5 ~= nil then
-			onToggleCommentTranslation = v5.toggle
-		end
-
-		v18.onToggleCommentTranslation = onToggleCommentTranslation
-		v18.onRetryPendingSubmission = onRetryPendingSubmission
-		v18.onEditPendingSubmission = onEditPendingSubmission
-		v18.onRetryLoadMore = onRetryLoadMore
-		return v18
 	end, {
 		viewerUsername,
 		data.feedItemId,
@@ -415,7 +421,7 @@ local function useCommentsListViewModel(data)
 		onBlockCommentAuthor,
 		onDeleteComment,
 		v4,
-		v5 or false,
+		onToggleCommentTranslation or false,
 		onRetryPendingSubmission,
 		onEditPendingSubmission,
 		onRetryLoadMore

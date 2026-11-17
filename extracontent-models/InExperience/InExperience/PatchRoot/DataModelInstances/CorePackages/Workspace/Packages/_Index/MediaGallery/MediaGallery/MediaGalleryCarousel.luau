@@ -22,6 +22,12 @@ local Responsive = require(parent.Responsive)
 local useBreakpointXOrSmaller = Responsive.useBreakpointXOrSmaller
 local useLastInput = Responsive.useLastInput
 
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagLuaAppMediaGalleryHideScrollArrowsOnTouch = SharedFlags4.FFlagLuaAppMediaGalleryHideScrollArrowsOnTouch
+
+local SharedFlags5 = require(parent.SharedFlags)
+local FFlagLuaAppMediaGalleryPageIndicatorOpacity = SharedFlags5.FFlagLuaAppMediaGalleryPageIndicatorOpacity
+
 local RoactUtils = require(parent.RoactUtils)
 local useGamepadSupports = RoactUtils.Hooks.useGamepadSupports
 
@@ -60,8 +66,8 @@ local useTouchDragScroll = require(MediaGallery.Hooks.useTouchDragScroll)
 local useCarouselGamepadInput = require(MediaGallery.Hooks.useCarouselGamepadInput)
 local isAudioPlaybackAllowedForDevice = require(MediaGallery.isAudioPlaybackAllowedForDevice)
 
-local SharedFlags4 = require(parent.SharedFlags)
-local FFlagLuaAppVideoLoadFailureFallback = SharedFlags4.FFlagLuaAppVideoLoadFailureFallback
+local SharedFlags6 = require(parent.SharedFlags)
+local FFlagLuaAppVideoLoadFailureFallback = SharedFlags6.FFlagLuaAppVideoLoadFailureFallback
 
 local SLIDING_WINDOW_SIZE = MediaGalleryConstants.SLIDING_WINDOW_SIZE
 
@@ -246,7 +252,16 @@ local function MediaGalleryCarousel(props)
 		v21 = v19
 	end
 
-	local v22 = v18 == Responsive.Input.Pointer or defineFastFlag and not v20
+	local v22
+
+	if FFlagLuaAppMediaGalleryHideScrollArrowsOnTouch then
+		v22 = v18 == Responsive.Input.Pointer
+			or v18 == Responsive.Input.Touch and props.isFullscreen == true
+			or defineFastFlag and v19 and not v20
+	else
+		v22 = v18 == Responsive.Input.Pointer or defineFastFlag and not v20
+	end
+
 	local v23
 
 	if FFlagLuaAppMediaGalleryGamepadSupport then
@@ -302,7 +317,16 @@ local function MediaGalleryCarousel(props)
 	v27.scrollRight = v25
 	local ref = useCarouselGamepadInput(v27)
 
-	useTouchDragScroll(v5.scrollingFrameRef, v5.scrollInDirection)
+	local scrollingFrameRef = v5.scrollingFrameRef
+	local v28
+
+	if FFlagLuaAppMediaGalleryHideScrollArrowsOnTouch then
+		v28 = v12
+	else
+		v28 = v5.scrollInDirection
+	end
+
+	useTouchDragScroll(scrollingFrameRef, v28)
 
 	local children = {
 		Layout = React.createElement("UIListLayout", {
@@ -472,7 +496,7 @@ local function MediaGalleryCarousel(props)
 	local size_350 = v3.Size.Size_350
 
 	local createElement = React.createElement
-	local v28 = {
+	local v29 = {
 		BackgroundTransparency = 1,
 		Size = props.Size or UDim2.fromScale(1, 1),
 		AnchorPoint = props.AnchorPoint,
@@ -488,8 +512,8 @@ local function MediaGalleryCarousel(props)
 		selectionImageObject = nil
 	end
 
-	v28.SelectionImageObject = selectionImageObject
-	v28.SelectionGroup = true
+	v29.SelectionImageObject = selectionImageObject
+	v29.SelectionGroup = true
 	local children2 = {
 		ScrollingFrame = React.createElement("ScrollingFrame", {
 			Selectable = false,
@@ -520,7 +544,7 @@ local function MediaGalleryCarousel(props)
 
 	if count > 1 and props.showPageIndicators ~= false and not props.isFullscreen then
 		local createElement2 = React.createElement
-		local v29 = {
+		local v30 = {
 			AnchorPoint = Vector2.new(0.5, 1),
 			AutomaticSize = Enum.AutomaticSize.X,
 			BackgroundTransparency = 1,
@@ -529,7 +553,7 @@ local function MediaGalleryCarousel(props)
 			ZIndex = 2
 		}
 
-		local v30 = {
+		local v31 = {
 			UIListLayout = React.createElement("UIListLayout", {
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				FillDirection = Enum.FillDirection.Horizontal,
@@ -544,56 +568,69 @@ local function MediaGalleryCarousel(props)
 
 		if v21 then
 			local createElement3 = React.createElement
-			local v31
+			local v32
 
 			if FFlagLuaAppMediaGalleryGamepadSupport then
-				v31 = Enum.KeyCode.ButtonL2
+				v32 = Enum.KeyCode.ButtonL2
 			else
-				v31 = Enum.KeyCode.ButtonL1
+				v32 = Enum.KeyCode.ButtonL1
 			end
 
 			pageLeftGamepadIcon = createElement3("ImageLabel", {
 				BackgroundTransparency = 1,
 				LayoutOrder = -1,
-				Image = UserInputService:GetImageForKeyCode(v31),
+				Image = UserInputService:GetImageForKeyCode(v32),
 				ImageTransparency = v5.currentIndex <= 1 and 0.5 or nil,
 				Size = UDim2.fromOffset(size_500, size_500)
 			})
 		end
 
-		v30.PageLeftGamepadIcon = pageLeftGamepadIcon
+		v31.PageLeftGamepadIcon = pageLeftGamepadIcon
 
-		v30.Indicators = React.createElement(MediaGalleryPageIndicators, {
+		local createElement3 = React.createElement
+		local v32 = {
 			numberOfItems = count,
 			startIndex = props.startIndex or 1,
-			currentItemProgressBinding = v11.progressBinding,
-			mediaGalleryScrolledSignal = v5.scrolledSignal,
+			currentItemProgressBinding = 0,
+			mediaGalleryScrolledSignal = 0,
 			useSpring = true,
-			springConfig = MediaGalleryConstants.SPRING_CONFIG
-		})
+			springConfig = 0
+		}
+		local currentItemProgressBinding
+
+		if not (FFlagLuaAppMediaGalleryPageIndicatorOpacity and props.autoAdvanceEnabled == false and not state2) then
+			currentItemProgressBinding = v11.progressBinding
+		end
+
+		v32.currentItemProgressBinding = currentItemProgressBinding
+
+		v32.mediaGalleryScrolledSignal = v5.scrolledSignal
+
+		v32.springConfig = MediaGalleryConstants.SPRING_CONFIG
+		v31.Indicators = createElement3(MediaGalleryPageIndicators, v32)
 		local pageRightGamepadIcon
 
 		if v21 then
-			local createElement3 = React.createElement
-			local v31
+			local createElement4 = React.createElement
+			local v49
 
 			if FFlagLuaAppMediaGalleryGamepadSupport then
-				v31 = Enum.KeyCode.ButtonR2
+				v49 = Enum.KeyCode.ButtonR2
 			else
-				v31 = Enum.KeyCode.ButtonR1
+				v49 = Enum.KeyCode.ButtonR1
 			end
 
-			pageRightGamepadIcon = createElement3("ImageLabel", {
+			pageRightGamepadIcon = createElement4("ImageLabel", {
 				BackgroundTransparency = 1,
 				LayoutOrder = 2,
-				Image = UserInputService:GetImageForKeyCode(v31),
+				Image = UserInputService:GetImageForKeyCode(v49),
 				ImageTransparency = count <= v5.currentIndex and 0.5 or nil,
 				Size = UDim2.fromOffset(size_500, size_500)
 			})
 		end
 
-		v30.PageRightGamepadIcon = pageRightGamepadIcon
-		pageIndicators = createElement2("Frame", v29, v30)
+		v31.PageRightGamepadIcon = pageRightGamepadIcon
+		pageIndicators = createElement2("Frame", v30, v31)
 	end
 
 	children2.PageIndicators = pageIndicators
@@ -601,7 +638,7 @@ local function MediaGalleryCarousel(props)
 
 	if v22 and not props.isMediaGalleryOccluded then
 		local createElement2 = React.createElement
-		local v29 = {
+		local v30 = {
 			AnchorPoint = Vector2.new(0.5, 0),
 			Position = UDim2.fromScale(0.5, 0),
 			Size = UDim2.new(1, props.isFullscreen and 0 or v3.Size.Size_1000, 1, 0),
@@ -618,13 +655,13 @@ local function MediaGalleryCarousel(props)
 			buttonOffsetFromEdge = v3.Size.Size_500
 		end
 
-		v29.buttonOffsetFromEdge = buttonOffsetFromEdge
+		v30.buttonOffsetFromEdge = buttonOffsetFromEdge
 
-		v29.leftScrollingEnabled = v5.currentIndex > 1
-		v29.rightScrollingEnabled = v5.currentIndex < count
-		v29.handleScrollLeft = v24
-		v29.handleScrollRight = v25
-		scrollButtons = createElement2(CarouselScrollButtons, v29)
+		v30.leftScrollingEnabled = v5.currentIndex > 1
+		v30.rightScrollingEnabled = v5.currentIndex < count
+		v30.handleScrollLeft = v24
+		v30.handleScrollRight = v25
+		scrollButtons = createElement2(CarouselScrollButtons, v30)
 	end
 
 	children2.ScrollButtons = scrollButtons
@@ -660,7 +697,7 @@ local function MediaGalleryCarousel(props)
 		end)
 	})
 	return {
-		Carousel = createElement("TextButton", v28, children2)
+		Carousel = createElement("TextButton", v29, children2)
 	}
 end
 

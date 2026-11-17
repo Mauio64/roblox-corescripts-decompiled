@@ -1,5 +1,7 @@
 local Flags = require(script:FindFirstAncestor("ViewRecyclerRoblox").Flags)
-local FFlagViewRecyclerReact08 = Flags.FFlagViewRecyclerReact08
+local FFlagViewRecyclerReact084 = Flags.FFlagViewRecyclerReact084
+local Flags2 = require(script:FindFirstAncestor("ViewRecyclerRoblox").Flags)
+local FFlagViewRecyclerReact08 = Flags2.FFlagViewRecyclerReact08
 local ViewRecyclerRoblox = script:FindFirstAncestor("ViewRecyclerRoblox")
 require(ViewRecyclerRoblox.Parent.ViewRecycler)
 
@@ -9,6 +11,8 @@ local HostMeasurement = require(ViewRecyclerRoblox.RobloxAdapter.HostMeasurement
 local HostPresentationPhase = require(ViewRecyclerRoblox.RobloxAdapter.HostPresentationPhase)
 local ReparentableHost = require(ViewRecyclerRoblox.RobloxAdapter.ReparentableHost)
 local StackPlacement = require(ViewRecyclerRoblox.RobloxAdapter.StackPlacement)
+
+require(ViewRecyclerRoblox.RobloxAdapter.VacantHosts)
 
 local function zero(): number
 	return 0
@@ -31,6 +35,14 @@ return {
 		local trackedItemViewCount = 0
 		local flag = false
 		local getCanvasOriginOffset = data.getCanvasOriginOffset or zero
+		local vacantHosts
+
+		if FFlagViewRecyclerReact084 then
+			vacantHosts = data.vacantHosts
+		else
+			vacantHosts = nil
+		end
+
 		local v6 = AbsolutePlacement.new(v.axis, v.selfSizing, getCanvasOriginOffset)
 
 		local function commitStack() -- 2 equivalent calls inferred from this helper
@@ -69,7 +81,7 @@ return {
 			onItemMeasurements = data.onItemMeasurements
 		})
 
-		local function stopMeasuring(p, state) -- 1 equivalent call inferred from this helper
+		local function stopMeasuring(p, state) -- 2 equivalent calls inferred from this helper
 			state.checkedSize = nil
 
 			if state.measuring then
@@ -78,21 +90,54 @@ return {
 			end
 		end
 
-		local function detachHost(p, state)
-			local host = state.host
+		local leaveHost
+		local isContainer
+		local detachHost
 
-			if host ~= nil then
-				if v3 ~= nil then
-					v3.remove(host)
+		if FFlagViewRecyclerReact084 then
+			leaveHost = function(p, state)
+				local host = state.host
+
+				if host ~= nil then
+					if v3 ~= nil then
+						v3.remove(host)
+					end
+
+					CanvasItemPlacer.release(host, state.placerState)
+					v6.remove(host)
+					vacantHosts.leave(host)
+					state.host = nil
 				end
 
-				ReparentableHost.clearSelection(host)
-				CanvasItemPlacer.detachForTransfer(host, state.placerState)
-				v6.remove(host)
-				state.host = nil
+				stopMeasuring(p, state) -- inferred equivalent call
 			end
 
-			stopMeasuring(p, state) -- inferred equivalent call
+			isContainer = function(p)
+				if p == v.container or p == v.viewportContainer then
+					return true
+				elseif v3 == nil then
+					return false
+				else
+					return (v3.isStackFrame(p))
+				end
+			end
+		else
+			detachHost = function(p, state)
+				local host = state.host
+
+				if host ~= nil then
+					if v3 ~= nil then
+						v3.remove(host)
+					end
+
+					ReparentableHost.clearSelection(host)
+					CanvasItemPlacer.detachForTransfer(host, state.placerState)
+					v6.remove(host)
+					state.host = nil
+				end
+
+				stopMeasuring(p, state) -- inferred equivalent call
+			end
 		end
 
 		local function getEntry(p) -- 1 equivalent call inferred from this helper
@@ -132,19 +177,30 @@ return {
 			local physicalState = state.physicalState
 
 			if physicalState == nil then
-				detachHost(p, state)
+				if FFlagViewRecyclerReact084 then
+					leaveHost(p, state)
+				else
+					detachHost(p, state)
+				end
+
 				reportPresentation(p, state) -- inferred equivalent call
 			else
 				local state2 = physicalState.state
 				local host = physicalState.host
 
 				if state.host ~= nil and state.host ~= host then
-					detachHost(p, state)
+					if FFlagViewRecyclerReact084 then
+						leaveHost(p, state)
+					else
+						detachHost(p, state)
+					end
 				end
 
 				local v8
 
-				if FFlagViewRecyclerReact08 then
+				if FFlagViewRecyclerReact084 then
+					v8 = state2.viewportPlacement ~= nil
+				elseif FFlagViewRecyclerReact08 then
 					v8 = state2.viewportPlacement ~= nil
 				elseif state2.viewportPlacement == nil then
 					v8 = false
@@ -161,9 +217,18 @@ return {
 				end
 
 				if v9 == nil then
-					detachHost(p, state)
+					if FFlagViewRecyclerReact084 then
+						leaveHost(p, state)
+					else
+						detachHost(p, state)
+					end
+
 					reportPresentation(p, state) -- inferred equivalent call
 				else
+					if FFlagViewRecyclerReact084 then
+						vacantHosts.reclaim(host)
+					end
+
 					local v10 = v3
 					local v11
 
@@ -230,7 +295,13 @@ return {
 
 			if v8 ~= nil then
 				for k, v10 in v2 do
-					if v10.host ~= nil and v8.isStacked(v10.host) then
+					if not (v10.host ~= nil and v8.isStacked(v10.host)) then
+						continue
+					end
+
+					if FFlagViewRecyclerReact084 then
+						leaveHost(k, v10)
+					else
 						detachHost(k, v10)
 					end
 				end
@@ -270,6 +341,13 @@ return {
 			end,
 			setConfiguration = function(p)
 				if not flag then
+					if
+						FFlagViewRecyclerReact084
+						and (p.container ~= v.container or p.viewportContainer ~= v.viewportContainer)
+					then
+						vacantHosts.evacuate(isContainer)
+					end
+
 					v = p
 					v7.setAxis(v.axis)
 					v6.setConfiguration(v.axis, v.selfSizing)
@@ -336,7 +414,15 @@ return {
 			cancelPendingMeasurements = function()
 				v7.cancelPending()
 			end,
-			hasDestroyedHost = FFlagViewRecyclerReact08 and function(): boolean
+			hasDestroyedHost = FFlagViewRecyclerReact084 and function(): boolean
+				for _, v8 in v2 do
+					if v8.host ~= nil and v8.host.Parent == nil then
+						return true
+					end
+				end
+
+				return false
+			end or FFlagViewRecyclerReact08 and function(): boolean
 				for _, v8 in v2 do
 					if v8.host ~= nil and v8.host.Parent == nil then
 						return true
@@ -363,7 +449,15 @@ return {
 				v7.destroy()
 
 				for k, v8 in v2 do
-					detachHost(k, v8)
+					if FFlagViewRecyclerReact084 then
+						leaveHost(k, v8)
+					else
+						detachHost(k, v8)
+					end
+				end
+
+				if FFlagViewRecyclerReact084 then
+					vacantHosts.evacuate(isContainer)
 				end
 
 				v6.destroy()

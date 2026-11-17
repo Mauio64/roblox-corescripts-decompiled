@@ -1,1 +1,0 @@
-return game:DefineFastFlag("StreamNotificationsSduiContentPage", false)

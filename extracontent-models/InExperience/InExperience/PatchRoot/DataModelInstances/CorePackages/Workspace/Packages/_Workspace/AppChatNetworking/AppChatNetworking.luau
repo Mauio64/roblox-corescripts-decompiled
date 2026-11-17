@@ -3,6 +3,7 @@ require(responses.SharedTypes)
 require(responses["create-conversations"])
 require(responses["expand-to-group-conversation"])
 require(responses["get-conversation-messages"])
+require(responses["get-messages"])
 require(responses["get-conversations"])
 require(responses["get-suggestions"])
 require(responses["get-user-conversations"])
@@ -14,6 +15,8 @@ require(responses["clear-global-unread-count"])
 require(responses["get-chat-moderation-statuses"])
 require(responses["translate-user-message"])
 require(script.rodux.GetModalSequence)
+require(script.http.GetConversations)
+require(script.http.RecordModalSequenceResponse)
 
 return {
 	Constants = require(script.Constants),

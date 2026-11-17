@@ -135,7 +135,7 @@ function WidgetManager:_flushWith(items, p)
 
 		if signal then
 			if signal.Widget == v3.Widget then
-				if Flags.FoundationPopoverPluginOverlayMeasurement and signal.Host ~= DEPRECATED_PluginGui then
+				if signal.Host ~= DEPRECATED_PluginGui then
 					signal.Host = DEPRECATED_PluginGui
 					table.insert(uris, v3.Uri)
 				end
@@ -149,39 +149,27 @@ function WidgetManager:_flushWith(items, p)
 			signal.AncestryChanged:Disconnect()
 		end
 
-		local signals = self._signals
-		local v4 = {
+		self._signals[str] = {
 			Widget = v3.Widget,
-			Host = 0,
-			PositionChanged = 0,
-			SizeChanged = 0,
-			VisibleChanged = 0,
-			AncestryChanged = 0
+			Host = DEPRECATED_PluginGui,
+			PositionChanged = v3.Widget:GetPropertyChangedSignal("AbsolutePosition"):Connect(function()
+				self:register(v3.Uri, v3.Widget)
+			end),
+			SizeChanged = v3.Widget:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+				self:register(v3.Uri, v3.Widget)
+			end),
+			VisibleChanged = v3.Widget:GetStyledPropertyChangedSignal("Visible"):Connect(function()
+				self:register(v3.Uri, v3.Widget)
+			end),
+			AncestryChanged = v3.Widget.AncestryChanged:Connect(function(_, parent2)
+				if not parent2 then
+					self:deregister(v3.Uri)
+				end
+			end)
 		}
-
-		if not Flags.FoundationPopoverPluginOverlayMeasurement then
-			DEPRECATED_PluginGui = nil
-		end
-
-		v4.Host = DEPRECATED_PluginGui
-		v4.PositionChanged = v3.Widget:GetPropertyChangedSignal("AbsolutePosition"):Connect(function()
-			self:register(v3.Uri, v3.Widget)
-		end)
-		v4.SizeChanged = v3.Widget:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-			self:register(v3.Uri, v3.Widget)
-		end)
-		v4.VisibleChanged = v3.Widget:GetStyledPropertyChangedSignal("Visible"):Connect(function()
-			self:register(v3.Uri, v3.Widget)
-		end)
-		v4.AncestryChanged = v3.Widget.AncestryChanged:Connect(function(_, parent2)
-			if not parent2 then
-				self:deregister(v3.Uri)
-			end
-		end)
-		signals[str] = v4
 	end
 
-	if Flags.FoundationPopoverPluginOverlayMeasurement and #uris > 0 then
+	if #uris > 0 then
 		pcall(function()
 			self._widgetsApi:DeregisterAsync(uris)
 		end)

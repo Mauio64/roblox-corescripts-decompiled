@@ -33,9 +33,11 @@ local useCreatorCreditMenuItem2 = useCreatorCreditMenuItem.useCreatorCreditMenuI
 local FFlagBuildExperiencePrivateInvites = require(BuildExperience.Flags.FFlagBuildExperiencePrivateInvites)
 local FFlagEnableBuildAdPromotion = require(BuildExperience.Flags.FFlagEnableBuildAdPromotion)
 local FFlagBuildCheckGamePermissions = require(BuildExperience.Flags.FFlagBuildCheckGamePermissions)
+local FFlagBuildExperiencePageImpressions = require(BuildExperience.Flags.FFlagBuildExperiencePageImpressions)
+local useBuildPageImpression = require(BuildExperience.Telemetry.useBuildPageImpression)
+local FFlagBuildExperienceOverflowMenuTelemetry = require(BuildExperience.Flags.FFlagBuildExperienceOverflowMenuTelemetry)
+local sendBuildExperienceEvent = require(BuildExperience.Telemetry.sendBuildExperienceEvent)
 local useGamePermissions = require(BuildExperience.useGamePermissions)
-
-local FFlagBuildExperienceReleaseFocusOnOverflowOpen = require(BuildExperience.Flags.FFlagBuildExperienceReleaseFocusOnOverflowOpen)
 local useGetAdCampaignEligibility = require(BuildExperience.Components.Ads.useGetAdCampaignEligibility)
 local adCampaignEligibilityUtils = require(BuildExperience.Components.Ads.adCampaignEligibilityUtils)
 
@@ -66,11 +68,36 @@ local function getSourceText(item, p) -- 1 equivalent call inferred from this he
 	return (item.getText(p))
 end
 
+local function sendOverflowMenuEvent(p, target, p2: string?)
+	local v = {
+		isInExperience = game.GameId == 0 and "false" or "true"
+	}
+
+	if p2 ~= nil then
+		v.item = p2
+	end
+
+	sendBuildExperienceEvent(
+		p,
+		{
+			universeId = target.universeId,
+			placeId = target.placeId,
+			conversationId = target.sessionId
+		},
+		v
+	)
+end
+
 local function BuildOverflowMenuButton(props)
 	local v = useScaledValue(defineFastInt)
 	local v2 = useOpenWebView()
 	local state, setState = React.useState(false)
 	local state2, setState2 = React.useState(false)
+
+	if FFlagBuildExperiencePageImpressions then
+		useBuildPageImpression("version-history", props.target, state2 and props.target.placeId ~= nil)
+	end
+
 	local v3
 
 	if FFlagBuildCheckGamePermissions then
@@ -264,15 +291,20 @@ local function BuildOverflowMenuButton(props)
 
 	local menuItems = buildMenuItems()
 
-	local onActivated = React.useCallback(function()
+	local useCallback = React.useCallback
+	local function fn()
 		if isDisabled then
 			return
 		end
 
-		local focusedTextBox = FFlagBuildExperienceReleaseFocusOnOverflowOpen and UserInputService:GetFocusedTextBox()
+		local focusedTextBox = UserInputService:GetFocusedTextBox()
 
 		if focusedTextBox then
 			focusedTextBox:ReleaseFocus()
+		end
+
+		if FFlagBuildExperienceOverflowMenuTelemetry and not state then
+			sendOverflowMenuEvent("OVERFLOW_MENU_OPEN", props.target)
 		end
 
 		setState(function(p): boolean
@@ -282,17 +314,37 @@ local function BuildOverflowMenuButton(props)
 		if props.onActivated then
 			props.onActivated()
 		end
-	end, { isDisabled, props.onActivated })
+	end
+
+	local onActivated = props.onActivated
+	local v14
+
+	if FFlagBuildExperienceOverflowMenuTelemetry then
+		v14 = state
+	end
+
+	local v15
+
+	if FFlagBuildExperienceOverflowMenuTelemetry then
+		v15 = props.target
+	end
+
+	local onActivated2 = useCallback(fn, { isDisabled, onActivated, v14, v15 })
 
 	local onPressedOutside = React.useCallback(function()
 		setState(false)
 	end, {})
 
-	local onActivated2 = React.useCallback(function(p)
+	local useCallback2 = React.useCallback
+	local function fn2(p)
 		local focusedTextBox = UserInputService:GetFocusedTextBox()
 
 		if focusedTextBox then
 			focusedTextBox:ReleaseFocus()
+		end
+
+		if FFlagBuildExperienceOverflowMenuTelemetry then
+			sendOverflowMenuEvent("OVERFLOW_MENU_ITEM_CLICK", props.target, tostring(p))
 		end
 
 		if v6 and v13 ~= nil and p == v13.item.id then
@@ -303,49 +355,49 @@ local function BuildOverflowMenuButton(props)
 				return
 			end
 
-			for _, v14 in v10 do
-				for _, item in v14.items do
+			for _, v16 in v10 do
+				for _, item in v16.items do
 					if item.id == p then
-						local v15
+						local v17
 
 						if item.onActivated then
-							v15 = item.onActivated(v9)
+							v17 = item.onActivated(v9)
 						end
 
-						if v15 ~= nil then
-							if v15.type == "openPage" then
-								if v15.page == "monetization" and not FFlagBuildExperienceMonetizationNativeUI then
+						if v17 ~= nil then
+							if v17.type == "openPage" then
+								if v17.page == "monetization" and not FFlagBuildExperienceMonetizationNativeUI then
 									v2(
 										urlBuilder({ universeId = v9.universeId }),
 										LocalizationStrings.GAME_CONFIGURATION_CREATOR_HUB
 									)
 								elseif props.onAction then
-									props.onAction(v15)
+									props.onAction(v17)
 								end
-							elseif v15.type == "openInvitePicker" then
+							elseif v17.type == "openInvitePicker" then
 								if props.onAction then
-									props.onAction(v15)
+									props.onAction(v17)
 								end
-							elseif v15.type == "openInviteManagement" then
+							elseif v17.type == "openInviteManagement" then
 								if props.onAction then
-									props.onAction(v15)
+									props.onAction(v17)
 								end
-							elseif v15.type == "openGetUsers" then
+							elseif v17.type == "openGetUsers" then
 								if props.onOpenGetUsersPage then
 									props.onOpenGetUsersPage()
 								end
-							elseif v15.type == "openVersionHistory" then
+							elseif v17.type == "openVersionHistory" then
 								releaseAnyFocus()
 								setState2(true)
-							elseif v15.type == "share" then
+							elseif v17.type == "share" then
 								if FFlagBuildExperiencePrivateInvites then
 									onShare()
-								elseif v15.placeId ~= nil then
-									v5(v15.placeId)
+								elseif v17.placeId ~= nil then
+									v5(v17.placeId)
 								end
-							elseif v15.type == "confirmFriendsShare" then
-								setState3(v15.placeId)
-							elseif v15.type == "leaveExperience" then
+							elseif v17.type == "confirmFriendsShare" then
+								setState3(v17.placeId)
+							elseif v17.type == "leaveExperience" then
 								setState(false)
 								leaveExperience()
 								return
@@ -358,28 +410,39 @@ local function BuildOverflowMenuButton(props)
 				end
 			end
 		end
-	end, {
+	end
+
+	local onAction = props.onAction
+	local onOpenGetUsersPage = props.onOpenGetUsersPage
+	local v16
+
+	if FFlagBuildExperienceOverflowMenuTelemetry then
+		v16 = props.target
+	end
+
+	local onActivated3 = useCallback2(fn2, {
 		v10,
 		v9,
 		v2,
-		props.onAction,
-		props.onOpenGetUsersPage,
+		onAction,
+		onOpenGetUsersPage,
 		onShare,
 		v5,
 		v6,
-		v13
+		v13,
+		v16
 	})
 
-	local v14 = React.useCallback(function()
+	local v17 = React.useCallback(function()
 		setState2(false)
 	end, {})
 
 	local onShare2 = React.useCallback(function()
-		local v15 = state3
+		local v18 = state3
 		setState3(nil)
 
-		if v15 ~= nil then
-			v5(v15)
+		if v18 ~= nil then
+			v5(v18)
 		end
 	end, { state3, v5 })
 
@@ -393,15 +456,15 @@ local function BuildOverflowMenuButton(props)
 			universeId = props.target.universeId,
 			placeId = props.target.placeId,
 			isOpen = true,
-			onClose = v14,
-			onAgentRollbackStarted = v14,
+			onClose = v17,
+			onAgentRollbackStarted = v17,
 			testId = "build-version-history"
 		})
 	end
 
 	local createElement = React.createElement
 	local fragment = React.Fragment
-	local v15 = {
+	local v18 = {
 		Menu = React.createElement(Menu, {
 			isOpen = state and not isDisabled,
 			items = menuItems,
@@ -409,7 +472,7 @@ local function BuildOverflowMenuButton(props)
 			size = InputSize.Large,
 			align = PopoverAlign.End,
 			onPressedOutside = onPressedOutside,
-			onActivated = onActivated2,
+			onActivated = onActivated3,
 			LayoutOrder = props.layoutOrder,
 			width = UDim.new(0, v)
 		}, React.createElement(IconButton, {
@@ -418,7 +481,7 @@ local function BuildOverflowMenuButton(props)
 			size = InputSize.Medium,
 			isCircular = true,
 			isDisabled = isDisabled,
-			onActivated = onActivated,
+			onActivated = onActivated2,
 			testId = "build-header-overflow-button"
 		})),
 		ShareOverlays = 0,
@@ -437,7 +500,7 @@ local function BuildOverflowMenuButton(props)
 		})
 	end
 
-	v15.ShareOverlays = shareOverlays
+	v18.ShareOverlays = shareOverlays
 	local friendsOnlyShareDialog
 
 	if not (FFlagBuildExperiencePrivateInvites or state3 == nil) then
@@ -447,10 +510,10 @@ local function BuildOverflowMenuButton(props)
 		})
 	end
 
-	v15.FriendsOnlyShareDialog = friendsOnlyShareDialog
+	v18.FriendsOnlyShareDialog = friendsOnlyShareDialog
 
-	v15.VersionHistory = versionHistory
-	return createElement(fragment, nil, v15)
+	v18.VersionHistory = versionHistory
+	return createElement(fragment, nil, v18)
 end
 
 return BuildOverflowMenuButton

@@ -1,4 +1,0 @@
-local FFlagLuaAppDesktopMediaGalleryTelemetry = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagLuaAppDesktopMediaGalleryTelemetry")
-local FFlagLuaAppEdpMediaGalleryRedesign = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagLuaAppEdpMediaGalleryRedesign")
-
-return FFlagLuaAppDesktopMediaGalleryTelemetry and FFlagLuaAppEdpMediaGalleryRedesign and game:DefineFastFlag("LuaAppEdpMediaGalleryRedesignTelemetry", false)

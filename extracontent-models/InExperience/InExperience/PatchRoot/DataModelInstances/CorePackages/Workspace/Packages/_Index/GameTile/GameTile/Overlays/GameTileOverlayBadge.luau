@@ -6,7 +6,6 @@ local Icon = Foundation.Icon
 local IconSize = Foundation.Enums.IconSize
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
 local React = require(parent.React)
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local useTokens = Foundation.Hooks.useTokens
 
@@ -98,47 +97,25 @@ local function GameTileOverlayBadge(props)
 	end
 
 	if v3 then
-		local createElement = React.createElement
-		local v9 = {
+		children.BadgeText = React.createElement("TextLabel", {
 			LayoutOrder = #icons + 1,
 			BackgroundTransparency = 1,
 			Size = UDim2.fromOffset(v8.X, v8.Y),
 			Text = text,
 			TextColor3 = style.Color3,
-			Font = 0,
-			FontFace = 0,
-			TextSize = 0,
-			TextXAlignment = 0,
-			TextYAlignment = 0,
+			FontFace = normalizeFontFace(titleSmall.Font),
+			TextSize = titleSmall.FontSize,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextYAlignment = Enum.TextYAlignment.Center,
 			TextWrapped = false,
-			TextTruncate = 0
-		}
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = titleSmall.Font
-		end
-
-		v9.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(titleSmall.Font)
-		end
-
-		v9.FontFace = fontFace
-		v9.TextSize = titleSmall.FontSize
-		v9.TextXAlignment = Enum.TextXAlignment.Left
-		v9.TextYAlignment = Enum.TextYAlignment.Center
-
-		v9.TextTruncate = Enum.TextTruncate.AtEnd
-		children.BadgeText = createElement("TextLabel", v9, {
+			TextTruncate = Enum.TextTruncate.AtEnd
+		}, {
 			UISizeConstraint = React.createElement("UISizeConstraint", {
 				MaxSize = props.maxWidthBinding:map(function(p: number)
-					local v10 = p - 2 * v6 - total
+					local v9 = p - 2 * v6 - total
 
-					if v10 > 0 then
-						return (Vector2.new(v10, 1e999))
+					if v9 > 0 then
+						return (Vector2.new(v9, 1e999))
 					end
 
 					return nil

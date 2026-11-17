@@ -4,6 +4,8 @@ local parent = SocialServerDrivenUi.Parent
 local React = require(parent.React)
 local SharedFlags = require(parent.SharedFlags)
 
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
 local DiscoveryTypes = require(parent.DiscoveryTypes)
 local SduiCoreSystem = require(parent.SduiCoreSystem)
 local findAnalyticsField = SduiCoreSystem.findAnalyticsField
@@ -16,6 +18,7 @@ local OpenProfileQRCodePageBridge = require(SocialServerDrivenUi.System.OpenProf
 local FFlagEnableFlyoutFriendsHeaderFix = SharedFlags.FFlagEnableFlyoutFriendsHeaderFix
 local FFlagFlyoutHideFriendsHeader = SocialCarousel.Flags.FFlagFlyoutHideFriendsHeader
 local FFlagLuaAppCompositionAlways = SharedFlags.FFlagLuaAppCompositionAlways
+local FFlagMobileGameJoinCardVideo = SharedFlags.FFlagMobileGameJoinCardVideo
 local FFlagLuaAppFriendsSortHeaderByPosition = SharedFlags.FFlagLuaAppFriendsSortHeaderByPosition
 local FFlagLuaAppHomeFriendsRemoveItemImpressions = SharedFlags.FFlagLuaAppHomeFriendsRemoveItemImpressions
 local FFlagSocialCarouselShareQREnabled = SharedFlags.FFlagSocialCarouselShareQREnabled
@@ -77,7 +80,9 @@ local function SduiFriendCarousel(props)
 		source = SocialCarousel.Constants.ANALYTICS.SRC.HOMEPAGE_FRIENDS_CAROUSEL,
 		hideCarouselHeader = 0,
 		appCompositionEnabled = 0,
-		navigateToQRCodePage = 0
+		navigateToQRCodePage = 0,
+		isJoinCardVideoEnabled = 0,
+		videoPlaybackContext = 0
 	}
 	local hideCarouselHeader
 
@@ -117,6 +122,20 @@ local function SduiFriendCarousel(props)
 	end
 
 	v.navigateToQRCodePage = navigateToQRCodePage
+	local isJoinCardVideoEnabled
+
+	if FFlagMobileGameJoinCardVideo then
+		isJoinCardVideoEnabled = props.sduiContext.appPage == AppPage.Home
+	end
+
+	v.isJoinCardVideoEnabled = isJoinCardVideoEnabled
+	local videoPlaybackContext
+
+	if FFlagMobileGameJoinCardVideo then
+		videoPlaybackContext = props.sduiContext.videoPlaybackContext
+	end
+
+	v.videoPlaybackContext = videoPlaybackContext
 	return createElement(entry, v)
 end
 

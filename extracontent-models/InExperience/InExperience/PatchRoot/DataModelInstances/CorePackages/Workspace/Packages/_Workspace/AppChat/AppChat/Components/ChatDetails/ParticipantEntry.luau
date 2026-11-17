@@ -5,11 +5,8 @@ local FFlagAppChatUseProfileFrameThumbnail = require(AppChat.Flags.FFlagAppChatU
 local Cryo = require(parent.Cryo)
 local React = require(parent.React)
 local Foundation = require(parent.Foundation)
-local AppCommonLib = require(parent.AppCommonLib)
-local Text = AppCommonLib.Text
 local Style = require(parent.Style)
 local GetTextSize = Style.GetTextSize
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local useUserData = require(AppChat.Hooks.useUserData)
 local useTokens = Foundation.Hooks.useTokens
@@ -41,37 +38,20 @@ local function ParticipantEntry(p)
 	end, { union.onActivated })
 
 	local v7 = React.useMemo(function()
-		local v7
+		local textSize = GetTextSize(v, v4.Typography.TitleLarge.FontSize, v4.Typography.TitleLarge.Font, Vector2.zero)
 
-		if FoundationFontFaceMigration then
-			v7 = GetTextSize(v, v4.Typography.TitleLarge.FontSize, v4.Typography.TitleLarge.Font, Vector2.zero)
-		else
-			v7 = Text.GetTextBounds(v, v4.Typography.TitleLarge.Font, v4.Typography.TitleLarge.FontSize, Vector2.zero)
-		end
-
-		return UDim2.fromOffset(v7.X, v7.Y)
+		return UDim2.fromOffset(textSize.X, textSize.Y)
 	end, { v4.Typography.TitleLarge.Font, v4.Typography.TitleLarge.FontSize })
 
 	local v8 = React.useMemo(function()
-		local v8
+		local textSize = GetTextSize(
+			"Roblox Studio",
+			v4.Typography.CaptionMedium.FontSize,
+			v4.Typography.CaptionMedium.Font,
+			Vector2.zero
+		)
 
-		if FoundationFontFaceMigration then
-			v8 = GetTextSize(
-				"Roblox Studio",
-				v4.Typography.CaptionMedium.FontSize,
-				v4.Typography.CaptionMedium.Font,
-				Vector2.zero
-			)
-		else
-			v8 = Text.GetTextBounds(
-				"Roblox Studio",
-				v4.Typography.CaptionMedium.Font,
-				v4.Typography.CaptionMedium.FontSize,
-				Vector2.zero
-			)
-		end
-
-		return UDim2.fromOffset(v8.X, v8.Y)
+		return UDim2.fromOffset(textSize.X, textSize.Y)
 	end, { v4.Typography.CaptionMedium.Font, v4.Typography.CaptionMedium.FontSize })
 
 	local createElement = React.createElement

@@ -2,8 +2,8 @@ local ProfileQRCodeApi = {
 	["jest.config"] = nil,
 	["jest.config"] = nil,
 	["jest.config"] = nil,
-	["jest.config"] = nil,
-	["jest.config"] = script.Parent["jest.config"]
+	["jest.config"] = script.Parent["jest.config"],
+	FFlagProfileQRCodeGamepadBackFix = require(script.Parent.Flags.FFlagProfileQRCodeGamepadBackFix)
 }
 local Rodux = require(script.Parent.Rodux)
 ProfileQRCodeApi.installReducer = Rodux.installReducer

@@ -45,11 +45,12 @@ function extended.willUpdate(p, p2)
 
 		if not p2.gotCurrentFavoriteCount then
 			coroutine.wrap(function()
-				if v then
-					getBundleFavoriteCount((UtilityFunctions.getBundleId(assetInfo)))
-				else
+				if not v then
 					getAssetFavoriteCount(assetInfo.assetId)
+					return
 				end
+
+				getBundleFavoriteCount((UtilityFunctions.getBundleId(assetInfo)))
 			end)()
 		end
 	end

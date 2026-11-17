@@ -87,6 +87,7 @@ local StatusBadgeVariant = require(script.Enums.StatusBadgeVariant)
 local StatusIndicatorShape = require(script.Enums.StatusIndicatorShape)
 local StatusIndicatorSize = require(script.Enums.StatusIndicatorSize)
 local StatusIndicatorVariant = require(script.Enums.StatusIndicatorVariant)
+local SwipeBehavior = require(script.Enums.SwipeBehavior)
 local TextOverflow = require(script.Enums.TextOverflow)
 
 local Theme = require(script.Enums.Theme)
@@ -154,6 +155,8 @@ local Empty = require(script.Components.Empty)
 
 local FeedbackAlert = require(script.Components.FeedbackAlert)
 
+local FloatingBanner = require(script.Components.FloatingBanner)
+
 local Icon = require(script.Components.Icon)
 
 local IconButton = require(script.Components.IconButton)
@@ -163,6 +166,8 @@ local Image = require(script.Components.Image)
 local InputChip = require(script.Components.InputChip)
 
 local InputLabel = require(script.Components.InputLabel)
+
+local InputSlider = require(script.Components.InputSlider)
 
 local KeyLabel = require(script.Components.KeyLabel)
 
@@ -181,6 +186,8 @@ local Metadata = require(script.Components.Metadata)
 local Menu = require(script.Components.Menu)
 
 local NavigationBar = require(script.Components.NavigationBar)
+
+local NavigationDrawer = require(script.Components.NavigationDrawer)
 
 local NumberInput = require(script.Components.NumberInput)
 
@@ -249,11 +256,13 @@ local v = {
 	HeaderBar = HeaderBar,
 	Empty = Empty,
 	FeedbackAlert = FeedbackAlert,
+	FloatingBanner = FloatingBanner,
 	Icon = Icon,
 	IconButton = IconButton,
 	Image = Image,
 	InputChip = InputChip,
 	InputLabel = InputLabel,
+	InputSlider = InputSlider,
 	KeyLabel = KeyLabel,
 	Knob = Knob,
 	Link = Link,
@@ -263,6 +272,7 @@ local v = {
 	Metadata = Metadata,
 	Menu = Menu,
 	NavigationBar = NavigationBar,
+	NavigationDrawer = NavigationDrawer,
 	NumberInput = NumberInput,
 	OptionSelectorGroup = OptionSelectorGroup,
 	Pagination = Pagination,
@@ -287,6 +297,8 @@ local v = {
 	Text = require(script.Components.Text),
 	TextArea = require(script.Components.TextArea),
 	TextInput = require(script.Components.TextInput),
+	TileIcon = require(script.Components.TileIcon),
+	TilePlayer = require(script.Components.TilePlayer),
 	Toggle = require(script.Components.Toggle),
 	ToggleGroup = require(script.Components.ToggleGroup),
 	Tooltip = require(script.Components.Tooltip),
@@ -307,6 +319,7 @@ local hooks = {
 	useDefaultTags = require(script.Utility.useDefaultTags),
 	useDialogNavigation = require(script.Components.Dialog.useDialogNavigation),
 	useSheetNavigation = require(script.Components.Sheet.useSheetNavigation),
+	useHeaderBarHeight = require(script.Components.HeaderBar.useHeaderBarHeight),
 	useIconSize = require(script.Utility.useIconSize),
 	useMeasurableRef = require(script.Components.Popover.useMeasurableRef),
 	useOverlay = require(script.Providers.Overlay.useOverlay),
@@ -413,6 +426,7 @@ v.Enums = {
 	StatusIndicatorShape = StatusIndicatorShape,
 	StatusIndicatorSize = StatusIndicatorSize,
 	StatusIndicatorVariant = StatusIndicatorVariant,
+	SwipeBehavior = SwipeBehavior,
 	TextOverflow = TextOverflow,
 	Theme = Theme,
 	ThemeName = ThemeName,

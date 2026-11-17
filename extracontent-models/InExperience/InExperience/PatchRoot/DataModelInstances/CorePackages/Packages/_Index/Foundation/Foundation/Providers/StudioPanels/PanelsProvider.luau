@@ -47,7 +47,7 @@ local function PanelsProvider(p)
 	end, { v3 })
 
 	local registerPopoverAsync = React.useCallback(
-		function(targetWidgetUri, data, callback, p2: number?, p3: string?, flag: boolean?)
+		function(targetWidgetUri, data, callback, p2: number?, p3: string?, flag: boolean?, vector2: Vector2?)
 			if Flags.FoundationPopoverPluginAnchorRefresh then
 				v2.refreshAsync(targetWidgetUri)
 			end
@@ -63,7 +63,11 @@ local function PanelsProvider(p)
 				flag = nil
 			end
 
-			local v5 = v3:openAtAsync(v4, callback, p2, p3, flag)
+			if not Flags.FoundationPopoverPluginPoolReclaim then
+				vector2 = nil
+			end
+
+			local v5 = v3:openAtAsync(v4, callback, p2, p3, flag, vector2)
 
 			return v5, function()
 				v5.close()

@@ -1,1 +1,0 @@
-return { UIBloxInGameConfig = require("@game/CorePackages/Workspace/Packages/_Workspace/CoreScriptsInitializer/CoreScriptsInitializer/UIBloxInGameConfig"), CoreLogger = require("@game/CorePackages/Workspace/Packages/_Workspace/CoreScriptsInitializer/CoreScriptsInitializer/CoreLogger") }

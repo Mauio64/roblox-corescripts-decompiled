@@ -72,17 +72,28 @@ local function useLibraryChatComposer(current, flag: boolean, isReadOnly: boolea
 		end
 
 		ref.current = v.token
+		local resources = v.resources
 
 		if v.action == "Remove" then
-			onRemoveResourceByPath(v.resource.path)
+			for _, resource in resources do
+				onRemoveResourceByPath(resource.path)
+			end
 		else
-			local replacePath = v.replacePath
+			local pathSet = {}
 
-			if replacePath ~= nil and replacePath ~= v.resource.path then
-				onRemoveResourceByPath(replacePath)
+			for _, resource in resources do
+				pathSet[resource.path] = true
 			end
 
-			onAddResource(v.resource)
+			for _, replacePath in v.replacePaths do
+				if not pathSet[replacePath] then
+					onRemoveResourceByPath(replacePath)
+				end
+			end
+
+			for _, resource in resources do
+				onAddResource(resource)
+			end
 		end
 
 		libraryStore.consumeChatResourceRequest(v.token)

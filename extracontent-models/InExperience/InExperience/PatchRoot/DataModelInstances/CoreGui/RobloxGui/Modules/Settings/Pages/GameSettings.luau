@@ -28,7 +28,6 @@ end
 
 local SharedExperimentDefinition = require(CorePackages.Workspace.Packages.SharedExperimentDefinition)
 local isInExperienceUIVREnabled = SharedExperimentDefinition.isInExperienceUIVREnabled
-local FFlagIEMSettingsGroups = require(RobloxGui.Modules.Settings.Flags.FFlagIEMSettingsGroups)
 
 local LocalizationService = game:GetService("LocalizationService")
 local InExperienceLocales = require(CorePackages.Workspace.Packages.InExperienceLocales)
@@ -36,15 +35,8 @@ local localization = InExperienceLocales.Localization.new(LocalizationService.Ro
 
 local getCamMicPermissions = require(RobloxGui.Modules.Settings.getCamMicPermissions)
 local isCamEnabledForUserAndPlace = require(RobloxGui.Modules.Settings.isCamEnabledForUserAndPlace)
-local renderSettingsHeader, renderSettingsDivider
-
-if FFlagIEMSettingsGroups then
-	renderSettingsHeader = require(RobloxGui.Modules.Settings.Components.renderSettingsHeader)
-	renderSettingsDivider = require(RobloxGui.Modules.Settings.Components.renderSettingsDivider)
-else
-	renderSettingsHeader = nil
-	renderSettingsDivider = nil
-end
+local renderSettingsHeader = require(RobloxGui.Modules.Settings.Components.renderSettingsHeader)
+local renderSettingsDivider = require(RobloxGui.Modules.Settings.Components.renderSettingsDivider)
 
 local FFlagEnablePioneerIGMSettingsBanner = require(RobloxGui.Modules.Settings.Flags.FFlagEnablePioneerIGMSettingsBanner)
 local renderMoreSettingsBanner = nil
@@ -97,12 +89,22 @@ local FFlagChatSummariesSettingEnabled = SharedFlags.FFlagChatSummariesSettingEn
 
 local fFlagExpChatDictation = SharedFlags.FFlagExpChatDictationVoiceTypingModeSetting
 	and (SharedFlags.FFlagExpChatDictation or SharedFlags.FFlagExpChatContinuousDictation)
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
 local FFlagVoiceRewarmTelemetry = SharedFlags.FFlagVoiceRewarmTelemetry
 local defineFastFlag10 = game:DefineFastFlag("DebounceVoiceSelectorIndexChange", false)
 local defineFastFlag11 = game:DefineFastFlag("VoiceSelectorIgnoreFailedStateDisconnect", false)
 
 local FFlagVoiceVolumeControlsEnableVoiceChatVolumeSlider = require(RobloxGui.Modules.Settings.Flags.FFlagVoiceVolumeControlsEnableVoiceChatVolumeSlider)
+
+local FFlagFriendsCallingCallVolumeSlider = require(RobloxGui.Modules.Settings.Flags.FFlagFriendsCallingCallVolumeSlider)
+local FriendsCallingService, GetFriendsCallingStore
+
+if FFlagFriendsCallingCallVolumeSlider then
+	FriendsCallingService = game:GetService("FriendsCallingService")
+	GetFriendsCallingStore = require(CorePackages.Workspace.Packages.FriendsCalling.GetFriendsCallingStore)
+else
+	FriendsCallingService = nil
+	GetFriendsCallingStore = nil
+end
 
 local defineFastFlag12 = game:DefineFastFlag("VoiceVolumeControlsFixSliderVisibilityOnEligibleGames", false)
 
@@ -3170,6 +3172,54 @@ local function Initialize()
 		end)
 	end
 
+	local function createCallVolumeOptions()
+		if FriendsCallingService == nil or GetFriendsCallingStore == nil then
+			return
+		end
+
+		local friendsCallingStore = GetFriendsCallingStore(false)
+
+		local v18 = 10
+
+		local callVolumeFrame, v19, callVolumeSlider = Utility:AddNewRow(newPage, "Call Volume", "Slider", 10, v18)
+		newPage.CallVolumeFrame = callVolumeFrame
+		_ = v19
+		newPage.CallVolumeSlider = callVolumeSlider
+
+		newPage.CallVolumeFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.CallVolumeFrame
+		newPage.CallVolumeFrame.Visible = false
+
+		local callId = nil
+		newPage.CallVolumeDisposeEffect = Signals.createEffect(function(p)
+			local call = friendsCallingStore.getCall(p)
+
+			if not call or call.phase ~= Enum.FriendsCallingPhase.Active then
+				call = nil
+			end
+
+			newPage.CallVolumeFrame.Visible = call ~= nil
+
+			if call and call.callId ~= callId then
+				callId = call.callId
+				v18 = math.floor(call.volume * 10 + 0.5)
+				newPage.CallVolumeSlider:SetValue(v18)
+			end
+		end)
+
+		newPage.CallVolumeSlider.ValueChanged:connect(function(p)
+			if p == v18 then
+				return
+			end
+
+			local v20 = v18
+			v18 = p
+			FriendsCallingService:SetVolume(p / 10)
+
+			reportSettingsChangeForAnalytics("call_volume", v20, p)
+			reportSettingsForAnalytics()
+		end)
+	end
+
 	local function createVoiceChatVolumeOptions()
 		local v18 = voiceChatVolumeToSlider(gameSettings.VoiceChatVolume) -- inferred equivalent call
 		local success, result = pcall(function()
@@ -3429,12 +3479,15 @@ local function Initialize()
 
 		Create("UICorner")({ CornerRadius = Theme.DefaultCornerRadius, Parent = parent })
 
-		local function setMouseSensitivityText(p) -- 2 equivalent calls inferred from this helper
+		local function setMouseSensitivityText(p) -- 1 equivalent call inferred from this helper
 			local v20 = math.floor(p * 1000 + 0.5) / 1000
-			parent.Text = tostring((tonumber((string.format("%.3f", v20)))))
+			local v21 = string.format("%.3f", v20)
+
+			parent.Text = tostring((tonumber(v21)))
 		end
 
-		setMouseSensitivityText(gameSettings.MouseSensitivityFirstPerson.X) -- inferred equivalent call
+		local v20 = math.floor(gameSettings.MouseSensitivityFirstPerson.X * 1000 + 0.5) / 1000
+		parent.Text = tostring((tonumber((string.format("%.3f", v20)))))
 
 		newPage.MouseAdvancedEntry:SetValue(translateEngineMouseSensitivityToGui(gameSettings.MouseSensitivityFirstPerson.X)) -- inferred equivalent call
 
@@ -3470,10 +3523,10 @@ local function Initialize()
 		parent.FocusLost:connect(function()
 			newPage.MouseAdvancedEntry:SetInteractable(true)
 
-			local v20 = tonumber((string.match(parent.Text, "([%d%.]+)")))
+			local v21 = tonumber((string.match(parent.Text, "([%d%.]+)")))
 
-			if v20 then
-				setMouseSensitivity(clampMouseSensitivity(v20), parent)
+			if v21 then
+				setMouseSensitivity(clampMouseSensitivity(v21), parent)
 			else
 				setMouseSensitivity(gameSettings.MouseSensitivityFirstPerson.X, parent)
 			end
@@ -3484,9 +3537,9 @@ local function Initialize()
 		end)
 
 		newPage.MouseAdvancedEntry.ValueChanged:connect(function(p)
-			local v20 = translateGuiMouseSensitivityToEngine(clampMouseSensitivity(p)) -- inferred equivalent call
+			local v21 = translateGuiMouseSensitivityToEngine(clampMouseSensitivity(p)) -- inferred equivalent call
 
-			setMouseSensitivity(v20, newPage.MouseAdvancedEntry)
+			setMouseSensitivity(v21, newPage.MouseAdvancedEntry)
 		end)
 	end
 
@@ -5438,6 +5491,10 @@ local function Initialize()
 		createPartyVoiceVolumeOptions()
 	end
 
+	if FFlagFriendsCallingCallVolumeSlider then
+		createCallVolumeOptions()
+	end
+
 	createHapticsToggle()
 	createGraphicsOptions()
 
@@ -5496,9 +5553,7 @@ local function Initialize()
 		createVoiceTypingModeSettingOptions()
 	end
 
-	if FFlagExpChatEnableFriendsTab then
-		createChatNotificationsSettingOptions()
-	end
+	createChatNotificationsSettingOptions()
 
 	createDeveloperConsoleOption()
 
@@ -5523,48 +5578,46 @@ local function Initialize()
 		})
 	end
 
-	if FFlagIEMSettingsGroups then
-		newPage.AudioHeader = renderSettingsHeader({
-			headerText = "CoreScripts.InGameMenu.GameSettings.AudioHeader",
-			layoutOrder = SETTINGS_MENU_LAYOUT_ORDER.AudioHeader,
+	newPage.AudioHeader = renderSettingsHeader({
+		headerText = "CoreScripts.InGameMenu.GameSettings.AudioHeader",
+		layoutOrder = SETTINGS_MENU_LAYOUT_ORDER.AudioHeader,
+		parent = newPage.Page
+	})
+
+	newPage.AudioDivider = renderSettingsDivider({
+		layoutOrder = SETTINGS_MENU_LAYOUT_ORDER.AudioDivider,
+		parent = newPage.Page
+	})
+
+	newPage.DisplayHeader = renderSettingsHeader({
+		headerText = "CoreScripts.InGameMenu.GameSettings.DisplayHeader",
+		layoutOrder = SETTINGS_MENU_LAYOUT_ORDER.DisplayHeader,
+		parent = newPage.Page
+	})
+
+	newPage.DisplayDivider = renderSettingsDivider({
+		layoutOrder = SETTINGS_MENU_LAYOUT_ORDER.DisplayDivider,
+		parent = newPage.Page
+	})
+
+	if not isSpatial() then
+		newPage.LanguageHeader = renderSettingsHeader({
+			headerText = "CoreScripts.InGameMenu.GameSettings.LanguageHeader",
+			layoutOrder = SETTINGS_MENU_LAYOUT_ORDER.LanguageHeader,
 			parent = newPage.Page
 		})
 
-		newPage.AudioDivider = renderSettingsDivider({
-			layoutOrder = SETTINGS_MENU_LAYOUT_ORDER.AudioDivider,
-			parent = newPage.Page
-		})
-
-		newPage.DisplayHeader = renderSettingsHeader({
-			headerText = "CoreScripts.InGameMenu.GameSettings.DisplayHeader",
-			layoutOrder = SETTINGS_MENU_LAYOUT_ORDER.DisplayHeader,
-			parent = newPage.Page
-		})
-
-		newPage.DisplayDivider = renderSettingsDivider({
-			layoutOrder = SETTINGS_MENU_LAYOUT_ORDER.DisplayDivider,
-			parent = newPage.Page
-		})
-
-		if not isSpatial() then
-			newPage.LanguageHeader = renderSettingsHeader({
-				headerText = "CoreScripts.InGameMenu.GameSettings.LanguageHeader",
-				layoutOrder = SETTINGS_MENU_LAYOUT_ORDER.LanguageHeader,
-				parent = newPage.Page
-			})
-
-			newPage.LanguageDivider = renderSettingsDivider({
-				layoutOrder = SETTINGS_MENU_LAYOUT_ORDER.LanguageDivider,
-				parent = newPage.Page
-			})
-		end
-
-		newPage.ViewAndControlsHeader = renderSettingsHeader({
-			headerText = "CoreScripts.InGameMenu.GameSettings.ViewandControlsHeader",
-			layoutOrder = SETTINGS_MENU_LAYOUT_ORDER.ViewAndControlsHeader,
+		newPage.LanguageDivider = renderSettingsDivider({
+			layoutOrder = SETTINGS_MENU_LAYOUT_ORDER.LanguageDivider,
 			parent = newPage.Page
 		})
 	end
+
+	newPage.ViewAndControlsHeader = renderSettingsHeader({
+		headerText = "CoreScripts.InGameMenu.GameSettings.ViewandControlsHeader",
+		layoutOrder = SETTINGS_MENU_LAYOUT_ORDER.ViewAndControlsHeader,
+		parent = newPage.Page
+	})
 
 	newPage.TabHeader.Name = "GameSettingsTab"
 	local iconscommonsettings = Migration.uiblox["icons/common/settings"]

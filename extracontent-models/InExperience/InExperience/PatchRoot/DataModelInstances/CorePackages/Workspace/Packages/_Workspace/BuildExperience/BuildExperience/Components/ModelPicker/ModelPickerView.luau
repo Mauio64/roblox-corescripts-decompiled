@@ -3,6 +3,8 @@ local parent = BuildExperience.Parent
 
 local Foundation = require(parent.Foundation)
 local React = require(parent.React)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagBuildExperienceAdvancedPreviewSpecs = SharedFlags.FFlagBuildExperienceAdvancedPreviewSpecs
 local FFlagBuildExperienceModelPicker = require(BuildExperience.Flags.FFlagBuildExperienceModelPicker)
 local AgentSpecDebugSheet
 
@@ -294,6 +296,7 @@ local function ModelPickerView(props)
 	if props.isSpecOpen and internalTesting then
 		agentSpecSheet = React.createElement(AgentSpecDebugSheet, {
 			specVersion = internalTesting.previewHash,
+			specName = FFlagBuildExperienceAdvancedPreviewSpecs and (internalTesting.previewSpecName or "build-on-mobile") or nil,
 			onSave = internalTesting.onSaveSpec,
 			onClose = props.onCloseSpec,
 			focusRootRef = props.focusRootRef,

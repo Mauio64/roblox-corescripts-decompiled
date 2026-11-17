@@ -9,7 +9,6 @@ local Roact = require(parent.Roact)
 local UIBlox = require(parent.UIBlox)
 local Foundation = require(parent.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local withStyle = UIBlox.Style.withStyle
 
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
@@ -247,7 +246,7 @@ function extended:renderWithSelectionCursor(callback)
 		or GetFFlagEnableTextFieldContentType() and Enum.TextInputType.PasswordShown
 		or Enum.TextInputType.NoSuggestions
 
-	return withStyle(function(props)
+	return withStyle(function(p)
 		local selectionImageObject
 
 		if GetFFlagLuaAppFixSelectionCursor() then
@@ -304,28 +303,14 @@ function extended:renderWithSelectionCursor(callback)
 			["Size"] = nil,
 			["Size"] = nil,
 			["Size"] = nil,
-			["Size"] = nil,
 			Size = UDim2.new(1, 0, 1, 0),
 			Position = UDim2.new(0.5, 0, 0.5, 0),
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Text = text,
 			PlaceholderText = placeholderText,
-			PlaceholderColor3 = placeholderColor
+			PlaceholderColor3 = placeholderColor,
+			FontFace = normalizeFontFace(p.Tokens.Typography.BodyLarge.Font)
 		}
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = props.Font.Body.Font
-		end
-
-		v3.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(props.Tokens.Typography.BodyLarge.Font)
-		end
-
-		v3.FontFace = fontFace
 		local inputSink
 
 		if engineFeature then
@@ -409,8 +394,8 @@ function extended:renderWithSelectionCursor(callback)
 
 		v4.Image = image
 
-		v4.ImageColor3 = props.Theme.IconDefault.Color
-		v4.ImageTransparency = props.Theme.IconDefault.Transparency
+		v4.ImageColor3 = p.Theme.IconDefault.Color
+		v4.ImageTransparency = p.Theme.IconDefault.Transparency
 		children.Toggler = createElement4("TextButton", onTogglerActivatedsByActivated, {
 			ImageLabel = createElement5(ImageSetLabel, v4)
 		})

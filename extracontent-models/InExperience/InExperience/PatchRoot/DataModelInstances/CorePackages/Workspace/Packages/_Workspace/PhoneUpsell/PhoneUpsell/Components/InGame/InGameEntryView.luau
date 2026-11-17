@@ -6,7 +6,6 @@ local UIBlox = require(parent.UIBlox)
 local Foundation = require(parent.Foundation)
 local Checkbox = Foundation.Checkbox
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local useStyle = UIBlox.Core.Style.useStyle
 local Localization = require(parent.Localization)
@@ -95,51 +94,30 @@ local function InGameEntryView(p)
 		),
 		onCloseClicked = v2.onClose,
 		middleContent = function()
-			local createElement = React.createElement
-			local v6 = {
-				BackgroundTransparency = 1,
-				AutomaticSize = Enum.AutomaticSize.Y,
-				Size = UDim2.new(1, 0, 0, 0)
-			}
-
-			local createElement2 = React.createElement
-			local v7 = {
-				LayoutOrder = 0,
-				BackgroundTransparency = 1,
-				Text = v5.descriptionKey,
-				TextSize = baseSize,
-				TextColor3 = v4.Theme.TextDefault.Color,
-				TextTransparency = v4.Theme.TextDefault.Transparency,
-				Font = 0,
-				FontFace = 0,
-				TextXAlignment = 0,
-				TextWrapped = true,
-				Size = 0,
-				AutomaticSize = 0,
-				RichText = true
-			}
-			local font
-
-			if not FoundationFontFaceMigration then
-				font = v4.Font.Body.Font
-			end
-
-			v7.Font = font
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(v4.Tokens.Typography.BodyLarge.Font)
-			end
-
-			v7.FontFace = fontFace
-
-			v7.TextXAlignment = Enum.TextXAlignment.Left
-
-			v7.Size = UDim2.new(1, 0, 0, 0)
-			v7.AutomaticSize = Enum.AutomaticSize.Y
-			return createElement("Frame", v6, {
-				BodyText = createElement2("TextLabel", v7)
-			})
+			return React.createElement(
+				"Frame",
+				{
+					BackgroundTransparency = 1,
+					AutomaticSize = Enum.AutomaticSize.Y,
+					Size = UDim2.new(1, 0, 0, 0)
+				},
+				{
+					BodyText = React.createElement("TextLabel", {
+						LayoutOrder = 0,
+						BackgroundTransparency = 1,
+						Text = v5.descriptionKey,
+						TextSize = baseSize,
+						TextColor3 = v4.Theme.TextDefault.Color,
+						TextTransparency = v4.Theme.TextDefault.Transparency,
+						FontFace = normalizeFontFace(v4.Tokens.Typography.BodyLarge.Font),
+						TextXAlignment = Enum.TextXAlignment.Left,
+						TextWrapped = true,
+						Size = UDim2.new(1, 0, 0, 0),
+						AutomaticSize = Enum.AutomaticSize.Y,
+						RichText = true
+					})
+				}
+			)
 		end,
 		footerContent = GetFFlagDisablePVUpsellDataConsent() and function(): nil
 			return nil
@@ -165,99 +143,54 @@ local function InGameEntryView(p)
 			local legalTextContainer
 
 			if v2.requireLegalTextCheckbox then
-				local createElement2 = React.createElement
-				local v8 = {
+				legalTextContainer = React.createElement(
+					"Frame",
+					{
+						LayoutOrder = 3,
+						BackgroundTransparency = 1,
+						Size = UDim2.new(1, 0, 0, 0),
+						AutomaticSize = Enum.AutomaticSize.Y
+					},
+					{
+						UIListLayout = React.createElement("UIListLayout", {
+							FillDirection = Enum.FillDirection.Horizontal,
+							HorizontalAlignment = Enum.HorizontalAlignment.Center,
+							VerticalAlignment = Enum.VerticalAlignment.Center,
+							Padding = UDim.new(0, size_150)
+						}),
+						LegalCheckbox = React.createElement(Checkbox, {
+							onActivated = setState,
+							isChecked = state,
+							label = ""
+						}),
+						LegalText = React.createElement("TextLabel", {
+							BackgroundTransparency = 1,
+							Text = v5.legalTextKey,
+							TextSize = baseSize * relativeSize,
+							TextColor3 = v4.Theme.TextDefault.Color,
+							TextTransparency = v4.Theme.TextDefault.Transparency,
+							FontFace = normalizeFontFace(v4.Tokens.Typography.BodyLarge.Font),
+							TextXAlignment = Enum.TextXAlignment.Left,
+							TextWrapped = true,
+							Size = UDim2.new(1, -(26 + size_150), 0, 0),
+							AutomaticSize = Enum.AutomaticSize.Y
+						})
+					}
+				)
+			elseif v2.alwaysShowLegalText or v2.countryCode.prefix == "1" then
+				legalTextContainer = React.createElement("TextLabel", {
 					LayoutOrder = 3,
 					BackgroundTransparency = 1,
+					Text = v5.legalTextKey,
+					TextSize = baseSize * relativeSize,
+					TextColor3 = v4.Theme.TextDefault.Color,
+					TextTransparency = v4.Theme.TextDefault.Transparency,
+					FontFace = normalizeFontFace(v4.Tokens.Typography.BodyLarge.Font),
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextWrapped = true,
 					Size = UDim2.new(1, 0, 0, 0),
 					AutomaticSize = Enum.AutomaticSize.Y
-				}
-				local v9 = {
-					UIListLayout = React.createElement("UIListLayout", {
-						FillDirection = Enum.FillDirection.Horizontal,
-						HorizontalAlignment = Enum.HorizontalAlignment.Center,
-						VerticalAlignment = Enum.VerticalAlignment.Center,
-						Padding = UDim.new(0, size_150)
-					}),
-					LegalCheckbox = React.createElement(Checkbox, {
-						onActivated = setState,
-						isChecked = state,
-						label = ""
-					}),
-					LegalText = 0
-				}
-
-				local createElement3 = React.createElement
-				local v10 = {
-					BackgroundTransparency = 1,
-					Text = v5.legalTextKey,
-					TextSize = baseSize * relativeSize,
-					TextColor3 = v4.Theme.TextDefault.Color,
-					TextTransparency = v4.Theme.TextDefault.Transparency,
-					Font = 0,
-					FontFace = 0,
-					TextXAlignment = 0,
-					TextWrapped = true,
-					Size = 0,
-					AutomaticSize = 0
-				}
-				local font
-
-				if not FoundationFontFaceMigration then
-					font = v4.Font.Body.Font
-				end
-
-				v10.Font = font
-				local fontFace
-
-				if FoundationFontFaceMigration then
-					fontFace = normalizeFontFace(v4.Tokens.Typography.BodyLarge.Font)
-				end
-
-				v10.FontFace = fontFace
-
-				v10.TextXAlignment = Enum.TextXAlignment.Left
-
-				v10.Size = UDim2.new(1, -(26 + size_150), 0, 0)
-				v10.AutomaticSize = Enum.AutomaticSize.Y
-				v9.LegalText = createElement3("TextLabel", v10)
-				legalTextContainer = createElement2("Frame", v8, v9)
-			elseif v2.alwaysShowLegalText or v2.countryCode.prefix == "1" then
-				local createElement2 = React.createElement
-				local v8 = {
-					LayoutOrder = 3,
-					BackgroundTransparency = 1,
-					Text = v5.legalTextKey,
-					TextSize = baseSize * relativeSize,
-					TextColor3 = v4.Theme.TextDefault.Color,
-					TextTransparency = v4.Theme.TextDefault.Transparency,
-					Font = 0,
-					FontFace = 0,
-					TextXAlignment = 0,
-					TextWrapped = true,
-					Size = 0,
-					AutomaticSize = 0
-				}
-				local font
-
-				if not FoundationFontFaceMigration then
-					font = v4.Font.Body.Font
-				end
-
-				v8.Font = font
-				local fontFace
-
-				if FoundationFontFaceMigration then
-					fontFace = normalizeFontFace(v4.Tokens.Typography.BodyLarge.Font)
-				end
-
-				v8.FontFace = fontFace
-
-				v8.TextXAlignment = Enum.TextXAlignment.Left
-
-				v8.Size = UDim2.new(1, 0, 0, 0)
-				v8.AutomaticSize = Enum.AutomaticSize.Y
-				legalTextContainer = createElement2("TextLabel", v8)
+				})
 			else
 				legalTextContainer = false
 			end
@@ -266,73 +199,49 @@ local function InGameEntryView(p)
 			local legalButtonsContainer
 
 			if v2.countryCode.prefix == "1" then
-				local createElement2 = React.createElement
-				local v8 = {
-					LayoutOrder = 4,
-					BackgroundTransparency = 1,
-					Size = UDim2.new(1, 0, 0, 0),
-					AutomaticSize = Enum.AutomaticSize.Y
-				}
-				local children = {
-					UIListLayout = React.createElement("UIListLayout", {
-						FillDirection = Enum.FillDirection.Horizontal,
-						SortOrder = Enum.SortOrder.LayoutOrder,
-						HorizontalAlignment = Enum.HorizontalAlignment.Center,
-						VerticalAlignment = Enum.VerticalAlignment.Center,
-						Padding = UDim.new(0, 5)
-					}),
-					TermsOfUseButton = React.createElement(LinkButton, {
-						text = v5.termsOfUseKey,
-						onActivated = v2.onTermsOfUseClick,
-						layoutOrder = 5,
-						fontStyle = "CaptionBody",
-						size = UDim2.fromScale(0.2, 0.2)
-					}),
-					TextButtonDivider = 0,
-					PrivacyPolicyButton = 0
-				}
-
-				local createElement3 = React.createElement
-				local v9 = {
-					LayoutOrder = 6,
-					BackgroundTransparency = 1,
-					Text = "-",
-					TextSize = baseSize * relativeSize,
-					TextColor3 = v4.Theme.TextDefault.Color,
-					TextTransparency = v4.Theme.TextDefault.Transparency,
-					Font = 0,
-					FontFace = 0,
-					TextXAlignment = 0,
-					TextWrapped = true,
-					AutomaticSize = 0
-				}
-				local font
-
-				if not FoundationFontFaceMigration then
-					font = v4.Font.Body.Font
-				end
-
-				v9.Font = font
-				local fontFace
-
-				if FoundationFontFaceMigration then
-					fontFace = normalizeFontFace(v4.Tokens.Typography.BodyLarge.Font)
-				end
-
-				v9.FontFace = fontFace
-
-				v9.TextXAlignment = Enum.TextXAlignment.Center
-
-				v9.AutomaticSize = Enum.AutomaticSize.XY
-				children.TextButtonDivider = createElement3("TextLabel", v9)
-
-				children.PrivacyPolicyButton = React.createElement(LinkButton, {
-					text = v5.privacyPolicyKey,
-					onActivated = v2.onPrivacyPolicyClick,
-					layoutOrder = 7,
-					fontStyle = "CaptionBody"
-				})
-				legalButtonsContainer = createElement2("Frame", v8, children)
+				legalButtonsContainer = React.createElement(
+					"Frame",
+					{
+						LayoutOrder = 4,
+						BackgroundTransparency = 1,
+						Size = UDim2.new(1, 0, 0, 0),
+						AutomaticSize = Enum.AutomaticSize.Y
+					},
+					{
+						UIListLayout = React.createElement("UIListLayout", {
+							FillDirection = Enum.FillDirection.Horizontal,
+							SortOrder = Enum.SortOrder.LayoutOrder,
+							HorizontalAlignment = Enum.HorizontalAlignment.Center,
+							VerticalAlignment = Enum.VerticalAlignment.Center,
+							Padding = UDim.new(0, 5)
+						}),
+						TermsOfUseButton = React.createElement(LinkButton, {
+							text = v5.termsOfUseKey,
+							onActivated = v2.onTermsOfUseClick,
+							layoutOrder = 5,
+							fontStyle = "CaptionBody",
+							size = UDim2.fromScale(0.2, 0.2)
+						}),
+						TextButtonDivider = React.createElement("TextLabel", {
+							LayoutOrder = 6,
+							BackgroundTransparency = 1,
+							Text = "-",
+							TextSize = baseSize * relativeSize,
+							TextColor3 = v4.Theme.TextDefault.Color,
+							TextTransparency = v4.Theme.TextDefault.Transparency,
+							FontFace = normalizeFontFace(v4.Tokens.Typography.BodyLarge.Font),
+							TextXAlignment = Enum.TextXAlignment.Center,
+							TextWrapped = true,
+							AutomaticSize = Enum.AutomaticSize.XY
+						}),
+						PrivacyPolicyButton = React.createElement(LinkButton, {
+							text = v5.privacyPolicyKey,
+							onActivated = v2.onPrivacyPolicyClick,
+							layoutOrder = 7,
+							fontStyle = "CaptionBody"
+						})
+					}
+				)
 			else
 				legalButtonsContainer = false
 			end

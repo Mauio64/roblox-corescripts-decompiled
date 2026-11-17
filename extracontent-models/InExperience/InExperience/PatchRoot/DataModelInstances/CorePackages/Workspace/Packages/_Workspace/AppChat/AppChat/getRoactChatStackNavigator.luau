@@ -22,6 +22,18 @@ local defineFastString = game:DefineFastString("AppChatFixRootChatBackNavigation
 
 local GetTopBarStore = require(AppChat.Stores.GetTopBarStore)
 
+local FFlagSignalsNavDeferProjection = SharedFlags.FFlagSignalsNavDeferProjection
+local getIsChatVisibleNow
+
+if FFlagSignalsNavDeferProjection then
+	local getIsChatVisibleNow2 = require(AppChat.Utils.getIsChatVisibleNow)
+	getIsChatVisibleNow = getIsChatVisibleNow2.getIsChatVisibleNow
+else
+	getIsChatVisibleNow = nil
+end
+
+local FFlagAppChatFoundationHeaderBar = require(AppChat.Flags.FFlagAppChatFoundationHeaderBar)
+
 require(AppChat.types)
 local function getActiveChildParams(data)
 	local index = data.index
@@ -34,16 +46,16 @@ local function getActiveChildParams(data)
 	return data.params
 end
 
-local function getActiveChildNavigationOptions(p)
-	local state = p.state
+local function getActiveChildNavigationOptions(childNavigation)
+	local state = childNavigation.state
 	local index = state.index
 	local v = state.routes and state.routes[index]
 
 	if v and v.routes then
-		return getActiveChildNavigationOptions((p.getChildNavigation(v.key)))
+		return getActiveChildNavigationOptions((childNavigation.getChildNavigation(v.key)))
 	end
 
-	return RoactNavigation.getActiveChildNavigationOptions(p)
+	return RoactNavigation.getActiveChildNavigationOptions(childNavigation)
 end
 
 local function getActiveConversationId(p) -- 2 equivalent calls inferred from this helper
@@ -69,25 +81,52 @@ local function RoactChatStackNavigatorWithFocusNavigation(props)
 
 	local ref = ReactFocusNavigation.useEventHandler(FocusNavigationEventNameEnum.NavigateBack, v)
 
-	return Roact.createFragment({
-		FocusNavigationContainer = Roact.createElement(
-			"Frame",
-			{ Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1, ref = ref },
-			{
-				navigator = Roact.createElement(props.navigator, { navigation = props.navigation })
-			}
-		)
+	local createFragment = Roact.createFragment
+	local createElement = Roact.createElement
+	local v2 = { Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1, ref = ref }
+
+	local createElement2 = Roact.createElement
+	local navigator = props.navigator
+	local v3 = { navigation = props.navigation, screenProps = 0 }
+	local screenProps
+
+	if FFlagAppChatFoundationHeaderBar then
+		screenProps = props.screenProps
+	end
+
+	v3.screenProps = screenProps
+	return createFragment({
+		FocusNavigationContainer = createElement("Frame", v2, {
+			navigator = createElement2(navigator, v3)
+		})
 	})
 end
 
 local function RoactChatStackNavigatorWithBackHandler(props)
-	return Roact.createElement(BackHandlerContext.Provider, { value = props.registerBackHandler }, {
-		FocusNavigation = Roact.createElement(RoactChatStackNavigatorWithFocusNavigation, {
-			navigation = props.navigation,
-			navigator = props.navigator,
-			onNavigateBack = props.onNavigateBack,
-			shouldSuppressNavigateBack = props.shouldSuppressNavigateBack
-		})
+	local createElement = Roact.createElement
+	local provider = BackHandlerContext.Provider
+	local v = { value = props.registerBackHandler }
+
+	local createElement2 = Roact.createElement
+	local v2 = {
+		navigation = props.navigation,
+		screenProps = 0,
+		navigator = 0,
+		onNavigateBack = 0,
+		shouldSuppressNavigateBack = 0
+	}
+	local screenProps
+
+	if FFlagAppChatFoundationHeaderBar then
+		screenProps = props.screenProps
+	end
+
+	v2.screenProps = screenProps
+	v2.navigator = props.navigator
+	v2.onNavigateBack = props.onNavigateBack
+	v2.shouldSuppressNavigateBack = props.shouldSuppressNavigateBack
+	return createElement(provider, v, {
+		FocusNavigation = createElement2(RoactChatStackNavigatorWithFocusNavigation, v2)
 	})
 end
 
@@ -200,7 +239,15 @@ return function(navigator, callback, object, p)
 			p2.props.setActiveConversationId(activeConversationId2)
 		end
 
-		if not p3.chatIsVisible then
+		local v5
+
+		if FFlagSignalsNavDeferProjection then
+			v5 = getIsChatVisibleNow()
+		else
+			v5 = p3.chatIsVisible
+		end
+
+		if not v5 then
 			return
 		end
 
@@ -209,23 +256,23 @@ return function(navigator, callback, object, p)
 		local navigation = p3.navigation
 		local state4 = navigation.state
 		local index3 = state4.index
-		local v5 = state4.routes and state4.routes[index3]
-		local v6
+		local v6 = state4.routes and state4.routes[index3]
+		local v7
 
-		if v5 and v5.routes then
-			v6 = getActiveChildNavigationOptions((navigation.getChildNavigation(v5.key)))
+		if v6 and v6.routes then
+			v7 = getActiveChildNavigationOptions((navigation.getChildNavigation(v6.key)))
 		else
-			v6 = RoactNavigation.getActiveChildNavigationOptions(navigation)
+			v7 = RoactNavigation.getActiveChildNavigationOptions(navigation)
 		end
 
-		local v7 = GetTopBarStore(false).getScreenTopBar(route.routeName)()
+		local v8 = GetTopBarStore(false).getScreenTopBar(route.routeName)()
 
-		if v7.backButtonEnabled ~= nil then
-			p2.props.setBackButtonEnabled(v7.backButtonEnabled)
+		if v8.backButtonEnabled ~= nil then
+			p2.props.setBackButtonEnabled(v8.backButtonEnabled)
 		end
 
-		if v6 and v6.tabBarVisible ~= nil then
-			p2.props.setTabBarVisible(v6.tabBarVisible)
+		if v7 and v7.tabBarVisible ~= nil then
+			p2.props.setTabBarVisible(v7.tabBarVisible)
 		end
 	end
 
@@ -256,8 +303,16 @@ return function(navigator, callback, object, p)
 
 	function extended.render(props)
 		local navigation = props.props.navigation
-		return Roact.createElement(RoactChatStackNavigatorWithBackHandler, {
+		local createElement = Roact.createElement
+		local screenProps
+
+		if FFlagAppChatFoundationHeaderBar then
+			screenProps = props.props.screenProps
+		end
+
+		return createElement(RoactChatStackNavigatorWithBackHandler, {
 			navigation = navigation,
+			screenProps = screenProps,
 			navigator = navigator,
 			onNavigateBack = props.onBackButtonPressed,
 			registerBackHandler = props.registerBackHandler,

@@ -19,9 +19,7 @@ local DiscoveryUtils2 = require(parent.DiscoveryUtils)
 local ApportioningDiagnosticTelemetry = DiscoveryUtils2.ApportioningDiagnosticTelemetry
 
 local SharedFlags = require(parent.SharedFlags)
-local FFlagLuaAppFixTotalColsBound = SharedFlags.FFlagLuaAppFixTotalColsBound
 local FFlagLuaAppEnableNxMRoduxApportioning = SharedFlags.FFlagLuaAppEnableNxMRoduxApportioning
-local FFlagLuaAppEnableHomepageOneByTwoTile = SharedFlags.FFlagLuaAppEnableHomepageOneByTwoTile
 local FFlagLuaAppEnableNxMApportioningExtraLogging = SharedFlags.FFlagLuaAppEnableNxMApportioningExtraLogging
 
 local v = {
@@ -30,7 +28,7 @@ local v = {
 	[GameCollectionItemTypes.GameCollectionItemType.Blank] = renderBlankTile
 }
 
-if FFlagLuaAppEnableHomepageOneByTwoTile then
+if FFlagLuaAppEnableNxMRoduxApportioning then
 	v[GameCollectionItemTypes.GameCollectionItemType.OneByTwoTile] = renderOneByTwoTile
 end
 
@@ -122,15 +120,7 @@ return {
 		local set = {}
 
 		for i = 1, totalRows do
-			local v3
-
-			if FFlagLuaAppEnableNxMRoduxApportioning or FFlagLuaAppFixTotalColsBound then
-				v3 = itemsPerRow
-			else
-				v3 = totalCols
-			end
-
-			for j = 1, v3 do
+			for j = 1, itemsPerRow do
 				local entryIndex = list2[i] and list2[i][j]
 
 				if entryIndex and entryIndex > 0 then
@@ -140,26 +130,26 @@ return {
 						gameCollectionItemTypeOverride = componentTypes[entryIndex] or nil
 					end
 
-					local v4
+					local v3
 
 					if FFlagLuaAppEnableNxMRoduxApportioning then
-						v4 = list[entryIndex]
+						v3 = list[entryIndex]
 					end
 
 					if gameCollectionItemTypeOverride then
 						set[entryIndex] = true
 
 						if FFlagLuaAppEnableNxMRoduxApportioning then
-							local v5 = #collectionEntries + 1
+							local v4 = #collectionEntries + 1
 							GridLayoutTelemetry.logTilePlaced(
-								v4 and v4.adId,
-								v4 and v4.universeId,
+								v3 and v3.adId,
+								v3 and v3.universeId,
 								gameCollectionItemTypeOverride,
 								pageContext,
 								itemsPerRow,
 								totalRows,
 								entryIndex,
-								v5,
+								v4,
 								sortIndex,
 								topicId,
 								nil
@@ -167,33 +157,24 @@ return {
 						else
 							local item = list[entryIndex]
 
-							local v5 = #collectionEntries + 1
-							local logTilePlaced = GridLayoutTelemetry.logTilePlaced
-							local adId = item and item.adId
-							local universeId = item and item.universeId
-							local v6
-
-							if FFlagLuaAppFixTotalColsBound then
-								v6 = totalCols
-							end
-
-							logTilePlaced(
-								adId,
-								universeId,
+							local v4 = #collectionEntries + 1
+							GridLayoutTelemetry.logTilePlaced(
+								item and item.adId,
+								item and item.universeId,
 								gameCollectionItemTypeOverride,
 								pageContext,
 								itemsPerRow,
 								totalRows,
 								entryIndex,
-								v5,
+								v4,
 								sortIndex,
 								topicId,
-								v6
+								totalCols
 							)
 						end
 					end
 
-					if FFlagLuaAppEnableNxMRoduxApportioning and not v4 then
+					if FFlagLuaAppEnableNxMRoduxApportioning and not v3 then
 						DiscoveryEventErrorLogger.reportError(
 							"GameCollectionItemBuilder_StaleLayoutEntry",
 							"layout entryIndex points past end of entries",
@@ -218,7 +199,7 @@ return {
 						local join = Cryo.Dictionary.join
 
 						if not FFlagLuaAppEnableNxMRoduxApportioning then
-							v4 = list[entryIndex]
+							v3 = list[entryIndex]
 						end
 
 						local spanOverride
@@ -227,14 +208,14 @@ return {
 							spanOverride = items[entryIndex] or nil
 						end
 
-						local v5 = {
+						local v4 = {
 							spanOverride = spanOverride,
 							gameCollectionItemTypeOverride = gameCollectionItemTypeOverride,
 							tileType = gameCollectionItemTypeOverride or GameCollectionItemTypes.GameCollectionItemType.GameTile,
 							showDescription = gameCollectionItemTypeOverride == GameCollectionItemTypes.GameCollectionItemType.EmphasisTile and flag or nil,
 							customRenderFunction = gameCollectionItemTypeOverride and v[gameCollectionItemTypeOverride] or nil
 						}
-						table.insert(collectionEntries, join(v4, v5))
+						table.insert(collectionEntries, join(v3, v4))
 
 						if FFlagLuaAppEnableNxMApportioningExtraLogging and v2 then
 							v2.realTileCount += 1

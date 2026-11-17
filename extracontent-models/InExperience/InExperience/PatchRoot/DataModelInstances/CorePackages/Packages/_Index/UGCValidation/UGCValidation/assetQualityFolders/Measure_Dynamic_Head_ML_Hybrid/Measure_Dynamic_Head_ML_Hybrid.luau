@@ -10,6 +10,8 @@ local getFFlagUGCValidateAQDynamicHeadMLHybridShadow = require(parent.flags.getF
 
 local getFFlagUGCValidateAQDynamicHeadMLHybridNewFacsMessages = require(parent.flags.getFFlagUGCValidateAQDynamicHeadMLHybridNewFacsMessages)
 
+local getFFlagUGCValidateAQDynamicHeadMLHybridWarnings = require(parent.flags.getFFlagUGCValidateAQDynamicHeadMLHybridWarnings)
+
 local getFIntUGCValidationDynamicHeadMLEyesMinScorePerMillion = require(parent.flags.getFIntUGCValidationDynamicHeadMLEyesMinScorePerMillion)
 
 local getFIntUGCValidationDynamicHeadMLMouthMinScorePerMillion = require(parent.flags.getFIntUGCValidationDynamicHeadMLMouthMinScorePerMillion)
@@ -154,6 +156,24 @@ local function checkAnimationQuality(object, p): boolean
 	return false
 end
 
+local function warnExpressionQuality(object, p)
+	if p.step2b_status ~= "completed" or p.score == nil or tonumber(p.score) == 100 then
+		return
+	end
+
+	local function formatMetric(p2: string) -- 5 equivalent calls inferred from this helper
+		return string.format("%.2f", tonumber(p[p2]) or 0)
+	end
+
+	object:warn(ErrorSourceStrings.Keys.AQSWarn_DynamicHead, {
+		left_eye_close = formatMetric("step2b_deformation_left_eye_close"), -- inferred equivalent call
+		right_eye_close = formatMetric("step2b_deformation_right_eye_close"), -- inferred equivalent call
+		mouth_open = formatMetric("step2b_deformation_mouth_open"), -- inferred equivalent call
+		is_happy = formatMetric("step2b_deformation_happy"), -- inferred equivalent call
+		is_sad = formatMetric("step2b_deformation_sad") -- inferred equivalent call
+	})
+end
+
 local v4 = { checkFacialFeatures, checkCageLandmarks, checkFacsDeformation, checkAnimationQuality }
 
 function MeasureDynamicHeadMLHybrid.run(p, p2)
@@ -176,6 +196,10 @@ function MeasureDynamicHeadMLHybrid.run(p, p2)
 			if not v6(p, v5) then
 				break
 			end
+		end
+
+		if getFFlagUGCValidateAQDynamicHeadMLHybridWarnings() then
+			warnExpressionQuality(p, v5)
 		end
 	end
 

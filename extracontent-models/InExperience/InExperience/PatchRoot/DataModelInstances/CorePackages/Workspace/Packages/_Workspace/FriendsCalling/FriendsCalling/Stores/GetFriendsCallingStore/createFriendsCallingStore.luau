@@ -55,13 +55,15 @@ end
 return function(instance)
 	local signal, v = Signals.createSignal({})
 	local signal2, v2 = Signals.createSignal(0)
+	local count = 0
+	local signal3, v3 = Signals.createSignal(0)
 	local getCall = Signals.createComputed(function(p)
 		return signal(p)[1]
 	end)
 
 	local getCallId = Signals.createComputed(function(p)
-		local v3 = getCall(p)
-		return if v3 then v3.callId else nil
+		local v4 = getCall(p)
+		return if v4 then v4.callId else nil
 	end)
 
 	local getHasCall = Signals.createComputed(function(p): boolean
@@ -72,58 +74,58 @@ return function(instance)
 		return { hasCall = getHasCall(p), session = signal2(p) }
 	end)
 
-	local v3 = {}
-	local count = 0
+	local v4 = {}
 	local count2 = 0
-	local v4 = false
+	local count3 = 0
+	local v5 = false
 
 	local function publish()
-		local clone = table.clone(v3)
+		local clone = table.clone(v4)
 		table.sort(clone, function(a, b): boolean
 			return a.arrivalOrder < b.arrivalOrder
 		end)
 
-		local v5 = {}
+		local v6 = {}
 
-		for _, v6 in clone do
-			table.insert(v5, readCall(v6.instance))
+		for _, v7 in clone do
+			table.insert(v6, readCall(v7.instance))
 		end
 
-		local v6 = #v5 > 0
-		local v7 = v4 and not v6
-		v4 = v6
+		local v7 = #v6 > 0
+		local v8 = v5 and not v7
+		v5 = v7
 
-		v(v5)
+		v(v6)
 
-		if v7 then
-			count2 += 1
-			v2(count2)
+		if v8 then
+			count3 += 1
+			v2(count3)
 		end
 
-		local v8 = v5[1]
+		local v9 = v6[1]
 		Logger:debug(
 			"{} - published: hasCall={}, session={}, callId={}, phase={}, endReason={}, participants={}",
 			script.Name,
-			tostring(v6),
-			count2,
-			v8 and v8.callId or "",
-			not v8 and "" or v8.phase.Name,
-			not v8 and "" or v8.endReason.Name,
-			v8 and #v8.participants or 0
+			tostring(v7),
+			count3,
+			v9 and v9.callId or "",
+			not v9 and "" or v9.phase.Name,
+			not v9 and "" or v9.endReason.Name,
+			v9 and #v9.participants or 0
 		)
 	end
 
 	local function unobserveCall(child)
-		for k, v5 in v3 do
-			if v5.instance == child then
+		for k, v6 in v4 do
+			if v6.instance == child then
 				Logger:debug(
 					"{} - unobserveCall: callId={}, phase={}",
 					script.Name,
 					child.CallId or "",
 					child.Phase.Name
 				)
-				disconnectObservedCall(v5)
-				table.remove(v3, k)
+				disconnectObservedCall(v6)
+				table.remove(v4, k)
 				publish()
 				break
 			end
@@ -131,26 +133,26 @@ return function(instance)
 	end
 
 	local function observeCall(child)
-		for _, v5 in v3 do
-			if v5.instance == child then
+		for _, v6 in v4 do
+			if v6.instance == child then
 				return
 			end
 		end
 
 		Logger:debug("{} - observeCall: callId={}, phase={}", script.Name, child.CallId or "", child.Phase.Name)
-		count += 1
-		local v5 = {
+		count2 += 1
+		local v6 = {
 			instance = child,
-			arrivalOrder = count,
+			arrivalOrder = count2,
 			connections = {},
 			participantConnections = {}
 		}
 
-		table.insert(v3, v5)
+		table.insert(v4, v6)
 
 		local function observeParticipant(child2) -- 2 equivalent calls inferred from this helper
-			if child2.ClassName == "FriendsCallingParticipant" and not v5.participantConnections[child2] then
-				v5.participantConnections[child2] = child2.Changed:Connect(function(p: string)
+			if child2.ClassName == "FriendsCallingParticipant" and not v6.participantConnections[child2] then
+				v6.participantConnections[child2] = child2.Changed:Connect(function(p: string)
 					Logger:debug(
 						"{} - child.Changed: property {}, userId={}, callId={}",
 						script.Name,
@@ -165,15 +167,15 @@ return function(instance)
 		end
 
 		local function unobserveParticipant(child2) -- 1 equivalent call inferred from this helper
-			local participantConnection = v5.participantConnections[child2]
+			local participantConnection = v6.participantConnections[child2]
 
 			if participantConnection then
 				participantConnection:Disconnect()
-				v5.participantConnections[child2] = nil
+				v6.participantConnections[child2] = nil
 			end
 		end
 
-		table.insert(v5.connections, child.Changed:Connect(function(p: string)
+		table.insert(v6.connections, child.Changed:Connect(function(p: string)
 			Logger:debug(
 				"{} - call.Changed: property {}, callId={}, phase={}",
 				script.Name,
@@ -185,7 +187,7 @@ return function(instance)
 			publish()
 		end))
 
-		table.insert(v5.connections, child.ChildAdded:Connect(function(child2)
+		table.insert(v6.connections, child.ChildAdded:Connect(function(child2)
 			if child2.ClassName == "FriendsCallingParticipant" then
 				Logger:debug(
 					"{} - call.ChildAdded: userId={}, callId={}",
@@ -199,7 +201,7 @@ return function(instance)
 			publish()
 		end))
 
-		table.insert(v5.connections, child.ChildRemoved:Connect(function(child2)
+		table.insert(v6.connections, child.ChildRemoved:Connect(function(child2)
 			if child2.ClassName == "FriendsCallingParticipant" then
 				Logger:debug(
 					"{} - call.ChildRemoved: userId={}, callId={}",
@@ -244,19 +246,24 @@ return function(instance)
 		childAddedConnection:Disconnect()
 		childRemovedConnection:Disconnect()
 
-		for _, v5 in v3 do
-			disconnectObservedCall(v5)
+		for _, v6 in v4 do
+			disconnectObservedCall(v6)
 		end
 
-		table.clear(v3)
-		local v5 = v4
-		v4 = false
+		table.clear(v4)
+		local v6 = v5
+		v5 = false
 		v({})
 
-		if v5 then
-			count2 += 1
-			v2(count2)
+		if v6 then
+			count3 += 1
+			v2(count3)
 		end
+	end
+
+	local function expand()
+		count += 1
+		v3(count)
 	end
 
 	return {
@@ -266,6 +273,8 @@ return function(instance)
 		getHasCall = getHasCall,
 		getSession = signal2,
 		getWindowView = getWindowView,
+		getExpandCount = signal3,
+		expand = expand,
 		cleanup = cleanup
 	}
 end

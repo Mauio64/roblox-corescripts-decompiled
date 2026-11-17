@@ -13,11 +13,9 @@ local useProfileCta = require(UserList.Hooks.useProfileCta)
 local composeCtaRow = require(script.Parent.composeCtaRow)
 local FFlagUserListCanonicalCtaAnalytics = require(UserList.Flags.FFlagUserListCanonicalCtaAnalytics)
 local SharedFlags = require(parent.SharedFlags)
-local FFlagUserListComposeRenderRowWithCta = SharedFlags.FFlagUserListComposeRenderRowWithCta
+local FFlagUserListSurfaceExtensions = SharedFlags.FFlagUserListSurfaceExtensions
 local SharedFlags2 = require(parent.SharedFlags)
-local FFlagUserListSurfaceExtensions = SharedFlags2.FFlagUserListSurfaceExtensions
-local SharedFlags3 = require(parent.SharedFlags)
-local FFlagUserListSurfacePresenceWins = SharedFlags3.FFlagUserListSurfacePresenceWins
+local FFlagUserListSurfacePresenceWins = SharedFlags2.FFlagUserListSurfacePresenceWins
 
 local function CtaRow(data)
 	local id = data.entity.id
@@ -51,7 +49,7 @@ local function CtaRow(data)
 
 	local renderRow = data.renderRow
 
-	if FFlagUserListComposeRenderRowWithCta and renderRow then
+	if renderRow then
 		local createRow = data.createRow
 		return renderRow(function(p)
 			local clone = table.clone(p)

@@ -17,11 +17,7 @@ local RoactServiceTags2 = require(parent.RoactServiceTags)
 local AppEventIngestService = RoactServiceTags2.AppEventIngestService
 local Loggers = require(parent.Loggers)
 local flaggedMutedError = Loggers.flaggedMutedError
-local GameInfosRodux = require(parent.GameInfosRodux)
-local GameInfosReducer = GameInfosRodux.GameInfosReducer
 local GameHydrationReact = require(parent.GameHydrationReact)
-local SharedFlags = require(parent.SharedFlags)
-local FFlagMigrateGameInfoToStore = SharedFlags.FFlagMigrateGameInfoToStore
 local GameDetailRodux = require(parent.GameDetailRodux)
 local FetchUserSettingsAndOptions = GameDetailRodux.FetchUserSettingsAndOptions
 local Dash = require(parent.Dash)
@@ -31,8 +27,8 @@ local NavigationRodux = require(parent.NavigationRodux)
 local NavigateDown = NavigationRodux.Thunks.NavigateDown
 local NavigationRodux2 = require(parent.NavigationRodux)
 local NavigateBack = NavigationRodux2.Thunks.NavigateBack
-local SharedFlags2 = require(parent.SharedFlags)
-local FFlagSignalsNavP3Dispatch = SharedFlags2.FFlagSignalsNavP3Dispatch
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSignalsNavP3Dispatch = SharedFlags.FFlagSignalsNavP3Dispatch
 local navigationCommands
 
 if FFlagSignalsNavP3Dispatch then
@@ -71,34 +67,34 @@ local defineFastString = game:DefineFastString(
 	"mild=NinePlus,moderate=ThirteenPlus,restricted=SeventeenPlus,unrated=ThirteenPlus"
 )
 
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagLuaAppParentUpsellPolicy = SharedFlags2.FFlagLuaAppParentUpsellPolicy
 local SharedFlags3 = require(parent.SharedFlags)
-local FFlagLuaAppParentUpsellPolicy = SharedFlags3.FFlagLuaAppParentUpsellPolicy
+local FFlagLuaAppPlayButtonAmpAgeCheckFlow = SharedFlags3.FFlagLuaAppPlayButtonAmpAgeCheckFlow
+
 local SharedFlags4 = require(parent.SharedFlags)
-local FFlagLuaAppPlayButtonAmpAgeCheckFlow = SharedFlags4.FFlagLuaAppPlayButtonAmpAgeCheckFlow
+local FStringLuaAppPlayButtonAgeCheckAmpFeatureName = SharedFlags4.FStringLuaAppPlayButtonAgeCheckAmpFeatureName
 
 local SharedFlags5 = require(parent.SharedFlags)
-local FStringLuaAppPlayButtonAgeCheckAmpFeatureName = SharedFlags5.FStringLuaAppPlayButtonAgeCheckAmpFeatureName
-
+local FStringLuaAppPlayButtonAgeCheckAmpNameSpace = SharedFlags5.FStringLuaAppPlayButtonAgeCheckAmpNameSpace
 local SharedFlags6 = require(parent.SharedFlags)
-local FStringLuaAppPlayButtonAgeCheckAmpNameSpace = SharedFlags6.FStringLuaAppPlayButtonAgeCheckAmpNameSpace
+local FFlagLuaAppVpcUpsellNamespace = SharedFlags6.FFlagLuaAppVpcUpsellNamespace
+
 local SharedFlags7 = require(parent.SharedFlags)
-local FFlagLuaAppVpcUpsellNamespace = SharedFlags7.FFlagLuaAppVpcUpsellNamespace
+local FStringLuaAppVpcSettingsChangeAmpNameSpace = SharedFlags7.FStringLuaAppVpcSettingsChangeAmpNameSpace
 
 local SharedFlags8 = require(parent.SharedFlags)
-local FStringLuaAppVpcSettingsChangeAmpNameSpace = SharedFlags8.FStringLuaAppVpcSettingsChangeAmpNameSpace
-
+local FStringLuaAppVpcAccountManagementAmpNameSpace = SharedFlags8.FStringLuaAppVpcAccountManagementAmpNameSpace
 local SharedFlags9 = require(parent.SharedFlags)
-local FStringLuaAppVpcAccountManagementAmpNameSpace = SharedFlags9.FStringLuaAppVpcAccountManagementAmpNameSpace
-local SharedFlags10 = require(parent.SharedFlags)
-local FFlagLuaAppParentApprovedExperiences = SharedFlags10.FFlagLuaAppParentApprovedExperiences
+local FFlagLuaAppParentApprovedExperiences = SharedFlags9.FFlagLuaAppParentApprovedExperiences
 local AmpUpsell2 = require(parent.AmpUpsell)
 local GetFFlagEnableAmpWizardVPCNavigationFix = AmpUpsell2.GetFFlagEnableAmpWizardVPCNavigationFix
 local FFlagEnablePlayButtonWizardVPCPrologue = require(GamePlayButton.Flags.FFlagEnablePlayButtonWizardVPCPrologue)
 local FFlagLuaAppPlayButtonOdpEventUniverseId = require(GamePlayButton.Flags.FFlagLuaAppPlayButtonOdpEventUniverseId)
+local SharedFlags10 = require(parent.SharedFlags)
+local FFlagLuaAppPlayButtonWizardCloseDelay = SharedFlags10.FFlagLuaAppPlayButtonWizardCloseDelay
 local SharedFlags11 = require(parent.SharedFlags)
-local FFlagLuaAppPlayButtonWizardCloseDelay = SharedFlags11.FFlagLuaAppPlayButtonWizardCloseDelay
-local SharedFlags12 = require(parent.SharedFlags)
-local FIntLuaAppPlayButtonWizardCloseDelayMs = SharedFlags12.FIntLuaAppPlayButtonWizardCloseDelayMs
+local FIntLuaAppPlayButtonWizardCloseDelayMs = SharedFlags11.FIntLuaAppPlayButtonWizardCloseDelayMs
 
 local _ = {
 	SelfUpdateSetting = "SelfUpdateSetting",
@@ -151,7 +147,7 @@ return function(universeId: string, callback, pageName: string?)
 	local v3 = useRoactService(AppEventIngestService)
 	local v4 = useDispatch()
 
-	local contentMaturityRating = useSelector(function(p)
+	local v5 = useSelector(function(p)
 		local ageRecommendation = p.AgeRecommendations[universeId]
 
 		if
@@ -163,30 +159,15 @@ return function(universeId: string, callback, pageName: string?)
 			return ageRecommendation.summary.ageRecommendation.contentMaturity
 		end
 
-		if FFlagMigrateGameInfoToStore then
-			return nil
-		end
-
-		local v5 = p.Personalization[GameInfosReducer.key][universeId]
-
-		if v5 and v5.contentMaturity then
-			return v5.contentMaturity
-		end
-
 		return nil
 	end)
-	local contentMaturity
 
-	if FFlagMigrateGameInfoToStore then
-		local v5 = GameHydrationReact.useGameInfo(universeId)
-		contentMaturity = v5 and v5.contentMaturity
-	end
+	local v6 = GameHydrationReact.useGameInfo(universeId)
+	local contentMaturity = v6 and v6.contentMaturity
 
-	if FFlagMigrateGameInfoToStore then
-		contentMaturityRating = contentMaturityRating or contentMaturity
-	end
+	local contentMaturityRating = v5 or contentMaturity
 
-	local v5 = useLocalization({
+	local v7 = useLocalization({
 		unplayableTitleText = "Feature.ExperienceDetails.RestrictedUnplayableModal.Label.Title",
 		unplayableBodyText = "Feature.ExperienceDetails.RestrictedUnplayableModal.Label.Body",
 		unplayableButtonText = "Feature.ExperienceDetails.RestrictedUnplayableModal.Action.Ok",
@@ -200,7 +181,7 @@ return function(universeId: string, callback, pageName: string?)
 		consoleSelfUpdateSettingButtonText = "Feature.ExperienceDetails.UpdateMaturitySettingModal.Console.Action.Ok"
 	})
 
-	local v6 = React.useCallback(function(p, p2, p3, p4, p5, p6, p7, p8)
+	local v8 = React.useCallback(function(p, p2, p3, p4, p5, p6, p7, p8)
 		if not FFlagLuaAppPlayButtonAmpAgeCheckFlow then
 			p5 = nil
 		end
@@ -213,17 +194,17 @@ return function(universeId: string, callback, pageName: string?)
 			p7 = nil
 		end
 
-		local v6 = FFlagEnablePlayButtonWizardVPCPrologue and p8 and true or nil
+		local v8 = FFlagEnablePlayButtonWizardVPCPrologue and p8 and true or nil
 
 		if not FFlagEnablePlayButtonWizardVPCPrologue then
 			p8 = nil
 		end
 
-		v4(OpenAmpWizardContainer(p, p2, p3, p4, p5, p6, nil, nil, p7, v6, p8))
+		v4(OpenAmpWizardContainer(p, p2, p3, p4, p5, p6, nil, nil, p7, v8, p8))
 	end, { v4 })
 
-	local v7 = React.useCallback(function(featureName, localizationStrings, onCloseModal, onCancelled)
-		local v7 = {
+	local v9 = React.useCallback(function(featureName, localizationStrings, onCloseModal, onCancelled)
+		local v9 = {
 			name = AppPage.AccountSettingsUpsell,
 			extraProps = {
 				featureName = featureName,
@@ -234,21 +215,21 @@ return function(universeId: string, callback, pageName: string?)
 		}
 
 		if FFlagSignalsNavP3Dispatch then
-			navigationCommands.down(navigationCommands.fromLegacyPage(v7), true)
+			navigationCommands.down(navigationCommands.fromLegacyPage(v9), true)
 		else
-			v4(NavigateDown(v7, true))
+			v4(NavigateDown(v9, true))
 		end
 	end, { v4 })
 
-	local v8 = React.useCallback(function(p, p2, p3, p4, p5, p6, p7)
+	local v10 = React.useCallback(function(p, p2, p3, p4, p5, p6, p7)
 		v4(OpenPlayButtonUpsellDialog(p, p2, p3, p4, p5, p6, p7))
 	end, { v4 })
 
-	local v9 = React.useCallback(function(p, p2, p3, p4, p5)
+	local v11 = React.useCallback(function(p, p2, p3, p4, p5)
 		v4(OpenCloseOnlyInteractiveAlert(p, p2, p3, p4, p5))
 	end, { v4 })
 
-	local v10 = React.useCallback(function()
+	local v12 = React.useCallback(function()
 		if FFlagSignalsNavP3Dispatch then
 			navigationCommands.back(true)
 		else
@@ -256,34 +237,34 @@ return function(universeId: string, callback, pageName: string?)
 		end
 	end, { v4 })
 
-	local v11 = React.useCallback(function()
+	local v13 = React.useCallback(function()
 		v4(CloseCentralOverlay())
 	end, { v4 })
 
-	local v12 = React.useCallback(function()
+	local v14 = React.useCallback(function()
 		v4(FetchGamePlayButtonData.Fetch(v2, universeId, true))
 	end, { v4, v2, universeId })
 
-	local v13 = React.useCallback(function()
-		v10()
-
+	local v15 = React.useCallback(function()
 		v12()
-	end, { v10, v12 })
+
+		v14()
+	end, { v12, v14 })
 
 	local onCloseModal = React.useCallback(function()
-		v11()
+		v13()
 
 		authButtonClick("gameJoinContentMaturityLock", "cancelAskParent")
 
-		v12()
-	end, { v11, v12 })
-	local v14
+		v14()
+	end, { v13, v14 })
+	local v16
 
 	if FFlagEnablePlayButtonWizardVPCPrologue then
 		local useCallback = React.useCallback
 		local function fn(bodyText: string)
 			local config = {
-				titleText = v5.askYourParentTitleText,
+				titleText = v7.askYourParentTitleText,
 				bodyText = 0,
 				bodyContent = 0,
 				confirmText = 0,
@@ -305,9 +286,9 @@ return function(universeId: string, callback, pageName: string?)
 				onCloseModal = onCloseModal
 			})
 
-			config.confirmText = v5.askYourParentActionButtonText
-			config.cancelText = v5.askYourParentCancelButtonText
-			local v15 = {
+			config.confirmText = v7.askYourParentActionButtonText
+			config.cancelText = v7.askYourParentCancelButtonText
+			local v17 = {
 				config = config,
 				onConfirm = function()
 					authButtonClick("gameJoinContentMaturityLock", "askParent")
@@ -323,124 +304,124 @@ return function(universeId: string, callback, pageName: string?)
 				odpEventUniverseId = universeId
 			end
 
-			v15.odpEventUniverseId = odpEventUniverseId
-			return v15
+			v17.odpEventUniverseId = odpEventUniverseId
+			return v17
 		end
 
-		local askYourParentTitleText = v5.askYourParentTitleText
-		local askYourParentActionButtonText = v5.askYourParentActionButtonText
-		local askYourParentCancelButtonText = v5.askYourParentCancelButtonText
-		local v15
+		local askYourParentTitleText = v7.askYourParentTitleText
+		local askYourParentActionButtonText = v7.askYourParentActionButtonText
+		local askYourParentCancelButtonText = v7.askYourParentCancelButtonText
+		local v17
 
 		if FFlagLuaAppPlayButtonOdpEventUniverseId then
-			v15 = universeId
+			v17 = universeId
 		end
 
-		v14 = useCallback(fn, {
+		v16 = useCallback(fn, {
 			askYourParentTitleText,
 			askYourParentActionButtonText,
 			askYourParentCancelButtonText,
 			onCloseModal,
-			v15
+			v17
 		})
 	else
-		v14 = nil
+		v16 = nil
 	end
 
 	local useCallback = React.useCallback
 	local function fn(contentAgeRestriction: string?, p)
-		v11()
+		v13()
 
 		if not FFlagEnablePlayButtonWizardVPCPrologue then
 			authButtonClick("gameJoinContentMaturityLock", "askParent")
 		end
 
 		if FFlagLuaAppParentApprovedExperiences then
-			local v15
+			local v17
 
 			if GetFFlagEnableAmpWizardVPCNavigationFix() then
-				v15 = v12
+				v17 = v14
 			else
-				v15 = v10
+				v17 = v12
 			end
 
-			local v16
+			local v18
 
 			if FFlagLuaAppVpcUpsellNamespace then
-				v16 = FStringLuaAppVpcAccountManagementAmpNameSpace
+				v18 = FStringLuaAppVpcAccountManagementAmpNameSpace
 			end
 
 			if not FFlagEnablePlayButtonWizardVPCPrologue then
 				p = nil
 			end
 
-			v6(
+			v8(
 				"CanApproveExperience",
-				v15,
+				v17,
 				{ universeId = universeId, experienceManagementAction = "Approve" },
 				"gameJoinContentMaturityLock",
 				nil,
-				v16,
+				v18,
 				nil,
 				p
 			)
 		else
-			local v15
+			local v17
 
 			if GetFFlagEnableAmpWizardVPCNavigationFix() then
-				v15 = v12
+				v17 = v14
 			else
-				v15 = v10
+				v17 = v12
 			end
 
-			local v16
+			local v18
 
 			if FFlagLuaAppVpcUpsellNamespace then
-				v16 = FStringLuaAppVpcSettingsChangeAmpNameSpace
+				v18 = FStringLuaAppVpcSettingsChangeAmpNameSpace
 			end
 
 			if not FFlagEnablePlayButtonWizardVPCPrologue then
 				p = nil
 			end
 
-			v6(
+			v8(
 				"CanChangeSetting",
-				v15,
+				v17,
 				{ contentAgeRestriction = contentAgeRestriction },
 				"gameJoinContentMaturityLock",
 				nil,
-				v16,
+				v18,
 				nil,
 				p
 			)
 		end
 	end
 
-	local v15
+	local v17
 
 	if GetFFlagEnableAmpWizardVPCNavigationFix() then
-		v15 = v12
+		v17 = v14
 	end
 
-	local v16
+	local v18
 
 	if not GetFFlagEnableAmpWizardVPCNavigationFix() then
-		v16 = v10
+		v18 = v12
 	end
 
-	local v17
+	local v19
 
 	if
 		FFlagLuaAppParentApprovedExperiences
 		or FFlagEnablePlayButtonWizardVPCPrologue and FFlagLuaAppPlayButtonOdpEventUniverseId
 	then
-		v17 = universeId
+		v19 = universeId
 	end
 
-	local v18 = useCallback(fn, { v6, v15, v16, v11, v17 })
+	local v20 = useCallback(fn, { v8, v17, v18, v13, v19 })
 
-	local v19 = React.useCallback(function(upsellName: string, p: string?)
-		local v19 = {
+	local v21 = React.useCallback(function(upsellName: string, p: string?)
+		local v21 = {
 			universeId = universeId,
 			upsellName = upsellName,
 			playabilityStatus = 0,
@@ -454,83 +435,83 @@ return function(universeId: string, callback, pageName: string?)
 			playabilityStatus = PlayabilityStatusEnum.ContextualPlayabilityAgeRecommendationParentalControls
 		end
 
-		v19.playabilityStatus = playabilityStatus
+		v21.playabilityStatus = playabilityStatus
 
-		v19.pageName = pageName
-		unlockPlayIntent(v3, v19)
+		v21.pageName = pageName
+		unlockPlayIntent(v3, v21)
 	end, { v3, universeId, pageName })
-	local v20
+	local v22
 
 	if FFlagLuaAppParentUpsellPolicy then
-		v20 = useAppPolicy(function(p)
+		v22 = useAppPolicy(function(p)
 			return p.getShouldShowVpcPlayButtonUpsells()
 		end)
 	else
-		v20 = nil
+		v22 = nil
 	end
 
-	local v21 = useAppPolicy(function(p)
+	local v23 = useAppPolicy(function(p)
 		return p.getWebViewSupport()
 	end)
-	local v22
+	local v24
 
 	if FFlagLuaAppParentApprovedExperiences then
 		local useCallback2 = React.useCallback
 		local function fn2(p)
-			if FFlagLuaAppParentUpsellPolicy and not v20 then
+			if FFlagLuaAppParentUpsellPolicy and not v22 then
 				callback(p)
 
-				v19("GameLaunch", PlayabilityStatusEnum.ContextualPlayabilityRequireParentApproval)
+				v21("GameLaunch", PlayabilityStatusEnum.ContextualPlayabilityRequireParentApproval)
 			else
 				if FFlagEnablePlayButtonWizardVPCPrologue then
-					v18(nil, v14(v5.askYourParentToAllowGameBodyText))
+					v20(nil, v16(v7.askYourParentToAllowGameBodyText))
 				else
-					v8(
-						v5.askYourParentTitleText,
-						v5.askYourParentToAllowGameBodyText,
-						v5.askYourParentActionButtonText,
-						v5.askYourParentCancelButtonText,
-						v18,
+					v10(
+						v7.askYourParentTitleText,
+						v7.askYourParentToAllowGameBodyText,
+						v7.askYourParentActionButtonText,
+						v7.askYourParentCancelButtonText,
+						v20,
 						onCloseModal,
 						onCloseModal
 					)
 				end
 
-				v19("ParentApprovedExperience", PlayabilityStatusEnum.ContextualPlayabilityRequireParentApproval)
+				v21("ParentApprovedExperience", PlayabilityStatusEnum.ContextualPlayabilityRequireParentApproval)
 			end
 		end
 
-		local askYourParentTitleText = v5.askYourParentTitleText
-		local askYourParentToAllowGameBodyText = v5.askYourParentToAllowGameBodyText
-		local askYourParentActionButtonText = v5.askYourParentActionButtonText
-		local askYourParentCancelButtonText = v5.askYourParentCancelButtonText
-		local v23
+		local askYourParentTitleText = v7.askYourParentTitleText
+		local askYourParentToAllowGameBodyText = v7.askYourParentToAllowGameBodyText
+		local askYourParentActionButtonText = v7.askYourParentActionButtonText
+		local askYourParentCancelButtonText = v7.askYourParentCancelButtonText
+		local v25
 
 		if FFlagEnablePlayButtonWizardVPCPrologue then
-			v23 = v14
+			v25 = v16
 		end
 
-		v22 = useCallback2(fn2, {
-			v8,
-			v18,
-			onCloseModal,
-			v19,
-			callback,
+		v24 = useCallback2(fn2, {
+			v10,
 			v20,
+			onCloseModal,
+			v21,
+			callback,
+			v22,
 			askYourParentTitleText,
 			askYourParentToAllowGameBodyText,
 			askYourParentActionButtonText,
 			askYourParentCancelButtonText,
-			v23
+			v25
 		})
 	end
 
 	local useCallback2 = React.useCallback
 	local function fn2(p)
-		if FFlagLuaAppParentUpsellPolicy and not v20 then
+		if FFlagLuaAppParentUpsellPolicy and not v22 then
 			callback(p)
 
-			v19("GameLaunch")
+			v21("GameLaunch")
 		else
 			FetchUserSettingsAndOptions(v2):andThen(function(p2)
 				local contentAgeRestriction = p2.contentAgeRestriction
@@ -539,18 +520,18 @@ return function(universeId: string, callback, pageName: string?)
 					assert(contentMaturityRating, "Content maturity rating must be present to show correct upsell")
 
 					if v[contentMaturityRating] then
-						local v23 = v[contentMaturityRating]
+						local v25 = v[contentMaturityRating]
 
-						local v24 = Dash.find(contentAgeRestriction.options, function(p3)
-							return p3 and p3.option and p3.option.optionValue == v23 and true or false
+						local v26 = Dash.find(contentAgeRestriction.options, function(p3)
+							return p3 and p3.option and p3.option.optionValue == v25 and true or false
 						end)
 
-						if v24 then
-							local requirement = v24.requirement
+						if v26 then
+							local requirement = v26.requirement
 
 							if requirement == "SelfUpdateSetting" then
-								if v21 then
-									v7(
+								if v23 then
+									v9(
 										"gameJoinContentMaturityLock",
 										{
 											title = "Feature.ExperienceDetails.UpdateMaturitySettingModal.Label.Title",
@@ -558,80 +539,80 @@ return function(universeId: string, callback, pageName: string?)
 											buttonCancel = "Feature.ExperienceDetails.UpdateMaturitySettingModal.Action.Cancel",
 											buttonSettings = "Feature.ExperienceDetails.UpdateMaturitySettingModal.Action.GoToSettings"
 										},
-										v13,
-										v13
+										v15,
+										v15
 									)
 								else
-									v9(
-										v5.consoleSelfUpdateSettingTitleText,
-										v5.consoleSelfUpdateSettingBodyText,
-										v11,
-										v5.consoleSelfUpdateSettingButtonText,
+									v11(
+										v7.consoleSelfUpdateSettingTitleText,
+										v7.consoleSelfUpdateSettingBodyText,
+										v13,
+										v7.consoleSelfUpdateSettingButtonText,
 										true
 									)
 								end
 							elseif requirement == "ParentalConsent" then
 								if FFlagEnablePlayButtonWizardVPCPrologue then
-									v18(v24.option.optionValue, v14(v5.askYourParentBodyText))
+									v20(v26.option.optionValue, v16(v7.askYourParentBodyText))
 								else
-									v8(
-										v5.askYourParentTitleText,
-										v5.askYourParentBodyText,
-										v5.askYourParentActionButtonText,
-										v5.askYourParentCancelButtonText,
+									v10(
+										v7.askYourParentTitleText,
+										v7.askYourParentBodyText,
+										v7.askYourParentActionButtonText,
+										v7.askYourParentCancelButtonText,
 										function()
-											v18(v24.option.optionValue)
+											v20(v26.option.optionValue)
 										end,
 										onCloseModal,
 										onCloseModal
 									)
 								end
 							elseif requirement == "ContentAgeRestrictionVerification" then
-								local v25
+								local v27
 
 								if FFlagLuaAppPlayButtonAmpAgeCheckFlow then
-									v25 = not pageName and "gameJoinContentMaturityLock"
+									v27 = not pageName and "gameJoinContentMaturityLock"
 										or `gameJoinContentMaturityLock-{pageName}`
 								end
 
-								local v26
+								local v28
 
 								if FFlagLuaAppPlayButtonAmpAgeCheckFlow then
-									v26 = FStringLuaAppPlayButtonAgeCheckAmpNameSpace
+									v28 = FStringLuaAppPlayButtonAgeCheckAmpNameSpace
 								end
 
-								local v27
+								local v29
 
 								if FFlagLuaAppPlayButtonWizardCloseDelay then
-									v27 = delayedAmpWizardCompletionCallbackOverride(
-										v12,
+									v29 = delayedAmpWizardCompletionCallbackOverride(
+										v14,
 										FIntLuaAppPlayButtonWizardCloseDelayMs
 									)
 								end
 
-								v6(
+								v8(
 									not FFlagLuaAppPlayButtonAmpAgeCheckFlow and "ShouldNotPromptSeventeenPlusSettingVerifications" or FStringLuaAppPlayButtonAgeCheckAmpFeatureName,
-									v12,
+									v14,
 									nil,
-									v25,
+									v27,
 									nil,
-									v26,
-									v27
+									v28,
+									v29
 								)
 							else
 								flaggedMutedError(
 									"ExperienceParentalControlsUnknownUpsellRequirement",
-									`Unknown requirement {requirement} for ContentAgeRestriction option {v24} on play button click`
+									`Unknown requirement {requirement} for ContentAgeRestriction option {v26} on play button click`
 								)
 
 								callback(p)
 							end
 
-							v19(requirement or "GameLaunch")
+							v21(requirement or "GameLaunch")
 						else
-							v9(v5.unplayableTitleText, v5.unplayableBodyText, v11, v5.unplayableButtonText, true)
+							v11(v7.unplayableTitleText, v7.unplayableBodyText, v13, v7.unplayableButtonText, true)
 
-							v19("RestrictedUnplayableOptionNotFound")
+							v21("RestrictedUnplayableOptionNotFound")
 						end
 					else
 						LoggingProtocol.default:logRobloxTelemetryEvent({
@@ -648,7 +629,7 @@ return function(universeId: string, callback, pageName: string?)
 
 						callback(p)
 
-						v19("GameLaunch")
+						v21("GameLaunch")
 					end
 				else
 					flaggedMutedError(
@@ -658,39 +639,39 @@ return function(universeId: string, callback, pageName: string?)
 
 					callback(p)
 
-					v19("GameLaunch")
+					v21("GameLaunch")
 				end
 			end, function()
 				callback(p)
 
-				v19("GameLaunch")
+				v21("GameLaunch")
 			end)
 		end
 	end
 
-	local v23
+	local v25
 
 	if FFlagLuaAppPlayButtonAmpAgeCheckFlow then
-		v23 = v12
+		v25 = v14
 	end
 
-	local v24 = {
+	local v26 = {
 		v2,
 		universeId,
 		callback,
 		contentMaturityRating,
 		v4,
-		v7,
-		v6,
 		v9,
 		v8,
-		v18,
-		v13,
-		onCloseModal,
 		v11,
-		v23,
-		v19,
-		v5.unplayableTitleText,
+		v10,
+		v20,
+		v15,
+		onCloseModal,
+		v13,
+		v25,
+		v21,
+		v7.unplayableTitleText,
 		nil,
 		nil,
 		nil,
@@ -705,27 +686,27 @@ return function(universeId: string, callback, pageName: string?)
 		nil,
 		nil
 	}
-	local unplayableBodyText = v5.unplayableBodyText
-	local unplayableButtonText = v5.unplayableButtonText
-	local askYourParentTitleText = v5.askYourParentTitleText
-	local askYourParentBodyText = v5.askYourParentBodyText
-	local askYourParentActionButtonText = v5.askYourParentActionButtonText
-	local askYourParentCancelButtonText = v5.askYourParentCancelButtonText
-	local consoleSelfUpdateSettingTitleText = v5.consoleSelfUpdateSettingTitleText
-	local consoleSelfUpdateSettingBodyText = v5.consoleSelfUpdateSettingBodyText
-	local consoleSelfUpdateSettingButtonText = v5.consoleSelfUpdateSettingButtonText
-	local v25
+	local unplayableBodyText = v7.unplayableBodyText
+	local unplayableButtonText = v7.unplayableButtonText
+	local askYourParentTitleText = v7.askYourParentTitleText
+	local askYourParentBodyText = v7.askYourParentBodyText
+	local askYourParentActionButtonText = v7.askYourParentActionButtonText
+	local askYourParentCancelButtonText = v7.askYourParentCancelButtonText
+	local consoleSelfUpdateSettingTitleText = v7.consoleSelfUpdateSettingTitleText
+	local consoleSelfUpdateSettingBodyText = v7.consoleSelfUpdateSettingBodyText
+	local consoleSelfUpdateSettingButtonText = v7.consoleSelfUpdateSettingButtonText
+	local v27
 
 	if FFlagEnablePlayButtonWizardVPCPrologue then
-		v25 = v14
+		v27 = v16
 	end
 
-	v24[17], v24[18], v24[19], v24[20], v24[21], v24[22], v24[23], v24[24], v24[25], v24[26], v24[27], v24[28], v24[29] = unplayableBodyText, unplayableButtonText, askYourParentTitleText, askYourParentBodyText, askYourParentActionButtonText, askYourParentCancelButtonText, consoleSelfUpdateSettingTitleText, consoleSelfUpdateSettingBodyText, consoleSelfUpdateSettingButtonText, v20, v21, pageName, v25
-	local v26 = useCallback2(fn2, v24)
+	v26[17], v26[18], v26[19], v26[20], v26[21], v26[22], v26[23], v26[24], v26[25], v26[26], v26[27], v26[28], v26[29] = unplayableBodyText, unplayableButtonText, askYourParentTitleText, askYourParentBodyText, askYourParentActionButtonText, askYourParentCancelButtonText, consoleSelfUpdateSettingTitleText, consoleSelfUpdateSettingBodyText, consoleSelfUpdateSettingButtonText, v22, v23, pageName, v27
+	local v28 = useCallback2(fn2, v26)
 
 	if not FFlagLuaAppParentApprovedExperiences then
-		v22 = nil
+		v24 = nil
 	end
 
-	return v26, v22
+	return v28, v24
 end

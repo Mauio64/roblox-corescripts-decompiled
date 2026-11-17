@@ -9,6 +9,9 @@ local applyCloseupPreviewPose = require(script.Shared.applyCloseupPreviewPose)
 local computeCutoutFieldOfViewDeg = require(script.Shared.computeCutoutFieldOfViewDeg)
 local computeFocusAngleAboveCenterRad = require(script.Shared.computeFocusAngleAboveCenterRad)
 local frameCloseupPreviewCamera = require(script.Shared.frameCloseupPreviewCamera)
+local useProfileFrames = require(script.Hooks.useProfileFrames)
+local useProfileFramesGating = require(script.Hooks.useProfileFramesGating)
+local saveEditProfileImage = require(script.Utils.saveEditProfileImage)
 
 local EditProfileImageAnalytics = require(script.Analytics.EditProfileImageAnalytics)
 
@@ -26,6 +29,9 @@ return {
 	TextKeys = require(script.Common.TextKeys),
 	Constants = Constants,
 	useUserAvatarConfigurations = require(script.Hooks.useUserAvatarConfigurations),
+	useProfileFrames = useProfileFrames,
+	useProfileFramesGating = useProfileFramesGating,
+	saveEditProfileImage = saveEditProfileImage,
 	parseCloseupCameraConfig = parseCloseupCameraConfig,
 	parseProfileFrameAssetId = parseProfileFrameAssetId,
 	parseUserAvatarConfigurationsV4 = parseUserAvatarConfigurationsV4.parseUserAvatarConfigurationsV4,

@@ -1,23 +1,30 @@
 local Flags = require(script:FindFirstAncestor("ViewRecyclerRoblox").Flags)
-local FFlagViewRecyclerReact08 = Flags.FFlagViewRecyclerReact08
+local FFlagViewRecyclerReact084 = Flags.FFlagViewRecyclerReact084
+local Flags2 = require(script:FindFirstAncestor("ViewRecyclerRoblox").Flags)
+local FFlagViewRecyclerReact08 = Flags2.FFlagViewRecyclerReact08
 local ViewRecyclerRoblox = script:FindFirstAncestor("ViewRecyclerRoblox")
 local ViewRecycler = require(ViewRecyclerRoblox.Parent.ViewRecycler)
 
 local AttachedViewportOverlay = require(ViewRecyclerRoblox.RobloxAdapter.AttachedViewportOverlay)
 local HostPlacement = require(ViewRecyclerRoblox.RobloxAdapter.HostPlacement)
 local HostPresentationPhase = require(ViewRecyclerRoblox.RobloxAdapter.HostPresentationPhase)
+
+local ReducedMotion = require(ViewRecyclerRoblox.RobloxAdapter.ReducedMotion)
 local ScrollHost = require(ViewRecyclerRoblox.RobloxAdapter.ScrollHost)
 
+local VacantHosts = require(ViewRecyclerRoblox.RobloxAdapter.VacantHosts)
 local VirtualizerConfigurationKeys = require(ViewRecyclerRoblox.RobloxAdapter.VirtualizerConfigurationKeys)
 local VisibleItemsPresentation = require(ViewRecyclerRoblox.RobloxAdapter.VisibleItemsPresentation)
 require(ViewRecyclerRoblox.RobloxAdapter.createRecyclingScope)
 
 local Axis = ViewRecycler.Axis
-local Layout = ViewRecycler.Layout
+
+local reachedThreshold = ViewRecycler.Adapter._Private.ReachedThreshold
+local scrollMotion = ViewRecycler.Adapter._Private.ScrollMotion
 local shallowTable = ViewRecycler.Adapter._Private.ShallowTable
 local frozen
 
-if FFlagViewRecyclerReact08 then
+if FFlagViewRecyclerReact084 or FFlagViewRecyclerReact08 then
 	frozen = nil
 else
 	frozen = table.freeze({
@@ -59,7 +66,14 @@ local frozen2 = table.freeze({
 	"onContentLengthChanged"
 })
 
-local frozen3 = table.freeze({
+local frozen3 = table.freeze(FFlagViewRecyclerReact084 and {
+	"overscan",
+	"contentAlignment",
+	"initialScrollAlignment",
+	"autoScrollOnChange",
+	"preserveScrollPositionOnChange",
+	"isItemStickyHeader"
+} or {
 	"overscan",
 	"dataPrefetch",
 	"contentAlignment",
@@ -71,12 +85,41 @@ local frozen3 = table.freeze({
 	"preserveScrollPositionOnChange",
 	"isItemStickyHeader"
 })
+local frozen4, frozen5, coreScrollOptions
+
+if FFlagViewRecyclerReact084 then
+	frozen4 = table.freeze({ "endReachedThreshold", "autoScrollThreshold", "startReachedThreshold" })
+
+	frozen5 = table.freeze({ "startItems", "endItems" })
+
+	coreScrollOptions = function(data, options)
+		if data == nil or data.animated ~= true or ReducedMotion.isEnabled() then
+			return nil
+		end
+
+		local v = options or {}
+		return {
+			animated = true,
+			jumpDistance = data.jumpDistance or v.jumpDistance,
+			frequency = data.frequency or v.frequency,
+			cruiseSpeed = data.cruiseSpeed or v.cruiseSpeed,
+			approachDistance = data.approachDistance or v.approachDistance,
+			landingDistance = data.landingDistance or v.landingDistance
+		}
+	end
+else
+	frozen4 = nil
+	frozen5 = nil
+	coreScrollOptions = nil
+end
 
 local function pick(p) -- 2 equivalent calls inferred from this helper
 	local result = {}
 	local v
 
-	if FFlagViewRecyclerReact08 then
+	if FFlagViewRecyclerReact084 then
+		v = VirtualizerConfigurationKeys
+	elseif FFlagViewRecyclerReact08 then
 		v = VirtualizerConfigurationKeys
 	else
 		v = frozen
@@ -93,8 +136,26 @@ local function samePinnedItem(options, options2) -- 2 equivalent calls inferred 
 	return shallowTable.equal(options or {}, options2 or {})
 end
 
+local sameThresholds = FFlagViewRecyclerReact084 and function(p, p2): boolean
+	for _, v in frozen4 do
+		if not reachedThreshold.equal(p[v], p2[v]) then
+			return false
+		end
+	end
+
+	return true
+end or nil
+
 local function samePolicy(data, data2)
-	local v = shallowTable.containsEqual(data, data2, frozen3)
+	local v
+
+	if FFlagViewRecyclerReact084 then
+		v = shallowTable.containsEqual(data, data2, frozen3)
+			and sameThresholds(data, data2)
+			and shallowTable.optionalContainsEqual(data.dataPrefetch, data2.dataPrefetch, frozen5)
+	else
+		v = shallowTable.containsEqual(data, data2, frozen3)
+	end
 
 	if not v then
 		return v
@@ -128,11 +189,21 @@ local function assertPlaceable(layout) -- 2 equivalent calls inferred from this 
 	)
 end
 
-local needsOwnedOverlay = FFlagViewRecyclerReact08 and function(data): boolean
-	return data.viewportOverlay == nil
-		and data.scrollingFrame ~= nil
-		and (data.isItemStickyHeader ~= nil or data.pinnedStartItem ~= nil or data.pinnedEndItem ~= nil)
-end or nil
+local needsOwnedOverlay
+
+if FFlagViewRecyclerReact084 then
+	needsOwnedOverlay = FFlagViewRecyclerReact084 and function(data): boolean
+		return data.viewportOverlay == nil
+			and data.scrollingFrame ~= nil
+			and (data.isItemStickyHeader ~= nil or data.pinnedStartItem ~= nil or data.pinnedEndItem ~= nil)
+	end or nil
+else
+	needsOwnedOverlay = FFlagViewRecyclerReact08 and function(data): boolean
+		return data.viewportOverlay == nil
+			and data.scrollingFrame ~= nil
+			and (data.isItemStickyHeader ~= nil or data.pinnedStartItem ~= nil or data.pinnedEndItem ~= nil)
+	end or nil
+end
 
 local function corePolicy(data)
 	return {
@@ -158,11 +229,20 @@ end
 local function createVirtualizer(data)
 	assert(data.axis == Axis.X or data.axis == Axis.Y, "createVirtualizer: invalid axis")
 	assertPlaceable(data.layout) -- inferred equivalent call
+	local vacantHosts
+
+	if FFlagViewRecyclerReact084 then
+		scrollMotion.validate(data.animatedScroll, "createVirtualizer: animatedScroll")
+		vacantHosts = VacantHosts.forScope(data.recyclingScope)
+	end
+
 	local configuration = pick(data) -- inferred equivalent call
 	local flag = false
 	local v
 
-	if FFlagViewRecyclerReact08 then
+	if FFlagViewRecyclerReact084 then
+		v = data.active ~= false
+	elseif FFlagViewRecyclerReact08 then
 		v = data.active ~= false
 	else
 		v = nil
@@ -184,7 +264,45 @@ local function createVirtualizer(data)
 	end)
 	local v8, syncOwnedOverlay, viewportContainer
 
-	if FFlagViewRecyclerReact08 then
+	if FFlagViewRecyclerReact084 then
+		v8 = nil
+
+		syncOwnedOverlay = function(p)
+			local v9 = v8
+
+			if not needsOwnedOverlay(p) then
+				v8 = nil
+				return v9
+			end
+
+			local scrollingFrame = p.scrollingFrame
+
+			if v9 ~= nil and v9.scrollingFrame == scrollingFrame and v9.axis == p.axis then
+				return nil
+			end
+
+			v8 = {
+				scrollingFrame = scrollingFrame,
+				axis = p.axis,
+				handle = AttachedViewportOverlay.new(scrollingFrame, p.axis)
+			}
+
+			return v9
+		end
+
+		viewportContainer = function(p)
+			local viewportOverlay = p.viewportOverlay
+
+			if viewportOverlay ~= nil then
+				return viewportOverlay
+			end
+
+			local v9 = v8
+			return if v9 ~= nil then v9.handle.overlay else nil
+		end
+
+		syncOwnedOverlay(configuration)
+	elseif FFlagViewRecyclerReact08 then
 		v8 = nil
 
 		syncOwnedOverlay = function(p)
@@ -229,7 +347,13 @@ local function createVirtualizer(data)
 	end
 
 	local new = HostPlacement.new
+
+	if not FFlagViewRecyclerReact084 then
+		vacantHosts = nil
+	end
+
 	local v9 = {
+		vacantHosts = vacantHosts,
 		container = configuration.scrollingFrame,
 		viewportContainer = 0,
 		axis = 0,
@@ -241,7 +365,9 @@ local function createVirtualizer(data)
 	}
 	local viewportContainer2
 
-	if FFlagViewRecyclerReact08 then
+	if FFlagViewRecyclerReact084 then
+		viewportContainer2 = viewportContainer(configuration)
+	elseif FFlagViewRecyclerReact08 then
 		viewportContainer2 = viewportContainer(configuration)
 	else
 		viewportContainer2 = configuration.viewportOverlay
@@ -275,7 +401,7 @@ local function createVirtualizer(data)
 
 	local v10 = new(v9)
 
-	local frozen4 = table.freeze({ apply = v10.apply })
+	local frozen6 = table.freeze({ apply = v10.apply })
 
 	local presentItemView = data.presentItemView or function(p, state, p2, p3)
 		local transition = data.transition
@@ -329,7 +455,7 @@ local function createVirtualizer(data)
 			object[itemView] = assignment
 		end
 
-		presentItemView(itemView, state, v11, frozen4)
+		presentItemView(itemView, state, v11, frozen6)
 	end
 
 	local v11 = nil
@@ -346,7 +472,7 @@ local function createVirtualizer(data)
 						object[v13] = nil
 					end
 
-					presentItemView(v13, nil, v14, frozen4)
+					presentItemView(v13, nil, v14, frozen6)
 				end
 
 				for _, v13 in v12.entered do
@@ -396,124 +522,202 @@ local function createVirtualizer(data)
 	end
 
 	local v12 = corePolicy(configuration)
-	v5 = ViewRecycler.Adapter.createVirtualizer({
+	local createVirtualizer2 = ViewRecycler.Adapter.createVirtualizer
+	local v13 = {
 		dataSource = configuration.dataSource,
 		layout = configuration.layout,
 		recyclingScope = data.recyclingScope,
 		getItemViewType = data.getItemViewType,
-		overscan = v12.overscan,
-		dataPrefetch = v12.dataPrefetch,
-		contentAlignment = v12.contentAlignment,
-		endThreshold = v12.endThreshold,
-		initialScrollAlignment = v12.initialScrollAlignment,
-		autoScrollOnChange = v12.autoScrollOnChange,
-		autoScrollThreshold = v12.autoScrollThreshold,
-		startReachedThreshold = v12.startReachedThreshold,
-		startReachedEnabled = v12.startReachedEnabled,
-		endReachedEnabled = v12.endReachedEnabled,
-		isItemStickyHeader = v12.pinnedItems.isItemStickyHeader,
-		pinnedStartItem = v12.pinnedItems.pinnedStartItem,
-		pinnedEndItem = v12.pinnedItems.pinnedEndItem,
-		preserveScrollPositionOnChange = v12.preserveScrollPositionOnChange,
-		diagnostics = data.diagnostics,
-		onTransaction = applyRecord
-	})
+		isReadyOnAssignment = 0,
+		overscan = 0,
+		dataPrefetch = 0,
+		contentAlignment = 0,
+		endThreshold = 0,
+		initialScrollAlignment = 0,
+		autoScrollOnChange = 0,
+		autoScrollThreshold = 0,
+		startReachedThreshold = 0,
+		startReachedEnabled = 0,
+		endReachedEnabled = 0,
+		isItemStickyHeader = 0,
+		pinnedStartItem = 0,
+		pinnedEndItem = 0,
+		preserveScrollPositionOnChange = 0,
+		diagnostics = 0,
+		onTransaction = 0
+	}
+	local isReadyOnAssignment
 
-	v6 = ScrollHost.new({
+	if FFlagViewRecyclerReact084 then
+		isReadyOnAssignment = data.isReadyOnAssignment
+	end
+
+	v13.isReadyOnAssignment = isReadyOnAssignment
+	v13.overscan = v12.overscan
+	v13.dataPrefetch = v12.dataPrefetch
+	v13.contentAlignment = v12.contentAlignment
+	v13.endThreshold = v12.endThreshold
+	v13.initialScrollAlignment = v12.initialScrollAlignment
+	v13.autoScrollOnChange = v12.autoScrollOnChange
+	v13.autoScrollThreshold = v12.autoScrollThreshold
+	v13.startReachedThreshold = v12.startReachedThreshold
+	v13.startReachedEnabled = v12.startReachedEnabled
+	v13.endReachedEnabled = v12.endReachedEnabled
+	v13.isItemStickyHeader = v12.pinnedItems.isItemStickyHeader
+	v13.pinnedStartItem = v12.pinnedItems.pinnedStartItem
+	v13.pinnedEndItem = v12.pinnedItems.pinnedEndItem
+	v13.preserveScrollPositionOnChange = v12.preserveScrollPositionOnChange
+	v13.diagnostics = data.diagnostics
+	v13.onTransaction = applyRecord
+	v5 = createVirtualizer2(v13)
+
+	local new2 = ScrollHost.new
+	local v14 = {
 		observeScrollOffset = v5.observeScrollOffset,
 		setViewportSize = v5.setViewportSize,
 		getCurrent = v5.getCurrent,
-		getInstance = function()
-			if flag then
-				return nil
-			end
+		stepAnimatedScroll = 0,
+		stopAnimatedScroll = 0,
+		getInstance = 0,
+		getConfiguration = 0,
+		onCanvasOriginMoved = 0
+	}
+	local stepAnimatedScroll
 
-			return configuration.scrollingFrame
-		end,
-		getConfiguration = function()
-			return configuration
-		end,
-		onCanvasOriginMoved = v10.reposition
-	})
+	if FFlagViewRecyclerReact084 then
+		stepAnimatedScroll = v5.stepAnimatedScroll
+	end
+
+	v14.stepAnimatedScroll = stepAnimatedScroll
+	local stopAnimatedScroll
+
+	if FFlagViewRecyclerReact084 then
+		stopAnimatedScroll = v5.stopAnimatedScroll
+	end
+
+	v14.stopAnimatedScroll = stopAnimatedScroll
+	function v14.getInstance()
+		return if not flag then configuration.scrollingFrame else nil
+	end
+
+	function v14.getConfiguration()
+		return configuration
+	end
+
+	v14.onCanvasOriginMoved = v10.reposition
+	v6 = new2(v14)
 
 	local function update(clone)
 		if flag then
 			return
 		end
 
-		local v13 = configuration
+		local v15 = configuration
 		local result = pick(clone) -- inferred equivalent call
 		assert(result.axis == Axis.X or result.axis == Axis.Y, "createVirtualizer: invalid axis")
 		assertPlaceable(result.layout) -- inferred equivalent call
-		local v14 = result.dataSource ~= v13.dataSource
-		local v15 = result.layout ~= v13.layout
-		local v16 = result.scrollingFrame ~= v13.scrollingFrame
-		local v17, v18
 
-		if FFlagViewRecyclerReact08 then
-			local v19 = viewportContainer(v13)
-			v17 = syncOwnedOverlay(result)
-			v18 = not (viewportContainer(result) == v19)
+		if FFlagViewRecyclerReact084 then
+			scrollMotion.validate(result.animatedScroll, "createVirtualizer: animatedScroll")
 		end
 
-		local v19
+		local v16 = result.dataSource ~= v15.dataSource
+		local v17 = result.layout ~= v15.layout
+		local v18 = result.scrollingFrame ~= v15.scrollingFrame
+		local v19, v20
 
-		if v16 then
-			v19 = v16
+		if FFlagViewRecyclerReact084 then
+			local v21 = viewportContainer(v15)
+			v19 = syncOwnedOverlay(result)
+			v20 = viewportContainer(result) ~= v21
+		elseif FFlagViewRecyclerReact08 then
+			local v21 = viewportContainer(v15)
+			v19 = syncOwnedOverlay(result)
+			v20 = not (viewportContainer(result) == v21)
+		end
+
+		local v21
+
+		if v18 then
+			v21 = v18
 		else
-			local v20
+			local v22
 
-			if FFlagViewRecyclerReact08 then
-				v20 = v18
+			if FFlagViewRecyclerReact084 or FFlagViewRecyclerReact08 then
+				v22 = v20
 			else
-				v20 = result.viewportOverlay ~= v13.viewportOverlay
+				v22 = result.viewportOverlay ~= v15.viewportOverlay
 			end
 
-			v19 = v20
-				or result.axis ~= v13.axis
-				or v15
-				or (result.isItemStickyHeader == nil) ~= (v13.isItemStickyHeader == nil)
+			v21 = v22
+				or result.axis ~= v15.axis
+				or v17
+				or (result.isItemStickyHeader == nil) ~= (v15.isItemStickyHeader == nil)
 		end
 
-		local v20
+		local v22
 
-		if FFlagViewRecyclerReact08 then
-			v20 = v
+		if FFlagViewRecyclerReact084 then
+			v22 = v
 
-			if v20 then
-				if v16 or v18 then
-					v20 = v10.hasDestroyedHost()
+			if v22 then
+				if v18 or v20 then
+					v22 = v10.hasDestroyedHost()
 				else
-					v20 = v18
+					v22 = v20
 				end
 			end
+		end
 
-			if v20 then
+		local v23
+
+		if FFlagViewRecyclerReact084 then
+			v23 = v22
+		else
+			v23 = FFlagViewRecyclerReact08
+		end
+
+		if v23 then
+			if FFlagViewRecyclerReact084 then
 				v5.setActive(false)
+			else
+				v22 = v
+
+				if v22 then
+					if v18 or v20 then
+						v22 = v10.hasDestroyedHost()
+					else
+						v22 = v20
+					end
+				end
+
+				if v22 then
+					v5.setActive(false)
+				end
 			end
 		end
 
 		configuration = result
 
-		if v14 then
+		if v16 then
 			v7.rearm()
 		end
 
-		if v14 or v15 then
+		if v16 or v17 then
 			v10.cancelPendingMeasurements()
 
-			if v14 and v15 then
+			if v16 and v17 then
 				v5.setDataSourceAndLayout(result.dataSource, result.layout)
-			elseif v14 then
+			elseif v16 then
 				v5.setDataSource(result.dataSource)
 			else
 				v5.setLayout(result.layout)
 			end
 		end
 
-		if v19 then
+		if v21 then
 			local setConfiguration = v10.setConfiguration
-			local v21 = {
+			local v24 = {
 				container = result.scrollingFrame,
 				viewportContainer = 0,
 				axis = 0,
@@ -522,38 +726,64 @@ local function createVirtualizer(data)
 			}
 			local viewportContainer3
 
-			if FFlagViewRecyclerReact08 then
+			if FFlagViewRecyclerReact084 then
+				viewportContainer3 = viewportContainer(result)
+			elseif FFlagViewRecyclerReact08 then
 				viewportContainer3 = viewportContainer(result)
 			else
 				viewportContainer3 = result.viewportOverlay
 			end
 
-			v21.viewportContainer = viewportContainer3
+			v24.viewportContainer = viewportContainer3
 
-			v21.axis = result.axis
-			v21.selfSizing = result.layout.requiresItemMeasurement()
-			v21.stackedSpacing = stackedSpacing(result) -- inferred equivalent call
-			setConfiguration(v21)
+			v24.axis = result.axis
+			v24.selfSizing = result.layout.requiresItemMeasurement()
+			v24.stackedSpacing = stackedSpacing(result) -- inferred equivalent call
+			setConfiguration(v24)
 		end
 
-		if FFlagViewRecyclerReact08 and v17 ~= nil then
-			v17.handle.destroy()
+		local v24
+
+		if FFlagViewRecyclerReact084 then
+			v24 = v19 ~= nil
+		else
+			v24 = FFlagViewRecyclerReact08
 		end
 
-		if not samePolicy(v13, result) then
+		if v24 then
+			if FFlagViewRecyclerReact084 then
+				v19.handle.destroy()
+			elseif v19 ~= nil then
+				v19.handle.destroy()
+			end
+		end
+
+		if not samePolicy(v15, result) then
 			v5.setPolicy(corePolicy(result))
 		end
 
-		if not shallowTable.containsEqual(v13, result, frozen2) then
+		if not shallowTable.containsEqual(v15, result, frozen2) then
 			v6.configurationChanged()
 		end
 
-		if v16 then
+		if v18 then
 			v6.scrollingFrameChanged()
 		end
 
-		if FFlagViewRecyclerReact08 and v20 then
-			v5.setActive(true)
+		local v25
+
+		if FFlagViewRecyclerReact084 then
+			v25 = v22
+		else
+			v25 = FFlagViewRecyclerReact08
+		end
+
+		if v25 then
+			if FFlagViewRecyclerReact084 then
+				v5.setActive(true)
+			elseif v22 then
+				v5.setActive(true)
+			end
 		end
 	end
 
@@ -563,29 +793,48 @@ local function createVirtualizer(data)
 		update(clone)
 	end
 
-	local v13 = nil
+	local v15 = nil
 
-	local function destroy() -- 1 equivalent call inferred from this helper
+	local function destroy()
 		if flag then
 			return
 		end
 
 		flag = true
 
-		if v13 ~= nil then
-			v13()
-			v13 = nil
+		if v15 ~= nil then
+			v15()
+			v15 = nil
 		end
 
 		v5.destroy()
 		v10.destroy()
+		local v16
 
-		if FFlagViewRecyclerReact08 then
-			local v14 = v8
+		if FFlagViewRecyclerReact084 then
+			v16 = v8
+			v8 = nil
+		end
+
+		local v17
+
+		if FFlagViewRecyclerReact084 then
+			v17 = v16 ~= nil
+		else
+			v17 = FFlagViewRecyclerReact08
+		end
+
+		if v17 then
+			if FFlagViewRecyclerReact084 then
+				v16.handle.destroy()
+				return
+			end
+
+			local v18 = v8
 			v8 = nil
 
-			if v14 ~= nil then
-				v14.handle.destroy()
+			if v18 ~= nil then
+				v18.handle.destroy()
 			end
 		end
 	end
@@ -594,14 +843,14 @@ local function createVirtualizer(data)
 		v5.setActive(false)
 	end
 
-	v13 = v6.connect()
+	v15 = v6.connect()
 	v2 = true
 	flag2 = true
 	local success, result = pcall(v5.activate)
 	flag2 = false
 
 	if not success then
-		destroy() -- inferred equivalent call
+		destroy()
 		error(result, 0)
 	end
 
@@ -641,102 +890,144 @@ local function createVirtualizer(data)
 		destroy = 0,
 		setScrollOffset = 0
 	}
-	local setActive
+	local fn
 
-	if FFlagViewRecyclerReact08 then
-		setActive = function(p)
+	if FFlagViewRecyclerReact084 then
+		fn = function(p)
+			if not flag then
+				v = p
+				v5.setActive(p)
+			end
+		end
+	elseif FFlagViewRecyclerReact08 then
+		fn = function(p)
 			if not flag then
 				v = p
 				v5.setActive(p)
 			end
 		end
 	else
-		setActive = function(p)
+		fn = function(p)
 			if not flag then
 				v5.setActive(p)
 			end
 		end
 	end
 
-	virtualizer.setActive = setActive
+	virtualizer.setActive = fn
+	local scrollToOffset2
 
-	function virtualizer.scrollToOffset(p)
-		return v5.scrollToOffset(p).scrollState.scrollOffset
+	if FFlagViewRecyclerReact084 then
+		scrollToOffset2 = function(p, p2)
+			local scrollToOffset = v5.scrollToOffset(p, coreScrollOptions(p2, configuration.animatedScroll))
+
+			return scrollToOffset.animatedScrollTarget or scrollToOffset.scrollState.scrollOffset
+		end
+	else
+		scrollToOffset2 = function(p)
+			return v5.scrollToOffset(p).scrollState.scrollOffset
+		end
 	end
 
-	function virtualizer.scrollToStart()
-		v5.scrollToStart()
+	virtualizer.scrollToOffset = scrollToOffset2
+	local scrollToStart
+
+	if FFlagViewRecyclerReact084 then
+		scrollToStart = function(p)
+			v5.scrollToStart(coreScrollOptions(p, configuration.animatedScroll))
+		end
+	else
+		scrollToStart = function()
+			v5.scrollToStart()
+		end
 	end
-	function virtualizer.scrollToEnd()
-		v5.scrollToEnd()
+
+	virtualizer.scrollToStart = scrollToStart
+	local scrollToEnd
+
+	if FFlagViewRecyclerReact084 then
+		scrollToEnd = function(p)
+			v5.scrollToEnd(coreScrollOptions(p, configuration.animatedScroll))
+		end
+	else
+		scrollToEnd = function()
+			v5.scrollToEnd()
+		end
 	end
+
+	virtualizer.scrollToEnd = scrollToEnd
+
 	function virtualizer.scrollBy(p)
 		return v5.scrollBy(p).scrollState.scrollOffset
 	end
 
 	function virtualizer.scrollToIndex(p, p2)
 		if v6.isReady() then
-			v5.scrollToIndex(p, p2 and p2.alignment)
+			if FFlagViewRecyclerReact084 then
+				v5.scrollToIndex(p, p2 and p2.alignment, coreScrollOptions(p2, configuration.animatedScroll))
+			else
+				v5.scrollToIndex(p, p2 and p2.alignment)
+			end
 		end
 	end
 	function virtualizer.setDataSource(dataSource)
-		local function fn(p)
+		local function fn2(p)
 			p.dataSource = dataSource
 		end
 
-		updateWith(fn) -- inferred equivalent call
+		updateWith(fn2) -- inferred equivalent call
 	end
 	function virtualizer.setLayout(layout)
-		local function fn(p)
+		local function fn2(p)
 			p.layout = layout
 		end
 
-		updateWith(fn) -- inferred equivalent call
+		updateWith(fn2) -- inferred equivalent call
 	end
 	function virtualizer.setDataSourceAndLayout(dataSource, layout)
-		local function fn(p)
+		local function fn2(p)
 			p.dataSource = dataSource
 			p.layout = layout
 		end
 
-		updateWith(fn) -- inferred equivalent call
+		updateWith(fn2) -- inferred equivalent call
 	end
 	function virtualizer.setOverscan(overscan)
-		local function fn(p)
+		local function fn2(p)
 			p.overscan = overscan
 		end
 
-		updateWith(fn) -- inferred equivalent call
+		updateWith(fn2) -- inferred equivalent call
 	end
 	function virtualizer.setDataPrefetch(dataPrefetch)
-		local function fn(p)
+		local function fn2(p)
 			p.dataPrefetch = dataPrefetch
 		end
 
-		updateWith(fn) -- inferred equivalent call
+		updateWith(fn2) -- inferred equivalent call
 	end
 	function virtualizer.setContentAlignment(contentAlignment)
-		local function fn(p)
+		local function fn2(p)
 			p.contentAlignment = contentAlignment
 		end
 
-		updateWith(fn) -- inferred equivalent call
+		updateWith(fn2) -- inferred equivalent call
 	end
 	function virtualizer.setPinnedItems(data2)
-		local function fn(p)
+		local function fn2(p)
 			p.isItemStickyHeader = data2.isItemStickyHeader
 			p.pinnedStartItem = data2.pinnedStartItem
 			p.pinnedEndItem = data2.pinnedEndItem
 		end
 
-		updateWith(fn) -- inferred equivalent call
+		updateWith(fn2) -- inferred equivalent call
 	end
 	function virtualizer.setPreserveScrollPositionOnChange(preserveScrollPositionOnChange)
-		local function fn(p)
+		local function fn2(p)
 			p.preserveScrollPositionOnChange = preserveScrollPositionOnChange
 		end
 
-		updateWith(fn) -- inferred equivalent call
+		updateWith(fn2) -- inferred equivalent call
 	end
 	function virtualizer.refreshItemViews()
 		v5.refresh()
@@ -763,10 +1054,15 @@ local function createVirtualizer(data)
 	end
 
 	virtualizer.destroy = destroy
+	local setScrollOffset
 
-	virtualizer.setScrollOffset = not FFlagViewRecyclerReact08 and function(p)
-		v5.setScrollOffset(p)
-	end or nil
+	if not FFlagViewRecyclerReact084 then
+		setScrollOffset = not FFlagViewRecyclerReact08 and function(p)
+			v5.setScrollOffset(p)
+		end or nil
+	end
+
+	virtualizer.setScrollOffset = setScrollOffset
 	return virtualizer
 end
 

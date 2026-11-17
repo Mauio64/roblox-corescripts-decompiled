@@ -13,7 +13,6 @@ local Cryo = require(parent.Cryo)
 local UIBlox = require(parent.UIBlox)
 local Foundation = require(parent.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local withStyle = UIBlox.Style.withStyle
 local withTextSizeOffset = UIBlox.Core.Style.withTextSizeOffset
@@ -82,34 +81,20 @@ function extended:renderSponsored(data)
 			TextSize = textSize,
 			TextColor3 = theme.TextEmphasis.Color,
 			TextTransparency = theme.TextEmphasis.Transparency,
-			Font = 0,
 			FontFace = 0,
 			Text = 0,
 			AutomaticSize = 0,
 			LayoutOrder = 1
 		}
-		local font2
+		local v4
 
-		if not FoundationFontFaceMigration then
-			font2 = v.Font
+		if self.props.useLargerFont then
+			v4 = data.Tokens.Typography.BodyLarge.Font
+		else
+			v4 = data.Tokens.Typography.CaptionLarge.Font
 		end
 
-		v3.Font = font2
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			local v4
-
-			if self.props.useLargerFont then
-				v4 = data.Tokens.Typography.BodyLarge.Font
-			else
-				v4 = data.Tokens.Typography.CaptionLarge.Font
-			end
-
-			fontFace = normalizeFontFace(v4)
-		end
-
-		v3.FontFace = fontFace
+		v3.FontFace = normalizeFontFace(v4)
 
 		v3.Text = sponsoredText
 		v3.AutomaticSize = Enum.AutomaticSize.XY
@@ -125,10 +110,10 @@ function extended:renderSponsored(data)
 		})
 		local element = createElement("Frame", v2, children)
 
-		local v4 = math.ceil(textSize)
+		local v5 = math.ceil(textSize)
 
 		return Roact.createElement("Frame", {
-			Size = UDim2.new(1, 0, 0, v4),
+			Size = UDim2.new(1, 0, 0, v5),
 			Position = UDim2.new(0, 0, 1, 0),
 			AnchorPoint = Vector2.new(0, 1),
 			BackgroundColor3 = theme.UIDefault.Color,
@@ -220,7 +205,6 @@ function extended:renderFullGameStats(props, p, text, value: number?)
 
 	local theme = props.Theme
 	local font = props.Font
-	local font2 = font.CaptionSubHeader.Font
 	local textSize = font.BaseSize * font.CaptionSubHeader.RelativeSize
 	local v = math.ceil(textSize)
 	local maxTextSize = textSize + props.Tokens.Size.Size_150
@@ -240,53 +224,27 @@ function extended:renderFullGameStats(props, p, text, value: number?)
 			ImageTransparency = theme.TextDefault.Transparency,
 			ScaleType = Enum.ScaleType.Fit
 		}),
-		Vote = 0,
+		Vote = Roact.createElement("TextLabel", {
+			Size = UDim2.new(0.35, 0, 0, v2),
+			BackgroundTransparency = 1,
+			AnchorPoint = Vector2.new(0, 0.5),
+			Position = UDim2.fromScale(0.15, 0.5),
+			Text = text,
+			FontFace = normalizeFontFace(props.Tokens.Typography.CaptionLarge.Font),
+			TextColor3 = theme.TextDefault.Color,
+			TextTransparency = theme.TextDefault.Transparency,
+			TextSize = textSize,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextYAlignment = Enum.TextYAlignment.Bottom,
+			TextTruncate = Enum.TextTruncate.AtEnd
+		}, {
+			UiTextSizeConstraint = Roact.createElement("UITextSizeConstraint", {
+				MaxTextSize = maxTextSize
+			})
+		}),
 		PlayerIcon = 0,
 		PlayerCount = 0
 	}
-
-	local createElement2 = Roact.createElement
-	local v5 = {
-		Size = UDim2.new(0.35, 0, 0, v2),
-		BackgroundTransparency = 1,
-		AnchorPoint = Vector2.new(0, 0.5),
-		Position = UDim2.fromScale(0.15, 0.5),
-		Text = text,
-		Font = 0,
-		FontFace = 0,
-		TextColor3 = 0,
-		TextTransparency = 0,
-		TextSize = 0,
-		TextXAlignment = 0,
-		TextYAlignment = 0,
-		TextTruncate = 0
-	}
-	local font3
-
-	if not FoundationFontFaceMigration then
-		font3 = font2
-	end
-
-	v5.Font = font3
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(props.Tokens.Typography.CaptionLarge.Font)
-	end
-
-	v5.FontFace = fontFace
-
-	v5.TextColor3 = theme.TextDefault.Color
-	v5.TextTransparency = theme.TextDefault.Transparency
-	v5.TextSize = textSize
-	v5.TextXAlignment = Enum.TextXAlignment.Left
-	v5.TextYAlignment = Enum.TextYAlignment.Bottom
-	v5.TextTruncate = Enum.TextTruncate.AtEnd
-	v4.Vote = createElement2("TextLabel", v5, {
-		UiTextSizeConstraint = Roact.createElement("UITextSizeConstraint", {
-			MaxTextSize = maxTextSize
-		})
-	})
 	local playerIcon
 
 	if playerCountText ~= nil then
@@ -306,43 +264,20 @@ function extended:renderFullGameStats(props, p, text, value: number?)
 	local playerCount
 
 	if playerCountText ~= nil then
-		local createElement3 = Roact.createElement
-		local v6 = {
+		playerCount = Roact.createElement("TextLabel", {
 			Size = UDim2.new(0.35, 0, 0, v2),
 			BackgroundTransparency = 1,
 			AnchorPoint = Vector2.new(0, 0.5),
 			Position = UDim2.fromScale(0.65, 0.5),
 			Text = playerCountText,
-			Font = 0,
-			FontFace = 0,
-			TextColor3 = 0,
-			TextTransparency = 0,
-			TextSize = 0,
-			TextXAlignment = 0,
-			TextYAlignment = 0,
-			TextTruncate = 0
-		}
-
-		if FoundationFontFaceMigration then
-			font2 = nil
-		end
-
-		v6.Font = font2
-		local fontFace2
-
-		if FoundationFontFaceMigration then
-			fontFace2 = normalizeFontFace(props.Tokens.Typography.CaptionLarge.Font)
-		end
-
-		v6.FontFace = fontFace2
-
-		v6.TextColor3 = theme.TextDefault.Color
-		v6.TextTransparency = theme.TextDefault.Transparency
-		v6.TextSize = textSize
-		v6.TextXAlignment = Enum.TextXAlignment.Left
-		v6.TextYAlignment = Enum.TextYAlignment.Bottom
-		v6.TextTruncate = Enum.TextTruncate.AtEnd
-		playerCount = createElement3("TextLabel", v6, {
+			FontFace = normalizeFontFace(props.Tokens.Typography.CaptionLarge.Font),
+			TextColor3 = theme.TextDefault.Color,
+			TextTransparency = theme.TextDefault.Transparency,
+			TextSize = textSize,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextYAlignment = Enum.TextYAlignment.Bottom,
+			TextTruncate = Enum.TextTruncate.AtEnd
+		}, {
 			UiTextSizeConstraint = Roact.createElement("UITextSizeConstraint", {
 				MaxTextSize = maxTextSize
 			})
@@ -356,19 +291,16 @@ end
 function extended:renderConcurrentUsersPill(p, p2)
 	local playerCountText = p2.playerCountText
 	local font = p.Font
-	local font2 = font.Footer.Font
 	local textSize = font.BaseSize * font.Footer.RelativeSize
 
-	local createElement = Roact.createElement
-	local v = {
+	return Roact.createElement("Frame", {
 		Size = UDim2.new(0, 0, 0, 23),
 		Position = UDim2.new(1, -8, 1, -8),
 		AnchorPoint = Vector2.new(1, 1),
 		AutomaticSize = Enum.AutomaticSize.X,
 		BackgroundTransparency = 0,
 		BackgroundColor3 = Colors.Black
-	}
-	local v2 = {
+	}, {
 		Corner = Roact.createElement("UICorner", { CornerRadius = UDim.new(0, 8) }),
 		Padding = Roact.createElement("UIPadding", {
 			PaddingTop = UDim.new(0, 2),
@@ -393,45 +325,20 @@ function extended:renderConcurrentUsersPill(p, p2)
 			ImageTransparency = 0,
 			ScaleType = Enum.ScaleType.Fit
 		}),
-		PillPlayerCount = 0
-	}
-
-	local createElement2 = Roact.createElement
-	local v3 = {
-		Size = UDim2.new(0, 0, 0, 0),
-		AutomaticSize = Enum.AutomaticSize.XY,
-		BackgroundTransparency = 1,
-		LayoutOrder = 2,
-		Text = playerCountText,
-		Font = 0,
-		FontFace = 0,
-		TextColor3 = 0,
-		TextTransparency = 0,
-		TextSize = 0,
-		TextXAlignment = 0,
-		TextYAlignment = 0
-	}
-
-	if FoundationFontFaceMigration then
-		font2 = nil
-	end
-
-	v3.Font = font2
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(p.Tokens.Typography.CaptionSmall.Font)
-	end
-
-	v3.FontFace = fontFace
-
-	v3.TextColor3 = Colors.White
-
-	v3.TextSize = textSize
-	v3.TextXAlignment = Enum.TextXAlignment.Left
-	v3.TextYAlignment = Enum.TextYAlignment.Bottom
-	v2.PillPlayerCount = createElement2("TextLabel", v3)
-	return createElement("Frame", v, v2)
+		PillPlayerCount = Roact.createElement("TextLabel", {
+			Size = UDim2.new(0, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.XY,
+			BackgroundTransparency = 1,
+			LayoutOrder = 2,
+			Text = playerCountText,
+			FontFace = normalizeFontFace(p.Tokens.Typography.CaptionSmall.Font),
+			TextColor3 = Colors.White,
+			TextTransparency = 0,
+			TextSize = textSize,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextYAlignment = Enum.TextYAlignment.Bottom
+		})
+	})
 end
 
 function extended:render()

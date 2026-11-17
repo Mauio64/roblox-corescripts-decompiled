@@ -1,1 +1,0 @@
-return game:DefineFastInt("RobloxPlusTrialDiscountBaseDays", 60)

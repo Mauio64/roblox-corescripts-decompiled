@@ -14,9 +14,7 @@ local FFlagUserListCanonicalCtaAnalytics = require(UserList.Flags.FFlagUserListC
 local SharedFlags = require(parent.SharedFlags)
 local FFlagUserListDefaultCtaWidths = SharedFlags.FFlagUserListDefaultCtaWidths
 local SharedFlags2 = require(parent.SharedFlags)
-local FFlagUserListComposeRenderRowWithCta = SharedFlags2.FFlagUserListComposeRenderRowWithCta
-local SharedFlags3 = require(parent.SharedFlags)
-local FFlagUserListSurfaceExtensions = SharedFlags3.FFlagUserListSurfaceExtensions
+local FFlagUserListSurfaceExtensions = SharedFlags2.FFlagUserListSurfaceExtensions
 
 local ProfileCTAService = ProfileCtaService.ProfileCTAService
 
@@ -31,10 +29,6 @@ local function useCtaRenderRow(p, renderRow)
 	end, {})
 
 	local actionHandlers = useCtaActionHandlers(p)
-
-	if not FFlagUserListComposeRenderRowWithCta then
-		renderRow = nil
-	end
 
 	local ctaConfig = React.useMemo(function()
 		if
@@ -72,12 +66,11 @@ local function useCtaRenderRow(p, renderRow)
 					renderRow = nil
 				}
 
-				if not (FFlagUserListCanonicalCtaAnalytics or FFlagUserListComposeRenderRowWithCta and renderRow) then
+				if not (FFlagUserListCanonicalCtaAnalytics or renderRow) then
 					p2 = nil
 				end
 
 				v3.index = p2
-
 				v3.renderRow = renderRow
 				return createElement(v2, v3)
 			elseif renderRow then

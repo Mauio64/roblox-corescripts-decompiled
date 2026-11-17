@@ -1,4 +1,3 @@
-local TextService = game:GetService("TextService")
 local CorePackages = game:GetService("CorePackages")
 local GuiService = game:GetService("GuiService")
 
@@ -30,7 +29,6 @@ local SetCurrentPage = require(parent.Actions.SetCurrentPage)
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 
 local Foundation = require(CorePackages.Packages.Foundation)
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local Image = Foundation.Image
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagCoreUiMigrateUIBloxToFoundation = SharedFlags.FFlagCoreUiMigrateUIBloxToFoundation
@@ -49,20 +47,14 @@ end
 function extended.render(p)
 	local props = p.props
 
-	return withFoundationOrUIBloxStyle(function(p2)
-		local tokens
-
-		if FoundationFontFaceMigration then
-			tokens = p2
-		end
-
+	return withFoundationOrUIBloxStyle(function(tokens)
 		return {
 			Tokens = tokens,
 			Font = {
 				BaseSize = 1,
 				Body = {
-					Font = p2.Typography.BodyLarge.Font,
-					RelativeSize = p2.Typography.BodyLarge.FontSize
+					Font = tokens.Typography.BodyLarge.Font,
+					RelativeSize = tokens.Typography.BodyLarge.FontSize
 				}
 			}
 		}
@@ -71,17 +63,10 @@ function extended.render(p)
 			noFriendsText = "CoreScripts.InGameMenu.InviteFriends.NoFriends",
 			makeFriendsNow = "CoreScripts.InGameMenu.InviteFriends.MakeFriendsNow"
 		})(function(p3)
-			local font = p2.Font.Body.Font
 			local v = p2.Font.Body.RelativeSize * p2.Font.BaseSize
-			local y
-
-			if FoundationFontFaceMigration then
-				y = GetTextSize(p3.noFriendsText, v, p2.Tokens.Typography.BodyLarge.Font, Vector2.new(304, 1e999), {
-					addTemporaryPadding = false
-				}).Y
-			else
-				y = TextService:GetTextSize(p3.noFriendsText, v, font, Vector2.new(304, 1e999)).Y
-			end
+			local y = GetTextSize(p3.noFriendsText, v, p2.Tokens.Typography.BodyLarge.Font, Vector2.new(304, 1e999), {
+				addTemporaryPadding = false
+			}).Y
 
 			local createElement = Roact.createElement
 			local v2 = {

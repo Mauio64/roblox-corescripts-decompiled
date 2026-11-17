@@ -1,5 +1,5 @@
 local function lazyMembers(p, items)
-	local function load(p2: string) -- 1 equivalent call inferred from this helper
+	local function load(p2: string) -- 2 equivalent calls inferred from this helper
 		local v = items[p2]()
 		rawset(p, p2, v)
 		return v
@@ -16,7 +16,7 @@ local function lazyMembers(p, items)
 		__iter = function(p2)
 			for k in items do
 				if rawget(p2, k) == nil then
-					rawset(p, k, (items[k]()))
+					load(k) -- inferred equivalent call
 				end
 			end
 

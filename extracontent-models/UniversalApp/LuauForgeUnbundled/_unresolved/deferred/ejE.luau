@@ -1,1 +1,0 @@
-return { useCoHubAnalytics = require("@luauforge/deferred/ejF"), EventNames = require("@game/CorePackages/Workspace/Packages/_Workspace/UserRelationshipModals/UserRelationshipModals/Analytics/EventNames") }

@@ -8,6 +8,8 @@ require(parent.Common.DirectRecommendationTypes)
 
 local SharedFlags = require(parent2.SharedFlags)
 local FFlagLuaAppEnableSduiHomePage = SharedFlags.FFlagLuaAppEnableSduiHomePage
+local SharedFlags2 = require(parent2.SharedFlags)
+local FFlagPymkCarouselExtendProps = SharedFlags2.FFlagPymkCarouselExtendProps
 
 local UserList = require(parent2.UserList)
 
@@ -31,7 +33,7 @@ local function usePrimaryCta(data)
 	v.contactId = contactId
 	local recommendation
 
-	if FFlagLuaAppEnableSduiHomePage then
+	if FFlagPymkCarouselExtendProps or FFlagLuaAppEnableSduiHomePage then
 		recommendation = data.recommendation
 	end
 

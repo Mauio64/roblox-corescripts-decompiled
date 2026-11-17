@@ -1,4 +1,34 @@
-return table.freeze({
+local Flags = require(script:FindFirstAncestor("ViewRecyclerRoblox").Flags)
+local FFlagViewRecyclerReact084 = Flags.FFlagViewRecyclerReact084
+return table.freeze(FFlagViewRecyclerReact084 and {
+	"scrollingFrame",
+	"viewportOverlay",
+	"axis",
+	"dataSource",
+	"layout",
+	"overscan",
+	"dataPrefetch",
+	"contentAlignment",
+	"isItemStickyHeader",
+	"pinnedStartItem",
+	"pinnedEndItem",
+	"preserveScrollPositionOnChange",
+	"initialScrollAlignment",
+	"autoScrollOnChange",
+	"autoScrollThreshold",
+	"animatedScroll",
+	"onStartReached",
+	"onEndReached",
+	"startReachedThreshold",
+	"endReachedThreshold",
+	"onViewportChanged",
+	"onScrollOffsetChanged",
+	"onContentLengthChanged",
+	"onVisibleRangeChanged",
+	"onMountedRangeChanged",
+	"onVisibleItemsPresented",
+	"onDataPrefetchRequested"
+} or {
 	"scrollingFrame",
 	"viewportOverlay",
 	"axis",

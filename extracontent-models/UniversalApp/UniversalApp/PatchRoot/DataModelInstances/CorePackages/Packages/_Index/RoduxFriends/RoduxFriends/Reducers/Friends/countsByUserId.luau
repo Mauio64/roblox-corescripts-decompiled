@@ -40,11 +40,11 @@ return function(p)
 				return countUserFriendsInStore((setFriendshipsInStore(v2.byUserId, p3)))
 			end
 
-			if p3 and p3.type == friendsNetworking.UnfriendTargetUserId.Succeeded.name then
-				return countUserFriendsInStore((removeTargetUserFriendshipInStore(p2.byUserId, p3)))
+			if not p3 or p3.type ~= friendsNetworking.UnfriendTargetUserId.Succeeded.name then
+				return v2.countsByUserId
 			end
 
-			return v2.countsByUserId
+			return countUserFriendsInStore((removeTargetUserFriendshipInStore(p2.byUserId, p3)))
 		end
 	end
 end

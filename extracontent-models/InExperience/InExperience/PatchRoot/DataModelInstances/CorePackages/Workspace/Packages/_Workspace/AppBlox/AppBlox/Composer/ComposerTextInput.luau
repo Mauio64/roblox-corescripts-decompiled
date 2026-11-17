@@ -9,8 +9,6 @@ local SharedFlags = require(parent2.SharedFlags)
 local FFlagComposerFooter = SharedFlags.FFlagComposerFooter
 local defineFastFlag = game:DefineFastFlag("ComposerMultiLineCaretFix", false)
 local defineFastFlag2 = game:DefineFastFlag("ComposerDraftTextBindingSync", false)
-local Foundation = require(parent2.Foundation)
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local components = foundation.Components
 local Icon = require(components.Icon)
@@ -71,20 +69,7 @@ local memo = React.memo(React.forwardRef(function(props, ref)
 	v2.Selectable = false
 	v2.Active = not isBoundsChecker and nil
 	v2.Visible = not isBoundsChecker and nil
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = props.fontStyle.Font
-	end
-
-	v2.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(props.fontStyle.Font)
-	end
-
-	v2.FontFace = fontFace
+	v2.FontFace = normalizeFontFace(props.fontStyle.Font)
 	v2.TextSize = props.fontStyle.FontSize
 	v2.LineHeight = props.fontStyle.LineHeight
 	local textColor
@@ -271,42 +256,30 @@ local function InternalTextInput(p, p2)
 	end, {})
 
 	local v15 = React.useCallback(function(text: string)
-		local v15 = {
+		local v15 = measureTextLineCount({
 			text = text,
 			maxLines = v2.maxLines,
 			singleLineHeight = multiLineTextHeight,
 			layoutWidth = v14(),
-			font = 0,
-			fontSize = 0
-		}
-		local font
-
-		if FoundationFontFaceMigration then
-			font = normalizeFontFace(fontStyle.Font)
-		else
-			font = fontStyle.Font
-		end
-
-		v15.font = font
-
-		v15.fontSize = fontSize
-		local v16 = measureTextLineCount(v15)
+			font = normalizeFontFace(fontStyle.Font),
+			fontSize = fontSize
+		})
 
 		if defineFastFlag then
-			setState5(getMultiLineTextHeight(fontSize, v16.unclampedLineCount, lineHeight))
+			setState5(getMultiLineTextHeight(fontSize, v15.unclampedLineCount, lineHeight))
 		else
-			local v17
+			local v16
 
-			if v16.boundsY and v16.boundsY > 0 then
-				v17 = math.ceil(v16.boundsY)
+			if v15.boundsY and v15.boundsY > 0 then
+				v16 = math.ceil(v15.boundsY)
 			else
-				v17 = multiLineTextHeight
+				v16 = multiLineTextHeight
 			end
 
-			setState5((math.max(v17, v16.lineCount * multiLineTextHeight)))
+			setState5((math.max(v16, v15.lineCount * multiLineTextHeight)))
 		end
 
-		return v16.lineCount
+		return v15.lineCount
 	end, { fontSize, lineHeight, fontStyle.Font, v2.maxLines, v14, multiLineTextHeight })
 	local text3
 

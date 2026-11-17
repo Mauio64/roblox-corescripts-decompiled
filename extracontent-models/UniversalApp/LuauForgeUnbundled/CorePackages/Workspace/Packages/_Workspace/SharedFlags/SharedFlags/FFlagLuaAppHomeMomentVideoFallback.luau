@@ -1,1 +1,0 @@
-return game:DefineFastFlag("LuaAppHomeMomentVideoFallback3", false)

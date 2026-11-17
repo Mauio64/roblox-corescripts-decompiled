@@ -9,7 +9,6 @@ local t = InGameMenuDependencies.t
 
 local withStyle = UIBlox.Core.Style.withStyle
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local parent = script.Parent.Parent.Parent
 local GlobalConfig = require(parent.GlobalConfig)
 
@@ -54,38 +53,19 @@ local function ThemedTextLabel(p)
 		local v3 = props.Theme[p.themeKey or "TextDefault"]
 		local v4 = props.Font[p.fontKey or "Body"]
 
-		local join = Cryo.Dictionary.join
-		local v5 = { TextColor3 = v3.Color, TextTransparency = v3.Transparency }
-
-		local v6 = {
+		local joined = Cryo.Dictionary.join({
+			TextColor3 = v3.Color,
+			TextTransparency = v3.Transparency
+		}, p, {
 			fontKey = Cryo.None,
 			themeKey = Cryo.None,
 			BackgroundTransparency = 1,
-			Font = 0,
-			FontFace = 0,
-			TextSize = 0
-		}
-		local font
+			Font = Cryo.None,
+			FontFace = normalizeFontFace(props.Tokens.Typography[v[p.fontKey or "Body"]].Font),
+			TextSize = v4.RelativeSize * props.Font.BaseSize
+		})
 
-		if FoundationFontFaceMigration then
-			font = Cryo.None
-		else
-			font = v4.Font
-		end
-
-		v6.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(props.Tokens.Typography[v[p.fontKey or "Body"]].Font)
-		end
-
-		v6.FontFace = fontFace
-
-		v6.TextSize = v4.RelativeSize * props.Font.BaseSize
-		local v7 = join(v5, p, v6)
-
-		return Roact.createElement("TextLabel", v7)
+		return Roact.createElement("TextLabel", joined)
 	end)
 end
 

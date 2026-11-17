@@ -13,6 +13,7 @@ local fetchShareLink = require(script.Parent.fetchShareLink)
 local GetShareCountsStore = require(Moments.Stores.GetShareCountsStore)
 local GetToastStore = require(Moments.Stores.GetToastStore)
 local readAppPolicy = require(script.Parent.readAppPolicy)
+local FFlagMomentsLinkCopiedOnlyWhenCopied = require(Moments.Flags.FFlagMomentsLinkCopiedOnlyWhenCopied)
 
 local function shareMoment(data)
 	local momentId = data.momentId
@@ -40,13 +41,27 @@ local function shareMoment(data)
 			return
 		end
 
-		if not pcall(function()
-			local v = readAppPolicy()
+		local v
 
-			if v and v.EnableShareCaptureCTA and v.EligibleForCapturesFeature then
+		if FFlagMomentsLinkCopiedOnlyWhenCopied then
+			v = false
+		else
+			v = nil
+		end
+
+		if not pcall(function()
+			local v2 = readAppPolicy()
+
+			if v2 and v2.EnableShareCaptureCTA and v2.EligibleForCapturesFeature then
 				default:shareUrl({ url = result, context = "MomentsFeed" })
-			else
-				default:setClipboardText({ text = result, context = "MomentsFeed" })
+
+				return
+			end
+
+			default:setClipboardText({ text = result, context = "MomentsFeed" })
+
+			if FFlagMomentsLinkCopiedOnlyWhenCopied then
+				v = true
 			end
 		end) then
 			notifyFailure() -- inferred equivalent call
@@ -65,7 +80,9 @@ local function shareMoment(data)
 			Analytics.fireAnalyticsEvent(EventNames.FeedShareButtonPressed, feedActionFields)
 		end
 
-		GetToastStore(false).triggerToast({ title = strings.linkCopied, text = "" })
+		if not FFlagMomentsLinkCopiedOnlyWhenCopied or v then
+			GetToastStore(false).triggerToast({ title = strings.linkCopied, text = "" })
+		end
 	end)
 end
 

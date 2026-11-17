@@ -19,7 +19,7 @@ local recommendationConfig = {
 }
 return {
 	DisplayOrder = { Feed = 100, FeedTopBar = 101, Modals = 400 },
-	ZIndex = { Toasts = 10, Dialog = 20 },
+	ZIndex = { PostStatusCard = 9, Toasts = 10, Dialog = 20 },
 	MaxSize = { BottomUI = Vector2.new(600, 1e999) },
 	RecommendationConfig = recommendationConfig,
 	ImmersiveFeedKind = { Trending = "trending", User = "user" },
@@ -60,5 +60,6 @@ return {
 		image3 = "rbxassetid://75489087089000"
 	},
 	NonRootPlaceErrorMessages = "The Source Place and the Destination Place are not in the same Universe.",
-	UserCannotJoin = "A specified Member cannot join the Destination Place"
+	UserCannotJoin = "A specified Member cannot join the Destination Place",
+	PostStatusToastNotificationType = "MomentPostStatus"
 }

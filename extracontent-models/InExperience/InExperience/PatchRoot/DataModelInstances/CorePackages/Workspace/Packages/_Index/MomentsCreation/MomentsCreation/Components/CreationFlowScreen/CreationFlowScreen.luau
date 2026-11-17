@@ -146,6 +146,8 @@ local function CreationFlowContent(props)
 
 	if FFlagMomentsCreateAvatarPosts and isAvatarMoment(selectedCapture) then
 		avatarMoment = selectedCapture
+	else
+		avatarMoment = nil
 	end
 
 	local v6 = useSignalState(v.getComposedEdits)
@@ -311,13 +313,24 @@ local function CreationFlowContent(props)
 		end
 	end, { current2, v5.disable })
 
-	local v13 = useCallback(function()
+	local function fn()
 		if not (v8 and v8.modalType) then
 			return nil
 		end
 
 		if v8.modalType == DialogType.ExitCreationConfirmation then
-			return React.createElement(ExitConfirmationDialog, v8.modalProps)
+			local createElement = React.createElement
+			local v13
+
+			if FFlagMomentsCreateAvatarPosts and avatarMoment ~= nil then
+				v13 = Cryo.Dictionary.join(v8.modalProps, {
+					bodyLocalizationKey = "Feature.Moments.Description.LeaveAvatarMomentsCreation"
+				})
+			else
+				v13 = v8.modalProps
+			end
+
+			return createElement(ExitConfirmationDialog, v13)
 		end
 
 		if v8.modalType == DialogType.TextFiltered then
@@ -341,9 +354,17 @@ local function CreationFlowContent(props)
 		end
 
 		return nil
-	end, { v8 })
+	end
 
-	local v14 = useCallback(function(p: string)
+	local v13
+
+	if FFlagMomentsCreateAvatarPosts then
+		v13 = avatarMoment
+	end
+
+	local v14 = useCallback(fn, { v8, v13 })
+
+	local v15 = useCallback(function(p: string)
 		if v7 == nil or v7.presentation ~= p or current2 ~= v7.step then
 			return nil
 		end
@@ -359,55 +380,55 @@ local function CreationFlowContent(props)
 		return React.createElement(StepStub(v7.kind), {})
 	end, { v7, current2, v })
 
-	local v15 = useMemo(function()
+	local v16 = useMemo(function()
 		local signal, setItemSize = Signals.createSignal(Vector2.zero)
 		return { getItemSize = signal, setItemSize = setItemSize }
 	end, {})
 
-	local v16 = useMemo(function()
+	local v17 = useMemo(function()
 		local signal, setItemResolution = Signals.createSignal(Vector2.zero)
 		return { getItemResolution = signal, setItemResolution = setItemResolution }
 	end, {})
 
-	local v17 = useMemo(function()
+	local v18 = useMemo(function()
 		local signal, set = Signals.createSignal(false)
 		return { get = signal, set = set }
 	end, {})
-	local hidden = useSignalState(v17.get)
+	local hidden = useSignalState(v18.get)
 
 	if FFlagMomentsTextOverlayDragToDeleteRefinement then
 		useEffect(function()
-			v17.set(false)
-		end, { current2, v17 })
+			v18.set(false)
+		end, { current2, v18 })
 	end
 
-	local v18 = useMemo(function()
+	local v19 = useMemo(function()
 		return {
-			getItemSize = v15.getItemSize,
-			getItemResolution = v16.getItemResolution,
-			setIsOverlayDragging = v17.set
+			getItemSize = v16.getItemSize,
+			getItemResolution = v17.getItemResolution,
+			setIsOverlayDragging = v18.set
 		}
-	end, { v15, v16, v17 })
+	end, { v16, v17, v18 })
 
 	local onAbsoluteSizeChanged2 = useCallback(function(p)
-		v15.setItemSize(p.AbsoluteSize)
-	end, { v15 })
-
-	local onResolutionChanged = useCallback(function(vector2: Vector2)
-		v16.setItemResolution(vector2)
+		v16.setItemSize(p.AbsoluteSize)
 	end, { v16 })
 
-	local v19 = useMemo(function()
+	local onResolutionChanged = useCallback(function(vector2: Vector2)
+		v17.setItemResolution(vector2)
+	end, { v17 })
+
+	local v20 = useMemo(function()
 		local result = {}
 
-		for _, v19 in tools do
-			if v19.renderPreviewLayer ~= nil then
-				result[v19.kind .. "PreviewLayer"] = v19.renderPreviewLayer(v, v18)
+		for _, v20 in tools do
+			if v20.renderPreviewLayer ~= nil then
+				result[v20.kind .. "PreviewLayer"] = v20.renderPreviewLayer(v, v19)
 			end
 		end
 
 		return result
-	end, { tools, v, v18 })
+	end, { tools, v, v19 })
 	local scaleType
 
 	if v5.enabled then
@@ -419,7 +440,7 @@ local function CreationFlowContent(props)
 	local AvatarMomentContainer = require(MomentsCreation.Components.AvatarMomentContainer)
 
 	local createElement = React.createElement
-	local v20 = {
+	local v21 = {
 		backgroundStyle = v3.Color.Common.Scrim,
 		tag = "position-center-center anchor-center-center size-full-full",
 		onActivated = onActivated3,
@@ -428,7 +449,7 @@ local function CreationFlowContent(props)
 	}
 
 	local createElement2 = React.createElement
-	local v21 = {
+	local v22 = {
 		tag = {
 			["position-center-center anchor-center-center size-full-full bg-surface-0"] = true,
 			["radius-large"] = not FFlagMomentsCreationCompactPanelSquareCorners or v4 == FormFactor.Wide
@@ -444,10 +465,10 @@ local function CreationFlowContent(props)
 		maxSize = Vector2.new(600, 700)
 	end
 
-	v21.sizeConstraint = { MaxSize = maxSize }
+	v22.sizeConstraint = { MaxSize = maxSize }
 
-	v21.onActivated = noopActivated
-	v21.stateLayer = stateLayer
+	v22.onActivated = noopActivated
+	v22.stateLayer = stateLayer
 	local voiceBackControls
 
 	if GetFFlagMomentsTTSAudioOverlay and current2 == CreationFlowState.Voice then
@@ -489,7 +510,7 @@ local function CreationFlowContent(props)
 	local createElement3 = React.createElement
 
 	local createElement4 = React.createElement
-	local v22 = {
+	local v23 = {
 		tag = "col align-x-center",
 		Size = v10:map(function(p: number)
 			return UDim2.new(1, 0, 1, -(p + state))
@@ -497,12 +518,12 @@ local function CreationFlowContent(props)
 	}
 
 	local createElement5 = React.createElement
-	local v23 = {
+	local v24 = {
 		LayoutOrder = 1,
 		Size = UDim2.fromScale(1, 1),
 		BackgroundTransparency = v3.Color.None.Transparency
 	}
-	local v24 = {
+	local v25 = {
 		UIFlexItem = React.createElement("UIFlexItem", {
 			FlexMode = Enum.UIFlexMode.Custom,
 			ShrinkRatio = selectedCapture and 1 or 2
@@ -529,10 +550,10 @@ local function CreationFlowContent(props)
 			onAbsoluteSizeChanged = onAbsoluteSizeChanged2,
 			onResolutionChanged = onResolutionChanged,
 			ttsAudio = v.ttsAudio
-		}, v19)
+		}, v20)
 	end
 
-	v24.CaptureView = captureView
+	v25.CaptureView = captureView
 	local avatarMomentView
 
 	if avatarMoment ~= nil then
@@ -542,10 +563,10 @@ local function CreationFlowContent(props)
 			onAbsoluteSizeChanged = onAbsoluteSizeChanged2,
 			onResolutionChanged = onResolutionChanged,
 			ttsAudio = v.ttsAudio
-		}, v19)
+		}, v20)
 	end
 
-	v24.AvatarMomentView = avatarMomentView
+	v25.AvatarMomentView = avatarMomentView
 	local voiceTopScrim
 
 	if GetFFlagMomentsTTSAudioOverlay and current2 == CreationFlowState.Voice then
@@ -557,12 +578,12 @@ local function CreationFlowContent(props)
 		})
 	end
 
-	v24.VoiceTopScrim = voiceTopScrim
+	v25.VoiceTopScrim = voiceTopScrim
 
 	local createElement6 = React.createElement
 
 	local createElement7 = React.createElement
-	local v25 = {
+	local v26 = {
 		padding = {
 			bottom = UDim.new(0, v3.Padding.Large),
 			left = UDim.new(0, (math.max(v2.left, v3.Padding.Large))),
@@ -581,22 +602,22 @@ local function CreationFlowContent(props)
 		local createElement8 = React.createElement
 
 		local createElement9 = React.createElement
-		local v26 = { musicAssetId = music.assetId, onActivated = onActivated2, onRemove = 0 }
+		local v27 = { musicAssetId = music.assetId, onActivated = onActivated2, onRemove = 0 }
 
 		if not FFlagMomentsCreationMusicChipRemoveButton then
 			onRemove = nil
 		end
 
-		v26.onRemove = onRemove
+		v27.onRemove = onRemove
 		musicIndicator = createElement8(View, {
 			tag = "position-bottom-left anchor-bottom-left auto-xy"
 		}, {
-			MusicChip = createElement9(MusicChip, v26)
+			MusicChip = createElement9(MusicChip, v27)
 		})
 	end
 
-	local v26 = {
-		OtherControls = createElement7(View, v25, { MusicIndicator = musicIndicator }),
+	local v27 = {
+		OtherControls = createElement7(View, v26, { MusicIndicator = musicIndicator }),
 		PlaybackControls = 0
 	}
 	local playbackControls
@@ -629,17 +650,17 @@ local function CreationFlowContent(props)
 		})
 	end
 
-	v26.PlaybackControls = playbackControls
-	v24.PreviewMediaOverlay = createElement6(
+	v27.PlaybackControls = playbackControls
+	v25.PreviewMediaOverlay = createElement6(
 		View,
 		{ tag = "col position-bottom-center anchor-bottom-center size-full-0 auto-y", ZIndex = 5 },
-		v26
+		v27
 	)
 	local editCTABar
 
 	if current2 == CreationFlowState.Preview then
 		local createElement8 = React.createElement
-		local v27 = {
+		local v28 = {
 			tools = tools,
 			onToolSelected = onToolSelected,
 			showText = showText,
@@ -655,7 +676,7 @@ local function CreationFlowContent(props)
 			hidden = nil
 		end
 
-		v27.hidden = hidden
+		v28.hidden = hidden
 		local coachmark
 
 		if GetFFlagMomentsTTSAudioOverlay and GetFFlagMomentsTTSCoachmark() then
@@ -663,13 +684,13 @@ local function CreationFlowContent(props)
 			coachmark = makeVoiceCoachmarkConfig(GetFFlagMomentsTTSAudioOverlay, GetFFlagMomentsTTSCoachmark())
 		end
 
-		v27.coachmark = coachmark
-		editCTABar = createElement8(EditCTABar, v27)
+		v28.coachmark = coachmark
+		editCTABar = createElement8(EditCTABar, v28)
 	end
 
-	v24.EditCTABar = editCTABar
-	local v27 = {
-		PreviewContainer = createElement5("CanvasGroup", v23, v24),
+	v25.EditCTABar = editCTABar
+	local v28 = {
+		PreviewContainer = createElement5("CanvasGroup", v24, v25),
 		GalleryView = 0,
 		PreviewView = 0,
 		ActiveStepEditor = 0,
@@ -699,7 +720,7 @@ local function CreationFlowContent(props)
 		end
 	end
 
-	v27.GalleryView = galleryView
+	v28.GalleryView = galleryView
 	local previewView
 
 	if current2 == CreationFlowState.Preview then
@@ -716,9 +737,9 @@ local function CreationFlowContent(props)
 		})
 	end
 
-	v27.PreviewView = previewView
+	v28.PreviewView = previewView
 
-	v27.ActiveStepEditor = v14("Step")
+	v28.ActiveStepEditor = v15("Step")
 	local descriptionView
 
 	if current2 == CreationFlowState.Description then
@@ -736,30 +757,30 @@ local function CreationFlowContent(props)
 		})
 	end
 
-	v27.DescriptionView = descriptionView
-	local v28 = { MainView = createElement4(View, v22, v27), MusicView = 0 }
+	v28.DescriptionView = descriptionView
+	local v29 = { MainView = createElement4(View, v23, v28), MusicView = 0 }
 	local musicView
 
 	if FFlagMomentsCreationMusicEditorRedesign then
 		musicView = React.createElement(DockedEditorContext.Provider, { value = v11 }, {
-			MusicView = v14("Overlay")
+			MusicView = v15("Overlay")
 		})
 	else
-		musicView = v14("Overlay")
+		musicView = v15("Overlay")
 	end
 
-	v28.MusicView = musicView
-	local element = createElement(View, v20, {
-		CreationFlowView = createElement2(View, v21, {
+	v29.MusicView = musicView
+	local element = createElement(View, v21, {
+		CreationFlowView = createElement2(View, v22, {
 			VoiceBackControls = voiceBackControls,
 			CloseButtonContainer = closeButtonContainer,
 			MainViewContainer = createElement3(View, {
 				tag = "size-full",
 				ZIndex = GetFFlagMomentsCreationCloseButtonZIndexFix and 1 or nil,
 				onAbsoluteSizeChanged = onAbsoluteSizeChanged
-			}, v28)
+			}, v29)
 		}),
-		Modal = v13()
+		Modal = v14()
 	})
 
 	return React.createElement(
@@ -773,6 +794,14 @@ local function CreationFlowScreen(props)
 	local onExit = props.onExit
 	local host = props.host
 	local captureSource = props.captureSource
+	local canDismissCreationFlow
+
+	if FFlagMomentsRenderCreatePostStatus then
+		canDismissCreationFlow = props.canDismissCreationFlow
+	else
+		canDismissCreationFlow = nil
+	end
+
 	local ref
 
 	if FFlagMomentsRenderCreatePostStatus then
@@ -782,42 +811,65 @@ local function CreationFlowScreen(props)
 		ref = nil
 	end
 
-	local host2 = React.useMemo(function()
-		if host == nil then
-			return {
-				exitCreationFlow = onExit,
-				onPublishFinished = FFlagMomentsRenderCreatePostStatus and function(flag: boolean)
-					local current = ref.current
-
-					if current ~= nil then
-						current(flag)
-					end
-				end or nil,
-				captureSource = captureSource,
-				isTextFiltered = isTextFiltered,
-				createMoment = studio and function(_, _, p: string)
-					print(`[moments-creation] dev publish (not uploaded): "{p}"`)
-				end or publishMoment
-			}
+	local useMemo2 = React.useMemo
+	local function fn()
+		if host ~= nil then
+			return host
 		end
 
-		return host
-	end, { host, onExit, captureSource })
+		local v = {
+			exitCreationFlow = onExit,
+			canDismissCreationFlow = nil,
+			onPublishFinished = 0,
+			captureSource = 0,
+			isTextFiltered = 0,
+			createMoment = 0
+		}
+		local canDismissCreationFlow2
+
+		if FFlagMomentsRenderCreatePostStatus then
+			canDismissCreationFlow2 = canDismissCreationFlow
+		end
+
+		v.canDismissCreationFlow = canDismissCreationFlow2
+		v.onPublishFinished = FFlagMomentsRenderCreatePostStatus and function(flag: boolean)
+			local current = ref.current
+
+			if current ~= nil then
+				current(flag)
+			end
+		end or nil
+
+		v.captureSource = captureSource
+		v.isTextFiltered = isTextFiltered
+		v.createMoment = studio and function(_, _, p: string)
+			print(`[moments-creation] dev publish (not uploaded): "{p}"`)
+		end or publishMoment
+		return v
+	end
+
+	local v
+
+	if FFlagMomentsRenderCreatePostStatus then
+		v = canDismissCreationFlow
+	end
+
+	local host2 = useMemo2(fn, { host, onExit, captureSource, v })
 
 	local createElement = React.createElement
-	local v = { colorMode = ColorMode.Dark }
+	local v2 = { colorMode = ColorMode.Dark }
 
 	local createElement2 = React.createElement
-	local v2 = { host = host2, excludeGallery = props.excludeGallery, initialAvatarMoment = 0 }
+	local v3 = { host = host2, excludeGallery = props.excludeGallery, initialAvatarMoment = 0 }
 	local initialAvatarMoment
 
 	if FFlagMomentsCreateAvatarPosts then
 		initialAvatarMoment = props.initialAvatarMoment
 	end
 
-	v2.initialAvatarMoment = initialAvatarMoment
-	return createElement(FoundationProvider, v, {
-		Root = createElement2(CreationControllerProvider, v2, {
+	v3.initialAvatarMoment = initialAvatarMoment
+	return createElement(FoundationProvider, v2, {
+		Root = createElement2(CreationControllerProvider, v3, {
 			Content = React.createElement(CreationFlowContent, {
 				excludeGallery = props.excludeGallery,
 				captureSource = host2.captureSource,

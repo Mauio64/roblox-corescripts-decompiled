@@ -26,9 +26,13 @@ return function(callback, p, items)
 	ArgCheck.isType(p, "string", "fetchConfigWithAttributes expects abuseVector as a string")
 
 	local robloxLocaleId = LocalizationService.RobloxLocaleId
+	local v2
 
-	local v2 = (not items or next(items) == nil) and ""
-		or `&attributes={HttpService:UrlEncode((HttpService:JSONEncode(items)))}`
+	if items and next(items) ~= nil then
+		v2 = `&attributes={HttpService:UrlEncode((HttpService:JSONEncode(items)))}`
+	else
+		v2 = ""
+	end
 
 	local urlEncode = HttpService:UrlEncode(p)
 	local urlEncode2 = HttpService:UrlEncode(robloxLocaleId)

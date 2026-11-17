@@ -3,12 +3,10 @@ local parent = script:FindFirstAncestor("AppChat").Parent
 local React = require(parent.React)
 
 return {
-	ConversationListUltimate = function(p)
-		local ConversationListUltimate = require(script.Parent.ConversationListUltimate)
+	ConversationListViewRecycler = function(p)
+		local ConversationListViewRecycler = require(script.Parent.ConversationListViewRecycler)
 
-		return React.createElement(ConversationListUltimate, p)
+		return React.createElement(ConversationListViewRecycler, p)
 	end,
-	ConversationRow = require(script.Parent.ConversationRow),
-	logger = require(script.Parent.Logger),
-	screenComponent = require(script.Parent.ChatLandingScreen)
+	ConversationRow = require(script.Parent.ConversationRow)
 }

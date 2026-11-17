@@ -186,15 +186,15 @@ function translateText(p)
 
 	local url = translateTextUrl(p)
 
-	if typeof(url) == "string" then
-		return OpenCloudService:HttpRequestAsync({
-			["Url"] = url,
-			Request_Type = "POST",
-			Body = HttpService:JSONEncode(p)
-		})
+	if typeof(url) ~= "string" then
+		return url
 	end
 
-	return url
+	return OpenCloudService:HttpRequestAsync({
+		["Url"] = url,
+		Request_Type = "POST",
+		Body = HttpService:JSONEncode(p)
+	})
 end
 
 OpenCloudService:RegisterOpenCloud("v2", "TranslateText", translateText)
@@ -286,15 +286,15 @@ function generateSpeech(p)
 
 	local url = generateSpeechUrl(p)
 
-	if typeof(url) == "string" then
-		return OpenCloudService:HttpRequestAsync({
-			["Url"] = url,
-			Request_Type = "POST",
-			Body = HttpService:JSONEncode(p)
-		})
+	if typeof(url) ~= "string" then
+		return url
 	end
 
-	return url
+	return OpenCloudService:HttpRequestAsync({
+		["Url"] = url,
+		Request_Type = "POST",
+		Body = HttpService:JSONEncode(p)
+	})
 end
 
 OpenCloudService:RegisterOpenCloud("v2", "GenerateSpeech", generateSpeech)
@@ -391,15 +391,15 @@ function generateText(p)
 
 	local url = generateTextUrl(p)
 
-	if typeof(url) == "string" then
-		return OpenCloudService:HttpRequestAsync({
-			["Url"] = url,
-			Request_Type = "POST",
-			Body = HttpService:JSONEncode(p)
-		})
+	if typeof(url) ~= "string" then
+		return url
 	end
 
-	return url
+	return OpenCloudService:HttpRequestAsync({
+		["Url"] = url,
+		Request_Type = "POST",
+		Body = HttpService:JSONEncode(p)
+	})
 end
 
 OpenCloudService:RegisterOpenCloud("v2", "GenerateText", generateText)

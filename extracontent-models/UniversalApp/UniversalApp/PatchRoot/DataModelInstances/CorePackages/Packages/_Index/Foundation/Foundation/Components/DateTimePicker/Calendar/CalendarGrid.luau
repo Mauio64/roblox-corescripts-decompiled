@@ -130,7 +130,8 @@ return {
 			local result = {}
 
 			for _, v2 in v do
-				result[`{v2.keyPrefix}-{v2.day}`] = getDayCellAppearance(
+				local formatted = `{v2.keyPrefix}-{v2.day}`
+				result[formatted] = getDayCellAppearance(
 					DateTime.fromLocalTime(v2.year, v2.month, v2.day),
 					props.localSelectedDateTimes,
 					props.highlightDates,

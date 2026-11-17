@@ -11,6 +11,7 @@ local UniversalAppPolicy = require(parent.UniversalAppPolicy)
 local getAppFeaturePolicies = UniversalAppPolicy.getAppFeaturePolicies
 
 local isSduiBuyRobuxSupported = require(BuyRobuxRouting.isSduiBuyRobuxSupported)
+local FFlagBuyRobuxRoutingAppendWebContext = require(BuyRobuxRouting.Flags.FFlagBuyRobuxRoutingAppendWebContext)
 
 local FFlagEnableBuyRobuxNextJS = SharedFlags.FFlagEnableBuyRobuxNextJS
 local FFlagBuyRobuxLatencyIxpEnabled = SharedFlags.FFlagBuyRobuxLatencyIxpEnabled
@@ -21,7 +22,7 @@ local logBuyRobuxRoutingDecision = require(script.Parent.logBuyRobuxRoutingDecis
 
 local v = string.gsub(ContentProvider.BaseUrl:lower(), "/m.", "/www.")
 
-local function isExcludedRegion() -- 1 equivalent call inferred from this helper
+local function isExcludedRegion() -- 2 equivalent calls inferred from this helper
 	local appFeaturePolicies = getAppFeaturePolicies()
 	return appFeaturePolicies.useLuobuAuthentication()
 		or appFeaturePolicies.getUseVNGUserAgreementPopup()
@@ -43,12 +44,56 @@ local function buildUrl(p: string, p2)
 	return v .. p .. (not (#v2 > 0) and "" or "?" .. table.concat(v2, "&"))
 end
 
-local function webDestination(url: string, fFlagBuyRobuxLatencyIxpEnabled: boolean) -- 4 equivalent calls inferred from this helper
+local function appendRoutingContext(value: string, p: string?)
+	local v2 = {}
+
+	if p ~= nil then
+		table.insert(v2, "variant=" .. HttpService:UrlEncode(p))
+	end
+
+	table.insert(v2, "startMs=" .. tostring(DateTime.now().UnixTimestampMillis))
+	return value .. (string.find(value, "?", 1, true) and "&" or "?") .. table.concat(v2, "&")
+end
+
+local function webDestination(url: string, fFlagBuyRobuxLatencyIxpEnabled: boolean) -- 8 equivalent calls inferred from this helper
 	return { kind = "web", url = url, shouldExpose = fFlagBuyRobuxLatencyIxpEnabled }
 end
 
 local function fallbackWebUrl(p) -- 1 equivalent call inferred from this helper
 	return buildUrl("upgrades/robux", p)
+end
+
+local function resolveDestinationWithWebContext(p)
+	if isExcludedRegion() then -- inferred equivalent call
+		logBuyRobuxRoutingDecision("controlWeb", "excludedRegion")
+		return webDestination(appendRoutingContext(buildUrl("upgrades/robux", p), nil), false) -- inferred equivalent call
+	end
+
+	if not (FFlagBypassBuyRobuxSduiSupportForWebRouting or isSduiBuyRobuxSupported()) then
+		logBuyRobuxRoutingDecision("controlWeb", "sduiNotSupported")
+		return webDestination(appendRoutingContext(buildUrl("upgrades/robux", p), nil), false) -- inferred equivalent call
+	end
+
+	if FFlagEnableBuyRobuxSdui then
+		logBuyRobuxRoutingDecision("nativeSdui", "experimentArm")
+		return { kind = "native", shouldExpose = FFlagBuyRobuxLatencyIxpEnabled }
+	end
+
+	if FFlagEnableBuyRobuxNextJS then
+		logBuyRobuxRoutingDecision("nextJsWeb", "experimentArm")
+
+		return webDestination( -- inferred equivalent call
+			appendRoutingContext(buildUrl("upgrades/robux/v2", p), "nextjs"),
+			FFlagBuyRobuxLatencyIxpEnabled
+		)
+	end
+
+	logBuyRobuxRoutingDecision("controlWeb", "experimentArm")
+
+	return webDestination( -- inferred equivalent call
+		appendRoutingContext(buildUrl("upgrades/robux", p), "control"),
+		FFlagBuyRobuxLatencyIxpEnabled
+	)
 end
 
 local function resolveDestination(p)
@@ -69,28 +114,39 @@ local function resolveDestination(p)
 		return { kind = "native", shouldExpose = FFlagBuyRobuxLatencyIxpEnabled }
 	end
 
-	if not FFlagEnableBuyRobuxNextJS then
-		logBuyRobuxRoutingDecision("controlWeb", "experimentArm")
-		return webDestination(url, FFlagBuyRobuxLatencyIxpEnabled) -- inferred equivalent call
+	if FFlagEnableBuyRobuxNextJS then
+		logBuyRobuxRoutingDecision("nextJsWeb", "experimentArm")
+		return webDestination(buildUrl("upgrades/robux/v2", p), FFlagBuyRobuxLatencyIxpEnabled) -- inferred equivalent call
 	end
 
-	logBuyRobuxRoutingDecision("nextJsWeb", "experimentArm")
-	return webDestination(buildUrl("upgrades/robux/v2", p), FFlagBuyRobuxLatencyIxpEnabled) -- inferred equivalent call
+	logBuyRobuxRoutingDecision("controlWeb", "experimentArm")
+	return webDestination(url, FFlagBuyRobuxLatencyIxpEnabled) -- inferred equivalent call
 end
 
-local function logExposure(destination) -- 1 equivalent call inferred from this helper
-	if destination.shouldExpose and FStringPaymentsBuyRobuxLayer ~= "" then
+local function logExposure(p) -- 1 equivalent call inferred from this helper
+	if p.shouldExpose and FStringPaymentsBuyRobuxLayer ~= "" then
 		IXPServiceWrapper:LogFlagLinkedUserLayerExposure(FStringPaymentsBuyRobuxLayer)
 	end
 end
 
+if not FFlagBuyRobuxRoutingAppendWebContext then
+	resolveDestinationWithWebContext = resolveDestination
+end
+
 return {
 	fallbackWebUrl = fallbackWebUrl,
-	resolveDestination = resolveDestination,
+	resolveDestination = resolveDestinationWithWebContext,
 	logExposure = logExposure,
 	resolveAndLogDestination = function(p)
-		local destination = resolveDestination(p)
-		logExposure(destination) -- inferred equivalent call
-		return destination
+		local v2
+
+		if FFlagBuyRobuxRoutingAppendWebContext then
+			v2 = resolveDestinationWithWebContext(p)
+		else
+			v2 = resolveDestination(p)
+		end
+
+		logExposure(v2) -- inferred equivalent call
+		return v2
 	end
 }

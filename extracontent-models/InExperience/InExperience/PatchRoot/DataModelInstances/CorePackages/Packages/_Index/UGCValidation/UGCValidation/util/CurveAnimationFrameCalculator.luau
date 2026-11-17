@@ -199,29 +199,39 @@ return {
 		local curveTracks = getCurveTracks()
 		local v2 = calculateCurveAnimLength(curveTracks)
 
-		local v3 = {}
-		local v4 = {}
+		local result = {}
+		local result2 = {}
 
-		local function addData(p2: number) -- 2 equivalent calls inferred from this helper
-			local v5 = calculateTransformsAtTime(p2, curveTracks)
+		local function addData(p2: number)
+			local v3 = calculateTransformsAtTime(p2, curveTracks)
 
-			table.insert(v3, (AssetCalculator.calculateAllTransformsForFullBody(childrenByName, v5)))
+			local allTransformsForFullBody = AssetCalculator.calculateAllTransformsForFullBody(childrenByName, v3)
+			table.insert(result, allTransformsForFullBody)
 
-			table.insert(v4, calculatePositionMagnitudeResultsAtTime(p2, curveTracks))
+			table.insert(result2, calculatePositionMagnitudeResultsAtTime(p2, curveTracks))
 		end
 
 		local total = 0
 
 		while total <= v2 do
-			addData(total) -- inferred equivalent call
+			local v3 = calculateTransformsAtTime(total, curveTracks)
+
+			table.insert(result, (AssetCalculator.calculateAllTransformsForFullBody(childrenByName, v3)))
+
+			table.insert(result2, calculatePositionMagnitudeResultsAtTime(total, curveTracks))
+
 			total += v
 		end
 
 		if v2 >= 0 then
-			addData(v2) -- inferred equivalent call
+			local v3 = calculateTransformsAtTime(v2, curveTracks)
+
+			table.insert(result, (AssetCalculator.calculateAllTransformsForFullBody(childrenByName, v3)))
+
+			table.insert(result2, calculatePositionMagnitudeResultsAtTime(v2, curveTracks))
 		end
 
 		defaultCharacter:Destroy()
-		return v3, v2, v4, curveTracks
+		return result, v2, result2, curveTracks
 	end
 }

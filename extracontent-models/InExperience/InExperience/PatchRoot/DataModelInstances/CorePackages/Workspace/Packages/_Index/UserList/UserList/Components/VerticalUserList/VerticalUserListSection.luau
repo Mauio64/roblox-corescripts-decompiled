@@ -11,7 +11,6 @@ local UserListHeader = require(UserList.Components.UserListHeader)
 local UserListFooter = require(UserList.Components.UserListFooter)
 local VerticalUserList = require(script.Parent.VerticalUserList)
 
-local defineFastFlag = game:DefineFastFlag("UserListTightHeaderSpacing", false)
 local SharedFlags = require(parent.SharedFlags)
 local FFlagUserListCtaIntegrationEnabled = SharedFlags.FFlagUserListCtaIntegrationEnabled
 local SharedFlags2 = require(parent.SharedFlags)
@@ -23,11 +22,7 @@ local function VerticalUserListSection(props)
 
 	if props.header then
 		v = React.createElement(View, {
-			tag = {
-				["size-full-0 auto-y"] = true,
-				["padding-bottom-small"] = defineFastFlag,
-				["padding-bottom-large"] = not defineFastFlag and props.isScrollEnabled
-			},
+			tag = "size-full-0 auto-y padding-bottom-small",
 			LayoutOrder = not props.isScrollEnabled and 1 or nil
 		}, {
 			HeaderContent = React.createElement(UserListHeader, props.header)
@@ -38,10 +33,7 @@ local function VerticalUserListSection(props)
 
 	if props.hasMore and props.onLoadMore then
 		v2 = React.createElement(View, {
-			tag = {
-				["size-full-0 auto-y"] = true,
-				["padding-top-large"] = defineFastFlag or props.isScrollEnabled
-			},
+			tag = "size-full-0 auto-y padding-top-large",
 			LayoutOrder = not props.isScrollEnabled and 3 or nil
 		}, {
 			FooterContent = React.createElement(UserListFooter, {
@@ -108,13 +100,7 @@ local function VerticalUserListSection(props)
 		return createElement(VerticalUserList, v3)
 	else
 		local createElement = React.createElement
-		local v3 = {
-			tag = {
-				["col size-full-0 auto-y"] = defineFastFlag,
-				["col gap-large size-full-0 auto-y"] = not defineFastFlag
-			},
-			LayoutOrder = props.layoutOrder
-		}
+		local v3 = { tag = "col size-full-0 auto-y", LayoutOrder = props.layoutOrder }
 
 		local createElement2 = React.createElement
 		local v4 = {

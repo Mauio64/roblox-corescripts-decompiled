@@ -32,9 +32,8 @@ local function fn2(searchKeyword: string) -- 1 equivalent call inferred from thi
 end
 
 return function(data)
-	local v = useMatchSearchPagination({
-		users = data.users or {}
-	})
+	local users = data.users or {}
+	local v = useMatchSearchPagination({ users = users })
 
 	local userIds = React.useMemo(function()
 		return Dash.map(v, function(p)

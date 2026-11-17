@@ -66,7 +66,6 @@ local FFlagExpChatPresetChatGamepadEnabled = require(ExpChat.Flags.FFlagExpChatP
 local FFlagLuaSupportMicroGamepadPreferredInput = SharedFlags.FFlagLuaSupportMicroGamepadPreferredInput
 local FFlagDebugForceEnableChatButtonOn = require(ExpChat.Flags.FFlagDebugForceEnableChatButtonOn)
 local FFlagExpChatUseChatConfigStore = SharedFlags.FFlagExpChatUseChatConfigStore
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
 local FFlagExpChatTabShortcutNav = SharedFlags.FFlagExpChatTabShortcutNav
 local FFlagExpChatGenericChatFocus = require(ExpChat.Flags.FFlagExpChatGenericChatFocus)
 local FocusNavigationExperiment = require(ExpChat.ShortcutNav.FocusNavigationExperiment)
@@ -85,6 +84,7 @@ local SharedExperimentDefinition = require(parent.SharedExperimentDefinition)
 local isInExperienceUIVREnabled = SharedExperimentDefinition.isInExperienceUIVREnabled
 local getFFlagExpChatTriggerWindowStatusEvent = require(ExpChat.Flags.getFFlagExpChatTriggerWindowStatusEvent)
 local FFlagExpChatWindowStatusEventFixes = require(ExpChat.Flags.FFlagExpChatWindowStatusEventFixes)
+local FFlagExpChatClearStaleSelectionOnClose = require(ExpChat.Flags.FFlagExpChatClearStaleSelectionOnClose)
 
 local v = isInExperienceUIVREnabled
 	and {
@@ -606,12 +606,27 @@ function extended:didMount()
 	end
 end
 
-function extended:didUpdate(p)
+function extended:didUpdate(data)
+	if
+		FFlagExpChatClearStaleSelectionOnClose
+		and (data.isChatWindowVisible and not self.props.isChatWindowVisible or data.renderingFriends and not self.props.renderingFriends)
+	then
+		local selectedCoreObject = GuiService.SelectedCoreObject
+
+		if selectedCoreObject == nil or not selectedCoreObject:IsDescendantOf(game) then
+			if selectedCoreObject ~= nil then
+				GuiService.SelectedCoreObject = nil
+			end
+
+			GetTransparencyStore(false).clearWindowFocusInput()
+		end
+	end
+
 	if not FFlagExpChatWindowStatusEventFixes then
 		return
 	end
 
-	local isChatWindowVisible = p.isChatWindowVisible or p.isChatInputBarVisible
+	local isChatWindowVisible = data.isChatWindowVisible or data.isChatInputBarVisible
 	local chatSurfaceVisibleForStatusTracking = self:isChatSurfaceVisibleForStatusTracking()
 
 	if isChatWindowVisible == chatSurfaceVisibleForStatusTracking then
@@ -1231,19 +1246,13 @@ function extended.render(props)
 		end
 
 		children.bottomBorder = bottomBorder
-		local appLayout = createElement("Frame", v7, children)
+		local element = createElement("Frame", v7, children)
 
-		local createElement4 = Roact.createElement
-		local provider = SpatialUI.Provider
-		local v11 = {
+		return Roact.createElement(SpatialUI.Provider, {
 			value = { isSpatialUIEnabled = props.props.isSpatialUIEnabled }
-		}
-
-		if FFlagExpChatEnableFriendsTab then
-			appLayout = Roact.createElement(ChatPlatformProvider, {}, { appLayout = appLayout })
-		end
-
-		return createElement4(provider, v11, { appLayout = appLayout })
+		}, {
+			appLayout = Roact.createElement(ChatPlatformProvider, {}, { appLayout = element })
+		})
 	end
 
 	return Roact.createElement(

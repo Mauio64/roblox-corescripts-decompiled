@@ -1,1 +1,0 @@
-return game:DefineFastFlag("AppChatShowOSAOnPageEntry3", false)

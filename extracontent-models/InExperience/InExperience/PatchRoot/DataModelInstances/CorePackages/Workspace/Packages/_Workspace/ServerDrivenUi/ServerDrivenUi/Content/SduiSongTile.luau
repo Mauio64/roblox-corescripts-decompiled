@@ -29,12 +29,13 @@ local function SduiSongTile(props)
 	local onActivated = React.useCallback(function()
 		if props.onActivated then
 			props.onActivated()
-		else
-			executeAction({
-				actionType = SduiActionType.OpenSongDetail,
-				actionParams = { songId = songId }
-			}, props.analyticsContext, props.sduiContext)
+			return
 		end
+
+		executeAction({
+			actionType = SduiActionType.OpenSongDetail,
+			actionParams = { songId = songId }
+		}, props.analyticsContext, props.sduiContext)
 	end, { props.onActivated, props.sduiContext, props.analyticsContext, songId })
 
 	local footerComponent = React.useMemo(function()

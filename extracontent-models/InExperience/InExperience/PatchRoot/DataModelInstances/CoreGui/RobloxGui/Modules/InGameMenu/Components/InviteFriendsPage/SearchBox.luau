@@ -11,7 +11,6 @@ local Foundation = require(CorePackages.Packages.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagCoreUiMigrateUIBloxToFoundation = SharedFlags.FFlagCoreUiMigrateUIBloxToFoundation
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local v
 
 if FFlagCoreUiMigrateUIBloxToFoundation then
@@ -55,38 +54,32 @@ end
 
 function extended:renderWithSelectionCursor(callback)
 	return withLocalization({ searchPlaceholder = "CoreScripts.InGameMenu.InviteFriends.Search" })(function(p)
-		return withFoundationOrUIBloxStyle(function(p2)
-			local tokens
-
-			if FoundationFontFaceMigration then
-				tokens = p2
-			end
-
+		return withFoundationOrUIBloxStyle(function(tokens)
 			return {
 				Tokens = tokens,
 				Theme = {
 					TextEmphasis = {
-						Color = p2.Color.Content.Emphasis.Color3,
-						Transparency = p2.Color.Content.Emphasis.Transparency
+						Color = tokens.Color.Content.Emphasis.Color3,
+						Transparency = tokens.Color.Content.Emphasis.Transparency
 					},
 					IconEmphasis = {
-						Color = p2.Color.Content.Emphasis.Color3,
-						Transparency = p2.Color.Content.Emphasis.Transparency
+						Color = tokens.Color.Content.Emphasis.Color3,
+						Transparency = tokens.Color.Content.Emphasis.Transparency
 					},
 					BackgroundUIContrast = {
-						Color = p2.Color.OverMedia.OverMedia_0.Color3,
-						Transparency = p2.Color.OverMedia.OverMedia_0.Transparency
+						Color = tokens.Color.OverMedia.OverMedia_0.Color3,
+						Transparency = tokens.Color.OverMedia.OverMedia_0.Transparency
 					},
 					Divider = {
-						Color = p2.Color.Stroke.Emphasis.Color3,
-						Transparency = p2.Color.Stroke.Emphasis.Transparency
+						Color = tokens.Color.Stroke.Emphasis.Color3,
+						Transparency = tokens.Color.Stroke.Emphasis.Transparency
 					}
 				},
 				Font = {
 					BaseSize = 1,
 					Body = {
-						Font = p2.Typography.BodyLarge.Font,
-						RelativeSize = p2.Typography.BodyLarge.FontSize
+						Font = tokens.Typography.BodyLarge.Font,
+						RelativeSize = tokens.Typography.BodyLarge.FontSize
 					}
 				}
 			}
@@ -204,15 +197,7 @@ function extended:renderWithSelectionCursor(callback)
 
 			children.SearchIcon = searchIcon
 
-			local createElement3 = Roact.createElement
-			local v6 = {
-				["Size"] = nil,
-				["Size"] = nil,
-				["Size"] = nil,
-				["Size"] = nil,
-				["Size"] = nil,
-				["Size"] = nil,
-				["Size"] = nil,
+			children.TextBox = Roact.createElement("TextBox", {
 				Size = UDim2.new(1, -total, 1, 0),
 				Position = UDim2.new(0, 44, 0, 0),
 				PlaceholderText = "",
@@ -222,37 +207,20 @@ function extended:renderWithSelectionCursor(callback)
 				TextXAlignment = Enum.TextXAlignment.Left,
 				TextYAlignment = Enum.TextYAlignment.Center,
 				TextColor3 = textEmphasis.Color,
-				TextTransparency = textEmphasis.Transparency
-			}
-			local font
+				TextTransparency = textEmphasis.Transparency,
+				FontFace = normalizeFontFace(props.Tokens.Typography.BodyLarge.Font),
+				TextSize = body.RelativeSize * props.Font.BaseSize,
+				TextWrapped = false,
+				SelectionImageObject = callback(v2.InputFields),
+				[Roact.Change.Text] = function(p2)
+					if self.state.searchText ~= p2.Text then
+						self:setState({ searchText = p2.Text })
 
-			if not FoundationFontFaceMigration then
-				font = body.Font
-			end
-
-			v6.Font = font
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(props.Tokens.Typography.BodyLarge.Font)
-			end
-
-			v6.FontFace = fontFace
-
-			v6.TextSize = body.RelativeSize * props.Font.BaseSize
-			v6.TextWrapped = false
-
-			v6.SelectionImageObject = callback(v2.InputFields)
-
-			v6[Roact.Change.Text] = function(p2)
-				if self.state.searchText ~= p2.Text then
-					self:setState({ searchText = p2.Text })
-
-					self.props.searchUpdated(p2.Text)
-				end
-			end
-			v6[Roact.Ref] = self.props.itemRef
-			children.TextBox = createElement3("TextBox", v6)
+						self.props.searchUpdated(p2.Text)
+					end
+				end,
+				[Roact.Ref] = self.props.itemRef
+			})
 
 			children.PlaceholderText = Roact.createElement(ThemedTextLabel, {
 				themeKey = "TextEmphasis",

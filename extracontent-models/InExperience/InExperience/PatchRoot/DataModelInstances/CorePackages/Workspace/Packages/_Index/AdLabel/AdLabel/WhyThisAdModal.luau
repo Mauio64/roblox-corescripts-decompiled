@@ -59,7 +59,19 @@ local function WhyThisAdModal(props)
 			onActivated = function()
 				AdDisclosureTelemetry.logAdPreferencesLinkClicked()
 
-				if not GetFFlagEnableUnifiedWebViews() then
+				if GetFFlagEnableUnifiedWebViews() then
+					local onWindowClosedConnection = nil
+					onWindowClosedConnection = WebViewService.OnWindowClosed:Connect(function()
+						WebViewService:CloseWindow()
+
+						if onWindowClosedConnection then
+							onWindowClosedConnection:Disconnect()
+							onWindowClosedConnection = nil
+						end
+					end)
+
+					WebViewService:OpenWindow(FStringLuaAppAdPreferencesUrl, v.adPreferences, true)
+				else
 					BrowserService:SendCommand((HttpService:JSONEncode({
 						command = "open",
 						url = FStringLuaAppAdPreferencesUrl,
@@ -67,21 +79,7 @@ local function WhyThisAdModal(props)
 						visible = true,
 						isGenericWebview = true
 					})))
-
-					return
 				end
-
-				local onWindowClosedConnection = nil
-				onWindowClosedConnection = WebViewService.OnWindowClosed:Connect(function()
-					WebViewService:CloseWindow()
-
-					if onWindowClosedConnection then
-						onWindowClosedConnection:Disconnect()
-						onWindowClosedConnection = nil
-					end
-				end)
-
-				WebViewService:OpenWindow(FStringLuaAppAdPreferencesUrl, v.adPreferences, true)
 			end,
 			LayoutOrder = 2
 		})

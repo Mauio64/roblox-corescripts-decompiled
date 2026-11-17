@@ -791,18 +791,21 @@ local function useCheckoutPageViewModel(data)
 		local useMemo2 = React.useMemo
 		local function fn8(): boolean
 			if
-				not v21
-				and not v25
-				and (not FFlagAXMISWithOffers or FFlagAXMISWithOffers and #Cryo.Dictionary.keys(v28.offersAvailable) == 0)
+				v21
+				or v25
+				or FFlagAXMISWithOffers
+				and (not FFlagAXMISWithOffers or #Cryo.Dictionary.keys(v28.offersAvailable) ~= 0)
 			then
-				for _, v46 in v5 do
-					if
-						FIntBlackbirdUpsellMinPriceForDiscountInclusive <= v46.priceInRobux
-						and v46.priceInRobux <= FIntBlackbirdUpsellMaxPriceForDiscountInclusive
-						and (not v46.isOwned or v46.isOwned and v46.expirationTime)
-					then
-						return true
-					end
+				return false
+			end
+
+			for _, v46 in v5 do
+				if
+					FIntBlackbirdUpsellMinPriceForDiscountInclusive <= v46.priceInRobux
+					and v46.priceInRobux <= FIntBlackbirdUpsellMaxPriceForDiscountInclusive
+					and (not v46.isOwned or v46.isOwned and v46.expirationTime)
+				then
+					return true
 				end
 			end
 
@@ -949,39 +952,37 @@ local function useCheckoutPageViewModel(data)
 
 	local useCallback4 = React.useCallback
 	local function fn11(p)
-		if not FFlagAXCatalogMakeupSupport then
+		if FFlagAXCatalogMakeupSupport then
+			local tryOnItemsContainsOnlyMakeupTypes = getTryOnItemsContainsOnlyMakeupTypes(p)
+
+			local v60 = not (v17 and v17[itemId] and v17[itemId].name)
+				and (tryOnItemsContainsOnlyMakeupTypes and "Makeup" or "Avatar")
+				or v17[itemId].name
+
+			if v17 and v17[v14] and v17[v14].name then
+				v60 = v17[v14].name
+			end
+
+			if not tryOnItemsContainsOnlyMakeupTypes then
+				v3(SaveAsAvatarThunk(v60, data.getCombinedHumanoidDescriptionFromEquippedAndOutfitTryOn, p, v59))
+			elseif FFlagAXMISSaveWearFix then
+				v3(SaveAsMakeupLookThunk(
+					networkImpl,
+					v60,
+					p,
+					nil,
+					data.getCombinedHumanoidDescriptionFromEquippedAndOutfitTryOn
+				))
+			else
+				v3(SaveAsMakeupLookThunk(networkImpl, v60, p))
+			end
+		else
 			v3(SaveAsAvatarThunk(
 				not (v17 and v17[v14] and v17[v14].name) and "Avatar" or v17[v14].name,
 				data.getCombinedHumanoidDescriptionFromEquippedAndOutfitTryOn,
 				p,
 				v59
 			))
-
-			return
-		end
-
-		local tryOnItemsContainsOnlyMakeupTypes = getTryOnItemsContainsOnlyMakeupTypes(p)
-
-		local v60 = not (v17 and v17[itemId] and v17[itemId].name)
-			and (tryOnItemsContainsOnlyMakeupTypes and "Makeup" or "Avatar")
-			or v17[itemId].name
-
-		if v17 and v17[v14] and v17[v14].name then
-			v60 = v17[v14].name
-		end
-
-		if not tryOnItemsContainsOnlyMakeupTypes then
-			v3(SaveAsAvatarThunk(v60, data.getCombinedHumanoidDescriptionFromEquippedAndOutfitTryOn, p, v59))
-		elseif FFlagAXMISSaveWearFix then
-			v3(SaveAsMakeupLookThunk(
-				networkImpl,
-				v60,
-				p,
-				nil,
-				data.getCombinedHumanoidDescriptionFromEquippedAndOutfitTryOn
-			))
-		else
-			v3(SaveAsMakeupLookThunk(networkImpl, v60, p))
 		end
 	end
 
@@ -1361,7 +1362,8 @@ local function useCheckoutPageViewModel(data)
 				clone2.isOrganicLook = v16 == nil
 			end
 
-			local avatarScreenProperty = AvatarScreenProperties[v2 and v2.current and v2.current.name]
+			local name = v2 and v2.current and v2.current.name
+			local avatarScreenProperty = AvatarScreenProperties[name]
 			local unifiedLoggingSurface
 
 			if avatarScreenProperty and avatarScreenProperty.analyticsData then

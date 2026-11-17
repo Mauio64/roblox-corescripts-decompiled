@@ -12,6 +12,9 @@ local getRecommendationContextualInfoType = SocialCommon.Utils.getRecommendation
 local Analytics = require(parent.Analytics)
 local getFriendStatus = require(parent.Analytics.getFriendStatus)
 local EventNames = Analytics.EventNames
+require(parent.Analytics.AnalyticsTypes)
+local SharedFlags = require(parent2.SharedFlags)
+local FFlagPymkCarouselExtendProps = SharedFlags.FFlagPymkCarouselExtendProps
 
 local function useOnActivatedTile(data)
 	local mutualFriendsCount = react.useMemo(function()
@@ -26,21 +29,43 @@ local function useOnActivatedTile(data)
 		return nil
 	end, { data.recommendation.mutualFriendsCount, data.recommendation.mutualFriendsList })
 
-	local v = react.useCallback(function()
+	local useCallback = react.useCallback
+	local function fn()
 		local openProfilePeekView = data.openProfilePeekView
 		local userId = data.userId
 		local v = {
 			absolutePosition = data.absolutePosition,
-			source = Constants.HomepagePYMKCarouselSourceName,
+			source = 0,
 			isRecommendation = true,
-			mutualFriendsCount = mutualFriendsCount,
-			recommendationSessionId = data.recommendationSessionId,
-			recommendationRank = data.recommendation.rank,
-			recommendationContextType = data.recommendation.contextType and data.recommendation.contextType.rawValue() or nil,
-			contextualInfoType = getRecommendationContextualInfoType(data.recommendation),
+			mutualFriendsCount = 0,
+			recommendationSessionId = 0,
+			recommendationRank = 0,
+			recommendationContextType = 0,
+			contextualInfoType = 0,
 			contactProps = 0,
 			profileType = 0
 		}
+		local source
+
+		if FFlagPymkCarouselExtendProps then
+			if data.analyticsSurface then
+				source = data.analyticsSurface.source
+			else
+				source = Constants.HomepagePYMKCarouselSourceName
+			end
+		else
+			source = Constants.HomepagePYMKCarouselSourceName
+		end
+
+		v.source = source
+
+		v.mutualFriendsCount = mutualFriendsCount
+		v.recommendationSessionId = data.recommendationSessionId
+		v.recommendationRank = data.recommendation.rank
+		v.recommendationContextType = data.recommendation.contextType and data.recommendation.contextType.rawValue()
+			or nil
+
+		v.contextualInfoType = getRecommendationContextualInfoType(data.recommendation)
 		local contactProps
 
 		if data.recommendation.contextType == recommendationContextType.Contacts then
@@ -60,20 +85,35 @@ local function useOnActivatedTile(data)
 
 		v.profileType = data.recommendation.contextType == recommendationContextType.Contacts and "FromContacts" or nil
 		openProfilePeekView(userId, v)
-	end, {
-		data.openProfilePeekView,
-		data.userId,
-		data.absolutePosition,
+	end
+
+	local openProfilePeekView = data.openProfilePeekView
+	local userId = data.userId
+	local absolutePosition = data.absolutePosition
+
+	local recommendationSessionId = data.recommendationSessionId
+	local recommendation = data.recommendation
+	local v
+
+	if FFlagPymkCarouselExtendProps then
+		v = data.analyticsSurface
+	end
+
+	local v2 = useCallback(fn, {
+		openProfilePeekView,
+		userId,
+		absolutePosition,
 		mutualFriendsCount,
-		data.recommendationSessionId,
-		data.recommendation
+		recommendationSessionId,
+		recommendation,
+		v
 	})
 
 	return (react.useCallback(function()
-		v()
+		v2()
 		local fireAnalyticsEvent = data.fireAnalyticsEvent
 		local userPressed = EventNames.UserPressed
-		local v2 = {
+		local v3 = {
 			recommendationId = data.userId,
 			friendStatus = getFriendStatus(data.friendshipStatus, data.recommendation.hasIncomingFriendRequest),
 			recommendationContextType = data.recommendation.contextType,
@@ -90,13 +130,13 @@ local function useOnActivatedTile(data)
 			contactId = data.userId
 		end
 
-		v2.contactId = contactId
+		v3.contactId = contactId
 
-		v2.presence = data.userPresenceType
-		v2.interactionUuid = HttpService:GenerateGUID(false)
-		fireAnalyticsEvent(userPressed, v2)
+		v3.presence = data.userPresenceType
+		v3.interactionUuid = HttpService:GenerateGUID(false)
+		fireAnalyticsEvent(userPressed, v3)
 	end, {
-		v,
+		v2,
 		data.fireAnalyticsEvent,
 		data.userId,
 		data.friendshipStatus,

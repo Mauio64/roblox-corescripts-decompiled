@@ -8,10 +8,16 @@ local HttpRbxApiService = game:GetService("HttpRbxApiService")
 local HttpService = game:GetService("HttpService")
 
 local formatted = `https://apis.{APIUtil.getBaseDomain()}assets/rcc/v1/assets/`
+
 local UnpublishedDependencies = {}
 
+function UnpublishedDependencies.getLatestVersionNumber(p: string)
+	local revisionId = HttpService:JSONDecode(HttpRbxApiService:GetAsyncFullUrl(formatted .. p)).revisionId
+	return assert(tonumber(revisionId), `Unexpected revisionId {revisionId}`)
+end
+
 function UnpublishedDependencies.getVersion(p: string, p2: number?)
-	return HttpService:JSONDecode(HttpRbxApiService:GetAsyncFullUrl(`{formatted}{p}/versions/{p2 or HttpService:JSONDecode(HttpRbxApiService:GetAsyncFullUrl(formatted .. p)).revisionId}`))
+	return HttpService:JSONDecode(HttpRbxApiService:GetAsyncFullUrl(`{formatted}{p}/versions/{p2 or UnpublishedDependencies.getLatestVersionNumber(p)}`))
 end
 
 function UnpublishedDependencies.shouldReturnOnLoadFailure(data)

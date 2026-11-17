@@ -6,6 +6,7 @@ local Signals = require(parent.Signals)
 require(script.Parent.Types.acpSession)
 local SharedFlags = require(parent.SharedFlags)
 local FFlagBuildExperienceModelPickerData = SharedFlags.FFlagBuildExperienceModelPickerData
+local FFlagBuildExperienceAdvancedPreviewSpecs = SharedFlags.FFlagBuildExperienceAdvancedPreviewSpecs
 local v = Signals.createSignal
 
 if FFlagBuildExperienceModelPickerData and defineFastFlag then
@@ -41,7 +42,8 @@ local function getState(p: string?, p2)
 
 	local state = {
 		isSet = v9 ~= nil,
-		specVersion = 0
+		specVersion = 0,
+		specName = 0
 	}
 	local specVersion
 
@@ -50,6 +52,13 @@ local function getState(p: string?, p2)
 	end
 
 	state.specVersion = specVersion
+	local specName
+
+	if FFlagBuildExperienceAdvancedPreviewSpecs and v9 ~= nil then
+		specName = v9.specName
+	end
+
+	state.specName = specName
 	return state
 end
 
@@ -57,13 +66,18 @@ local function isPending(p: string?): boolean -- 5 equivalent calls inferred fro
 	return p ~= nil and v4(false)[p] == true
 end
 
-local function writeDisplay(p: string, p2: string?, p3)
+local function writeDisplay(p: string, p2: string?, p3, specName)
 	local clone = table.clone(v2(false))
 	local clone2 = table.clone(p3 or clone[p] or {
 		clientToolConfig = { mode = "exclude", tools = {} }
 	})
 
 	clone2.specVersion = normalize(p2) -- inferred equivalent call
+
+	if FFlagBuildExperienceAdvancedPreviewSpecs and p3 == nil then
+		clone2.specName = specName
+	end
+
 	clone[p] = clone2
 	v3(clone)
 end
@@ -86,11 +100,23 @@ end
 
 local count = 0
 
-local function buildPromptPayload(p: string) -- 2 equivalent calls inferred from this helper
+local function buildPromptPayload(p: string)
 	local clone = table.clone(v2(false)[p])
 
 	if v7(false)[p] == false then
 		clone.specVersion = ""
+
+		if FFlagBuildExperienceAdvancedPreviewSpecs then
+			clone.specName = nil
+		end
+	end
+
+	if
+		FFlagBuildExperienceAdvancedPreviewSpecs
+		and clone.specName == "build-on-mobile-advanced"
+		and clone.specVersion == ""
+	then
+		clone.specVersion = "latest"
 	end
 
 	return clone
@@ -126,10 +152,14 @@ function ExperimentOverride.getInternalSelection(p: string, p2)
 	local state = getState(p, p2)
 
 	if isSelected == nil then
-		isSelected = state.specVersion ~= nil
+		isSelected = state.specVersion ~= nil or state.specName == "build-on-mobile-advanced"
 	end
 
-	return { isSelected = isSelected, previewHash = state.specVersion }
+	return {
+		isSelected = isSelected,
+		previewHash = state.specVersion,
+		previewSpecName = state.specName
+	}
 end
 
 function ExperimentOverride.hasInternalEdit(p: string?): boolean
@@ -161,12 +191,12 @@ end
 
 ExperimentOverride.isPending = isPending
 
-function ExperimentOverride.set(p: string?, p2: string?)
+function ExperimentOverride.set(p: string?, p2: string?, specName)
 	if p == nil then
 		return
 	end
 
-	writeDisplay(p, p2)
+	writeDisplay(p, p2, nil, specName)
 	setPendingFlag(p, true) -- inferred equivalent call
 end
 
@@ -218,19 +248,28 @@ end
 
 function ExperimentOverride.getExperiment(p: string?)
 	local state = getState(p, nil)
+	local v9 = FFlagBuildExperienceAdvancedPreviewSpecs
 
-	if not defineFastFlag or state.specVersion == nil then
-		return nil
+	if v9 then
+		if state.specName == "build-on-mobile-advanced" then
+			v9 = v7(false)[p] ~= false
+		else
+			v9 = false
+		end
 	end
 
-	return buildPromptPayload(p) -- inferred equivalent call
+	if defineFastFlag and (state.specVersion ~= nil or v9) then
+		return buildPromptPayload(p)
+	end
+
+	return nil
 end
 
 function ExperimentOverride.getPromptExperiment(p: string?)
 	local state = getState(p, nil)
 
 	if defineFastFlag and isPending(p) and state.isSet then -- inferred equivalent call
-		return buildPromptPayload(p) -- inferred equivalent call
+		return buildPromptPayload(p)
 	end
 
 	return nil

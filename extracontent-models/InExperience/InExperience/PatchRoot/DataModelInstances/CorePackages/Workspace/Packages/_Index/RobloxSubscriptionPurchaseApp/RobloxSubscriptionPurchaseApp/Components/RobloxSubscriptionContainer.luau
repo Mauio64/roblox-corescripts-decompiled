@@ -14,6 +14,9 @@ local SignalsReact = require(parent.SignalsReact)
 local useNativePurchaseFinishedListener = require(RobloxSubscriptionPurchaseApp.Hooks.useNativePurchaseFinishedListener)
 local useRobloxSubscriptionChangedListener = require(RobloxSubscriptionPurchaseApp.Hooks.useRobloxSubscriptionChangedListener)
 local useSubscriptionPollingTimeoutGuard = require(RobloxSubscriptionPurchaseApp.Hooks.useSubscriptionPollingTimeoutGuard)
+local useMembershipConfigChangePoller = require(RobloxSubscriptionPurchaseApp.Hooks.useMembershipConfigChangePoller)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagPlusMembershipConfigChangeCheck = SharedFlags.FFlagPlusMembershipConfigChangeCheck
 
 local Sheet = Foundation.Sheet
 local DialogSize = Foundation.Enums.DialogSize
@@ -38,11 +41,15 @@ local function RobloxSubscriptionContainer()
 	useRobloxSubscriptionChangedListener()
 	useSubscriptionPollingTimeoutGuard()
 
+	if FFlagPlusMembershipConfigChangeCheck then
+		useMembershipConfigChangePoller()
+	end
+
 	local blackbirdSheetContent = BlackbirdSheetContent()
 	local errorSheetContent = ErrorSheetContent()
 
-	if errorSet[v2] ~= true then
-		errorSheetContent = blackbirdSheetContent
+	if errorSet[v2] == true then
+		blackbirdSheetContent = errorSheetContent
 	end
 
 	return set[v2] == true and React.createElement(Sheet.Root, {
@@ -52,9 +59,9 @@ local function RobloxSubscriptionContainer()
 		preferCenterSheet = true,
 		size = DialogSize.Medium
 	}, {
-		Header = errorSheetContent.Header,
-		Content = errorSheetContent.Content,
-		Actions = errorSheetContent.Actions
+		Header = blackbirdSheetContent.Header,
+		Content = blackbirdSheetContent.Content,
+		Actions = blackbirdSheetContent.Actions
 	}) or nil
 end
 

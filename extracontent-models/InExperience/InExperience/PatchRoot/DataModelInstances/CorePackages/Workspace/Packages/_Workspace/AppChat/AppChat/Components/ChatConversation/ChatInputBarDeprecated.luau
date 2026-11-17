@@ -5,8 +5,6 @@ local SocialLibraries = require(AppChat.SocialLibraries)
 local Roact = require(parent.Roact)
 local AppCommonLib = require(parent.AppCommonLib)
 local Text = AppCommonLib.Text
-local Foundation = require(parent.Foundation)
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local Style = require(parent.Style)
 local GetTextSize = Style.GetTextSize
 local AppCommonLib2 = require(parent.AppCommonLib)
@@ -97,11 +95,7 @@ function extended:init()
 	self.textChangedFallback = self.props.textChangedFallback or not UserInputService.KeyboardEnabled
 
 	function self.heightOfFourLines(p, p2, p3)
-		if FoundationFontFaceMigration then
-			return GetTextSize("A\nB\nC\nD", p2, p, Vector2.new(p3, 10000)).Y
-		end
-
-		return Text.GetTextHeight("A\nB\nC\nD", p, p2, p3)
+		return GetTextSize("A\nB\nC\nD", p2, p, Vector2.new(p3, 10000)).Y
 	end
 
 	function self.isMoreMenuEnabled()
@@ -109,28 +103,21 @@ function extended:init()
 	end
 
 	function self.calculateInputBoxHeight(p, p2, p3, p4)
+		local y = GetTextSize(p, p3, p2, Vector2.new(p4, 10000)).Y
+		local heightOfFourLines = self.heightOfFourLines(p2, p3, p4)
 		local v
 
-		if FoundationFontFaceMigration then
-			v = GetTextSize(p, p3, p2, Vector2.new(p4, 10000)).Y
-		else
-			v = Text.GetTextHeight(p, p2, p3, p4)
-		end
-
-		local heightOfFourLines = self.heightOfFourLines(p2, p3, p4)
-		local v2
-
 		if self.isMoreMenuEnabled() then
-			v2 = p3 + math.min(v, heightOfFourLines)
+			v = p3 + math.min(y, heightOfFourLines)
 		else
-			v2 = p3 + math.min(v, heightOfFourLines) + 16
+			v = p3 + math.min(y, heightOfFourLines) + 16
 		end
 
 		if self.props.onHeightChanged then
-			self.props.onHeightChanged(v2)
+			self.props.onHeightChanged(v)
 		end
 
-		return v2
+		return v
 	end
 
 	self.inputConnectionActive = false
@@ -318,14 +305,7 @@ function extended:renderContent(p)
 		return withChatPagePadding(function(p2)
 			return withSelectionCursorProvider(function(callback)
 				local font = data.Font
-				local font2
-
-				if FoundationFontFaceMigration then
-					font2 = data.Tokens.Typography.BodyLarge.Font
-				else
-					font2 = font.Body.Font
-				end
-
+				local font2 = data.Tokens.Typography.BodyLarge.Font
 				local v = font.BaseSize * font.Body.RelativeSize
 				local v2
 

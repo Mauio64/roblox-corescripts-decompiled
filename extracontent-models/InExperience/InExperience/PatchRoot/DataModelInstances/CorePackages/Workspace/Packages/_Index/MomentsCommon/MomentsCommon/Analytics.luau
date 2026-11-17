@@ -40,6 +40,8 @@ return {
 	reportMomentsEditToolOpened = reportMomentsRealtimeEvent.reportMomentsEditToolOpened,
 	reportMomentsEditToolAbandoned = reportMomentsRealtimeEvent.reportMomentsEditToolAbandoned,
 	reportMomentsGenerateText = reportMomentsRealtimeEvent.reportMomentsGenerateText,
+	reportMomentsPostInsightsRequest = reportMomentsRealtimeEvent.reportMomentsPostInsightsRequest,
+	reportMomentsPostInsightsRequestLatency = reportMomentsRealtimeEvent.reportMomentsPostInsightsRequestLatency,
 	reportMomentsComments = reportMomentsCommentsRealtime.reportMomentsComments,
 	reportMomentsCommentAction = reportMomentsCommentsRealtime.reportMomentsCommentAction
 }

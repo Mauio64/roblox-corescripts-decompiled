@@ -5,6 +5,7 @@ return {
 	WhyThisAdModal = require(script.WhyThisAdModal),
 	SponsoredUserCohort = require(script.Enums.SponsoredUserCohort),
 	OneByTwoTile = require(script.OneByTwoTile),
+	openAdClickoutUrl = require(script.openAdClickoutUrl),
 	TwoByOneGameTile = TwoByOneGameTile,
 	renderOneByTwoTile = require(script.renderOneByTwoTile),
 	renderTwoByOneTile = require(script.renderTwoByOneTile),

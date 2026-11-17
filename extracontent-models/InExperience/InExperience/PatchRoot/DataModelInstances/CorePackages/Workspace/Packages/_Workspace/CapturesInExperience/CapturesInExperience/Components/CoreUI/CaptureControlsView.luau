@@ -20,13 +20,19 @@ local PopoverSide = Foundation.Enums.PopoverSide
 local Tooltip = Foundation.Tooltip
 local View = Foundation.View
 
+local GalleryButtonContent = require(parent.Components.CoreUI.GalleryButtonContent)
 local VideoCaptureControl = require(parent.Components.CoreUI.VideoCaptureControl)
 local VoiceChatIndicator = require(parent.Components.CoreUI.VoiceChatIndicator)
 
+local CapturesContext = require(parent.Context.CapturesContext)
 local CapturesPolicy = require(parent.App.CapturesPolicy)
+local CarouselOpened = require(parent.Actions.CarouselOpened)
 local Constants = require(parent.Constants)
 local EventNames = require(parent.Analytics.EventNames)
+local GetLatestCaptureStore = require(parent.Stores.GetLatestCaptureStore)
 local TakeCapture = require(parent.Thunks.TakeCapture)
+
+local findCaptureIndex = require(parent.Utils.findCaptureIndex)
 
 local SnapDirection = require(parent.Enums.SnapDirection)
 
@@ -38,6 +44,8 @@ local useEffect = React.useEffect
 local useLocalization = Localization.Hooks.useLocalization
 local usePlayShutterSound = require(parent.Hooks.usePlayShutterSound)
 local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local useLatestCapture = require(parent.Hooks.useLatestCapture)
+local useSystemMenuDetection = require(parent.Hooks.useSystemMenuDetection)
 local useTokens = Foundation.Hooks.useTokens
 local useTopbarInset = require(parent.Hooks.useTopbarInset)
 
@@ -45,6 +53,7 @@ local defineFastFlag = game:DefineFastFlag("DebugOverrideCaptureControlsVideoGua
 local SharedFlags = require(parent2.SharedFlags)
 local FStringSocialCaptureIXPLayer = SharedFlags.FStringSocialCaptureIXPLayer
 local FFlagCapturesControlsUseBuilderIcons = require(parent.Flags.FFlagCapturesControlsUseBuilderIcons)
+local FFlagCapturesControlsGalleryButton = require(parent.Flags.FFlagCapturesControlsGalleryButton)
 
 local name = not FFlagCapturesControlsUseBuilderIcons and "icons/controls/screenCapture" or IconName.FrameCameraCenter
 local large
@@ -70,47 +79,81 @@ end)(function(p)
 	local v2 = useAnalytics()
 	local v3 = useDispatch()
 	local v4 = useLocalization({
-		captureScreenshot = "Feature.Captures.Title.CaptureScreenshotTooltip"
+		captureScreenshot = "Feature.Captures.Title.CaptureScreenshotTooltip",
+		gallery = FFlagCapturesControlsGalleryButton and "Feature.Captures.Title.Gallery" or nil
 	})
 
 	local v5 = useTokens()
+	local openGallery
 
-	local v6 = useTopbarInset()
+	if FFlagCapturesControlsGalleryButton then
+		openGallery = React.useContext(CapturesContext).openGallery
+	else
+		openGallery = nil
+	end
 
-	local v7 = useSelector(function(p2)
+	local v6
+
+	if FFlagCapturesControlsGalleryButton then
+		v6 = useSystemMenuDetection()
+	else
+		v6 = false
+	end
+
+	local latestCapture
+
+	if FFlagCapturesControlsGalleryButton then
+		latestCapture = useLatestCapture()
+	else
+		latestCapture = nil
+	end
+
+	local v7
+
+	if FFlagCapturesControlsGalleryButton then
+		v7 = useSelector(function(p2)
+			return p2[Constants.RoduxKey].Captures
+		end)
+	else
+		v7 = nil
+	end
+
+	local v8 = useTopbarInset()
+
+	local v9 = useSelector(function(p2)
 		return p2[Constants.RoduxKey].IsActive
 	end)
 
-	local v8 = useSelector(function(p2)
+	local v10 = useSelector(function(p2)
 		return p2[Constants.RoduxKey].IsVideoCaptureActive.status
 	end)
 
 	useEffect(function()
-		if v7 then
+		if v9 then
 			ixpServiceWrapper:LogFlagLinkedUserLayerExposure(FStringSocialCaptureIXPLayer)
 		end
-	end, { v7 })
+	end, { v9 })
 
-	local v9 = usePlayShutterSound()
+	local v11 = usePlayShutterSound()
 
-	local v10 = useCaptureControlsController(v7, (React.useMemo(function()
-		return Vector2.new(v6.Min.X - v5.Padding.Small, v6.Height - v5.Padding.XSmall - v5.Padding.XXSmall)
-	end, { v6, v5 })))
+	local v12 = useCaptureControlsController(v9, (React.useMemo(function()
+		return Vector2.new(v8.Min.X - v5.Padding.Small, v8.Height - v5.Padding.XSmall - v5.Padding.XXSmall)
+	end, { v8, v5 })))
 
-	local dragContainerRef = v10.dragContainerRef
-	local dragDetectorRef = v10.dragDetectorRef
-	local dragItemAnchorPointBinding = v10.dragItemAnchorPointBinding
-	local dragItemPositionBinding = v10.dragItemPositionBinding
-	local dragItemRef = v10.dragItemRef
-	local isItemHorizontal = v10.isItemHorizontal
-	local screenshotButtonRef = v10.screenshotButtonRef
-	local snapDirection = v10.snapDirection
+	local dragContainerRef = v12.dragContainerRef
+	local dragDetectorRef = v12.dragDetectorRef
+	local dragItemAnchorPointBinding = v12.dragItemAnchorPointBinding
+	local dragItemPositionBinding = v12.dragItemPositionBinding
+	local dragItemRef = v12.dragItemRef
+	local isItemHorizontal = v12.isItemHorizontal
+	local screenshotButtonRef = v12.screenshotButtonRef
+	local snapDirection = v12.snapDirection
 
 	useEffect(function()
-		if v7 then
+		if v9 then
 			v2.fireEvent(EventNames.CapturesEntrypointViewed)
 		end
-	end, { v7 })
+	end, { v9 })
 
 	local onActivated = useCallback(function()
 		if not SocialStopwatch.Stopwatch.get(SocialStopwatch.Events.CaptureTaken) then
@@ -119,14 +162,40 @@ end)(function(p)
 
 		v2.fireEvent(EventNames.CapturesEntrypointActivated)
 
-		v9()
+		v11()
 		v3(TakeCapture())
-	end, { v9 })
+	end, { v11 })
+	local onActivated2
+
+	if FFlagCapturesControlsGalleryButton then
+		onActivated2 = useCallback(function()
+			local latestCaptureFilePath = GetLatestCaptureStore(false).getLatestCaptureFilePath(false)
+
+			if not openGallery() or latestCapture == nil or v7 == nil then
+				return
+			end
+
+			local captureIndex = findCaptureIndex(v7, latestCapture, latestCaptureFilePath)
+
+			if captureIndex then
+				v2.fireEvent(EventNames.CapturesCarouselOpened)
+				v3(CarouselOpened(captureIndex))
+			end
+		end, { openGallery, latestCapture, v7, v2.fireEvent, v3 })
+	end
+
+	local galleryButtonContent
+
+	if FFlagCapturesControlsGalleryButton then
+		galleryButtonContent = React.createElement(GalleryButtonContent, {
+			latestCapture = latestCapture
+		})
+	end
 
 	local createElement = React.createElement
-	local v11 = {
-		Position = UDim2.fromOffset(0, -v6.Height),
-		Size = UDim2.new(1, 0, 1, v6.Height),
+	local v13 = {
+		Position = UDim2.fromOffset(0, -v8.Height),
+		Size = UDim2.new(1, 0, 1, v8.Height),
 		tag = "padding-x-large padding-y-medium",
 		ZIndex = Constants.ZIndex.Entrypoint
 	}
@@ -134,9 +203,9 @@ end)(function(p)
 	local createElement2 = React.createElement
 	local captureControls
 
-	if v7 then
+	if v9 then
 		local createElement3 = React.createElement
-		local v12 = {
+		local v14 = {
 			AnchorPoint = dragItemAnchorPointBinding:map(function(p2)
 				return Vector2.new(p2.x, p2.y)
 			end),
@@ -153,7 +222,7 @@ end)(function(p)
 			}
 		}
 
-		local v13 = {
+		local v15 = {
 			DragDetector = React.createElement("UIDragDetector", {
 				DragStyle = Enum.UIDragDetectorDragStyle.Scriptable,
 				BoundingUI = dragContainerRef,
@@ -162,6 +231,7 @@ end)(function(p)
 			}),
 			VideoCaptureControl = 0,
 			ScreenshotCTA = 0,
+			GalleryCTA = 0,
 			VoiceChatIndicator = 0,
 			DragAffordance = 0
 		}
@@ -174,10 +244,10 @@ end)(function(p)
 			})
 		end
 
-		v13.VideoCaptureControl = videoCaptureControl
+		v15.VideoCaptureControl = videoCaptureControl
 		local screenshotCTA
 
-		if not v8 then
+		if not v10 then
 			screenshotCTA = React.createElement(View, {
 				LayoutOrder = 2,
 				tag = {
@@ -205,17 +275,44 @@ end)(function(p)
 			})
 		end
 
-		v13.ScreenshotCTA = screenshotCTA
+		v15.ScreenshotCTA = screenshotCTA
+		local galleryCTA
+
+		if FFlagCapturesControlsGalleryButton and openGallery and not v10 then
+			local createElement4 = React.createElement
+			local galleryTooltip
+
+			if not v6 then
+				galleryTooltip = React.createElement(
+					Tooltip,
+					{ align = PopoverAlign.Center, side = v[snapDirection], title = v4.gallery },
+					React.createElement(View, { tag = "size-1200-1200" })
+				)
+			end
+
+			galleryCTA = createElement4(
+				View,
+				{
+					LayoutOrder = 3,
+					tag = "position-center-center anchor-center-center size-1200-1200 auto-xy radius-circle clip",
+					testId = "--social-captures-controls-gallery-button",
+					onActivated = onActivated2
+				},
+				{ GalleryButtonContent = galleryButtonContent, GalleryTooltip = galleryTooltip }
+			)
+		end
+
+		v15.GalleryCTA = galleryCTA
 		local voiceChatIndicator
 
-		if v8 then
+		if v10 then
 			voiceChatIndicator = React.createElement(VoiceChatIndicator, {
-				layoutOrder = 3,
+				layoutOrder = FFlagCapturesControlsGalleryButton and 4 or 3,
 				popoverSide = v[snapDirection]
 			})
 		end
 
-		v13.VoiceChatIndicator = voiceChatIndicator
+		v15.VoiceChatIndicator = voiceChatIndicator
 
 		local createElement4 = React.createElement
 		local dragAffordanceIcon
@@ -235,18 +332,14 @@ end)(function(p)
 			})
 		end
 
-		v13.DragAffordance = createElement4(
-			View,
-			{
-				LayoutOrder = 4,
-				tag = "anchor-center-center auto-xy padding-xxsmall position-center-center"
-			},
-			{ DragAffordanceIcon = dragAffordanceIcon }
-		)
-		captureControls = createElement3(View, v12, v13)
+		v15.DragAffordance = createElement4(View, {
+			LayoutOrder = FFlagCapturesControlsGalleryButton and 5 or 4,
+			tag = "anchor-center-center auto-xy padding-xxsmall position-center-center"
+		}, { DragAffordanceIcon = dragAffordanceIcon })
+		captureControls = createElement3(View, v14, v15)
 	end
 
-	return createElement(View, v11, {
+	return createElement(View, v13, {
 		PaddedContainer = createElement2(
 			View,
 			{

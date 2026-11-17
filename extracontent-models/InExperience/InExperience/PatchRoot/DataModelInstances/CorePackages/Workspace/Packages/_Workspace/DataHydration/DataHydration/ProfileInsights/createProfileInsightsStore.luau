@@ -11,7 +11,132 @@ local ProfileInsightsModel = ProfileInsights.ProfileInsightsModel
 local MultiGetProfileInsights = require(script.Parent.Requests.MultiGetProfileInsights)
 require(script.Parent.ProfileInsightsStoreTypes)
 
+local SharedFlags = require(parent.SharedFlags)
+local FFlagProfileInsightsKeyByRankingStrategy = SharedFlags.FFlagProfileInsightsKeyByRankingStrategy
+
 local defineFastInt = game:DefineFastInt("ProfileInsightsStoreProcessDelaySec", 0)
+
+local function createInsightBucket()
+	local pendingFetchOptions = {}
+	return {
+		resolver = createDataResolver({
+			cache = createDataCache(),
+			queueProcessDelaySec = defineFastInt,
+			replaceItems = true,
+			onClear = function()
+				table.clear(pendingFetchOptions)
+			end,
+			fetchFn = function(p)
+				local keys = Cryo.Dictionary.keys(p)
+				local rankingStrategy = nil
+				local count = nil
+
+				for _, key in keys do
+					local v = pendingFetchOptions[key]
+
+					if not v then
+						continue
+					end
+
+					if rankingStrategy == nil then
+						rankingStrategy = v.rankingStrategy
+					end
+
+					if count == nil then
+						count = v.count
+					end
+
+					pendingFetchOptions[key] = nil
+				end
+
+				return MultiGetProfileInsights({
+					userIds = keys,
+					count = count,
+					rankingStrategy = rankingStrategy
+				}):andThen(function(p2)
+					local createProfileInsightsList = ProfileInsightsModel.createProfileInsightsList
+					local v
+
+					if p2 then
+						v = p2.userInsights
+					end
+
+					local profileInsightsList = createProfileInsightsList(v)
+
+					local result = {}
+
+					for _, key in keys do
+						result[key] = {
+							targetUserId = key,
+							isOfflineFrequents = false,
+							mutualFriends = {}
+						}
+					end
+
+					for _, profileInsight in profileInsightsList do
+						if result[profileInsight.targetUserId] ~= nil then
+							result[profileInsight.targetUserId] = profileInsight
+						end
+					end
+
+					return result
+				end)
+			end
+		}),
+		pendingFetchOptions = pendingFetchOptions
+	}
+end
+
+local function createProfileInsightsStoreKeyedByRankingStrategy()
+	local buckets = {}
+
+	local function getBucket(value: string?) -- 1 equivalent call inferred from this helper
+		local v = value or ""
+		local bucket = buckets[v]
+
+		if bucket == nil then
+			bucket = createInsightBucket()
+			buckets[v] = bucket
+		end
+
+		return bucket
+	end
+
+	return {
+		GetProfileInsight = function(p, data)
+			local v
+
+			if data then
+				v = data.rankingStrategy
+			end
+
+			local bucket = getBucket(v) -- inferred equivalent call
+
+			if data and data.skipFetch then
+				return bucket.resolver.getCachedItem(p)
+			end
+
+			if data then
+				bucket.pendingFetchOptions[p] = {
+					rankingStrategy = data.rankingStrategy,
+					count = data.count
+				}
+			end
+
+			return bucket.resolver.getAndFetchItem(p)
+		end,
+		clear = function()
+			for _, v in buckets do
+				v.resolver.clear()
+			end
+		end,
+		dispose = function()
+			for _, v in buckets do
+				v.resolver.dispose()
+			end
+		end
+	}
+end
 
 local function createProfileInsightsStore()
 	local dataCache = createDataCache()
@@ -94,6 +219,10 @@ local function createProfileInsightsStore()
 		clear = dataCache.clear,
 		dispose = dataCache.dispose
 	}
+end
+
+if FFlagProfileInsightsKeyByRankingStrategy then
+	return createProfileInsightsStoreKeyedByRankingStrategy
 end
 
 return createProfileInsightsStore

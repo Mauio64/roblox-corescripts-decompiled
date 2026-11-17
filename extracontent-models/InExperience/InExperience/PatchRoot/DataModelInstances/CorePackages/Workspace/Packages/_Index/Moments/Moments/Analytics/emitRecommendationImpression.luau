@@ -1,7 +1,9 @@
 local Moments = script:FindFirstAncestor("Moments")
 local Constants = require(Moments.Constants)
 require(script.Parent.RecommendationContentType)
+require(Moments.Enums.MomentsFeedType)
 local FFlagMomentsRecommendationContentType = require(Moments.Flags.FFlagMomentsRecommendationContentType)
+local FFlagMomentsRecommendationFeedType = require(Moments.Flags.FFlagMomentsRecommendationFeedType)
 
 local v = {
 	eventName = "RecommendationImpressionEvent",
@@ -13,10 +15,16 @@ local v = {
 
 local function emitRecommendationImpression(data)
 	local TelemetryService = game:GetService("TelemetryService")
-	local content_type
+	local contentType
 
 	if FFlagMomentsRecommendationContentType then
-		content_type = data.contentType
+		contentType = data.contentType
+	end
+
+	local feed_type
+
+	if FFlagMomentsRecommendationFeedType then
+		feed_type = data.feedType
 	end
 
 	TelemetryService:LogEvent(v, {
@@ -35,7 +43,8 @@ local function emitRecommendationImpression(data)
 			departure_intent = data.departureIntent,
 			moments_session_id = data.momentsSessionId,
 			source_surface = Constants.SOURCE_SURFACE,
-			content_type = content_type
+			content_type = contentType,
+			feed_type = feed_type
 		}
 	})
 end

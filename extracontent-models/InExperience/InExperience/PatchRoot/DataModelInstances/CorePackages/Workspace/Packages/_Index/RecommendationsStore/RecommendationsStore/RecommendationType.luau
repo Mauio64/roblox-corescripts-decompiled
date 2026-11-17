@@ -1,1 +1,0 @@
-return { Invalid = 0, User = 1, Contact = 2 }

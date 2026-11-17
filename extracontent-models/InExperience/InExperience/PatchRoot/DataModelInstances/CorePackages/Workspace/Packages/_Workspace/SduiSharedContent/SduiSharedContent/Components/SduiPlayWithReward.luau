@@ -17,10 +17,10 @@ local function SduiPlayWithReward(props)
 	local v = useNavigationFocus()
 	local state, setState = React.useState(false)
 
-	local v2 = usePlayButtonState(
-		props.sduiContext and props.sduiContext.dependencies and props.sduiContext.dependencies.networking,
-		props.universeId
-	)
+	local networking = props.sduiContext
+		and props.sduiContext.dependencies
+		and props.sduiContext.dependencies.networking
+	local v2 = usePlayButtonState(networking, props.universeId)
 	local v3 = v2.playButtonState == PlayButtonStates.Playable
 
 	React.useEffect(function()

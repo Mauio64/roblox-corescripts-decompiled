@@ -18,6 +18,7 @@ require(script.Types.AXItemInfo)
 require(script.Types.AXCollectibleItemInfo)
 require(script.Types.AXCollectibleInstance)
 require(script.Types.WidgetContentTypes)
+require(script.Stores.AvatarSettingsStore.createAvatarSettingsStore)
 
 return {
 	["jest.config"] = script["jest.config"],
@@ -35,6 +36,7 @@ return {
 		RecommendationsType = RecommendationsType
 	},
 	Stores = {
+		getAvatarSettingsStore = require(script.Stores.AvatarSettingsStore.getAvatarSettingsStore),
 		getLayeredClothingEntryPageStore = require(script.Stores.LayeredClothingEntryPageStore.getLayeredClothingEntryPageStore),
 		getLayeredClothingLastSavedSortStore = require(script.Stores.LayeredClothingLastSavedSortStore.getLayeredClothingLastSavedSortStore)
 	}

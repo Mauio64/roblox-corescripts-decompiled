@@ -462,7 +462,9 @@ function extended:init()
 			onFocusGained = self.onTextInputBoxFocused,
 			onFocusLost = self.onTextInputBoxFocusLost,
 			onReturnPressed = self.props.onReturnPressedFromOnScreenKeyboard,
-			textBoxRef = self.foundationTextBoxRef
+			textBoxRef = self.foundationTextBoxRef,
+			inputRef = self.props.foundationInputRef,
+			NextSelectionDown = self.props.NextSelectionDown
 		})
 	end
 end

@@ -4,7 +4,6 @@ local parent = Foundation.Parent
 local React = require(parent.React)
 
 local constants = require(script.Parent.constants)
-local Flags = require(Foundation.Utility.Flags)
 local Text = require(Foundation.Components.Text)
 require(Foundation.Components.Types)
 local View = require(Foundation.Components.View)
@@ -22,28 +21,6 @@ local withDefaults = require(Foundation.Utility.withDefaults)
 require(Foundation.Enums.ProgressShape)
 
 local ProgressSize = require(Foundation.Enums.ProgressSize)
-
-local function getBarSequenceFromProgress(value: number?)
-	local v = value or 0
-
-	if v == 0 then
-		return NumberSequence.new(1)
-	elseif v == 1 then
-		return NumberSequence.new(0)
-	end
-
-	local numberSequenceKeypoints = {
-		NumberSequenceKeypoint.new(0, 0),
-		NumberSequenceKeypoint.new(v, 0),
-		NumberSequenceKeypoint.new(math.min(v + 0.001, 1), 1)
-	}
-
-	if v < 0.999 then
-		table.insert(numberSequenceKeypoints, NumberSequenceKeypoint.new(1, 1))
-	end
-
-	return NumberSequence.new(numberSequenceKeypoints)
-end
 
 local function getFillSizeFromProgress(value: number?)
 	return UDim2.fromScale(value or 0, 1)
@@ -101,78 +78,57 @@ local function ProgressBar(p)
 	local v4 = usePreferences()
 	local v5
 
-	if Flags.FoundationProgressBarBetaUpdate then
-		if v2.size == ProgressSize.Small then
-			v5 = ProgressSize.Small
-		else
-			v5 = ProgressSize.Medium
-		end
+	if v2.size == ProgressSize.Small then
+		v5 = ProgressSize.Small
 	else
-		v5 = v2.size
+		v5 = ProgressSize.Medium
 	end
 
 	local v6 = useProgressVariants(v3, v5)
 
 	local v7, v8 = useProgressBinding(v2.value)
-	local v9 = useRotation(1)
-	local v10 = usePulseBinding(1 / constants.INDETERMINATE_SHIMMER_SPEED)
-	local transparency = mapBindable(v7, getBarSequenceFromProgress)
 
 	local createElement = React.createElement
 
+	local v9 = withCommonProps(v2, {
+		tag = "col gap-xsmall size-full-0 auto-y",
+		Size = UDim2.new(v2.width, UDim.new(0, 0)),
+		ref = v2.ref
+	})
+
+	local createElement2 = React.createElement
 	local v11 = {
-		tag = Flags.FoundationProgressBarBetaUpdate and "col gap-xsmall size-full-0 auto-y" or "radius-small bg-shift-400",
+		Size = UDim2.new(UDim.new(1, 0), UDim.new(0, v6.bar.height)),
+		cornerRadius = UDim.new(0, v3.Radius.Circle),
+		tag = "size-full-0 clip bg-shift-400",
+		LayoutOrder = 1,
+		testId = `{v2.testId}--track`
+	}
+
+	local createElement3 = React.createElement
+
+	local v12 = {
+		backgroundStyle = v3.Color.Content.Emphasis,
+		cornerRadius = UDim.new(0, v3.Radius.Circle),
 		Size = 0,
-		ref = 0
+		tag = 0,
+		testId = 0
 	}
 	local size
 
-	if Flags.FoundationProgressBarBetaUpdate then
-		size = UDim2.new(v2.width, UDim.new(0, 0))
+	if v8 then
+		size = UDim2.fromScale(1, 1)
 	else
-		size = UDim2.new(v2.width, UDim.new(0, v6.bar.height))
+		size = mapBindable(v7, getFillSizeFromProgress)
 	end
 
-	v11.Size = size
+	v12.Size = size
 
-	v11.ref = v2.ref
-	local v12 = withCommonProps(v2, v11)
-	local children
-
-	if Flags.FoundationProgressBarBetaUpdate then
-		children = { Track = 0, Labels = 0 }
-		local createElement2 = React.createElement
-		local v13 = {
-			Size = UDim2.new(UDim.new(1, 0), UDim.new(0, v6.bar.height)),
-			cornerRadius = UDim.new(0, v3.Radius.Circle),
-			tag = "size-full-0 clip bg-shift-400",
-			LayoutOrder = 1,
-			testId = `{v2.testId}--track`
-		}
-
-		local createElement3 = React.createElement
-
-		local v14 = {
-			backgroundStyle = v3.Color.Content.Emphasis,
-			cornerRadius = UDim.new(0, v3.Radius.Circle),
-			Size = 0,
-			tag = 0,
-			testId = 0
-		}
-		local size2
-
-		if v8 then
-			size2 = UDim2.fromScale(1, 1)
-		else
-			size2 = mapBindable(v7, getFillSizeFromProgress)
-		end
-
-		v14.Size = size2
-
-		v14.tag = v8 and "size-full" or nil
-		v14.testId = `{v2.testId}--fill`
-		children.Track = createElement2(View, v13, {
-			Fill = createElement3(View, v14, v8 and {
+	v12.tag = v8 and "size-full" or nil
+	v12.testId = `{v2.testId}--fill`
+	local v10 = {
+		Track = createElement2(View, v11, {
+			Fill = createElement3(View, v12, v8 and {
 				Gradient = React.createElement(ProgressBarIndeterminateGradient, {
 					emphasisColor3 = v3.Color.Content.Emphasis.Color3,
 					emphasisTransparency = v3.Color.Content.Emphasis.Transparency,
@@ -180,84 +136,34 @@ local function ProgressBar(p)
 					testId = `{v2.testId}--fill--gradient`
 				})
 			} or nil)
-		})
-		local labels
+		}),
+		Labels = 0
+	}
+	local labels
 
-		if v2.showLabel and not v8 then
-			labels = React.createElement(
-				View,
-				{ tag = "row size-full-0 auto-y", LayoutOrder = 2, testId = `{v2.testId}--labels` },
-				{
-					MinValue = React.createElement(Text, {
-						Text = v2.minValueLabel,
-						tag = "fill auto-xy text-label-medium text-align-x-left content-default",
-						LayoutOrder = 1,
-						testId = `{v2.testId}--label-min`
-					}),
-					MaxValue = React.createElement(Text, {
-						Text = v2.maxValueLabel,
-						tag = "fill auto-xy text-label-medium text-align-x-right content-default",
-						LayoutOrder = 2,
-						testId = `{v2.testId}--label-max`
-					})
-				}
-			)
-		end
-
-		children.Labels = labels
-	else
-		children = { Fill = 0 }
-		local createElement2 = React.createElement
-		local v13 = {
-			backgroundStyle = v3.Color.Content.Emphasis,
-			tag = "size-full radius-small",
-			ref = v2.ref,
-			testId = `{v2.testId}--fill`
-		}
-
-		local createElement3 = React.createElement
-		local v14 = {
-			Color = ColorSequence.new(v3.Color.Content.Emphasis.Color3),
-			Transparency = 0,
-			Offset = 0
-		}
-
-		if v8 then
-			transparency = v10:map(function(p2: number)
-				if v4.reducedMotion then
-					return NumberSequence.new(p2)
-				end
-
-				return NumberSequence.new({
-					NumberSequenceKeypoint.new(0, 1),
-					NumberSequenceKeypoint.new(0.2, 1),
-					NumberSequenceKeypoint.new(0.5, v3.Color.Content.Emphasis.Transparency),
-					NumberSequenceKeypoint.new(0.8, 1),
-					NumberSequenceKeypoint.new(1, 1)
+	if v2.showLabel and not v8 then
+		labels = React.createElement(
+			View,
+			{ tag = "row size-full-0 auto-y", LayoutOrder = 2, testId = `{v2.testId}--labels` },
+			{
+				MinValue = React.createElement(Text, {
+					Text = v2.minValueLabel,
+					tag = "fill auto-xy text-label-medium text-align-x-left content-default",
+					LayoutOrder = 1,
+					testId = `{v2.testId}--label-min`
+				}),
+				MaxValue = React.createElement(Text, {
+					Text = v2.maxValueLabel,
+					tag = "fill auto-xy text-label-medium text-align-x-right content-default",
+					LayoutOrder = 2,
+					testId = `{v2.testId}--label-max`
 				})
-			end)
-		end
-
-		v14.Transparency = transparency
-		local offset
-
-		if v8 then
-			offset = v9:map(function(p2: number)
-				if v4.reducedMotion then
-					return Vector2.new(0, 0)
-				end
-
-				return Vector2.new(p2 * constants.INDETERMINATE_SHIMMER_SPEED % 360 / 360 * 2 - 1, 0)
-			end)
-		end
-
-		v14.Offset = offset
-		children.Fill = createElement2(View, v13, {
-			Gradient = createElement3("UIGradient", v14)
-		})
+			}
+		)
 	end
 
-	return createElement(View, v12, children)
+	v10.Labels = labels
+	return createElement(View, v9, v10)
 end
 
 return ProgressBar

@@ -80,12 +80,8 @@ require(BuildExperience.Chat.useChatSessionCore)
 local FFlagEnableBuildAdPromotion = require(BuildExperience.Flags.FFlagEnableBuildAdPromotion)
 
 local FFlagBuildExperienceChatAccordionScrollAnchor = require(BuildExperience.Flags.FFlagBuildExperienceChatAccordionScrollAnchor)
-local FFlagBuildExperienceChatImageAttachments = require(BuildExperience.Flags.FFlagBuildExperienceChatImageAttachments)
 local FFlagBuildCheckGamePermissions = require(BuildExperience.Flags.FFlagBuildCheckGamePermissions)
 require(BuildExperience.useGamePermissions)
-
-local SharedFlags2 = require(parent.SharedFlags)
-local FFlagBuildExperienceChatResourceAttachments = SharedFlags2.FFlagBuildExperienceChatResourceAttachments
 local useScrollPerformanceTracker = require(BuildExperience.Telemetry.useScrollPerformanceTracker)
 
 local Divider = Foundation.Divider
@@ -432,7 +428,7 @@ local function BuildChatPageView(props)
 			modelPicker = props.modelPicker
 		end
 
-		local v12 = {
+		footer = createElement2(ChatActions, {
 			LayoutOrder = layoutOrder,
 			modelPicker = modelPicker,
 			composerText = props.composerText,
@@ -442,67 +438,21 @@ local function BuildChatPageView(props)
 			isPromptChipsLoading = props.isPromptChipsLoading,
 			onPromptChipActivated = props.onPromptChipActivated,
 			onPromptChipExhausted = props.onPromptChipExhausted,
-			images = 0,
-			onImagesChanged = 0,
-			onRetryImage = 0,
-			isSendBlocked = 0,
-			resourceAttachments = 0,
-			onRemoveResourceAttachment = 0,
-			placeholder = 0,
-			textBoxRef = 0,
-			isAssistantResponding = 0,
-			canStopAssistantResponse = 0,
-			canSendWhileResponding = 0,
-			isReadOnly = 0,
-			onSend = 0,
-			onStop = 0
-		}
-		local images
-
-		if FFlagBuildExperienceChatImageAttachments then
-			images = props.composerImages
-		end
-
-		v12.images = images
-		local onImagesChanged
-
-		if FFlagBuildExperienceChatImageAttachments then
-			onImagesChanged = props.onComposerImagesChanged
-		end
-
-		v12.onImagesChanged = onImagesChanged
-		local onRetryImage
-
-		if FFlagBuildExperienceChatImageAttachments then
-			onRetryImage = props.onRetryComposerImage
-		end
-
-		v12.onRetryImage = onRetryImage
-		v12.isSendBlocked = props.isComposerSendBlocked
-		local resourceAttachments
-
-		if FFlagBuildExperienceChatResourceAttachments then
-			resourceAttachments = props.composerResourceAttachments
-		end
-
-		v12.resourceAttachments = resourceAttachments
-		local onRemoveResourceAttachment
-
-		if FFlagBuildExperienceChatResourceAttachments then
-			onRemoveResourceAttachment = props.onRemoveComposerResourceAttachment
-		end
-
-		v12.onRemoveResourceAttachment = onRemoveResourceAttachment
-
-		v12.placeholder = v3.composerPlaceholder
-		v12.textBoxRef = props.textBoxRef
-		v12.isAssistantResponding = props.isAssistantResponding
-		v12.canStopAssistantResponse = props.canStopAssistantResponse
-		v12.canSendWhileResponding = props.canSendWhileResponding
-		v12.isReadOnly = props.isChatReadOnly
-		v12.onSend = props.onSend
-		v12.onStop = props.onStop
-		footer = createElement2(ChatActions, v12)
+			images = props.composerImages,
+			onImagesChanged = props.onComposerImagesChanged,
+			onRetryImage = props.onRetryComposerImage,
+			isSendBlocked = props.isComposerSendBlocked,
+			resourceAttachments = props.composerResourceAttachments,
+			onRemoveResourceAttachment = props.onRemoveComposerResourceAttachment,
+			placeholder = v3.composerPlaceholder,
+			textBoxRef = props.textBoxRef,
+			isAssistantResponding = props.isAssistantResponding,
+			canStopAssistantResponse = props.canStopAssistantResponse,
+			canSendWhileResponding = props.canSendWhileResponding,
+			isReadOnly = props.isChatReadOnly,
+			onSend = props.onSend,
+			onStop = props.onStop
+		})
 	end
 
 	local element = createElement(View, v11, {

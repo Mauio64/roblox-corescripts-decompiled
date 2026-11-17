@@ -14,11 +14,11 @@ local function createUserProfileNameGetter(callback, computed, fn) -- 3 equivale
 
 		local v = callback(p)
 
-		if v.data and #v.data ~= 0 then
-			return fn(v.data[1].names) or ""
+		if not v.data or #v.data == 0 then
+			return ""
 		end
 
-		return ""
+		return fn(v.data[1].names) or ""
 	end)
 end
 
@@ -44,19 +44,22 @@ local function useUserDataValues(p: string)
 		return displayName or username
 	end
 
-	local v4 = useSignalState((createUserProfileNameGetter(v2, computed, fn))) -- inferred equivalent call
+	local userProfileNameGetter = createUserProfileNameGetter(v2, computed, fn) -- inferred equivalent call
+	local v4 = useSignalState(userProfileNameGetter)
 
 	local function fn2(p2)
 		return p2.getUsername(false)
 	end
 
-	local v5 = useSignalState((createUserProfileNameGetter(v2, computed, fn2))) -- inferred equivalent call
+	local userProfileNameGetter2 = createUserProfileNameGetter(v2, computed, fn2) -- inferred equivalent call
+	local v5 = useSignalState(userProfileNameGetter2)
 
 	local function fn3(p2)
 		return p2.getCombinedName(false)
 	end
 
-	local v6 = useSignalState((createUserProfileNameGetter(v2, computed, fn3))) -- inferred equivalent call
+	local userProfileNameGetter3 = createUserProfileNameGetter(v2, computed, fn3) -- inferred equivalent call
+	local v6 = useSignalState(userProfileNameGetter3)
 
 	return React.useMemo(function()
 		return {

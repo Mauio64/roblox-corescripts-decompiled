@@ -75,8 +75,8 @@ end
 
 local v = nil
 
-local function getLevel2RouteAndExclusions(items, p)
-	if not routeHasSupportAboveContent(items, p) then
+local function getLevel2RouteAndExclusions(items, eligibilityMap)
+	if not routeHasSupportAboveContent(items, eligibilityMap) then
 		v = nil
 		return items, nil
 	end
@@ -88,7 +88,7 @@ local function getLevel2RouteAndExclusions(items, p)
 	local v4 = false
 
 	for _, item in items do
-		local v5 = p[item.name]
+		local v5 = eligibilityMap[item.name]
 
 		if v5 == SplitPaneSlot.Support then
 			v4 = true

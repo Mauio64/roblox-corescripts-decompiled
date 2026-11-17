@@ -2,6 +2,7 @@ local Actions = require(script.Actions)
 local Commands = require(script.Commands)
 local GlobalCommands = require(script.GlobalCommands)
 local TabTypes = require(script.TabTypes)
+require(script.Reducers.TextChannels)
 
 return {
 	ActionBindableEvent = require(script.ActionBindableEvent),

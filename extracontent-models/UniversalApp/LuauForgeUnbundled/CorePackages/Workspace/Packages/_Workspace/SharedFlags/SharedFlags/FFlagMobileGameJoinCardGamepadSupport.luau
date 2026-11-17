@@ -1,1 +1,0 @@
-return game:DefineFastFlag("MobileGameJoinCardGamepadSupport_v2", false)

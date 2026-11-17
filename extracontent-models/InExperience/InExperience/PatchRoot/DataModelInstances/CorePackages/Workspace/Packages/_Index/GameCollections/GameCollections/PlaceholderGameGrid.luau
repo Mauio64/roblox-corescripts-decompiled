@@ -60,15 +60,19 @@ local function PlaceholderGameGrid(props)
 
 	local shouldHideTileTitle = props.shouldHideTileTitle or false
 	local shouldHideTileMetadata = props.shouldHideTileMetadata or false
+	local containedTile = props.containedTile or false
+	local titleTextLines = GameTileConstants.TileTextLines[gameTileLayoutType]
+		and GameTileConstants.TileTextLines[gameTileLayoutType].titleTextLines
+
 	local getItemHeight = useGetGameTileHeight(
 		v4,
 		gameTileLayoutType,
-		props.containedTile or false,
+		containedTile,
 		shouldHideTileMetadata,
 		shouldHideTileTitle,
 		nil,
 		nil,
-		GameTileConstants.TileTextLines[gameTileLayoutType] and GameTileConstants.TileTextLines[gameTileLayoutType].titleTextLines
+		titleTextLines
 	)
 
 	if not FFlagLuaAppCompositionAlways then

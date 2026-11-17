@@ -1,5 +1,7 @@
 local Flags = require(script:FindFirstAncestor("ViewRecycler").Flags)
-local FFlagViewRecyclerReact08 = Flags.FFlagViewRecyclerReact08
+local FFlagViewRecyclerReact084 = Flags.FFlagViewRecyclerReact084
+local Flags2 = require(script:FindFirstAncestor("ViewRecycler").Flags)
+local FFlagViewRecyclerReact08 = Flags2.FFlagViewRecyclerReact08
 local ViewRecycler = script:FindFirstAncestor("ViewRecycler")
 
 require(ViewRecycler.Core.Layout)
@@ -96,7 +98,7 @@ local function createViewport(data)
 	contentLength = v5
 	contentStartOffset = v6
 
-	return {
+	local viewport = {
 		setLayout = function(p)
 			layout = p
 			refresh() -- inferred equivalent call
@@ -265,11 +267,19 @@ local function createViewport(data)
 
 			return data2
 		end,
+		scrollBy = 0
+	}
+	local scrollBy
+
+	if not FFlagViewRecyclerReact084 then
 		scrollBy = not FFlagViewRecyclerReact08 and function(p)
 			assert(math.abs(p) < 1e999, "Virtualizer: scroll delta must be finite")
 			return scrollTo(scrollOffset + p) -- inferred equivalent call
 		end or nil
-	}
+	end
+
+	viewport.scrollBy = scrollBy
+	return viewport
 end
 
 return createViewport

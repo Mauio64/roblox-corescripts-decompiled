@@ -1,4 +1,0 @@
-local fFlagUIBloxAddNavigationTabTooltipAndTruncation = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/UIBlox").FFlagUIBloxAddNavigationTabTooltipAndTruncation
-
-return game:DefineFastFlag("EnableNavRailTooltipAndTruncation", false)
-	and fFlagUIBloxAddNavigationTabTooltipAndTruncation

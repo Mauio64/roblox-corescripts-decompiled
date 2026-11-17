@@ -1,1 +1,0 @@
-return { FriendsCommonPresenceUpdateSignal = require("@game/CorePackages/Workspace/Packages/_Index/FriendsCommon/FriendsCommon/Signals/FriendsCommonPresenceUpdateSignal")() }

@@ -7,6 +7,8 @@ local Localization = require(parent.Localization)
 local useLocalization = Localization.Hooks.useLocalization
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
 local GameConfigurationActions = require(BuildExperience.utils.GameConfigurationActions)
+local ConfigurationActionTelemetry = require(BuildExperience.Telemetry.ConfigurationActionTelemetry)
+local FFlagBuildExperienceActionOutcomeTelemetry = require(BuildExperience.Flags.FFlagBuildExperienceActionOutcomeTelemetry)
 
 local IconButton = Foundation.IconButton
 local Text = Foundation.Text
@@ -17,6 +19,59 @@ local View = Foundation.View
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local IconName = Foundation.Enums.IconName
 local InputSize = Foundation.Enums.InputSize
+
+local Action = ConfigurationActionTelemetry.Action
+local FailureReason = ConfigurationActionTelemetry.FailureReason
+
+local function isSameText(logged, p: string, p2: string): boolean -- 2 equivalent calls inferred from this helper
+	return logged ~= nil and logged.title == p and logged.description == p2
+end
+
+local function getSaveParameters(saved, p: string, p2: string) -- 2 equivalent calls inferred from this helper
+	return {
+		changedFields = ConfigurationActionTelemetry.getChangedFields(p ~= saved.title, p2 ~= saved.description)
+	}
+end
+
+local function logSaveSuccess(ref, universeId: number, title: string, value: string)
+	local current = ref.current
+
+	if current.loggedSuccess and isSameText(current.logged, title, value) then -- inferred equivalent call
+		return
+	end
+
+	ConfigurationActionTelemetry.sendSuccess(
+		Action.ExperienceDetailsSave,
+		{ universeId = universeId },
+		nil,
+		getSaveParameters(current.saved, title, value) -- inferred equivalent call
+	)
+
+	local v = { title = title, description = value }
+	ref.current = { saved = v, logged = v, loggedSuccess = true }
+end
+
+local function logSaveFailure(ref, universeId: number, title: string, value: string, err)
+	local current = ref.current
+
+	if isSameText(current.logged, title, value) then -- inferred equivalent call
+		return
+	end
+
+	ConfigurationActionTelemetry.sendFailure(
+		Action.ExperienceDetailsSave,
+		{ universeId = universeId },
+		{ reason = FailureReason.RequestFailed, error = err },
+		nil,
+		getSaveParameters(current.saved, title, value) -- inferred equivalent call
+	)
+
+	ref.current = {
+		saved = current.saved,
+		logged = { title = title, description = value },
+		loggedSuccess = false
+	}
+end
 
 local function TitleDescriptionPage(props)
 	local testId = props.testId or "title-description-page"
@@ -33,6 +88,17 @@ local function TitleDescriptionPage(props)
 	local descriptionLabel = v.descriptionLabel
 	local title = v.title
 	local titleLabel = v.titleLabel
+	local ref
+
+	if FFlagBuildExperienceActionOutcomeTelemetry then
+		ref = React.useRef({
+			saved = { title = titleText, description = descriptionText },
+			logged = nil,
+			loggedSuccess = false
+		})
+	else
+		ref = nil
+	end
 
 	local onFocusLost = React.useCallback(function()
 		local universeId = props.universeId
@@ -48,8 +114,20 @@ local function TitleDescriptionPage(props)
 			return
 		end
 
-		GameConfigurationActions.updateTitleDescription(universeId, value, value2):catch(function(p)
-			warn(`[BuildExperience] Failed to save title and description: {tostring(p)}`)
+		local v2 = GameConfigurationActions.updateTitleDescription(universeId, value, value2)
+
+		if FFlagBuildExperienceActionOutcomeTelemetry then
+			v2 = v2:andThen(function()
+				logSaveSuccess(ref, universeId, value, value2)
+			end)
+		end
+
+		v2:catch(function(err)
+			warn(`[BuildExperience] Failed to save title and description: {tostring(err)}`)
+
+			if FFlagBuildExperienceActionOutcomeTelemetry then
+				logSaveFailure(ref, universeId, value, value2, err)
+			end
 		end)
 	end, { text2, descriptionText, titleText, props.universeId, text })
 

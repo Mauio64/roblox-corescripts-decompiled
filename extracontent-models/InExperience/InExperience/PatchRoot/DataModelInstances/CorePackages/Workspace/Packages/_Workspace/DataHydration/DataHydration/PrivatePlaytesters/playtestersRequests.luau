@@ -14,7 +14,7 @@ local function playtestersUrl(p: string, p2: number) -- 3 equivalent calls infer
 	return ("%s/v1/universes/%d/configuration/playtesters"):format(p, p2)
 end
 
-local function resolveBase(options) -- 2 equivalent calls inferred from this helper
+local function resolveBase(options) -- 3 equivalent calls inferred from this helper
 	local v = options or {}
 	return v.network, v.baseUrl or UrlBase.new("develop")
 end
@@ -53,11 +53,11 @@ end
 local PlaytestersRequests = {}
 
 function PlaytestersRequests.fetchPlaytesters(p: number, options)
-	local v = options or {}
+	local base, v = resolveBase(options) -- inferred equivalent call
 	return asPromise((fetch({
-		network = v.network,
+		network = base,
 		method = "GET",
-		url = playtestersUrl(v.baseUrl or UrlBase.new("develop"), p), -- inferred equivalent call
+		url = playtestersUrl(v, p), -- inferred equivalent call
 		analyticsKey = "private-playtesters.fetch",
 		legacy = true,
 		decode = decodePlaytesterIds

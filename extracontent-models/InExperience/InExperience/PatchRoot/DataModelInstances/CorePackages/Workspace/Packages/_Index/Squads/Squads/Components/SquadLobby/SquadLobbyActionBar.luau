@@ -783,14 +783,14 @@ return function(props)
 		local v30 = useIsVoiceFocused() or props.forceIsVoiceFocused
 		local v31 = useParticipants()
 		local v32 = useIsActiveParticipant(v25)
-		local v50
+		local v51
 
 		if FFlagSquadLobbyActionBarFixMicLevelRerender then
-			v50 = useIsParticipantMuted(v25) == true
+			v51 = useIsParticipantMuted(v25) == true
 		end
 
 		local state2, setState2 = React.useState(0)
-		local v51 = engineFeature
+		local v52 = engineFeature
 
 		local onActivated4 = React.useCallback(function(_)
 			print("----------- CEV FOREGROUND -----------")
@@ -811,23 +811,23 @@ return function(props)
 			end
 		end, { v27 })
 
-		local v54 = not isDisabled
+		local v55 = not isDisabled
 
-		if v54 then
+		if v55 then
 			if v28 then
 				if v27 == nil then
-					v54 = false
+					v55 = false
 				else
-					v54 = not v27.isMuted and v32 == true
+					v55 = not v27.isMuted and v32 == true
 				end
 			else
-				v54 = v28
+				v55 = v28
 			end
 		end
 
 		local useEffect = React.useEffect
 		local function fn7()
-			if FFlagSquadLobbyActionBarFixMicLevelRerender and not v54 then
+			if FFlagSquadLobbyActionBarFixMicLevelRerender and not v55 then
 				return nil
 			end
 
@@ -846,23 +846,23 @@ return function(props)
 			end
 		end
 
-		local v55
+		local v56
 
 		if FFlagSquadLobbyActionBarFixMicLevelRerender then
-			v55 = { v54, props.renderStepService }
+			v56 = { v55, props.renderStepService }
 		else
-			v55 = { props.renderStepService }
+			v56 = { props.renderStepService }
 		end
 
-		useEffect(fn7, v55)
+		useEffect(fn7, v56)
 
 		toggleAudioFocusButton = React.useMemo(function()
-			if isDisabled or not (v51 and v28) then
+			if isDisabled or not (v52 and v28) then
 				return nil
 			end
 
 			return renderToggleAudioFocusButton(v6, v5.audioText, props.toggleVoiceChatMenu, state, v8)
-		end, { v6, v51, state, isDisabled, v28, v5.audioText, v8, props.toggleVoiceChatMenu })
+		end, { v6, v52, state, isDisabled, v28, v5.audioText, v8, props.toggleVoiceChatMenu })
 
 		if defineFastFlag then
 			local useMemo4 = React.useMemo
@@ -874,7 +874,7 @@ return function(props)
 					currentHoveredButton = state
 				end
 
-				local v57 = {
+				local v58 = {
 					currentHoveredButton = currentHoveredButton,
 					enableFirstTimeTooltip = not squadCoordinationExperienceJoinExperimentation.getShouldShowFTUXOnExpPickerEnabled() and nil,
 					ftuxAppStorageKey = squadCoordinationExperienceJoinExperimentation.getShouldShowFTUXOnExpPickerEnabled() and "" or nil,
@@ -892,13 +892,13 @@ return function(props)
 					onHoverCalled = v8
 				end
 
-				v57.onHoverCalled = onHoverCalled
+				v58.onHoverCalled = onHoverCalled
 
-				v57.showFtuxCustomConditionsMet = not squadCoordinationExperienceJoinExperimentation.getShouldShowFTUXOnExpPickerEnabled()
+				v58.showFtuxCustomConditionsMet = not squadCoordinationExperienceJoinExperimentation.getShouldShowFTUXOnExpPickerEnabled()
 					and nil
 				return createElement(
 					fn,
-					v57,
+					v58,
 					renderStandardImage(
 						isDisabled,
 						"icons/status/player/developer",
@@ -909,19 +909,19 @@ return function(props)
 				)
 			end
 
-			local v57
-
-			if squadCoordinationExperienceJoinExperimentation.getShouldShowFTUXOnExpPickerEnabled() then
-				v57 = state
-			end
-
 			local v58
 
 			if squadCoordinationExperienceJoinExperimentation.getShouldShowFTUXOnExpPickerEnabled() then
-				v58 = v8
+				v58 = state
 			end
 
-			debugVoiceButton = useMemo4(fn8, { v57, v6, isDisabled, onActivated4, v58 })
+			local v59
+
+			if squadCoordinationExperienceJoinExperimentation.getShouldShowFTUXOnExpPickerEnabled() then
+				v59 = v8
+			end
+
+			debugVoiceButton = useMemo4(fn8, { v58, v6, isDisabled, onActivated4, v59 })
 		end
 
 		local useMemo4 = React.useMemo
@@ -929,13 +929,13 @@ return function(props)
 			return getLoadingIndicatorIcon(v6, v27, v28, not isDisabled and v32, state2)
 		end
 
-		local v57
+		local v58
 
 		if FFlagSquadLobbyActionBarFixMicLevelRerender then
-			v57 = v50
+			v58 = v51
 		end
 
-		local image = useMemo4(fn8, { v32, isDisabled, v28, state2, v27, v6, v57 })
+		local image = useMemo4(fn8, { v32, isDisabled, v28, state2, v27, v6, v58 })
 
 		local useMemo5 = React.useMemo
 		local function fn9()
@@ -944,7 +944,7 @@ return function(props)
 			end
 
 			local isDisabled2 = not v28 or v27 == nil or isDisabled
-			local v60 = not v28 or not v27 or v27.isMuted
+			local v61 = not v28 or not v27 or v27.isMuted
 
 			local createElement = React.createElement
 			local currentHoveredButton
@@ -953,7 +953,7 @@ return function(props)
 				currentHoveredButton = state
 			end
 
-			local v62 = {
+			local v63 = {
 				currentHoveredButton = currentHoveredButton,
 				enableFirstTimeTooltip = not squadCoordinationExperienceJoinExperimentation.getShouldShowFTUXOnExpPickerEnabled() and nil,
 				ftuxAppStorageKey = squadCoordinationExperienceJoinExperimentation.getShouldShowFTUXOnExpPickerEnabled() and "" or nil,
@@ -971,22 +971,22 @@ return function(props)
 				onHoverCalled = v8
 			end
 
-			v62.onHoverCalled = onHoverCalled
+			v63.onHoverCalled = onHoverCalled
 
-			v62.showFtuxCustomConditionsMet = not squadCoordinationExperienceJoinExperimentation.getShouldShowFTUXOnExpPickerEnabled()
+			v63.showFtuxCustomConditionsMet = not squadCoordinationExperienceJoinExperimentation.getShouldShowFTUXOnExpPickerEnabled()
 				and nil
 			local tooltipText
 
-			if v60 then
+			if v61 then
 				tooltipText = v5.unmuteMicText
 			else
 				tooltipText = v5.muteMicText
 			end
 
-			v62.tooltipText = tooltipText
+			v63.tooltipText = tooltipText
 			return createElement(
 				fn,
-				v62,
+				v63,
 				renderStandardImage(
 					isDisabled2,
 					image,
@@ -997,26 +997,26 @@ return function(props)
 			)
 		end
 
-		local v60
+		local v61
 
 		if squadCoordinationExperienceJoinExperimentation.getShouldShowFTUXOnExpPickerEnabled() then
-			v60 = state
+			v61 = state
 		end
 
 		local muteMicText = v5.muteMicText
 		local unmuteMicText = v5.unmuteMicText
-		local v61
+		local v62
 
 		if squadCoordinationExperienceJoinExperimentation.getShouldShowFTUXOnExpPickerEnabled() then
-			v61 = v8
+			v62 = v8
 		end
 
 		if not FFlagSquadLobbyActionBarFixMicLevelRerender then
-			v50 = nil
+			v51 = nil
 		end
 
 		toggleMicButton = useMemo5(fn9, {
-			v60,
+			v61,
 			v6,
 			image,
 			isDisabled,
@@ -1024,11 +1024,11 @@ return function(props)
 			v28,
 			muteMicText,
 			unmuteMicText,
-			v61,
+			v62,
 			onActivated5,
 			v27,
 			v29,
-			v50
+			v51
 		})
 	end
 

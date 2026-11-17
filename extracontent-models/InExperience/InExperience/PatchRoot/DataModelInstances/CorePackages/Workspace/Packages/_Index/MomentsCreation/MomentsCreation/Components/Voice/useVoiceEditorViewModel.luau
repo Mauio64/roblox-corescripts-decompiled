@@ -464,10 +464,9 @@ local function useVoiceEditorViewModel(data)
 
 	local fontSize = v6.Typography.BodyMedium.FontSize
 	local numLines = useMemo(function()
-		return (math.max(
-			fIntMomentsTTSComposerMinLines,
-			(measureTextLineCount(state2, state3 - 32, fontSize, BuilderSans, fIntMomentsTTSComposerMaxLines))
-		))
+		local v11 = measureTextLineCount(state2, state3 - 32, fontSize, BuilderSans, fIntMomentsTTSComposerMaxLines)
+
+		return (math.max(fIntMomentsTTSComposerMinLines, v11))
 	end, { state2, state3, fontSize })
 
 	local v11 = computeVoiceButtonState({

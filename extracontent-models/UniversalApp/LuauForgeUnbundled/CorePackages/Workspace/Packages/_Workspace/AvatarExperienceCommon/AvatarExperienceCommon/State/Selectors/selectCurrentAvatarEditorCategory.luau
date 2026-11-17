@@ -1,5 +1,0 @@
-local function selectCurrentAvatarEditorCategory(p2)
-	return p2.AvatarExperience.AvatarEditor.Categories.category
-end
-
-return selectCurrentAvatarEditorCategory

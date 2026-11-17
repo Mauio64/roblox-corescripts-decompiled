@@ -46,7 +46,6 @@ local Loading = Foundation.Loading
 
 local FoundationProvider = Foundation.FoundationProvider
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local InExperienceLocales = require(parent.InExperienceLocales)
 local Localization = InExperienceLocales.Localization
 local Localization2 = require(parent.Localization)
@@ -340,7 +339,7 @@ function extended:renderPlaceIcon(p)
 	})
 end
 
-function extended:renderInfoFrame(props)
+function extended:renderInfoFrame(p)
 	local productInfo = self.props.productInfo
 	local name = productInfo and productInfo.Name or ""
 	local name2 = productInfo and productInfo.Creator.Name or ""
@@ -350,10 +349,9 @@ function extended:renderInfoFrame(props)
 	end
 
 	local v6 = math.clamp(math.max(self.state.absoluteSize.X, self.state.absoluteSize.Y) / 1024 * v3[1], v3[1], v3[2])
-	local createElement = Roact.createElement
-	local v7 = {
+	return Roact.createElement("Frame", {
 		Name = "InfoFrame",
-		BackgroundColor3 = props.Theme.BackgroundMuted.Color,
+		BackgroundColor3 = p.Theme.BackgroundMuted.Color,
 		BackgroundTransparency = self.bindings.infoFrameTransparency,
 		BorderSizePixel = 0,
 		AnchorPoint = Vector2.new(0.5, 0.5),
@@ -361,142 +359,77 @@ function extended:renderInfoFrame(props)
 		Position = UDim2.fromScale(0.5, 0.5),
 		Size = self.isPortrait and UDim2.fromScale(1, 0) or UDim2.fromScale(0.6, 0),
 		Active = true,
-		[Roact.Change.AbsoluteSize] = function(p)
-			self.updateBindings.updateInfoFrameAbsoluteSize(p.AbsoluteSize)
+		[Roact.Change.AbsoluteSize] = function(p2)
+			self.updateBindings.updateInfoFrameAbsoluteSize(p2.AbsoluteSize)
 		end
-	}
-	local children = { PlaceIcon = self:renderPlaceIcon(props), TextLayoutFrame = 0, Corner = 0 }
-	local createElement2 = Roact.createElement
-	local v8 = {
-		Name = "TextLayout",
-		BackgroundColor3 = props.Theme.BackgroundMuted.Color,
-		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
-		AnchorPoint = Vector2.new(0.5, 0),
-		AutomaticSize = Enum.AutomaticSize.Y,
-		Position = UDim2.new(0.5, 0, 0, v6 / 2),
-		Size = UDim2.fromScale(1, 0),
-		Active = true
-	}
-
-	local createElement3 = Roact.createElement
-	local placeLabel = {
-		Name = "PlaceLabel",
-		BackgroundTransparency = 1,
-		TextTransparency = self.bindings.placeTextTransparency,
-		Size = UDim2.fromScale(0.8, 0),
-		AnchorPoint = Vector2.new(0.5, 0),
-		AutomaticSize = Enum.AutomaticSize.Y,
-		Font = 0,
-		FontFace = 0,
-		TextSize = 0,
-		TextScaled = false,
-		TextWrapped = true,
-		TextColor3 = 0,
-		TextStrokeTransparency = 1,
-		Text = 0,
-		TextXAlignment = 0,
-		TextYAlignment = 0,
-		ZIndex = 2,
-		LayoutOrder = 1,
-		TextTruncate = 0,
-		RichText = false
-	}
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = props.Font.Title.Font
-	end
-
-	placeLabel.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(props.Tokens.Typography.HeadingLarge.Font)
-	end
-
-	placeLabel.FontFace = fontFace
-
-	placeLabel.TextSize = self.bindings.placeTextSize
-
-	placeLabel.TextColor3 = props.Theme.TextEmphasis.Color
-
-	placeLabel.Text = name
-	placeLabel.TextXAlignment = Enum.TextXAlignment.Center
-	placeLabel.TextYAlignment = Enum.TextYAlignment.Center
-
-	placeLabel.TextTruncate = Enum.TextTruncate.AtEnd
-	local children2 = {
-		PlaceLabel = createElement3("TextLabel", placeLabel),
-		CreatorLabel = 0,
-		UIListLayout = 0,
-		Padding = 0
-	}
-
-	local createElement4 = Roact.createElement
-	local creatorLabel = {
-		Name = "CreatorLabel",
-		BackgroundTransparency = 1,
-		TextTransparency = self.bindings.creatorTextTransparency,
-		Size = UDim2.fromScale(0.6, 0),
-		AnchorPoint = Vector2.new(0.5, 1),
-		AutomaticSize = Enum.AutomaticSize.Y,
-		Font = 0,
-		FontFace = 0,
-		TextSize = 0,
-		TextWrapped = true,
-		TextScaled = false,
-		TextColor3 = 0,
-		TextStrokeTransparency = 1,
-		Text = 0,
-		TextXAlignment = 0,
-		TextYAlignment = 0,
-		ZIndex = 2,
-		LayoutOrder = 2,
-		TextTruncate = 0,
-		RichText = false
-	}
-	local font2
-
-	if not FoundationFontFaceMigration then
-		font2 = props.Font.CaptionBody.Font
-	end
-
-	creatorLabel.Font = font2
-	local fontFace2
-
-	if FoundationFontFaceMigration then
-		fontFace2 = normalizeFontFace(props.Tokens.Typography.BodySmall.Font)
-	end
-
-	creatorLabel.FontFace = fontFace2
-
-	creatorLabel.TextSize = self.bindings.creatorTextSize
-
-	creatorLabel.TextColor3 = props.Theme.TextDefault.Color
-
-	creatorLabel.Text = name2
-	creatorLabel.TextXAlignment = Enum.TextXAlignment.Center
-	creatorLabel.TextYAlignment = Enum.TextYAlignment.Center
-
-	creatorLabel.TextTruncate = Enum.TextTruncate.AtEnd
-	children2.CreatorLabel = createElement4("TextLabel", creatorLabel)
-
-	children2.UIListLayout = Roact.createElement("UIListLayout", {
-		SortOrder = Enum.SortOrder.LayoutOrder,
-		HorizontalAlignment = Enum.HorizontalAlignment.Center,
-		VerticalAlignment = Enum.VerticalAlignment.Center,
-		Padding = UDim.new(0, v2 and 12 or 36)
+	}, {
+		PlaceIcon = self:renderPlaceIcon(p),
+		TextLayoutFrame = Roact.createElement("Frame", {
+			Name = "TextLayout",
+			BackgroundColor3 = p.Theme.BackgroundMuted.Color,
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			AnchorPoint = Vector2.new(0.5, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			Position = UDim2.new(0.5, 0, 0, v6 / 2),
+			Size = UDim2.fromScale(1, 0),
+			Active = true
+		}, {
+			PlaceLabel = Roact.createElement("TextLabel", {
+				Name = "PlaceLabel",
+				BackgroundTransparency = 1,
+				TextTransparency = self.bindings.placeTextTransparency,
+				Size = UDim2.fromScale(0.8, 0),
+				AnchorPoint = Vector2.new(0.5, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				FontFace = normalizeFontFace(p.Tokens.Typography.HeadingLarge.Font),
+				TextSize = self.bindings.placeTextSize,
+				TextScaled = false,
+				TextWrapped = true,
+				TextColor3 = p.Theme.TextEmphasis.Color,
+				TextStrokeTransparency = 1,
+				Text = name,
+				TextXAlignment = Enum.TextXAlignment.Center,
+				TextYAlignment = Enum.TextYAlignment.Center,
+				ZIndex = 2,
+				LayoutOrder = 1,
+				TextTruncate = Enum.TextTruncate.AtEnd,
+				RichText = false
+			}),
+			CreatorLabel = Roact.createElement("TextLabel", {
+				Name = "CreatorLabel",
+				BackgroundTransparency = 1,
+				TextTransparency = self.bindings.creatorTextTransparency,
+				Size = UDim2.fromScale(0.6, 0),
+				AnchorPoint = Vector2.new(0.5, 1),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				FontFace = normalizeFontFace(p.Tokens.Typography.BodySmall.Font),
+				TextSize = self.bindings.creatorTextSize,
+				TextWrapped = true,
+				TextScaled = false,
+				TextColor3 = p.Theme.TextDefault.Color,
+				TextStrokeTransparency = 1,
+				Text = name2,
+				TextXAlignment = Enum.TextXAlignment.Center,
+				TextYAlignment = Enum.TextYAlignment.Center,
+				ZIndex = 2,
+				LayoutOrder = 2,
+				TextTruncate = Enum.TextTruncate.AtEnd,
+				RichText = false
+			}),
+			UIListLayout = Roact.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				Padding = UDim.new(0, v2 and 12 or 36)
+			}),
+			Padding = Roact.createElement("UIPadding", {
+				PaddingTop = UDim.new(0, v2 and 12 or 36),
+				PaddingBottom = UDim.new(0, v2 and 12 or 36)
+			})
+		}),
+		Corner = Roact.createElement("UICorner")
 	})
-
-	children2.Padding = Roact.createElement("UIPadding", {
-		PaddingTop = UDim.new(0, v2 and 12 or 36),
-		PaddingBottom = UDim.new(0, v2 and 12 or 36)
-	})
-	children.TextLayoutFrame = createElement2("Frame", v8, children2)
-
-	children.Corner = Roact.createElement("UICorner")
-	return createElement("Frame", v7, children)
 end
 
 function extended:renderMain(p)
@@ -640,9 +573,9 @@ function extended:renderCloseBtn(_)
 	return closeBtn
 end
 
-function extended:renderServerFrame(props)
+function extended:renderServerFrame(p)
 	local serverStatusText = self.state.serverStatusText
-	local policyLabel2 = self.props.isSubjectToChinaPolicies
+	local isSubjectToChinaPolicies = self.props.isSubjectToChinaPolicies
 	local textSize = tenFootInterface and 16 or 12
 	local textSize2 = tenFootInterface and 16 or 12
 	local createElement = Roact.createElement
@@ -656,189 +589,101 @@ function extended:renderServerFrame(props)
 		Active = true
 	}
 
-	if policyLabel2 then
-		local createElement2 = Roact.createElement
-		local policyLabel = {
+	local v7 = {
+		PolicyLabel = isSubjectToChinaPolicies and Roact.createElement("TextLabel", {
 			Name = "PolicyLabel",
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1, 0, 0, 2 * textSize2),
 			Position = UDim2.new(0, 0, 1, -4 * textSize - 2 * textSize2),
-			Font = 0,
-			FontFace = 0,
-			TextSize = 0,
+			FontFace = normalizeFontFace(p.Tokens.Typography.CaptionSmall.Font),
+			TextSize = textSize2,
 			TextWrapped = true,
 			TextScaled = false,
-			TextColor3 = 0,
+			TextColor3 = p.Theme.TextDefault.Color,
 			TextStrokeTransparency = 1,
-			Text = 0,
-			TextXAlignment = 0,
-			TextYAlignment = 0,
+			Text = localization:Format("Authentication.Login.WeChat.AntiAddictionText"),
+			TextXAlignment = Enum.TextXAlignment.Center,
+			TextYAlignment = Enum.TextYAlignment.Center,
 			ZIndex = 2
-		}
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = props.Font.Footer.Font
-		end
-
-		policyLabel.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(props.Tokens.Typography.CaptionSmall.Font)
-		end
-
-		policyLabel.FontFace = fontFace
-
-		policyLabel.TextSize = textSize2
-
-		policyLabel.TextColor3 = props.Theme.TextDefault.Color
-
-		policyLabel.Text = localization:Format("Authentication.Login.WeChat.AntiAddictionText")
-		policyLabel.TextXAlignment = Enum.TextXAlignment.Center
-		policyLabel.TextYAlignment = Enum.TextYAlignment.Center
-		policyLabel2 = createElement2("TextLabel", policyLabel)
-	end
+		}),
+		JoinServerLabel = 0
+	}
 
 	local createElement2 = Roact.createElement
-	local v7 = {
-		["Name"] = nil,
-		["Name"] = nil,
-		["Name"] = nil,
-		["Name"] = nil,
-		["Name"] = nil,
-		["Name"] = nil,
-		["Name"] = nil,
-		["Name"] = nil,
-		["Name"] = nil,
-		["Name"] = nil,
-		["Name"] = nil,
-		["Name"] = nil,
-		["Name"] = nil,
+	local v8 = {
 		Name = "JoinText",
 		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 0, 4 * textSize),
-		Position = UDim2.new(0, 0, 1, -2 * textSize)
+		["Size"] = UDim2.new(1, 0, 0, 4 * textSize),
+		Position = UDim2.new(0, 0, 1, -2 * textSize),
+		FontFace = normalizeFontFace(p.Tokens.Typography.CaptionSmall.Font),
+		TextSize = textSize,
+		TextWrapped = true,
+		TextScaled = false,
+		TextColor3 = p.Theme.TextDefault.Color,
+		TextStrokeTransparency = 1,
+		Text = serverStatusText,
+		TextXAlignment = Enum.TextXAlignment.Center,
+		TextYAlignment = Enum.TextYAlignment.Center,
+		ZIndex = 2,
+		RootLocalizationTable = CoreGui.CoreScriptLocalization
 	}
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = props.Font.Footer.Font
-	end
-
-	v7.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(props.Tokens.Typography.CaptionSmall.Font)
-	end
-
-	v7.FontFace = fontFace
-
-	v7.TextSize = textSize
-	v7.TextWrapped = true
-	v7.TextScaled = false
-	v7.TextColor3 = props.Theme.TextDefault.Color
-	v7.TextStrokeTransparency = 1
-	v7.Text = serverStatusText
-	v7.TextXAlignment = Enum.TextXAlignment.Center
-	v7.TextYAlignment = Enum.TextYAlignment.Center
-	v7.ZIndex = 2
-	v7.RootLocalizationTable = CoreGui.CoreScriptLocalization
 	local inputBegan = Roact.Event.InputBegan
-	local v8
+	local v9
 
 	if not self.props.isSubjectToChinaPolicies then
-		v8 = self.showConnnectionHealthDebugMenu or nil
+		v9 = self.showConnnectionHealthDebugMenu or nil
 	end
 
-	v7[inputBegan] = v8
-	return createElement("Frame", v6, {
-		PolicyLabel = policyLabel2,
-		JoinServerLabel = createElement2("TextLabel", v7)
-	})
+	v8[inputBegan] = v9
+	v7.JoinServerLabel = createElement2("TextLabel", v8)
+	return createElement("Frame", v6, v7)
 end
 
-function extended:renderGamepadCancelBtn(props)
+function extended:renderGamepadCancelBtn(p)
 	local gamepadCancelBtn
 
 	if self.props.preferredInputRef.current == Responsive.Input.Directional then
-		gamepadCancelBtn = not self.state.gamepadCancelPressed
-
-		if gamepadCancelBtn then
-			local createElement = Roact.createElement
-			local v6 = {
-				Name = "GamepadCancelFrame",
+		gamepadCancelBtn = not self.state.gamepadCancelPressed and Roact.createElement("Frame", {
+			Name = "GamepadCancelFrame",
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			AnchorPoint = Vector2.new(0, 1),
+			Position = UDim2.fromScale(0, 1),
+			Size = UDim2.fromOffset(150, 48),
+			Active = true
+		}, {
+			CancelIcon = Roact.createElement("ImageLabel", {
+				Name = "GamepadCancel",
+				Image = "rbxasset://textures/ui/Controls/DesignSystem/ButtonB@2x.png",
 				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
-				AnchorPoint = Vector2.new(0, 1),
-				Position = UDim2.fromScale(0, 1),
-				Size = UDim2.fromOffset(150, 48),
-				Active = true
-			}
-
-			local children = {
-				CancelIcon = Roact.createElement("ImageLabel", {
-					Name = "GamepadCancel",
-					Image = "rbxasset://textures/ui/Controls/DesignSystem/ButtonB@2x.png",
-					BackgroundTransparency = 1,
-					Size = UDim2.fromOffset(24, 24),
-					Active = false,
-					ZIndex = 10,
-					LayoutOrder = 0
-				}),
-				CancelLabel = 0,
-				UIListLayout = 0
-			}
-
-			local createElement2 = Roact.createElement
-			local cancelText = {
+				Size = UDim2.fromOffset(24, 24),
+				Active = false,
+				ZIndex = 10,
+				LayoutOrder = 0
+			}),
+			CancelLabel = Roact.createElement("TextLabel", {
 				Name = "CancelText",
 				BackgroundTransparency = 1,
 				Size = UDim2.fromScale(1, 1),
-				Font = 0,
-				FontFace = 0,
+				FontFace = normalizeFontFace(p.Tokens.Typography.TitleLarge.Font),
 				TextSize = 24,
 				TextWrapped = true,
-				TextColor3 = 0,
+				TextColor3 = p.Theme.TextEmphasis.Color,
 				TextStrokeTransparency = 1,
-				Text = 0,
-				TextXAlignment = 0,
-				TextYAlignment = 0,
+				Text = localization:Format("CoreScripts.TopBar.Back"),
+				TextXAlignment = Enum.TextXAlignment.Left,
+				TextYAlignment = Enum.TextYAlignment.Center,
 				ZIndex = 2,
 				LayoutOrder = 1
-			}
-			local font
-
-			if not FoundationFontFaceMigration then
-				font = props.Font.SubHeader1.Font
-			end
-
-			cancelText.Font = font
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(props.Tokens.Typography.TitleLarge.Font)
-			end
-
-			cancelText.FontFace = fontFace
-
-			cancelText.TextColor3 = props.Theme.TextEmphasis.Color
-
-			cancelText.Text = localization:Format("CoreScripts.TopBar.Back")
-			cancelText.TextXAlignment = Enum.TextXAlignment.Left
-			cancelText.TextYAlignment = Enum.TextYAlignment.Center
-			children.CancelLabel = createElement2("TextLabel", cancelText)
-
-			children.UIListLayout = Roact.createElement("UIListLayout", {
+			}),
+			UIListLayout = Roact.createElement("UIListLayout", {
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				HorizontalAlignment = Enum.HorizontalAlignment.Left,
 				VerticalAlignment = Enum.VerticalAlignment.Center,
 				FillDirection = Enum.FillDirection.Horizontal,
 				Padding = UDim.new(0, 5)
 			})
-			gamepadCancelBtn = createElement("Frame", v6, children)
-		end
+		})
 	else
 		gamepadCancelBtn = false
 	end
@@ -891,7 +736,6 @@ function extended:init()
 		self:playAnimation(v5.FadeOut, {}, function()
 			if FFlagLoadingScreenControlMilestones and self.props.milestones then
 				self.props.milestones.record(LoadingScreenMilestones.Milestone.ScreenHidden)
-				self.props.milestones.complete()
 			end
 
 			self:setState({ visible = false })

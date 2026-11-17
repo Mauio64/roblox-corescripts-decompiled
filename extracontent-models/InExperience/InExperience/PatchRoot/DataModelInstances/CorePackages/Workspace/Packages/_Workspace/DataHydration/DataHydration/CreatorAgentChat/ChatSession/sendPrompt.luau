@@ -9,6 +9,7 @@ local sendConfiguration = require(script.Parent.Parent.sendConfiguration)
 local FFlagBuildExperienceModelPickerData = SharedFlags.FFlagBuildExperienceModelPickerData
 local FFlagBuildExperiencePromptFailureTelemetry = SharedFlags.FFlagBuildExperiencePromptFailureTelemetry
 local FFlagBuildExperienceLibrary = SharedFlags.FFlagBuildExperienceLibrary
+local FFlagBuildExperienceChatOpenId = SharedFlags.FFlagBuildExperienceChatOpenId
 
 return {
 	createSendPrompt = function(data)
@@ -16,58 +17,71 @@ return {
 			sendPrompt = function(data2)
 				local v
 
-				if FFlagBuildExperienceModelPickerData and data2.sendConfiguration ~= nil then
-					v = sendConfiguration.capture(data2.sendConfiguration.tier, data2.sendConfiguration.experiment)
+				if FFlagBuildExperienceChatOpenId and data.getSendChatOpenId ~= nil then
+					v = data.getSendChatOpenId()
 				else
 					v = nil
 				end
 
+				local v2
+
+				if FFlagBuildExperienceModelPickerData and data2.sendConfiguration ~= nil then
+					v2 = sendConfiguration.capture(data2.sendConfiguration.tier, data2.sendConfiguration.experiment)
+				else
+					v2 = nil
+				end
+
 				local model2
 
-				if v == nil then
+				if v2 == nil then
 					if FFlagBuildExperienceModelPickerData then
 						model2 = data2.model
 					else
 						model2 = nil
 					end
 				else
-					model2 = v.tier
+					model2 = v2.tier
 				end
 
 				if FFlagBuildExperienceModelPickerData then
-					assert(v == nil or data2.model == nil or data2.model == model2, "conflicting model tiers")
+					assert(v2 == nil or data2.model == nil or data2.model == model2, "conflicting model tiers")
 					local model = data2.promptMeta and data2.promptMeta._roblox and data2.promptMeta._roblox.model
 					assert(model2 == nil or model == nil or model == model2, "conflicting model tiers")
 					local experiment = data2.promptMeta
 						and data2.promptMeta._roblox
 						and data2.promptMeta._roblox.experiment
 					assert(
-						v == nil or experiment == nil or sendConfiguration.sameExperiment(experiment, v.experiment),
+						v2 == nil or experiment == nil or sendConfiguration.sameExperiment(experiment, v2.experiment),
 						"conflicting experiments"
 					)
 				end
 
-				local v2 = data.incrementAssistantTurnSequence()
+				local v3 = data.incrementAssistantTurnSequence()
 
-				local signal, v3 = Signals.createSignal(nil)
-				local signal2, v4 = Signals.createSignal(nil)
+				local signal, v4 = Signals.createSignal(nil)
+				local signal2, v5 = Signals.createSignal(nil)
 
 				local flag = false
 				local flag2 = false
-				local v5 = false
 				local v6 = false
+				local v7 = false
 				local flag3 = false
-				local v7 = nil
 				local v8 = nil
 				local v9 = nil
+				local v10 = nil
 
 				local function fireCompleted(p)
-					if flag2 or v2 ~= data.getAssistantTurnSequence() then
+					if flag2 or v3 ~= data.getAssistantTurnSequence() then
 						return
 					end
 
 					flag2 = true
 					data.setActiveStop(nil)
+
+					if v10 ~= nil then
+						v10()
+						v10 = nil
+					end
 
 					if v9 ~= nil then
 						v9()
@@ -75,12 +89,7 @@ return {
 					end
 
 					if v8 ~= nil then
-						v8()
-						v8 = nil
-					end
-
-					if v7 ~= nil then
-						data.noteTurnSequenceIds(v7)
+						data.noteTurnSequenceIds(v8)
 					end
 
 					if data2.onCompleted ~= nil then
@@ -112,7 +121,7 @@ return {
 									requestFailure = nil
 								end
 
-								v4({
+								v5({
 									stage = "initialize",
 									errorCode = errorCode,
 									requestFailure = requestFailure
@@ -123,17 +132,33 @@ return {
 							end
 						end
 
-						local sessionId, v10
+						local sessionId, v11
 
 						if FFlagBuildExperienceModelPickerData then
-							sessionId, v10 = data.ensureCasSession(model2, data2.isCancelled, v, true)
+							local ensureCasSession = data.ensureCasSession
+
+							local isCancelled = data2.isCancelled
+							local v12
+
+							if FFlagBuildExperienceChatOpenId then
+								v12 = v
+							end
+
+							sessionId, v11 = ensureCasSession(model2, isCancelled, v2, true, v12)
 						else
-							sessionId, v10 = data.ensureCasSession(model2)
+							local ensureCasSession = data.ensureCasSession
+							local v12
+
+							if FFlagBuildExperienceChatOpenId then
+								v12 = v
+							end
+
+							sessionId, v11 = ensureCasSession(model2, nil, nil, nil, v12)
 						end
 
 						if sessionId == nil then
-							if not FFlagBuildExperienceModelPickerData or v10 ~= nil then
-								v4(v10 or { stage = "session_new" })
+							if not FFlagBuildExperienceModelPickerData or v11 ~= nil then
+								v5(v11 or { stage = "session_new" })
 							end
 
 							fireCompleted(nil)
@@ -147,24 +172,24 @@ return {
 								return
 							end
 
-							local sessionPrompt, v11 = data.sessionPrompt(
+							local sessionPrompt, v12 = data.sessionPrompt(
 								{
 									sessionId = sessionId,
 									prompt = data2.prompt,
 									model = model2,
 									_meta = data2.promptMeta
 								},
-								v
+								v2
 							)
 
-							v7 = sessionPrompt
-							v3(sessionPrompt)
+							v8 = sessionPrompt
+							v4(sessionPrompt)
 
 							if flag3 then
 								sessionPrompt.cancel()
 							end
 
-							v8 = data.startPollingTurnFromHistory(sessionId, sessionPrompt, {
+							v9 = data.startPollingTurnFromHistory(sessionId, sessionPrompt, {
 								rtnIdleFallbackSeconds = data2.rtnIdleFallbackSeconds,
 								rtnSequenceGapFallbackSeconds = data2.rtnSequenceGapFallbackSeconds,
 								pollMinIntervalSeconds = data2.pollMinIntervalSeconds,
@@ -173,34 +198,34 @@ return {
 								onDroppedChatMessage = data2.onDroppedChatMessage
 							})
 
-							v9 = Signals.createEffect(function(p)
+							v10 = Signals.createEffect(function(p)
 								local state = sessionPrompt.state(p)
 
 								if
 									FFlagBuildExperienceModelPickerData
-									and v11 ~= nil
+									and v12 ~= nil
 									and (state.status == "streaming" or state.status == "succeeded" or FFlagBuildExperienceLibrary and sessionPrompt.isAccepted(p) and not state.isDone)
 								then
-									v11()
-									v11 = nil
+									v12()
+									v12 = nil
 								end
 
-								if FFlagBuildExperienceLibrary and data2.onAccepted ~= nil and not v6 then
-									local v12 = state.status == "streaming" or state.status == "succeeded"
-									local v13 = sessionPrompt.isAccepted(p) and not state.isDone
+								if FFlagBuildExperienceLibrary and data2.onAccepted ~= nil and not v7 then
+									local v13 = state.status == "streaming" or state.status == "succeeded"
+									local v14 = sessionPrompt.isAccepted(p) and not state.isDone
 
-									if v12 or v13 then
-										v6 = true
+									if v13 or v14 then
+										v7 = true
 										data2.onAccepted()
 									end
 								end
 
 								if
 									data2.onReceived ~= nil
-									and not v5
+									and not v6
 									and (state.status == "streaming" or state.status == "succeeded")
 								then
-									v5 = true
+									v6 = true
 									data2.onReceived(sessionPrompt.getTurnId())
 								end
 
@@ -219,19 +244,19 @@ return {
 
 					flag3 = true
 
-					if v7 ~= nil then
-						v7.cancel()
+					if v8 ~= nil then
+						v8.cancel()
 						return
+					end
+
+					if v10 ~= nil then
+						v10()
+						v10 = nil
 					end
 
 					if v9 ~= nil then
 						v9()
 						v9 = nil
-					end
-
-					if v8 ~= nil then
-						v8()
-						v8 = nil
 					end
 
 					fireCompleted(nil)

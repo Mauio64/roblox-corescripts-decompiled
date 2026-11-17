@@ -5,8 +5,6 @@ local llama = require(parent.llama)
 local dictionary = llama.Dictionary
 local ExpChatShared = require(parent.ExpChatShared)
 local FFlagExpChatEnableV2ChatWindow = require(ExpChat.Flags.FFlagExpChatEnableV2ChatWindow)
-local SharedFlags = require(parent.SharedFlags)
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
 local GetFFlagTextChatEnableUniverseChatTabs = ExpChatShared.Flags.GetFFlagTextChatEnableUniverseChatTabs
 
 local BottomLockedScrollViewV3 = require(ExpChat.ChatWindow.UI.BottomLockedScrollViewV3)
@@ -43,43 +41,19 @@ function extended.render(p)
 	end
 
 	v.messageComponentsSignal = p.props.messageComponentsSignal
-	local createElement = Roact.createElement
-	local v2 = { BackgroundTransparency = 1, Selectable = false, Size = p.props.size }
-
-	local createElement2 = Roact.createElement
-
-	local join = dictionary.join
-	local v3 = {
-		Size = UDim2.fromScale(1, 1),
-		isChannelBarVisible = p.props.isChannelBarVisible,
-		scrollResetKey = p.props.scrollResetKey,
-		scrollToTopOnReset = 0,
-		onCanvasPositionChanged = 0,
-		contentTopPadding = 0
-	}
-	local scrollToTopOnReset
-
-	if FFlagExpChatEnableFriendsTab then
-		scrollToTopOnReset = p.props.scrollToTopOnReset
-	end
-
-	v3.scrollToTopOnReset = scrollToTopOnReset
-	local onCanvasPositionChanged
-
-	if FFlagExpChatEnableFriendsTab then
-		onCanvasPositionChanged = p.props.onCanvasPositionChanged
-	end
-
-	v3.onCanvasPositionChanged = onCanvasPositionChanged
-	local contentTopPadding
-
-	if FFlagExpChatEnableFriendsTab then
-		contentTopPadding = p.props.contentTopPadding
-	end
-
-	v3.contentTopPadding = contentTopPadding
-	return createElement("ImageButton", v2, {
-		bottomLockedScrollView = createElement2(BottomLockedScrollViewV3, join(v3, v))
+	return Roact.createElement("ImageButton", {
+		BackgroundTransparency = 1,
+		Selectable = false,
+		Size = p.props.size
+	}, {
+		bottomLockedScrollView = Roact.createElement(BottomLockedScrollViewV3, dictionary.join({
+			Size = UDim2.fromScale(1, 1),
+			isChannelBarVisible = p.props.isChannelBarVisible,
+			scrollResetKey = p.props.scrollResetKey,
+			scrollToTopOnReset = p.props.scrollToTopOnReset,
+			onCanvasPositionChanged = p.props.onCanvasPositionChanged,
+			contentTopPadding = p.props.contentTopPadding
+		}, v))
 	})
 end
 

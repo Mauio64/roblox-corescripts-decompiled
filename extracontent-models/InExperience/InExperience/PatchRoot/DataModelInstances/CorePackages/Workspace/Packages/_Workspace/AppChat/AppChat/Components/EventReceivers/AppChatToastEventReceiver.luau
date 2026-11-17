@@ -23,9 +23,7 @@ local DismissNotificationSnoozeMenuSignal = ToastNotification.Signals.DismissNot
 
 local UniversalAppPolicy = require(parent.UniversalAppPolicy)
 local SharedFlags = require(parent.SharedFlags)
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
 local GetFFlagAppChatInExpToastSnoozeMenuDismissFix = SharedFlags.GetFFlagAppChatInExpToastSnoozeMenuDismissFix
-local GetFFlagIsSquadEnabled = SharedFlags.GetFFlagIsSquadEnabled
 local FFlagAppChatToastChatTerminologyFixEnabled = SharedFlags.FFlagAppChatToastChatTerminologyFixEnabled
 
 local v = {
@@ -37,21 +35,10 @@ local v = {
 
 return function(p)
 	local joined = Cryo.Dictionary.join(v, p)
-	local snoozeTitle
-
-	if FFlagAppChatToastChatTerminologyFixEnabled and FFlagExpChatEnableFriendsTab then
-		snoozeTitle = UniversalAppPolicy.getAppFeaturePolicies().getCanSeeChatTerminology()
-			and "Feature.Chat.Label.MuteInGameChatToastNotifications"
-			or "Feature.Chat.Label.MuteInGamePartyToastNotifications"
-	else
-		snoozeTitle = FFlagExpChatEnableFriendsTab and "Feature.Chat.Label.MuteInGameChatToastNotifications"
-			or GetFFlagIsSquadEnabled() and "Feature.Chat.Label.SnoozePartyNotifications"
-			or "Feature.Chat.Label.SnoozeChatNotifications"
-	end
 
 	local v2 = useLocalization({
 		snoozeDescription = "Feature.Chat.Description.SnoozeDescription",
-		snoozeTitle = snoozeTitle
+		snoozeTitle = FFlagAppChatToastChatTerminologyFixEnabled and (UniversalAppPolicy.getAppFeaturePolicies().getCanSeeChatTerminology() and "Feature.Chat.Label.MuteInGameChatToastNotifications" or "Feature.Chat.Label.MuteInGamePartyToastNotifications") or "Feature.Chat.Label.MuteInGameChatToastNotifications"
 	})
 	local v3
 
@@ -109,14 +96,12 @@ return function(p)
 	React.useEffect(function()
 		local connection = default:listenToDisplayNotification(function(p2)
 			if p2.notificationType == NotificationTypeEnum.ChatNewMessage then
-				local v6 = FFlagExpChatEnableFriendsTab
+				local v6
 
-				if v6 then
-					if joined.visibleFriendsConversationId == nil then
-						v6 = false
-					else
-						v6 = shouldHideFriendsChatToast(p2, joined.visibleFriendsConversationId)
-					end
+				if joined.visibleFriendsConversationId == nil then
+					v6 = false
+				else
+					v6 = shouldHideFriendsChatToast(p2, joined.visibleFriendsConversationId)
 				end
 
 				if v5 or not canSeeChatTab or v6 then

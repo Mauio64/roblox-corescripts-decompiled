@@ -1,3 +1,5 @@
+local Flags = require(script:FindFirstAncestor("ViewRecyclerRoblox").Flags)
+local FFlagViewRecyclerReact084 = Flags.FFlagViewRecyclerReact084
 local ViewRecyclerRoblox = script:FindFirstAncestor("ViewRecyclerRoblox")
 require(ViewRecyclerRoblox.Parent.ViewRecycler)
 
@@ -113,6 +115,15 @@ return {
 
 				if v2 ~= nil then
 					v[p2] = nil
+
+					if FFlagViewRecyclerReact084 then
+						local endLimitFrame = v2.endLimitFrame
+
+						if endLimitFrame ~= nil and p2.Parent == endLimitFrame.instance then
+							p2.Parent = endLimitFrame.instance.Parent
+						end
+					end
+
 					releaseEndLimitFrame(v2) -- inferred equivalent call
 				end
 			end,

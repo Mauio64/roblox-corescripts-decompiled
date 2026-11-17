@@ -21,9 +21,12 @@ end
 
 local function isMarker(object2, nextNonSpaceIndex: number): boolean -- 2 equivalent calls inferred from this helper
 	local content = object2:getLine():getContent()
-	return object2:getIndent() < Parsing.CODE_BLOCK_INDENT
-		and nextNonSpaceIndex < #content
-		and byte(content, nextNonSpaceIndex + 1) == 62
+
+	if object2:getIndent() < Parsing.CODE_BLOCK_INDENT and nextNonSpaceIndex < #content then
+		return byte(content, nextNonSpaceIndex + 1) == 62
+	end
+
+	return false
 end
 
 function object.isContainer(_): boolean

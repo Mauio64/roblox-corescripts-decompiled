@@ -3,11 +3,9 @@ local dependencies = require(SocialLibraries.dependencies)
 
 local cryo = dependencies.Cryo
 local roact = dependencies.Roact
-local text = dependencies.Text
 
 local TestStyle = require(SocialLibraries.Components.Style.TestStyle)
 local CallbackInputBox = require(script.Parent.CallbackInputBox)
-local foundationFontFaceMigration = dependencies.Foundation.Utility.Flags.FoundationFontFaceMigration
 local getTextBoundsAsync = dependencies.Foundation.Utility.getTextBoundsAsync
 local normalizeFontFace = dependencies.Foundation.Utility.normalizeFontFace
 
@@ -30,79 +28,62 @@ function extended:init()
 		self:setState({ inputText = inputText })
 	end
 
-	if foundationFontFaceMigration then
-		self.isMounted = false
-		self.measurementId = 0
+	self.isMounted = false
+	self.measurementId = 0
 
-		function self.measureText()
-			local style = self.props.style
-			local measuredText = #self.state.inputText .. "/" .. self.props.characterLimit
-			local font = style.Font.CaptionSubHeader.Font
-			local measuredFontSize = style.Font.BaseSize * style.Font.CaptionSubHeader.RelativeSize
+	function self.measureText()
+		local style = self.props.style
+		local measuredText = #self.state.inputText .. "/" .. self.props.characterLimit
+		local font = style.Font.CaptionSubHeader.Font
+		local measuredFontSize = style.Font.BaseSize * style.Font.CaptionSubHeader.RelativeSize
 
-			if
-				self.measuredText == measuredText
-				and self.measuredFont == font
-				and self.measuredFontSize == measuredFontSize
-			then
-				return
-			end
-
-			self.measuredText = measuredText
-			self.measuredFont = font
-			self.measuredFontSize = measuredFontSize
-			self.measurementId += 1
-			local measurementId = self.measurementId
-
-			task.spawn(function()
-				local textBoundsAsync = getTextBoundsAsync(measuredText, font, measuredFontSize)
-
-				if self.isMounted and self.measurementId == measurementId then
-					self:setState({ textBounds = textBoundsAsync })
-				end
-			end)
+		if
+			self.measuredText == measuredText
+			and self.measuredFont == font
+			and self.measuredFontSize == measuredFontSize
+		then
+			return
 		end
+
+		self.measuredText = measuredText
+		self.measuredFont = font
+		self.measuredFontSize = measuredFontSize
+		self.measurementId += 1
+		local measurementId = self.measurementId
+
+		task.spawn(function()
+			local textBoundsAsync = getTextBoundsAsync(measuredText, font, measuredFontSize)
+
+			if self.isMounted and self.measurementId == measurementId then
+				self:setState({ textBounds = textBoundsAsync })
+			end
+		end)
 	end
 end
 
 function extended:didMount()
-	if foundationFontFaceMigration then
-		self.isMounted = true
-		self.measureText()
-	end
+	self.isMounted = true
+	self.measureText()
 end
 
 function extended.didUpdate(p)
-	if foundationFontFaceMigration then
-		p.measureText()
-	end
+	p.measureText()
 end
 
 function extended:willUnmount()
-	if foundationFontFaceMigration then
-		self.isMounted = false
-		self.measurementId += 1
-	end
+	self.isMounted = false
+	self.measurementId += 1
 end
 
 function extended.render(props)
 	local style = props.props.style
 
 	local count = #props.state.inputText
-	local text2 = count .. "/" .. props.props.characterLimit
+	local text = count .. "/" .. props.props.characterLimit
 	local font = style.Font.CaptionSubHeader.Font
 	local textSize = style.Font.BaseSize * style.Font.CaptionSubHeader.RelativeSize
-	local v
 
-	if foundationFontFaceMigration then
-		local textBounds = props.state.textBounds or Vector2.new(0, textSize)
-		local _ = textBounds.X
-		v = textBounds.Y
-	else
-		local textWidth = text.GetTextWidth(text2, font, textSize)
-		v = text.GetTextHeight(text2, font, textSize, textWidth)
-	end
-
+	local y = (props.state.textBounds or Vector2.new(0, textSize)).Y
 	local textColor, textTransparency
 
 	if count <= props.props.characterLimit then
@@ -118,9 +99,7 @@ function extended.render(props)
 		textChangedCallback = props.textChangedCallback
 	})
 
-	local createElement = roact.createElement
-	local v2 = { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 1, 0) }
-	local v3 = {
+	return roact.createElement("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 1, 0) }, {
 		layout = roact.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			FillDirection = Enum.FillDirection.Vertical,
@@ -128,7 +107,7 @@ function extended.render(props)
 		}),
 		inputBoxContainer = roact.createElement("Frame", {
 			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 1, -v),
+			Size = UDim2.new(1, 0, 1, -y),
 			LayoutOrder = 1
 		}, {
 			border = roact.createElement("ImageLabel", {
@@ -140,53 +119,31 @@ function extended.render(props)
 			}),
 			inputBox = roact.createElement(CallbackInputBox, joined)
 		}),
-		characterCounter = 0
-	}
-
-	local createElement2 = roact.createElement
-	local v4 = { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, v), LayoutOrder = 2 }
-
-	local v5 = {
-		layout = roact.createElement("UIListLayout", {
-			VerticalAlignment = Enum.VerticalAlignment.Bottom,
-			HorizontalAlignment = Enum.HorizontalAlignment.Right
-		}),
-		padding = roact.createElement("UIPadding", {
-			PaddingRight = UDim.new(0, props.props.counterTextPadding)
-		}),
-		characterCountLabel = 0
-	}
-
-	local createElement3 = roact.createElement
-	local v6 = {
-		Size = UDim2.new(1, 0, 1, 0),
-		BackgroundTransparency = 1,
-		Text = text2,
-		TextColor3 = textColor,
-		TextTransparency = textTransparency,
-		TextSize = textSize,
-		TextXAlignment = Enum.TextXAlignment.Right,
-		TextYAlignment = Enum.TextYAlignment.Top,
-		Font = 0,
-		FontFace = 0
-	}
-	local font2
-
-	if not foundationFontFaceMigration then
-		font2 = font
-	end
-
-	v6.Font = font2
-	local fontFace
-
-	if foundationFontFaceMigration then
-		fontFace = normalizeFontFace(font)
-	end
-
-	v6.FontFace = fontFace
-	v5.characterCountLabel = createElement3("TextLabel", v6)
-	v3.characterCounter = createElement2("Frame", v4, v5)
-	return createElement("Frame", v2, v3)
+		characterCounter = roact.createElement(
+			"Frame",
+			{ BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, y), LayoutOrder = 2 },
+			{
+				layout = roact.createElement("UIListLayout", {
+					VerticalAlignment = Enum.VerticalAlignment.Bottom,
+					HorizontalAlignment = Enum.HorizontalAlignment.Right
+				}),
+				padding = roact.createElement("UIPadding", {
+					PaddingRight = UDim.new(0, props.props.counterTextPadding)
+				}),
+				characterCountLabel = roact.createElement("TextLabel", {
+					Size = UDim2.new(1, 0, 1, 0),
+					BackgroundTransparency = 1,
+					Text = text,
+					TextColor3 = textColor,
+					TextTransparency = textTransparency,
+					TextSize = textSize,
+					TextXAlignment = Enum.TextXAlignment.Right,
+					TextYAlignment = Enum.TextYAlignment.Top,
+					FontFace = normalizeFontFace(font)
+				})
+			}
+		)
+	})
 end
 
 return extended

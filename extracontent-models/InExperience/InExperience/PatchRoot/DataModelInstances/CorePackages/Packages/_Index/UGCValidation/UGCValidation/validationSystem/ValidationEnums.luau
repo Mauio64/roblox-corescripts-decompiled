@@ -95,6 +95,7 @@ ValidationEnums.ValidationModule = {
 	ExtentsWithinParent = "ExtentsWithinParent",
 	IndividualMeshPartBoundsValid = "IndividualMeshPartBoundsValid",
 	MeshSizePropertyCorrect = "MeshSizePropertyCorrect",
+	NoMeshBelowFeet = "NoMeshBelowFeet",
 	LCDeformationWithinBounds = "LCDeformationWithinBounds",
 	VerticesNotCoincident = "VerticesNotCoincident",
 	CageMeshDistanceBounded = "CageMeshDistanceBounded",

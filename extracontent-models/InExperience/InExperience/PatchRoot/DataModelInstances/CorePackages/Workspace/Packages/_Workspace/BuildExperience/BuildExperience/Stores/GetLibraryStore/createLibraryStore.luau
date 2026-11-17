@@ -31,20 +31,32 @@ local function createLibraryStore()
 		v({ token = count, position = position, radius = radius, model = model })
 	end
 
-	local function requestAddToChat(resource, replacePath: string?, focusComposer: boolean?)
+	local function requestAddAllToChat(resources, replacePaths, focusComposer: boolean?) -- 1 equivalent call inferred from this helper
+		if #resources == 0 then
+			return
+		end
+
 		count += 1
 		v2({
 			token = count,
 			action = "Add",
-			resource = resource,
-			replacePath = replacePath,
+			resources = resources,
+			replacePaths = replacePaths,
 			focusComposer = focusComposer
 		})
 	end
 
-	local function requestRemoveFromChat(resource)
+	local function requestRemoveAllFromChat(resources)
+		if #resources == 0 then
+			return
+		end
+
 		count += 1
-		v2({ token = count, action = "Remove", resource = resource })
+		v2({ token = count, action = "Remove", resources = resources, replacePaths = {} })
+	end
+
+	local function requestAddToChat(p, p2: string?, focusComposer: boolean?)
+		requestAddAllToChat({ p }, p2 == nil and {} or { p2 }, focusComposer) -- inferred equivalent call
 	end
 
 	return {
@@ -74,7 +86,11 @@ local function createLibraryStore()
 			end
 		end,
 		requestAddToChat = requestAddToChat,
-		requestRemoveFromChat = requestRemoveFromChat,
+		requestRemoveFromChat = function(p)
+			requestRemoveAllFromChat({ p })
+		end,
+		requestAddAllToChat = requestAddAllToChat,
+		requestRemoveAllFromChat = requestRemoveAllFromChat,
 		getChatComposerState = signal7,
 		setChatComposerState = setChatComposerState,
 		getPromptFailure = signal8,

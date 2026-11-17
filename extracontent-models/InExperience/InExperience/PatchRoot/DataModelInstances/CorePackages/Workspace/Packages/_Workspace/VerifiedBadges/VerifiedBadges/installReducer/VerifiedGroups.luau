@@ -3,12 +3,6 @@ local VerifiedBadges = script:FindFirstAncestor("VerifiedBadges")
 local Rodux = require(VerifiedBadges.Parent.Rodux)
 local Cryo = require(VerifiedBadges.Parent.Cryo)
 
-local SharedFlags = require(VerifiedBadges.Parent.SharedFlags)
-local FFlagLuaAppEdpBackendV2HydrateLegacyDefault = SharedFlags.FFlagLuaAppEdpBackendV2HydrateLegacyDefault
-
-local SharedFlags2 = require(VerifiedBadges.Parent.SharedFlags)
-local FFlagLuaAppEdpBackendV2HydrateLegacyIxp = SharedFlags2.FFlagLuaAppEdpBackendV2HydrateLegacyIxp
-
 return Rodux.createReducer({}, {
 	AddGameDetails = function(p, p2)
 		local v = {}
@@ -25,7 +19,7 @@ return Rodux.createReducer({}, {
 
 		return Cryo.Dictionary.join(p, v)
 	end,
-	AddGameDetailsV2 = (FFlagLuaAppEdpBackendV2HydrateLegacyDefault or FFlagLuaAppEdpBackendV2HydrateLegacyIxp) and function(p, p2)
+	AddGameDetailsV2 = function(p, p2)
 		local v = {}
 
 		for _, gameDetail in pairs(p2.gameDetails) do
@@ -39,7 +33,7 @@ return Rodux.createReducer({}, {
 		end
 
 		return Cryo.Dictionary.join(p, v)
-	end or nil,
+	end,
 	SetAssetInfoFromCatalogItemAction = function(p, p2)
 		if p2.assetData.creatorType ~= Enum.CreatorType.Group.Name then
 			return p

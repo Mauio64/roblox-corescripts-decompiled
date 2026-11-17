@@ -14,6 +14,9 @@ local useLocalization = Localization.Hooks.useLocalization
 
 local FocusOnChrome = Chrome.FocusUtils.FocusOnChrome
 
+local Flags = require(CoreGuiCommon.Flags)
+local FFlagUseSelectModeToggleLabel = Flags.FFlagUseSelectModeToggleLabel
+
 local Stores = require(CoreGuiCommon.Stores)
 local GetUiSelectorSignalStore = Stores.GetUiSelectorSignalStore
 
@@ -27,7 +30,7 @@ local function InExperienceUiSelector(_)
 	local ref2 = React.useRef(nil)
 	local v3 = useLocalization({
 		robloxMenu = "CoreScripts.InGameMenu.Controls.RobloxMenu",
-		uiNavToggle = "CoreScripts.InGameMenu.GameSettings.UINavToggle"
+		uiNavToggle = FFlagUseSelectModeToggleLabel and "Feature.Accessibility.Menu.SelectModeToggle" or "CoreScripts.InGameMenu.GameSettings.UINavToggle"
 	})
 
 	React.useEffect(function()

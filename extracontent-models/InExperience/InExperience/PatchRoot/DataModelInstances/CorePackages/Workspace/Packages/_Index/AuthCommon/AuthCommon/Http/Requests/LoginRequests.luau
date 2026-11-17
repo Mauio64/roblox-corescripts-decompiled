@@ -241,16 +241,16 @@ function LoginRequests.singleSignOnLogin(p)
 	local singleSignOnUrls = getSingleSignOnUrls()
 	local login = singleSignOnUrls.login
 
-	if login then
-		return ConsoleAuthRequestWrapper(p, login(), "POST", {
-			postBody = not singleSignOnUrls.linkingPlatform and "{}" or HttpService:JSONEncode({
-				identityProvider = singleSignOnUrls.linkingPlatform
-			}),
-			maxRetryCount = 0
-		}, true)
+	if not login then
+		return Promise.reject({ errorCode = LoginErrorCodes.ServiceUnavailable })
 	end
 
-	return Promise.reject({ errorCode = LoginErrorCodes.ServiceUnavailable })
+	return ConsoleAuthRequestWrapper(p, login(), "POST", {
+		postBody = not singleSignOnUrls.linkingPlatform and "{}" or HttpService:JSONEncode({
+			identityProvider = singleSignOnUrls.linkingPlatform
+		}),
+		maxRetryCount = 0
+	}, true)
 end
 
 function LoginRequests.singleSignOnConnectWithCode(p, cvalue, password)
@@ -265,14 +265,14 @@ function LoginRequests.singleSignOnConnectWithCode(p, cvalue, password)
 		} or nil
 	})
 
-	if connect then
-		return ConsoleAuthRequestWrapper(p, connect(), "POST", {
-			postBody = jsonEncode,
-			maxRetryCount = 0
-		})
+	if not connect then
+		return Promise.reject({ errorCode = LoginErrorCodes.ServiceUnavailable })
 	end
 
-	return Promise.reject({ errorCode = LoginErrorCodes.ServiceUnavailable })
+	return ConsoleAuthRequestWrapper(p, connect(), "POST", {
+		postBody = jsonEncode,
+		maxRetryCount = 0
+	})
 end
 
 function LoginRequests.singleSignOnConnectWithCredential(p, cvalue, password, ctype)
@@ -287,14 +287,14 @@ function LoginRequests.singleSignOnConnectWithCredential(p, cvalue, password, ct
 		} or nil
 	})
 
-	if connect then
-		return ConsoleAuthRequestWrapper(p, connect(), "POST", {
-			postBody = jsonEncode,
-			maxRetryCount = 0
-		})
+	if not connect then
+		return Promise.reject({ errorCode = LoginErrorCodes.ServiceUnavailable })
 	end
 
-	return Promise.reject({ errorCode = LoginErrorCodes.ServiceUnavailable })
+	return ConsoleAuthRequestWrapper(p, connect(), "POST", {
+		postBody = jsonEncode,
+		maxRetryCount = 0
+	})
 end
 
 return LoginRequests

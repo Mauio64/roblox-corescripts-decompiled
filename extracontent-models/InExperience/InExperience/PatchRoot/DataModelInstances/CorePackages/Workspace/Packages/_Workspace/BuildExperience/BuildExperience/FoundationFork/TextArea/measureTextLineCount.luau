@@ -1,10 +1,5 @@
-local TextService = game:GetService("TextService")
-
 local parent = script:FindFirstAncestor("BuildExperience").Parent
-local Foundation = require(parent.Foundation)
 local Style = require(parent.Style)
-
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local getVisibleLineCount = require(script.Parent.getVisibleLineCount)
 local chatTextAreaDebug = require(script.Parent.chatTextAreaDebug)
 
@@ -36,35 +31,20 @@ local function measureTextLineCount(data)
 	local lineCount
 
 	if layoutWidth > 0 then
-		local v2
+		local y = Style.GetTextSize("M", data.fontSize, data.font, Vector2.new(layoutWidth, 100000), {
+			addTemporaryPadding = false
+		}).Y
 
-		if FoundationFontFaceMigration then
-			v2 = Style.GetTextSize("M", data.fontSize, data.font, Vector2.new(layoutWidth, 100000), {
-				addTemporaryPadding = false
-			})
-		else
-			v2 = TextService:GetTextSize("M", data.fontSize, data.font, Vector2.new(layoutWidth, 100000))
-		end
-
-		local y = v2.Y
-		local v3
-
-		if FoundationFontFaceMigration then
-			v3 = Style.GetTextSize(data.text, data.fontSize, data.font, Vector2.new(layoutWidth, 100000), {
-				addTemporaryPadding = false
-			})
-		else
-			v3 = TextService:GetTextSize(data.text, data.fontSize, data.font, Vector2.new(layoutWidth, 100000))
-		end
-
-		boundsY = v3.Y
+		boundsY = Style.GetTextSize(data.text, data.fontSize, data.font, Vector2.new(layoutWidth, 100000), {
+			addTemporaryPadding = false
+		}).Y
 
 		if boundsY > 0 and y > 0 then
 			wrappedLineCount = math.ceil(boundsY / y)
-			local v4 = math.max(v, wrappedLineCount)
+			local v2 = math.max(v, wrappedLineCount)
 
-			lineCount = math.clamp(v4, 1, data.maxLines)
-			boundsY = v4 * data.singleLineHeight
+			lineCount = math.clamp(v2, 1, data.maxLines)
+			boundsY = v2 * data.singleLineHeight
 		else
 			lineCount = visibleLineCount
 		end

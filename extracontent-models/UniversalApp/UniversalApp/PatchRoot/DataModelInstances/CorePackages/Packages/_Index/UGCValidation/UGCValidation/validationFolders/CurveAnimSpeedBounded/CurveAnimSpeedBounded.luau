@@ -6,51 +6,70 @@ local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 
 local GetFStringUGCValidationMaxAnimationDeltas = require(parent.flags.GetFStringUGCValidationMaxAnimationDeltas)
 local getFIntUGCValidateMaxAnimationFPS = require(parent.flags.getFIntUGCValidateMaxAnimationFPS)
-return {
-	categories = { ValidationEnums.UploadCategory.EMOTE_ANIMATION, ValidationEnums.UploadCategory.ANIMATION },
-	requiredData = {
-		ValidationEnums.SharedDataMember.curveAnimations,
-		ValidationEnums.SharedDataMember.curveAnimComputedFrames
-	},
-	expectedFailures = {},
-	prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable },
-	run = function(object, p)
-		local animFrames = p.curveAnimComputedFrames.animFrames
-		local v = 1 / getFIntUGCValidateMaxAnimationFPS()
+local CurveAnimSpeedBounded = {}
 
-		local v2 = v / (1 / 30)
-		local v3 = GetFStringUGCValidationMaxAnimationDeltas.asNumber() * v2
+CurveAnimSpeedBounded.categories = {
+	ValidationEnums.UploadCategory.EMOTE_ANIMATION,
+	ValidationEnums.UploadCategory.ANIMATION
+}
+CurveAnimSpeedBounded.requiredData = {
+	ValidationEnums.SharedDataMember.curveAnimations,
+	ValidationEnums.SharedDataMember.curveAnimComputedFrames
+}
 
-		local v4 = GetFStringUGCValidationMaxAnimationDeltas.asNumber() * 30
+CurveAnimSpeedBounded.expectedFailures = {}
+CurveAnimSpeedBounded.prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable }
 
-		local v5 = {}
+local function validateCurveAnimClip(object, curveAnimComputedFrame)
+	local fullName = curveAnimComputedFrame.animation and curveAnimComputedFrame.animation:GetFullName()
+	local animFrames = curveAnimComputedFrame.animFrames
+	local v = 1 / getFIntUGCValidateMaxAnimationFPS()
 
-		for k, animFrame in animFrames do
-			for k2, v6 in animFrame do
-				local v7 = v5[k2]
+	local v2 = v / (1 / 30)
+	local v3 = GetFStringUGCValidationMaxAnimationDeltas.asNumber() * v2
 
-				if not v7 then
-					continue
-				end
+	local v4 = GetFStringUGCValidationMaxAnimationDeltas.asNumber() * 30
 
-				local magnitude = (v6.Position - v7.Position).Magnitude
+	local v5 = {}
 
-				if v3 < magnitude then
-					local v8 = (k - 1) * v
-					local v9 = magnitude / v2 * 30
+	for k, animFrame in animFrames do
+		for k2, v6 in animFrame do
+			local v7 = v5[k2]
 
-					object:fail(ErrorSourceStrings.Keys.CurveAnim_SpeedTooFast, {
-						time = string.format("%.2f", v8),
-						bodyPart = k2,
-						speed = string.format("%.2f", v9),
-						maxSpeed = string.format("%.2f", v4)
-					})
-
-					return
-				end
+			if not v7 then
+				continue
 			end
 
-			v5 = animFrame
+			local magnitude = (v6.Position - v7.Position).Magnitude
+
+			if v3 < magnitude then
+				local v8 = (k - 1) * v
+				local v9 = magnitude / v2 * 30
+
+				local v10 = {
+					time = string.format("%.2f", v8),
+					bodyPart = k2,
+					speed = string.format("%.2f", v9),
+					maxSpeed = string.format("%.2f", v4)
+				}
+
+				if fullName then
+					v10.animationName = fullName
+				end
+
+				object:fail(ErrorSourceStrings.Keys.CurveAnim_SpeedTooFast, v10, curveAnimComputedFrame.animation)
+				return
+			end
 		end
+
+		v5 = animFrame
 	end
-}
+end
+
+function CurveAnimSpeedBounded.run(p, p2)
+	for _, curveAnimComputedFrame in p2.curveAnimComputedFrames do
+		validateCurveAnimClip(p, curveAnimComputedFrame)
+	end
+end
+
+return CurveAnimSpeedBounded

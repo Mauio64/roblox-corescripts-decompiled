@@ -18,6 +18,10 @@ local function fn()
 	local signal, setHasRobloxSubscriptionForTesting = Signals.createSignal(hasRobloxSubscription)
 	local signal2, setGainedRobloxSubscriptionThisSessionForTesting = Signals.createSignal(false)
 
+	local signal3, setHasRobloxSubscriptionUpgradedThisSession = Signals.createSignal(false)
+
+	local signal4, setExistingSubscriptionUpgradedThisSession = Signals.createSignal(false)
+
 	local hasRobloxSubscriptionChangedConnection = localPlayer:GetPropertyChangedSignal("HasRobloxSubscription"):Connect(function()
 		local hasRobloxSubscription2 = localPlayer.HasRobloxSubscription == true
 		local v3 = signal()
@@ -31,6 +35,10 @@ local function fn()
 	return {
 		getHasRobloxSubscription = signal,
 		getGainedRobloxSubscriptionThisSession = signal2,
+		getHasRobloxSubscriptionUpgradedThisSession = signal3,
+		setHasRobloxSubscriptionUpgradedThisSession = setHasRobloxSubscriptionUpgradedThisSession,
+		getExistingSubscriptionUpgradedThisSession = signal4,
+		setExistingSubscriptionUpgradedThisSession = setExistingSubscriptionUpgradedThisSession,
 		setHasRobloxSubscriptionForTesting = setHasRobloxSubscriptionForTesting,
 		setGainedRobloxSubscriptionThisSessionForTesting = setGainedRobloxSubscriptionThisSessionForTesting,
 		cleanup = function()

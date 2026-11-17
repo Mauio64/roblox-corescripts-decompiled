@@ -1,5 +1,3 @@
-local TextService = game:GetService("TextService")
-
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
 local parent = ProfilePlatform.Parent
 
@@ -16,7 +14,6 @@ local UIBlox = require(parent.UIBlox)
 local Foundation = require(parent.Foundation)
 local Style = require(parent.Style)
 local GetTextSize = Style.GetTextSize
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local Localization = require(parent.Localization)
 local RobloxAppHooks = require(parent.RobloxAppHooks)
 local Responsive = require(parent.Responsive)
@@ -54,18 +51,13 @@ local function Description(props)
 		v12 = v11
 	else
 		v12 = React.useMemo(function()
-			local v13 = string.gsub(text or "", "[\r\n]+", " ")
-			local v14
-
-			if FoundationFontFaceMigration then
-				v14 = GetTextSize(v13, bodyMedium.FontSize, bodyMedium.Font, Vector2.new(1e999, 1e999), {
-					addTemporaryPadding = false
-				}).Y
-			else
-				v14 = TextService:GetTextSize(v13, bodyMedium.FontSize, bodyMedium.Font, Vector2.new(1e999, 1e999)).Y
-			end
-
-			return v14 * (v9 and 2.6 or 2)
+			return GetTextSize(
+				string.gsub(text or "", "[\r\n]+", " "),
+				bodyMedium.FontSize,
+				bodyMedium.Font,
+				Vector2.new(1e999, 1e999),
+				{ addTemporaryPadding = false }
+			).Y * (v9 and 2.6 or 2)
 		end, { text, bodyMedium.FontSize, bodyMedium.Font, v9 })
 	end
 

@@ -18,7 +18,6 @@ local useCursor = Foundation.Hooks.useCursor
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
 local CursorType = Foundation.Enums.CursorType
 local useLocalization = Localization.Hooks.useLocalization
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local SharedFlags = require(parent.SharedFlags)
 local FFlagAppPageShellScrollToTopFocus = SharedFlags.FFlagAppPageShellScrollToTopFocus
@@ -68,47 +67,33 @@ local function BackToTopButton(props)
 		backToTopClickEvent(props.pageContext)
 	end, { props.scrollingFrameRef, props.pageContext, v2 })
 
-	local createElement = React.createElement
-	local v5 = {
-		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 0, 70),
-		LayoutOrder = props.layoutOrder
-	}
-
-	local createElement2 = React.createElement
-	local v6 = {}
-	v6.Size = UDim2.new(0.5, 0, 0, 30)
-	v6.Position = UDim2.new(0.25, 0, 0, 20)
-	v6.BackgroundTransparency = 1
-	v6.BorderSizePixel = 0
-	v6.AutoButtonColor = false
-	v6.SelectionOrder = selectionOrder
-	v6.Text = v3.backToTop
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = v.Typography.BodyLarge.Font
-	end
-
-	v6.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(v.Typography.BodyLarge.Font)
-	end
-
-	v6.FontFace = fontFace
-
-	v6.TextSize = v.Typography.BodyLarge.FontSize
-	v6.TextColor3 = v.Color.Content.Emphasis.Color3
-	v6.TextTransparency = v.Color.Content.Emphasis.Transparency
-	v6.TextXAlignment = Enum.TextXAlignment.Center
-	v6.TextYAlignment = Enum.TextYAlignment.Center
-	v6.SelectionImageObject = selectionImageObject
-	v6[React.Event.Activated] = v4
-	return createElement("Frame", v5, {
-		BackToTopButton = createElement2("TextButton", v6)
-	})
+	return React.createElement(
+		"Frame",
+		{
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, 70),
+			LayoutOrder = props.layoutOrder
+		},
+		{
+			BackToTopButton = React.createElement("TextButton", {
+				Size = UDim2.new(0.5, 0, 0, 30),
+				Position = UDim2.new(0.25, 0, 0, 20),
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				AutoButtonColor = false,
+				SelectionOrder = selectionOrder,
+				Text = v3.backToTop,
+				FontFace = normalizeFontFace(v.Typography.BodyLarge.Font),
+				TextSize = v.Typography.BodyLarge.FontSize,
+				TextColor3 = v.Color.Content.Emphasis.Color3,
+				TextTransparency = v.Color.Content.Emphasis.Transparency,
+				TextXAlignment = Enum.TextXAlignment.Center,
+				TextYAlignment = Enum.TextYAlignment.Center,
+				SelectionImageObject = selectionImageObject,
+				[React.Event.Activated] = v4
+			})
+		}
+	)
 end
 
 return BackToTopButton

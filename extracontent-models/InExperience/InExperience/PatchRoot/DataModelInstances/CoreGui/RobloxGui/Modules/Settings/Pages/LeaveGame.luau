@@ -24,8 +24,7 @@ local InExperienceLocales = require(CorePackages.Workspace.Packages.InExperience
 local Localization = InExperienceLocales.Localization
 local Localization2 = require(CorePackages.Workspace.Packages.Localization)
 local LocalizationProvider = Localization2.LocalizationProvider
-local Localization3 = require(CorePackages.Workspace.Packages.Localization)
-local useLocalization = Localization3.Hooks.useLocalization
+local useLocalization = Localization2.Hooks.useLocalization
 
 local Foundation = require(CorePackages.Packages.Foundation)
 
@@ -60,13 +59,19 @@ local FFlagEnableConsoleExpControls = SharedFlags.FFlagEnableConsoleExpControls
 local FFlagChromeShortcutRemoveRespawnOnLeavePage = SharedFlags.FFlagChromeShortcutRemoveRespawnOnLeavePage
 local PioneerUtils = require(CorePackages.Workspace.Packages.PioneerUtils)
 local isPioneerLaunch = PioneerUtils.isPioneerLaunch
+local PioneerUtils2 = require(CorePackages.Workspace.Packages.PioneerUtils)
+local PioneerLeaveReason = PioneerUtils2.PioneerLeaveReason
+local FFlagPioneerLeaveLogsOut = SharedFlags.FFlagPioneerLeaveLogsOut
+
 local FFlagRefactorMenuConfirmationButtons = require(RobloxGui.Modules.Settings.Flags.FFlagRefactorMenuConfirmationButtons)
+
 local FFlagConfirmationButtonsUseGreyButtons = require(RobloxGui.Modules.Settings.Flags.FFlagConfirmationButtonsUseGreyButtons)
 
 local Constants2 = require(RobloxGui.Modules:WaitForChild("InGameMenu"):WaitForChild("Resources"):WaitForChild("Constants"))
 
 local InExperienceSideSheet = require(CorePackages.Workspace.Packages.InExperienceSideSheet)
 local LocalizationKeys = InExperienceSideSheet.Constants.LocalizationKeys
+local FFlagPioneerLogoutButtonLabel = InExperienceSideSheet.Flags.FFlagPioneerLogoutButtonLabel
 
 local focusNavigationService = ReactFocusNavigation.FocusNavigationService.new(ReactFocusNavigation.EngineInterface.CoreGui)
 
@@ -86,35 +91,42 @@ local function LeaveButtonsContainer(p)
 
 	local v = useLastInput()
 	local v2 = useFocusGuiObject()
-	local confirmLeaveGame
+	local confirmLeaveGame2
 
-	if isPioneerLaunch() then
-		confirmLeaveGame = LocalizationKeys.QuitConfirmation
+	if isPioneerLaunch() and not FFlagPioneerLeaveLogsOut then
+		confirmLeaveGame2 = LocalizationKeys.QuitConfirmation
+	elseif FFlagPioneerLogoutButtonLabel and isPioneerLaunch() and FFlagPioneerLeaveLogsOut then
+		confirmLeaveGame2 = LocalizationKeys.LogoutConfirmation
 	else
-		confirmLeaveGame = Constants2.ConfirmLeaveGameLocalizedKey
+		confirmLeaveGame2 = Constants2.ConfirmLeaveGameLocalizedKey
 	end
 
-	local leaveGame2
+	local leaveGame3
 
-	if isPioneerLaunch() then
-		leaveGame2 = LocalizationKeys.QuitButton
+	if isPioneerLaunch() and not FFlagPioneerLeaveLogsOut then
+		leaveGame3 = LocalizationKeys.QuitButton
+	elseif FFlagPioneerLogoutButtonLabel and isPioneerLaunch() and FFlagPioneerLeaveLogsOut then
+		leaveGame3 = LocalizationKeys.LogoutButton
 	else
-		leaveGame2 = Constants2.LeaveGameLocalizedKey
+		leaveGame3 = Constants2.LeaveGameLocalizedKey
 	end
 
 	local dontLeaveGame
 
-	if isPioneerLaunch() then
+	if isPioneerLaunch() and not FFlagPioneerLeaveLogsOut then
 		dontLeaveGame = LocalizationKeys.Resume
 	else
 		dontLeaveGame = Constants2.DontLeaveGameLocalizedKey
 	end
 
 	local v3 = useLocalization({
-		ConfirmLeaveGame = confirmLeaveGame,
-		LeaveGame = leaveGame2,
+		ConfirmLeaveGame = confirmLeaveGame2,
+		LeaveGame = leaveGame3,
 		DontLeaveGame = dontLeaveGame
 	})
+
+	local confirmLeaveGame = v3.ConfirmLeaveGame
+	local leaveGame2 = v3.LeaveGame
 
 	React.useEffect(function()
 		if v == Input.Touch then
@@ -125,7 +137,9 @@ local function LeaveButtonsContainer(p)
 	end, { v, v2 })
 
 	local onActivated = React.useCallback(function()
-		if isPioneerLaunch() then
+		if FFlagPioneerLeaveLogsOut and isPioneerLaunch() then
+			leaveGame(false, { leaveReason = PioneerLeaveReason.Logout, inhibitAppRating = true })
+		elseif isPioneerLaunch() then
 			leaveGame(false, { shouldNativeExit = true })
 		else
 			leaveGame(true)
@@ -144,7 +158,7 @@ local function LeaveButtonsContainer(p)
 
 	local v5 = {
 		LeaveGameText = React.createElement(Text, {
-			Text = v3.ConfirmLeaveGame,
+			Text = confirmLeaveGame,
 			Size = UDim2.new(1, 0, 0, Utility:IsSmallTouchScreen() and 100 or 200),
 			LayoutOrder = 1,
 			tag = {
@@ -161,13 +175,14 @@ local function LeaveButtonsContainer(p)
 
 	local createElement3 = React.createElement
 	local v6 = {
-		text = v3.LeaveGame,
+		text = leaveGame2,
 		size = InputSize.Large,
 		variant = 0,
 		width = 0,
 		LayoutOrder = 1,
 		ref = 0,
-		onActivated = 0
+		onActivated = 0,
+		testId = 0
 	}
 	local variant
 
@@ -178,10 +193,12 @@ local function LeaveButtonsContainer(p)
 	end
 
 	v6.variant = variant
+
 	v6.width = UDim.new(0, textheadinglarge and 300 or 200)
 
 	v6.ref = ref
 	v6.onActivated = onActivated
+	v6.testId = FFlagPioneerLogoutButtonLabel and "--leave-game-page-button-leave" or nil
 	v5.LeaveButtonsContainer = createElement2(
 		View,
 		{ LayoutOrder = 2, tag = "size-full-0 auto-y row align-x-center gap-xlarge wrap" },
@@ -193,7 +210,8 @@ local function LeaveButtonsContainer(p)
 				variant = ButtonVariant.Subtle,
 				width = UDim.new(0, textheadinglarge and 300 or 200),
 				LayoutOrder = 2,
-				onActivated = onActivated2
+				onActivated = onActivated2,
+				testId = FFlagPioneerLogoutButtonLabel and "--leave-game-page-button-dont-leave" or nil
 			})
 		}
 	)
@@ -284,8 +302,10 @@ local function Initialize()
 	else
 		local text
 
-		if isPioneerLaunch() then
+		if isPioneerLaunch() and not FFlagPioneerLeaveLogsOut then
 			text = RobloxTranslator:FormatByKey(LocalizationKeys.QuitConfirmation)
+		elseif FFlagPioneerLogoutButtonLabel and isPioneerLaunch() and FFlagPioneerLeaveLogsOut then
+			text = RobloxTranslator:FormatByKey(LocalizationKeys.LogoutConfirmation)
 		else
 			text = RobloxTranslator:FormatByKey(Constants2.ConfirmLeaveGameLocalizedKey)
 		end
@@ -330,18 +350,27 @@ local function Initialize()
 			parent.FontSize = Enum.FontSize.Size48
 		end
 
-		newPage.LeaveGameButton = Utility:MakeStyledButton(
-			"LeaveGame",
-			not isPioneerLaunch() and "Leave" or RobloxTranslator:FormatByKey(LocalizationKeys.QuitButton),
-			nil,
-			function()
-				if isPioneerLaunch() then
-					leaveGame(false, { shouldNativeExit = true })
-				else
-					leaveGame(true)
-				end
+		local v
+
+		if isPioneerLaunch() and not FFlagPioneerLeaveLogsOut then
+			v = RobloxTranslator:FormatByKey(LocalizationKeys.QuitButton)
+		else
+			v = not (FFlagPioneerLogoutButtonLabel and isPioneerLaunch() and FFlagPioneerLeaveLogsOut) and "Leave"
+				or RobloxTranslator:FormatByKey(LocalizationKeys.LogoutButton)
+		end
+
+		newPage.LeaveGameButton = Utility:MakeStyledButton("LeaveGame", v, nil, function()
+			if FFlagPioneerLeaveLogsOut and isPioneerLaunch() then
+				leaveGame(false, {
+					leaveReason = PioneerLeaveReason.Logout,
+					inhibitAppRating = true
+				})
+			elseif isPioneerLaunch() then
+				leaveGame(false, { shouldNativeExit = true })
+			else
+				leaveGame(true)
 			end
-		)
+		end)
 		newPage.LeaveGameButton.NextSelectionRight = nil
 		newPage.LeaveGameButton.Parent = parent2
 

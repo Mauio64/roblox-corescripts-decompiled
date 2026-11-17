@@ -15,7 +15,7 @@ if game:DefineFastFlag("FFlagAXFixAvatarSaveContext", false) then
 		end,
 		getLastSuccessfullySavedStateSignal = Signals.createSignal({}),
 		getSaveEligibilityStatusSignal = Signals.createSignal(SaveStatusEnum.AlreadySaved),
-		autoSaveNextNewSaveData = function(): nil
+		autoSaveNextNewSaveData = function(_: number?): nil
 			return nil
 		end,
 		trySaveAvatar = function(): nil

@@ -27,8 +27,14 @@ local NavigateDown = NavigationRodux.Thunks.NavigateDown
 local FFlagMomentsOptimisticProfilePending = SharedFlags.FFlagMomentsOptimisticProfilePending
 local FFlagSignalsNavP3Dispatch = SharedFlags.FFlagSignalsNavP3Dispatch
 local FFlagProfileMomentsFeedRootRoute = SharedFlags.FFlagProfileMomentsFeedRootRoute
+local FFlagEnableArgus = SharedFlags.FFlagEnableArgus
+local FFlagEnableArgusImmersiveNav = SharedFlags.FFlagEnableArgusImmersiveNav
 local FFlagProfileRenderAvatarMoments = SharedFlags.FFlagProfileRenderAvatarMoments
 local FFlagProfileMomentsLoadFailureAnalytics = require(ProfilePlatform.Flags.FFlagProfileMomentsLoadFailureAnalytics)
+local v = FFlagProfileMomentsFeedRootRoute
+	and FFlagEnableArgus
+	and FFlagEnableArgusImmersiveNav
+	and FFlagProfileRenderAvatarMoments
 local navigationCommands
 
 if FFlagSignalsNavP3Dispatch then
@@ -38,48 +44,48 @@ else
 	navigationCommands = nil
 end
 
-local v = FFlagProfileMomentsFeedRootRoute or FFlagProfileRenderAvatarMoments
+local v2 = FFlagProfileMomentsFeedRootRoute or FFlagProfileRenderAvatarMoments
 
 local function MomentsCarouselContainer(p)
-	local v2 = useProfileWrapperContext()
-	local v3 = useProfileAnalyticsContext()
-	local v4 = useNavigation()
-	local v5
+	local v3 = useProfileWrapperContext()
+	local v4 = useProfileAnalyticsContext()
+	local v5 = useNavigation()
+	local v6
 
-	if v then
-		v5 = useDispatch()
+	if v2 then
+		v6 = useDispatch()
 	else
-		v5 = nil
+		v6 = nil
 	end
 
-	local profileId = v2.profileId
-	local v6 = useUserMoments(profileId)
-	local moments = v6.moments
+	local profileId = v3.profileId
+	local v7 = useUserMoments(profileId)
+	local moments = v7.moments
 
 	if FFlagProfileMomentsLoadFailureAnalytics then
 		React.useEffect(function()
-			if v6.hasFailed and profileId ~= nil then
+			if v7.hasFailed and profileId ~= nil then
 				fireAnalyticsEvent(eventNames.ProfileLoadFailed, { userId = profileId })
 			end
-		end, { v6.hasFailed, profileId })
+		end, { v7.hasFailed, profileId })
 	end
 
 	local onActivateHeader = React.useCallback(function()
-		v3.fireAnalyticsEvent(EventNames.MomentsSeeAll)
-		v4.navigate(Enums.Screens.MomentsAll, {
+		v4.fireAnalyticsEvent(EventNames.MomentsSeeAll)
+		v5.navigate(Enums.Screens.MomentsAll, {
 			extraProps = { profileId = profileId }
 		})
-	end, { v3, v4, profileId })
+	end, { v4, v5, profileId })
 
 	local onSelectMoment = React.useCallback(function(initialIndex: number)
 		local moment = moments[initialIndex]
 
-		local v7 = moment
+		local v8 = moment
 			and profileId
 			and makeProfileTileFields.makeProfileTileInteractionFields(moment, profileId, "carousel", initialIndex)
 
-		if v7 then
-			fireAnalyticsEvent(eventNames.ProfileMomentSelected, v7)
+		if v8 then
+			fireAnalyticsEvent(eventNames.ProfileMomentSelected, v8)
 		end
 
 		local extraProps = {
@@ -95,30 +101,38 @@ local function MomentsCarouselContainer(p)
 
 		extraProps.initialMomentId = initialMomentId
 
-		if not v then
-			v4.navigate(Enums.Screens.MomentsFeed, { extraProps = extraProps })
+		if not v2 then
+			v5.navigate(Enums.Screens.MomentsFeed, { extraProps = extraProps })
 
 			return
 		end
 
-		local v8 = { name = AppPage.ProfileMomentsFeed, extraProps = extraProps }
+		local name
+
+		if v then
+			name = AppPage.MomentsImmersive
+		else
+			name = AppPage.ProfileMomentsFeed
+		end
+
+		local v9 = { name = name, extraProps = extraProps }
 
 		if FFlagSignalsNavP3Dispatch then
-			navigationCommands.down(navigationCommands.fromLegacyPage(v8))
+			navigationCommands.down(navigationCommands.fromLegacyPage(v9))
 		else
-			v5(NavigateDown(v8))
+			v6(NavigateDown(v9))
 		end
-	end, { v3, v4, v5, profileId, moments })
+	end, { v4, v5, v6, profileId, moments })
 
 	local onTileImpression = React.useCallback(function(p2: number)
 		local moment = moments[p2]
-		local v7 = moment
+		local v8 = moment
 			and profileId
 			and moment.recommendationMetadata
 			and makeProfileTileFields.makeProfileTileImpressionFields(moment, profileId, "carousel", p2)
 
-		if v7 then
-			fireAnalyticsEvent(eventNames.ProfileMomentTileImpression, v7)
+		if v8 then
+			fireAnalyticsEvent(eventNames.ProfileMomentTileImpression, v8)
 		end
 	end, { profileId, moments })
 

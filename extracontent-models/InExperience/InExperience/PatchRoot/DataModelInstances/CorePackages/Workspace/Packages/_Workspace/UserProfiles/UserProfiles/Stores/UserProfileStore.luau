@@ -474,26 +474,23 @@ local computed = createComputed(function(_)
 			if v then
 				invalidateCachedProfiles(getNameFields(false), p)
 				invalidateCachedProfiles(getPlatformFields(), p) -- inferred equivalent call
-			else
-				if not FFlagUserProfilePlatformProfile then
-					invalidateCachedProfiles(
-						{
-							v2.COMBINED_NAME,
-							v2.DISPLAY_NAME,
-							v2.USERNAME,
-							v2.IN_EXPERIENCE_COMBINED_NAME,
-							v2.CONTACT_NAME,
-							v2.ALIAS,
-							v2.PLATFORM_NAME,
-							v2.PLATFORM_PROFILE_ID
-						},
-						p
-					)
-					return
-				end
-
+			elseif FFlagUserProfilePlatformProfile then
 				invalidateCachedProfiles(getNameFields(false), p)
 				invalidateCachedProfiles(getNameFields(true), p)
+			else
+				invalidateCachedProfiles(
+					{
+						v2.COMBINED_NAME,
+						v2.DISPLAY_NAME,
+						v2.USERNAME,
+						v2.IN_EXPERIENCE_COMBINED_NAME,
+						v2.CONTACT_NAME,
+						v2.ALIAS,
+						v2.PLATFORM_NAME,
+						v2.PLATFORM_PROFILE_ID
+					},
+					p
+				)
 			end
 		end
 	}

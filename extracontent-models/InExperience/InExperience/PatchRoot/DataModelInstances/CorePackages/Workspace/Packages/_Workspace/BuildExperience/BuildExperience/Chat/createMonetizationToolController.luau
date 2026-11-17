@@ -196,23 +196,23 @@ local function createMonetizationToolController(data, p, p2, data2, callback)
 		return result
 	end
 
-	local function submitAutomaticResult(toolCallId: string, p3, p4, flag: boolean, p5: number, p6: number)
-		if not isAutomaticWorkCurrent(p5, p6) then -- inferred equivalent call
+	local function submitAutomaticResult(toolCallId: string, p3, formatResultContent, flag: boolean, p4: number, p5: number)
+		if not isAutomaticWorkCurrent(p4, p5) then -- inferred equivalent call
 			return
 		end
 
-		local submitActiveToolResult = p.submitActiveToolResult(p4, flag, p3.turnId, p3.referenceId)
+		local submitActiveToolResult = p.submitActiveToolResult(formatResultContent, flag, p3.turnId, p3.referenceId)
 
 		if submitActiveToolResult == nil then
 			v3[toolCallId] = nil
 
-			if isGenerationCurrent(p5) then -- inferred equivalent call
+			if isGenerationCurrent(p4) then -- inferred equivalent call
 				p2[toolCallId] = nil
 			end
 		else
 			local status, v5 = awaitReply(submitActiveToolResult, "automatic") -- inferred equivalent call
 
-			if not isAutomaticWorkCurrent(p5, p6) then -- inferred equivalent call
+			if not isAutomaticWorkCurrent(p4, p5) then -- inferred equivalent call
 				return
 			end
 

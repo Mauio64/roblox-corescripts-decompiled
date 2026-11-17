@@ -7,6 +7,9 @@ local PromptState = require(RobloxSubscriptionPurchaseApp.Enums.PromptState)
 local finalizeRobloxSubscriptionUpsellFlow = require(RobloxSubscriptionPurchaseApp.Actions.finalizeRobloxSubscriptionUpsellFlow)
 local transitionToError = require(RobloxSubscriptionPurchaseApp.Actions.transitionToError)
 local ErrorReason = require(RobloxSubscriptionPurchaseApp.Enums.ErrorReason)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagPlusMembershipConfigChangeCheck = SharedFlags.FFlagPlusMembershipConfigChangeCheck
+local FIntPlusUpgradePollingTimeoutSeconds = require(RobloxSubscriptionPurchaseApp.Flags.FIntPlusUpgradePollingTimeoutSeconds)
 
 local defineFastInt = game:DefineFastInt("RobloxSubscriptionPurchasePollingTimeoutSeconds", 4)
 
@@ -22,8 +25,15 @@ local function useSubscriptionPollingTimeoutGuard()
 		end
 
 		local flag = false
+		local v4
 
-		task.delay(defineFastInt, function()
+		if FFlagPlusMembershipConfigChangeCheck and ref.current.getMembershipConfigSnapshot() ~= nil then
+			v4 = FIntPlusUpgradePollingTimeoutSeconds
+		else
+			v4 = defineFastInt
+		end
+
+		task.delay(v4, function()
 			if flag then
 				return
 			end

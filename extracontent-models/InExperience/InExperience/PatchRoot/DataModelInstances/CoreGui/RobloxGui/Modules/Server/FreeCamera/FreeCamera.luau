@@ -946,55 +946,56 @@ local function StepFreecam(p)
 		v49 = v37:Update(p, v38.Roll(p))
 	end
 
-	local v50 = sqrt(0.7002075382097097 / tan((rad(fieldOfView2 / 2))))
+	local v53 = sqrt(0.7002075382097097 / tan((rad(fieldOfView2 / 2))))
 
-	fieldOfView2 = clamp(fieldOfView2 + v48 * 300 * (p / v50), 1, 120)
-	local v51
+	fieldOfView2 = clamp(fieldOfView2 + v48 * 300 * (p / v53), 1, 120)
+	local v55
 
 	if v7 then
-		local v52 = v47 * v15 * (p / v50)
-		v28 += Vector3.new(v52.X, v52.Y, v49 * -1.5707963267948966 * (p / v50))
+		local v56 = v47 * v15 * (p / v53)
+		v28 += Vector3.new(v56.X, v56.Y, v49 * -1.5707963267948966 * (p / v53))
 
 		if v8 then
 			v28 = Vector3.new(v28.x % 6.283185307179586, v28.y % 6.283185307179586, v28.z % 6.283185307179586)
 		else
-			v28 = Vector3.new(clamp(v28.x, -1.5707963267948966, 1.5707963267948966), v28.y % 6.283185307179586, v28.z)
+			local x = v28.x
+			v28 = Vector3.new(clamp(x, -1.5707963267948966, 1.5707963267948966), v28.y % 6.283185307179586, v28.z)
 		end
 
-		v51 = CFrame.new(v27) * CFrame.fromOrientation(v28.x, v28.y, v28.z) * CFrame.new(v46 * Vector3.new(64, 64, 64) * p)
+		v55 = CFrame.new(v27) * CFrame.fromOrientation(v28.x, v28.y, v28.z) * CFrame.new(v46 * Vector3.new(64, 64, 64) * p)
 	else
-		v28 += v47 * v15 * (p / v50)
+		v28 += v47 * v15 * (p / v53)
 		v28 = Vector2.new(clamp(v28.x, -1.5707963267948966, 1.5707963267948966), v28.y % 6.283185307179586)
 
-		v51 = CFrame.new(v27) * CFrame.fromOrientation(v28.x, v28.y, 0) * CFrame.new(v46 * Vector3.new(64, 64, 64) * p)
+		v55 = CFrame.new(v27) * CFrame.fromOrientation(v28.x, v28.y, 0) * CFrame.new(v46 * Vector3.new(64, 64, 64) * p)
 	end
 
 	if v11 and v21 and v25 then
-		local v52 = v46.Z * 64 * p
-		local v53 = v46.Y * 64 * p
-		v22 = clamp(v22 + v52, 5, 50)
-		v23 = clamp(v23 + v53, -10, 10)
+		local v56 = v46.Z * 64 * p
+		local v57 = v46.Y * 64 * p
+		v22 = clamp(v22 + v56, 5, 50)
+		v23 = clamp(v23 + v57, -10, 10)
 		local cframe = CFrame.new(v25.Position + Vector3.new(0, v23, 0))
-		local v54
+		local v60
 
 		if v7 then
-			v54 = CFrame.fromOrientation(v28.x, v28.y, v28.z)
+			v60 = CFrame.fromOrientation(v28.x, v28.y, v28.z)
 		else
-			v54 = CFrame.fromOrientation(v28.x, v28.y, 0)
+			v60 = CFrame.fromOrientation(v28.x, v28.y, 0)
 		end
 
-		v51 = cframe * v54 * CFrame.new(0, 0, v22)
+		v55 = cframe * v60 * CFrame.new(0, 0, v22)
 	end
 
 	if v13 and freecamCustomGui and freecamCustomGui.Parent and freecam and freecam.Parent and freecam.Enabled then
-		local v52 = ""
+		local v56 = ""
 
 		if p > 0 then
-			local v53 = (v51.p - v27) / p
-			v52 ..= string.format("Velocity: (%.1f, %.1f, %.1f)\n", v53.X, v53.Y, v53.Z)
+			local v57 = (v55.p - v27) / p
+			v56 ..= string.format("Velocity: (%.1f, %.1f, %.1f)\n", v57.X, v57.Y, v57.Z)
 		end
 
-		local text = v52 .. string.format("FOV: %.1f\n", fieldOfView2)
+		local text = v56 .. string.format("FOV: %.1f\n", fieldOfView2)
 
 		if v7 then
 			text ..= string.format("Tilt: %.1f°\n", (math.deg(v28.z)))
@@ -1033,10 +1034,10 @@ local function StepFreecam(p)
 		freecamCustomGui.Text = text
 	end
 
-	v27 = v51.p
+	v27 = v55.p
 
-	parent.CFrame = v51
-	parent.Focus = v51
+	parent.CFrame = v55
+	parent.Focus = v55
 	parent.FieldOfView = fieldOfView2
 end
 

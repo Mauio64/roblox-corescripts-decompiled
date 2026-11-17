@@ -1,1 +1,0 @@
-return { config = require("@game/CorePackages/Workspace/Packages/_Index/UserBlockingNetworking/UserBlockingNetworking/createRequestThunks") }

@@ -3,6 +3,7 @@ local parent = Moments.Parent
 
 local Foundation = require(parent.Foundation)
 local Localization = require(parent.Localization)
+local MomentsCommon = require(parent.MomentsCommon)
 local React = require(parent.React)
 local FocusNavigationUtils = require(parent.FocusNavigationUtils)
 
@@ -12,6 +13,7 @@ local useTokens = Foundation.Hooks.useTokens
 require(script.Parent.FeedTypes)
 local FeedMessageView = require(script.Parent.FeedMessageView)
 local FFlagMomentsFeedErrorStateRedesign = require(Moments.Flags.FFlagMomentsFeedErrorStateRedesign)
+local FFlagMomentsParentTimeLimit = MomentsCommon.Flags.FFlagMomentsParentTimeLimit
 
 local FocusRoot = FocusNavigationUtils.FocusRoot
 local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
@@ -121,6 +123,19 @@ local function FeedStateView(props)
 			}),
 			Cta = props.emptyContent
 		})
+	end
+
+	if FFlagMomentsParentTimeLimit and status == "LimitReached" then
+		return React.createElement(
+			View,
+			{
+				tag = "col align-x-center align-y-center gap-medium size-full padding-xlarge bg-surface-0",
+				ZIndex = props.zIndex
+			},
+			{
+				TimeLimit = React.createElement(require(script.Parent.Items.TimeLimit.MomentsTimeLimitContainer))
+			}
+		)
 	end
 
 	if props.loadMoreFailed then

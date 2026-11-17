@@ -11,7 +11,9 @@ local getAccessoryScale = require(parent.util.getAccessoryScale)
 local getAttachment = require(parent.util.getAttachment)
 local getMeshMinMax = require(parent.util.getMeshMinMax)
 local isMeshPartAccessory = require(parent.util.isMeshPartAccessory)
+local valueToString = require(parent.util.valueToString)
 local getFFlagUGCValidateMeshMaxScale = require(parent.flags.getFFlagUGCValidateMeshMaxScale)
+local getFFlagUGCValidateMeshScaleErrorMessage = require(parent.flags.getFFlagUGCValidateMeshScaleErrorMessage)
 
 local getFIntUGCValidateMeshCenteringHundredsThreshold = require(parent.flags.getFIntUGCValidateMeshCenteringHundredsThreshold)
 
@@ -42,7 +44,7 @@ local function pointInBounds(vector3: Vector3, cframe: CFrame, size: Vector3): b
 		and pointToObjectSpace.Z <= size.Z / 2
 end
 
-local function truncate(p: number) -- 6 equivalent calls inferred from this helper
+local function truncate(p: number) -- 12 equivalent calls inferred from this helper
 	return math.floor(p * 100) / 100
 end
 
@@ -82,6 +84,39 @@ function MeshBoundsValid.run(object, data)
 	end
 
 	local scale = handle2.scale
+
+	-- [DEDUP] synthesized from 2 duplicated terminal regions
+	local function deduplicatedTail()
+		local v2, v3, _, v4, v5, v6
+
+		if data.consumerConfig.consumerEnv ~= ValidationEnums.ConsumerEnv.IEC then
+			v2 = {
+				fullName = handle:GetFullName(),
+				fieldName = "MeshId",
+				editableMesh = handle2.editable,
+				scale = scale,
+				context = rootInstance.Name
+			}
+
+			v3, _, v4, v5 = getMeshMinMax(v2, { isServer = isServer, shouldYield = false })
+
+			if not v3 then
+				object:fetchError(string.format("Failed to compute mesh min/max for %s", handle:GetFullName()))
+			end
+
+			if v4 and v5 then
+				v6 = (v4 + v5) / 2
+
+				if getFIntUGCValidateMeshCenteringHundredsThreshold() / 100 < v6.Magnitude then
+					object:fail(ErrorSourceStrings.Keys.MeshGeometry_NotCentered, {
+						meshName = handle:GetFullName(),
+						fieldName = "MeshId"
+					})
+				end
+			end
+		end
+	end
+
 	local size = bound.size
 	local v2 = bound.offset or Vector3.new(0, 0, 0)
 
@@ -117,10 +152,7 @@ function MeshBoundsValid.run(object, data)
 		or handle.Position.Z < -10000
 	then
 		object:fail(ErrorSourceStrings.Keys.MeshGeometry_PositionOutOfBounds, {})
-		return
-	end
-
-	if
+	elseif
 		v3.Position.X > 10000
 		or v3.Position.X < -10000
 		or v3.Position.Y > 10000
@@ -129,24 +161,119 @@ function MeshBoundsValid.run(object, data)
 		or v3.Position.Z < -10000
 	then
 		object:fail(ErrorSourceStrings.Keys.MeshGeometry_PositionOutOfBounds, {})
-		return
-	end
+	elseif scale.X < defineFastInt / 1000 or scale.Y < defineFastInt / 1000 or scale.Z < defineFastInt / 1000 then
+		local v4 = math.min(scale.X, scale.Y, scale.Z)
 
-	if scale.X < defineFastInt / 1000 or scale.Y < defineFastInt / 1000 or scale.Z < defineFastInt / 1000 then
-		object:fail(ErrorSourceStrings.Keys.MeshGeometry_ScaleTooSmall, {})
-		return
-	end
+		if not getFFlagUGCValidateMeshScaleErrorMessage() or v4 ~= v4 then
+			object:fail(ErrorSourceStrings.Keys.MeshGeometry_ScaleTooSmall, {})
+			return
+		end
 
-	local editableMeshVerts, _, _, _, _, _, _
+		if v4 <= 0 then
+			object:fail(ErrorSourceStrings.Keys.MeshGeometry_ScaleNotPositive, {
+				meshName = handle:GetFullName()
+			})
+			return
+		end
 
-	-- [DEDUP] synthesized from 2 duplicated terminal regions
-	local function deduplicatedTail()
-		local v4, v5, v6, v7, v8, v9
+		local v5 = defineFastInt / 10
+		local v6 = math.clamp(math.round(v4 * 10000) / 100, 0.01, v5 - 0.01)
+		object:fail(ErrorSourceStrings.Keys.MeshGeometry_ScaleBelowMinimum, {
+			meshName = handle:GetFullName(),
+			scalePercent = valueToString(v6),
+			minScalePercent = valueToString(v5)
+		})
+	else
+		local editableMeshVerts, v4, v5, _, _, _, _, _, _
 
-		for _, v10 in pairs(editableMeshVerts) do
-			if not pointInBounds(handle.CFrame:PointToWorldSpace(v10 * scale), v3, size) then
+		if getFFlagUGCValidateMeshMaxScale() then
+			local x = scale.X
+
+			if not (defineFastInt2 / 1000 < x) then
+				local y = scale.Y
+
+				if not (defineFastInt2 / 1000 < y) then
+					local z = scale.Z
+
+					if not (defineFastInt2 / 1000 < z) then
+						editableMeshVerts = UGCValidationService:GetEditableMeshVerts(handle2.editable)
+
+						for k, editableMeshVert in pairs(editableMeshVerts) do
+							v4 = handle.CFrame:PointToWorldSpace(editableMeshVert * scale)
+
+							if not pointInBounds(v4, v3, size) then
+								object:fail(ErrorSourceStrings.Keys.MeshGeometry_ExceedsBounds, {
+									meshName = rootInstance.Name,
+									assetTypeName = assetType.Name,
+									maxSizeX = string.format("%.2f", truncate(size.X)), -- inferred equivalent call
+									maxSizeY = string.format("%.2f", truncate(size.Y)), -- inferred equivalent call
+									maxSizeZ = string.format("%.2f", truncate(size.Z)) -- inferred equivalent call
+								})
+
+								return
+							end
+						end
+
+						v5 = (attachment.CFrame.Rotation * handle.Size):Abs()
+
+						if not (v5.X <= size.X and v5.Y <= size.Y and v5.Z <= size.Z) then
+							object:fail(ErrorSourceStrings.Keys.MeshGeometry_ExceedsBounds, {
+								meshName = handle:GetFullName(),
+								assetTypeName = assetType.Name,
+								maxSizeX = string.format("%.2f", truncate(size.X)), -- inferred equivalent call
+								maxSizeY = string.format("%.2f", truncate(size.Y)), -- inferred equivalent call
+								maxSizeZ = string.format("%.2f", truncate(size.Z)) -- inferred equivalent call
+							})
+
+							return
+						end
+
+						return deduplicatedTail()
+					end
+				end
+			end
+
+			local v6 = math.max(scale.X, scale.Y, scale.Z)
+
+			if not (getFFlagUGCValidateMeshScaleErrorMessage() and v6 < 1e999) then
+				object:fail(ErrorSourceStrings.Keys.MeshGeometry_ScaleTooLarge, {
+					meshName = handle.Name
+				})
+
+				return
+			end
+
+			local v7 = defineFastInt2 / 1000
+			local v8 = math.max(math.round(v6 * 100) / 100, v7 + 0.01)
+			object:fail(ErrorSourceStrings.Keys.MeshGeometry_ScaleAboveMaximum, {
+				meshName = handle:GetFullName(),
+				scaleMultiple = valueToString(v8),
+				maxScaleMultiple = valueToString(v7)
+			})
+		else
+			editableMeshVerts = UGCValidationService:GetEditableMeshVerts(handle2.editable)
+
+			for k, editableMeshVert in pairs(editableMeshVerts) do
+				v4 = handle.CFrame:PointToWorldSpace(editableMeshVert * scale)
+
+				if not pointInBounds(v4, v3, size) then
+					object:fail(ErrorSourceStrings.Keys.MeshGeometry_ExceedsBounds, {
+						meshName = rootInstance.Name,
+						assetTypeName = assetType.Name,
+						maxSizeX = string.format("%.2f", truncate(size.X)), -- inferred equivalent call
+						maxSizeY = string.format("%.2f", truncate(size.Y)), -- inferred equivalent call
+						maxSizeZ = string.format("%.2f", truncate(size.Z)) -- inferred equivalent call
+					})
+
+					return
+				end
+			end
+
+			v5 = (attachment.CFrame.Rotation * handle.Size):Abs()
+
+			if not (v5.X <= size.X and v5.Y <= size.Y and v5.Z <= size.Z) then
 				object:fail(ErrorSourceStrings.Keys.MeshGeometry_ExceedsBounds, {
-					meshName = rootInstance.Name,
+					meshName = handle:GetFullName(),
 					assetTypeName = assetType.Name,
 					maxSizeX = string.format("%.2f", truncate(size.X)), -- inferred equivalent call
 					maxSizeY = string.format("%.2f", truncate(size.Y)), -- inferred equivalent call
@@ -155,64 +282,9 @@ function MeshBoundsValid.run(object, data)
 
 				return
 			end
+
+			return deduplicatedTail()
 		end
-
-		v4 = (attachment.CFrame.Rotation * handle.Size):Abs()
-
-		if not (v4.X <= size.X and v4.Y <= size.Y and v4.Z <= size.Z) then
-			object:fail(ErrorSourceStrings.Keys.MeshGeometry_ExceedsBounds, {
-				meshName = handle:GetFullName(),
-				assetTypeName = assetType.Name,
-				maxSizeX = string.format("%.2f", truncate(size.X)), -- inferred equivalent call
-				maxSizeY = string.format("%.2f", truncate(size.Y)), -- inferred equivalent call
-				maxSizeZ = string.format("%.2f", truncate(size.Z)) -- inferred equivalent call
-			})
-		elseif data.consumerConfig.consumerEnv ~= ValidationEnums.ConsumerEnv.IEC then
-			v5, v6, v7, v8 = getMeshMinMax({
-				fullName = handle:GetFullName(),
-				fieldName = "MeshId",
-				editableMesh = handle2.editable,
-				scale = scale,
-				context = rootInstance.Name
-			}, { isServer = isServer, shouldYield = false })
-
-			if not v5 then
-				object:fetchError(string.format("Failed to compute mesh min/max for %s", handle:GetFullName()))
-			end
-
-			if v7 and v8 then
-				v9 = (v7 + v8) / 2
-
-				if getFIntUGCValidateMeshCenteringHundredsThreshold() / 100 < v9.Magnitude then
-					object:fail(ErrorSourceStrings.Keys.MeshGeometry_NotCentered, {
-						meshName = handle:GetFullName(),
-						fieldName = "MeshId"
-					})
-				end
-			end
-		end
-	end
-
-	if getFFlagUGCValidateMeshMaxScale() then
-		local x = scale.X
-
-		if not (defineFastInt2 / 1000 < x) then
-			local y = scale.Y
-
-			if not (defineFastInt2 / 1000 < y) then
-				local z = scale.Z
-
-				if not (defineFastInt2 / 1000 < z) then
-					editableMeshVerts = UGCValidationService:GetEditableMeshVerts(handle2.editable)
-					return deduplicatedTail()
-				end
-			end
-		end
-
-		object:fail(ErrorSourceStrings.Keys.MeshGeometry_ScaleTooLarge, { meshName = handle.Name })
-	else
-		editableMeshVerts = UGCValidationService:GetEditableMeshVerts(handle2.editable)
-		return deduplicatedTail()
 	end
 end
 

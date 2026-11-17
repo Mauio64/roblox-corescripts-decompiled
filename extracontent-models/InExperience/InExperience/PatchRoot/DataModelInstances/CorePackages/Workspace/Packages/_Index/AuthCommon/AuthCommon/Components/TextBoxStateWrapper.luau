@@ -4,7 +4,6 @@ local Cryo = require(parent.Cryo)
 local UIBlox = require(parent.UIBlox)
 local Foundation = require(parent.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local Roact = require(parent.Roact)
 
@@ -86,140 +85,81 @@ function extended.render(data)
 				HorizontalAlignment = Enum.HorizontalAlignment.Center,
 				Padding = UDim.new(0, data.props.TextBoxLabelPadding)
 			}),
-			TextBoxLabel = 0,
-			TextBox = 0,
+			TextBoxLabel = labelText and Roact.createElement("TextLabel", {
+				AutomaticSize = Enum.AutomaticSize.Y,
+				BackgroundTransparency = 1,
+				FontFace = normalizeFontFace(props.Tokens.Typography.CaptionLarge.Font),
+				LayoutOrder = 1,
+				Size = UDim2.fromScale(1, 0),
+				Text = labelText,
+				TextColor3 = props.Theme.TextEmphasis.Color,
+				TextSize = data.props.TextBoxLabelTextSize,
+				TextTransparency = props.Theme.TextEmphasis.Transparency,
+				TextWrapped = true,
+				TextXAlignment = Enum.TextXAlignment.Left
+			}),
+			TextBox = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				LayoutOrder = 2,
+				Size = data.props.Size,
+				[Roact.Ref] = data.props.buttonRef
+			}, {
+				Border = Roact.createElement(ImageSetLabel, {
+					Size = UDim2.new(1, 0, 1, 0),
+					ZIndex = 2,
+					BackgroundTransparency = 1,
+					ScaleType = Enum.ScaleType.Slice,
+					SliceCenter = Rect.new(9, 9, 9, 9),
+					Image = GetImageData("LuaApp/buttons/buttonStroke") or "LuaApp/buttons/buttonStroke",
+					ImageColor3 = color,
+					ImageTransparency = transparency
+				}),
+				TextBox = Roact.createElement(data.props.ChildClass, Cryo.Dictionary.join(data.props.ChildProps, {
+					Size = UDim2.new(1, 0, 1, 0),
+					onMouseEnter = data.onMouseEnter,
+					onMouseLeave = data.onMouseLeave,
+					onFocused = data.onFocused,
+					onFocusLost = data.onFocusLost
+				})),
+				IconWrapper = data.props.Icon and Roact.createElement("Frame", {
+					Size = UDim2.new(1, 0, 1, 0),
+					Position = UDim2.new(1, -2, 0, 0),
+					AnchorPoint = Vector2.new(1, 0),
+					BackgroundTransparency = 1,
+					ZIndex = 2
+				}, {
+					AspectRatio = Roact.createElement("UIAspectRatioConstraint", { AspectRatio = 1 }),
+					Icon = Roact.createElement(ImageSetLabel, {
+						Size = data.props.IconSize,
+						Position = UDim2.new(0.5, 0, 0.5, 0),
+						AnchorPoint = Vector2.new(0.5, 0.5),
+						BackgroundTransparency = 1,
+						Image = data.props.Icon,
+						ImageColor3 = color,
+						ImageTransparency = transparency
+					})
+				})
+			}),
 			ErrorText = 0,
 			HelpComponentWrapper = 0
 		}
 
-		local textBoxLabel = labelText
-
-		if textBoxLabel then
-			local createElement2 = Roact.createElement
-			local v2 = {
-				AutomaticSize = Enum.AutomaticSize.Y,
-				BackgroundTransparency = 1,
-				Font = 0,
-				FontFace = 0,
-				LayoutOrder = 1,
-				Size = 0,
-				Text = 0,
-				TextColor3 = 0,
-				TextSize = 0,
-				TextTransparency = 0,
-				TextWrapped = true,
-				TextXAlignment = 0
-			}
-			local font
-
-			if not FoundationFontFaceMigration then
-				font = props.Font.CaptionHeader.Font
-			end
-
-			v2.Font = font
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(props.Tokens.Typography.CaptionLarge.Font)
-			end
-
-			v2.FontFace = fontFace
-
-			v2.Size = UDim2.fromScale(1, 0)
-			v2.Text = labelText
-			v2.TextColor3 = props.Theme.TextEmphasis.Color
-			v2.TextSize = data.props.TextBoxLabelTextSize
-			v2.TextTransparency = props.Theme.TextEmphasis.Transparency
-
-			v2.TextXAlignment = Enum.TextXAlignment.Left
-			textBoxLabel = createElement2("TextLabel", v2)
-		end
-
-		v.TextBoxLabel = textBoxLabel
-
-		v.TextBox = Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			LayoutOrder = 2,
-			Size = data.props.Size,
-			[Roact.Ref] = data.props.buttonRef
-		}, {
-			Border = Roact.createElement(ImageSetLabel, {
-				Size = UDim2.new(1, 0, 1, 0),
-				ZIndex = 2,
-				BackgroundTransparency = 1,
-				ScaleType = Enum.ScaleType.Slice,
-				SliceCenter = Rect.new(9, 9, 9, 9),
-				Image = GetImageData("LuaApp/buttons/buttonStroke") or "LuaApp/buttons/buttonStroke",
-				ImageColor3 = color,
-				ImageTransparency = transparency
-			}),
-			TextBox = Roact.createElement(data.props.ChildClass, Cryo.Dictionary.join(data.props.ChildProps, {
-				Size = UDim2.new(1, 0, 1, 0),
-				onMouseEnter = data.onMouseEnter,
-				onMouseLeave = data.onMouseLeave,
-				onFocused = data.onFocused,
-				onFocusLost = data.onFocusLost
-			})),
-			IconWrapper = data.props.Icon and Roact.createElement("Frame", {
-				Size = UDim2.new(1, 0, 1, 0),
-				Position = UDim2.new(1, -2, 0, 0),
-				AnchorPoint = Vector2.new(1, 0),
-				BackgroundTransparency = 1,
-				ZIndex = 2
-			}, {
-				AspectRatio = Roact.createElement("UIAspectRatioConstraint", { AspectRatio = 1 }),
-				Icon = Roact.createElement(ImageSetLabel, {
-					Size = data.props.IconSize,
-					Position = UDim2.new(0.5, 0, 0.5, 0),
-					AnchorPoint = Vector2.new(0.5, 0.5),
-					BackgroundTransparency = 1,
-					Image = data.props.Icon,
-					ImageColor3 = color,
-					ImageTransparency = transparency
-				})
-			})
-		})
-
 		local errorText2 = errorText
 
 		if errorText2 then
-			local createElement2 = Roact.createElement
-			local v2 = {
+			errorText2 = Roact.createElement("TextLabel", {
 				AutomaticSize = Enum.AutomaticSize.Y,
 				BackgroundTransparency = 1,
-				Font = 0,
-				FontFace = 0,
+				FontFace = normalizeFontFace(props.Tokens.Typography.BodySmall.Font),
 				LayoutOrder = 3,
-				Size = 0,
-				Text = 0,
-				TextColor3 = 0,
-				TextSize = 0,
+				Size = UDim2.fromScale(1, 0),
+				Text = errorText,
+				TextColor3 = props.Theme.Alert.Color,
+				TextSize = props.Font.CaptionBody.RelativeSize * props.Font.BaseSize,
 				TextWrapped = true,
-				TextXAlignment = 0
-			}
-			local font
-
-			if not FoundationFontFaceMigration then
-				font = props.Font.CaptionBody.Font
-			end
-
-			v2.Font = font
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(props.Tokens.Typography.BodySmall.Font)
-			end
-
-			v2.FontFace = fontFace
-
-			v2.Size = UDim2.fromScale(1, 0)
-			v2.Text = errorText
-			v2.TextColor3 = props.Theme.Alert.Color
-			v2.TextSize = props.Font.CaptionBody.RelativeSize * props.Font.BaseSize
-
-			v2.TextXAlignment = Enum.TextXAlignment.Left
-			errorText2 = createElement2("TextLabel", v2, {
+				TextXAlignment = Enum.TextXAlignment.Left
+			}, {
 				Padding = data.props.InnerSidePadding ~= 0 and Roact.createElement("UIPadding", {
 					PaddingRight = UDim.new(0, data.props.InnerSidePadding),
 					PaddingLeft = UDim.new(0, data.props.InnerSidePadding)

@@ -5,6 +5,8 @@ local HttpService = game:GetService("HttpService")
 
 local React = require(parent.React)
 local ReactUtils = require(parent.ReactUtils)
+local Loggers = require(parent.Loggers)
+local v = Loggers.Logger:new(script.Name)
 local ToastNotification = require(parent.ToastNotification)
 local ToastNotificationsProtocol = require(parent.ToastNotificationsProtocol)
 
@@ -29,8 +31,8 @@ local function VoiceCallReceivedEventReceiver(p): nil
 	local ref = React.useRef({})
 
 	local function forgetToast(notificationId: string) -- 1 equivalent call inferred from this helper
-		for k, v in ref.current do
-			if v == notificationId then
+		for k, v2 in ref.current do
+			if v2 == notificationId then
 				ref.current[k] = nil
 				break
 			end
@@ -46,12 +48,12 @@ local function VoiceCallReceivedEventReceiver(p): nil
 			local callData = HttpService:JSONDecode(data.lifecycleData).callData
 			local callId = HttpService:JSONDecode(callData).callId
 			local status = callingService:GetCallingState(callId).status
-			local v
+			local v2
 
 			if data.content == nil then
-				v = false
+				v2 = false
 			else
-				v = data.content.currentState == "missed"
+				v2 = data.content.currentState == "missed"
 			end
 
 			if status == nil then
@@ -65,7 +67,7 @@ local function VoiceCallReceivedEventReceiver(p): nil
 			elseif status == CallingStatus.Ringing then
 				ref.current[callId] = data.notificationId
 			elseif status == CallingStatus.Missed then
-				if not v then
+				if not v2 then
 					default:updateNotification(data.notificationId, "missed")
 				end
 			else
@@ -85,23 +87,23 @@ local function VoiceCallReceivedEventReceiver(p): nil
 		end
 	end, { callingService, friendsCallingService })
 
-	local v = React.useCallback(function(p2)
-		local v = ref.current[p2.callId]
+	local v2 = React.useCallback(function(p2)
+		local v2 = ref.current[p2.callId]
 
-		if not (v ~= nil and p2.status ~= CallingStatus.Ringing) then
+		if not (v2 ~= nil and p2.status ~= CallingStatus.Ringing) then
 			return
 		end
 
 		if p2.status == CallingStatus.Missed then
 			ref.current[p2.callId] = nil
-			default:updateNotification(v, "missed")
+			default:updateNotification(v2, "missed")
 		else
 			ref.current[p2.callId] = nil
-			default:dismissNotification(v)
+			default:dismissNotification(v2)
 		end
 	end, {})
 
-	useEventConnection(callingService.OnCallingStateChange, v)
+	useEventConnection(callingService.OnCallingStateChange, v2)
 
 	React.useEffect(function()
 		return LifecycleEvents:RegisterCallback(
@@ -118,8 +120,25 @@ local function VoiceCallReceivedEventReceiver(p): nil
 
 				if visualItem.visualItemName == "AnswerCall" then
 					if FFlagFriendsCallingServiceLuaMigration then
+						for _, child in friendsCallingService:GetChildren() do
+							if
+								child.ClassName == "FriendsCallingInstance"
+								and child.CallId ~= ""
+								and child.CallId ~= callId
+							then
+								v:warning("Answering {} while {} is still up", callId, child.CallId)
+								break
+							end
+						end
+
 						friendsCallingService:AnswerCall(callId)
 					else
+						local callingState = callingService:GetCallingState()
+
+						if callingState.callId ~= nil and callingState.callId ~= callId then
+							v:warning("Answering {} while {} is still up", callId, callingState.callId)
+						end
+
 						callingService:AnswerIncomingCall(callId)
 					end
 				elseif visualItem.visualItemName == "DeclineCall" then

@@ -8,5 +8,5 @@ return {
 	GameCoPlay = "GameCoPlay",
 	TrendingSearches = "TrendingSearches",
 	Song = "Song",
-	AdLink = SharedFlags.FFlagLuaAppEnableHomepageOneByTwoTile and "AdLink" or nil
+	AdLink = SharedFlags.FFlagLuaAppEnableNxMRoduxApportioning and "AdLink" or nil
 }

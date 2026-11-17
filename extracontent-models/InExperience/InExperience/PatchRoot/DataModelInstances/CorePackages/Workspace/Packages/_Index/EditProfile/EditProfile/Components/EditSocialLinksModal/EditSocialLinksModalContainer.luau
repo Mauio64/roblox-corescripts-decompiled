@@ -92,7 +92,9 @@ local function EditSocialLinksModalContainer()
 				return HttpService:JSONDecode(p.Body)
 			end)
 
-			openEditSocialNetworksErrorModal(success and result and result.errors and result.errors[1] and result.errors[1].code or -1)
+			local code = success and result and result.errors and result.errors[1] and result.errors[1].code or -1
+
+			openEditSocialNetworksErrorModal(code)
 		end)
 	end
 

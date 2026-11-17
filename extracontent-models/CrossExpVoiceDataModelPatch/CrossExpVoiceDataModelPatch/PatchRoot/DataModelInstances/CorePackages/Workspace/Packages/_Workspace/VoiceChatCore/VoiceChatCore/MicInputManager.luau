@@ -23,6 +23,8 @@ local FFlagExpChatDictation = SharedFlags4.FFlagExpChatDictation
 local GetFFlagUseAudioAnalyzerForLocalMetering2 = require(Flags.GetFFlagUseAudioAnalyzerForLocalMetering2)
 local fFlagUseAudioAnalyzerForLocalMetering2 = GetFFlagUseAudioAnalyzerForLocalMetering2()
 local GetFFlagMicConsumerRegistry = require(Flags.GetFFlagMicConsumerRegistry)
+local FFlagMicSyncVoiceDeviceAcrossRejoin = require(Flags.FFlagMicSyncVoiceDeviceAcrossRejoin)
+local FFlagMicPermissionCheckOnConsumerUnmute = require(Flags.FFlagMicPermissionCheckOnConsumerUnmute)
 local FFlagMicRegistryIgnoreDefaultVoiceDevice = require(Flags.FFlagMicRegistryIgnoreDefaultVoiceDevice)
 
 local PERMISSION_STATE = Constants.PERMISSION_STATE
@@ -72,6 +74,8 @@ function MicInputManager.new(p)
 	object._developerAudioInstancesFolder = nil
 	object.levelChanged = Instance.new("BindableEvent")
 	object._lastLevel = 0
+	object._hasConsumerMicPermission = false
+	object._isRequestingConsumerMicPermission = false
 
 	return object
 end
@@ -195,21 +199,64 @@ function MicInputManager:SyncLocalAudioDeviceActive()
 		return
 	end
 
-	local active
+	if FFlagMicSyncVoiceDeviceAcrossRejoin then
+		if self:_setLocalPlayerAudioDevicesActive(self:_shouldLocalAudioDeviceBeActive()) then
+			self:_syncLocalAudioDeviceActiveToServer()
+		end
 
-	if self.localMuted == false then
-		active = not GetFFlagMicConsumerRegistry() or self._micIndicatorReady
+		self:_assertDeviceStateConsistency()
 	else
-		active = false
+		local active
+
+		if self.localMuted == false then
+			active = not GetFFlagMicConsumerRegistry() or self._micIndicatorReady
+		else
+			active = false
+		end
+
+		for k in self.callbacks.getAudioDevices() do
+			if k.Player and k.Player == Players.LocalPlayer then
+				k.Active = active
+			end
+		end
+
+		self:_assertDeviceStateConsistency()
 	end
+end
+
+function MicInputManager:_syncLocalAudioDeviceActiveToServer()
+	task.spawn(function()
+		local sendMuteEvent = self.callbacks.getSendMuteEvent()
+
+		if not sendMuteEvent then
+			return
+		end
+
+		local shouldLocalAudioDeviceBeActive = self:_shouldLocalAudioDeviceBeActive()
+
+		if self:_setLocalPlayerAudioDevicesActive(shouldLocalAudioDeviceBeActive) then
+			sendMuteEvent:FireServer(shouldLocalAudioDeviceBeActive)
+		end
+	end)
+end
+
+function MicInputManager:_shouldLocalAudioDeviceBeActive()
+	return self.localMuted == false and (not GetFFlagMicConsumerRegistry() or self._micIndicatorReady)
+end
+
+function MicInputManager:_setLocalPlayerAudioDevicesActive(active: boolean)
+	local v = false
 
 	for k in self.callbacks.getAudioDevices() do
-		if k.Player and k.Player == Players.LocalPlayer then
-			k.Active = active
+		if not (k.Player and k.Player == Players.LocalPlayer) then
+			continue
 		end
+
+		k.Active = active
+		v = true
 	end
 
-	self:_assertDeviceStateConsistency()
+	return v
 end
 
 function MicInputManager:SetupEarlyAudioDeviceGuard()
@@ -492,6 +539,14 @@ function MicInputManager:SetMicIndicatorReady(micIndicatorReady: boolean)
 		end
 	end
 
+	if
+		FFlagMicSyncVoiceDeviceAcrossRejoin
+		and VoiceChatService.UseNewAudioApi
+		and self._activeConsumerType == "VoiceChat"
+	then
+		self:_syncLocalAudioDeviceActiveToServer()
+	end
+
 	self:_assertDeviceStateConsistency()
 end
 
@@ -757,7 +812,12 @@ function MicInputManager:SetMicActiveForAllConsumers(flag: boolean, p: string?)
 			return
 		end
 
-		if GetFFlagJoinWithoutMicPermissions() then
+		if FFlagMicPermissionCheckOnConsumerUnmute and not self._hasConsumerMicPermission then
+			self:_requestConsumerMicPermission(p)
+			return
+		end
+
+		if not FFlagMicPermissionCheckOnConsumerUnmute and GetFFlagJoinWithoutMicPermissions() then
 			if self.permissionState == PERMISSION_STATE.LISTEN_ONLY then
 				self.log:debug("SetMicActiveForAllConsumers: permission denied")
 
@@ -824,6 +884,46 @@ function MicInputManager:SetMicActiveForAllConsumers(flag: boolean, p: string?)
 	end
 
 	self:_assertDeviceStateConsistency()
+end
+
+function MicInputManager:_requestConsumerMicPermission(p: string?)
+	if self._isRequestingConsumerMicPermission then
+		return
+	end
+
+	self._isRequestingConsumerMicPermission = true
+
+	local function onResult(p2: string?)
+		self._isRequestingConsumerMicPermission = false
+		self.log:debug("Consumer mic permission status {}", p2)
+
+		if p2 == permissionsProtocol.Status.AUTHORIZED or p2 == permissionsProtocol.Status.UNSUPPORTED then
+			self._hasConsumerMicPermission = true
+
+			if self._activeConsumerType ~= nil and self._activeConsumerType ~= "VoiceChat" then
+				self:SetMicActiveForAllConsumers(true, p)
+			end
+		elseif self.callbacks.emitOnMicPermissionDeniedToast then
+			self.callbacks.emitOnMicPermissionDeniedToast()
+		end
+	end
+
+	if GetFFlagDebugVoiceChatMicPermissionCliBypass() then
+		onResult(permissionsProtocol.Status.AUTHORIZED)
+	else
+		self.callbacks.requestPermissions({ permissionsProtocol.Permissions.MICROPHONE_ACCESS }):andThen(function(p2)
+			local v
+
+			if p2 then
+				v = p2.status
+			end
+
+			onResult(v)
+		end, function(p2)
+			self.log:warning("Consumer mic permission request failed: {}", (tostring(p2)))
+			onResult(nil)
+		end)
+	end
 end
 
 function MicInputManager:Disconnect()

@@ -9,7 +9,6 @@ local React = require(parent.React)
 
 local SharedFlags = require(parent.SharedFlags)
 local FFlagLuaAppChartsFilterOptionTextTag = SharedFlags.FFlagLuaAppChartsFilterOptionTextTag
-local defineFastFlag = game:DefineFastFlag("LuaAppWrapChartsFilterOptionLabels", false)
 
 local useTokens = Foundation.Hooks.useTokens
 
@@ -72,7 +71,7 @@ return function(props)
 			local v5 = {
 				tag = {
 					["auto-xy content-default gui-object-defaults size-0 text-color-defaults text-defaults text-size-defaults text-title-medium text-truncate-split text-align-x-left text-align-y-center shrink"] = true,
-					["text-wrap"] = defineFastFlag
+					["text-wrap"] = true
 				},
 				LayoutOrder = 1,
 				Text = option.optionDisplayName,

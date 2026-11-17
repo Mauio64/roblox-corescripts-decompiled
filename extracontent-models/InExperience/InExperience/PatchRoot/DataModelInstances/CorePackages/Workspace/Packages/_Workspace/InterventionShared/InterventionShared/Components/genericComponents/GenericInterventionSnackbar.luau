@@ -13,9 +13,11 @@ local defineFastInt = game:DefineFastInt("GenericInterventionSnackbarAutoDismiss
 
 local function GenericInterventionSnackbar(props)
 	useEffect(function()
+		local autoDismissDelaySeconds = props.autoDismissDelaySeconds or defineFastInt
+
 		local v = setTimeout(function()
 			props.onDismiss()
-		end, (props.autoDismissDelaySeconds or defineFastInt) * 1000)
+		end, autoDismissDelaySeconds * 1000)
 
 		return function()
 			if v then

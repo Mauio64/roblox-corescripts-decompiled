@@ -6,50 +6,35 @@ local Loggers = require(parent2.Loggers)
 
 local EnhancedVideoTelemetry = require(parent.EnhancedVideoTelemetry)
 
-local FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline = require(parent.FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline)
-
 local flaggedMutedError = Loggers.flaggedMutedError
 local createSignal = Signals.createSignal
 
 local serveEnhancedVideo = require(parent.serveEnhancedVideo)
 require(parent.Types)
 
-local interface = t.interface
-local v = {
+local interface = t.interface({
 	adDisclosureText = t.string,
 	showAdPreferencesUrl = t.boolean,
 	videoAssetId = t.string,
-	timelineJson = 0
-}
-local timelineJson2
-
-if FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline then
-	timelineJson2 = t.optional(t.string)
-end
-
-v.timelineJson = timelineJson2
-local v2 = interface(v)
+	timelineJson = t.optional(t.string)
+})
 
 function createEnhancedVideoStore()
-	local signal, v3 = createSignal("")
-	local signal2, v4 = createSignal(false)
-	local signal3, v5 = createSignal("")
-	local getTimelineJson, v6
+	local signal, v = createSignal("")
+	local signal2, v2 = createSignal(false)
+	local signal3, v3 = createSignal("")
+	local signal4, v4 = createSignal("")
 
-	if FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline then
-		getTimelineJson, v6 = createSignal("")
-	else
-		v6 = nil
-	end
-
-	local fn
-
-	if FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline then
-		fn = function(p, p2: number)
+	return {
+		getAdDisclosureText = signal,
+		getShowAdPreferencesUrl = signal2,
+		getVideoAssetId = signal3,
+		getTimelineJson = signal4,
+		fetchInitialData = function(p, p2: number)
 			return serveEnhancedVideo(p, p2):andThen(function(p3)
 				local responseBody = p3.responseBody
 
-				if not v2(responseBody) then
+				if not interface(responseBody) then
 					flaggedMutedError(
 						"EnhancedVideo_InvalidResponseSchema",
 						`Response does not match expected schema for universe {p2}`
@@ -58,50 +43,17 @@ function createEnhancedVideoStore()
 					return nil
 				end
 
-				v3(responseBody.adDisclosureText)
-				v4(responseBody.showAdPreferencesUrl)
-				v5(responseBody.videoAssetId)
+				v(responseBody.adDisclosureText)
+				v2(responseBody.showAdPreferencesUrl)
+				v3(responseBody.videoAssetId)
 				local timelineJson = responseBody.timelineJson or ""
-				v6(timelineJson)
+				v4(timelineJson)
 				return { videoAssetId = responseBody.videoAssetId, timelineJson = timelineJson }
 			end):catch(function(p3): nil
 				EnhancedVideoTelemetry.logServeEnhancedVideoError((tostring(p3)))
 				return nil
 			end)
 		end
-	else
-		fn = function(p, p2: number)
-			serveEnhancedVideo(p, p2):andThen(function(p3)
-				local responseBody = p3.responseBody
-
-				if not v2(responseBody) then
-					flaggedMutedError(
-						"EnhancedVideo_InvalidResponseSchema",
-						`Response does not match expected schema for universe ${p2}`
-					)
-
-					return
-				end
-
-				v3(responseBody.adDisclosureText)
-				v4(responseBody.showAdPreferencesUrl)
-				v5(responseBody.videoAssetId)
-			end):catch(function(p3)
-				EnhancedVideoTelemetry.logServeEnhancedVideoError((tostring(p3)))
-			end)
-		end
-	end
-
-	if not FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline then
-		getTimelineJson = nil
-	end
-
-	return {
-		getAdDisclosureText = signal,
-		getShowAdPreferencesUrl = signal2,
-		getVideoAssetId = signal3,
-		getTimelineJson = getTimelineJson,
-		fetchInitialData = fn
 	}
 end
 

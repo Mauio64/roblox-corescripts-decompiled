@@ -78,20 +78,20 @@ local function getStatusAndFetch(p: string)
 	return item, v5
 end
 
-local function resolveUserProfileField(profileModel, p: string, p2)
-	if p == "userId" then
+local function resolveUserProfileField(profileModel, item: string, p)
+	if item == "userId" then
 		return (tonumber(profileModel.userId))
-	elseif p == "username" then
-		return profileModel.names.getUsername(p2)
-	elseif p == "displayName" then
-		return profileModel.names.getDisplayName(p2)
+	elseif item == "username" then
+		return profileModel.names.getUsername(p)
+	elseif item == "displayName" then
+		return profileModel.names.getDisplayName(p)
 	end
 
-	if not (p == "isVerified" and profileModel.getIsVerified ~= nil) then
+	if not (item == "isVerified" and profileModel.getIsVerified ~= nil) then
 		return nil
 	end
 
-	return (profileModel.getIsVerified(p2))
+	return (profileModel.getIsVerified(p))
 end
 
 local function fetchNamesWithRetries(p: string, p2: number, count2: number)
@@ -111,11 +111,10 @@ local function fetchNamesWithRetries(p: string, p2: number, count2: number)
 		elseif p3.status == "failed" then
 			if p2 < defineFastInt then
 				task.delay(2 ^ p2 + math.random(), fetchNamesWithRetries, p, p2 + 1, count2)
-				return
+			else
+				v4[p] = nil
+				getNamesStatusCache().markItemsAsFailed({ p })
 			end
-
-			v4[p] = nil
-			getNamesStatusCache().markItemsAsFailed({ p })
 		end
 	end)
 end
@@ -181,11 +180,11 @@ function UserProfileDataHydration.resolveField(_: string, list, p: string, p2, _
 
 	local profileModel = getProfileModel(v5) -- inferred equivalent call
 
-	if profileModel then
-		return resolveUserProfileField(profileModel, list[2], p2), status
+	if not profileModel then
+		return nil, status
 	end
 
-	return nil, status
+	return resolveUserProfileField(profileModel, list[2], p2), status
 end
 
 function UserProfileDataHydration.updateFromHydration(items)

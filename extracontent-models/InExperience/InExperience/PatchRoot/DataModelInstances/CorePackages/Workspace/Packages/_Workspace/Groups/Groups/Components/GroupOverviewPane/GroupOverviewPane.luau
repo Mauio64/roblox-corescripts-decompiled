@@ -10,6 +10,9 @@ local Navigation = require(parent.Navigation)
 local React = require(parent.React)
 local SduiSharedUtilities = require(parent.SduiSharedUtilities)
 
+local SharedFlags = require(parent.SharedFlags)
+local FFlagGroupSduiPublishContainerWidth = SharedFlags.FFlagGroupSduiPublishContainerWidth
+
 local useGroupsWrapperContext = require(Groups.Contexts.useGroupsWrapperContext)
 local getGroupOverviewPaneConfig = require(Groups.Common.getGroupOverviewPaneConfig)
 local fetchGroupOverviewPane = require(Groups.Common.fetchGroupOverviewPane)
@@ -22,6 +25,7 @@ local SduiSurfaceLoadTimeTracker = SduiSharedUtilities.SduiSurfaceLoadTimeTracke
 local UiStatus = SduiSharedUtilities.UiStatus
 local useComponentConfig = SduiSharedUtilities.useComponentConfig
 local usePageScopeRef = SduiSharedUtilities.usePageScopeRef
+local usePublishContainerWidth = SduiSharedUtilities.usePublishContainerWidth
 local useUiStatus = SduiSharedUtilities.useUiStatus
 
 local function createPageTimer(config, page: string)
@@ -59,6 +63,15 @@ local function useFinishPageTimerWhenEmpty(configKey: string, p)
 	end, { p, v3 })
 end
 
+local function ContainerWidthFrame(p)
+	local ref = usePublishContainerWidth(p.configKey)
+	return React.createElement(
+		"Frame",
+		{ Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, BorderSizePixel = 0, ref = ref },
+		p.children
+	)
+end
+
 local function GroupOverviewPaneContent(props)
 	local config = props.config
 	local routeName = Navigation.useRouteName()
@@ -86,7 +99,7 @@ local function GroupOverviewPaneContent(props)
 		return { source = props.source }
 	end, { props.source })
 
-	return React.createElement(SduiPageEntryPoint, {
+	local element = React.createElement(SduiPageEntryPoint, {
 		appPage = AppPage.Groups,
 		routeName = routeName,
 		configKey = config.configKey,
@@ -97,6 +110,14 @@ local function GroupOverviewPaneContent(props)
 		disableRootPadding = true,
 		additionalAnalyticsData = additionalAnalyticsData
 	})
+
+	if FFlagGroupSduiPublishContainerWidth then
+		return React.createElement(ContainerWidthFrame, { configKey = config.configKey }, {
+			Page = element
+		})
+	end
+
+	return element
 end
 
 local function GroupOverviewPaneEmpty(p)

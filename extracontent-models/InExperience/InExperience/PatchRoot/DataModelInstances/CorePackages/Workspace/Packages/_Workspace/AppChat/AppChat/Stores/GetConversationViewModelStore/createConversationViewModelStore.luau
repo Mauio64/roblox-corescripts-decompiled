@@ -14,7 +14,7 @@ require(AppChat.Stores.GetConversationStore.createConversationStore)
 require(AppChat.Stores.GetConversationMessageStore.createConversationMessageStore)
 
 require(AppChat.Stores.GetConversationMessageListStore.createConversationMessageListStore)
-local getPreciseUnixTimestamp = require(AppChat.Utils.getPreciseUnixTimestamp)
+local getUnixTimestampMillis = require(AppChat.Utils.getUnixTimestampMillis)
 local Enums = require(AppChat.MessageData.Enums)
 require(AppChat.MessageData.Types)
 local RobloxAppLocales = require(parent.RobloxAppLocales)
@@ -66,26 +66,29 @@ local function getUnixTime(value)
 	return nil
 end
 
-local function getLatestUnixTime(conversation, p) -- 1 equivalent call inferred from this helper
-	local preciseUnixTimestamp = getPreciseUnixTimestamp(conversation.lastUpdated)
+local function getLatestUnixSeconds(conversation, p) -- 1 equivalent call inferred from this helper
+	local unixTimestampMillis = getUnixTimestampMillis(conversation.lastUpdated)
 	local v
 
 	if p ~= nil then
-		v = getPreciseUnixTimestamp(p.created_at)
+		v = getUnixTimestampMillis(p.created_at)
 	end
 
-	if v == nil or preciseUnixTimestamp ~= nil and not (preciseUnixTimestamp < v) then
-		return preciseUnixTimestamp
+	if v == nil or unixTimestampMillis ~= nil and not (unixTimestampMillis < v) then
+		v = unixTimestampMillis
 	end
 
-	return v
+	if v == nil then
+		return nil
+	end
+
+	return v / 1000
 end
 
 local function isNewerPreviewThanServer(conversation, p): boolean -- 1 equivalent call inferred from this helper
-	local preciseUnixTimestamp = getPreciseUnixTimestamp(conversation.lastUpdated)
-	local preciseUnixTimestamp2 = getPreciseUnixTimestamp(p.created_at)
-	return preciseUnixTimestamp2 ~= nil
-		and (preciseUnixTimestamp == nil or preciseUnixTimestamp <= preciseUnixTimestamp2)
+	local unixTimestampMillis = getUnixTimestampMillis(conversation.lastUpdated)
+	local unixTimestampMillis2 = getUnixTimestampMillis(p.created_at)
+	return unixTimestampMillis2 ~= nil and (unixTimestampMillis == nil or unixTimestampMillis <= unixTimestampMillis2)
 end
 
 local function getSubtitle(conversation, data)
@@ -479,7 +482,7 @@ local function createConversationViewModelStore(p, p2, p3)
 					v5.newestPreviewableMessage = newestPreviewableMessage
 				end
 
-				return getLatestUnixTime(conversation, newestPreviewableMessage(p5)) -- inferred equivalent call
+				return getLatestUnixSeconds(conversation, newestPreviewableMessage(p5)) -- inferred equivalent call
 			else
 				if conversation == nil then
 					return nil

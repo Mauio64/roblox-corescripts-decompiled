@@ -1,5 +1,4 @@
 local CorePackages = game:GetService("CorePackages")
-local TextService = game:GetService("TextService")
 local ContextActionService = game:GetService("ContextActionService")
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
 local UserInputService = game:GetService("UserInputService")
@@ -19,10 +18,8 @@ local Responsive = require(CorePackages.Workspace.Packages.Responsive)
 local useLastInput = Responsive.useLastInput
 
 local UIBlox = require(CorePackages.Packages.UIBlox)
-local Foundation = require(CorePackages.Packages.Foundation)
 local Style = require(CorePackages.Workspace.Packages.Style)
 local GetTextSize = Style.GetTextSize
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local Button = UIBlox.App.Button.Button
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local Toast = UIBlox.App.Dialog.Toast
@@ -769,55 +766,42 @@ function extended.render(props)
 	then
 		local toastTitle = props.state.toastContent.toastTitle
 		local font = props.promptStyle.Font.Header1.Font
-		local v23 = props.promptStyle.Font.Header1.RelativeSize * props.promptStyle.Font.BaseSize
+		local v23 = 20 + GetTextSize(
+			toastTitle,
+			props.promptStyle.Font.Header1.RelativeSize * props.promptStyle.Font.BaseSize,
+			font,
+			Vector2.new(325, 1e999),
+			{ addTemporaryPadding = false }
+		).Y
 		local v24
-
-		if FoundationFontFaceMigration then
-			v24 = GetTextSize(toastTitle, v23, font, Vector2.new(325, 1e999), {
-				addTemporaryPadding = false
-			}).Y
-		else
-			v24 = TextService:GetTextSize(toastTitle, v23, font, Vector2.new(325, 1e999)).Y
-		end
-
-		local v25 = 20 + v24
-		local v26
 
 		if
 			FFlagVoiceChatBanDurationUseServerTime
 			or v19
 			or GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and v20
 		then
-			v26 = props.state.banEnd
+			v24 = props.state.banEnd
 		else
-			v26 = formatByKey2 .. props.state.banEnd
+			v24 = formatByKey2 .. props.state.banEnd
 		end
 
-		local v27
+		local v25
 
 		if props.state.banEnd == "" then
-			v27 = props.state.toastContent.toastSubtitle .. props.state.banEnd
+			v25 = props.state.toastContent.toastSubtitle .. props.state.banEnd
 		else
-			v27 = "<b>" .. v26 .. "</b><br />" .. props.state.toastContent.toastSubtitle
+			v25 = "<b>" .. v24 .. "</b><br />" .. props.state.toastContent.toastSubtitle
 		end
 
-		local text = errorText or v27
+		local text = errorText or v25
 		local font2 = props.promptStyle.Font.Body.Font
-		local v28 = props.promptStyle.Font.Body.RelativeSize * props.promptStyle.Font.BaseSize
-		local v29
-
-		if FoundationFontFaceMigration then
-			v29 = GetTextSize(text, v28, font2, Vector2.new(325, 1e999), {
-				addTemporaryPadding = false
-			}).Y
-		else
-			v29 = TextService:GetTextSize(text, v28, font2, Vector2.new(325, 1e999)).Y
-		end
-
-		local v30 = 20 + v29
+		local v26 = props.promptStyle.Font.Body.RelativeSize * props.promptStyle.Font.BaseSize
+		local v27 = 20 + GetTextSize(text, v26, font2, Vector2.new(325, 1e999), {
+			addTemporaryPadding = false
+		}).Y
 
 		if v19 or v20 then
-			v30 += 20
+			v27 += 20
 		end
 
 		local text2
@@ -830,17 +814,9 @@ function extended.render(props)
 			text2 = formatByKey
 		end
 
-		local v31
-
-		if FoundationFontFaceMigration then
-			v31 = GetTextSize(text2, v28, font2, Vector2.new(325, 1e999), {
-				addTemporaryPadding = false
-			}).Y
-		else
-			v31 = TextService:GetTextSize(text2, v28, font2, Vector2.new(325, 1e999)).Y
-		end
-
-		local v32 = 20 + v31
+		local v28 = 20 + GetTextSize(text2, v26, font2, Vector2.new(325, 1e999), {
+			addTemporaryPadding = false
+		}).Y
 
 		local secondaryButton = ShouldShowSecondaryButton(props.state.promptType) -- inferred equivalent call
 		local stop
@@ -849,14 +825,14 @@ function extended.render(props)
 			stop = Enum.SelectionBehavior.Stop
 		end
 
-		local v38 = GetFFlagSupportGamepadNavInVoiceModals() and true or nil
+		local v29 = GetFFlagSupportGamepadNavInVoiceModals() and true or nil
 		local confirmButton
 
 		if defineFastFlag2 then
 			local createElement = Roact.createElement
-			local v41 = {}
-			v41.Size = UDim2.new(1, -5, 0, 48)
-			v41.LayoutOrder = 1
+			local v30 = {}
+			v30.Size = UDim2.new(1, -5, 0, 48)
+			v30.LayoutOrder = 1
 			local text3
 
 			if GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and VoiceNudgeUseNewDACopy() and v20 then
@@ -874,30 +850,30 @@ function extended.render(props)
 				text3 = formatByKey3
 			end
 
-			v41.Text = text3
+			v30.Text = text3
 
-			v41[Roact.Event.Activated] = props.handlePrimayActivated
-			v41[Roact.Event.MouseEnter] = function(p)
+			v30[Roact.Event.Activated] = props.handlePrimayActivated
+			v30[Roact.Event.MouseEnter] = function(p)
 				p.BackgroundColor3 = color2
 			end
-			v41[Roact.Event.MouseLeave] = function(p)
+			v30[Roact.Event.MouseLeave] = function(p)
 				p.BackgroundColor3 = color
 			end
-			v41.Selectable = v38
-			v41.BackgroundColor3 = color
-			v41.BackgroundTransparency = 0
-			v41.TextColor3 = Color3.fromRGB(0, 0, 0)
-			v41.BorderSizePixel = 0
-			v41.AutoButtonColor = false
+			v30.Selectable = v29
+			v30.BackgroundColor3 = color
+			v30.BackgroundTransparency = 0
+			v30.TextColor3 = Color3.fromRGB(0, 0, 0)
+			v30.BorderSizePixel = 0
+			v30.AutoButtonColor = false
 
-			v41.Font = Enum.Font.BuilderSansBold
-			v41.TextSize = 20
-			confirmButton = createElement("TextButton", v41, {
+			v30.Font = Enum.Font.BuilderSansBold
+			v30.TextSize = 20
+			confirmButton = createElement("TextButton", v30, {
 				Corner = Roact.createElement("UICorner", { CornerRadius = UDim.new(0, 8) })
 			})
 		else
 			local createElement = Roact.createElement
-			local v40 = {
+			local v30 = {
 				buttonType = ButtonType.PrimarySystem,
 				layoutOrder = 1,
 				size = UDim2.new(1, -5, 0, 48),
@@ -922,22 +898,22 @@ function extended.render(props)
 				text3 = formatByKey3
 			end
 
-			v40.text = text3
+			v30.text = text3
 
-			v40.onActivated = props.handlePrimayActivated
-			v40.Selectable = v38
-			confirmButton = createElement(Button, v40)
+			v30.onActivated = props.handlePrimayActivated
+			v30.Selectable = v29
+			confirmButton = createElement(Button, v30)
 		end
 
 		local createElement = Roact.createElement
-		local v41 = {
+		local v30 = {
 			DisplayOrder = 8,
 			IgnoreGuiInset = true,
 			OnTopOfCoreBlur = true,
 			Enabled = props.state.showPrompt,
 			ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 		}
-		local v42 = {
+		local v31 = {
 			Overlay = Roact.createElement("TextButton", {
 				AutoButtonColor = false,
 				BackgroundColor3 = props.promptStyle.Theme.Overlay.Color,
@@ -951,7 +927,7 @@ function extended.render(props)
 
 		local createElement2 = Roact.createElement
 		local imageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
-		local v43 = {
+		local v32 = {
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			BackgroundTransparency = 1,
 			Image = Assets.Images.RoundedRect.Image,
@@ -959,14 +935,14 @@ function extended.render(props)
 			ImageTransparency = props.promptStyle.Theme.BackgroundUIDefault.Transparency,
 			Position = UDim2.new(0.5, 0, 0.5, 0),
 			ScaleType = Assets.Images.RoundedRect.ScaleType,
-			Size = UDim2.new(0, 365, 0, 55 + v25 + 1 + v30 + 14 + v32 + 36 + 40),
+			Size = UDim2.new(0, 365, 0, 55 + v23 + 1 + v27 + 14 + v28 + 36 + 40),
 			AutomaticSize = y,
 			SliceCenter = Assets.Images.RoundedRect.SliceCenter,
 			SelectionBehaviorDown = stop,
 			SelectionBehaviorLeft = stop,
 			SelectionBehaviorRight = stop,
 			SelectionBehaviorUp = stop,
-			SelectionGroup = v38,
+			SelectionGroup = v29,
 			ref = 0
 		}
 		local ref
@@ -975,8 +951,8 @@ function extended.render(props)
 			ref = props.ref
 		end
 
-		v43.ref = ref
-		local v45 = {
+		v32.ref = ref
+		local v42 = {
 			Padding = Roact.createElement("UIPadding", {
 				PaddingTop = UDim.new(0, 20),
 				PaddingBottom = UDim.new(0, 20),
@@ -1002,7 +978,7 @@ function extended.render(props)
 				{
 					BackgroundTransparency = 1,
 					LayoutOrder = 2,
-					Size = UDim2.new(1, 0, 0, v25),
+					Size = UDim2.new(1, 0, 0, v23),
 					AutomaticSize = y
 				},
 				{
@@ -1029,7 +1005,7 @@ function extended.render(props)
 			}),
 			BodyTextContainer = Roact.createElement(
 				"Frame",
-				{ BackgroundTransparency = 1, LayoutOrder = 5, Size = UDim2.new(1, 0, 0, v30) },
+				{ BackgroundTransparency = 1, LayoutOrder = 5, Size = UDim2.new(1, 0, 0, v27) },
 				{
 					BodyText = Roact.createElement(UIBlox.App.Text.StyledTextLabel, {
 						fontStyle = props.promptStyle.Font.Body,
@@ -1050,7 +1026,7 @@ function extended.render(props)
 				{
 					BackgroundTransparency = 1,
 					LayoutOrder = 7,
-					Size = UDim2.new(1, 0, 0, v32),
+					Size = UDim2.new(1, 0, 0, v28),
 					AutomaticSize = y
 				},
 				{
@@ -1072,14 +1048,14 @@ function extended.render(props)
 		}
 
 		local createElement3 = Roact.createElement
-		local v47 = {
+		local v44 = {
 			BackgroundTransparency = 1,
 			LayoutOrder = 9,
 			Size = UDim2.new(1, 0, 0, 36),
 			AutomaticSize = y
 		}
 
-		local v48 = {
+		local v45 = {
 			Layout = Roact.createElement("UIListLayout", {
 				FillDirection = Enum.FillDirection.Vertical,
 				HorizontalAlignment = Enum.HorizontalAlignment.Center,
@@ -1094,7 +1070,7 @@ function extended.render(props)
 		if secondaryButton then
 			local createElement4 = Roact.createElement
 			local linkButton = UIBlox.App.Button.LinkButton
-			local v49 = {
+			local v46 = {
 				layoutOrder = defineFastFlag2 and 2 or 1,
 				size = UDim2.new(1, -5, 0, 36),
 				text = 0,
@@ -1103,20 +1079,20 @@ function extended.render(props)
 				onActivated = 0
 			}
 			local text3 = if v21 then v15 else formatByKey5
-			v49.text = text3
+			v46.text = text3
 
-			v49.onActivated = props.handleSecondaryActivated
-			secondaryButton = createElement4(linkButton, v49)
+			v46.onActivated = props.handleSecondaryActivated
+			secondaryButton = createElement4(linkButton, v46)
 		end
 
-		v48.SecondaryButton = secondaryButton
-		v45.ButtonContainer = createElement3("Frame", v47, v48)
-		v42.DialogMainFrame = createElement2(imageSetLabel, v43, v45)
-		local inGameMenuInformationalDialog = createElement("ScreenGui", v41, v42)
+		v45.SecondaryButton = secondaryButton
+		v42.ButtonContainer = createElement3("Frame", v44, v45)
+		v31.DialogMainFrame = createElement2(imageSetLabel, v32, v42)
+		local inGameMenuInformationalDialog = createElement("ScreenGui", v30, v31)
 
 		if v22 then
 			local createElement4 = Roact.createElement
-			local v50 = {
+			local v47 = {
 				titleText = v[props.state.promptType],
 				bodyText = v7[props.state.promptType],
 				handlePrimaryActivated = props.handlePrimayActivated,
@@ -1136,20 +1112,20 @@ function extended.render(props)
 				userInputService = props.props.UserInputService
 			end
 
-			v50.UserInputService = userInputService
+			v47.UserInputService = userInputService
 			local ref2
 
 			if GetFFlagSupportGamepadNavInVoiceModals() then
 				ref2 = props.ref
 			end
 
-			v50.ref = ref2
-			inGameMenuInformationalDialog = createElement4(DevicePermissionsModal, v50)
+			v47.ref = ref2
+			inGameMenuInformationalDialog = createElement4(DevicePermissionsModal, v47)
 		end
 
 		if voiceConsentModal then
 			local createElement4 = Roact.createElement
-			local v50 = {
+			local v47 = {
 				titleText = v[props.state.promptType],
 				bodyText = v7[props.state.promptType],
 				handlePrimaryActivated = props.handlePrimayActivated,
@@ -1166,8 +1142,8 @@ function extended.render(props)
 				ref2 = props.ref
 			end
 
-			v50.ref = ref2
-			inGameMenuInformationalDialog = createElement4(VoiceChatConsentModal, v50)
+			v47.ref = ref2
+			inGameMenuInformationalDialog = createElement4(VoiceChatConsentModal, v47)
 		end
 
 		return (Roact.createElement(Roact.Portal, { target = CoreGui }, {

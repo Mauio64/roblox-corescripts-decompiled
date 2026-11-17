@@ -71,7 +71,9 @@ local function InspectAvatarSheetContainer(p)
 		avatarBackgroundImage = useAvatarBackgroundFromWrapper()
 	end
 
-	local v7 = useInspectAvatarData(useProfileJsonComponent(Enums.Components.CurrentlyWearing).assets or {})
+	local assets = useProfileJsonComponent(Enums.Components.CurrentlyWearing).assets or {}
+
+	local v7 = useInspectAvatarData(assets)
 	local displayItems = v7.displayItems
 
 	local state, setState = React.useState({})

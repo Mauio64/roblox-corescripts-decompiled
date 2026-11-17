@@ -166,16 +166,16 @@ function PlatformLeaderboardController:_isRateLimited(p: number): boolean
 	local now = os.clock()
 	local rateLimit = self._rateLimits[p]
 
-	if rateLimit == nil or defineFastInt2 <= now - rateLimit.windowStart then
-		self._rateLimits[p] = { windowStart = now, count = 1 }
+	if rateLimit ~= nil and not (defineFastInt2 <= now - rateLimit.windowStart) then
+		if defineFastInt <= rateLimit.count then
+			return true
+		end
+
+		rateLimit.count += 1
 		return false
 	end
 
-	if defineFastInt <= rateLimit.count then
-		return true
-	end
-
-	rateLimit.count += 1
+	self._rateLimits[p] = { windowStart = now, count = 1 }
 	return false
 end
 

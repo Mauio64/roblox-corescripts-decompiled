@@ -77,17 +77,25 @@ function UserProfilesDataLoader:getLoader(p, p2, p3)
 		local joined = table.concat(clone, ",")
 		local now = os.clock()
 		local loadersByField = self.loadersByFields[joined]
+		local loader
 
-		if
-			loadersByField
-			and (getFFlagRemoveDataLoaderTimer() or not (defineFastInt < now - loadersByField.lastTime))
-		then
+		if loadersByField then
+			if getFFlagRemoveDataLoaderTimer() then
+				return loadersByField.loader
+			end
+
+			if defineFastInt < now - loadersByField.lastTime then
+				loader = self:makeDataLoader(p, clone, p3)
+				self.loadersByFields[joined] = { loader = loader, lastTime = now }
+				return loader
+			end
+
 			return loadersByField.loader
 		end
 
-		local dataLoader2 = self:makeDataLoader(p, clone, p3)
-		self.loadersByFields[joined] = { loader = dataLoader2, lastTime = now }
-		return dataLoader2
+		loader = self:makeDataLoader(p, clone, p3)
+		self.loadersByFields[joined] = { loader = loader, lastTime = now }
+		return loader
 	else
 		self.fieldsSet = Cryo.Dictionary.join(self.fieldsSet, convertToSet(p2))
 		local now = os.clock()

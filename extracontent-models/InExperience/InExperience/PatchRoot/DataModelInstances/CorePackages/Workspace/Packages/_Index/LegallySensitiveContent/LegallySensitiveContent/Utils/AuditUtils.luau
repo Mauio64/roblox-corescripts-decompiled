@@ -59,10 +59,10 @@ local function getAuditDataForConsent(p, data)
 	})[p] or {}
 end
 
-local function getAuditHeaderValue(list, surface: string, items)
+local function getAuditHeaderValue(auditDataForConsent, surface: string, items)
 	local content = {}
 
-	for _, item in ipairs(list) do
+	for _, item in ipairs(auditDataForConsent) do
 		local vars = {
 			hash = CryptoUtils.hashStringWithFnv1a32(item.consentStringTemplate)
 		}

@@ -89,12 +89,14 @@ return {
 						end
 
 						set[total] = true
-						fn2("c:{%s}||cc:{%d}||tpr[c]:{%s}", tostring(c), v8:byte(), (tostring(v7[c])))
+						local c2 = c
+						fn2("c:{%s}||cc:{%d}||tpr[c]:{%s}", tostring(c2), v8:byte(), (tostring(v7[c])))
 						fn2("busy[i]:{%s},i:{%d}", tostring(set[total]), total)
 						fn2("[FindPH]:#LINE# Success! || i=%d", total)
 					end
 
-					fn2("c:{%s}||cc:{%d}||tpr[c]:{%s}", c, v8:byte(), (tostring(v7[c])))
+					local c2 = c
+					fn2("c:{%s}||cc:{%d}||tpr[c]:{%s}", c2, v8:byte(), (tostring(v7[c])))
 					fn2("%s", (tostring(set[total])))
 				end
 

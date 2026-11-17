@@ -21,11 +21,13 @@ local FFlagUserTileShowBadges = SharedFlags3.FFlagUserTileShowBadges
 local SharedFlags4 = require(parent.SharedFlags)
 local FFlagEnableMobileGameJoinCard = SharedFlags4.FFlagEnableMobileGameJoinCard
 local SharedFlags5 = require(parent.SharedFlags)
-local FFlagUserTileAddContextualInfoIcon = SharedFlags5.FFlagUserTileAddContextualInfoIcon
+local FFlagSocialCarouselInGamePlayIcon = SharedFlags5.FFlagSocialCarouselInGamePlayIcon
 local SharedFlags6 = require(parent.SharedFlags)
-local FFlagUserTileTitleStackAddExtraInfo = SharedFlags6.FFlagUserTileTitleStackAddExtraInfo
+local FFlagUserTileAddContextualInfoIcon = SharedFlags6.FFlagUserTileAddContextualInfoIcon
 local SharedFlags7 = require(parent.SharedFlags)
-local FFlagUserTileUnfilteredChatIndicator = SharedFlags7.FFlagUserTileUnfilteredChatIndicator
+local FFlagUserTileTitleStackAddExtraInfo = SharedFlags7.FFlagUserTileTitleStackAddExtraInfo
+local SharedFlags8 = require(parent.SharedFlags)
+local FFlagUserTileUnfilteredChatIndicator = SharedFlags8.FFlagUserTileUnfilteredChatIndicator
 
 local function UserTile(props)
 	local state, setState = React.useState(false)
@@ -48,8 +50,16 @@ local function UserTile(props)
 		selection = { Selectable = props.selectable },
 		onStateChanged = onStateChanged,
 		onActivated = props.onActivated,
-		stateLayer = { affordance = Enums.StateLayerAffordance.None }
+		stateLayer = { affordance = Enums.StateLayerAffordance.None },
+		ref = 0
 	}
+	local ref
+
+	if FFlagSocialCarouselInGamePlayIcon then
+		ref = props.buttonRef
+	end
+
+	v2.ref = ref
 
 	local createElement2 = React.createElement
 	local v3 = { tag = "size-full aspect-1-1", Size = props.avatarSize, LayoutOrder = 1 }

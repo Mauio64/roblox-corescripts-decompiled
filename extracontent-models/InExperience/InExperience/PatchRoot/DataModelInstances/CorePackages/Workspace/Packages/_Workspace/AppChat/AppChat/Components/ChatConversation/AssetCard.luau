@@ -8,9 +8,6 @@ local ChatBubbleContainer = require(script.Parent.Bubble.ChatBubbleContainer)
 local Constants = require(AppChat.Constants)
 local Foundation = require(parent.Foundation)
 local useScaledValue = Foundation.Hooks.useScaledValue
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
-local AppCommonLib = require(parent.AppCommonLib)
-local Text = AppCommonLib.Text
 local Style = require(parent.Style)
 local GetTextSize = Style.GetTextSize
 
@@ -198,20 +195,13 @@ local function AssetCardTemp(p)
 		end
 
 		local v7 = union.parentWidth - (TEXT_BUBBLE_X_PADDING + BUBBLE_PADDING) * 2 - (not union.wideMode and 0 or TEXT_BUBBLE_X_WIDE_ADDITIONAL_PADDING)
-		local v8
-
-		if FoundationFontFaceMigration then
-			v8 = GetTextSize(url, union.textSize, union.font, Vector2.new(v7, 10000))
-		else
-			v8 = Text.GetTextBounds(url, union.font, union.textSize, Vector2.new(v7, 10000))
-		end
-
+		local textSize = GetTextSize(url, union.textSize, union.font, Vector2.new(v7, 10000))
 		return Roact.createElement(PlainText, {
 			text = url,
 			font = union.font,
 			textSize = union.textSize,
 			innerPadding = union.innerPadding,
-			maxWidth = v8.X + BUBBLE_PADDING * 2,
+			maxWidth = textSize.X + BUBBLE_PADDING * 2,
 			hasTail = union.hasTail,
 			isIncoming = union.isIncoming,
 			isPending = union.isPending,

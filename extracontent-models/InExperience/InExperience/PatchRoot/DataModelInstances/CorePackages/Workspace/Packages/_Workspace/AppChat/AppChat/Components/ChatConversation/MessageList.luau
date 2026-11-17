@@ -168,6 +168,7 @@ function extended:init()
 				showDateTime = props.showDateTime,
 				messageId = props.messageId,
 				senderTargetId = 0,
+				conversationId = 0,
 				debugElement = 0
 			}
 			local senderTargetId
@@ -177,6 +178,7 @@ function extended:init()
 			end
 
 			v2.senderTargetId = senderTargetId
+			v2.conversationId = self.props.conversationId
 
 			v2.debugElement = debugElement
 			return createElement(SystemMessageContainer, v2)

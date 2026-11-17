@@ -56,15 +56,13 @@ local FFlagLuaAppMediaGalleryGamepadSupport = SharedFlags4.FFlagLuaAppMediaGalle
 local SharedFlags5 = require(parent.SharedFlags)
 local FFlagSduiPageEntryPointResolvedSlot = SharedFlags5.FFlagSduiPageEntryPointResolvedSlot
 local SharedFlags6 = require(parent.SharedFlags)
-local FFlagSduiSrpScrollAway = SharedFlags6.FFlagSduiSrpScrollAway
+local FFlagAppThemeHalloween2026HomeBackground = SharedFlags6.FFlagAppThemeHalloween2026HomeBackground
 local SharedFlags7 = require(parent.SharedFlags)
-local FFlagAppThemeHalloween2026HomeBackground = SharedFlags7.FFlagAppThemeHalloween2026HomeBackground
+local FFlagSduiVerticalFeedScrollTelemetry = SharedFlags7.FFlagSduiVerticalFeedScrollTelemetry
 local SharedFlags8 = require(parent.SharedFlags)
-local FFlagSduiVerticalFeedScrollTelemetry = SharedFlags8.FFlagSduiVerticalFeedScrollTelemetry
+local FFlagLuaAppSduiVideoThumbnail = SharedFlags8.FFlagLuaAppSduiVideoThumbnail
 local SharedFlags9 = require(parent.SharedFlags)
-local FFlagLuaAppSduiVideoThumbnail = SharedFlags9.FFlagLuaAppSduiVideoThumbnail
-local SharedFlags10 = require(parent.SharedFlags)
-local FFlagLuaAppOneByTwoHoverIdleAutoplay = SharedFlags10.FFlagLuaAppOneByTwoHoverIdleAutoplay
+local FFlagLuaAppOneByTwoHoverIdleAutoplay = SharedFlags9.FFlagLuaAppOneByTwoHoverIdleAutoplay
 
 local function SduiPageEntryPoint(props, p)
 	local appPage = props.appPage
@@ -228,13 +226,8 @@ local function SduiPageEntryPoint(props, p)
 		end
 
 		extraLocalProps.scrollToSelectionRevealOnly = scrollToSelectionRevealOnly
-		local onScrollDirectionChanged
 
-		if FFlagSduiSrpScrollAway then
-			onScrollDirectionChanged = props.onScrollDirectionChanged
-		end
-
-		extraLocalProps.onScrollDirectionChanged = onScrollDirectionChanged
+		extraLocalProps.onScrollDirectionChanged = props.onScrollDirectionChanged
 		extraLocalProps.defaultContentTag = props.contentTag
 		extraLocalProps.defaultStickyContentTag = props.stickyContentTag
 		local scrollPerformanceIntervalName
@@ -266,12 +259,7 @@ local function SduiPageEntryPoint(props, p)
 		scrollToSelectionRevealOnly = props.scrollToSelectionRevealOnly
 	end
 
-	local onScrollDirectionChanged
-
-	if FFlagSduiSrpScrollAway then
-		onScrollDirectionChanged = props.onScrollDirectionChanged
-	end
-
+	local onScrollDirectionChanged = props.onScrollDirectionChanged
 	local scrollPerformanceIntervalName
 
 	if FFlagSduiVerticalFeedScrollTelemetry then

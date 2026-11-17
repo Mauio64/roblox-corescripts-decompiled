@@ -1,6 +1,5 @@
 local IXPService = game:GetService("IXPService")
 local UserInputService = game:GetService("UserInputService")
-local TextService = game:GetService("TextService")
 local AppChat = script:FindFirstAncestor("AppChat")
 local parent = AppChat.Parent
 
@@ -20,7 +19,6 @@ local EnumScreens = require(AppChat.EnumScreens)
 local Cryo = require(parent.Cryo)
 local Foundation = require(parent.Foundation)
 local Skeleton = Foundation.Skeleton
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
 local Style = require(parent.Style)
 local GetTextSize = Style.GetTextSize
@@ -81,6 +79,10 @@ local FFlagAppChatConsoleFocusFixes = require(AppChat.Flags.FFlagAppChatConsoleF
 local FFlagAppChatAlignAvatarToMessageGroupBottom = require(AppChat.Flags.FFlagAppChatAlignAvatarToMessageGroupBottom)
 local useDescendantSelected = require(script.Parent.Hooks.useDescendantSelected)
 local useDescendantSelected2 = useDescendantSelected.useDescendantSelected
+local MessageReactionChip = require(script.Parent.MessageReactions.MessageReactionChip)
+local useIsInExperience = require(AppChat.Hooks.useIsInExperience)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAppChatEnableReactions = SharedFlags.FFlagAppChatEnableReactions
 
 local defineFastFlag = game:DefineFastFlag("AppChatEnableRepliesUIIxpEnabled2", false)
 
@@ -147,6 +149,14 @@ function ChatMessageContainer(p)
 		v3 = false
 	end
 
+	local v4
+
+	if FFlagAppChatEnableReactions then
+		v4 = not useIsInExperience()
+	else
+		v4 = false
+	end
+
 	local useCallback = React.useCallback
 	local function fn()
 		if joined.viewProfileOnAvatarPressed then
@@ -160,21 +170,21 @@ function ChatMessageContainer(p)
 		openViewProfile = joined.openViewProfile
 	end
 
-	local v4
+	local v5
 
 	if FFlagAppChatConsoleFocusFixes then
-		v4 = joined.viewProfileOnAvatarPressed
+		v5 = joined.viewProfileOnAvatarPressed
 	end
 
-	local onActivated = useCallback(fn, { senderUserId, openViewProfile, v4 })
+	local onActivated = useCallback(fn, { senderUserId, openViewProfile, v5 })
 
-	local v5 = useStyle()
+	local v6 = useStyle()
 	local shouldShowName = joined.shouldShowName
-	local v6 = useChatPagePadding()
+	local v7 = useChatPagePadding()
 
-	local v7 = Foundation.Hooks.useTokens()
+	local v8 = Foundation.Hooks.useTokens()
 
-	local v8 = React.useMemo(function()
+	local v9 = React.useMemo(function()
 		if not defineFastFlag2 then
 			return {
 				direction = SwipeDirection.Right,
@@ -238,44 +248,44 @@ function ChatMessageContainer(p)
 	local ref = React.useRef(nil)
 	local ref2 = React.useRef(nil)
 	local ref3 = React.useRef(Vector2.zero)
-	local v9
+	local v10
 
 	if FFlagAppChatMessageModelOnDemand then
-		local v10 = React.useContext(ChatConversationTelemetryLayer.Context)
-		v9 = React.useMemo(function()
-			return createTelemetryEmitter(v10)
-		end, { v10 })
+		local v11 = React.useContext(ChatConversationTelemetryLayer.Context)
+		v10 = React.useMemo(function()
+			return createTelemetryEmitter(v11)
+		end, { v11 })
 	else
-		v9 = useTelemetry(ChatConversationTelemetryLayer.Context)
+		v10 = useTelemetry(ChatConversationTelemetryLayer.Context)
 	end
 
-	local v10 = useTriggerFeedback()
+	local v11 = useTriggerFeedback()
 	local state, setState = React.useState(false)
 	local state2, setState2 = React.useState(false)
 	local state3, setState3 = React.useState(false)
-	local v11, v12
+	local v12, v13
 
 	if FFlagAppChatConsoleFocusFixes then
-		v11, v12 = useDescendantSelected2()
+		v12, v13 = useDescendantSelected2()
 	else
-		v11 = nil
 		v12 = nil
+		v13 = nil
 	end
 
-	local v13
+	local v14
 
 	if FFlagAppChatConsoleFocusFixes then
-		local v14 = ReactFocusNavigation.useFocusGuiObject()
+		local v15 = ReactFocusNavigation.useFocusGuiObject()
 
-		v13 = React.useCallback(function()
+		v14 = React.useCallback(function()
 			local current = ref2.current
 
 			if current then
-				v14(current)
+				v15(current)
 			end
-		end, { ref2, v14 })
+		end, { ref2, v15 })
 	else
-		v13 = nil
+		v14 = nil
 	end
 
 	React.useEffect(function()
@@ -287,8 +297,8 @@ function ChatMessageContainer(p)
 		end
 	end)
 
-	local v14 = React.useMemo(function()
-		local v14 = {
+	local v15 = React.useMemo(function()
+		local v15 = {
 			conversationId = joined.conversationId,
 			targetMessageSenderId = joined.senderUserId,
 			targetMessageId = joined.messageId,
@@ -302,10 +312,10 @@ function ChatMessageContainer(p)
 			targetMessageSentAt = joined.sent.dateTime
 		end
 
-		v14.targetMessageSentAt = targetMessageSentAt
-		v14.targetMessageLength = joined.content and #joined.content or nil
-		v14.targetMessageVisibility = joined.visibility
-		return v14
+		v15.targetMessageSentAt = targetMessageSentAt
+		v15.targetMessageLength = joined.content and #joined.content or nil
+		v15.targetMessageVisibility = joined.visibility
+		return v15
 	end, {
 		joined.conversationId,
 		joined.senderUserId,
@@ -314,106 +324,106 @@ function ChatMessageContainer(p)
 		joined.content,
 		joined.visibility
 	})
-	local v15
+	local v16
 
 	if FFlagAppChatConsoleFocusFixes then
-		v15 = React.useMemo(function()
-			return not v3 and (state2 or v11)
-		end, { state2, v3, v11 })
+		v16 = React.useMemo(function()
+			return not v3 and (state2 or v12)
+		end, { state2, v3, v12 })
 	else
-		v15 = React.useMemo(function()
+		v16 = React.useMemo(function()
 			return not v3 and state2
 		end, { state2, v3 })
 	end
 
 	React.useEffect(function()
-		if v15 and joined.isLastIncomingChatMessage then
+		if v16 and joined.isLastIncomingChatMessage then
 			MessageFtuxTooltipDismissSignal.dismiss(MessageFtuxTooltipVariant.Replies)
 		end
-	end, { v15, joined.isLastIncomingChatMessage })
+	end, { v16, joined.isLastIncomingChatMessage })
 	local emitImpressionTelemetryEvent = React.useCallback(function()
-		v9.emit(ChatConversationTelemetryEvents.ConversationMessageReplyIconImpression, v14)
-	end, { v9, v14 })
-	local v16 = useNavigation()
-	local v17 = useGetConversationFromId(joined.conversationId)
-	local v18
+		v10.emit(ChatConversationTelemetryEvents.ConversationMessageReplyIconImpression, v15)
+	end, { v10, v15 })
+	local v17 = useNavigation()
+	local v18 = useGetConversationFromId(joined.conversationId)
+	local v19
 
 	if FFlagAppChatSignalsReplyStore then
-		v18 = GetReplyingToStore(false)
+		v19 = GetReplyingToStore(false)
 	else
-		v18 = nil
+		v19 = nil
 	end
 
-	local v19 = nil
 	local v20 = nil
+	local v21 = nil
 
 	if
 		FFlagAppChatMessageModelOnDemand
 		and shouldReadMessageListFromSignalsStore
 		and GetConversationMessageViewModelStore
 	then
-		v20 = GetConversationMessageViewModelStore(false).conversationMessageStore.messages[joined.messageId]
+		v21 = GetConversationMessageViewModelStore(false).conversationMessageStore.messages[joined.messageId]
 	elseif shouldReadMessageListFromSignalsStore and GetConversationMessageViewModelStore then
 		local message = GetConversationMessageViewModelStore(false).conversationMessageStore.messages[joined.messageId]
 
 		if message then
-			v19 = MessageModel.fromChannelsApi(message, joined.conversationId)
+			v20 = MessageModel.fromChannelsApi(message, joined.conversationId)
 		else
-			v19 = nil
+			v20 = nil
 		end
-	elseif v17 and v17.messages then
-		v19 = v17.messages:Get(joined.messageId)
+	elseif v18 and v18.messages then
+		v20 = v18.messages:Get(joined.messageId)
 	end
 
-	local v21
+	local v22
 
 	if FFlagAppChatMessageModelOnDemand then
-		v21 = React.useCallback(function()
-			if v20 then
-				return MessageModel.fromChannelsApi(v20, joined.conversationId)
+		v22 = React.useCallback(function()
+			if v21 then
+				return MessageModel.fromChannelsApi(v21, joined.conversationId)
 			end
 
-			return v19
-		end, { v20, v19, joined.conversationId })
+			return v20
+		end, { v21, v20, joined.conversationId })
 	else
-		v21 = nil
+		v22 = nil
 	end
 
-	local v22 = useReplyingToMessageDispatch()
-	local v23 = useLocalUserId()
+	local v23 = useReplyingToMessageDispatch()
+	local v24 = useLocalUserId()
 
 	local onSwipeThresholdReached = React.useCallback(function()
 		if not v3 then
-			v10(HapticFeedbackContext.Default, HapticFeedbackType.Press)
+			v11(HapticFeedbackContext.Default, HapticFeedbackType.Press)
 		end
-	end, { v3, v10 })
+	end, { v3, v11 })
 
 	local useCallback2 = React.useCallback
 	local function fn2()
-		v9.emit(ChatConversationTelemetryEvents.ConversationMessageSwiped, v14)
+		v10.emit(ChatConversationTelemetryEvents.ConversationMessageSwiped, v15)
 
 		if not v3 then
-			if FFlagAppChatSignalsReplyStore and v18 then
-				v18.setReplyingTo(joined.messageId)
+			if FFlagAppChatSignalsReplyStore and v19 then
+				v19.setReplyingTo(joined.messageId)
 				return
 			end
 
-			local v24
+			local v25
 
 			if FFlagAppChatMessageModelOnDemand then
-				v24 = v21()
+				v25 = v22()
 			else
-				v24 = v19
+				v25 = v20
 			end
 
-			v22(v24)
+			v23(v25)
 		end
 	end
 
-	local v24
+	local v25
 
 	if FFlagAppChatSignalsReplyStore then
-		v24 = v18
+		v25 = v19
 	end
 
 	local messageId
@@ -422,45 +432,45 @@ function ChatMessageContainer(p)
 		messageId = joined.messageId
 	end
 
-	local v25
+	local v26
 
 	if FFlagAppChatMessageModelOnDemand then
-		v25 = v21
+		v26 = v22
 	end
 
-	local v26 = useSwipeGesture({
+	local v27 = useSwipeGesture({
 		onSwipeThresholdReached = onSwipeThresholdReached,
-		onSwipeComplete = useCallback2(fn2, { v22, v19, v9, v14, v3, v24, messageId, v25 }),
-		direction = v8.direction
+		onSwipeComplete = useCallback2(fn2, { v23, v20, v10, v15, v3, v25, messageId, v26 }),
+		direction = v9.direction
 	})
 
-	local v27 = React.useCallback(function()
-		v16.navigate(EnumScreens.MessageContextMenu, {
+	local v28 = React.useCallback(function()
+		v17.navigate(EnumScreens.MessageContextMenu, {
 			messageId = joined.messageId,
 			conversationId = joined.conversationId,
 			inputBoxRef = joined.inputBoxRef
 		})
-	end, { v16.navigate, joined.messageId, joined.conversationId, joined.inputBoxRef })
+	end, { v17.navigate, joined.messageId, joined.conversationId, joined.inputBoxRef })
 
-	local v28 = React.useCallback(function(p2, p3, p4: number)
+	local v29 = React.useCallback(function(p2, p3, p4: number)
 		if p3 then
 			ref3.current = Vector2.new(p3.Position.X, p3.Position.Y)
 		end
 
 		setTimeout(function()
-			local v28
+			local v29
 
 			if p3 then
 				local current = ref3.current
-				v28 = (Vector2.new(p3.Position.X, p3.Position.Y) - current).Magnitude
+				v29 = (Vector2.new(p3.Position.X, p3.Position.Y) - current).Magnitude
 			else
-				v28 = 0
+				v29 = 0
 			end
 
 			if
 				p3
 				and (p3.UserInputState == Enum.UserInputState.Begin or p3.UserInputState == Enum.UserInputState.Change)
-				and v28 < defineFastInt
+				and v29 < defineFastInt
 			then
 				handleEvent(p2, p3)
 			end
@@ -489,27 +499,27 @@ function ChatMessageContainer(p)
 
 		if UserInputService.GamepadEnabled or UserInputService.TouchEnabled or joined.unitTestTouchEnabled then
 			if p2 == React.Event.TouchLongPress then
-				v9.emit(ChatConversationTelemetryEvents.ConversationMessageLongPressed, v14)
+				v10.emit(ChatConversationTelemetryEvents.ConversationMessageLongPressed, v15)
 
 				if not v3 then
 					setState3(true)
 
 					if FFlagAppChatEnableMessageContextMenu then
-						v27()
+						v28()
 					end
 
-					v28(React.Event.InputEnded, p3, ChatMessageContainerConstants.PEEK_VIEW_ANIMATION_MILLISEC)
+					v29(React.Event.InputEnded, p3, ChatMessageContainerConstants.PEEK_VIEW_ANIMATION_MILLISEC)
 				end
 			end
 
 			if p2 == React.Event.InputBegan and p3 then
-				v9.emit(ChatConversationTelemetryEvents.ConversationMessagePressed, v14)
+				v10.emit(ChatConversationTelemetryEvents.ConversationMessagePressed, v15)
 
 				if not (v3 or state3) then
 					GlobalLongPressSignal.dismiss()
 				end
 
-				v28(React.Event.TouchLongPress, p3, ChatMessageContainerConstants.LONG_PRESS_DELAY_MILLISEC)
+				v29(React.Event.TouchLongPress, p3, ChatMessageContainerConstants.LONG_PRESS_DELAY_MILLISEC)
 			end
 
 			if p2 == React.Event.TouchTap then
@@ -522,31 +532,31 @@ function ChatMessageContainer(p)
 
 			if p4 == OptionsEnum.MessageContextMenu then
 				if ChatConversationTelemetryEvents.ConversationMessageOpenMenuIconClicked then
-					v9.emit(ChatConversationTelemetryEvents.ConversationMessageOpenMenuIconClicked, v14)
+					v10.emit(ChatConversationTelemetryEvents.ConversationMessageOpenMenuIconClicked, v15)
 				end
 
-				v27()
+				v28()
 			end
 
 			if p4 == OptionsEnum.Reply then
-				v9.emit(ChatConversationTelemetryEvents.ConversationMessageReplyIconClicked, v14)
+				v10.emit(ChatConversationTelemetryEvents.ConversationMessageReplyIconClicked, v15)
 
-				v10(HapticFeedbackContext.Default, HapticFeedbackType.Press)
+				v11(HapticFeedbackContext.Default, HapticFeedbackType.Press)
 
-				if FFlagAppChatSignalsReplyStore and v18 then
-					v18.setReplyingTo(joined.messageId)
+				if FFlagAppChatSignalsReplyStore and v19 then
+					v19.setReplyingTo(joined.messageId)
 					return
 				end
 
-				local v29
+				local v30
 
 				if FFlagAppChatMessageModelOnDemand then
-					v29 = v21()
+					v30 = v22()
 				else
-					v29 = v19
+					v30 = v20
 				end
 
-				v22(v29)
+				v23(v30)
 			end
 		end
 	end
@@ -555,108 +565,108 @@ function ChatMessageContainer(p)
 	local unitTestTouchEnabled = joined.unitTestTouchEnabled
 	local mouseEnabled = UserInputService.MouseEnabled
 	local touchEnabled = UserInputService.TouchEnabled
-	local v29
-
-	if FFlagAppChatSignalsReplyStore then
-		v29 = v18
-	end
-
 	local v30
 
-	if not FFlagAppChatSignalsReplyStore then
+	if FFlagAppChatSignalsReplyStore then
 		v30 = v19
 	end
 
 	local v31
 
-	if FFlagAppChatSignalsReplyStore then
-		v31 = joined.messageId
+	if not FFlagAppChatSignalsReplyStore then
+		v31 = v20
 	end
 
-	local v32 = {
+	local v32
+
+	if FFlagAppChatSignalsReplyStore then
+		v32 = joined.messageId
+	end
+
+	local v40 = {
 		isPending,
 		unitTestTouchEnabled,
 		mouseEnabled,
 		touchEnabled,
-		v28,
+		v29,
 		setState2,
 		setState3,
 		setState,
-		v9,
-		v27,
-		v22,
 		v10,
+		v28,
+		v23,
+		v11,
 		v3,
-		v29,
 		v30,
 		v31,
+		v32,
 		nil,
 		nil,
 		nil
 	}
-	local v40
+	local v45
 
 	if FFlagAppChatMessageModelOnDemand and not FFlagAppChatSignalsReplyStore then
-		v40 = v21
+		v45 = v22
 	end
 
-	local v41
+	local v46
 
 	if FFlagAppChatMessageModelOnDemand then
-		v41 = v14
+		v46 = v15
 	end
 
-	local v42
+	local v47
 
 	if FFlagAppChatMessageModelOnDemand then
-		v42 = joined.closeKeyboard
+		v47 = joined.closeKeyboard
 	end
 
-	v32[17], v32[18], v32[19] = v40, v41, v42
-	handleEvent = useCallback3(fn3, v32)
+	v40[17], v40[18], v40[19] = v45, v46, v47
+	handleEvent = useCallback3(fn3, v40)
 
-	local v43 = React.useCallback(function(p2, p3)
-		if UserInputService.TouchEnabled and v26 then
-			v26.onInputBegan(p2, p3)
+	local v48 = React.useCallback(function(p2, p3)
+		if UserInputService.TouchEnabled and v27 then
+			v27.onInputBegan(p2, p3)
 
 			MessageFtuxTooltipDismissSignal.dismiss(MessageFtuxTooltipVariant.Replies)
 		end
 
-		v28(React.Event.InputBegan, p3, ChatMessageContainerConstants.INPUT_BEGAN_DELAY_MILLISEC)
-	end, { v28, v26 })
+		v29(React.Event.InputBegan, p3, ChatMessageContainerConstants.INPUT_BEGAN_DELAY_MILLISEC)
+	end, { v29, v27 })
 
-	local v44 = React.useCallback(function(_)
+	local v49 = React.useCallback(function(_)
 		handleEvent(React.Event.InputEnded)
 	end, { handleEvent })
 
-	local v45 = React.useCallback(function(_)
+	local v50 = React.useCallback(function(_)
 		handleEvent(React.Event.MouseEnter)
 	end, { handleEvent })
 
-	local v46 = React.useCallback(function(_)
+	local v51 = React.useCallback(function(_)
 		handleEvent(React.Event.MouseLeave)
 	end, { handleEvent })
 
-	local v47 = React.useCallback(function(_)
+	local v52 = React.useCallback(function(_)
 		handleEvent(React.Event.TouchTap)
 	end, { handleEvent })
 
-	local v48 = React.useCallback(function(_)
+	local v53 = React.useCallback(function(_)
 		handleEvent(React.Event.MouseButton1Down)
 	end, { handleEvent })
 
 	local senderTargetId = joined.repliesTo and joined.repliesTo.senderTargetId
 
 	local function getDisplayNameText(senderName: string, repliedToName: string)
-		local senderIsLocalUser = v23 == joined.senderUserId
+		local senderIsLocalUser = v24 == joined.senderUserId
 		local senderRepliedToSelf = joined.senderUserId == joined.repliesTo.senderTargetId
-		local senderRepliedToLocalUser = v23 == joined.repliesTo.senderTargetId
+		local senderRepliedToLocalUser = v24 == joined.repliesTo.senderTargetId
 
 		if not senderTargetId then
 			return senderName
 		end
 
-		local conversationType = v17 and v17.conversationType
+		local conversationType = v18 and v18.conversationType
 
 		if
 			conversationType == Conversation.Type.ONE_TO_ONE_CONVERSATION
@@ -681,122 +691,105 @@ function ChatMessageContainer(p)
 		table.insert(senderTargetIds, joined.repliesTo.senderTargetId)
 	end
 
-	local v49 = nil
-	local v50 = nil
+	local v54 = nil
+	local v55 = nil
 
 	if FFlagAppChatUseUserProfileHydration then
-		v50 = useProfileNames(senderTargetIds)
+		v55 = useProfileNames(senderTargetIds)
 	else
-		v49 = UserProfiles.Hooks.useUserProfilesFetch({
+		v54 = UserProfiles.Hooks.useUserProfilesFetch({
 			userIds = senderTargetIds,
 			query = UserProfiles.Queries.userProfilesCombinedNameAndUsernameByUserIds
 		})
 	end
 
-	local v51, displayName2
+	local v56, displayName2
 
 	if FFlagAppChatUseUserProfileHydration then
-		local combinedNameFromProfileNames = getCombinedNameFromProfileNames(v50, joined.senderUserId)
-		local v53
+		local combinedNameFromProfileNames = getCombinedNameFromProfileNames(v55, joined.senderUserId)
+		local v58
 
 		if senderTargetId then
-			v53 = getCombinedNameFromProfileNames(v50, joined.repliesTo.senderTargetId)
+			v58 = getCombinedNameFromProfileNames(v55, joined.repliesTo.senderTargetId)
 		end
 
-		if v50 == nil or v50.status == DataStatus.Ready then
-			v51 = false
+		if v55 == nil or v55.status == DataStatus.Ready then
+			v56 = false
 		else
-			v51 = combinedNameFromProfileNames == nil or senderTargetId and v53 == nil
+			v56 = combinedNameFromProfileNames == nil or senderTargetId and v58 == nil
 		end
 
-		if not v51 then
+		if not v56 then
 			if senderTargetId then
 				displayName2 = getDisplayNameText(
 					combinedNameFromProfileNames or joined.unknownUserKey,
-					v53 or joined.unknownUserKey
+					v58 or joined.unknownUserKey
 				)
 			else
 				displayName2 = combinedNameFromProfileNames or joined.unknownUserKey
 			end
 		end
-	elseif v49.data then
-		v51 = false
-		displayName2 = UserProfiles.Selectors.getCombinedNameFromId(v49.data, joined.senderUserId)
+	elseif v54.data then
+		v56 = false
+		displayName2 = UserProfiles.Selectors.getCombinedNameFromId(v54.data, joined.senderUserId)
 			or joined.unknownUserKey
 
 		if senderTargetId then
 			displayName2 = getDisplayNameText(
 				displayName2,
-				UserProfiles.Selectors.getCombinedNameFromId(v49.data, joined.repliesTo.senderTargetId) or joined.unknownUserKey
+				UserProfiles.Selectors.getCombinedNameFromId(v54.data, joined.repliesTo.senderTargetId) or joined.unknownUserKey
 			)
 		end
 	else
-		v51 = true
+		v56 = true
 	end
 
 	local displayName = useLocalization(senderTargetId and { displayName = displayName2 } or {}).displayName
 		or displayName2
 
-	local useCallback4 = React.useCallback
-	local function fn4()
+	local v58 = React.useCallback(function()
 		local vector2_3 = Vector2.new(
 			math.max(1, joined.messageMaxWidth - ChatMessageContainerConstants.TAIL_WIDTH),
 			1e999
 		)
-		local v53
+		local textSize = GetTextSize(
+			displayName,
+			v6.Font.BaseSize * v6.Font.Footer.RelativeSize,
+			v8.Typography.CaptionSmall.Font,
+			vector2_3,
+			{ addTemporaryPadding = false }
+		)
 
-		if FoundationFontFaceMigration then
-			v53 = GetTextSize(
-				displayName,
-				v5.Font.BaseSize * v5.Font.Footer.RelativeSize,
-				v7.Typography.CaptionSmall.Font,
-				vector2_3,
-				{ addTemporaryPadding = false }
-			)
-		else
-			v53 = TextService:GetTextSize(
-				displayName,
-				v5.Font.BaseSize * v5.Font.Footer.RelativeSize,
-				v5.Font.Footer.Font,
-				vector2_3
-			)
-		end
-
-		return UDim2.new(0, v53.X, 0, v53.Y)
-	end
-
-	local v54 = v5.Font.BaseSize * v5.Font.Footer.RelativeSize
-	local font = v5.Font.Footer.Font
-	local v55 = joined.messageMaxWidth - ChatMessageContainerConstants.TAIL_WIDTH
-	local v56
-
-	if FoundationFontFaceMigration then
-		v56 = v7.Typography.CaptionSmall.Font
-	end
-
-	local v57 = useCallback4(fn4, { v54, font, v55, displayName, v56 })
-	local v58
+		return UDim2.new(0, textSize.X, 0, textSize.Y)
+	end, {
+		v6.Font.BaseSize * v6.Font.Footer.RelativeSize,
+		v6.Font.Footer.Font,
+		joined.messageMaxWidth - ChatMessageContainerConstants.TAIL_WIDTH,
+		displayName,
+		v8.Typography.CaptionSmall.Font
+	})
+	local v59
 
 	if joined.showDateTime then
-		v58 = 0
+		v59 = 0
 	else
-		local v59
+		local v60
 
 		if joined.isNewSender or senderTargetId then
-			v59 = ChatMessageContainerConstants.CHAT_MESSAGE_MAX_SPACE
+			v60 = ChatMessageContainerConstants.CHAT_MESSAGE_MAX_SPACE
 		else
-			v59 = ChatMessageContainerConstants.CHAT_MESSAGE_MIN_SPACE
+			v60 = ChatMessageContainerConstants.CHAT_MESSAGE_MIN_SPACE
 		end
 
-		v58 = v59 + joined.messageTypePaddingOffset
+		v59 = v60 + joined.messageTypePaddingOffset
 	end
 
-	local left = v6.left
-	local v59 = left + v7.Size.Size_700
+	local left = v7.left
+	local v60 = left + v8.Size.Size_700
 	local left2 = joined.isIncoming and Enum.HorizontalAlignment.Left or Enum.HorizontalAlignment.Right
 
 	local state4, setState4 = React.useState(false)
-	local v60 = React.useCallback(function()
+	local v61 = React.useCallback(function()
 		if getFFlagDebugAppChat() then
 			setState4(function(p2): boolean
 				return not p2
@@ -819,13 +812,13 @@ function ChatMessageContainer(p)
 		return React.createElement(Foundation.Icon, {
 			name = Foundation.Enums.IconName.TriangleExclamation,
 			size = Foundation.Enums.IconSize.Large,
-			style = v7.Color.System.Alert,
+			style = v8.Color.System.Alert,
 			LayoutOrder = joined.isIncoming and 0 or 3
 		})
-	end, { v7, v5, joined.isIncoming })
+	end, { v8, v6, joined.isIncoming })
 
 	if not (joined.failed or joined.moderated) then
-		if v15 then
+		if v16 then
 			icons = React.createElement(Options, {
 				LayoutOrder = joined.isIncoming and 2 or 1,
 				isIncoming = joined.isIncoming,
@@ -840,10 +833,10 @@ function ChatMessageContainer(p)
 	local isIncoming = joined.isIncoming
 	local style
 
-	if v26 and v26.swipeProgress then
-		style = v26.swipeProgress:map(function(p2: number)
+	if v27 and v27.swipeProgress then
+		style = v27.swipeProgress:map(function(p2: number)
 			local transparency = 1 - math.pow(p2, 3)
-			return { Color3 = v7.Color.Content.Default.Color3, Transparency = transparency }
+			return { Color3 = v8.Color.Content.Default.Color3, Transparency = transparency }
 		end)
 	else
 		style = nil
@@ -851,9 +844,9 @@ function ChatMessageContainer(p)
 
 	local position
 
-	if v26 and v26.swipeOffset then
-		position = v26.swipeOffset:map(function(p2: number)
-			if v8.direction ~= SwipeDirection.Right then
+	if v27 and v27.swipeOffset then
+		position = v27.swipeOffset:map(function(p2: number)
+			if v9.direction ~= SwipeDirection.Right then
 				p2 = -p2
 			end
 
@@ -865,9 +858,9 @@ function ChatMessageContainer(p)
 
 	local position2
 
-	if v26 and v26.swipeProgress then
-		position2 = v26.swipeProgress:map(function(p2: number)
-			return v8.messagePosition + UDim2.new(0, p2 * v8.iconOffset, 0, 0)
+	if v27 and v27.swipeProgress then
+		position2 = v27.swipeProgress:map(function(p2: number)
+			return v9.messagePosition + UDim2.new(0, p2 * v9.iconOffset, 0, 0)
 		end)
 	else
 		position2 = nil
@@ -875,21 +868,21 @@ function ChatMessageContainer(p)
 
 	local function renderMessage()
 		local createElement = React.createElement
-		local v68 = {
+		local v69 = {
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			AutomaticSize = Enum.AutomaticSize.Y,
 			LayoutOrder = 2,
 			Size = UDim2.new(1, 0, 0, 0),
 			Position = position,
-			[React.Event.MouseEnter] = v45,
-			[React.Event.MouseLeave] = v46
+			[React.Event.MouseEnter] = v50,
+			[React.Event.MouseLeave] = v51
 		}
-		local v69 = {
+		local v70 = {
 			Padding = React.createElement("UIPadding", {
-				PaddingTop = UDim.new(0, v58),
-				PaddingLeft = UDim.new(0, joined.thumbnail and left or v59),
-				PaddingRight = UDim.new(0, v6.right - 0)
+				PaddingTop = UDim.new(0, v59),
+				PaddingLeft = UDim.new(0, joined.thumbnail and left or v60),
+				PaddingRight = UDim.new(0, v7.right - 0)
 			}),
 			Layout = React.createElement("UIListLayout", {
 				FillDirection = Enum.FillDirection.Horizontal,
@@ -921,33 +914,45 @@ function ChatMessageContainer(p)
 			})
 		end
 
-		v69.AvatarContainer = avatarContainer
+		v70.AvatarContainer = avatarContainer
 
 		local createElement2 = React.createElement
-		local v72 = {
+		local v73 = {
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			LayoutOrder = 2,
 			AutomaticSize = Enum.AutomaticSize.Y,
-			Size = UDim2.new(1, joined.isIncoming and -v59 or 0, 0, 0)
+			Size = UDim2.new(1, joined.isIncoming and -v60 or 0, 0, 0)
 		}
-		local v73 = {
-			Layout = React.createElement("UIListLayout", {
-				FillDirection = Enum.FillDirection.Vertical,
-				HorizontalAlignment = left2
-			}),
+
+		local createElement3 = React.createElement
+		local v75 = {
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = left2,
+			SortOrder = 0
+		}
+		local sortOrder
+
+		if FFlagAppChatEnableReactions then
+			sortOrder = Enum.SortOrder.LayoutOrder
+		end
+
+		v75.SortOrder = sortOrder
+		local children = {
+			Layout = createElement3("UIListLayout", v75),
 			Padding = React.createElement("UIPadding", {
-				PaddingLeft = UDim.new(0, joined.isIncoming and v7.Size.Size_200 or 0)
+				PaddingLeft = UDim.new(0, joined.isIncoming and v8.Size.Size_200 or 0)
 			}),
 			DisplayNameContainer = 0,
-			MessageWithIcons = 0
+			MessageWithIcons = 0,
+			MessageReactionChip = 0
 		}
 
 		local displayNameContainer = shouldShowName
 
 		if displayNameContainer then
-			local createElement3 = React.createElement
-			local v76 = {
+			local createElement4 = React.createElement
+			local v79 = {
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
 				Size = UDim2.new(0, joined.messageMaxWidth - ChatMessageContainerConstants.TAIL_WIDTH, 0, 0),
@@ -955,8 +960,8 @@ function ChatMessageContainer(p)
 				LayoutOrder = 1
 			}
 
-			local createElement4 = React.createElement
-			local v79 = {
+			local createElement5 = React.createElement
+			local v82 = {
 				PaddingLeft = UDim.new(0, ChatMessageContainerConstants.GROUPED_MESSAGE_DISPLAY_NAME_LEFT_PADDING),
 				PaddingRight = 0,
 				PaddingBottom = 0
@@ -969,7 +974,7 @@ function ChatMessageContainer(p)
 				paddingRight = UDim.new(0, ChatMessageContainerConstants.TAIL_WIDTH)
 			end
 
-			v79.PaddingRight = paddingRight
+			v82.PaddingRight = paddingRight
 			local paddingBottom
 
 			if senderTargetId then
@@ -978,34 +983,21 @@ function ChatMessageContainer(p)
 				paddingBottom = UDim.new(0, ChatMessageContainerConstants.GROUPED_MESSAGE_DISPLAY_NAME_BOTTOM_PADDING)
 			end
 
-			v79.PaddingBottom = paddingBottom
-			local v77 = {
-				Padding = createElement4("UIPadding", v79),
+			v82.PaddingBottom = paddingBottom
+			local v80 = {
+				Padding = createElement5("UIPadding", v82),
 				DisplayName = 0,
 				ShimmerName = 0
 			}
 			local displayName3
 
-			if not v51 then
-				local createElement5 = React.createElement
-				local font2
-
-				if not FoundationFontFaceMigration then
-					font2 = v5.Font.Footer.Font
-				end
-
-				local fontFace
-
-				if FoundationFontFaceMigration then
-					fontFace = normalizeFontFace(v7.Typography.CaptionSmall.Font)
-				end
-
-				local v84 = {
+			if not v56 then
+				local createElement6 = React.createElement
+				local v87 = {
 					BackgroundTransparency = 1,
 					BorderSizePixel = 0,
-					Font = font2,
-					FontFace = fontFace,
-					Size = v57(),
+					FontFace = normalizeFontFace(v8.Typography.CaptionSmall.Font),
+					Size = v58(),
 					AnchorPoint = 0,
 					Position = 0,
 					Text = 0,
@@ -1023,7 +1015,7 @@ function ChatMessageContainer(p)
 					anchorPoint = Vector2.new(1, 0)
 				end
 
-				v84.AnchorPoint = anchorPoint
+				v87.AnchorPoint = anchorPoint
 				local position3
 
 				if isIncoming then
@@ -1032,11 +1024,11 @@ function ChatMessageContainer(p)
 					position3 = UDim2.fromScale(1, 0)
 				end
 
-				v84.Position = position3
-				v84.Text = displayName
-				v84.TextColor3 = v5.Theme.TextDefault.Color
-				v84.TextSize = v5.Font.BaseSize * v5.Font.Footer.RelativeSize
-				v84.TextTransparency = v5.Theme.TextDefault.Transparency
+				v87.Position = position3
+				v87.Text = displayName
+				v87.TextColor3 = v6.Theme.TextDefault.Color
+				v87.TextSize = v6.Font.BaseSize * v6.Font.Footer.RelativeSize
+				v87.TextTransparency = v6.Theme.TextDefault.Transparency
 				local textXAlignment
 
 				if isIncoming then
@@ -1045,17 +1037,17 @@ function ChatMessageContainer(p)
 					textXAlignment = Enum.TextXAlignment.Right
 				end
 
-				v84.TextXAlignment = textXAlignment
+				v87.TextXAlignment = textXAlignment
 
-				v84.TextYAlignment = Enum.TextYAlignment.Top
-				displayName3 = createElement5("TextLabel", v84)
+				v87.TextYAlignment = Enum.TextYAlignment.Top
+				displayName3 = createElement6("TextLabel", v87)
 			end
 
-			v77.DisplayName = displayName3
+			v80.DisplayName = displayName3
 			local shimmerName
 
-			if v51 then
-				local createElement5 = React.createElement
+			if v56 then
+				local createElement6 = React.createElement
 				local anchorPoint
 
 				if isIncoming then
@@ -1072,7 +1064,7 @@ function ChatMessageContainer(p)
 					position3 = UDim2.fromScale(1, 0)
 				end
 
-				shimmerName = createElement5(Skeleton, {
+				shimmerName = createElement6(Skeleton, {
 					AnchorPoint = anchorPoint,
 					Position = position3,
 					Size = UDim2.new(
@@ -1085,50 +1077,50 @@ function ChatMessageContainer(p)
 				})
 			end
 
-			v77.ShimmerName = shimmerName
-			displayNameContainer = createElement3("Frame", v76, v77)
+			v80.ShimmerName = shimmerName
+			displayNameContainer = createElement4("Frame", v79, v80)
 		end
 
-		v73.DisplayNameContainer = displayNameContainer
+		children.DisplayNameContainer = displayNameContainer
 
-		local createElement3 = React.createElement
-		local v76 = {}
-		v76.BackgroundTransparency = 1
-		v76.BorderSizePixel = 0
-		v76.LayoutOrder = 2
-		v76.AutomaticSize = Enum.AutomaticSize.Y
+		local createElement4 = React.createElement
+		local v79 = {}
+		v79.BackgroundTransparency = 1
+		v79.BorderSizePixel = 0
+		v79.LayoutOrder = 2
+		v79.AutomaticSize = Enum.AutomaticSize.Y
 		local size
 
 		if FFlagAppChatConsoleFocusFixes then
 			size = UDim2.new(1, 0, 0, 0)
 		else
-			size = UDim2.new(1, joined.isIncoming and -v59 or 0, 0, 0)
+			size = UDim2.new(1, joined.isIncoming and -v60 or 0, 0, 0)
 		end
 
-		v76.Size = size
+		v79.Size = size
 		local selectable
 
 		if FFlagAppChatConsoleFocusFixes then
 			selectable = not v3
 		end
 
-		v76.Selectable = selectable
+		v79.Selectable = selectable
 		local ref4
 
 		if FFlagAppChatConsoleFocusFixes then
-			ref4 = v12
+			ref4 = v13
 		end
 
-		v76.ref = ref4
+		v79.ref = ref4
 		local selectionGained = React.Event.SelectionGained
-		local v80
+		local v83
 
 		if FFlagAppChatConsoleFocusFixes then
-			v80 = v13
+			v83 = v14
 		end
 
-		v76[selectionGained] = v80
-		local v81 = {
+		v79[selectionGained] = v83
+		local v84 = {
 			Layout = React.createElement("UIListLayout", {
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				FillDirection = Enum.FillDirection.Horizontal,
@@ -1142,23 +1134,23 @@ function ChatMessageContainer(p)
 		}
 
 		local renderMessage2 = joined.renderMessage
-		local v82 = {
+		local v85 = {
 			LayoutOrder = joined.isIncoming and 1 or 2,
-			[React.Event.InputBegan] = v43,
-			[React.Event.InputEnded] = v44,
-			[React.Event.TouchTap] = v47,
-			[React.Event.MouseButton1Down] = v48
+			[React.Event.InputBegan] = v48,
+			[React.Event.InputEnded] = v49,
+			[React.Event.TouchTap] = v52,
+			[React.Event.MouseButton1Down] = v53
 		}
-		local v83 = { isPressed = state, Icons = icons, bubbleRef = nil, ref = nil }
+		local v86 = { isPressed = state, Icons = icons, bubbleRef = nil, ref = nil }
 		local bubbleRef
 
 		if FFlagAppChatConsoleFocusFixes then
 			bubbleRef = ref2
 		end
 
-		v83.bubbleRef = bubbleRef
-		v83.ref = ref
-		v81.Message = renderMessage2(v82, v83)
+		v86.bubbleRef = bubbleRef
+		v86.ref = ref
+		v84.Message = renderMessage2(v85, v86)
 		local messageFtuxTooltip2
 
 		if joined.isLastIncomingChatMessage and not v3 then
@@ -1169,10 +1161,21 @@ function ChatMessageContainer(p)
 			})
 		end
 
-		v81.MessageFtuxTooltip = messageFtuxTooltip2
-		v73.MessageWithIcons = createElement3("Frame", v76, v81)
-		v69.MessageWithDisplayName = createElement2("Frame", v72, v73)
-		local element = createElement("Frame", v68, v69)
+		v84.MessageFtuxTooltip = messageFtuxTooltip2
+		children.MessageWithIcons = createElement4("Frame", v79, v84)
+		local messageReactionChip
+
+		if v4 then
+			messageReactionChip = React.createElement(MessageReactionChip, {
+				messageId = joined.messageId,
+				isIncoming = joined.isIncoming,
+				layoutOrder = 3
+			})
+		end
+
+		children.MessageReactionChip = messageReactionChip
+		v70.MessageWithDisplayName = createElement2("Frame", v73, children)
+		local element = createElement("Frame", v69, v70)
 
 		if v3 then
 			return element
@@ -1183,10 +1186,10 @@ function ChatMessageContainer(p)
 			{ tag = "size-full-0 auto-y", ClipsDescendants = false, LayoutOrder = 2, ZIndex = 2 },
 			{
 				ReplyIconFilled = React.createElement(Foundation.Icon, {
-					name = v8.iconName,
+					name = v9.iconName,
 					size = Foundation.Enums.IconSize.Medium,
 					variant = Foundation.Enums.IconVariant.Filled,
-					AnchorPoint = v8.iconAnchorPoint,
+					AnchorPoint = v9.iconAnchorPoint,
 					Position = position2,
 					style = style,
 					ZIndex = 1
@@ -1202,7 +1205,7 @@ function ChatMessageContainer(p)
 		end
 	end, { joined.isLastIncomingChatMessage })
 	local createElement = React.createElement
-	local v67 = {
+	local v68 = {
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		["AutomaticSize"] = Enum.AutomaticSize.Y,
@@ -1212,11 +1215,11 @@ function ChatMessageContainer(p)
 	local activated = React.Event.Activated
 
 	if not getFFlagDebugAppChat() then
-		v60 = nil
+		v61 = nil
 	end
 
-	v67[activated] = v60
-	local v68 = {
+	v68[activated] = v61
+	local v69 = {
 		Layout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			HorizontalAlignment = left2,
@@ -1234,7 +1237,7 @@ function ChatMessageContainer(p)
 
 	if notice then
 		local createElement2 = React.createElement
-		local v69 = {
+		local v70 = {
 			Font = joined.Font,
 			HorizontalAlignment = left2,
 			LayoutOrder = 3,
@@ -1250,41 +1253,41 @@ function ChatMessageContainer(p)
 		local textColor
 
 		if v3 then
-			textColor = v7.Color.Content.Muted.Color3
+			textColor = v8.Color.Content.Muted.Color3
 		else
-			textColor = joined.moderated and v5.Theme.Alert.Color or v5.Theme.UIDefault.Color
+			textColor = joined.moderated and v6.Theme.Alert.Color or v6.Theme.UIDefault.Color
 		end
 
-		v69.TextColor3 = textColor
+		v70.TextColor3 = textColor
 		local textTransparency
 
 		if v3 then
-			textTransparency = v7.Color.Content.Muted.Transparency
+			textTransparency = v8.Color.Content.Muted.Transparency
 		else
-			textTransparency = joined.moderated and v5.Theme.Alert.Transparency or v5.Theme.UIDefault.Transparency
+			textTransparency = joined.moderated and v6.Theme.Alert.Transparency or v6.Theme.UIDefault.Transparency
 		end
 
-		v69.TextTransparency = textTransparency
+		v70.TextTransparency = textTransparency
 
-		v69.TextXAlignment = joined.isIncoming and Enum.TextXAlignment.Left or Enum.TextXAlignment.Right
-		v69.TextSize = v7.Typography.CaptionSmall.FontSize
+		v70.TextXAlignment = joined.isIncoming and Enum.TextXAlignment.Left or Enum.TextXAlignment.Right
+		v70.TextSize = v8.Typography.CaptionSmall.FontSize
 
-		v69.margin = {
-			top = v7.Padding.Small,
-			left = joined.isIncoming and v59 + ChatMessageContainerConstants.NOTICE_HORIZONTAL_PADDING or 0,
-			right = joined.isIncoming and 0 or v6.right or 0,
+		v70.margin = {
+			top = v8.Padding.Small,
+			left = joined.isIncoming and v60 + ChatMessageContainerConstants.NOTICE_HORIZONTAL_PADDING or 0,
+			right = joined.isIncoming and 0 or v7.right or 0,
 			bottom = 0
 		}
 
-		v69.maxWidth = joined.parentWidth
-		v69.width = UDim.new(1, joined.isIncoming and -v59 or 0)
-		notice = createElement2(NoticeText, v69)
+		v70.maxWidth = joined.parentWidth
+		v70.width = UDim.new(1, joined.isIncoming and -v60 or 0)
+		notice = createElement2(NoticeText, v70)
 	end
 
-	v68.Notice = notice
+	v69.Notice = notice
 
-	v68.debug = joined.debugElement or nil
-	return createElement(v2, v67, v68)
+	v69.debug = joined.debugElement or nil
+	return createElement(v2, v68, v69)
 end
 
 return ChatMessageContainer

@@ -130,13 +130,14 @@ function ParticipantDialog(p)
 	end
 
 	if joined.showViewProfileButton then
+		local viewProfileText = joined.viewProfileText
 		local function fn()
 			Logger:info("User activated viewProfile | userId: {}", participantId)
 			joined.openViewProfile(participantId)
 		end
 
 		table.insert(items, {
-			text = joined.viewProfileText,
+			text = viewProfileText,
 			isDisabled = nil,
 			onActivated = function()
 				if ref2.current then
@@ -179,6 +180,7 @@ function ParticipantDialog(p)
 	end
 
 	if joined.showChatButton then
+		local chatText = joined.chatText
 		local function fn()
 			Logger:info("User activated openChat | userId: {}", participantId)
 			v2.emit(ChatDetailsTelemetryEvents.ParticipantDialogChatClicked, {})
@@ -186,7 +188,7 @@ function ParticipantDialog(p)
 		end
 
 		table.insert(items, {
-			text = joined.chatText,
+			text = chatText,
 			isDisabled = nil,
 			onActivated = function()
 				if ref2.current then
@@ -203,6 +205,7 @@ function ParticipantDialog(p)
 		})
 	end
 
+	local reportUserText = joined.reportUserText
 	local function fn()
 		Logger:info("User activated reportUser | userId: {}, conversationId: {}", participantId, conversationId)
 		v2.emit(ChatDetailsTelemetryEvents.ParticipantDialogReportUserClicked, {})
@@ -210,7 +213,7 @@ function ParticipantDialog(p)
 	end
 
 	table.insert(items, {
-		text = joined.reportUserText,
+		text = reportUserText,
 		isDisabled = nil,
 		onActivated = function()
 			if ref2.current then

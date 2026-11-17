@@ -8,12 +8,11 @@ local CharacterUtility = Thumbnailing.CharacterUtility
 local Thumbnailing2 = require(CorePackages.Packages.Thumbnailing)
 local CFrameUtility = Thumbnailing2.CFrameUtility
 
-local engineFeature = game:GetEngineFeature("AnimatorAndADFRefactor")
-local engineFeature2 = game:GetEngineFeature("PlayerViewRemoteEventSupport")
+local engineFeature = game:GetEngineFeature("PlayerViewRemoteEventSupport")
 
 local trackerStreamAnimation = nil
 local v = nil
-local defineFastFlag = game:DefineFastFlag("SelfViewNewPoseSynchronization", false)
+local defineFastFlag = game:DefineFastFlag("SelfViewRestorePoseSynchronization", false)
 local defineFastFlag2 = game:DefineFastFlag("DebugSelfViewPerfBenchmark", false)
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local GetFFlagSelfViewVisibilityFix = SharedFlags.GetFFlagSelfViewVisibilityFix
@@ -314,7 +313,7 @@ local function updateClone(player)
 	animator = ModelUtils.getAnimator(selfAvatar, 0)
 
 	if animator then
-		if not (engineFeature and defineFastFlag) then
+		if not defineFastFlag then
 			local playingAnimationTracks = animator:GetPlayingAnimationTracks()
 			local playingAnimationTracksCoreScript = animator:GetPlayingAnimationTracksCoreScript()
 
@@ -343,7 +342,7 @@ local function updateClone(player)
 		end
 
 		if animator2 then
-			if engineFeature and defineFastFlag then
+			if defineFastFlag then
 				animator:SynchronizeWith(animator2)
 			else
 				for _, v16 in ipairs(animator2:GetPlayingAnimationTracksCoreScript()) do
@@ -874,8 +873,8 @@ function startRenderStepped(p)
 
 						assert(v7 ~= nil)
 
-						if service and service.VideoAnimationEnabled and (cframe2 ~= nil or engineFeature2) then
-							if engineFeature2 then
+						if service and service.VideoAnimationEnabled and (cframe2 ~= nil or engineFeature) then
+							if engineFeature then
 								local PlayerViewService = game:GetService("PlayerViewService")
 								local deviceCameraCFrameForSelfView = PlayerViewService:GetDeviceCameraCFrameForSelfView()
 								local position = deviceCameraCFrameForSelfView.Position

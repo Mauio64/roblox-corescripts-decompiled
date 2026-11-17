@@ -1,3 +1,5 @@
+local Flags = require(script:FindFirstAncestor("ViewRecyclerRoblox").Flags)
+local FFlagViewRecyclerReact084 = Flags.FFlagViewRecyclerReact084
 local ViewRecyclerRoblox = script:FindFirstAncestor("ViewRecyclerRoblox")
 require(ViewRecyclerRoblox.Parent.ViewRecycler)
 
@@ -18,7 +20,7 @@ function CanvasItemPlacer.createState()
 	}
 end
 
-local function resetAppliedState(p) -- 2 equivalent calls inferred from this helper
+local function resetAppliedState(p) -- 3 equivalent calls inferred from this helper
 	p.anchorPointInitialized = false
 	p.position = nil
 	p.size = nil
@@ -134,52 +136,87 @@ function CanvasItemPlacer:hide(p)
 	end
 end
 
-function CanvasItemPlacer:detach(p)
-	local count = 0
+if FFlagViewRecyclerReact084 then
+	function CanvasItemPlacer:release(p)
+		local count = 0
 
-	if p.unpinnedZIndex ~= nil then
-		if self.ZIndex ~= p.unpinnedZIndex then
-			self.ZIndex = p.unpinnedZIndex
+		if p.unpinnedZIndex ~= nil then
+			if self.ZIndex ~= p.unpinnedZIndex then
+				self.ZIndex = p.unpinnedZIndex
+				count += 1
+			end
+
+			p.unpinnedZIndex = nil
+		end
+
+		if self.Visible then
+			self.Visible = false
 			count += 1
 		end
 
-		p.unpinnedZIndex = nil
+		p.parent = nil
+		resetAppliedState(p) -- inferred equivalent call
+		return count
 	end
+end
 
-	if self.Visible then
-		self.Visible = false
-		count += 1
+function CanvasItemPlacer:detach(p)
+	local v
+
+	if FFlagViewRecyclerReact084 then
+		v = CanvasItemPlacer.release(self, p)
+	else
+		v = 0
+
+		if p.unpinnedZIndex ~= nil then
+			if self.ZIndex ~= p.unpinnedZIndex then
+				self.ZIndex = p.unpinnedZIndex
+				v += 1
+			end
+
+			p.unpinnedZIndex = nil
+		end
+
+		if self.Visible then
+			self.Visible = false
+			v += 1
+		end
 	end
 
 	if self.Parent ~= nil then
 		self.Parent = nil
-		count += 1
-	end
-
-	p.parent = nil
-	resetAppliedState(p) -- inferred equivalent call
-	return count
-end
-
-function CanvasItemPlacer:detachForTransfer(p)
-	local v = CanvasItemPlacer.detach(self, p)
-
-	if self.Position ~= UDim2.new() then
-		self.Position = UDim2.new()
 		v += 1
 	end
 
-	if self.Size ~= UDim2.new() then
-		self.Size = UDim2.new()
-		v += 1
-	end
-
-	if self.AutomaticSize ~= Enum.AutomaticSize.None then
-		self.AutomaticSize = Enum.AutomaticSize.None
-		return v + 1
+	if not FFlagViewRecyclerReact084 then
+		p.parent = nil
+		resetAppliedState(p) -- inferred equivalent call
 	end
 
 	return v
+end
+
+if not FFlagViewRecyclerReact084 then
+	function CanvasItemPlacer:detachForTransfer(p)
+		local v = CanvasItemPlacer.detach(self, p)
+
+		if self.Position ~= UDim2.new() then
+			self.Position = UDim2.new()
+			v += 1
+		end
+
+		if self.Size ~= UDim2.new() then
+			self.Size = UDim2.new()
+			v += 1
+		end
+
+		if self.AutomaticSize ~= Enum.AutomaticSize.None then
+			self.AutomaticSize = Enum.AutomaticSize.None
+			return v + 1
+		end
+
+		return v
+	end
 end
 
 return CanvasItemPlacer

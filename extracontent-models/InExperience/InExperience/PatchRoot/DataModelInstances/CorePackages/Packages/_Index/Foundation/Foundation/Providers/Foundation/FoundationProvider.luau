@@ -19,6 +19,8 @@ require(parent2.Components.Types)
 local WidgetsProvider = require(parent.StudioWidgets.WidgetsProvider)
 local ElevationProvider = require(parent.Elevation.ElevationProvider)
 local elevationProvider = ElevationProvider.ElevationProvider
+local ScreenRegionProvider = require(parent.ScreenRegion.ScreenRegionProvider)
+local screenRegionProvider = ScreenRegionProvider.ScreenRegionProvider
 local isPluginElevated = require(parent.Plugin.isPluginElevated)
 
 local frozen = table.freeze({})
@@ -73,6 +75,10 @@ local function FoundationProvider(props)
 		createElement(Overlay, v2),
 		React.createElement(Cursor)
 	}
+
+	if Flags.FoundationScreenRegionProvider then
+		table.insert(providers, React.createElement(screenRegionProvider, nil))
+	end
 
 	if props.plugin and isPluginElevated(props.plugin) then
 		table.insert(providers, React.createElement(WidgetsProvider, {}))

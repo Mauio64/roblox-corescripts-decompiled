@@ -4,35 +4,27 @@ require(parent.util.Types)
 local ValidationEnums = require(parent.validationSystem.ValidationEnums)
 local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 
-local getFFlagUGCValidateAnimationPackNoDuplicateIds = require(parent.flags.getFFlagUGCValidateAnimationPackNoDuplicateIds)
-local AnimationPackNoDuplicateIds = {}
-AnimationPackNoDuplicateIds.categories = { ValidationEnums.UploadCategory.ANIMATION_PACK }
-AnimationPackNoDuplicateIds.requiredData = { ValidationEnums.SharedDataMember.contentIds }
+return {
+	categories = { ValidationEnums.UploadCategory.ANIMATION_PACK },
+	requiredData = { ValidationEnums.SharedDataMember.contentIds },
+	expectedFailures = {},
+	prereqTests = { ValidationEnums.ValidationModule.ExpectedRootSchema },
+	run = function(object, p)
+		for k, contentId in p.contentIds do
+			if not (#contentId > 1) then
+				continue
+			end
 
-function AnimationPackNoDuplicateIds.fflag()
-	return getFFlagUGCValidateAnimationPackNoDuplicateIds()
-end
+			local fullNames = {}
 
-AnimationPackNoDuplicateIds.expectedFailures = {}
-AnimationPackNoDuplicateIds.prereqTests = { ValidationEnums.ValidationModule.ExpectedRootSchema }
+			for _, v in contentId do
+				table.insert(fullNames, v.instance:GetFullName())
+			end
 
-function AnimationPackNoDuplicateIds.run(object, p)
-	for k, contentId in p.contentIds do
-		if not (#contentId > 1) then
-			continue
+			object:fail(ErrorSourceStrings.Keys.AnimationPack_DuplicateAnimationId, {
+				animationId = k,
+				instancePaths = table.concat(fullNames, ", ")
+			})
 		end
-
-		local fullNames = {}
-
-		for _, v in contentId do
-			table.insert(fullNames, v.instance:GetFullName())
-		end
-
-		object:fail(ErrorSourceStrings.Keys.AnimationPack_DuplicateAnimationId, {
-			animationId = k,
-			instancePaths = table.concat(fullNames, ", ")
-		})
 	end
-end
-
-return AnimationPackNoDuplicateIds
+}

@@ -10,7 +10,6 @@ local FitFrameVertical = RoactFitComponents.FitFrameVertical
 local UIBlox = require(parent3.UIBlox)
 local Foundation = require(parent3.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local withStyle = UIBlox.Core.Style.withStyle
@@ -82,8 +81,7 @@ function extended:renderAlert(data)
 			anchorPoint = props.anchorPoint,
 			title = data.InsufficientRobuxTitle,
 			middleContent = function()
-				local createElement = Roact.createElement
-				local v3 = {
+				return Roact.createElement(FitFrameVertical, {
 					BackgroundTransparency = 1,
 					width = UDim.new(1, 0),
 					FillDirection = Enum.FillDirection.Vertical,
@@ -92,8 +90,7 @@ function extended:renderAlert(data)
 					contentPadding = UDim.new(0, 15),
 					[Roact.Ref] = self.contentRef,
 					[Roact.Change.AbsoluteSize] = self.changeContentSize
-				}
-				local v4 = {
+				}, {
 					ProductDetails = Roact.createElement(ProductDetails, {
 						layoutOrder = 1,
 						model = props.model,
@@ -108,45 +105,20 @@ function extended:renderAlert(data)
 						BackgroundTransparency = theme.Divider.Transparency,
 						Size = UDim2.new(1, 0, 0, 1)
 					}),
-					AdditionalBuyText = 0
-				}
-
-				local createElement2 = Roact.createElement
-				local v5 = {
-					LayoutOrder = 3,
-					BackgroundTransparency = 1,
-					Size = UDim2.new(0, self.state.contentSize.X, 0, 0),
-					RichText = true,
-					AutomaticSize = Enum.AutomaticSize.Y,
-					TextWrapped = true,
-					Font = 0,
-					FontFace = 0,
-					Text = 0,
-					TextSize = 0,
-					TextColor3 = 0,
-					TextTransparency = 0
-				}
-				local font2
-
-				if not FoundationFontFaceMigration then
-					font2 = font.Body.Font
-				end
-
-				v5.Font = font2
-				local fontFace
-
-				if FoundationFontFaceMigration then
-					fontFace = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
-				end
-
-				v5.FontFace = fontFace
-
-				v5.Text = text
-				v5.TextSize = font.BaseSize * font.Body.RelativeSize
-				v5.TextColor3 = theme.TextDefault.Color
-				v5.TextTransparency = theme.TextDefault.Transparency
-				v4.AdditionalBuyText = createElement2("TextLabel", v5)
-				return createElement(FitFrameVertical, v3, v4)
+					AdditionalBuyText = Roact.createElement("TextLabel", {
+						LayoutOrder = 3,
+						BackgroundTransparency = 1,
+						Size = UDim2.new(0, self.state.contentSize.X, 0, 0),
+						RichText = true,
+						AutomaticSize = Enum.AutomaticSize.Y,
+						TextWrapped = true,
+						FontFace = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font),
+						Text = text,
+						TextSize = font.BaseSize * font.Body.RelativeSize,
+						TextColor3 = theme.TextDefault.Color,
+						TextTransparency = theme.TextDefault.Transparency
+					})
+				})
 			end,
 			buttonStackInfo = {
 				buttons = {

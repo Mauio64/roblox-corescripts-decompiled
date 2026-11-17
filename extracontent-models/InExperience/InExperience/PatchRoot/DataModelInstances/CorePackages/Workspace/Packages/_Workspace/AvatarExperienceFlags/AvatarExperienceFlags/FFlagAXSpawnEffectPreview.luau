@@ -1,2 +1,2 @@
 local engineFeature = game:GetEngineFeature("PlayAvatarEffectAsyncEnabled")
-return game:DefineFastFlag("AXSpawnEffectPreview", false) and engineFeature
+return game:DefineFastFlag("AXSpawnEffectPreview2", false) and engineFeature

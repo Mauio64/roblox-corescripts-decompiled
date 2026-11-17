@@ -8,7 +8,6 @@ local RoactUtils = require(parent2.RoactUtils)
 local UIBlox = require(parent2.UIBlox)
 local Foundation = require(parent2.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local useAnalytics = require(parent.Analytics.useAnalytics)
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
@@ -39,14 +38,14 @@ return function(p)
 		return p2[Constants.RoduxKey].Captures
 	end)
 
-	local nothingHereYet = next(captures) == nil
+	local v5 = next(captures) == nil
 
-	local v5 = useLocalization({
+	local v6 = useLocalization({
 		nothingHereYet = "Feature.Captures.Label.NothingHereYet",
 		title = "Feature.Captures.Title.Gallery"
 	})
 
-	local v6 = React.useCallback(function(p2)
+	local v7 = React.useCallback(function(p2)
 		return function()
 			v.fireEvent(EventNames.CapturesCarouselOpened)
 			v2(CarouselOpened(p2))
@@ -59,19 +58,18 @@ return function(p)
 	local transparency = v3.Theme.BackgroundDefault.Transparency
 
 	local color2 = v3.Theme.TextMuted.Color
-	local font = v3.Font.CaptionBody.Font
 	local textSize = v3.Font.BaseSize * v3.Font.CaptionBody.RelativeSize
 	local transparency2 = v3.Theme.TextMuted.Transparency
-	local v7
+	local v8
 
 	if FFlagCapturesGalleryDespawnOnMenuClose then
-		v7 = v4 and not nothingHereYet
+		v8 = v4 and not v5
 	else
-		v7 = not nothingHereYet
+		v8 = not v5
 	end
 
 	local createElement = React.createElement
-	local v8 = {
+	local v9 = {
 		BackgroundColor3 = color,
 		BackgroundTransparency = transparency,
 		BorderSizePixel = 0,
@@ -79,7 +77,7 @@ return function(p)
 		Size = size
 	}
 
-	local v9 = {
+	local v10 = {
 		UICorner = React.createElement("UICorner", { CornerRadius = UDim.new(0, 8) }),
 		Layout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
@@ -88,29 +86,11 @@ return function(p)
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			VerticalAlignment = Enum.VerticalAlignment.Top
 		}),
-		NothingHereYet = 0,
-		GalleryGridView = 0
-	}
-
-	if nothingHereYet then
-		local createElement2 = React.createElement
-
-		if FoundationFontFaceMigration then
-			font = nil
-		end
-
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(v3.Tokens.Typography.BodySmall.Font)
-		end
-
-		nothingHereYet = createElement2("TextLabel", {
+		NothingHereYet = v5 and React.createElement("TextLabel", {
 			BackgroundTransparency = 1,
-			Font = font,
-			FontFace = fontFace,
+			FontFace = normalizeFontFace(v3.Tokens.Typography.BodySmall.Font),
 			Size = UDim2.new(1, -12, 1, 12),
-			Text = v5.nothingHereYet,
+			Text = v6.nothingHereYet,
 			TextColor3 = color2,
 			TextSize = textSize,
 			TextTransparency = transparency2,
@@ -118,13 +98,12 @@ return function(p)
 			TextXAlignment = Enum.TextXAlignment.Center
 		}, {
 			MaxSize = React.createElement("UISizeConstraint", { MaxSize = Vector2.new(312, 1e999) })
-		})
-	end
-
-	v9.NothingHereYet = nothingHereYet
+		}),
+		GalleryGridView = 0
+	}
 	local galleryGridView
 
-	if v7 then
+	if v8 then
 		if FFlagUseCaptureCommonComponents then
 			galleryGridView = React.createElement(CaptureGridView, {
 				captures = captures,
@@ -136,7 +115,7 @@ return function(p)
 				renderItem = function(capture, p2)
 					return React.createElement(CaptureItem, {
 						capture = capture,
-						onActivated = v6(p2)
+						onActivated = v7(p2)
 					})
 				end,
 				shouldShowShowMoreButton = true
@@ -149,6 +128,6 @@ return function(p)
 		end
 	end
 
-	v9.GalleryGridView = galleryGridView
-	return createElement("Frame", v8, v9)
+	v10.GalleryGridView = galleryGridView
+	return createElement("Frame", v9, v10)
 end

@@ -313,11 +313,14 @@ local function createCreatorCreditStore(options)
 		dispose = dispose
 	}
 
-	if FFlagBuildExperienceModelPickerData then
-		creatorCreditStore.getTierQuotaSummary = getTierStore().getTierQuotaSummary -- inferred equivalent call
-		creatorCreditStore.getTierQuotaSummarySignals = tierStore.getTierQuotaSummarySignals
-		creatorCreditStore.refreshTierQuotaSummary = tierStore.refreshTierQuotaSummary
+	if not FFlagBuildExperienceModelPickerData then
+		return creatorCreditStore
 	end
+
+	local tierStore2 = getTierStore() -- inferred equivalent call
+	creatorCreditStore.getTierQuotaSummary = tierStore2.getTierQuotaSummary
+	creatorCreditStore.getTierQuotaSummarySignals = tierStore2.getTierQuotaSummarySignals
+	creatorCreditStore.refreshTierQuotaSummary = tierStore2.refreshTierQuotaSummary
 
 	return creatorCreditStore
 end

@@ -231,21 +231,22 @@ function ConnectionAmpUpsellOnLeave.createParentalApprovalCallback(p, p2, p3: nu
 					fn2(v4, placeId, not v7 and "" or tostring(v7))
 				end
 
-				if v7 then
-					openWizardThenReconnect(
-						p,
-						p2,
-						v6,
-						"CanApproveExperience",
-						nil,
-						"gameJoinContentMaturityLock",
-						{ universeId = tostring(v7), experienceManagementAction = "Approve" },
-						nil,
-						"AmpParentApprovalOpened"
-					)
-				else
+				if not v7 then
 					logTelemetry(p, "AmpParentApprovalUniverseIdLookupFailed")
+					return
 				end
+
+				openWizardThenReconnect(
+					p,
+					p2,
+					v6,
+					"CanApproveExperience",
+					nil,
+					"gameJoinContentMaturityLock",
+					{ universeId = tostring(v7), experienceManagementAction = "Approve" },
+					nil,
+					"AmpParentApprovalOpened"
+				)
 			end)
 		else
 			logTelemetry(p, "AmpParentApprovalMissingPlaceId")

@@ -155,7 +155,8 @@ function class2.new(data)
 		updated_time = 0,
 		total_up_votes = 0,
 		total_down_votes = 0,
-		user_vote = 0
+		user_vote = 0,
+		is_purchasable = 0
 	}
 	local created_time
 
@@ -192,6 +193,7 @@ function class2.new(data)
 	end
 
 	v2.user_vote = user_vote
+	v2.is_purchasable = data ~= nil and data.is_purchasable ~= nil and data.is_purchasable
 	return (setmetatable(v2, class2))
 end
 
@@ -284,6 +286,11 @@ function class2:encode()
 		v2, v3 = proto.writeVarInt(v4, v5, self.user_vote and 1 or 0)
 	end
 
+	if self.is_purchasable then
+		local v4, v5 = proto.writeTag(v2, v3, 17, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, self.is_purchasable and 1 or 0)
+	end
+
 	local buf = buffer.create(v3)
 	buffer.copy(buf, 0, v2, 0, v3)
 	return buf
@@ -338,6 +345,10 @@ function class2.decode(buf: buffer)
 				local v5
 				v5, v2 = proto.readVarInt(buf, v2)
 				result.user_vote = v5 ~= 0
+			elseif v3 == 17 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.is_purchasable = v5 ~= 0
 			else
 				local _
 				_, v2 = proto.readVarInt(buf, v2)
@@ -457,6 +468,10 @@ function class2:jsonEncode()
 
 	if self.user_vote ~= nil then
 		v2.userVote = self.user_vote
+	end
+
+	if self.is_purchasable then
+		v2.isPurchasable = self.is_purchasable
 	end
 
 	return v2
@@ -595,6 +610,14 @@ function class2.jsonDecode(data)
 
 	if data.userVote ~= nil then
 		v2.user_vote = data.userVote
+	end
+
+	if data.is_purchasable ~= nil then
+		v2.is_purchasable = data.is_purchasable
+	end
+
+	if data.isPurchasable ~= nil then
+		v2.is_purchasable = data.isPurchasable
 	end
 
 	return v2

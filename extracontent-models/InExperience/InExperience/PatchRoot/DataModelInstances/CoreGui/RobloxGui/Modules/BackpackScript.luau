@@ -27,14 +27,8 @@ local defineFastFlag = game:DefineFastFlag("EnableHotbarHide", false)
 local SharedFlags2 = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagStudioDeviceSimVRSwitchFixes = SharedFlags2.FFlagStudioDeviceSimVRSwitchFixes
 
-local defineFastFlag2 = game:DefineFastFlag("SAToolEquipLuauFlag", false)
-
 local function featureSAToolEquipEnabled(): boolean -- 2 equivalent calls inferred from this helper
-	if defineFastFlag2 and game:GetEngineFeature("SAToolEquipEngineFeature") then
-		return workspace.AuthorityMode == Enum.AuthorityMode.Server
-	end
-
-	return false
+	return workspace.AuthorityMode == Enum.AuthorityMode.Server
 end
 
 local BackpackScript = {}

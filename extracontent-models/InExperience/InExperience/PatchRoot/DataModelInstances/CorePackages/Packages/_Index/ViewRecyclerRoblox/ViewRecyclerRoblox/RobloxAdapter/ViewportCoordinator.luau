@@ -1,7 +1,6 @@
 local ViewRecyclerRoblox = script:FindFirstAncestor("ViewRecyclerRoblox")
-local ViewRecycler = require(ViewRecyclerRoblox.Parent.ViewRecycler)
+require(ViewRecyclerRoblox.Parent.ViewRecycler)
 
-local Axis = ViewRecycler.Axis
 local SignalsExperimental = require(ViewRecyclerRoblox.Parent.SignalsExperimental)
 local axisMap = require(ViewRecyclerRoblox.RobloxAdapter.axisMap)
 local RunService = game:GetService("RunService")

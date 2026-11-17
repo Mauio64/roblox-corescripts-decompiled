@@ -109,10 +109,10 @@ local function createMomentsUserStore(options)
 		end,
 		getUserMomentsVersion = signal,
 		getPendingUserMoments = signal2,
-		prependPendingUserMoment = function(p: number, moment)
+		prependPendingUserMoment = function(p: number, moment, startedAtClock: number?)
 			local clone = table.clone(signal2(false))
 			local clone2 = table.clone(clone[p] or {})
-			table.insert(clone2, 1, { moment = moment })
+			table.insert(clone2, 1, { moment = moment, startedAtClock = startedAtClock })
 			clone[p] = clone2
 			v6(clone)
 		end,
@@ -139,39 +139,67 @@ local function createMomentsUserStore(options)
 			clone[p] = v8
 			v6(clone)
 		end,
-		resolvePendingUserMoment = function(p: number, p2: string, publishedMoment2): boolean
+		resolvePendingUserMoment = function(p: number, p2: string, publishedMoment): boolean
 			local clone = table.clone(signal2(false))
 			local v7 = clone[p] or {}
 
-			local feedItemId = publishedMoment2.recommendationMetadata.feedItemId
+			local feedItemId = publishedMoment.recommendationMetadata.feedItemId
 			local v8 = nil
 
 			for k, v9 in v7 do
 				if v9.moment.momentId == p2 then
 					v8 = k
 				elseif v9.publishedMoment ~= nil then
-					local publishedMoment = v9.publishedMoment
+					local publishedMoment2 = v9.publishedMoment
 
 					if
-						publishedMoment.momentId == publishedMoment2.momentId
+						publishedMoment2.momentId == publishedMoment.momentId
 						or feedItemId ~= nil
 						and feedItemId ~= ""
-						and publishedMoment.recommendationMetadata.feedItemId == feedItemId
+						and publishedMoment2.recommendationMetadata.feedItemId == feedItemId
 					then
 						return false
 					end
 				end
 			end
 
-			if v8 == nil then
+			if v8 == nil or v7[v8].status == "Moderated" then
 				return false
 			end
 
 			local clone2 = table.clone(v7)
-			clone2[v8] = { moment = v7[v8].moment, publishedMoment = publishedMoment2 }
+			local clone3 = table.clone(v7[v8])
+			clone3.publishedMoment = publishedMoment
+			clone2[v8] = clone3
 			clone[p] = clone2
 			v6(clone)
 			return true
+		end,
+		setPendingUserMomentStatus = function(p: number, p2: string, status): boolean
+			local v7 = signal2(false)[p]
+
+			if v7 == nil then
+				return false
+			end
+
+			for k, v8 in v7 do
+				if v8.moment.momentId == p2 then
+					if v8.publishedMoment ~= nil or v8.status == "Moderated" then
+						return false
+					end
+
+					local clone = table.clone(signal2(false))
+					local clone2 = table.clone(v7)
+					local clone3 = table.clone(v8)
+					clone3.status = status
+					clone2[k] = clone3
+					clone[p] = clone2
+					v6(clone)
+					return true
+				end
+			end
+
+			return false
 		end,
 		clear = function()
 			v6({})

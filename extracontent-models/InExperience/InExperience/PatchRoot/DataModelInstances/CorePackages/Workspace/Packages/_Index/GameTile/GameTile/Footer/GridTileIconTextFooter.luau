@@ -11,7 +11,6 @@ local getGameTileMetadataFont = require(GameTile.Footer.getGameTileMetadataFont)
 local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local useTextSizeOffset = UIBlox.Core.Style.useTextSizeOffset
 local GameTileTypes = require(GameTile.GameTileTypes)
 
@@ -99,52 +98,26 @@ local function GridTileIconTextFooter(props)
 		})
 	end
 
-	local children = {
+	return createElement("Frame", v7, {
 		IconSlot = createElement2("Frame", v8, { Icon = icon }),
-		Text = 0
-	}
-
-	local createElement3 = React.createElement
-	local v9 = {
-		LayoutOrder = 2,
-		Text = props.text,
-		Size = UDim2.new(1, -(v6 + v4), 0, fontSize + v2),
-		AutomaticSize = Enum.AutomaticSize.None,
-		Position = UDim2.new(0, v6 + v4, 0.5, 0),
-		AnchorPoint = Vector2.new(0, 0.5),
-		BackgroundTransparency = 1,
-		TextSize = fontSize,
-		Font = 0,
-		FontFace = 0,
-		TextTransparency = 0,
-		TextColor3 = 0,
-		TextWrapped = false,
-		TextTruncate = 0,
-		TextXAlignment = 0,
-		TextYAlignment = 0
-	}
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = gameTileMetadataFont.Font
-	end
-
-	v9.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(gameTileMetadataFont.Font)
-	end
-
-	v9.FontFace = fontFace
-	v9.TextTransparency = default.Transparency
-	v9.TextColor3 = default.Color3
-
-	v9.TextTruncate = Enum.TextTruncate.AtEnd
-	v9.TextXAlignment = Enum.TextXAlignment.Left
-	v9.TextYAlignment = Enum.TextYAlignment.Center
-	children.Text = createElement3("TextLabel", v9)
-	return createElement("Frame", v7, children)
+		Text = React.createElement("TextLabel", {
+			LayoutOrder = 2,
+			Text = props.text,
+			Size = UDim2.new(1, -(v6 + v4), 0, fontSize + v2),
+			AutomaticSize = Enum.AutomaticSize.None,
+			Position = UDim2.new(0, v6 + v4, 0.5, 0),
+			AnchorPoint = Vector2.new(0, 0.5),
+			BackgroundTransparency = 1,
+			TextSize = fontSize,
+			FontFace = normalizeFontFace(gameTileMetadataFont.Font),
+			TextTransparency = default.Transparency,
+			TextColor3 = default.Color3,
+			TextWrapped = false,
+			TextTruncate = Enum.TextTruncate.AtEnd,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextYAlignment = Enum.TextYAlignment.Center
+		})
+	})
 end
 
 return GridTileIconTextFooter

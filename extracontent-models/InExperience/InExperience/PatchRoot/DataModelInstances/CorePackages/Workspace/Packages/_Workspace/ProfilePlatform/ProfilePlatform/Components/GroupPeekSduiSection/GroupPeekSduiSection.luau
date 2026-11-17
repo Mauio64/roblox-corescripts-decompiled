@@ -13,12 +13,15 @@ local usePreferredInput = Responsive.usePreferredInput
 local SduiSharedUtilities = require(parent.SduiSharedUtilities)
 local SduiFeatureEntryPoint = SduiSharedUtilities.SduiFeatureEntryPoint
 local useComponentConfig = SduiSharedUtilities.useComponentConfig
+local usePublishContainerWidth = SduiSharedUtilities.usePublishContainerWidth
 
 local Enums = require(ProfilePlatform.Common.Enums)
 local useProfileWrapperContext = require(ProfilePlatform.Contexts.useProfileWrapperContext)
 
 local SharedFlags = require(parent.SharedFlags)
 local FFlagGroupPeekEngagementTelemetry = SharedFlags.FFlagGroupPeekEngagementTelemetry
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagGroupSduiPublishContainerWidth = SharedFlags2.FFlagGroupSduiPublishContainerWidth
 
 local groupPeekSdui = nil
 local function getGroupPeekSdui() -- 3 equivalent calls inferred from this helper
@@ -36,6 +39,18 @@ local function getIdentifier(groupPeekSdui2, section: string) -- 1 equivalent ca
 	end
 
 	return groupPeekSdui2.Identifiers.ForumsDiscovery
+end
+
+local function ContainerWidthFrame(p)
+	local ref = usePublishContainerWidth(p.configKey)
+	return React.createElement("Frame", {
+		Size = UDim2.fromScale(1, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		LayoutOrder = 1,
+		ref = ref
+	}, p.children)
 end
 
 local function SectionEntry(props)
@@ -61,26 +76,29 @@ local function SectionEntry(props)
 		return nil
 	end
 
-	return React.createElement(
-		HorizontalPageMargin,
-		{
-			size = UDim2.new(1, 0, 0, 0),
-			backgroundTransparency = 1,
-			layoutOrder = props.layoutOrder,
-			useAutomaticSizing = true
-		},
-		{
-			Sdui = React.createElement(SduiFeatureEntryPoint, {
-				appPage = groupPeekSdui2.AppPage,
-				configKey = configKey,
-				identifier = identifier,
-				shouldDisplayLoading = false,
-				shouldDisplayError = false,
-				LayoutOrder = 1,
-				additionalAnalyticsData = additionalAnalyticsData
-			})
-		}
-	)
+	local sdui = React.createElement(SduiFeatureEntryPoint, {
+		appPage = groupPeekSdui2.AppPage,
+		configKey = configKey,
+		identifier = identifier,
+		shouldDisplayLoading = false,
+		shouldDisplayError = false,
+		LayoutOrder = 1,
+		additionalAnalyticsData = additionalAnalyticsData
+	})
+
+	local createElement = React.createElement
+	local v2 = {
+		size = UDim2.new(1, 0, 0, 0),
+		backgroundTransparency = 1,
+		layoutOrder = props.layoutOrder,
+		useAutomaticSizing = true
+	}
+
+	if FFlagGroupSduiPublishContainerWidth then
+		sdui = React.createElement(ContainerWidthFrame, { configKey = configKey }, { Sdui = sdui })
+	end
+
+	return createElement(HorizontalPageMargin, v2, { Sdui = sdui })
 end
 
 local function GroupPeekSduiSection(p)

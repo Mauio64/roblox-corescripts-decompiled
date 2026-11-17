@@ -54,7 +54,9 @@ local function buildGroupJoinPromptData(p)
 
 	local components = p.components or {}
 	local communityProfileHeader = components.CommunityProfileHeader or {}
-	local v = parseMembershipStatusFromActions(components.Actions or {})
+	local actions = components.Actions or {}
+
+	local v = parseMembershipStatusFromActions(actions)
 
 	local v2 = {
 		groupName = communityProfileHeader.name,
@@ -145,7 +147,8 @@ return function(p)
 						return
 					end
 
-					local v7 = parseMembershipStatusFromActions((p4.components or {}).Actions or {})
+					local actions = (p4.components or {}).Actions or {}
+					local v7 = parseMembershipStatusFromActions(actions)
 					local v8, v9
 
 					if v7.isAlreadyMember then

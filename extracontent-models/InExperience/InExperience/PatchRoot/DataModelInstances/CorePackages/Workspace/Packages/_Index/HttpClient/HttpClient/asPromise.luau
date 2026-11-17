@@ -4,7 +4,6 @@ local Promise = require(parent.Promise)
 local Signals = require(parent.Signals)
 
 require(script.Parent.types)
-local FFlagHttpClientRetryExtensions = require(script.Parent.Flags.FFlagHttpClientRetryExtensions)
 
 local v = {}
 
@@ -27,9 +26,7 @@ local function asPromise(p)
 				v3()
 			end
 
-			if FFlagHttpClientRetryExtensions then
-				p.dispose()
-			end
+			p.dispose()
 		end
 
 		local function settle(data)
@@ -42,14 +39,12 @@ local function asPromise(p)
 
 			if data.status == "succeeded" then
 				callback(data.result)
-			elseif FFlagHttpClientRetryExtensions then
+			else
 				callback2({
 					responseCode = data.errorCode,
 					errorMessage = data.error,
 					response = data.response
 				})
-			else
-				callback2({ responseCode = data.errorCode, errorMessage = data.error })
 			end
 		end
 

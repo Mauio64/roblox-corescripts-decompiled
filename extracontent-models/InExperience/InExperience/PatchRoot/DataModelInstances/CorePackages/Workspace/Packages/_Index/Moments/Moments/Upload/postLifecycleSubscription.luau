@@ -12,20 +12,33 @@ local getLocalUserId = require(Moments.Utils.getLocalUserId)
 
 local defineFastFlag = game:DefineFastFlag("MomentsPostReviewTelemetry", false)
 
-local signal, v = Signals.createSignal({})
+local Loggers = require(parent.Loggers)
+local v = Loggers.Logger:new("Moments.Upload")
+
+local signal, v2 = Signals.createSignal({})
 
 local function advanceWakeVersion(localUserId: number) -- 2 equivalent calls inferred from this helper
 	local clone = table.clone(signal(false))
 	clone[localUserId] = (clone[localUserId] or 0) + 1
-	v(clone)
+	v2(clone)
 end
 
 local set = {}
 
-local v2 = nil
+local v3 = nil
 local onUnhideConnection = nil
 
 local function onPostLifecycleEvent(data)
+	if SharedFlags.FFlagMomentsPostFeedback and type(data) == "table" then
+		v:debug(
+			"event=post_lifecycle_event type={} status={} isNewPost={} postAssetId={}",
+			tostring(data.type),
+			tostring(data.status),
+			tostring(data.isNewPost),
+			(tostring(data.postAssetId))
+		)
+	end
+
 	if
 		type(data) ~= "table"
 		or data.type ~= "PostStatusChanged"
@@ -43,10 +56,10 @@ local function onPostLifecycleEvent(data)
 	end
 
 	if defineFastFlag and data.isNewPost == true then
-		local v3 = data.postAssetId .. ":" .. data.status
+		local v4 = data.postAssetId .. ":" .. data.status
 
-		if not set[v3] then
-			set[v3] = true
+		if not set[v4] then
+			set[v4] = true
 			MomentsCommon.Analytics.reportMomentsCreationStep(
 				"post_review",
 				data.status == "Published" and "success" or "failed"
@@ -74,11 +87,11 @@ end
 local PostLifecycleSubscription = {}
 
 function PostLifecycleSubscription.subscribe(p, p2)
-	if v2 ~= nil then
+	if v3 ~= nil then
 		return
 	end
 
-	v2 = (p or RealtimeDelivery.RobloxEventReceiver.new(NotificationService)):observeEvent(
+	v3 = (p or RealtimeDelivery.RobloxEventReceiver.new(NotificationService)):observeEvent(
 		"MomentsPostLifecycleV1",
 		onPostLifecycleEvent
 	)
@@ -106,9 +119,9 @@ function PostLifecycleSubscription.subscribe(p, p2)
 end
 
 function PostLifecycleSubscription.unsubscribe()
-	if v2 ~= nil then
-		v2:disconnect()
-		v2 = nil
+	if v3 ~= nil then
+		v3:disconnect()
+		v3 = nil
 	end
 
 	if onUnhideConnection ~= nil then

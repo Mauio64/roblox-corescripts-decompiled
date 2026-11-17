@@ -13,7 +13,7 @@ local useTokens = require(Foundation.Providers.Style.useTokens)
 local SHADOW_IMAGE = Constants.SHADOW_IMAGE
 local v
 
-if Flags.FoundationPopoverPluginOverlayMeasurement and Flags.FoundationPluginShadowSize then
+if Flags.FoundationPluginShadowSize then
 	v = Constants.PLUGIN_SHADOW_SIZE
 else
 	v = Constants.SHADOW_SIZE
@@ -22,7 +22,7 @@ end
 local function PopoverShadow(props)
 	local v2 = useTokens()
 
-	if not (Flags.FoundationPopoverPluginOverlayMeasurement and Flags.FoundationPluginShadowSize) then
+	if not Flags.FoundationPluginShadowSize then
 		return (React.createElement(Image, {
 			AnchorPoint = props.AnchorPoint,
 			Image = SHADOW_IMAGE,

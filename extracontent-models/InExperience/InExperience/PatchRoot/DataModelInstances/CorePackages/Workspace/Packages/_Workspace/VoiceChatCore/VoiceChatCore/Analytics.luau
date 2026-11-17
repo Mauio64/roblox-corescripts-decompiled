@@ -36,6 +36,23 @@ local v = {
 	}
 }
 
+local v2 = {
+	Connected = {
+		eventName = "VoiceConnected",
+		backends = { "RobloxTelemetryCounter" },
+		lastUpdated = { 2026, 11, 3 },
+		description = "Counted wherever the voiceConnectEvent event stream event is sent, so the two stay comparable. customFields: source (the VOICE_CONNECTION_SOURCE that started the join: AUTO_CONNECT, IN_EXPERIENCE, SETTINGS_TOGGLE_ON, or none). User-initiated connects are every source except AUTO_CONNECT.",
+		links = ""
+	},
+	Disconnected = {
+		eventName = "VoiceDisconnected",
+		backends = { "RobloxTelemetryCounter" },
+		lastUpdated = { 2026, 11, 3 },
+		description = "The voice session reached the Ended state, counted alongside the voiceDisconnectReasonEvent event stream event. customFields: reason (the VOICE_DISCONNECT_REASON: USER_DISCONNECT when the user turned voice off, MODERATED, or SYSTEM for everything else).",
+		links = ""
+	}
+}
+
 function Analytics.new(impl)
 	impl = impl or RbxAnalyticsService
 	assert(impl, "Analytics impl must not be nil.")
@@ -61,22 +78,22 @@ function Analytics:setImpl(impl)
 end
 
 function Analytics:_report(p, p2, p3, p4)
-	local v2 = p .. "-" .. p2
+	local v3 = p .. "-" .. p2
 
 	if game:GetFastFlag("LuaVoiceChatAnalyticsUsePointsV2") then
-		self._impl:ReportInfluxSeries(v2, p4, game:GetFastInt("LuaVoiceChatAnalyticsPointsThrottle"))
+		self._impl:ReportInfluxSeries(v3, p4, game:GetFastInt("LuaVoiceChatAnalyticsPointsThrottle"))
 	end
 
 	if game:GetFastFlag("LuaVoiceChatAnalyticsUseCounterV2") then
 		if p3 then
-			v2 ..= "-" .. p3
+			v3 ..= "-" .. p3
 		end
 
 		if p4 and p4.result then
-			v2 ..= "-" .. p4.result
+			v3 ..= "-" .. p4.result
 		end
 
-		self._impl:ReportCounter(v2, 1)
+		self._impl:ReportCounter(v3, 1)
 	end
 
 	if game:GetFastFlag("LuaVoiceChatAnalyticsUseEventsV2") then
@@ -326,6 +343,22 @@ function Analytics.reportVoiceRewarmClicked(_, flag: boolean, value: string?)
 		customFields = {
 			rearmed = tostring(flag),
 			consequence = value or "none"
+		}
+	}, 1)
+end
+
+function Analytics.reportVoiceConnected(_, value: string?)
+	TelemetryService:LogCounter(v2.Connected, {
+		customFields = {
+			source = value or "none"
+		}
+	}, 1)
+end
+
+function Analytics.reportVoiceDisconnected(_, value: string?)
+	TelemetryService:LogCounter(v2.Disconnected, {
+		customFields = {
+			reason = value or "none"
 		}
 	}, 1)
 end

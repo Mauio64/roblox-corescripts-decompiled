@@ -1,1 +1,0 @@
-return game:DefineFastString("LuaAppCloudClientPlayButtonIxpLayer", "PlayerApp.PlayButton.UX")

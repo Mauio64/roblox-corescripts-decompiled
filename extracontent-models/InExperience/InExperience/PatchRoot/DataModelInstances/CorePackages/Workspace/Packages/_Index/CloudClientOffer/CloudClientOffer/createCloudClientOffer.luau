@@ -7,6 +7,9 @@ require(CloudClientOffer.CloudClientServiceAdapter)
 require(CloudClientOffer.CloudClientExperiment)
 
 require(CloudClientOffer.Stores.GetCloudClientSessionStore.createCloudClientSessionStore)
+local FFlagLuaAppCloudClientOfferDryRun = require(CloudClientOffer.Flags.FFlagLuaAppCloudClientOfferDryRun)
+
+local FFlagLuaAppCloudClientOfferDecisionTelemetry = require(CloudClientOffer.Flags.FFlagLuaAppCloudClientOfferDecisionTelemetry)
 
 local function getRefusalKey(kind: string, p: string) -- 1 equivalent call inferred from this helper
 	return `{kind}/{p}`
@@ -25,7 +28,7 @@ local function createCloudClientOffer(data)
 	local count = 0
 	local v5 = false
 
-	local function decide(p) -- 6 equivalent calls inferred from this helper
+	local function decide(p) -- 7 equivalent calls inferred from this helper
 		local v6 = v3
 		v3 = nil
 		v4 = nil
@@ -91,11 +94,15 @@ local function createCloudClientOffer(data)
 						return
 					end
 
-					if p3.kind == "Ineligible" then
-						session.markPlaceRefused(refusalKey)
-					end
+					if FFlagLuaAppCloudClientOfferDryRun and p3.kind == "Unavailable" and p3.reason == "DryRun" then
+						decide({ kind = "Local" }) -- inferred equivalent call
+					else
+						if p3.kind == "Ineligible" then
+							session.markPlaceRefused(refusalKey)
+						end
 
-					tryNextCandidate() -- inferred equivalent call
+						tryNextCandidate() -- inferred equivalent call
+					end
 				end
 
 				service.checkEligibility(v6):andThen(function(flag: boolean)
@@ -149,12 +156,20 @@ local function createCloudClientOffer(data)
 			return
 		end
 
+		if FFlagLuaAppCloudClientOfferDecisionTelemetry then
+			service.reportDecision(offer.reservationToken, "accepted")
+		end
+
 		decide({ kind = "Stream", offer = offer }) -- inferred equivalent call
 	end
 
 	local function decline()
 		if v5 or v2 == nil then
 			return
+		end
+
+		if FFlagLuaAppCloudClientOfferDecisionTelemetry then
+			service.reportDecision(v2.reservationToken, "rejected")
 		end
 
 		releaseHeldOffer() -- inferred equivalent call
@@ -164,6 +179,10 @@ local function createCloudClientOffer(data)
 	local function dismiss()
 		if v5 or v2 == nil then
 			return
+		end
+
+		if FFlagLuaAppCloudClientOfferDecisionTelemetry then
+			service.reportDecision(v2.reservationToken, "dismissed")
 		end
 
 		releaseHeldOffer() -- inferred equivalent call

@@ -28,6 +28,7 @@ local FFlagCreateConnectionsHub = SharedFlags.FFlagCreateConnectionsHub
 local FFlagEnableArgus = SharedFlags.FFlagEnableArgus
 local FFlagEnableBlackbird = SharedFlags.FFlagEnableBlackbird
 local FFlagEnableBlackbirdOnFlyoutMenu = SharedFlags.FFlagEnableBlackbirdOnFlyoutMenu
+local FFlagFlyoutAddAdjustScreen = require(script.Parent.Parent.Flags.FFlagFlyoutAddAdjustScreen)
 local FFlagFlyoutSidePanelTradesEntry = require(script.Parent.Parent.Flags.FFlagFlyoutSidePanelTradesEntry)
 local FFlagFlyoutFilterWebViewsAndBrowserLinks = SharedFlags.FFlagFlyoutFilterWebViewsAndBrowserLinks
 local FFlagEnableLuaCommunityList = SharedFlags.FFlagEnableLuaCommunityList
@@ -45,6 +46,7 @@ local itemType = {
 	Communities = "Communities",
 	Messages = "Messages",
 	Settings = "Settings",
+	AdjustScreen = "AdjustScreen",
 	HelpAndSafety = "HelpAndSafety",
 	Moments = "Moments",
 	Charts = "Charts",
@@ -82,6 +84,7 @@ local itemTextKey = {
 	[itemType.Communities] = "CommonUI.Features.Label.Groups",
 	[itemType.Messages] = "CommonUI.Features.Label.Messages",
 	[itemType.Settings] = "CommonUI.Features.Label.Settings",
+	[itemType.AdjustScreen] = "CommonUI.Features.Label.AdjustScreen",
 	[itemType.HelpAndSafety] = "CommonUI.Features.Label.HelpAndSafety",
 	[itemType.Moments] = "CommonUI.Features.Label.RM",
 	[itemType.Charts] = "CommonUI.Features.Label.Charts",
@@ -228,6 +231,13 @@ itemInfo[itemType.Settings] = {
 	icon = BuilderIcons.Icon.Gear,
 	context = { appPage = AppPage.Settings, destinationType = destinationType2.AppPage }
 }
+
+itemInfo[itemType.AdjustScreen] = FFlagFlyoutAddAdjustScreen and {
+	itemType = itemType.AdjustScreen,
+	textKey = itemTextKey[itemType.AdjustScreen],
+	icon = BuilderIcons.Icon.SquareDualArrowsToCorner,
+	context = { appPage = AppPage.AdjustScreen, destinationType = destinationType2.AppPage }
+} or nil
 
 itemInfo[itemType.HelpAndSafety] = {
 	itemType = itemType.HelpAndSafety,

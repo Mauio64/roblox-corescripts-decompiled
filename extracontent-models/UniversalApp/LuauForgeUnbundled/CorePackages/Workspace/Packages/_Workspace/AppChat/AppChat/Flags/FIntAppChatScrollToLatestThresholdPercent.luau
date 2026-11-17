@@ -1,1 +1,0 @@
-return game:DefineFastInt("AppChatScrollToLatestThresholdPercent", 100)

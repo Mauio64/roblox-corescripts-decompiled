@@ -15,15 +15,9 @@ local SharedFlags = require(parent.SharedFlags)
 local FFlagEnableBlackbirdCheck = SharedFlags.FFlagEnableBlackbirdCheck
 
 local SharedFlags2 = require(parent.SharedFlags)
-local FFlagFixUserRowCombinedName = SharedFlags2.FFlagFixUserRowCombinedName
+local FFlagUserListCtaIntegrationEnabled = SharedFlags2.FFlagUserListCtaIntegrationEnabled
 local SharedFlags3 = require(parent.SharedFlags)
-local FFlagUserListCtaIntegrationEnabled = SharedFlags3.FFlagUserListCtaIntegrationEnabled
-local SharedFlags4 = require(parent.SharedFlags)
-local FFlagUserListUsernameFallbackConfig = SharedFlags4.FFlagUserListUsernameFallbackConfig
-local SharedFlags5 = require(parent.SharedFlags)
-local FFlagAddStatusIndicatorToBaseRow = SharedFlags5.FFlagAddStatusIndicatorToBaseRow
-local SharedFlags6 = require(parent.SharedFlags)
-local FFlagUserListSurfaceExtensions = SharedFlags6.FFlagUserListSurfaceExtensions
+local FFlagUserListSurfaceExtensions = SharedFlags3.FFlagUserListSurfaceExtensions
 
 local function UserRow(props)
 	local v = useUserDataValues(props.entityId)
@@ -39,31 +33,23 @@ local function UserRow(props)
 		isRobloxSubscriber = useIsRobloxSubscriber(v2)
 	end
 
-	local title
+	local combinedName
 
-	if FFlagFixUserRowCombinedName then
-		if v.combinedName ~= "" then
-			title = v.combinedName
-		end
-	elseif v.displayName ~= "" then
-		title = v.displayName
+	if v.combinedName ~= "" then
+		combinedName = v.combinedName
 	end
 
 	local v2 = not props.configs or props.configs.showSubtitle == nil or props.configs.showSubtitle
 	local text
 
-	if FFlagUserListUsernameFallbackConfig and v.username ~= "" then
+	if v.username ~= "" then
 		text = `@{v.username}`
 	end
 
 	local subtitle
 
-	if FFlagUserListUsernameFallbackConfig then
-		if v2 then
-			subtitle = text
-		end
-	elseif v2 and v.username ~= "" then
-		subtitle = `@{v.username}`
+	if v2 then
+		subtitle = text
 	end
 
 	local v3 = not props.configs or props.configs.showPresence == nil or props.configs.showPresence
@@ -91,31 +77,27 @@ local function UserRow(props)
 	end
 
 	local contextualInfo = props.loadingState and props.loadingState.contextualInfo
-	local contextualInfo2
-
-	if FFlagUserListUsernameFallbackConfig then
-		contextualInfo2 = props.configs
-			and props.configs.showUsernameAsContextualFallback
-			and not props.contextualInfo
-			and { text = text }
-			or props.contextualInfo
-	end
+	local contextualInfo2 = props.configs
+		and props.configs.showUsernameAsContextualFallback
+		and not props.contextualInfo
+		and { text = text }
+		or props.contextualInfo
 
 	local createElement = React.createElement
 	local v4 = {
 		userId = props.entityId,
 		userPresenceType = userPresenceType,
-		title = title,
+		title = combinedName,
 		subtitle = subtitle,
 		layoutMode = props.layoutMode,
 		onActivated = props.onActivated,
 		isTitleLoading = isTitleLoading,
 		isSubtitleLoading = isSubtitleLoading,
 		isContextualInfoLoading = contextualInfo,
-		contextualInfo = 0,
-		primaryCta = 0,
-		secondaryCta = 0,
-		shouldShowNewIndicator = 0,
+		contextualInfo = contextualInfo2,
+		primaryCta = props.primaryCta,
+		secondaryCta = props.secondaryCta,
+		shouldShowNewIndicator = props.shouldShowNewIndicator,
 		ctaLoading = 0,
 		trailingContent = 0,
 		layoutOrder = 0,
@@ -123,22 +105,6 @@ local function UserRow(props)
 		isRobloxSubscriber = 0,
 		disableRowActivation = 0
 	}
-
-	if not FFlagUserListUsernameFallbackConfig then
-		contextualInfo2 = props.contextualInfo
-	end
-
-	v4.contextualInfo = contextualInfo2
-
-	v4.primaryCta = props.primaryCta
-	v4.secondaryCta = props.secondaryCta
-	local shouldShowNewIndicator
-
-	if FFlagAddStatusIndicatorToBaseRow then
-		shouldShowNewIndicator = props.shouldShowNewIndicator
-	end
-
-	v4.shouldShowNewIndicator = shouldShowNewIndicator
 	local ctaLoading
 
 	if FFlagUserListCtaIntegrationEnabled then

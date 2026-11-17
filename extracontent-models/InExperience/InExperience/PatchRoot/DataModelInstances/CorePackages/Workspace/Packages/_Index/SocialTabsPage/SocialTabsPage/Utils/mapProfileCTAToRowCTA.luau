@@ -6,6 +6,9 @@ local ButtonTypes = UserList.Enums.ButtonTypes
 
 require(SocialTabsPage.Common.Types)
 
+local SharedFlags = require(parent.SharedFlags)
+local FFlagUserListActionsV2 = SharedFlags.FFlagUserListActionsV2
+
 local function fn() end
 
 local v = {
@@ -26,12 +29,13 @@ local function mapProfileCTAToRowCTA(p, p2, p3: string)
 
 		if v2 then
 			local v3 = p2[v2]
+			local v4 = v2 == ButtonTypes.Pending or nil
 			return {
 				type = v2,
 				onActivated = v3 and function()
 					v3(p3)
 				end or fn,
-				isDisabled = v2 == ButtonTypes.Pending or nil,
+				isDisabled = FFlagUserListActionsV2 and button.disabledReason ~= nil and true or v4,
 				disabledReason = button.disabledReason
 			}
 		end

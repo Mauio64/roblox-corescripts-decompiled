@@ -10,8 +10,6 @@ local parent = AppChat.Parent
 local Cryo = require(parent.Cryo)
 require(parent.MomentsTypes)
 local React = require(parent.React)
-local AppCommonLib = require(parent.AppCommonLib)
-local Text = AppCommonLib.Text
 local Style = require(parent.Style)
 local GetTextSize = Style.GetTextSize
 local PlainText = require(script.Parent.PlainText)
@@ -31,7 +29,6 @@ local FFlagAppChatEnableAutotranslation = require(AppChat.Flags.FFlagAppChatEnab
 local MessageModel = require(AppChat.Models.MessageModel)
 
 local Foundation = require(parent.Foundation)
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local View = Foundation.View
 local Image = Foundation.Image
 
@@ -124,47 +121,18 @@ return function(p)
 
 	if FFlagAppChatEnableAutotranslation then
 		v5 = React.useCallback(function(p2: number, p3: string, p4: number, p5, p6: string?)
-			if p6 then
-				local v6
-
-				if FoundationFontFaceMigration then
-					v6 = GetTextSize(p3, v4.Typography.BodySmall.FontSize, p5, Vector2.new(p2, 10000))
-				else
-					v6 = Text.GetTextBounds(p3, p5, v4.Typography.BodySmall.FontSize, Vector2.new(p2, 10000))
-				end
-
-				local v7
-
-				if FoundationFontFaceMigration then
-					v7 = GetTextSize(p6, p4, p5, Vector2.new(p2, 10000))
-				else
-					v7 = Text.GetTextBounds(p6, p5, p4, Vector2.new(p2, 10000))
-				end
-
-				return math.max(v6.X, v7.X) + BUBBLE_PADDING * 2
-			else
-				local v6
-
-				if FoundationFontFaceMigration then
-					v6 = GetTextSize(p3, p4, p5, Vector2.new(p2, 10000))
-				else
-					v6 = Text.GetTextBounds(p3, p5, p4, Vector2.new(p2, 10000))
-				end
-
-				return v6.X + BUBBLE_PADDING * 2
+			if not p6 then
+				return GetTextSize(p3, p4, p5, Vector2.new(p2, 10000)).X + BUBBLE_PADDING * 2
 			end
+
+			local textSize = GetTextSize(p3, v4.Typography.BodySmall.FontSize, p5, Vector2.new(p2, 10000))
+
+			local textSize2 = GetTextSize(p6, p4, p5, Vector2.new(p2, 10000))
+			return math.max(textSize.X, textSize2.X) + BUBBLE_PADDING * 2
 		end)
 	else
 		v5 = React.useCallback(function(p2: number, p3: string, p4: number, p5, _: string?)
-			local v6
-
-			if FoundationFontFaceMigration then
-				v6 = GetTextSize(p3, p4, p5, Vector2.new(p2, 10000))
-			else
-				v6 = Text.GetTextBounds(p3, p5, p4, Vector2.new(p2, 10000))
-			end
-
-			return v6.X + BUBBLE_PADDING * 2
+			return GetTextSize(p3, p4, p5, Vector2.new(p2, 10000)).X + BUBBLE_PADDING * 2
 		end)
 	end
 

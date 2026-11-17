@@ -12,13 +12,11 @@ local useLocalization = Localization.Hooks.useLocalization
 local UserTile = require(parent.UserTile)
 local userTile = UserTile.UserTile
 local LayoutMode = UserTile.LayoutMode
-
-local defineFastFlag = game:DefineFastFlag("PromptFriendRequestModalRevampFriendsRename", false)
 local defineFastInt = game:DefineFastInt("PromptFriendRequestModalInputDelayMs", 1000)
 
 local function PromptFriendRequestModal(props)
 	local v = useLocalization({
-		titleText = defineFastFlag and "InGame.FriendPlayerPrompt.Title.SendFriendRequest.FriendsRename" or "InGame.FriendPlayerPrompt.Title.SendFriendRequest",
+		titleText = "InGame.FriendPlayerPrompt.Title.SendFriendRequest.FriendsRename",
 		sendText = "InGame.FriendPlayerPrompt.Action.Send"
 	})
 

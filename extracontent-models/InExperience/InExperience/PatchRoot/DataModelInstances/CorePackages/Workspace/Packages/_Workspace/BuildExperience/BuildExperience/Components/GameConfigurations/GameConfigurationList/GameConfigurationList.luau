@@ -1,7 +1,10 @@
-local parent = script:FindFirstAncestor("BuildExperience").Parent
+local BuildExperience = script:FindFirstAncestor("BuildExperience")
+local parent = BuildExperience.Parent
 
 local Foundation = require(parent.Foundation)
 local React = require(parent.React)
+
+local FFlagBuildExperienceConfigurationRowTelemetry = require(BuildExperience.Flags.FFlagBuildExperienceConfigurationRowTelemetry)
 
 local Icon = Foundation.Icon
 local List = Foundation.List
@@ -15,11 +18,33 @@ local function GameConfigurationListItem(props)
 	local row = props.row
 	local isDisabled = row.isDisabled == true
 	local onActivated = row.onActivated
-	local onActivated2 = React.useCallback(function()
+	local onRowActivated
+
+	if FFlagBuildExperienceConfigurationRowTelemetry then
+		onRowActivated = props.onRowActivated
+	else
+		onRowActivated = nil
+	end
+
+	local id = row.id
+	local useCallback = React.useCallback
+	local function fn()
+		if FFlagBuildExperienceConfigurationRowTelemetry and onRowActivated ~= nil then
+			onRowActivated(id)
+		end
+
 		if onActivated ~= nil then
 			onActivated()
 		end
-	end, { onActivated })
+	end
+
+	local v
+
+	if FFlagBuildExperienceConfigurationRowTelemetry then
+		v = id
+	end
+
+	local onActivated2 = useCallback(fn, { onActivated, onRowActivated, v })
 	local trailing
 
 	if row.trailingIcon then
@@ -33,7 +58,7 @@ local function GameConfigurationListItem(props)
 
 	local createElement = React.createElement
 	local item = List.Item
-	local v = {
+	local v2 = {
 		LayoutOrder = props.LayoutOrder,
 		title = row.title,
 		description = row.description,
@@ -46,9 +71,9 @@ local function GameConfigurationListItem(props)
 		onActivated2 = nil
 	end
 
-	v.onActivated = onActivated2
-	v.testId = props.testId
-	local element = createElement(item, v)
+	v2.onActivated = onActivated2
+	v2.testId = props.testId
+	local element = createElement(item, v2)
 
 	if isDisabled then
 		return React.createElement("CanvasGroup", {
@@ -65,22 +90,41 @@ end
 
 local function GameConfigurationList(props)
 	local testId = props.testId or "game-configuration-list"
-	local v = React.useMemo(function()
+	local useMemo = React.useMemo
+	local function fn()
 		local children = {}
 
 		for k, row in props.rows do
-			children[row.id] = React.createElement(GameConfigurationListItem, {
+			local id = row.id
+			local createElement = React.createElement
+			local onRowActivated
+
+			if FFlagBuildExperienceConfigurationRowTelemetry then
+				onRowActivated = props.onRowActivated
+			end
+
+			children[id] = createElement(GameConfigurationListItem, {
 				LayoutOrder = k,
 				row = row,
+				onRowActivated = onRowActivated,
 				testId = `{testId}-row-{row.id}`
 			})
 		end
 
 		return children
-	end, { props.rows, testId })
+	end
+
+	local rows = props.rows
+	local v
+
+	if FFlagBuildExperienceConfigurationRowTelemetry then
+		v = props.onRowActivated
+	end
+
+	local v2 = useMemo(fn, { rows, testId, v })
 
 	local createElement = React.createElement
-	local v2 = {
+	local v3 = {
 		LayoutOrder = props.layoutOrder,
 		tag = "col gap-medium size-full-0 auto-y",
 		testId = testId
@@ -88,7 +132,7 @@ local function GameConfigurationList(props)
 
 	local createElement2 = React.createElement
 
-	local v3 = {
+	local v4 = {
 		Title = React.createElement(Text, {
 			LayoutOrder = 1,
 			Text = props.title,
@@ -108,15 +152,15 @@ local function GameConfigurationList(props)
 		})
 	end
 
-	v3.Body = body
-	return createElement(View, v2, {
-		Header = createElement2(View, { LayoutOrder = 1, tag = "col gap-xsmall size-full-0 auto-y" }, v3),
+	v4.Body = body
+	return createElement(View, v3, {
+		Header = createElement2(View, { LayoutOrder = 1, tag = "col gap-xsmall size-full-0 auto-y" }, v4),
 		Rows = React.createElement(List.Root, {
 			LayoutOrder = 2,
 			hasDivider = { hasDivider = true, isInset = false },
 			isContained = true,
 			size = InputSize.Medium
-		}, v)
+		}, v2)
 	})
 end
 

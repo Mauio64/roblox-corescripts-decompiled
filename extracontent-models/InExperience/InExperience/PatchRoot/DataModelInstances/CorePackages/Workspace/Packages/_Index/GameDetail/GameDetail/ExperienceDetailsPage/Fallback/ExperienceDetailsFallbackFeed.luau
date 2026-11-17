@@ -19,32 +19,21 @@ local CompositionTags = AppComposition.CompositionTags
 
 local ExperienceDetailsFallbackAttributionRow = require(script.Parent.ExperienceDetailsFallbackAttributionRow)
 local useGameInfo = require(script.Parent.Parent.useGameInfo)
-local GameInfosRodux = require(parent.GameInfosRodux)
-local useGameInfosSelector = GameInfosRodux.useGameInfosSelector
 
 local SharedFlags = require(parent.SharedFlags)
 local FFlagLuaAppSduiEdpFallbackAttributionFromCache = SharedFlags.FFlagLuaAppSduiEdpFallbackAttributionFromCache
-local SharedFlags2 = require(parent.SharedFlags)
-local FFlagMigrateGameInfoToStore = SharedFlags2.FFlagMigrateGameInfoToStore
 
 local function ExperienceDetailsFeedSkeleton(props)
 	local universeId = props.universeId
 	local v = useTokens()
 	local isSmallScreen = props.isSmallScreen
-
-	local v2 = nil
-	local v3 = nil
+	local v2
 
 	if FFlagLuaAppSduiEdpFallbackAttributionFromCache then
-		if FFlagMigrateGameInfoToStore then
-			v3 = useGameInfo(universeId)
-		else
-			v2 = useGameInfosSelector(universeId)
-		end
+		v2 = useGameInfo(universeId)
 	end
 
-	local createElement = React.createElement
-	local v4 = {
+	return React.createElement(View, {
 		tag = {
 			["col size-full auto-y"] = true,
 			["gap-xlarge"] = isSmallScreen,
@@ -54,22 +43,11 @@ local function ExperienceDetailsFeedSkeleton(props)
 			[CompositionTags.ContentRegion.Body] = true
 		},
 		testId = "--edp-fallback-feed-skeleton"
-	}
-
-	local createElement2 = React.createElement
-	local gameName
-
-	if FFlagMigrateGameInfoToStore then
-		gameName = v3 and v3.name
-	else
-		gameName = v2 and v2.name
-	end
-
-	return createElement(View, v4, {
-		AttributionRow = createElement2(ExperienceDetailsFallbackAttributionRow, {
+	}, {
+		AttributionRow = React.createElement(ExperienceDetailsFallbackAttributionRow, {
 			universeId = universeId,
 			isLoading = true,
-			gameName = gameName,
+			gameName = v2 and v2.name,
 			isSmallScreen = isSmallScreen,
 			launchSource = props.launchSource,
 			referralSource = props.referralSource,

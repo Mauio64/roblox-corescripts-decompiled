@@ -9,7 +9,6 @@ local memo = React.memo
 local UIBlox = require(parent.UIBlox)
 local Foundation = require(parent.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local useStyle = UIBlox.Core.Style.useStyle
 
@@ -67,42 +66,18 @@ local function Label(p)
 
 	v4.IconImage = iconImage
 
-	local createElement2 = React.createElement
-	local v5 = {
+	v4.BodyText = React.createElement("TextLabel", {
 		AutomaticSize = Enum.AutomaticSize.X,
 		BackgroundTransparency = 1,
-		Font = 0,
-		FontFace = 0,
+		FontFace = normalizeFontFace(style.Tokens.Typography.BodyLarge.Font),
 		LayoutOrder = 2,
-		Size = 0,
-		Text = 0,
-		TextColor3 = 0,
-		TextSize = 0,
-		TextXAlignment = 0,
-		TextYAlignment = 0
-	}
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = style.Font.Body.Font
-	end
-
-	v5.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(style.Tokens.Typography.BodyLarge.Font)
-	end
-
-	v5.FontFace = fontFace
-
-	v5.Size = UDim2.new(0, 0, 1, 0)
-	v5.Text = joined.bodyText
-	v5.TextColor3 = joined.bodyTextColor3 or style.Theme.TextEmphasis.Color
-	v5.TextSize = style.Tokens.FontSize.FontSize_250
-	v5.TextXAlignment = Enum.TextXAlignment.Left
-	v5.TextYAlignment = Enum.TextYAlignment.Center
-	v4.BodyText = createElement2("TextLabel", v5)
+		Size = UDim2.new(0, 0, 1, 0),
+		Text = joined.bodyText,
+		TextColor3 = joined.bodyTextColor3 or style.Theme.TextEmphasis.Color,
+		TextSize = style.Tokens.FontSize.FontSize_250,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextYAlignment = Enum.TextYAlignment.Center
+	})
 	return createElement("Frame", v3, v4)
 end
 

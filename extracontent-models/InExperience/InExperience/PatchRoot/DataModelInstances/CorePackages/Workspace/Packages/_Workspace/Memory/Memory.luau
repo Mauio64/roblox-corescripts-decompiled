@@ -7,15 +7,15 @@ return {
 	["jest.config"] = script["jest.config"],
 	MemoryTracker = MemoryTracker,
 	MemoryScope = MemoryScope,
-	start = function(self: boolean?, p: string?, p2)
-		local v = self and MemoryTracker(p, p2)
+	start = function(flag: boolean?, value: string?, p)
+		local v = flag and MemoryTracker(value, p)
 
 		if v then
 			v:start()
 		end
 
 		if FFlagEnableMemoryShell then
-			MemoryShell:start()
+			MemoryShell.start(value or "app")
 		end
 	end
 }

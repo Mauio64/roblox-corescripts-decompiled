@@ -1,5 +1,0 @@
-local fFlagUIBloxEnableActionBarButtonOverride = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/UIBlox").FFlagUIBloxEnableActionBarButtonOverride
-local FFlagLuaAppUnifyPlayButtonAllSurfacesIxp = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagLuaAppUnifyPlayButtonAllSurfacesIxp")
-
-return fFlagUIBloxEnableActionBarButtonOverride
-	and (game:DefineFastFlag("LuaAppUnifyPlayButtonNonMobileEdp3", false) or FFlagLuaAppUnifyPlayButtonAllSurfacesIxp)

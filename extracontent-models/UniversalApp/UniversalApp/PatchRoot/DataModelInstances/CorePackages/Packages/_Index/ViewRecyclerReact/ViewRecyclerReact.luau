@@ -11,7 +11,6 @@ local createReactAdapter = require(script.ReactAdapter.Private.createReactAdapte
 require(script.ReactAdapter.createRecyclableComponent)
 require(script.ReactAdapter.createRecyclableView)
 require(script.ReactAdapter.createVirtualList)
-
 require(script.ReactAdapter.useRectPlacement)
 
 return createReactAdapter({ createPortal = ReactRoblox.createPortal })

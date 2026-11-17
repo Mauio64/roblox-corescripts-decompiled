@@ -44,29 +44,27 @@ local FFlagSduiTileDisableLegacyHover = Flags.FFlagSduiTileDisableLegacyHover
 local Flags2 = require(ServerDrivenUi.Flags)
 local FFlagSduiEnableHeroUnitBottomRow = Flags2.FFlagSduiEnableHeroUnitBottomRow
 local SharedFlags2 = require(parent.SharedFlags)
-local FFlagSduiAttributionRowV2 = SharedFlags2.FFlagSduiAttributionRowV2
+local FFlagSduiExperienceDetailsSocialProof = SharedFlags2.FFlagSduiExperienceDetailsSocialProof
 local SharedFlags3 = require(parent.SharedFlags)
-local FFlagSduiExperienceDetailsSocialProof = SharedFlags3.FFlagSduiExperienceDetailsSocialProof
+local FFlagSduiChipAccessoryProps = SharedFlags3.FFlagSduiChipAccessoryProps
 local SharedFlags4 = require(parent.SharedFlags)
-local FFlagSduiChipAccessoryProps = SharedFlags4.FFlagSduiChipAccessoryProps
+local FFlagLuaAppDismissUnlockUpsell = SharedFlags4.FFlagLuaAppDismissUnlockUpsell
 local SharedFlags5 = require(parent.SharedFlags)
-local FFlagLuaAppDismissUnlockUpsell = SharedFlags5.FFlagLuaAppDismissUnlockUpsell
+local FFlagLuaAppSduiGameTileFeedback = SharedFlags5.FFlagLuaAppSduiGameTileFeedback
 local SharedFlags6 = require(parent.SharedFlags)
-local FFlagLuaAppSduiGameTileFeedback = SharedFlags6.FFlagLuaAppSduiGameTileFeedback
+local FFlagSduiGameTileDirectAction = SharedFlags6.FFlagSduiGameTileDirectAction
 local SharedFlags7 = require(parent.SharedFlags)
-local FFlagSduiGameTileDirectAction = SharedFlags7.FFlagSduiGameTileDirectAction
+local FFlagSduiOptionSelectorCollection = SharedFlags7.FFlagSduiOptionSelectorCollection
+
 local SharedFlags8 = require(parent.SharedFlags)
-local FFlagSduiOptionSelectorCollection = SharedFlags8.FFlagSduiOptionSelectorCollection
-
+local FFlagSduiCollectionCarouselPlaceholderItem = SharedFlags8.FFlagSduiCollectionCarouselPlaceholderItem
 local SharedFlags9 = require(parent.SharedFlags)
-local FFlagSduiCollectionCarouselPlaceholderItem = SharedFlags9.FFlagSduiCollectionCarouselPlaceholderItem
+local FFlagSduiCollectionGridRevealRows = SharedFlags9.FFlagSduiCollectionGridRevealRows
 local SharedFlags10 = require(parent.SharedFlags)
-local FFlagSduiCollectionGridRevealRows = SharedFlags10.FFlagSduiCollectionGridRevealRows
-local SharedFlags11 = require(parent.SharedFlags)
-local FFlagSduiIndividualFeedItemSpacing = SharedFlags11.FFlagSduiIndividualFeedItemSpacing
+local FFlagSduiIndividualFeedItemSpacing = SharedFlags10.FFlagSduiIndividualFeedItemSpacing
 
-local SharedFlags12 = require(parent.SharedFlags)
-local FFlagLuaAppSduiSearchAutocompleteSuggestionComponent = SharedFlags12.FFlagLuaAppSduiSearchAutocompleteSuggestionComponent
+local SharedFlags11 = require(parent.SharedFlags)
+local FFlagLuaAppSduiSearchAutocompleteSuggestionComponent = SharedFlags11.FFlagLuaAppSduiSearchAutocompleteSuggestionComponent
 local FFlagLuaAppHeroUnitSecondaryLabelText = require(ServerDrivenUi.FFlagLuaAppHeroUnitSecondaryLabelText)
 
 local v = {}
@@ -86,7 +84,7 @@ function SduiComponentDefinitions.new()
 		zIndex = parseNumberProp_
 	}
 
-	local v2 = Cryo.Dictionary.union({
+	local union = Cryo.Dictionary.union({
 		richText = parseBooleanProp_,
 		text = parseStringProp_,
 		textTruncate = getEngineEnumParser(Enum.TextTruncate),
@@ -95,7 +93,7 @@ function SduiComponentDefinitions.new()
 		textYAlignment = getEngineEnumParser(Enum.TextYAlignment)
 	}, iconOverrides)
 
-	local v3 = {
+	local layoutOverrides = {
 		columnGap = parseNumberProp_,
 		sideMargin = parseNumberProp_,
 		numColumns = parseNumberProp_,
@@ -104,138 +102,46 @@ function SduiComponentDefinitions.new()
 		verticalGap = parseNumberProp_
 	}
 
-	local v4 = { _registeredComponents = 0 }
+	local v2 = { _registeredComponents = 0 }
 
-	local v5 = SduiComponentType.AttributionRow
+	local attributionRow = SduiComponentType.AttributionRow
 	local SduiSharedContent = require(parent.SduiSharedContent)
-	local v6 = {
-		component = SduiSharedContent.SduiAttributionRow,
-		propParsers = 0,
-		propInterface = 0
+	local registeredComponents22 = {
+		[attributionRow] = {
+			component = SduiSharedContent.SduiAttributionRow,
+			propParsers = {
+				layoutOrder = parseIntegerProp_,
+				position = parseUDim2Prop_,
+				size = parseUDim2Prop_,
+				onActivated = parseCallbackProp_,
+				rightButtonContent = parseUiComponentProp_,
+				title = parseStringProp_,
+				titleFontStyle = parseTypographyTokenProp_,
+				titleTextColor = parseColorTokenProp_,
+				subtitle = parseStringProp_,
+				subtitleFontStyle = parseTypographyTokenProp_,
+				subtitleTextColor = parseColor3Prop_,
+				subtitleIconName = getLuaTableEnumParser(Foundation.Enums.IconName, "string"),
+				subtitleIconSize = getLuaTableEnumParser(Foundation.Enums.IconSize, "string"),
+				subtitleIconStyle = parseColorTokenProp_,
+				subtitleIconVariant = getLuaTableEnumParser(Foundation.Enums.IconVariant, "string"),
+				subtitleBackgroundIconName = getLuaTableEnumParser(Foundation.Enums.IconName, "string"),
+				subtitleBackgroundIconStyle = parseColorTokenProp_,
+				subtitleOnActivated = parseCallbackProp_,
+				caption = parseStringProp_,
+				captionTextColor = parseColorTokenProp_,
+				captionFontStyle = parseTypographyTokenProp_,
+				textContainerSize = parseUDim2Prop_,
+				image = parseImageStringProp_,
+				imageSize = parseUDim2Prop_
+			},
+			propInterface = { title = t.string, subtitle = t.string }
+		}
 	}
-	local propParsers = {
-		layoutOrder = parseIntegerProp_,
-		position = parseUDim2Prop_,
-		size = nil,
-		onActivated = nil,
-		rightButtonContent = nil,
-		title = nil,
-		titleFontStyle = nil,
-		titleTextColor = nil,
-		subtitle = nil,
-		subtitleFontStyle = nil,
-		subtitleTextColor = nil,
-		subtitleIconName = 0,
-		subtitleIconSize = 0,
-		subtitleIconStyle = 0,
-		subtitleIconVariant = 0,
-		subtitleBackgroundIconName = 0,
-		subtitleBackgroundIconStyle = 0,
-		subtitleOnActivated = 0,
-		caption = 0,
-		captionTextColor = 0,
-		captionFontStyle = 0,
-		textContainerSize = 0,
-		image = 0,
-		imageSize = 0
-	}
-	local v7
 
-	if FFlagSduiAttributionRowV2 then
-		v7 = parseUDim2Prop_
-	end
-
-	propParsers.size = v7
-	propParsers.onActivated = parseCallbackProp_
-	propParsers.rightButtonContent = parseUiComponentProp_
-	v7 = if FFlagSduiAttributionRowV2 then parseStringProp_ else nil
-	propParsers.title = v7
-
-	if FFlagSduiAttributionRowV2 then
-		v7 = parseTypographyTokenProp_
-	else
-		v7 = nil
-	end
-
-	propParsers.titleFontStyle = v7
-	v7 = if FFlagSduiAttributionRowV2 then parseColorTokenProp_ else nil
-	propParsers.titleTextColor = v7
-	v7 = if FFlagSduiAttributionRowV2 then parseStringProp_ else nil
-	propParsers.subtitle = v7
-
-	if FFlagSduiAttributionRowV2 then
-		v7 = parseTypographyTokenProp_
-	else
-		v7 = nil
-	end
-
-	propParsers.subtitleFontStyle = v7
-	v7 = if FFlagSduiAttributionRowV2 then parseColor3Prop_ else nil
-	propParsers.subtitleTextColor = v7
-
-	if FFlagSduiAttributionRowV2 then
-		v7 = getLuaTableEnumParser(Foundation.Enums.IconName, "string")
-	else
-		v7 = nil
-	end
-
-	propParsers.subtitleIconName = v7
-
-	if FFlagSduiAttributionRowV2 then
-		v7 = getLuaTableEnumParser(Foundation.Enums.IconSize, "string")
-	else
-		v7 = nil
-	end
-
-	propParsers.subtitleIconSize = v7
-	v7 = if FFlagSduiAttributionRowV2 then parseColorTokenProp_ else nil
-	propParsers.subtitleIconStyle = v7
-
-	if FFlagSduiAttributionRowV2 then
-		v7 = getLuaTableEnumParser(Foundation.Enums.IconVariant, "string")
-	else
-		v7 = nil
-	end
-
-	propParsers.subtitleIconVariant = v7
-
-	if FFlagSduiAttributionRowV2 then
-		v7 = getLuaTableEnumParser(Foundation.Enums.IconName, "string")
-	else
-		v7 = nil
-	end
-
-	propParsers.subtitleBackgroundIconName = v7
-	v7 = if FFlagSduiAttributionRowV2 then parseColorTokenProp_ else nil
-	propParsers.subtitleBackgroundIconStyle = v7
-	v7 = if FFlagSduiAttributionRowV2 then parseCallbackProp_ else nil
-	propParsers.subtitleOnActivated = v7
-	v7 = if FFlagSduiAttributionRowV2 then parseStringProp_ else nil
-	propParsers.caption = v7
-	v7 = if FFlagSduiAttributionRowV2 then parseColorTokenProp_ else nil
-	propParsers.captionTextColor = v7
-
-	if FFlagSduiAttributionRowV2 then
-		v7 = parseTypographyTokenProp_
-	else
-		v7 = nil
-	end
-
-	propParsers.captionFontStyle = v7
-	v7 = if FFlagSduiAttributionRowV2 then parseUDim2Prop_ else nil
-	propParsers.textContainerSize = v7
-
-	propParsers.image = parseImageStringProp_
-	v7 = if FFlagSduiAttributionRowV2 then parseUDim2Prop_ else nil
-	propParsers.imageSize = v7
-	v6.propParsers = propParsers
-
-	v6.propInterface = FFlagSduiAttributionRowV2 and { title = t.string, subtitle = t.string } or nil
-	local registeredComponents2 = { [v5] = v6 }
-
-	v5 = SduiComponentType.Button
+	local button = SduiComponentType.Button
 	local SduiSharedContent2 = require(parent.SduiSharedContent)
-	registeredComponents2[v5] = {
+	registeredComponents22[button] = {
 		component = SduiSharedContent2.SduiButton,
 		propParsers = {
 			anchorPoint = parseVector2Prop_,
@@ -260,8 +166,8 @@ function SduiComponentDefinitions.new()
 		}
 	}
 
-	v5 = SduiComponentType.CollectionCarousel
-	local v8 = {
+	local collectionCarousel = SduiComponentType.CollectionCarousel
+	local v3 = {
 		component = require(ServerDrivenUi.Content.Collections.SduiCollectionCarousel),
 		propParsers = 0
 	}
@@ -273,7 +179,7 @@ function SduiComponentDefinitions.new()
 		itemHeightFromWidth = parseUDimProp_,
 		headerComponent = parseUiComponentProp_,
 		itemHeightMode = getLuaTableEnumParser(ItemHeightMode, "string"),
-		layoutOverrides = v3,
+		layoutOverrides = layoutOverrides,
 		numColumnsOverride = parseNumberProp_,
 		scrollingEnabledOverride = parseBooleanProp_,
 		maxItemsToShow = parseNumberProp_,
@@ -291,14 +197,13 @@ function SduiComponentDefinitions.new()
 		skipItemImpressionsLog = 0,
 		enableHoverOverflow = 0
 	}
+	local respectClipAncestors
 
 	if FFlagLuaAppRespectClipAncestorImpressions then
-		v7 = parseBooleanProp_
-	else
-		v7 = nil
+		respectClipAncestors = parseBooleanProp_
 	end
 
-	propParsers2.respectClipAncestors = v7
+	propParsers2.respectClipAncestors = respectClipAncestors
 	propParsers2.backgroundMuralUrl = parseImageStringProp_
 	propParsers2.onScrollToEnd = parseCallbackProp_
 	propParsers2.scrollThresholdFromEnd = parseNumberProp_
@@ -310,44 +215,42 @@ function SduiComponentDefinitions.new()
 	propParsers2.impressionEventName = parseStringProp_
 	propParsers2.skipItemImpressionsLog = parseBooleanProp_
 	propParsers2.enableHoverOverflow = parseBooleanProp_
-	v8.propParsers = propParsers2
-	registeredComponents2[v5] = v8
+	v3.propParsers = propParsers2
+	registeredComponents22[collectionCarousel] = v3
 
-	v5 = SduiComponentType.VariableItemWidthCarousel
-	registeredComponents2[v5] = {
+	local variableItemWidthCarousel = SduiComponentType.VariableItemWidthCarousel
+	registeredComponents22[variableItemWidthCarousel] = {
 		component = require(ServerDrivenUi.Content.Collections.SduiVariableItemWidthCarousel)
 	}
 
-	v5 = SduiComponentType.CollectionCarouselPlaceholder
-	registeredComponents2[v5] = {
+	local collectionCarouselPlaceholder = SduiComponentType.CollectionCarouselPlaceholder
+	registeredComponents22[collectionCarouselPlaceholder] = {
 		component = require(ServerDrivenUi.Content.Collections.SduiCollectionCarouselPlaceholder)
 	}
 
-	v5 = SduiComponentType.PlaceholderTile
+	local placeholderTile = SduiComponentType.PlaceholderTile
+	local v4
 
 	if FFlagSduiCollectionCarouselPlaceholderItem then
-		v7 = { component = 0 }
+		v4 = { component = 0 }
 		local SduiSharedContent3 = require(parent.SduiSharedContent)
-		v7.component = SduiSharedContent3.SduiPlaceholderTile
-	else
-		v7 = nil
+		v4.component = SduiSharedContent3.SduiPlaceholderTile
 	end
 
-	registeredComponents2[v5] = v7
+	registeredComponents22[placeholderTile] = v4
 
-	v5 = SduiComponentType.OptionSelectorCollection
+	local optionSelectorCollection = SduiComponentType.OptionSelectorCollection
+	local v5
 
 	if FFlagSduiOptionSelectorCollection then
-		v7 = { component = 0 }
-		v7.component = require(ServerDrivenUi.Content.Collections.SduiOptionSelectorCollection)
-	else
-		v7 = nil
+		v5 = { component = 0 }
+		v5.component = require(ServerDrivenUi.Content.Collections.SduiOptionSelectorCollection)
 	end
 
-	registeredComponents2[v5] = v7
+	registeredComponents22[optionSelectorCollection] = v5
 
-	v5 = SduiComponentType.CollectionGrid
-	registeredComponents2[v5] = {
+	local collectionGrid = SduiComponentType.CollectionGrid
+	registeredComponents22[collectionGrid] = {
 		component = require(ServerDrivenUi.Content.Collections.SduiCollectionGrid),
 		propParsers = {
 			anchorPoint = parseVector2Prop_,
@@ -361,7 +264,7 @@ function SduiComponentDefinitions.new()
 			headerComponent = parseUiComponentProp_,
 			itemHeightFromWidth = parseUDimProp_,
 			itemTemplateKey = parseStringProp_,
-			layoutOverrides = v3,
+			layoutOverrides = layoutOverrides,
 			maxNumRows = parseNumberProp_,
 			shouldUseFrameBoundsForImpressions = parseBooleanProp_,
 			disableSelectionOrder = parseBooleanProp_,
@@ -374,19 +277,18 @@ function SduiComponentDefinitions.new()
 		propInterface = { itemHeightFromWidth = t.UDim }
 	}
 
-	v3 = SduiComponentType.RevealRowsButtonWithDivider
+	local revealRowsButtonWithDivider = SduiComponentType.RevealRowsButtonWithDivider
+	local v6
 
 	if FFlagSduiCollectionGridRevealRows then
-		v5 = { component = 0 }
-		v5.component = require(ServerDrivenUi.Content.Collections.SduiRevealRowsButtonWithDivider)
-	else
-		v5 = nil
+		v6 = { component = 0 }
+		v6.component = require(ServerDrivenUi.Content.Collections.SduiRevealRowsButtonWithDivider)
 	end
 
-	registeredComponents2[v3] = v5
+	registeredComponents22[revealRowsButtonWithDivider] = v6
 
-	v3 = SduiComponentType.Dialog
-	registeredComponents2[v3] = {
+	local dialog = SduiComponentType.Dialog
+	registeredComponents22[dialog] = {
 		component = require(ServerDrivenUi.Content.SduiDialog),
 		propParsers = {
 			size = getLuaTableEnumParser(Foundation.Enums.DialogSize, "string"),
@@ -413,8 +315,8 @@ function SduiComponentDefinitions.new()
 		}
 	}
 
-	v3 = SduiComponentType.Divider
-	registeredComponents2[v3] = {
+	local divider = SduiComponentType.Divider
+	registeredComponents22[divider] = {
 		component = require(ServerDrivenUi.Content.SduiDivider),
 		propParsers = {
 			anchorPoint = parseVector2Prop_,
@@ -424,17 +326,17 @@ function SduiComponentDefinitions.new()
 		}
 	}
 
-	v3 = SduiComponentType.FocusNavActions
-	registeredComponents2[v3] = {
+	local focusNavActions = SduiComponentType.FocusNavActions
+	registeredComponents22[focusNavActions] = {
 		component = require(ServerDrivenUi.FocusNavigation.SduiFocusNavActions),
 		propParsers = { focusNavActions = parseFocusNavActionsProp_ },
 		propInterface = { focusNavActions = t.table }
 	}
 
-	registeredComponents2[SduiComponentType.Fragment] = { component = React.Fragment }
+	registeredComponents22[SduiComponentType.Fragment] = { component = React.Fragment }
 
-	v3 = SduiComponentType.GameTileActiveFriendsFooter
-	registeredComponents2[v3] = {
+	local gameTileActiveFriendsFooter = SduiComponentType.GameTileActiveFriendsFooter
+	registeredComponents22[gameTileActiveFriendsFooter] = {
 		component = require(ServerDrivenUi.Content.SduiGameTileActiveFriendsFooter),
 		propParsers = {
 			anchorPoint = parseVector2Prop_,
@@ -452,8 +354,8 @@ function SduiComponentDefinitions.new()
 		propInterface = { universeId = t.union(t.string, t.number) }
 	}
 
-	v3 = SduiComponentType.HeroUnit
-	registeredComponents2[v3] = {
+	local heroUnit = SduiComponentType.HeroUnit
+	registeredComponents22[heroUnit] = {
 		component = require(ServerDrivenUi.Content.SduiHeroUnit),
 		propParsers = {
 			backgroundComponent = parseUiComponentProp_,
@@ -469,16 +371,16 @@ function SduiComponentDefinitions.new()
 		}
 	}
 
-	v3 = SduiComponentType.HoldToPlay
-	registeredComponents2[v3] = {
+	local holdToPlay = SduiComponentType.HoldToPlay
+	registeredComponents22[holdToPlay] = {
 		component = require(ServerDrivenUi.FocusNavigation.SduiHoldToPlay),
 		propParsers = { universeId = parseStringProp_, placeId = parseStringProp_ },
 		propInterface = { universeId = t.union(t.string, t.number) }
 	}
 
-	v3 = SduiComponentType.Image
+	local image = SduiComponentType.Image
 	local SduiSharedContent3 = require(parent.SduiSharedContent)
-	registeredComponents2[v3] = {
+	registeredComponents22[image] = {
 		component = SduiSharedContent3.SduiImage,
 		propParsers = {
 			anchorPoint = parseVector2Prop_,
@@ -504,8 +406,8 @@ function SduiComponentDefinitions.new()
 		}
 	}
 
-	v3 = SduiComponentType.SingleItemCollection
-	registeredComponents2[v3] = {
+	local singleItemCollection = SduiComponentType.SingleItemCollection
+	registeredComponents22[singleItemCollection] = {
 		component = require(ServerDrivenUi.Content.SduiSingleItemCollection),
 		propParsers = {
 			anchorPoint = parseVector2Prop_,
@@ -518,9 +420,9 @@ function SduiComponentDefinitions.new()
 		}
 	}
 
-	v3 = SduiComponentType.PlayButton
+	local playButton = SduiComponentType.PlayButton
 	local SduiSharedContent4 = require(parent.SduiSharedContent)
-	registeredComponents2[v3] = {
+	registeredComponents22[playButton] = {
 		component = SduiSharedContent4.SduiPlayButton,
 		propParsers = {
 			anchorPoint = parseVector2Prop_,
@@ -533,8 +435,8 @@ function SduiComponentDefinitions.new()
 		propInterface = { universeId = t.union(t.string, t.number) }
 	}
 
-	v3 = SduiComponentType.SectionHeader
-	registeredComponents2[v3] = {
+	local sectionHeader = SduiComponentType.SectionHeader
+	registeredComponents22[sectionHeader] = {
 		component = require(ServerDrivenUi.Content.SduiSectionHeader),
 		propParsers = {
 			anchorPoint = parseVector2Prop_,
@@ -567,21 +469,20 @@ function SduiComponentDefinitions.new()
 		}
 	}
 
-	v3 = SduiComponentType.SearchAutocompleteSuggestion
+	local searchAutocompleteSuggestion = SduiComponentType.SearchAutocompleteSuggestion
+	local v7
 
 	if FFlagLuaAppSduiSearchAutocompleteSuggestionComponent then
-		v5 = { component = 0, propInterface = 0 }
-		v5.component = require(ServerDrivenUi.Content.SduiSearchAutocompleteSuggestion)
-		v5.propInterface = { title = t.string, isRich = t.optional(t.boolean) }
-	else
-		v5 = nil
+		v7 = { component = 0, propInterface = 0 }
+		v7.component = require(ServerDrivenUi.Content.SduiSearchAutocompleteSuggestion)
+		v7.propInterface = { title = t.string, isRich = t.optional(t.boolean) }
 	end
 
-	registeredComponents2[v3] = v5
+	registeredComponents22[searchAutocompleteSuggestion] = v7
 
-	v3 = SduiComponentType.SeeAllTile
+	local seeAllTile = SduiComponentType.SeeAllTile
 	local GameCollections = require(parent.GameCollections)
-	registeredComponents2[v3] = {
+	registeredComponents22[seeAllTile] = {
 		component = GameCollections.SeeAllTile,
 		propParsers = {
 			layoutOrder = parseNumberProp_,
@@ -592,8 +493,8 @@ function SduiComponentDefinitions.new()
 		}
 	}
 
-	v3 = SduiComponentType.SlotOverlay
-	registeredComponents2[v3] = {
+	local slotOverlay = SduiComponentType.SlotOverlay
+	registeredComponents22[slotOverlay] = {
 		component = require(ServerDrivenUi.Content.SduiSlotOverlay),
 		propParsers = {
 			anchorPoint = parseVector2Prop_,
@@ -615,9 +516,9 @@ function SduiComponentDefinitions.new()
 		}
 	}
 
-	v3 = SduiComponentType.Text
+	local text = SduiComponentType.Text
 	local SduiSharedContent5 = require(parent.SduiSharedContent)
-	registeredComponents2[v3] = {
+	registeredComponents22[text] = {
 		component = SduiSharedContent5.SduiText,
 		propParsers = {
 			anchorPoint = parseVector2Prop_,
@@ -653,8 +554,8 @@ function SduiComponentDefinitions.new()
 		}
 	}
 
-	v3 = SduiComponentType.TextIconRow
-	registeredComponents2[v3] = {
+	local textIconRow = SduiComponentType.TextIconRow
+	registeredComponents22[textIconRow] = {
 		component = require(ServerDrivenUi.Content.SduiTextIconRow),
 		propParsers = {
 			anchorPoint = parseVector2Prop_,
@@ -673,7 +574,7 @@ function SduiComponentDefinitions.new()
 			icon = parseIconProp_,
 			iconWidth = parseNumberProp_,
 			iconColor = parseColor3Prop_,
-			textOverrides = v2,
+			textOverrides = union,
 			iconOverrides = iconOverrides,
 			textFlexMode = getEngineEnumParser(Enum.UIFlexMode),
 			backgroundStyle = parseColorTokenProp_,
@@ -681,8 +582,8 @@ function SduiComponentDefinitions.new()
 		}
 	}
 
-	iconOverrides = SduiComponentType.TextPill
-	registeredComponents2[iconOverrides] = {
+	local textPill = SduiComponentType.TextPill
+	registeredComponents22[textPill] = {
 		component = require(ServerDrivenUi.Content.SduiTextPill),
 		propParsers = {
 			anchorPoint = parseVector2Prop_,
@@ -694,8 +595,8 @@ function SduiComponentDefinitions.new()
 		}
 	}
 
-	iconOverrides = SduiComponentType.Tile
-	local v9 = {
+	local tile = SduiComponentType.Tile
+	local v8 = {
 		component = require(ServerDrivenUi.Content.SduiTile),
 		propParsers = 0
 	}
@@ -732,14 +633,13 @@ function SduiComponentDefinitions.new()
 		bottomButtonGap = 0,
 		holdActionConfig = 0
 	}
+	local enableLegacyHoverState
 
-	if FFlagSduiTileDisableLegacyHover then
-		v2 = nil
-	else
-		v2 = parseBooleanProp_
+	if not FFlagSduiTileDisableLegacyHover then
+		enableLegacyHoverState = parseBooleanProp_
 	end
 
-	propParsers3.enableLegacyHoverState = v2
+	propParsers3.enableLegacyHoverState = enableLegacyHoverState
 	propParsers3.focusNavActionsComponent = parseUiComponentProp_
 	propParsers3.bottomButtonComponent = parseUiComponentProp_
 	propParsers3.bottomButtonGap = parseNumberProp_
@@ -748,11 +648,11 @@ function SduiComponentDefinitions.new()
 		focusNavigationEventName = parseStringProp_,
 		keyCode = getEngineEnumParser(Enum.KeyCode)
 	}
-	v9.propParsers = propParsers3
-	registeredComponents2[iconOverrides] = v9
+	v8.propParsers = propParsers3
+	registeredComponents22[tile] = v8
 
-	iconOverrides = SduiComponentType.TileFooter
-	registeredComponents2[iconOverrides] = {
+	local tileFooter = SduiComponentType.TileFooter
+	registeredComponents22[tileFooter] = {
 		component = require(ServerDrivenUi.Content.SduiTileFooter),
 		propParsers = {
 			anchorPoint = parseVector2Prop_,
@@ -780,9 +680,9 @@ function SduiComponentDefinitions.new()
 		}
 	}
 
-	iconOverrides = SduiComponentType.View
+	local view = SduiComponentType.View
 	local SduiSharedContent6 = require(parent.SduiSharedContent)
-	registeredComponents2[iconOverrides] = {
+	registeredComponents22[view] = {
 		component = SduiSharedContent6.SduiView,
 		propParsers = {
 			anchorPoint = parseVector2Prop_,
@@ -812,29 +712,29 @@ function SduiComponentDefinitions.new()
 			zIndex = parseNumberProp_
 		}
 	}
-	v4._registeredComponents = registeredComponents2
+	v2._registeredComponents = registeredComponents22
 
-	iconOverrides = v4._registeredComponents
-	v2 = SduiComponentType.CountdownTextIconRow
-	iconOverrides[v2] = {
+	local registeredComponents = v2._registeredComponents
+	local countdownTextIconRow = SduiComponentType.CountdownTextIconRow
+	registeredComponents[countdownTextIconRow] = {
 		component = require(ServerDrivenUi.Content.SduiCountdownTextIconRow),
-		propParsers = Cryo.Dictionary.join(v4._registeredComponents[SduiComponentType.TextIconRow], {
+		propParsers = Cryo.Dictionary.join(v2._registeredComponents[SduiComponentType.TextIconRow], {
 			endTimestamp = parseNumberProp_,
 			formatStringHoursMinutes = parseStringProp_,
 			defaultString = parseStringProp_
 		})
 	}
 
-	iconOverrides = v4._registeredComponents
-	v2 = SduiComponentType.GameTile
-	local v10 = {
+	local _registeredComponents = v2._registeredComponents
+	local gameTile = SduiComponentType.GameTile
+	local v9 = {
 		component = require(ServerDrivenUi.Content.SduiGameTile),
 		propParsers = 0,
 		propInterface = 0
 	}
-	v3 = Cryo.Dictionary.join
-	v5 = v4._registeredComponents[SduiComponentType.Tile].propParsers
-	local v11 = {
+	local join = Cryo.Dictionary.join
+	local propParsers = v2._registeredComponents[SduiComponentType.Tile].propParsers
+	local v10 = {
 		universeId = parseStringProp_,
 		placeId = parseStringProp_,
 		collectionId = nil,
@@ -845,61 +745,57 @@ function SduiComponentDefinitions.new()
 		ratingText = nil,
 		playerCount = nil
 	}
+	local collectionId
 
 	if FFlagLuaAppSduiGameTileFeedback then
-		v7 = parseStringProp_
-	else
-		v7 = nil
+		collectionId = parseStringProp_
 	end
 
-	v11.collectionId = v7
+	v10.collectionId = collectionId
+	local hiddenStateComponent
 
 	if FFlagLuaAppSduiGameTileFeedback then
-		v7 = parseLazyUiComponentProp_
-	else
-		v7 = nil
+		hiddenStateComponent = parseLazyUiComponentProp_
 	end
 
-	v11.hiddenStateComponent = v7
+	v10.hiddenStateComponent = hiddenStateComponent
+	local overflowMenuComponent
 
 	if FFlagLuaAppSduiGameTileFeedback then
-		v7 = parseLazyUiComponentProp_
-	else
-		v7 = nil
+		overflowMenuComponent = parseLazyUiComponentProp_
 	end
 
-	v11.overflowMenuComponent = v7
+	v10.overflowMenuComponent = overflowMenuComponent
+	local directActionComponent
 
 	if FFlagSduiGameTileDirectAction then
-		v7 = parseLazyUiComponentProp_
-	else
-		v7 = nil
+		directActionComponent = parseLazyUiComponentProp_
 	end
 
-	v11.directActionComponent = v7
-	v11.disableHoldToPlay = parseBooleanProp_
-	v11.ratingText = parseStringProp_
-	v11.playerCount = parseNumberProp_
-	v10.propParsers = v3(v5, v11)
+	v10.directActionComponent = directActionComponent
+	v10.disableHoldToPlay = parseBooleanProp_
+	v10.ratingText = parseStringProp_
+	v10.playerCount = parseNumberProp_
+	v9.propParsers = join(propParsers, v10)
 
-	v10.propInterface = {
+	v9.propInterface = {
 		universeId = t.union(t.string, t.number),
 		placeId = t.union(t.string, t.number)
 	}
-	iconOverrides[v2] = v10
+	_registeredComponents[gameTile] = v9
 
 	if FFlagLuaAppSduiGameTileFeedback then
-		local registeredComponents = v4._registeredComponents
+		local registeredComponents2 = v2._registeredComponents
 		local gameTileHiddenState = SduiComponentType.GameTileHiddenState
-		registeredComponents[gameTileHiddenState] = {
+		registeredComponents2[gameTileHiddenState] = {
 			component = require(ServerDrivenUi.Content.SduiGameTileHiddenState)
 		}
 	end
 
 	if FFlagSduiEnableHeroUnitBottomRow then
-		local registeredComponents = v4._registeredComponents
+		local registeredComponents2 = v2._registeredComponents
 		local heroUnitBottomRow = SduiComponentType.HeroUnitBottomRow
-		local v12 = {
+		local v11 = {
 			component = require(ServerDrivenUi.Content.SduiHeroUnitBottomRow),
 			propParsers = 0
 		}
@@ -920,14 +816,14 @@ function SduiComponentDefinitions.new()
 
 		propParsers4.secondaryLabelText = secondaryLabelText
 		propParsers4.rightLabelContent = parseUiComponentProp_
-		v12.propParsers = propParsers4
-		registeredComponents[heroUnitBottomRow] = v12
+		v11.propParsers = propParsers4
+		registeredComponents2[heroUnitBottomRow] = v11
 	end
 
-	iconOverrides = v4._registeredComponents
-	v2 = SduiComponentType.Chip
+	local registeredComponents2 = v2._registeredComponents
+	local chip = SduiComponentType.Chip
 	local SduiSharedContent7 = require(parent.SduiSharedContent)
-	iconOverrides[v2] = {
+	registeredComponents2[chip] = {
 		component = SduiSharedContent7.SduiChip,
 		propParsers = {
 			anchorPoint = parseVector2Prop_,
@@ -952,10 +848,10 @@ function SduiComponentDefinitions.new()
 		} or nil
 	}
 
-	iconOverrides = v4._registeredComponents
-	v2 = SduiComponentType.DualActionChip
+	local registeredComponents3 = v2._registeredComponents
+	local dualActionChip = SduiComponentType.DualActionChip
 	local SduiSharedContent8 = require(parent.SduiSharedContent)
-	iconOverrides[v2] = {
+	registeredComponents3[dualActionChip] = {
 		component = SduiSharedContent8.SduiDualActionChip,
 		propParsers = {
 			anchorPoint = parseVector2Prop_,
@@ -971,9 +867,9 @@ function SduiComponentDefinitions.new()
 		}
 	}
 
-	iconOverrides = v4._registeredComponents
-	v2 = SduiComponentType.AssociatedItemsRow
-	iconOverrides[v2] = {
+	local registeredComponents4 = v2._registeredComponents
+	local associatedItemsRow = SduiComponentType.AssociatedItemsRow
+	registeredComponents4[associatedItemsRow] = {
 		component = require(ServerDrivenUi.Content.SduiAssociatedItemsRow),
 		propParsers = {
 			layoutOrder = parseIntegerProp_,
@@ -982,9 +878,9 @@ function SduiComponentDefinitions.new()
 		}
 	}
 
-	iconOverrides = v4._registeredComponents
-	v2 = SduiComponentType.ExperienceAssociatedItemsRow
-	iconOverrides[v2] = {
+	local registeredComponents5 = v2._registeredComponents
+	local experienceAssociatedItemsRow = SduiComponentType.ExperienceAssociatedItemsRow
+	registeredComponents5[experienceAssociatedItemsRow] = {
 		component = require(ServerDrivenUi.Content.ExperienceDetails.ExperienceAssociatedItemsRow),
 		propParsers = {
 			layoutOrder = parseIntegerProp_,
@@ -994,66 +890,66 @@ function SduiComponentDefinitions.new()
 		propInterface = { universeId = t.string }
 	}
 
-	iconOverrides = v4._registeredComponents
-	v2 = SduiComponentType.ExperienceDetailsVoteChip
-	iconOverrides[v2] = {
+	local registeredComponents6 = v2._registeredComponents
+	local experienceDetailsVoteChip = SduiComponentType.ExperienceDetailsVoteChip
+	registeredComponents6[experienceDetailsVoteChip] = {
 		component = require(ServerDrivenUi.Content.ExperienceDetails.ExperienceDetailsVoteChip),
 		propParsers = { layoutOrder = parseIntegerProp_, universeId = parseStringProp_ },
 		propInterface = { universeId = t.string }
 	}
 
-	iconOverrides = v4._registeredComponents
-	v2 = SduiComponentType.ExperienceDetailsFavoriteChip
-	iconOverrides[v2] = {
+	local registeredComponents7 = v2._registeredComponents
+	local experienceDetailsFavoriteChip = SduiComponentType.ExperienceDetailsFavoriteChip
+	registeredComponents7[experienceDetailsFavoriteChip] = {
 		component = require(ServerDrivenUi.Content.ExperienceDetails.ExperienceDetailsFavoriteChip),
 		propParsers = { layoutOrder = parseIntegerProp_, universeId = parseStringProp_ },
 		propInterface = { universeId = t.string }
 	}
 
-	iconOverrides = v4._registeredComponents
-	v2 = SduiComponentType.ExperienceDetailsNotifyChip
-	iconOverrides[v2] = {
+	local registeredComponents8 = v2._registeredComponents
+	local experienceDetailsNotifyChip = SduiComponentType.ExperienceDetailsNotifyChip
+	registeredComponents8[experienceDetailsNotifyChip] = {
 		component = require(ServerDrivenUi.Content.ExperienceDetails.ExperienceDetailsNotifyChip),
 		propParsers = { layoutOrder = parseIntegerProp_, universeId = parseStringProp_ },
 		propInterface = { universeId = t.string }
 	}
 
-	iconOverrides = v4._registeredComponents
-	v2 = SduiComponentType.ExperienceDetailsActiveChip
-	iconOverrides[v2] = {
+	local registeredComponents9 = v2._registeredComponents
+	local experienceDetailsActiveChip = SduiComponentType.ExperienceDetailsActiveChip
+	registeredComponents9[experienceDetailsActiveChip] = {
 		component = require(ServerDrivenUi.Content.ExperienceDetails.ExperienceDetailsActiveChip),
 		propParsers = { layoutOrder = parseIntegerProp_, universeId = parseStringProp_ },
 		propInterface = { universeId = t.string }
 	}
 
-	iconOverrides = v4._registeredComponents
-	v2 = SduiComponentType.ExperienceDetailsShareChip
-	iconOverrides[v2] = {
+	local registeredComponents10 = v2._registeredComponents
+	local experienceDetailsShareChip = SduiComponentType.ExperienceDetailsShareChip
+	registeredComponents10[experienceDetailsShareChip] = {
 		component = require(ServerDrivenUi.Content.ExperienceDetails.ExperienceDetailsShareChip),
 		propParsers = { layoutOrder = parseIntegerProp_, universeId = parseStringProp_ },
 		propInterface = { universeId = t.string }
 	}
 
-	iconOverrides = v4._registeredComponents
-	v2 = SduiComponentType.ExperienceDetailsReportChip
-	iconOverrides[v2] = {
+	local registeredComponents11 = v2._registeredComponents
+	local experienceDetailsReportChip = SduiComponentType.ExperienceDetailsReportChip
+	registeredComponents11[experienceDetailsReportChip] = {
 		component = require(ServerDrivenUi.Content.ExperienceDetails.ExperienceDetailsReportChip),
 		propParsers = { layoutOrder = parseIntegerProp_, universeId = parseStringProp_ },
 		propInterface = { universeId = t.string }
 	}
 
 	if FFlagSduiExperienceDetailsSocialProof then
-		local registeredComponents = v4._registeredComponents
-		local v12 = SduiComponentType.ExperienceDetailsConnectionsPlayedChip
-		registeredComponents[v12] = {
+		local registeredComponents12 = v2._registeredComponents
+		local experienceDetailsConnectionsPlayedChip = SduiComponentType.ExperienceDetailsConnectionsPlayedChip
+		registeredComponents12[experienceDetailsConnectionsPlayedChip] = {
 			component = require(ServerDrivenUi.Content.ExperienceDetails.ExperienceDetailsConnectionsPlayedChip),
 			propParsers = { layoutOrder = parseIntegerProp_, universeId = parseStringProp_ },
 			propInterface = { universeId = t.string }
 		}
 
-		registeredComponents = v4._registeredComponents
-		v12 = SduiComponentType.ExperienceDetailsConnectionsPlayedTextRow
-		registeredComponents[v12] = {
+		local registeredComponents13 = v2._registeredComponents
+		local experienceDetailsConnectionsPlayedTextRow = SduiComponentType.ExperienceDetailsConnectionsPlayedTextRow
+		registeredComponents13[experienceDetailsConnectionsPlayedTextRow] = {
 			component = require(ServerDrivenUi.Content.ExperienceDetails.ExperienceDetailsConnectionsPlayedTextRow),
 			propParsers = {
 				layoutOrder = parseIntegerProp_,
@@ -1064,10 +960,10 @@ function SduiComponentDefinitions.new()
 		}
 	end
 
-	iconOverrides = v4._registeredComponents
-	v2 = SduiComponentType.VerticalFeed
+	local registeredComponents12 = v2._registeredComponents
+	local verticalFeed = SduiComponentType.VerticalFeed
 	local SduiSharedContent9 = require(parent.SduiSharedContent)
-	local v12 = { component = SduiSharedContent9.SduiVerticalFeed, propParsers = 0 }
+	local v11 = { component = SduiSharedContent9.SduiVerticalFeed, propParsers = 0 }
 	local propParsers4 = {
 		layoutOrder = parseIntegerProp_,
 		feedItems = getArrayMetatableParser(parseLazyUiComponentProp_),
@@ -1085,14 +981,13 @@ function SduiComponentDefinitions.new()
 		stickyContentTag = 0,
 		backgroundStyle = 0
 	}
+	local gapAfterFirstFeedItem
 
 	if FFlagSduiIndividualFeedItemSpacing then
-		v3 = parseNumberProp_
-	else
-		v3 = nil
+		gapAfterFirstFeedItem = parseNumberProp_
 	end
 
-	propParsers4.gapAfterFirstFeedItem = v3
+	propParsers4.gapAfterFirstFeedItem = gapAfterFirstFeedItem
 	propParsers4.thresholdFromEnd = parseNumberProp_
 	propParsers4.onScrollToEnd = parseCallbackProp_
 	propParsers4.onRefresh = parseCallbackProp_
@@ -1104,23 +999,23 @@ function SduiComponentDefinitions.new()
 	propParsers4.stickyBackgroundStyle = parseColorTokenProp_
 	propParsers4.stickyContentTag = parseStringProp_
 	propParsers4.backgroundStyle = parseColorTokenProp_
-	v12.propParsers = propParsers4
-	iconOverrides[v2] = v12
+	v11.propParsers = propParsers4
+	registeredComponents12[verticalFeed] = v11
 
-	iconOverrides = v4._registeredComponents
-	v2 = SduiComponentType.BadgeTile
-	iconOverrides[v2] = {
+	local registeredComponents13 = v2._registeredComponents
+	local badgeTile = SduiComponentType.BadgeTile
+	registeredComponents13[badgeTile] = {
 		component = require(ServerDrivenUi.Content.SduiBadgeTile),
-		propParsers = Cryo.Dictionary.join(v4._registeredComponents[SduiComponentType.Tile].propParsers, {
+		propParsers = Cryo.Dictionary.join(v2._registeredComponents[SduiComponentType.Tile].propParsers, {
 			imageCornerRadius = parseNumberProp_,
 			imagePadding = parseNumberProp_
 		})
 	}
 
-	iconOverrides = v4._registeredComponents
-	v2 = SduiComponentType.Badge
+	local registeredComponents14 = v2._registeredComponents
+	local badge = SduiComponentType.Badge
 	local SduiSharedContent10 = require(parent.SduiSharedContent)
-	iconOverrides[v2] = {
+	registeredComponents14[badge] = {
 		component = SduiSharedContent10.SduiBadge,
 		propParsers = {
 			anchorPoint = parseVector2Prop_,
@@ -1134,16 +1029,16 @@ function SduiComponentDefinitions.new()
 		}
 	}
 
-	iconOverrides = v4._registeredComponents
-	v2 = SduiComponentType.SongTile
-	iconOverrides[v2] = {
+	local registeredComponents15 = v2._registeredComponents
+	local songTile = SduiComponentType.SongTile
+	registeredComponents15[songTile] = {
 		component = require(ServerDrivenUi.Content.SduiSongTile)
 	}
 
-	iconOverrides = v4._registeredComponents
-	v2 = SduiComponentType.InfoTable
+	local registeredComponents16 = v2._registeredComponents
+	local infoTable = SduiComponentType.InfoTable
 	local SduiSharedContent11 = require(parent.SduiSharedContent)
-	iconOverrides[v2] = {
+	registeredComponents16[infoTable] = {
 		component = SduiSharedContent11.SduiInfoTable,
 		propParsers = {
 			layoutOrder = parseIntegerProp_,
@@ -1155,10 +1050,10 @@ function SduiComponentDefinitions.new()
 		propInterface = { items = t.array(t.table) }
 	}
 
-	iconOverrides = v4._registeredComponents
-	v2 = SduiComponentType.InfoTableCell
+	local registeredComponents17 = v2._registeredComponents
+	local infoTableCell = SduiComponentType.InfoTableCell
 	local AppBlox = require(parent.AppBlox)
-	iconOverrides[v2] = {
+	registeredComponents17[infoTableCell] = {
 		component = AppBlox.InfoTableCell,
 		propParsers = {
 			labelComponent = parseUiComponentProp_,
@@ -1174,10 +1069,10 @@ function SduiComponentDefinitions.new()
 		}
 	}
 
-	iconOverrides = v4._registeredComponents
-	v2 = SduiComponentType.ExpandableText
+	local registeredComponents18 = v2._registeredComponents
+	local expandableText = SduiComponentType.ExpandableText
 	local SduiSharedContent12 = require(parent.SduiSharedContent)
-	iconOverrides[v2] = {
+	registeredComponents18[expandableText] = {
 		component = SduiSharedContent12.SduiExpandableText,
 		propParsers = {
 			layoutOrder = parseIntegerProp_,
@@ -1194,10 +1089,10 @@ function SduiComponentDefinitions.new()
 		propInterface = { text = t.string }
 	}
 
-	iconOverrides = v4._registeredComponents
-	v2 = SduiComponentType.OverflowMenu
+	local registeredComponents19 = v2._registeredComponents
+	local overflowMenu = SduiComponentType.OverflowMenu
 	local SduiSharedContent13 = require(parent.SduiSharedContent)
-	iconOverrides[v2] = {
+	registeredComponents19[overflowMenu] = {
 		component = SduiSharedContent13.SduiOverflowMenu,
 		propParsers = {
 			anchorPoint = parseVector2Prop_,
@@ -1217,9 +1112,9 @@ function SduiComponentDefinitions.new()
 	}
 
 	if FFlagLuaAppDismissUnlockUpsell then
-		local registeredComponents = v4._registeredComponents
+		local registeredComponents20 = v2._registeredComponents
 		local ageCheckUpsellRow = SduiComponentType.AgeCheckUpsellRow
-		registeredComponents[ageCheckUpsellRow] = {
+		registeredComponents20[ageCheckUpsellRow] = {
 			component = require(ServerDrivenUi.Content.SduiAgeCheckUpsellRow),
 			propParsers = {
 				leading = parseUiComponentProp_,
@@ -1238,8 +1133,8 @@ function SduiComponentDefinitions.new()
 		}
 	end
 
-	setmetatable(v4, SduiComponentDefinitions)
-	return v4
+	setmetatable(v2, SduiComponentDefinitions)
+	return v2
 end
 
 function SduiComponentDefinitions:getComponentDefinition(p)

@@ -4,6 +4,8 @@ local parent2 = parent.Parent
 local React = require(parent2.React)
 local Signals = require(parent2.Signals)
 local SignalsReact = require(parent2.SignalsReact)
+local Foundation = require(parent2.Foundation)
+local useTokens = Foundation.Hooks.useTokens
 
 require(parent2.LeaderboardStore)
 
@@ -14,13 +16,15 @@ local resolveDisplayName = require(parent.Common.resolveDisplayName)
 local Constants = require(parent.Common.Constants)
 require(parent.Common.computeStatColumns)
 
+local FFlagPlayerListContrastingTeamText = require(parent.Flags.FFlagPlayerListContrastingTeamText)
+
 local TEAM_LAYOUT_MULTIPLIER = Constants.TEAM_LAYOUT_MULTIPLIER
 
 local signal = Signals.createSignal({})
 
 local selection = { Selectable = true }
 
-local function buildEntryViewElement(props, p, layoutOrder, onActivated, rowRef, selection2)
+local function buildEntryViewElement(props, p, layoutOrder, onActivated, rowRef, selection2, p2)
 	local rowHeight = props.rowHeight
 	local statColumns = props.statColumns or {}
 
@@ -40,13 +44,32 @@ local function buildEntryViewElement(props, p, layoutOrder, onActivated, rowRef,
 			playerStat = p.stats.getData(statColumn.name, false)
 		end
 
-		children[`Stat_{statColumn.name}`] = React.createElement(StatCell, {
+		local formatted = `Stat_{statColumn.name}`
+		local createElement = React.createElement
+		local v = {
 			statName = statColumn.name,
 			playerStat = playerStat,
 			statWidth = props.statWidth,
 			rowHeight = rowHeight,
-			layoutOrder = i + 1
-		})
+			layoutOrder = i + 1,
+			fontStyle = 0,
+			textStyle = 0
+		}
+		local fontStyle
+
+		if FFlagPlayerListContrastingTeamText then
+			fontStyle = p2.Typography.BodySmall
+		end
+
+		v.fontStyle = fontStyle
+		local textStyle
+
+		if FFlagPlayerListContrastingTeamText then
+			textStyle = p2.Color.Content.Default
+		end
+
+		v.textStyle = textStyle
+		children[formatted] = createElement(StatCell, v)
 	end
 
 	return React.createElement(LeaderboardRowShell, {
@@ -102,6 +125,11 @@ end
 
 local function EntryView(p)
 	local v, v2, layoutOrder, onActivated = useEntryViewCore(p)
+	local v3
+
+	if FFlagPlayerListContrastingTeamText then
+		v3 = useTokens()
+	end
 
 	local rowRefForward = p.rowRefForward
 	return buildEntryViewElement(p, v2, layoutOrder, onActivated, React.useCallback(function(current)
@@ -114,7 +142,7 @@ local function EntryView(p)
 				rowRefForward.current = current
 			end
 		end
-	end, { v, rowRefForward }), selection)
+	end, { v, rowRefForward }), selection, v3)
 end
 
 return React.memo(EntryView)

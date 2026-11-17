@@ -16,6 +16,9 @@ local fetchEventDetails = require(parent.Common.fetchEventDetails)
 
 local ServiceOverrideContext = require(parent.Components.CoreUI.ServiceOverrideContext)
 
+local SharedFlags = require(parent2.SharedFlags)
+local FFlagInGameRsvpPushUpsellEnabled = SharedFlags.FFlagInGameRsvpPushUpsellEnabled
+
 return function(p)
 	local v = useRoactService(RoactNetworking)
 
@@ -27,7 +30,10 @@ return function(p)
 		end, function(p3)
 			socialService:PromptRsvpToEventCompleted(p2, false, Enum.RsvpStatus.None)
 			warn("Error fetching event details: ", p3)
-			p.closePrompt()
+
+			if not FFlagInGameRsvpPushUpsellEnabled then
+				p.closePrompt()
+			end
 		end)
 	end, { p.openRsvpPrompt, v })
 

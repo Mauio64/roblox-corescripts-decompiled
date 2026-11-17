@@ -151,8 +151,7 @@ end
 
 function resolveLazyType(p)
 	local payload = p._payload
-	local init = p._init
-	local success, result = xpcall(init, describeError, payload)
+	local success, result = xpcall(p._init, describeError, payload)
 	return if success then result else p
 end
 
@@ -376,12 +375,10 @@ local function ChildReconciler(p)
 				local fiberFromPortal = createFiberFromPortal(data, return_.mode, p2)
 				fiberFromPortal.return_ = return_
 				return fiberFromPortal
+			elseif Typeof == REACT_LAZY_TYPE and enableLazyElements then
+				local payload = data._payload
+				return createChild(return_, data._init(payload), p2)
 			else
-				if Typeof == REACT_LAZY_TYPE and enableLazyElements then
-					local payload = data._payload
-					return createChild(return_, data._init(payload), p2)
-				end
-
 				local fiberFromFragment = createFiberFromFragment(data, return_.mode, p2, nil)
 				fiberFromFragment.return_ = return_
 				return fiberFromFragment
@@ -432,12 +429,10 @@ local function ChildReconciler(p)
 				end
 
 				return nil
+			elseif Typeof == REACT_LAZY_TYPE and enableLazyElements then
+				local payload = data._payload
+				return updateSlot(return_, p2, data._init(payload), p3)
 			else
-				if Typeof == REACT_LAZY_TYPE and enableLazyElements then
-					local payload = data._payload
-					return updateSlot(return_, p2, data._init(payload), p3)
-				end
-
 				if key ~= nil then
 					return nil
 				end
@@ -488,12 +483,10 @@ local function ChildReconciler(p)
 				end
 
 				return updatePortal(return_, p2[p3], data, p4)
+			elseif Typeof == REACT_LAZY_TYPE and enableLazyElements then
+				local payload = data._payload
+				return updateFromMap(p2, return_, p3, data._init(payload), p4)
 			else
-				if Typeof == REACT_LAZY_TYPE and enableLazyElements then
-					local payload = data._payload
-					return updateFromMap(p2, return_, p3, data._init(payload), p4)
-				end
-
 				return updateFragment(return_, p2[p3], data, p4) -- inferred equivalent call
 			end
 		elseif typeName == "string" or typeName == "number" then

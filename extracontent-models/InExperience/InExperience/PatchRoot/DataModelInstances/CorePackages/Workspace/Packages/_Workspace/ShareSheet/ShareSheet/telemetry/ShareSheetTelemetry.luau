@@ -3,8 +3,6 @@ local TelemetryService = game:GetService("TelemetryService")
 local ShareSheet = script:FindFirstAncestor("ShareSheet")
 local parent = ShareSheet.Parent
 
-local SharedFlags = require(parent.SharedFlags)
-local FFlagShareSheetFriendsSort = SharedFlags.FFlagShareSheetFriendsSort
 require(parent.AppChat.GetExternalChatMessageSenderStore)
 local LoggingProtocol = require(parent.LoggingProtocol)
 require(ShareSheet.Recipients.RecipientSource)
@@ -202,31 +200,16 @@ end
 function ShareSheetTelemetry.startMessageSendResult(data)
 	local now = os.clock()
 	return function(p)
-		local logMessageSendResult = ShareSheetTelemetry.logMessageSendResult
-		local v7 = {
+		ShareSheetTelemetry.logMessageSendResult({
 			context = data.context,
-			recipientSource = 0,
-			telemetryId = 0,
-			requestedConversationId = 0,
-			resolvedConversationId = 0,
-			sendStatus = 0,
-			hasCustomMessage = 0,
-			durationMs = 0
-		}
-		local recipientSource
-
-		if FFlagShareSheetFriendsSort then
-			recipientSource = data.recipientSource
-		end
-
-		v7.recipientSource = recipientSource
-		v7.telemetryId = data.telemetryId
-		v7.requestedConversationId = data.requestedConversationId
-		v7.resolvedConversationId = p.conversationId
-		v7.sendStatus = p.status
-		v7.hasCustomMessage = data.hasCustomMessage
-		v7.durationMs = getElapsedTimeMs(now)
-		logMessageSendResult(v7)
+			recipientSource = data.recipientSource,
+			telemetryId = data.telemetryId,
+			requestedConversationId = data.requestedConversationId,
+			resolvedConversationId = p.conversationId,
+			sendStatus = p.status,
+			hasCustomMessage = data.hasCustomMessage,
+			durationMs = getElapsedTimeMs(now)
+		})
 	end
 end
 

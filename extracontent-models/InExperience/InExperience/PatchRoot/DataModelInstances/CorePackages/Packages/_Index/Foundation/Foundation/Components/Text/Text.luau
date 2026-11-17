@@ -6,7 +6,6 @@ local ReactIs = require(parent.ReactIs)
 
 local Interactable = require(Foundation.Components.Interactable)
 
-local Flags = require(Foundation.Utility.Flags)
 local GuiObjectChildren = require(Foundation.Utility.GuiObjectChildren)
 require(Foundation.Components.Types)
 local indexBindable = require(Foundation.Utility.indexBindable)
@@ -37,31 +36,13 @@ local function Text(p, ref)
 	local v5 = useStyleTags((useDefaultTags(v2.tag, v4)))
 
 	local fontFace = React.useMemo(function()
-		if Flags.FoundationFontFaceMigration then
-			local v6
+		local v6
 
-			if v2.fontStyle ~= nil then
-				v6 = v2.fontStyle.Font
-			end
-
-			return normalizeFontFace(v6)
-		else
-			local font
-
-			if v2.fontStyle ~= nil then
-				font = v2.fontStyle.Font
-			end
-
-			if typeof(font) == "table" and not ReactIs.isBinding(font) then
-				return Font.new(font.Family, font.Weight, font.Style)
-			end
-
-			if typeof(font) == "EnumItem" then
-				return Font.fromEnum(font)
-			end
-
-			return font
+		if v2.fontStyle ~= nil then
+			v6 = v2.fontStyle.Font
 		end
+
+		return normalizeFontFace(v6)
 	end, { v2.fontStyle })
 
 	local v6 = React.useMemo(function()

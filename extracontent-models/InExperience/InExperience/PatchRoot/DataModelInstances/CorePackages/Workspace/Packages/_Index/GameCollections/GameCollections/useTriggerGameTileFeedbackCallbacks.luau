@@ -3,33 +3,60 @@ local React = require(parent.React)
 
 local InteractionFeedback = require(parent.InteractionFeedback)
 local useTriggerFeedback = InteractionFeedback.useTriggerFeedback
+require(parent.InteractionFeedback)
+local DiscoveryUtils = require(parent.DiscoveryUtils)
+local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
 
-local function useTriggerGameTileFeedbackCallbacks()
-	local v = useTriggerFeedback()
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppSduiGameTileInteractionFeedback = SharedFlags.FFlagLuaAppSduiGameTileInteractionFeedback
+
+local function useTriggerGameTileFeedbackCallbacks(callback)
+	if not FFlagLuaAppSduiGameTileInteractionFeedback then
+		callback = useTriggerFeedback()
+	end
+
 	local ref = React.useRef(nil)
 	return React.useCallback(function(p)
 		local guiState = p.GuiState
 
+		if FFlagLuaAppSduiGameTileInteractionFeedback and not callback then
+			DiscoveryEventErrorLogger.reportError(
+				"GameTileMissingTriggerFeedback",
+				"useTriggerGameTileFeedbackCallbacks called without triggerFeedbackFn; interaction feedback is disabled"
+			)
+
+			return
+		end
+
 		if ref.current == Enum.GuiState.Press then
-			v("Default", "Release")
+			callback("Default", "Release")
 		end
 
 		if guiState == Enum.GuiState.Hover then
-			v("Default", "Hover")
+			callback("Default", "Hover")
 		end
 
 		if guiState == Enum.GuiState.Press then
-			v("Default", "Press")
+			callback("Default", "Press")
 		end
 
 		ref.current = guiState
-	end, { v, ref }), (React.useCallback(function()
+	end, { callback, ref }), (React.useCallback(function()
+		if FFlagLuaAppSduiGameTileInteractionFeedback and not callback then
+			DiscoveryEventErrorLogger.reportError(
+				"GameTileMissingTriggerFeedback",
+				"useTriggerGameTileFeedbackCallbacks called without triggerFeedbackFn; interaction feedback is disabled"
+			)
+
+			return
+		end
+
 		if ref.current == Enum.GuiState.Press then
-			v("Default", "Release")
+			callback("Default", "Release")
 		end
 
 		ref.current = Enum.GuiState.Idle
-	end, { v, ref }))
+	end, { callback, ref }))
 end
 
 return useTriggerGameTileFeedbackCallbacks

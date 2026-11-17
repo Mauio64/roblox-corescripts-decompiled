@@ -65,10 +65,10 @@ function class:stopProfilingSession()
 	self.profilingActive = false
 end
 
-local function sortPackageStatsByDuration(items)
+local function sortPackageStatsByDuration(packageStatistics)
 	local result = {}
 
-	for k, item in items do
+	for k, item in packageStatistics do
 		table.insert(result, {
 			packageName = k,
 			count = item.count,

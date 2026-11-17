@@ -16,6 +16,8 @@ local GetPlayButtonStore = require(BuildExperience.Stores.GetPlayButtonStore)
 local getCurrentExperienceProject = require(BuildExperience.utils.getCurrentExperienceProject)
 local AdsCampaignNotification = require(BuildExperience.utils.AdsCampaignNotification)
 local openDeepLink = require(parent.BuildExperiencePlaytestLaunch.openDeepLink)
+local sendBuildExperienceEvent = require(BuildExperience.Telemetry.sendBuildExperienceEvent)
+local FFlagBuildExperienceHomeTelemetry = require(BuildExperience.Flags.FFlagBuildExperienceHomeTelemetry)
 local SharedFlags = require(parent.SharedFlags)
 local FFlagBuildAdUpsell = SharedFlags.FFlagBuildAdUpsell
 
@@ -99,11 +101,30 @@ local function publishToast(classifyRtnDetail) -- 1 equivalent call inferred fro
 	)
 end
 
+local function sendResumeNotificationClick(data, flag: boolean, destination: string, placeId: number?)
+	local v = {
+		type = "creator_agent_resume",
+		kind = data.kind,
+		destination = destination,
+		isInExperience = flag and "true" or "false"
+	}
+
+	sendBuildExperienceEvent(
+		"NOTIFICATION_CLICK",
+		{ universeId = data.universeId, placeId = placeId, conversationId = data.sessionId },
+		v
+	)
+end
+
 local function routeToBuildChat(p, isInExperience: boolean, isBuildModeActive: boolean)
 	if isInExperience and isBuildModeActive then
 		local currentExperienceProject = getCurrentExperienceProject()
 
 		if p.universeId ~= nil and currentExperienceProject.universeId == p.universeId then
+			if FFlagBuildExperienceHomeTelemetry then
+				sendResumeNotificationClick(p, isInExperience, "build_sheet", currentExperienceProject.placeId)
+			end
+
 			local playButtonStore = GetPlayButtonStore()
 			playButtonStore.setResumeTarget({
 				universeId = p.universeId,
@@ -114,6 +135,10 @@ local function routeToBuildChat(p, isInExperience: boolean, isBuildModeActive: b
 			playButtonStore.setIsActive(true)
 			return
 		end
+	end
+
+	if FFlagBuildExperienceHomeTelemetry then
+		sendResumeNotificationClick(p, isInExperience, "deep_link", nil)
 	end
 
 	openDeepLink(ResumeNotification.getResumeDeepLink(p), isInExperience)

@@ -2,7 +2,6 @@ local ViewRecyclerReact = script:FindFirstAncestor("ViewRecyclerReact")
 
 local ViewRecycler = require(ViewRecyclerReact.Parent.ViewRecycler)
 local Axis = ViewRecycler.Axis
-local Layout = ViewRecycler.Layout
 local ItemHooks = require(ViewRecyclerReact.ReactAdapter.ItemHooks)
 local React = require(ViewRecyclerReact.Parent.React)
 local RecyclableViewReadiness = require(ViewRecyclerReact.ReactAdapter.RecyclableViewReadiness)

@@ -8,7 +8,6 @@ local GetImageData = RobloxAppAssets.GetImageData
 local Roact = require(parent.Roact)
 local Foundation = require(parent.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local function CountryCodeButton(props)
 	local v = useStyle()
@@ -35,8 +34,7 @@ local function CountryCodeButton(props)
 	local font = props.font or v2.Base.Field.Typography.Font
 	local textSize = props.textSize or v2.Base.Field.Typography.FontSize
 
-	local createElement = React.createElement
-	local v3 = {
+	return React.createElement(ImageSetLabel, {
 		ZIndex = 2,
 		Size = size,
 		BackgroundTransparency = 1,
@@ -46,41 +44,18 @@ local function CountryCodeButton(props)
 		ImageColor3 = imageColor,
 		ImageTransparency = transparency,
 		LayoutOrder = layoutOrder
-	}
-
-	local createElement2 = React.createElement
-	local v4 = {
-		["BackgroundTransparency"] = nil,
-		["BackgroundTransparency"] = nil,
-		["BackgroundTransparency"] = nil,
-		["BackgroundTransparency"] = nil,
-		["BackgroundTransparency"] = nil,
-		["BackgroundTransparency"] = nil,
-		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 1, 0),
-		Text = countryPrefix
-	}
-	local font2
-
-	if not FoundationFontFaceMigration then
-		font2 = font
-	end
-
-	v4.Font = font2
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(font)
-	end
-
-	v4.FontFace = fontFace
-	v4.TextSize = textSize
-	v4.TextColor3 = v2.Base.FieldValue.ContentColor.Color3
-	v4.TextTransparency = v2.Base.FieldValue.ContentColor.Transparency
-	v4[Roact.Event.Activated] = props.onButtonClick
-	v4[Roact.Ref] = props.forwardRef
-	return createElement(ImageSetLabel, v3, {
-		Button = createElement2("TextButton", v4)
+	}, {
+		Button = React.createElement("TextButton", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0),
+			Text = countryPrefix,
+			FontFace = normalizeFontFace(font),
+			TextSize = textSize,
+			TextColor3 = v2.Base.FieldValue.ContentColor.Color3,
+			TextTransparency = v2.Base.FieldValue.ContentColor.Transparency,
+			[Roact.Event.Activated] = props.onButtonClick,
+			[Roact.Ref] = props.forwardRef
+		})
 	})
 end
 

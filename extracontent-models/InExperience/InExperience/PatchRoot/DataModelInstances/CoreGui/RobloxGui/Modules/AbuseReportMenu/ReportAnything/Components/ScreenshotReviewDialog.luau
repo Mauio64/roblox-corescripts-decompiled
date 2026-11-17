@@ -3,7 +3,6 @@ local CorePackages = game:GetService("CorePackages")
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local Foundation = require(CorePackages.Packages.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local React = require(CorePackages.Packages.React)
 
 local ButtonStack = UIBlox.App.Button.ButtonStack
@@ -284,103 +283,72 @@ local function ScreenshotReviewDialog(props)
 
 	children2.Divider = React.createElement(Divider, { LayoutOrder = 2 })
 
-	local createElement7 = React.createElement
-	local v11 = {
-		BackgroundTransparency = 1,
-		LayoutOrder = 3,
-		Size = UDim2.new(1, 0, 1, -60),
-		ZIndex = 10
-	}
-
-	local children3 = {
-		Padding = React.createElement("UIPadding", { PaddingTop = UDim.new(0, 16) }),
-		Layout = React.createElement("UIListLayout", {
-			FillDirection = Enum.FillDirection.Vertical,
-			HorizontalAlignment = Enum.HorizontalAlignment.Center,
-			SortOrder = Enum.SortOrder.LayoutOrder
-		}),
-		ScreenshotContainer = React.createElement(
-			"Frame",
-			{ Size = UDim2.new(1, 0, 1, -32), BackgroundTransparency = 2, LayoutOrder = 1 },
-			{
-				Padding = React.createElement("UIPadding", {
-					PaddingTop = UDim.new(0, 12),
-					PaddingBottom = UDim.new(0, 12),
-					PaddingLeft = UDim.new(0, 16),
-					PaddingRight = UDim.new(0, 16)
-				}),
-				Screenshot = React.createElement("Frame", {
-					Size = UDim2.new(1, 0, 1, 0),
-					Position = UDim2.fromScale(0.5, 0.5),
-					AnchorPoint = Vector2.new(0.5, 0.5),
-					BorderSizePixel = 2,
-					BorderMode = Enum.BorderMode.Outline,
-					BorderColor3 = Color3.fromRGB(255, 255, 255),
-					LayoutOrder = 1
-				}, {
-					UIAspectRatioConstraint = React.createElement("UIAspectRatioConstraint", {
-						AspectRatio = props.imageAspectRatio
+	children2.ScreenshotBody = React.createElement(
+		"Frame",
+		{ BackgroundTransparency = 1, LayoutOrder = 3, Size = UDim2.new(1, 0, 1, -60), ZIndex = 10 },
+		{
+			Padding = React.createElement("UIPadding", { PaddingTop = UDim.new(0, 16) }),
+			Layout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			ScreenshotContainer = React.createElement(
+				"Frame",
+				{ Size = UDim2.new(1, 0, 1, -32), BackgroundTransparency = 2, LayoutOrder = 1 },
+				{
+					Padding = React.createElement("UIPadding", {
+						PaddingTop = UDim.new(0, 12),
+						PaddingBottom = UDim.new(0, 12),
+						PaddingLeft = UDim.new(0, 16),
+						PaddingRight = UDim.new(0, 16)
 					}),
-					ScreenshotImage = React.createElement(ImageSetButton, {
-						Active = true,
-						Selectable = not v,
-						Size = UDim2.fromScale(1, 1),
-						Image = props.screenshot,
-						ZIndex = 1,
-						AnchorPoint = Vector2.new(0.5, 0.5),
+					Screenshot = React.createElement("Frame", {
+						Size = UDim2.new(1, 0, 1, 0),
 						Position = UDim2.fromScale(0.5, 0.5),
-						BackgroundTransparency = 1,
-						ScaleType = Enum.ScaleType.Fit,
-						SliceCenter = Assets.Images.RoundedRect.SliceCenter,
-						[React.Event.Activated] = onActivated4
+						AnchorPoint = Vector2.new(0.5, 0.5),
+						BorderSizePixel = 2,
+						BorderMode = Enum.BorderMode.Outline,
+						BorderColor3 = Color3.fromRGB(255, 255, 255),
+						LayoutOrder = 1
+					}, {
+						UIAspectRatioConstraint = React.createElement("UIAspectRatioConstraint", {
+							AspectRatio = props.imageAspectRatio
+						}),
+						ScreenshotImage = React.createElement(ImageSetButton, {
+							Active = true,
+							Selectable = not v,
+							Size = UDim2.fromScale(1, 1),
+							Image = props.screenshot,
+							ZIndex = 1,
+							AnchorPoint = Vector2.new(0.5, 0.5),
+							Position = UDim2.fromScale(0.5, 0.5),
+							BackgroundTransparency = 1,
+							ScaleType = Enum.ScaleType.Fit,
+							SliceCenter = Assets.Images.RoundedRect.SliceCenter,
+							[React.Event.Activated] = onActivated4
+						})
 					})
-				})
-			}
-		),
-		Description = 0
-	}
-
-	local createElement8 = React.createElement
-	local v12 = {
-		Text = RobloxTranslator:FormatByKey("Feature.ReportAbuse.Message.ProblemNotInScene"),
-		Font = 0,
-		FontFace = 0,
-		LayoutOrder = 2,
-		TextColor3 = 0,
-		TextTransparency = 0,
-		TextSize = 0,
-		TextXAlignment = 0,
-		TextWrapped = true,
-		Size = 0,
-		BackgroundTransparency = 1
-	}
-	local font2
-
-	if not FoundationFontFaceMigration then
-		font2 = font.Header1.Font
-	end
-
-	v12.Font = font2
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(v3.Tokens.Typography.HeadingSmall.Font)
-	end
-
-	v12.FontFace = fontFace
-
-	v12.TextColor3 = theme.TextEmphasis.Color
-	v12.TextTransparency = theme.TextEmphasis.Transparency
-	v12.TextSize = props.isSmallPortraitMode and 12 or 20
-	v12.TextXAlignment = Enum.TextXAlignment.Center
-
-	v12.Size = UDim2.new(1, -24, 0, props.isSmallPortraitMode and 24 or 40)
-	children3.Description = createElement8("TextLabel", v12)
-	children2.ScreenshotBody = createElement7("Frame", v11, children3)
+				}
+			),
+			Description = React.createElement("TextLabel", {
+				Text = RobloxTranslator:FormatByKey("Feature.ReportAbuse.Message.ProblemNotInScene"),
+				FontFace = normalizeFontFace(v3.Tokens.Typography.HeadingSmall.Font),
+				LayoutOrder = 2,
+				TextColor3 = theme.TextEmphasis.Color,
+				TextTransparency = theme.TextEmphasis.Transparency,
+				TextSize = props.isSmallPortraitMode and 12 or 20,
+				TextXAlignment = Enum.TextXAlignment.Center,
+				TextWrapped = true,
+				Size = UDim2.new(1, -24, 0, props.isSmallPortraitMode and 24 or 40),
+				BackgroundTransparency = 1
+			})
+		}
+	)
 	children.HeaderAndContent = createElement4("Frame", v8, children2)
 
-	local createElement9 = React.createElement
-	local v13 = {
+	local createElement7 = React.createElement
+	local v11 = {
 		BackgroundTransparency = 0,
 		Size = UDim2.new(1, 0, 0, v2),
 		BackgroundColor3 = Color3.fromHex("#4F545F"),
@@ -389,7 +357,7 @@ local function ScreenshotReviewDialog(props)
 		LayoutOrder = 4
 	}
 
-	local v14 = {
+	local v12 = {
 		Layout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			HorizontalAlignment = Enum.HorizontalAlignment.Center
@@ -397,7 +365,7 @@ local function ScreenshotReviewDialog(props)
 		Container = 0
 	}
 
-	local createElement10 = React.createElement
+	local createElement8 = React.createElement
 	local size
 
 	if props.isSmallPortraitMode then
@@ -406,7 +374,7 @@ local function ScreenshotReviewDialog(props)
 		size = UDim2.new(0, props.isSmallPortraitMode and 400 or 612, 1, 0)
 	end
 
-	local v15 = {
+	local v13 = {
 		Padding = React.createElement("UIPadding", {
 			PaddingTop = UDim.new(0, 12),
 			PaddingBottom = UDim.new(0, 12),
@@ -416,14 +384,14 @@ local function ScreenshotReviewDialog(props)
 		ActionButtons = 0
 	}
 
-	local createElement11 = React.createElement
+	local createElement9 = React.createElement
 	local forcedFillDirection
 
 	if props.isSmallPortraitMode then
 		forcedFillDirection = Enum.FillDirection.Vertical
 	end
 
-	v15.ActionButtons = createElement11(ButtonStack, {
+	v13.ActionButtons = createElement9(ButtonStack, {
 		forcedFillDirection = forcedFillDirection,
 		marginBetween = 8,
 		buttons = {
@@ -443,8 +411,8 @@ local function ScreenshotReviewDialog(props)
 			} or nil
 		}
 	})
-	v14.Container = createElement10("Frame", { Size = size, BackgroundTransparency = 1 }, v15)
-	children.Footer = createElement9("Frame", v13, v14)
+	v12.Container = createElement8("Frame", { Size = size, BackgroundTransparency = 1 }, v13)
+	children.Footer = createElement7("Frame", v11, v12)
 	v6.ScreenshotDialog = createElement3(ImageSetButton, v7, children)
 	return createElement("TextButton", v4, {
 		Container = createElement2("Frame", v5, v6)

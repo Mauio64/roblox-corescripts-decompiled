@@ -11,6 +11,7 @@ local defineFastFlag4 = game:DefineFastFlag("EmoteUtilityRetargetPoses", false)
 
 local defineFastString2 = game:DefineFastString("EmoteUtilityCanonicalR15RigUri", "rbxasset://avatar/characterR15.rbxm")
 local defineFastFlag5 = game:DefineFastFlag("EmoteUtilityCurveRotationOnlyJoints", false)
+local defineFastFlag6 = game:DefineFastFlag("EmoteUtilityMoodOverride", false)
 
 local EmoteUtility = {}
 EmoteUtility.FallbackKeyframeSequenceAssetId = defineFastString
@@ -189,6 +190,20 @@ local function getAnimationClipByAssetId(keyframeSequenceId: string)
 	return nil
 end
 
+local function getControlNames(folder)
+	local nameSet = {}
+
+	for _, numberPose in folder:GetDescendants() do
+		if not (numberPose:IsA("NumberPose") and numberPose.Parent and numberPose.Parent:IsA("Folder")) then
+			continue
+		end
+
+		nameSet[numberPose.Name] = true
+	end
+
+	return nameSet
+end
+
 local function getThumbnailKeyframeFromAnimationOrUrl(keyframeSequenceId, p: number, p2: number?)
 	local v = nil
 	local instance
@@ -225,7 +240,7 @@ local function trySetProperty(child, name: string, value) -- 1 equivalent call i
 	end)
 end
 
-local function applyControlsFolder(instance, p, instance2)
+local function applyControlsFolder(instance, p, instance2, p2)
 	if not p then
 		return
 	end
@@ -245,21 +260,28 @@ local function applyControlsFolder(instance, p, instance2)
 	end
 
 	for _, numberPose in instance2:GetChildren() do
-		if numberPose:IsA("NumberPose") then
-			trySetProperty(child2, numberPose.Name, numberPose.Value) -- inferred equivalent call
+		if not numberPose:IsA("NumberPose") or defineFastFlag6 and p2 and p2[numberPose.Name] then
+			continue
 		end
+
+		trySetProperty(child2, numberPose.Name, numberPose.Value) -- inferred equivalent call
 	end
 end
 
-local function applyKeyframeControls(instance, moodKeyframe)
+local function applyKeyframeControls(instance, moodKeyframe, moodSkippedControls)
 	local function recurApplyControls(p, folder)
 		if folder:IsA("Folder") then
-			applyControlsFolder(instance, p, folder)
-			return
-		end
+			local v
 
-		for _, child in folder:GetChildren() do
-			recurApplyControls(folder, child)
+			if defineFastFlag6 then
+				v = moodSkippedControls
+			end
+
+			applyControlsFolder(instance, p, folder, v)
+		else
+			for _, child in folder:GetChildren() do
+				recurApplyControls(folder, child)
+			end
 		end
 	end
 
@@ -270,7 +292,7 @@ local function applyKeyframeControls(instance, moodKeyframe)
 	end
 end
 
-local function applyKeyframeInner(instance, object)
+local function applyKeyframeInner(instance, object, p)
 	local function recurApplyPoses(folder, child)
 		if folder and child:IsA("Pose") then
 			local child2 = instance:FindFirstChild(folder.Name)
@@ -293,23 +315,29 @@ local function applyKeyframeInner(instance, object)
 		end
 
 		if child:IsA("Folder") then
-			applyControlsFolder(instance, folder, child)
-			return
-		end
+			local v
 
-		for _, child2 in child:GetChildren() do
-			recurApplyPoses(child, child2)
+			if defineFastFlag6 then
+				v = p
+			end
+
+			applyControlsFolder(instance, folder, child, v)
+		else
+			for _, child2 in child:GetChildren() do
+				recurApplyPoses(child, child2)
+			end
 		end
 	end
 
 	if object then
 		for _, folder in pairs(object:GetPoses()) do
 			if folder:IsA("Folder") then
-				continue
-			end
-
-			for _, child in folder:GetChildren() do
-				recurApplyPoses(folder, child)
+				if defineFastFlag6 then
+				end
+			else
+				for _, child in folder:GetChildren() do
+					recurApplyPoses(folder, child)
+				end
 			end
 		end
 	end
@@ -1375,6 +1403,9 @@ function EmoteUtility.FindDefaultMoodAnimationId(instance)
 end
 
 local function loadKeyframesForPoseR15(instance, originalAnimationAssetId: number?, value: number?, flag: boolean?, flag2: boolean?)
+	local keyframesForPoseR15 = {}
+	keyframesForPoseR15.originalAnimationAssetId = originalAnimationAssetId
+
 	if defineFastFlag4 then
 		local success, result = pcall(function(): boolean
 			return game.GetService(game, "ThumbnailGenerator") ~= nil
@@ -1403,8 +1434,19 @@ local function loadKeyframesForPoseR15(instance, originalAnimationAssetId: numbe
 	local v4 = false
 
 	if defineFastFlag or value and value ~= 0 then
-		v4 = originalAnimationAssetId == nil
-			or (not EmoteUtility.PoseKeyframeHasFaceAnimation(mainThumbnailKeyframe) or false)
+		if defineFastFlag6 then
+			v4 = true
+			local moodSkippedControls
+
+			if v3 and mainThumbnailKeyframe then
+				moodSkippedControls = getControlNames(mainThumbnailKeyframe)
+			end
+
+			keyframesForPoseR15.moodSkippedControls = moodSkippedControls
+		else
+			v4 = originalAnimationAssetId == nil
+				or (not EmoteUtility.PoseKeyframeHasFaceAnimation(mainThumbnailKeyframe) or false)
+		end
 	end
 
 	if v4 then
@@ -1446,18 +1488,17 @@ local function loadKeyframesForPoseR15(instance, originalAnimationAssetId: numbe
 		end
 	end
 
-	return {
-		["originalAnimationAssetId"] = originalAnimationAssetId,
-		poseKeyframe = mainThumbnailKeyframe,
-		moodKeyframe = moodKeyframe,
-		defaultToolKeyframe = defaultToolKeyframe,
-		suggestedKeyframeFromTool = suggestedKeyframeFromTool,
-		finalAnimationAssetIdOrUrl = finalAnimationAssetIdOrUrl,
-		poseSourceRig = poseSourceRig,
-		moodSourceRig = moodSourceRig,
-		defaultToolSourceRig = defaultToolSourceRig,
-		suggestedToolSourceRig = suggestedToolSourceRig
-	}
+	keyframesForPoseR15.poseKeyframe = mainThumbnailKeyframe
+	keyframesForPoseR15.moodKeyframe = moodKeyframe
+	keyframesForPoseR15.defaultToolKeyframe = defaultToolKeyframe
+	keyframesForPoseR15.suggestedKeyframeFromTool = suggestedKeyframeFromTool
+	keyframesForPoseR15.finalAnimationAssetIdOrUrl = finalAnimationAssetIdOrUrl
+	keyframesForPoseR15.poseSourceRig = poseSourceRig
+	keyframesForPoseR15.moodSourceRig = moodSourceRig
+	keyframesForPoseR15.defaultToolSourceRig = defaultToolSourceRig
+	keyframesForPoseR15.suggestedToolSourceRig = suggestedToolSourceRig
+
+	return keyframesForPoseR15
 end
 
 function EmoteUtility.LoadKeyframesForPose(instance, originalAnimationAssetId: number?, value: number?, flag: boolean?, flag2: boolean?)
@@ -1574,9 +1615,9 @@ function EmoteUtility.ApplyKeyframesForPose(instance, data)
 
 	if humanoid.RigType == Enum.HumanoidRigType.R15 then
 		if v3 then
-			applyKeyframeControls(instance, data.moodKeyframe)
+			applyKeyframeControls(instance, data.moodKeyframe, data.moodSkippedControls)
 		else
-			applyKeyframeInner(instance, data.moodKeyframe)
+			applyKeyframeInner(instance, data.moodKeyframe, data.moodSkippedControls)
 		end
 	end
 

@@ -1,2 +1,0 @@
-return game:DefineFastFlag("UseGetGamePassOwnershipApi", false)
-	and game:GetEngineFeature("EnableGetPassOwnershipApi")

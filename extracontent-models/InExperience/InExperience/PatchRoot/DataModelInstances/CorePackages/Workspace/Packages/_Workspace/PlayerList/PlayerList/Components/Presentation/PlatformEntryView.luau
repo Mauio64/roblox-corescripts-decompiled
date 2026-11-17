@@ -2,6 +2,8 @@ local parent = script.Parent.Parent.Parent
 local parent2 = parent.Parent
 
 local React = require(parent2.React)
+local Foundation = require(parent2.Foundation)
+local Text = Foundation.Text
 local Signals = require(parent2.Signals)
 local SignalsReact = require(parent2.SignalsReact)
 
@@ -16,6 +18,7 @@ local LeaderboardTextCell = require(parent.Components.Presentation.LeaderboardTe
 local PeopleCell = require(parent.Components.Presentation.PeopleCell)
 
 local FFlagPlayerListPlatformLeaderboardAbbreviateScores = require(parent.Flags.FFlagPlayerListPlatformLeaderboardAbbreviateScores)
+local FFlagPlayerListContrastingTeamText = require(parent.Flags.FFlagPlayerListContrastingTeamText)
 
 local _ = { Rank = "Rank", People = "People", Score = "-" }
 
@@ -86,7 +89,10 @@ local function PlatformEntryViewImpl(props)
 
 		return props.layoutOrder
 	end, { props.layoutOrder, v2 })
-
+	local textTag = isHeader and "size-full text-caption-small text-align-x-left content-muted"
+		or "size-full text-body-small text-align-x-left content-default"
+	local textTag2 = isHeader and "size-full text-caption-small text-align-x-right content-muted"
+		or "size-full text-body-small text-align-x-right content-default"
 	local rowHeight = props.rowHeight
 
 	if not rowHeight then
@@ -100,34 +106,72 @@ local function PlatformEntryViewImpl(props)
 	local rankWidth = props.rankWidth or Constants.PLATFORM_RANK_WIDTH
 	local scoreWidth = props.scoreWidth or Constants.PLATFORM_SCORE_WIDTH
 
-	return React.createElement(LeaderboardRowShell, {
+	local createElement = React.createElement
+	local v3 = {
 		rowHeight = rowHeight,
 		layoutOrder = layoutOrder,
 		isHighlighted = props.isViewer == true and props.highlightViewerRow ~= false,
 		showDivider = props.showDivider == true,
 		flexTag = Constants.PLATFORM_ROW_FLEX_TAG
-	}, {
-		RankCell = React.createElement(LeaderboardTextCell, {
+	}
+	local rankCell
+
+	if FFlagPlayerListContrastingTeamText then
+		rankCell = React.createElement(Text, {
+			Text = text2,
+			Size = UDim2.fromOffset(rankWidth, rowHeight),
+			LayoutOrder = 1,
+			tag = {
+				["text-align-x-left clip"] = true,
+				["text-caption-small content-muted"] = isHeader,
+				["text-body-small content-default"] = not isHeader
+			}
+		})
+	else
+		rankCell = React.createElement(LeaderboardTextCell, {
 			text = text2,
 			width = rankWidth,
 			rowHeight = rowHeight,
 			layoutOrder = 1,
-			textTag = isHeader and "size-full text-caption-small text-align-x-left content-muted" or "size-full text-body-small text-align-x-left content-default"
-		}),
+			textTag = textTag
+		})
+	end
+
+	local v4 = {
+		RankCell = rankCell,
 		PeopleCell = React.createElement(PeopleCell, {
 			displayName = displayName,
 			layoutOrder = 2,
 			textTag = isHeader and "size-full text-caption-small text-align-x-left content-muted" or nil,
 			truncate = not isHeader
 		}),
-		ScoreCell = React.createElement(LeaderboardTextCell, {
+		ScoreCell = 0
+	}
+	local scoreCell
+
+	if FFlagPlayerListContrastingTeamText then
+		scoreCell = React.createElement(Text, {
+			Text = text,
+			Size = UDim2.fromOffset(scoreWidth, rowHeight),
+			LayoutOrder = 3,
+			tag = {
+				["text-align-x-right clip"] = true,
+				["text-caption-small content-muted"] = isHeader,
+				["text-body-small content-default"] = not isHeader
+			}
+		})
+	else
+		scoreCell = React.createElement(LeaderboardTextCell, {
 			text = text,
 			width = scoreWidth,
 			rowHeight = rowHeight,
 			layoutOrder = 3,
-			textTag = isHeader and "size-full text-caption-small text-align-x-right content-muted" or "size-full text-body-small text-align-x-right content-default"
+			textTag = textTag2
 		})
-	})
+	end
+
+	v4.ScoreCell = scoreCell
+	return createElement(LeaderboardRowShell, v3, v4)
 end
 
 return React.memo(PlatformEntryViewImpl)

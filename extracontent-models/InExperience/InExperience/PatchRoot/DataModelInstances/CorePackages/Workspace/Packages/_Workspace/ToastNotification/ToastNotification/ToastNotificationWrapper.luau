@@ -49,6 +49,14 @@ local useKeyCodeHold = require(components.useKeyCodeHold)
 local kind = require(parent.type)
 local constants = require(parent.constants)
 local JoinExperience = NotificationsCommon.JoinExperience
+local FFlagNotificationDeeplinkTapListenersEnabled = NotificationsCommon.FFlagNotificationDeeplinkTapListenersEnabled
+local deeplinkTapListeners
+
+if FFlagNotificationDeeplinkTapListenersEnabled then
+	deeplinkTapListeners = NotificationsCommon.DeeplinkTapListeners
+else
+	deeplinkTapListeners = nil
+end
 
 local SpringAnimatedItem = UIBlox.Utility.SpringAnimatedItem
 local iconsnavigationclose = Images["icons/navigation/close"]
@@ -108,14 +116,14 @@ local isToastToRight = toastNotificationHelper.isToastToRight
 local calculateTimeRemaining = toastNotificationHelper.calculateTimeRemaining
 
 return function(p)
-	local isCoreScript = p.renderLocation == kind.RenderLocationEnum.CoreScript
+	local v2 = p.renderLocation == kind.RenderLocationEnum.CoreScript
 	local desktopDevice = toastNotificationHelper.isDesktopDevice()
-	local v2
+	local v3
 
-	if isCoreScript then
-		v2 = constants.CardTopMargin.Experience
+	if v2 then
+		v3 = constants.CardTopMargin.Experience
 	else
-		v2 = constants.CardTopMargin.App
+		v3 = constants.CardTopMargin.App
 	end
 
 	local default2 = ToastNotificationProtocol.default
@@ -126,24 +134,24 @@ return function(p)
 		return workspace.CurrentCamera.ViewportSize
 	end
 
-	local state2, setState2 = React.useState(getNotificationSize(isCoreScript, fn().X)) -- inferred equivalent call
+	local state2, setState2 = React.useState(getNotificationSize(v2, fn().X)) -- inferred equivalent call
 	local state3, setState3 = React.useState(getDeviceOrientation(fn())) -- inferred equivalent call
 
 	local useState = React.useState
-	local v3
+	local v4
 
 	if FFlagFriendshipNotifsUseSendrExperiment then
-		v3 = fn() -- inferred equivalent call
+		v4 = fn() -- inferred equivalent call
 	end
 
-	local state4, setState4 = useState(v3)
+	local state4, setState4 = useState(v4)
 	local state5, setState5 = React.useState(false)
 
 	local state6, setState6 = React.useState(nil)
 
 	local state7, setState7 = React.useState(nil)
 
-	local state8, setState8 = React.useState(calculateToastPosition(false, isToastToRight(state3), v2, state))
+	local state8, setState8 = React.useState(calculateToastPosition(false, isToastToRight(state3), v3, state))
 
 	local state9, setState9 = React.useState(nil)
 	local state10, setState10 = React.useState(nil)
@@ -153,7 +161,7 @@ return function(p)
 	end
 
 	local state11, setState11 = React.useState(function()
-		return fn2(isCoreScript) -- inferred equivalent call
+		return fn2(v2) -- inferred equivalent call
 	end)
 
 	local state12, setState12 = React.useState(false)
@@ -164,13 +172,13 @@ return function(p)
 	local state16, setState16 = React.useState(false)
 	local state17, setState17 = React.useState(false)
 	local state18, setState18 = React.useState({})
-	local v4 = useIsSpatial()
+	local v5 = useIsSpatial()
 
 	local showHoldButton = usePreferredInput() == Responsive.Input.Directional
 
 	local state19, setState19 = React.useState(false)
 
-	local v5 = React.useMemo(function()
+	local v6 = React.useMemo(function()
 		return not showHoldButton or state19 or state6 == nil
 	end, { showHoldButton, state19, state6 })
 
@@ -194,22 +202,22 @@ return function(p)
 		end
 	end, { state19 })
 
-	local v6 = React.useCallback(function()
+	local v7 = React.useCallback(function()
 		setState19(true)
 	end, {})
-	local v7 = useKeyCodeHold(
+	local v8 = useKeyCodeHold(
 		Enum.KeyCode.ButtonSelect,
 		constants.SIGNAL_HOLD_INTENT_SECONDS,
 		constants.SIGNAL_HOLD_COMPLETE_SECONDS,
-		v6,
-		v5
+		v7,
+		v6
 	)
 
-	local holdProgress = v7.holdProgress
-	local holding = v7.holding
+	local holdProgress = v8.holdProgress
+	local holding = v8.holding
 
 	local state20, setState20 = React.useState((Instance.new("BindableEvent")))
-	local v8 = useStyle()
+	local v9 = useStyle()
 
 	local isHover = state15 or state16
 	local userId = Players and Players.LocalPlayer and Players.LocalPlayer.UserId or nil
@@ -231,7 +239,7 @@ return function(p)
 		local fireEvent = toastNotificationHelper.fireEvent
 
 		local join = Cryo.Dictionary.join
-		local v9 = {
+		local v10 = {
 			action_type = action_type,
 			delivery_channel = constants.DeliveryChannel,
 			notification_type = 0,
@@ -250,38 +258,38 @@ return function(p)
 			notification_type = data.notificationType or nil
 		end
 
-		v9.notification_type = notification_type
+		v10.notification_type = notification_type
 		local notification_id
 
 		if data then
 			notification_id = data.id or nil
 		end
 
-		v9.notification_id = notification_id
-		v9.recipient_userid = userId2 or nil
+		v10.notification_id = notification_id
+		v10.recipient_userid = userId2 or nil
 		local recipient_universe_id
 
-		if isCoreScript then
+		if v2 then
 			recipient_universe_id = game and game.GameId
 		end
 
-		v9.recipient_universe_id = recipient_universe_id
+		v10.recipient_universe_id = recipient_universe_id
 		local client_destination
 
-		if isCoreScript then
+		if v2 then
 			client_destination = constants.Destinations.Experience
 		else
 			client_destination = constants.Destinations.App
 		end
 
-		v9.client_destination = client_destination
+		v10.client_destination = client_destination
 		local deliver_timestamp
 
 		if data then
 			deliver_timestamp = data.deliverTimestamp or nil
 		end
 
-		v9.deliver_timestamp = deliver_timestamp
+		v10.deliver_timestamp = deliver_timestamp
 		local snoozed
 
 		if data and data.notificationType then
@@ -290,9 +298,9 @@ return function(p)
 			snoozed = false
 		end
 
-		v9.snoozed = snoozed
+		v10.snoozed = snoozed
 
-		v9.time_to_action_timestamp = time_to_action_timestamp
+		v10.time_to_action_timestamp = time_to_action_timestamp
 		local frr_toast_position_variant
 
 		if
@@ -302,8 +310,8 @@ return function(p)
 			frr_toast_position_variant = getFRRToastPositionVariant() -- inferred equivalent call
 		end
 
-		v9.frr_toast_position_variant = frr_toast_position_variant
-		fireEvent(eventStream, join(v9, data and data.clientEventsPayload or {}))
+		v10.frr_toast_position_variant = frr_toast_position_variant
+		fireEvent(eventStream, join(v10, data and data.clientEventsPayload or {}))
 	end
 
 	React.useEffect(function()
@@ -338,27 +346,27 @@ return function(p)
 		end
 	end
 
-	local v9 = React.useCallback(function()
+	local v10 = React.useCallback(function()
 		if state9 then
 			task.cancel(state9)
 		end
 
 		setState9(nil)
 	end, { state9 })
-	local v10
+	local v11
 
 	local function fn5(p2: string) -- 3 equivalent calls inferred from this helper
 		fn10(p2) -- inferred equivalent call
 		setState7(nil)
-		v9()
+		v10()
 	end
 
 	if defineFastFlag2 then
-		v10 = function(p2: string, duration: number, p3)
-			v9()
+		v11 = function(p2: string, duration: number, p3)
+			v10()
 			setState9((task.delay(duration, function()
 				if ref.current then
-					v9()
+					v10()
 					return
 				end
 
@@ -373,8 +381,8 @@ return function(p)
 			end)))
 		end
 	else
-		v10 = React.useCallback(function(p2: string, duration: number, p3)
-			v9()
+		v11 = React.useCallback(function(p2: string, duration: number, p3)
+			v10()
 			setState9((task.delay(duration, function()
 				if not state14 then
 					fn3(kind.ToastNotificationActionsEnum.Ignored, userId, p3)
@@ -390,7 +398,7 @@ return function(p)
 		end, { state14 })
 	end
 
-	local v11 = React.useCallback(function()
+	local v12 = React.useCallback(function()
 		if state6 and state7 and state7.id == state6.id then
 			if engineFeature and state6.luaNotifInfo then
 				GuiService:DismissNotification(state6.id)
@@ -403,18 +411,18 @@ return function(p)
 
 	local function fn6() -- 1 equivalent call inferred from this helper
 		fn3(kind.ToastNotificationActionsEnum.Dismissed, userId, state6)
-		v11()
+		v12()
 		setState16(false)
 	end
 
-	local v12 = React.useCallback(function()
-		if isCoreScript and state20 then
+	local v13 = React.useCallback(function()
+		if v2 and state20 then
 			setState13(true)
 			return state20.Event:Wait()
 		end
 
 		return true
-	end, { isCoreScript, state20 })
+	end, { v2, state20 })
 
 	local function fn7(state21) -- 2 equivalent calls inferred from this helper
 		local timeOnScreenMs = state21.state and state21.state.timeOnScreenMs
@@ -424,13 +432,13 @@ return function(p)
 
 	local function fn8() -- 1 equivalent call inferred from this helper
 		if state6 and state7 and not state9 then
-			v10(state6.id, fn7(state6), state6) -- inferred equivalent call
+			v11(state6.id, fn7(state6), state6) -- inferred equivalent call
 		end
 	end
 
 	local fn9 = defineFastFlag2 and function(flag: boolean, ...)
 		if flag then
-			v9()
+			v10()
 			return
 		end
 
@@ -443,28 +451,38 @@ return function(p)
 		end
 	end
 
-	local v13 = React.useCallback(function()
-		for _, v13 in ipairs(state18) do
-			task.cancel(v13)
+	local v14 = React.useCallback(function()
+		for _, v14 in ipairs(state18) do
+			task.cancel(v14)
 		end
 	end, { state18 })
 
 	React.useEffect(function()
 		return function()
-			v13()
+			v14()
 		end
-	end, { v13 })
+	end, { v14 })
 
 	local function fn10(p2: string) -- 6 equivalent calls inferred from this helper
 		default2:dismissNotification(p2)
 	end
 
-	local v14 = React.useCallback(function(data, p2)
+	local v15 = React.useCallback(function(data, p2, flag: boolean?)
 		if data.actionType == kind.ActionTypeEnum.Dismiss then
-			v11()
+			v12()
 		elseif data.actionType == kind.ActionTypeEnum.Deeplink then
-			if v12() then
-				if JoinExperience(data.path or "", isCoreScript) then
+			if v13() then
+				if FFlagNotificationDeeplinkTapListenersEnabled and flag then
+					deeplinkTapListeners.notify({
+						notificationType = p2 and p2.notificationType,
+						notificationId = p2 and p2.id,
+						url = data.path or "",
+						source = "toast",
+						isInExperience = v2
+					})
+				end
+
+				if JoinExperience(data.path or "", v2) then
 					setState13(false)
 
 					if p2 then
@@ -473,7 +491,7 @@ return function(p)
 				else
 					fn3(kind.ToastNotificationActionsEnum.DeeplinkFailed, userId, p2)
 
-					v11()
+					v12()
 				end
 			end
 		elseif data.actionType == kind.ActionTypeEnum.VoltronBroadcast then
@@ -495,25 +513,25 @@ return function(p)
 		then
 			ToastNotificationProtocol:updateNotification(p2.id, data.nextState)
 		end
-	end, { v11, v12 })
+	end, { v12, v13 })
 
-	local v15 = React.useCallback(function(data)
+	local v16 = React.useCallback(function(data)
 		local function executeAllActions(actions) -- 2 equivalent calls inferred from this helper
 			for _, item in ipairs(actions) do
-				v14(item, data)
+				v15(item, data)
 			end
 		end
 
-		v13()
+		v14()
 
 		if data.timers then
 			local threads = {}
 
 			for _, timer in pairs(data.timers) do
-				local v15 = calculateTimeRemaining(timer, data.notificationReceivedTimestampMs, data.displayTimestamp)
+				local v16 = calculateTimeRemaining(timer, data.notificationReceivedTimestampMs, data.displayTimestamp)
 
-				if v15 > 0 then
-					table.insert(threads, (task.delay(v15 / 1000, function()
+				if v16 > 0 then
+					table.insert(threads, (task.delay(v16 / 1000, function()
 						executeAllActions(timer.actions) -- inferred equivalent call
 					end)))
 				else
@@ -525,7 +543,7 @@ return function(p)
 				setState18(threads)
 			end
 		end
-	end, { v14, v13, calculateTimeRemaining })
+	end, { v15, v14, calculateTimeRemaining })
 
 	local handleActions = React.useCallback(function(visualItem)
 		if state12 then
@@ -549,16 +567,16 @@ return function(p)
 
 		if visualItem.actions and #visualItem.actions > 0 then
 			for _, action in ipairs(visualItem.actions) do
-				v14(action, state6)
+				v15(action, state6, FFlagNotificationDeeplinkTapListenersEnabled and true or nil)
 
-				if action.actionType == kind.ActionTypeEnum.Deeplink and v12() then
+				if action.actionType == kind.ActionTypeEnum.Deeplink and v13() then
 					break
 				end
 			end
 		end
 
 		setState12(false)
-	end, { state6, v11, state12, v12 })
+	end, { state6, v12, state12, v13 })
 
 	local function fn11(state21, p2)
 		state21.displayTimestamp = DateTime.now().UnixTimestampMillis
@@ -570,49 +588,48 @@ return function(p)
 			and ThirdPartyUserService.FriendCommunicationRestrictionStatus ~= Enum.ChatRestrictionStatus.NotRestricted
 		then
 			fn10(state21.id) -- inferred equivalent call
-			return
-		end
-
-		local v16
-
-		if p2 == "update" then
-			v16 = kind.ToastNotificationActionsEnum.Update
 		else
-			v16 = kind.ToastNotificationActionsEnum.Display
-		end
+			local v17
 
-		if defineFastFlag3 then
-			if default:isSnoozedNotificationType(state21.notificationType) then
-				fn10(state21.id) -- inferred equivalent call
-				return
+			if p2 == "update" then
+				v17 = kind.ToastNotificationActionsEnum.Update
+			else
+				v17 = kind.ToastNotificationActionsEnum.Display
 			end
 
-			fn3(v16, userId, state21)
-		else
-			fn3(v16, userId, state21)
+			if defineFastFlag3 then
+				if default:isSnoozedNotificationType(state21.notificationType) then
+					fn10(state21.id) -- inferred equivalent call
+					return
+				end
 
-			if default:isSnoozedNotificationType(state21.notificationType) then
-				fn10(state21.id) -- inferred equivalent call
-				return
+				fn3(v17, userId, state21)
+			else
+				fn3(v17, userId, state21)
+
+				if default:isSnoozedNotificationType(state21.notificationType) then
+					fn10(state21.id) -- inferred equivalent call
+					return
+				end
 			end
+
+			setState6(state21)
+			local v18 = fn7(state21) -- inferred equivalent call
+			v11(state21.id, v18, state21)
+
+			if p2 == "display" then
+				v16(state21)
+			end
+
+			if engineFeature and state21 and state21.luaNotifInfo then
+				GuiService:OnNotificationDisplayed(state21.id)
+			end
+
+			setState10(nil)
 		end
-
-		setState6(state21)
-		local v17 = fn7(state21) -- inferred equivalent call
-		v10(state21.id, v17, state21)
-
-		if p2 == "display" then
-			v15(state21)
-		end
-
-		if engineFeature and state21 and state21.luaNotifInfo then
-			GuiService:OnNotificationDisplayed(state21.id)
-		end
-
-		setState10(nil)
 	end
 
-	local v16 = React.useCallback(function(p2)
+	local v17 = React.useCallback(function(p2)
 		if
 			isTenFootInterface()
 			and p2
@@ -624,7 +641,7 @@ return function(p)
 
 		if
 			GetFFlagFilterSecurityAlertsVRToastEnabled()
-			and v4
+			and v5
 			and p2
 			and p2.notificationType ~= nil
 			and p2.notificationType == kind.NotificationTypeEnum.SecurityAlert
@@ -640,18 +657,17 @@ return function(p)
 			and p2.content.id
 		then
 			fn10(p2.content.id) -- inferred equivalent call
-			return
+		else
+			if not p2 or not p2.content or p2.content.id == nil then
+				setState7(nil)
+
+				return
+			end
+
+			local v17 = marshalNotificationData(p2)
+			setState7(v17)
+			LifecycleEvents:DispatchEvent(LifecycleEvents.ToastEvents.AttemptDisplay, v17.notificationType, v17)
 		end
-
-		if not p2 or not p2.content or p2.content.id == nil then
-			setState7(nil)
-
-			return
-		end
-
-		local v16 = marshalNotificationData(p2)
-		setState7(v16)
-		LifecycleEvents:DispatchEvent(LifecycleEvents.ToastEvents.AttemptDisplay, v16.notificationType, v16)
 	end, {})
 
 	local function fn12(state21, duration: number) -- 1 equivalent call inferred from this helper
@@ -671,23 +687,23 @@ return function(p)
 				fn11(state7, "update")
 				LifecycleEvents:DispatchEvent(LifecycleEvents.ToastEvents.Update, state7.notificationType, state7)
 			else
-				local v17 = constants.DisplayNotificationDelay
+				local v18 = constants.DisplayNotificationDelay
 
 				if state7.luaNotifInfo ~= nil then
-					v17 = not state6 and 0 or 1 / springOptions.frequency
+					v18 = not state6 and 0 or 1 / springOptions.frequency
 				end
 
-				fn12(state7, v17) -- inferred equivalent call
+				fn12(state7, v18) -- inferred equivalent call
 			end
 		end
 	end, { state7 })
 
 	React.useEffect(function()
-		local v17 = state7 and state6 and state7.id == state6.id and true or false
+		local v18 = state7 and state6 and state7.id == state6.id and true or false
 
-		setState5(v17)
+		setState5(v18)
 
-		if v17 == false then
+		if v18 == false then
 			setState19(false)
 		end
 	end, { state7, state6 })
@@ -705,65 +721,65 @@ return function(p)
 		if defineFastFlag2 then
 			fn9(state14)
 		else
-			fn9(state14, v9, fn8)
+			fn9(state14, v10, fn8)
 		end
 	end, { state14 })
 
-	local groupTransparency, v17 = ReactOtter.useAnimatedBinding(1, function()
+	local groupTransparency, v18 = ReactOtter.useAnimatedBinding(1, function()
 		if not state5 then
 			setState6(nil)
-			v13()
+			v14()
 		end
 	end)
 
 	React.useEffect(function()
-		v17(ReactOtter.spring(state5 and 0 or 1, springOptions))
-	end, { state5, v17 })
+		v18(ReactOtter.spring(state5 and 0 or 1, springOptions))
+	end, { state5, v18 })
 
 	local useEffect = React.useEffect
 	local function fn13()
-		local v18
+		local v19
 
 		if FFlagFriendshipNotifsUseSendrExperiment then
-			local v19
+			local v20
 
 			if state6 and state6.notificationType == kind.NotificationTypeEnum.FriendRequestReceived then
-				v19 = getFRRToastPositionVariant() == "legacyBottomRight" and "legacyBottomRight" or nil -- inferred equivalent call
+				v20 = getFRRToastPositionVariant() == "legacyBottomRight" and "legacyBottomRight" or nil -- inferred equivalent call
 			end
 
-			v18 = calculateToastPosition(state5, isToastToRight(state3), v2, state, v19, state4)
+			v19 = calculateToastPosition(state5, isToastToRight(state3), v3, state, v20, state4)
 		else
-			v18 = calculateToastPosition(state5, isToastToRight(state3), v2, state)
+			v19 = calculateToastPosition(state5, isToastToRight(state3), v3, state)
 		end
 
-		setState8(v18)
-	end
-
-	local v18
-
-	if FFlagFriendshipNotifsUseSendrExperiment then
-		v18 = state6
+		setState8(v19)
 	end
 
 	local v19
 
 	if FFlagFriendshipNotifsUseSendrExperiment then
-		v19 = v2
+		v19 = state6
 	end
 
 	local v20
 
 	if FFlagFriendshipNotifsUseSendrExperiment then
-		v20 = state4
+		v20 = v3
 	end
 
-	useEffect(fn13, { state3, state5, state, v18, v19, v20 })
+	local v21
+
+	if FFlagFriendshipNotifsUseSendrExperiment then
+		v21 = state4
+	end
+
+	useEffect(fn13, { state3, state5, state, v19, v20, v21 })
 
 	local function fn14() -- 2 equivalent calls inferred from this helper
 		local viewportSize = fn() -- inferred equivalent call
 		local deviceOrientation = getDeviceOrientation(viewportSize)
-		setState2((getNotificationSize(isCoreScript, viewportSize.X)))
-		setState11(fn2(isCoreScript)) -- inferred equivalent call
+		setState2((getNotificationSize(v2, viewportSize.X)))
+		setState11(fn2(v2)) -- inferred equivalent call
 		setState3(deviceOrientation)
 	end
 
@@ -806,7 +822,7 @@ return function(p)
 		task.delay(0, function()
 			local desktops
 
-			if isCoreScript then
+			if v2 then
 				desktops = { kind.ChannelListEnum.Experience, kind.ChannelListEnum.Dual }
 			else
 				desktops = { kind.ChannelListEnum.App, kind.ChannelListEnum.Dual }
@@ -821,25 +837,25 @@ return function(p)
 	end, {})
 
 	React.useEffect(function()
-		local connection = default2:listenToDisplayNotification(v16)
+		local connection = default2:listenToDisplayNotification(v17)
 		return function()
 			if connection then
 				connection:Disconnect()
 			end
 		end
-	end, { v16 })
+	end, { v17 })
 
 	local vrAppBuild = IsVRAppBuild()
-	local v21 = state5 or not vrAppBuild
-	local v22 = isHover and not TouchEnabled and not vrAppBuild and state5
+	local v22 = state5 or not vrAppBuild
+	local v23 = isHover and not TouchEnabled and not vrAppBuild and state5
 	local element = React.createElement("TextButton", {
 		ZIndex = 2,
 		LayoutOrder = 1,
 		AnchorPoint = Vector2.new(0, 0),
 		Size = UDim2.new(0, constants.CardSizeDefault.closeButton, 0, constants.CardSizeDefault.closeButton),
 		Position = UDim2.new(0, -10, 0, -10),
-		BackgroundTransparency = v8.Theme.BackgroundUIDefault.Transparency,
-		BackgroundColor3 = v8.Theme.BackgroundUIDefault.Color,
+		BackgroundTransparency = v9.Theme.BackgroundUIDefault.Transparency,
+		BackgroundColor3 = v9.Theme.BackgroundUIDefault.Color,
 		Text = "",
 		[React.Event.Activated] = fn6,
 		[React.Event.MouseEnter] = function()
@@ -851,7 +867,7 @@ return function(p)
 	}, {
 		Border = React.createElement("UIStroke", {
 			ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-			Color = v8.Theme.UIDefault.Color
+			Color = v9.Theme.UIDefault.Color
 		}),
 		UICorner = React.createElement("UICorner", {
 			CornerRadius = constants.DefaultCardCloseButtonCornerRadius
@@ -862,21 +878,21 @@ return function(p)
 			Position = UDim2.new(0.5, 0, 0.5, 0),
 			Size = UDim2.new(0, constants.CardSizeDefault.closeIcon, 0, constants.CardSizeDefault.closeIcon),
 			Image = iconsnavigationclose,
-			ImageColor3 = v8.Theme.SystemPrimaryDefault.Color
+			ImageColor3 = v9.Theme.SystemPrimaryDefault.Color
 		})
 	})
 
-	local v23 = React.useMemo(function()
+	local v24 = React.useMemo(function()
 		local createElement = React.createElement
 		local animatedFrame = SpringAnimatedItem.AnimatedFrame
-		local v23 = {
+		local v24 = {
 			regularProps = {
 				ClipsDescendants = false,
 				Size = state2,
 				AutomaticSize = Enum.AutomaticSize.Y,
 				BackgroundTransparency = 1,
 				Active = true,
-				Visible = v21 and state6 ~= nil,
+				Visible = v22 and state6 ~= nil,
 				[React.Event.MouseEnter] = function()
 					fn3(kind.ToastNotificationActionsEnum.Hover, userId, state6)
 
@@ -910,13 +926,13 @@ return function(p)
 			onComplete = function()
 				if not state5 then
 					setState6(nil)
-					v13()
+					v14()
 				end
 			end
 		}
 
 		local createElement2 = React.createElement
-		local v24 = {
+		local v25 = {
 			Size = UDim2.new(1, 0, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
 			swipeEnabled = state5,
@@ -930,7 +946,7 @@ return function(p)
 
 		if engineFeature and state6 and state6.luaNotifInfo and state6.id then
 			local createElement3 = React.createElement
-			local v25 = {
+			local v26 = {
 				notificationInfo = state6.luaNotifInfo,
 				notificationId = state6.id,
 				onPause = setState17,
@@ -944,21 +960,21 @@ return function(p)
 				transparency = groupTransparency
 			end
 
-			v25.transparency = transparency
+			v26.transparency = transparency
 
-			v25.width = state2.X
+			v26.width = state2.X
 			local toastCloseButton
 
-			if v22 then
+			if v23 then
 				toastCloseButton = element
 			end
 
-			notificationProvider = createElement3(ClientNotificationWrapper, v25, {
+			notificationProvider = createElement3(ClientNotificationWrapper, v26, {
 				ToastCloseButton = toastCloseButton
 			})
 		else
 			local createElement3 = React.createElement
-			local v25 = {
+			local v26 = {
 				state = state6 and state6.state,
 				isCompact = state11,
 				handleActions = handleActions,
@@ -987,29 +1003,29 @@ return function(p)
 
 			local toastCloseButton
 
-			if v22 then
+			if v23 then
 				toastCloseButton = element
 			end
 
-			notificationProvider = createElement3(NotificationCardProvider, v25, {
+			notificationProvider = createElement3(NotificationCardProvider, v26, {
 				NotificationCardCanvasGroup = notificationCardCanvasGroup,
 				ToastCloseButton = toastCloseButton
 			})
 		end
 
-		return createElement(animatedFrame, v23, {
-			SwipeDetector = createElement2(SwipeDetectionWrapper, v24, {
+		return createElement(animatedFrame, v24, {
+			SwipeDetector = createElement2(SwipeDetectionWrapper, v25, {
 				NotificationProvider = notificationProvider
 			})
 		})
 	end, {
 		constants,
-		v8,
+		v9,
 		state6,
-		v21,
+		v22,
 		state5,
 		state11,
-		v22,
+		v23,
 		isHover,
 		state8,
 		fn6,
@@ -1022,8 +1038,8 @@ return function(p)
 		return React.createElement(ToastVRWrapper, {
 			isConfirmModalOpen = state13,
 			isToastOpen = state5,
-			isCoreScript = isCoreScript,
-			ToastComponent = v23,
+			isCoreScript = v2,
+			ToastComponent = v24,
 			ToastNotificationSnoozeMenu = React.createElement(ToastNotificationSnoozeMenu),
 			ConfirmationModalComponent = React.createElement(DeeplinkConfirmationModal, {
 				closeCallback = fn4,
@@ -1040,7 +1056,7 @@ return function(p)
 			IgnoreGuiInset = true
 		},
 		{
-			Toast = v23,
+			Toast = v24,
 			ToastNotificationSnoozeMenu = React.createElement(ToastNotificationSnoozeMenu),
 			DeeplinkConfirmationModal = state13 and React.createElement(DeeplinkConfirmationModal, {
 				closeCallback = fn4

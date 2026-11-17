@@ -7,7 +7,6 @@ local React = require(CorePackages.Packages.React)
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local Foundation = require(CorePackages.Packages.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local Style = require(CorePackages.Workspace.Packages.Style)
 local useDesignTokens = Style.useDesignTokens
 local Localization = require(CorePackages.Workspace.Packages.Localization)
@@ -38,55 +37,29 @@ local function HeaderArea()
 		HeaderText = "CoreScripts.InGameMenu.EducationalPopup.UINavigation.Title"
 	})
 
-	local createElement = React.createElement
-	local v3 = {
-		AutomaticSize = Enum.AutomaticSize.XY,
-		LayoutOrder = 0,
-		BackgroundTransparency = 1
-	}
-
-	local createElement2 = React.createElement
-	local v4 = {
-		Text = v2.HeaderText,
-		BackgroundTransparency = 1,
-		Font = 0,
-		FontFace = 0,
-		TextSize = 0,
-		TextColor3 = 0,
-		Size = 0,
-		AutomaticSize = 0,
-		TextXAlignment = 0,
-		TextYAlignment = 0
-	}
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = typography.header.Font
-	end
-
-	v4.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(typography.header.Font)
-	end
-
-	v4.FontFace = fontFace
-	v4.TextSize = typography.header.FontSize
-	v4.TextColor3 = color.textColor.Color3
-	v4.Size = UDim2.fromOffset(0, 0)
-	v4.AutomaticSize = Enum.AutomaticSize.XY
-	v4.TextXAlignment = Enum.TextXAlignment.Center
-	v4.TextYAlignment = Enum.TextYAlignment.Center
-	return createElement("Frame", v3, {
-		Header = createElement2("TextLabel", v4),
-		Padding = React.createElement("UIPadding", {
-			PaddingTop = UDim.new(0, space.titlePadding),
-			PaddingBottom = UDim.new(0, space.titlePadding),
-			PaddingLeft = UDim.new(0, space.bodyPadding),
-			PaddingRight = UDim.new(0, space.bodyPadding)
-		})
-	})
+	return React.createElement(
+		"Frame",
+		{ AutomaticSize = Enum.AutomaticSize.XY, LayoutOrder = 0, BackgroundTransparency = 1 },
+		{
+			Header = React.createElement("TextLabel", {
+				Text = v2.HeaderText,
+				BackgroundTransparency = 1,
+				FontFace = normalizeFontFace(typography.header.Font),
+				TextSize = typography.header.FontSize,
+				TextColor3 = color.textColor.Color3,
+				Size = UDim2.fromOffset(0, 0),
+				AutomaticSize = Enum.AutomaticSize.XY,
+				TextXAlignment = Enum.TextXAlignment.Center,
+				TextYAlignment = Enum.TextYAlignment.Center
+			}),
+			Padding = React.createElement("UIPadding", {
+				PaddingTop = UDim.new(0, space.titlePadding),
+				PaddingBottom = UDim.new(0, space.titlePadding),
+				PaddingLeft = UDim.new(0, space.bodyPadding),
+				PaddingRight = UDim.new(0, space.bodyPadding)
+			})
+		}
+	)
 end
 
 local function GamepadImageArea()
@@ -102,104 +75,72 @@ local function GamepadImageArea()
 
 	local imageForKeyCode = UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonSelect)
 
-	local createElement = React.createElement
-	local v3 = {
-		BackgroundTransparency = 1,
-		LayoutOrder = 0,
-		AutomaticSize = Enum.AutomaticSize.XY
-	}
-	local children = {
-		Layout = React.createElement("UIListLayout", {
-			FillDirection = Enum.FillDirection.Vertical,
-			SortOrder = Enum.SortOrder.LayoutOrder,
-			HorizontalAlignment = Enum.HorizontalAlignment.Center,
-			VerticalAlignment = Enum.VerticalAlignment.Center,
-			Padding = UDim.new(0, space.iconPadding)
-		}),
-		ButtonLabelGroup = 0,
-		ControllerImage = 0
-	}
-
-	local createElement2 = React.createElement
-	local v4 = {
-		BackgroundTransparency = 1,
-		AutomaticSize = Enum.AutomaticSize.XY,
-		LayoutOrder = 0
-	}
-
-	local v5 = {
-		Layout = React.createElement("UIListLayout", {
-			FillDirection = Enum.FillDirection.Horizontal,
-			SortOrder = Enum.SortOrder.LayoutOrder,
-			HorizontalAlignment = Enum.HorizontalAlignment.Center,
-			VerticalAlignment = Enum.VerticalAlignment.Center,
-			Padding = UDim.new(0, space.iconPadding)
-		}),
-		Icon = React.createElement("ImageLabel", {
-			LayoutOrder = 0,
-			BackgroundTransparency = 1,
-			Image = imageForKeyCode,
-			Size = UDim2.fromOffset(size.iconSize, size.iconSize)
-		}),
-		ControllerButtonLabel = 0
-	}
-
-	local createElement3 = React.createElement
-	local v6 = {
-		Text = v2.ButtonLabelText,
-		LayoutOrder = 100,
-		BackgroundTransparency = 1,
-		Font = 0,
-		FontFace = 0,
-		TextSize = 0,
-		TextColor3 = 0,
-		Size = 0,
-		AutomaticSize = 0,
-		TextXAlignment = 0,
-		TextYAlignment = 0
-	}
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = typography.label.Font
-	end
-
-	v6.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(typography.label.Font)
-	end
-
-	v6.FontFace = fontFace
-	v6.TextSize = typography.label.FontSize
-	v6.TextColor3 = color.textColor.Color3
-	v6.Size = UDim2.fromOffset(0, 0)
-	v6.AutomaticSize = Enum.AutomaticSize.XY
-	v6.TextXAlignment = Enum.TextXAlignment.Center
-	v6.TextYAlignment = Enum.TextYAlignment.Center
-	v5.ControllerButtonLabel = createElement3("TextLabel", v6)
-	children.ButtonLabelGroup = createElement2("Frame", v4, v5)
-
-	children.ControllerImage = React.createElement(
-		"ImageLabel",
+	return React.createElement(
+		"Frame",
+		{ BackgroundTransparency = 1, LayoutOrder = 0, AutomaticSize = Enum.AutomaticSize.XY },
 		{
-			Image = "rbxasset://textures/ui/Gamepad/ControllerSelect.png",
-			Size = UDim2.fromScale(1, 1),
-			LayoutOrder = 100,
-			BackgroundTransparency = 1
-		},
-		{
-			UIAspectRatioConstraint = React.createElement("UIAspectRatioConstraint", {
-				AspectRatio = size.imageWidth / size.imageHeight
+			Layout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				Padding = UDim.new(0, space.iconPadding)
 			}),
-			UISizeConstraint = React.createElement("UISizeConstraint", {
-				MaxSize = Vector2.new(size.imageWidth, size.imageHeight),
-				MinSize = Vector2.new(size.imageWidth * 0.5, size.imageHeight * 0.5)
-			})
+			ButtonLabelGroup = React.createElement(
+				"Frame",
+				{
+					BackgroundTransparency = 1,
+					AutomaticSize = Enum.AutomaticSize.XY,
+					LayoutOrder = 0
+				},
+				{
+					Layout = React.createElement("UIListLayout", {
+						FillDirection = Enum.FillDirection.Horizontal,
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						HorizontalAlignment = Enum.HorizontalAlignment.Center,
+						VerticalAlignment = Enum.VerticalAlignment.Center,
+						Padding = UDim.new(0, space.iconPadding)
+					}),
+					Icon = React.createElement("ImageLabel", {
+						LayoutOrder = 0,
+						BackgroundTransparency = 1,
+						Image = imageForKeyCode,
+						Size = UDim2.fromOffset(size.iconSize, size.iconSize)
+					}),
+					ControllerButtonLabel = React.createElement("TextLabel", {
+						Text = v2.ButtonLabelText,
+						LayoutOrder = 100,
+						BackgroundTransparency = 1,
+						FontFace = normalizeFontFace(typography.label.Font),
+						TextSize = typography.label.FontSize,
+						TextColor3 = color.textColor.Color3,
+						Size = UDim2.fromOffset(0, 0),
+						AutomaticSize = Enum.AutomaticSize.XY,
+						TextXAlignment = Enum.TextXAlignment.Center,
+						TextYAlignment = Enum.TextYAlignment.Center
+					})
+				}
+			),
+			ControllerImage = React.createElement(
+				"ImageLabel",
+				{
+					Image = "rbxasset://textures/ui/Gamepad/ControllerSelect.png",
+					Size = UDim2.fromScale(1, 1),
+					LayoutOrder = 100,
+					BackgroundTransparency = 1
+				},
+				{
+					UIAspectRatioConstraint = React.createElement("UIAspectRatioConstraint", {
+						AspectRatio = size.imageWidth / size.imageHeight
+					}),
+					UISizeConstraint = React.createElement("UISizeConstraint", {
+						MaxSize = Vector2.new(size.imageWidth, size.imageHeight),
+						MinSize = Vector2.new(size.imageWidth * 0.5, size.imageHeight * 0.5)
+					})
+				}
+			)
 		}
 	)
-	return createElement("Frame", v3, children)
 end
 
 local function Body(p)
@@ -224,7 +165,7 @@ local function Body(p)
 		BackgroundTransparency = 1
 	}
 
-	local children = {
+	local v4 = {
 		Layout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			SortOrder = Enum.SortOrder.LayoutOrder,
@@ -239,50 +180,24 @@ local function Body(p)
 			PaddingBottom = UDim.new(0, space.bodyPadding)
 		}),
 		GamepadImageArea = React.createElement(GamepadImageArea),
-		ImageDescription = 0,
+		ImageDescription = React.createElement("TextLabel", {
+			Text = v2.Description,
+			LayoutOrder = 100,
+			BackgroundTransparency = 1,
+			FontFace = normalizeFontFace(typography.caption.Font),
+			TextSize = typography.caption.FontSize,
+			TextColor3 = color.textColor.Color3,
+			TextWrapped = true,
+			LineHeight = typography.caption.LineHeight,
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextYAlignment = Enum.TextYAlignment.Center
+		}),
 		ConfirmationButton = 0
 	}
+
 	local createElement2 = React.createElement
-	local v4 = {
-		Text = v2.Description,
-		LayoutOrder = 100,
-		BackgroundTransparency = 1,
-		Font = 0,
-		FontFace = 0,
-		TextSize = 0,
-		TextColor3 = 0,
-		TextWrapped = true,
-		LineHeight = 0,
-		Size = 0,
-		AutomaticSize = 0,
-		TextXAlignment = 0,
-		TextYAlignment = 0
-	}
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = typography.caption.Font
-	end
-
-	v4.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(typography.caption.Font)
-	end
-
-	v4.FontFace = fontFace
-	v4.TextSize = typography.caption.FontSize
-	v4.TextColor3 = color.textColor.Color3
-
-	v4.LineHeight = typography.caption.LineHeight
-	v4.Size = UDim2.new(1, 0, 0, 0)
-	v4.AutomaticSize = Enum.AutomaticSize.Y
-	v4.TextXAlignment = Enum.TextXAlignment.Left
-	v4.TextYAlignment = Enum.TextYAlignment.Center
-	children.ImageDescription = createElement2("TextLabel", v4)
-
-	local createElement3 = React.createElement
 	local v5 = {
 		buttonType = ButtonType.PrimarySystem,
 		layoutOrder = 200,
@@ -298,8 +213,8 @@ local function Body(p)
 	end
 
 	v5.icon = icon
-	children.ConfirmationButton = createElement3(Button, v5)
-	return createElement("Frame", v3, children)
+	v4.ConfirmationButton = createElement2(Button, v5)
+	return createElement("Frame", v3, v4)
 end
 
 local function GamepadNavigationDialog(p)

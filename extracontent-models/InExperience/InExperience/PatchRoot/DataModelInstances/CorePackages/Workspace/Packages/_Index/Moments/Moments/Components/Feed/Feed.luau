@@ -15,6 +15,7 @@ local Analytics = MomentsCommon.Analytics
 local EventNames = Analytics.EventNames
 local fireAnalyticsEvent = Analytics.fireAnalyticsEvent
 local MomentsSurfaceLoadManager = MomentsCommon.Performance.MomentsSurfaceLoadManager
+local FFlagMomentsPostInsightsIxpEnabled = require(Moments.Flags.FFlagMomentsPostInsightsIxpEnabled)
 local FFlagMomentsRemoveDeletedFromProfile = SharedFlags.FFlagMomentsRemoveDeletedFromProfile
 local FFlagMomentsOptimisticProfilePending = SharedFlags.FFlagMomentsOptimisticProfilePending
 local FFlagMomentsRenderAvatarPostsInFeed = SharedFlags.FFlagMomentsRenderAvatarPostsInFeed
@@ -61,6 +62,8 @@ local FFlagMomentsFixDeleteToastCopy = require(Moments.Flags.FFlagMomentsFixDele
 local GetFFlagMomentsNonInfiniteScroll = MomentsCommon.Flags.GetFFlagMomentsNonInfiniteScroll
 local GetToastStore = require(Moments.Stores.GetToastStore)
 local GetDeletedMomentsStore = require(Moments.Stores.GetDeletedMomentsStore)
+local getExperienceDetailsSheetStore = require(Moments.ExperienceDetailsSheet.Sheet.getExperienceDetailsSheetStore)
+local FFlagMomentsParentTimeLimit = MomentsCommon.Flags.FFlagMomentsParentTimeLimit
 local deleteMoment = require(Moments.Moderation.deleteMoment)
 local logMomentViewBegan = require(Moments.Analytics.logMomentViewBegan)
 local FFlagMomentsImpressionPrimaryEntity = require(Moments.Flags.FFlagMomentsImpressionPrimaryEntity)
@@ -131,6 +134,19 @@ local function feedItemAttribution(p) -- 1 equivalent call inferred from this he
 	return (feedItem.getAttribution(p))
 end
 
+local function withLimitReachedHidden(flag: boolean, pager)
+	if FFlagMomentsParentTimeLimit then
+		return React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.fromScale(1, 1),
+			Visible = not flag,
+			ZIndex = 1
+		}, { Pager = pager })
+	end
+
+	return pager
+end
+
 local function stringOrNil(p) -- 2 equivalent calls inferred from this helper
 	if p == nil then
 		return nil
@@ -186,86 +202,128 @@ end
 
 local function Feed(props)
 	local source = props.source
-	local v2 = props.active == nil or props.active
-	local v3
+	local isActiveFeed = props.active == nil or props.active
+	local v2
 
 	if props.playbackActive == nil then
-		v3 = v2
+		v2 = isActiveFeed
 	else
-		v3 = props.playbackActive
+		v2 = props.playbackActive
 	end
 
-	local v4 = props.showNavigationBar == nil or props.showNavigationBar
+	local v3 = props.showNavigationBar == nil or props.showNavigationBar
 	local telemetry = props.telemetry or noopTelemetry
 	local trackSurfaceLoad = props.trackSurfaceLoad == true
-	local coveringOverlay, v5
+	local coveringOverlay, v4
 
 	if FFlagMomentsComments and getCommentsSheetStore ~= nil then
 		coveringOverlay = SignalsReact.useSignalState(getCommentsSheetStore(false).getIsOpen)
 
-		v5 = SignalsReact.useSignalState(getCommentsSheetStore(false).getIsExpanded)
+		v4 = SignalsReact.useSignalState(getCommentsSheetStore(false).getIsExpanded)
 	else
 		coveringOverlay = false
-		v5 = false
+		v4 = false
 	end
 
-	local active = v2 and not coveringOverlay
-	local v6
+	local active = isActiveFeed and not coveringOverlay
+	local v5
 
 	if FFlagMomentsCreatorAnalytics and getPostInsightsPageStore ~= nil then
-		v6 = SignalsReact.useSignalState(getPostInsightsPageStore(false).getIsOpen)
+		v5 = SignalsReact.useSignalState(getPostInsightsPageStore(false).getIsOpen)
 
-		if v6 then
+		if v5 then
 			active = false
 		end
 	else
-		v6 = false
+		v5 = false
 	end
 
 	local playbackActive
 
-	if FFlagMomentsCreatorAnalytics and v6 then
+	if FFlagMomentsCreatorAnalytics and v5 then
 		playbackActive = false
 	else
-		playbackActive = v3 and not v5
+		playbackActive = v2 and not v4
 	end
 
 	local immersiveChromeStore = GetImmersiveChromeStore(false)
 
-	local v7 = useLocalization(v)
+	local v6 = useLocalization(v)
 
-	local v8 = useMomentsSession()
+	local v7 = useMomentsSession()
 	local toastStore = GetToastStore(false)
-	local v9 = SignalsReact.useSignalState(v8.getPendingDeletion)
+	local v8 = SignalsReact.useSignalState(v7.getPendingDeletion)
 
-	local v10 = React.useMemo(function()
-		return createFeedStore(
-			source,
-			feedItemDedupeKey,
-			trackSurfaceLoad,
-			(getFeedScrollLimit(true, GetFFlagMomentsNonInfiniteScroll(), function()
-				return GetMomentsCapabilities(false)
-			end))
-		)
+	local v9 = React.useMemo(function()
+		local feedScrollLimit = getFeedScrollLimit(true, GetFFlagMomentsNonInfiniteScroll(), function()
+			return GetMomentsCapabilities(false)
+		end)
+		local v9
+
+		if FFlagMomentsParentTimeLimit then
+			local GetMomentsUsageStore = require(Moments.Stores.GetMomentsUsageStore)
+			v9 = GetMomentsUsageStore(false)
+		end
+
+		return createFeedStore(source, feedItemDedupeKey, trackSurfaceLoad, feedScrollLimit, v9)
 	end, { source, trackSurfaceLoad })
 
+	local v10 = v2
 	React.useEffect(function()
-		v10.loadInitial()
-		return function()
-			v10.dispose()
+		if FFlagMomentsParentTimeLimit and v10 then
+			local GetMomentsUsageStore = require(Moments.Stores.GetMomentsUsageStore)
+			local retainWatching = GetMomentsUsageStore(false).retainWatching()
+			return function()
+				retainWatching()
+			end
 		end
 	end, { v10 })
 
+	local v11 = SignalsReact.useSignalState(v9.getStatus)
+	local v12 = FFlagMomentsParentTimeLimit and v11 == "LimitReached"
+
+	if v12 then
+		v2 = false
+		playbackActive = false
+	end
+
+	React.useEffect(function()
+		if not v12 then
+			return
+		end
+
+		getExperienceDetailsSheetStore(false).close()
+
+		if getCommentsSheetStore ~= nil then
+			local commentsSheetStore = getCommentsSheetStore(false)
+
+			if commentsSheetStore.getIsOpen(false) then
+				commentsSheetStore.close("navigation_hidden")
+			end
+		end
+
+		if getPostInsightsPageStore ~= nil then
+			getPostInsightsPageStore(false).close()
+		end
+	end, { v12 })
+
+	React.useEffect(function()
+		v9.loadInitial()
+		return function()
+			v9.dispose()
+		end
+	end, { v9 })
+
 	if FFlagMomentsCommentsCloseOnFeedJump and getCommentsSheetStore ~= nil then
 		React.useEffect(function()
-			if not v2 then
+			if not isActiveFeed then
 				return
 			end
 
 			local commentsSheetStore = getCommentsSheetStore(false)
 
 			local function getCurrentPosition(p)
-				local currentItem = v10.pager.getCurrentItem(p)
+				local currentItem = v9.pager.getCurrentItem(p)
 
 				if currentItem == nil or currentItem.kind == "skeleton" then
 					return nil
@@ -282,26 +340,26 @@ local function Feed(props)
 				return moment.recommendationMetadata.feedItemId or `moment:{moment.momentId}`
 			end
 
-			local v11 = getCurrentPosition(false)
+			local v13 = getCurrentPosition(false)
 			return Signals.createEffect(function(p)
 				local currentPosition = getCurrentPosition(p)
 
-				if currentPosition == nil or currentPosition == v11 then
+				if currentPosition == nil or currentPosition == v13 then
 					return
 				end
 
-				local v12 = v11
-				v11 = currentPosition
+				local v14 = v13
+				v13 = currentPosition
 
 				if
-					v12 ~= nil
+					v14 ~= nil
 					and commentsSheetStore.getIsOpen(false)
-					and commentsSheetStore.getFeedItemId(false) == v12
+					and commentsSheetStore.getFeedItemId(false) == v14
 				then
 					commentsSheetStore.close()
 				end
 			end)
-		end, { v2, v10 })
+		end, { isActiveFeed, v9 })
 	end
 
 	local ref = React.useRef(nil)
@@ -309,8 +367,8 @@ local function Feed(props)
 
 	local ref3 = React.useRef(nil)
 	local analytics = React.useMemo(function()
-		local v11 = {}
-		function v11.onTargetCommitted(p: number, p2: number, p3)
+		local v13 = {}
+		function v13.onTargetCommitted(p: number, p2: number, p3)
 			local current = ref2.current
 
 			if current ~= nil then
@@ -319,7 +377,7 @@ local function Feed(props)
 		end
 
 		if FFlagMomentsNavigationEvent then
-			function v11.onUserStep(p: number, p2: number)
+			function v13.onUserStep(p: number, p2: number)
 				local current = ref3.current
 
 				if current ~= nil then
@@ -328,7 +386,7 @@ local function Feed(props)
 			end
 		end
 
-		return v11
+		return v13
 	end, {})
 	local ref4 = React.useRef(0)
 	local ref5 = React.useRef(false)
@@ -349,17 +407,17 @@ local function Feed(props)
 		ref5.current = true
 		ref6.current += 1
 		local current2 = ref6.current
-		v10.refresh()
+		v9.refresh()
 
 		task.spawn(function()
 			while ref5.current and current2 == ref6.current do
-				local status = v10.getStatus(false)
+				local status = v9.getStatus(false)
 
 				if status == "Loaded" or status == "Empty" then
 					ref5.current = false
 					ref4.current = DateTime.now().UnixTimestampMillis + 1000
 					break
-				elseif status == "Failed" then
+				elseif status == "Failed" or FFlagMomentsParentTimeLimit and status == "LimitReached" then
 					ref5.current = false
 					break
 				else
@@ -367,42 +425,56 @@ local function Feed(props)
 				end
 			end
 		end)
-	end, { v10 })
+	end, { v9 })
 
 	local prependMoment = React.useCallback(function(moment)
-		v10.prependItem({ kind = "moment", moment = moment })
+		v9.prependItem({ kind = "moment", moment = moment })
 		local current = ref.current
 
 		if current ~= nil then
 			current.scrollToIndex(1)
 		end
-	end, { v10 })
+	end, { v9 })
 
 	local ref8 = React.useRef(nil)
-	local v11 = useMomentsHost().openAvatarLookTryOn ~= nil
+	local v13 = useMomentsHost().openAvatarLookTryOn ~= nil
+	local v14
+
+	if FFlagMomentsPostInsightsIxpEnabled then
+		v14 = source.recommendationSource or false
+	else
+		v14 = false
+	end
+
 	local onItemBecameActive = React.useCallback(function(p)
 		if p.kind ~= "moment" and (not FFlagMomentsRenderAvatarPostsInFeed or p.kind ~= "avatarMoment") then
 			return
 		end
 
 		local moment = p.moment
+
+		if FFlagMomentsPostInsightsIxpEnabled then
+			local logPostInsightsLayerExposure = require(Moments.Analytics.logPostInsightsLayerExposure)
+			logPostInsightsLayerExposure(moment, source.recommendationSource)
+		end
+
 		local current = ref8.current
 
-		local sessionSource = v8.getSessionSource(false)
-		local v12
+		local sessionSource = v7.getSessionSource(false)
+		local v15
 
 		if FFlagMomentsNavigationEvent and current ~= nil then
-			v12 = current()
+			v15 = current()
 		end
 
-		local v13
+		local v16
 
 		if FFlagMomentsImpressionPrimaryEntity then
-			v13 = v11
+			v16 = v13
 		end
 
-		logMomentViewBegan(moment, sessionSource, v12, v13)
-	end, { v8, v11 })
+		logMomentViewBegan(moment, sessionSource, v15, v16)
+	end, { v7, v13, v14 })
 
 	local includeRecommendationDetail = props.telemetry ~= nil
 	local onViewEnded = React.useCallback(function(p, data)
@@ -421,17 +493,17 @@ local function Feed(props)
 
 	local onEndStateReached = React.useCallback(function(itemPosition: number)
 		logFeedEndStateReached({
-			source = v8.getSessionSource(false),
+			source = v7.getSessionSource(false),
 			recommendationSource = source.recommendationSource or "",
 			feedSourceId = source.id or "",
 			itemPosition = itemPosition
 		})
-	end, { v8, source })
+	end, { v7, source })
 
-	local pager = v10.pager
-	local v12 = {
+	local pager = v9.pager
+	local v15 = {
 		telemetry = telemetry,
-		active = v2,
+		active = isActiveFeed and not v12,
 		getAttribution = feedItemAttribution,
 		recommendationSource = source.recommendationSource,
 		onItemBecameActive = onItemBecameActive,
@@ -444,45 +516,45 @@ local function Feed(props)
 		onEndStateReached = nil
 	end
 
-	v12.onEndStateReached = onEndStateReached
+	v15.onEndStateReached = onEndStateReached
 
 	if not FFlagMomentsNavigationEvent then
 		onViewEnded = nil
 	end
 
-	v12.onViewEnded = onViewEnded
+	v15.onViewEnded = onViewEnded
 	local inactiveDestination
 
 	if FFlagMomentsNavigationEvent then
 		inactiveDestination = props.inactiveDestination
 	end
 
-	v12.inactiveDestination = inactiveDestination
-	local v13 = useFeedTelemetry(pager, v12)
+	v15.inactiveDestination = inactiveDestination
+	local v16 = useFeedTelemetry(pager, v15)
 
-	ref8.current = v13.getViewId
-	ref7.current = v13.flushView
-	ref3.current = v13.noteUserStep
+	ref8.current = v16.getViewId
+	ref7.current = v16.flushView
+	ref3.current = v16.noteUserStep
 
 	React.useImperativeHandle(props.controllerRef, function()
-		return { prependMoment = prependMoment, refresh = refresh, flushView = v13.flushView }
-	end, { prependMoment, refresh, v13.flushView })
+		return { prependMoment = prependMoment, refresh = refresh, flushView = v16.flushView }
+	end, { prependMoment, refresh, v16.flushView })
 
-	local ref9 = React.useRef(v3)
+	local ref9 = React.useRef(v2)
 	React.useEffect(function()
 		local current = ref9.current
-		ref9.current = v3
+		ref9.current = v2
 
-		if v3 and not current then
-			local currentItem = v10.pager.getCurrentItem(false)
+		if v2 and not current then
+			local currentItem = v9.pager.getCurrentItem(false)
 
 			if currentItem ~= nil then
 				onItemBecameActive(currentItem)
 			end
 		end
-	end, { v3, v10, onItemBecameActive })
+	end, { v2, v9, onItemBecameActive })
 
-	local v14 = React.useCallback(function()
+	local v17 = React.useCallback(function()
 		local current = ref.current
 
 		if current ~= nil then
@@ -496,16 +568,14 @@ local function Feed(props)
 			current.previous()
 		end
 	end, {})
-
-	local v15 = SignalsReact.useSignalState(v10.getStatus)
-	local v16, v17
+	local v18, v19
 
 	if FFlagMomentsOptimisticProfilePending then
-		v16 = SignalsReact.useSignalState(v10.getInitialIndex)
-		v17 = SignalsReact.useSignalState(v10.getError)
+		v18 = SignalsReact.useSignalState(v9.getInitialIndex)
+		v19 = SignalsReact.useSignalState(v9.getError)
 	end
 
-	local current2 = SignalsReact.useSignalState(v10.getLoadMoreFailed)
+	local current2 = SignalsReact.useSignalState(v9.getLoadMoreFailed)
 	local ref10 = React.useRef({})
 
 	React.useEffect(function()
@@ -514,7 +584,7 @@ local function Feed(props)
 			ref5.current = false
 			ref4.current = 0
 		end
-	end, { v10 })
+	end, { v9 })
 
 	local ref11 = React.useRef(false)
 	local ref12 = React.useRef(false)
@@ -529,15 +599,15 @@ local function Feed(props)
 			end
 
 			local momentsFirstUIRenderedTimestamp = EventNames.MomentsFirstUIRenderedTimestamp
-			local v18
+			local v20
 
 			if trackSurfaceLoad and MomentsSurfaceLoadManager.isSessionActive() then
-				v18 = MomentsSurfaceLoadManager.elapsedMs()
+				v20 = MomentsSurfaceLoadManager.elapsedMs()
 			else
-				v18 = DateTime.now().UnixTimestampMillis
+				v20 = DateTime.now().UnixTimestampMillis
 			end
 
-			fireAnalyticsEvent(momentsFirstUIRenderedTimestamp, { value = v18 })
+			fireAnalyticsEvent(momentsFirstUIRenderedTimestamp, { value = v20 })
 		end
 	end, {})
 
@@ -546,25 +616,25 @@ local function Feed(props)
 			return
 		end
 
-		if not ref12.current and (v15 == "Loaded" or v15 == "LoadingMore") then
+		if not ref12.current and (v11 == "Loaded" or v11 == "LoadingMore") then
 			ref12.current = true
 			fireAnalyticsEvent(EventNames.MomentsFirstContentLoadedTimestamp, {
 				value = DateTime.now().UnixTimestampMillis
 			})
 		end
-	end, { v15 })
+	end, { v11 })
 
 	local ref13 = React.useRef(nil)
 
 	React.useEffect(function()
-		if v15 ~= ref13.current then
-			if v15 == "Failed" then
+		if v11 ~= ref13.current then
+			if v11 == "Failed" then
 				fireAnalyticsEvent(EventNames.FeedLoadFailed, {
 					recommendationSource = source.recommendationSource or "",
 					feedSourceId = source.id or "",
-					failureReason = v10.getError(false) or ""
+					failureReason = v9.getError(false) or ""
 				})
-			elseif v15 == "Empty" then
+			elseif v11 == "Empty" then
 				fireAnalyticsEvent(EventNames.FeedNoMomentsFetched, {
 					recommendationSource = source.recommendationSource or "",
 					feedSourceId = source.id or ""
@@ -572,22 +642,22 @@ local function Feed(props)
 			end
 		end
 
-		ref13.current = v15
-	end, { v15 })
+		ref13.current = v11
+	end, { v11 })
 
 	local ref14 = React.useRef(false)
 
 	React.useEffect(function()
 		if current2 and not ref14.current then
-			local v18 = v10.pager.getItems(false)[v10.pager.getCurrentIndex(false)]
-			local v19
+			local v20 = v9.pager.getItems(false)[v9.pager.getCurrentIndex(false)]
+			local v21
 
-			if v18 ~= nil then
-				v19 = feedItemAttribution(v18) -- inferred equivalent call
+			if v20 ~= nil then
+				v21 = feedItemAttribution(v20) -- inferred equivalent call
 			end
 
 			local feedLoadMoreFailed = EventNames.FeedLoadMoreFailed
-			local v20 = {
+			local v22 = {
 				recommendationSource = source.recommendationSource or "",
 				feedSourceId = source.id or "",
 				itemId = 0,
@@ -595,49 +665,49 @@ local function Feed(props)
 			}
 			local itemId
 
-			if v19 ~= nil then
-				itemId = v19.itemId
+			if v21 ~= nil then
+				itemId = v21.itemId
 			end
 
-			v20.itemId = itemId
+			v22.itemId = itemId
 			local tracingId
 
-			if v19 ~= nil then
-				tracingId = v19.tracingId
+			if v21 ~= nil then
+				tracingId = v21.tracingId
 			end
 
-			v20.tracingId = tracingId
-			fireAnalyticsEvent(feedLoadMoreFailed, v20)
+			v22.tracingId = tracingId
+			fireAnalyticsEvent(feedLoadMoreFailed, v22)
 		end
 
 		ref14.current = current2
 	end, { current2 })
 
 	local removeCurrentItem = React.useCallback(function()
-		local currentIndex = v10.pager.getCurrentIndex(false)
+		local currentIndex = v9.pager.getCurrentIndex(false)
 		local current = ref.current
 
 		if current ~= nil then
 			current.removeItem(currentIndex)
 		end
-	end, { v10 })
+	end, { v9 })
 
 	local onConfirm = React.useCallback(function()
-		if v9 then
-			local momentId = v9.momentId
-			local feedItemId = v9.feedItemId
-			local feedSessionId = v9.feedSessionId
+		if v8 then
+			local momentId = v8.momentId
+			local feedItemId = v8.feedItemId
+			local feedSessionId = v8.feedSessionId
 
 			if feedItemId == nil or feedItemId == "" then
-				v8.clearPendingDeletion()
+				v7.clearPendingDeletion()
 				return
 			end
 
 			task.spawn(function()
-				local v18, v19 = deleteMoment(feedItemId):await()
+				local v20, v21 = deleteMoment(feedItemId):await()
 
-				if not v18 then
-					getLogger():warning("Failed to delete moment {}: {}", momentId, (tostring(v19))) -- inferred equivalent call
+				if not v20 then
+					getLogger():warning("Failed to delete moment {}: {}", momentId, (tostring(v21))) -- inferred equivalent call
 				end
 			end)
 			removeCurrentItem()
@@ -653,22 +723,22 @@ local function Feed(props)
 			end
 
 			if FFlagMomentsDeleteSnackbar then
-				toastStore.triggerToast({ title = v7.deletedToast, text = "", variant = "snackbar" })
+				toastStore.triggerToast({ title = v6.deletedToast, text = "", variant = "snackbar" })
 			elseif FFlagMomentsFixDeleteToastCopy then
-				toastStore.triggerToast({ title = v7.deletedToast, text = "" })
+				toastStore.triggerToast({ title = v6.deletedToast, text = "" })
 			else
-				toastStore.triggerToast({ title = v7.deletedTitle, text = v7.deletedBody })
+				toastStore.triggerToast({ title = v6.deletedTitle, text = v6.deletedBody })
 			end
 		end
 
-		v8.clearPendingDeletion()
-	end, { v9, v8, toastStore, v7, removeCurrentItem })
+		v7.clearPendingDeletion()
+	end, { v8, v7, toastStore, v6, removeCurrentItem })
 
 	local onCancel = React.useCallback(function()
-		v8.clearPendingDeletion()
-	end, { v8 })
+		v7.clearPendingDeletion()
+	end, { v7 })
 
-	local v18 = React.useCallback(function(data, failureReason: string?)
+	local v20 = React.useCallback(function(data, failureReason: string?)
 		getLogger():debug( -- inferred equivalent call
 			"Filtering moment after media load failure | momentId: {}, assetId: {}, captureType: {}, failureReason: {}",
 			data.momentId,
@@ -686,12 +756,12 @@ local function Feed(props)
 		fireAnalyticsEvent(EventNames.FeedMediaLoadFailed, mediaLoadEventFields)
 	end, { source })
 
-	local v19 = React.useCallback(function(p: string, p2: string?)
+	local v21 = React.useCallback(function(p: string, p2: string?)
 		if ref10.current[p] then
 			return
 		end
 
-		local items = v10.pager.getItems(false)
+		local items = v9.pager.getItems(false)
 
 		for k, item in items do
 			if
@@ -699,11 +769,11 @@ local function Feed(props)
 				and item.moment.momentId == p
 			then
 				ref10.current[p] = true
-				v18(item.moment, p2)
+				v20(item.moment, p2)
 				local current = ref.current
 
 				if current == nil then
-					v10.pager.removeItem(k)
+					v9.pager.removeItem(k)
 				else
 					current.removeItem(k)
 				end
@@ -711,31 +781,31 @@ local function Feed(props)
 				break
 			end
 		end
-	end, { v10, v18 })
+	end, { v9, v20 })
 
 	local onMediaItemLoadAttempted = React.useCallback(function(p: string)
-		Analytics.reportMomentsFeedMediaLoad("attempted", v10.observabilityFeedType)
+		Analytics.reportMomentsFeedMediaLoad("attempted", v9.observabilityFeedType)
 
 		if FFlagMomentsFeedMediaLoadAttemptedEvent then
-			for _, v20 in v10.pager.getItems(false) do
-				if v20.kind == "moment" and v20.moment.momentId == p then
-					fireAnalyticsEvent(EventNames.FeedMediaLoadAttempted, makeMediaLoadEventFields(v20.moment, source))
+			for _, v22 in v9.pager.getItems(false) do
+				if v22.kind == "moment" and v22.moment.momentId == p then
+					fireAnalyticsEvent(EventNames.FeedMediaLoadAttempted, makeMediaLoadEventFields(v22.moment, source))
 					return
 				end
 			end
 		end
-	end, { v10, source })
+	end, { v9, source })
 
 	local onMediaItemFailed = React.useCallback(function(p: string, p2: string?)
-		Analytics.reportMomentsFeedMediaLoad("failed", v10.observabilityFeedType, p2)
-		v19(p, p2)
-	end, { v10, v19 })
+		Analytics.reportMomentsFeedMediaLoad("failed", v9.observabilityFeedType, p2)
+		v21(p, p2)
+	end, { v9, v21 })
 
-	local v20 = React.useMemo(function()
-		local v20 = {
-			getStatus = v10.getStatus,
-			isActiveFeed = v2,
-			isPlaybackActive = v3,
+	local v22 = React.useMemo(function()
+		local v22 = {
+			getStatus = v9.getStatus,
+			isActiveFeed = isActiveFeed,
+			isPlaybackActive = v2,
 			getCurrentIndex = 0,
 			getCurrentItem = 0,
 			recommendationSource = 0,
@@ -752,59 +822,59 @@ local function Feed(props)
 		local getCurrentIndex
 
 		if FFlagMomentsRenderAvatarPostsInFeed then
-			getCurrentIndex = v10.pager.getCurrentIndex
+			getCurrentIndex = v9.pager.getCurrentIndex
 		end
 
-		v20.getCurrentIndex = getCurrentIndex
+		v22.getCurrentIndex = getCurrentIndex
 		local getCurrentItem
 
 		if FFlagMomentsCommentDeepLinks then
-			getCurrentItem = v10.pager.getCurrentItem
+			getCurrentItem = v9.pager.getCurrentItem
 		end
 
-		v20.getCurrentItem = getCurrentItem
-		v20.recommendationSource = source.recommendationSource
-		function v20.logAction(p, p2, p3)
+		v22.getCurrentItem = getCurrentItem
+		v22.recommendationSource = source.recommendationSource
+		function v22.logAction(p, p2, p3)
 			return telemetry.logAction(p, p2, p3)
 		end
 
-		v20.flushView = v13.flushView
+		v22.flushView = v16.flushView
 
-		v20.getChromeVisible = immersiveChromeStore.getChromeVisible
-		v20.revealChrome = immersiveChromeStore.revealChrome
-		v20.removeCurrentItem = removeCurrentItem
-		v20.scrollToNext = v14
+		v22.getChromeVisible = immersiveChromeStore.getChromeVisible
+		v22.revealChrome = immersiveChromeStore.revealChrome
+		v22.removeCurrentItem = removeCurrentItem
+		v22.scrollToNext = v17
 		local loadMoreBeyondLimit
 
 		if GetFFlagMomentsNonInfiniteScroll() then
-			loadMoreBeyondLimit = v10.loadBeyondLimit
+			loadMoreBeyondLimit = v9.loadBeyondLimit
 		end
 
-		v20.loadMoreBeyondLimit = loadMoreBeyondLimit
-		v20.getCanLoadMoreBeyondLimit = v10.getCanLoadMoreBeyondLimit
-		v20.caughtUpState = props.caughtUpState
-		return v20
+		v22.loadMoreBeyondLimit = loadMoreBeyondLimit
+		v22.getCanLoadMoreBeyondLimit = v9.getCanLoadMoreBeyondLimit
+		v22.caughtUpState = props.caughtUpState
+		return v22
 	end, {
-		v10,
+		v9,
+		isActiveFeed,
 		v2,
-		v3,
 		source,
 		telemetry,
-		v13.flushView,
+		v16.flushView,
 		immersiveChromeStore,
 		removeCurrentItem,
-		v14,
+		v17,
 		props.caughtUpState
 	})
 
-	local v21 = v15 == "Loaded" or v15 == "LoadingMore"
+	local v23 = v11 == "Loaded" or v11 == "LoadingMore"
 	local active2
 
 	if active then
-		if v15 == "Failed" then
+		if v11 == "Failed" or v11 == "Empty" then
 			active2 = false
 		else
-			active2 = v15 ~= "Empty"
+			active2 = not v12
 		end
 	else
 		active2 = active
@@ -814,7 +884,7 @@ local function Feed(props)
 	local provider = feedContext.Provider
 
 	local createElement2 = React.createElement
-	local v22 = {
+	local v24 = {
 		AnchorPoint = props.AnchorPoint,
 		BackgroundTransparency = 1,
 		LayoutOrder = props.LayoutOrder,
@@ -824,12 +894,12 @@ local function Feed(props)
 	}
 
 	local createElement3 = React.createElement
-	local v23 = {
-		store = v10.pager,
+	local v25 = {
+		store = v9.pager,
 		renderItem = renderFeedItem,
 		keyExtractor = feedItemKey,
 		analytics = analytics,
-		onEndReached = v10.loadMore,
+		onEndReached = v9.loadMore,
 		active = active2,
 		controllerRef = ref,
 		initialIndex = 0,
@@ -840,21 +910,21 @@ local function Feed(props)
 	local initialIndex
 
 	if FFlagMomentsOptimisticProfilePending then
-		initialIndex = v16 or props.initialIndex
+		initialIndex = v18 or props.initialIndex
 	else
 		initialIndex = props.initialIndex
 	end
 
-	v23.initialIndex = initialIndex
+	v25.initialIndex = initialIndex
 
-	v23.tuning = props.pager
-	v23.Size = UDim2.fromScale(1, 1)
+	v25.tuning = props.pager
+	v25.Size = UDim2.fromScale(1, 1)
 	local children = {
-		Pager = createElement3(verticalPager, v23),
+		Pager = withLimitReachedHidden(v12, createElement3(verticalPager, v25)),
 		StateOverlay = React.createElement(FeedStateView, {
-			status = v15,
-			loadMoreFailed = current2 or FFlagMomentsOptimisticProfilePending and v17 ~= nil,
-			onRetry = v10.retry,
+			status = v11,
+			loadMoreFailed = current2 or FFlagMomentsOptimisticProfilePending and v19 ~= nil,
+			onRetry = v9.retry,
 			emptyContent = props.emptyContent,
 			emptyState = props.emptyState,
 			zIndex = 2
@@ -866,11 +936,11 @@ local function Feed(props)
 	}
 	local navBar
 
-	if v4 and v21 then
+	if v3 and v23 then
 		navBar = React.createElement(FeedNavigationBar, {
-			pager = v10.pager,
+			pager = v9.pager,
 			active = active,
-			onScrollToNext = v14,
+			onScrollToNext = v17,
 			onScrollToPrevious = onScrollToPrevious,
 			zIndex = 3
 		})
@@ -879,20 +949,20 @@ local function Feed(props)
 	children.NavBar = navBar
 
 	children.ImmersiveController = React.createElement(ImmersiveChromeController, {
-		pager = v10.pager,
-		active = v2 and v3,
+		pager = v9.pager,
+		active = isActiveFeed and v2,
 		controllerRef = ref,
 		coveringOverlay = coveringOverlay
 	})
 
 	children.SwipeLatency = React.createElement(SwipeLatencyTracker, {
-		pager = v10.pager,
+		pager = v9.pager,
 		controllerRef = ref,
 		onTargetCommittedRef = ref2
 	})
 	local deletionDialog
 
-	if v9 ~= nil then
+	if v8 ~= nil then
 		deletionDialog = React.createElement(DeletionConfirmationDialog, {
 			onCancel = onCancel,
 			onConfirm = onConfirm
@@ -900,19 +970,19 @@ local function Feed(props)
 	end
 
 	children.DeletionDialog = deletionDialog
-	local element = createElement(provider, { value = v20 }, {
-		Root = createElement2("Frame", v22, children)
+	local element = createElement(provider, { value = v22 }, {
+		Root = createElement2("Frame", v24, children)
 	})
 
 	return React.createElement(MomentMediaCoordinatorProvider, {
-		pager = v10.pager,
+		pager = v9.pager,
 		playbackActive = playbackActive,
 		createCoordinator = props.createCoordinator,
 		onMediaItemLoadAttempted = onMediaItemLoadAttempted,
 		onMediaItemFailed = onMediaItemFailed
 	}, trackSurfaceLoad and {
 		Feed = element,
-		SurfaceReadyTracker = React.createElement(SurfaceReadyTracker, { pager = v10.pager })
+		SurfaceReadyTracker = React.createElement(SurfaceReadyTracker, { pager = v9.pager })
 	} or element)
 end
 

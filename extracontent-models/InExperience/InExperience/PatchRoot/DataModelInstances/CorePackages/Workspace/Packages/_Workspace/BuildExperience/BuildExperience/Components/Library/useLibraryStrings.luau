@@ -19,7 +19,9 @@ local v2 = {
 	model = { LocalizationStrings.LIBRARY_OBJECTS_3D, "3D Objects" },
 	object = { LocalizationStrings.LIBRARY_OBJECT, "Object" },
 	world = { LocalizationStrings.LIBRARY_WORLD, "World" },
-	searchEmpty = { LocalizationStrings.LIBRARY_SEARCH_EMPTY, "No search results found" }
+	searchEmpty = { LocalizationStrings.LIBRARY_SEARCH_EMPTY, "No search results found" },
+	selectAll = { LocalizationStrings.LIBRARY_SELECT_ALL, "Select all" },
+	selectFirst = { LocalizationStrings.LIBRARY_SELECT_FIRST, "Select first {count}" }
 }
 
 local function useLibraryStrings()

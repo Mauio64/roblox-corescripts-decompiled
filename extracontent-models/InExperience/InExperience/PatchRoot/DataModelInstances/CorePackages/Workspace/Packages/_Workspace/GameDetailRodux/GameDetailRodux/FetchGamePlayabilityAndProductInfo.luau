@@ -30,22 +30,21 @@ function FetchGamePlayabilityAndProductInfo.Fetch(p, value)
 			local v = object:getState().PlayabilityStatus[value]
 
 			if
-				v.isPlayable ~= false
-				or v.playabilityStatus ~= PlayabilityStatusEnum.PurchaseRequired
-				and v.playabilityStatus ~= PlayabilityStatusEnum.FiatPurchaseRequired
+				v.isPlayable == false
+				and (v.playabilityStatus == PlayabilityStatusEnum.PurchaseRequired or v.playabilityStatus == PlayabilityStatusEnum.FiatPurchaseRequired)
 			then
-				return Promise.resolve(v.playabilityStatus)
+				return object:dispatch(FetchGamesProductInfo.Fetch(p, { value })):andThen(function(p3)
+					local unwrapped2, _ = p3[FetchGamesProductInfo.KeyMapper(value)]:unwrap()
+
+					if unwrapped2 then
+						return Promise.resolve(v.playabilityStatus)
+					end
+
+					return Promise.reject()
+				end)
 			end
 
-			return object:dispatch(FetchGamesProductInfo.Fetch(p, { value })):andThen(function(p3)
-				local unwrapped2, _ = p3[FetchGamesProductInfo.KeyMapper(value)]:unwrap()
-
-				if unwrapped2 then
-					return Promise.resolve(v.playabilityStatus)
-				end
-
-				return Promise.reject()
-			end)
+			return Promise.resolve(v.playabilityStatus)
 		end)
 	end)
 end

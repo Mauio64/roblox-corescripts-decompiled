@@ -150,22 +150,22 @@ local function useUserMoments(current: string?, p)
 
 	if FFlagMomentsRemoveDeletedFromProfile or FFlagMomentsOptimisticProfilePending then
 		v6 = SignalsReact.useSignalState(GetDeletedMomentsStore(false).getDeletedIds)
-
+		local v7 = v6
 		moments2 = React.useMemo(function()
-			if #v6 == 0 then
+			if #v7 == 0 then
 				return state
 			end
 
 			local result = {}
 
-			for _, v7 in state do
-				if not table.find(v6, v7.momentId) then
-					table.insert(result, v7)
+			for _, v8 in state do
+				if not table.find(v7, v8.momentId) then
+					table.insert(result, v8)
 				end
 			end
 
 			return result
-		end, { state, v6 })
+		end, { state, v7 })
 	else
 		moments2 = state
 		v6 = nil

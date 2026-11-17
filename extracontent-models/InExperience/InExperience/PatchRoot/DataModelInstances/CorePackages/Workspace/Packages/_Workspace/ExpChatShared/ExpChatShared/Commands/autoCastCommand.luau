@@ -7,8 +7,8 @@ local context = require(ExpChatShared.context)
 local Commands = script:FindFirstAncestor("Commands")
 require(Commands.types)
 
-local function matchesAlias(items, value: string): boolean
-	for _, item in pairs(items) do
+local function matchesAlias(autoCastCommand, value: string): boolean
+	for _, item in pairs(autoCastCommand) do
 		if string.find(value, "^" .. item .. " ") then
 			return true
 		end

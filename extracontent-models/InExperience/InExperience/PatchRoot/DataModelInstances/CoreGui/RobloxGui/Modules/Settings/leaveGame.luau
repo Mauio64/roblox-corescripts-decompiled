@@ -19,6 +19,8 @@ local PerfUtils = require(RobloxGui.Modules.Common.PerfUtils)
 local Cryo = require(CorePackages.Packages.Cryo)
 local MessageBus = require(CorePackages.Workspace.Packages.MessageBus)
 local messageBus = MessageBus.MessageBus
+local ExperienceService = require(CorePackages.Workspace.Packages.ExperienceService)
+local experienceService = ExperienceService.ExperienceService
 local SurveyEventPublisher = require(CorePackages.Workspace.Packages.OnPlatformSurveys.SurveyEventPublisher)
 local WebViewEventType = require(CorePackages.Workspace.Packages.OnPlatformSurveys.WebViewEventType)
 local CoreGuiFinalStateAnalytics = require(script:FindFirstAncestor("Settings").Analytics.CoreGuiFinalStateAnalytics)
@@ -112,14 +114,20 @@ return function(flag: boolean, data)
 	RunService.RenderStepped:wait()
 	RunService.RenderStepped:wait()
 
-	if not (isExitModalRemoved and data and data.shouldNativeExit) then
-		game:Shutdown()
-	end
+	if data and data.leaveReason then
+		experienceService:LeaveExperienceWithReason(data.leaveReason)
+		local settings = settings()
+		settings.Rendering.QualityLevel = GetDefaultQualityLevel()
+	else
+		if not (isExitModalRemoved and data and data.shouldNativeExit) then
+			game:Shutdown()
+		end
 
-	local settings = settings()
-	settings.Rendering.QualityLevel = GetDefaultQualityLevel()
+		local settings = settings()
+		settings.Rendering.QualityLevel = GetDefaultQualityLevel()
 
-	if isExitModalRemoved and data and data.shouldNativeExit then
-		GuiService:BroadcastNotification("", GuiService:GetNotificationTypeList().NATIVE_EXIT)
+		if isExitModalRemoved and data and data.shouldNativeExit then
+			GuiService:BroadcastNotification("", GuiService:GetNotificationTypeList().NATIVE_EXIT)
+		end
 	end
 end

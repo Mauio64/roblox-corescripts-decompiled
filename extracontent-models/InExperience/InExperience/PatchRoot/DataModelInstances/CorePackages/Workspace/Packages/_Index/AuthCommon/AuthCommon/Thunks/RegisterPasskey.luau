@@ -20,8 +20,8 @@ local function getFinishRegistrationUrl() -- 1 equivalent call inferred from thi
 	return string.format("%sv1/passkey/FinishRegistration", Url.AUTH_URL)
 end
 
-local function finishPasskeyRegistration(callback, postBody)
-	return callback(getFinishRegistrationUrl(), "POST", { postBody = postBody }):andThen(function(p) -- inferred equivalent call
+local function finishPasskeyRegistration(callback, jsonEncode)
+	return callback(getFinishRegistrationUrl(), "POST", { postBody = jsonEncode }):andThen(function(p) -- inferred equivalent call
 		return Promise.resolve(p)
 	end, function(p)
 		local body
@@ -121,7 +121,7 @@ local function attemptPasskeyRegistration(p, p2, isSilentPasskeyUpgrade, p3)
 					sessionId = sessionId,
 					credentialNickname = "Passkey",
 					attestationResponse = HttpService:JSONEncode(jsonDecode2),
-					source = 0
+					source = nil
 				}
 				local source
 

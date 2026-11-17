@@ -1,4 +1,0 @@
-local FFlagLuaAppUnifyPlayButtonTileIxp = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagLuaAppUnifyPlayButtonTileIxp")
-local FFlagLuaAppUnifyPlayButtonAllSurfacesIxp = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagLuaAppUnifyPlayButtonAllSurfacesIxp")
-
-return game:DefineFastFlag("LuaAppUnifyPlayButtonTile4", false) or FFlagLuaAppUnifyPlayButtonTileIxp or FFlagLuaAppUnifyPlayButtonAllSurfacesIxp

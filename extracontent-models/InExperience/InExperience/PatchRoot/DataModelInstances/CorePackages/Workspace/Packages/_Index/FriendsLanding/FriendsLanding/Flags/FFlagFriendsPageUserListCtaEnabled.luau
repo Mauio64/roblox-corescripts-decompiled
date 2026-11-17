@@ -5,6 +5,5 @@ local SharedFlags = require(parent.SharedFlags)
 return game:DefineFastFlag("FriendsPageUserListCtaEnabled", false)
 	and SharedFlags.FFlagFriendsPageUserListEnabled
 	and SharedFlags.FFlagUserListCtaIntegrationEnabled
-	and SharedFlags.FFlagUserListComposeRenderRowWithCta
 	and SharedFlags.FFlagUserListSurfacePresenceWins
 	and SharedFlags.FFlagUserListDefaultCtaWidths

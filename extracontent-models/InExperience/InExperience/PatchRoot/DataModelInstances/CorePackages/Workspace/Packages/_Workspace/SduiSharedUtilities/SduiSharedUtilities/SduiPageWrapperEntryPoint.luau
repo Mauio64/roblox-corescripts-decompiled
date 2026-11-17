@@ -50,7 +50,9 @@ local usePageEntrySnackbar = require(SduiSharedUtilities.usePageEntrySnackbar)
 local SharedFlags2 = require(parent.SharedFlags)
 local FFlagAppPageShellScrollToTopFocus = SharedFlags2.FFlagAppPageShellScrollToTopFocus
 local SharedFlags3 = require(parent.SharedFlags)
-local FFlagAppThemeHalloween2026HomeBackground = SharedFlags3.FFlagAppThemeHalloween2026HomeBackground
+local FFlagAppPageShellScrollTelemetry = SharedFlags3.FFlagAppPageShellScrollTelemetry
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagAppThemeHalloween2026HomeBackground = SharedFlags4.FFlagAppThemeHalloween2026HomeBackground
 
 local function SduiPageWrapperEntryPoint(props, p)
 	local appPage = props.appPage
@@ -273,7 +275,8 @@ local function SduiPageWrapperEntryPoint(props, p)
 		onRefresh = 0,
 		appEventName = 0,
 		contentTopPadding = 0,
-		stickyTopPadding = 0
+		stickyTopPadding = 0,
+		scrollPerformanceIntervalName = 0
 	}
 	local stickyBackgroundStyle
 
@@ -296,6 +299,13 @@ local function SduiPageWrapperEntryPoint(props, p)
 	v14.appEventName = appPage
 	v14.contentTopPadding = contentTopPadding
 	v14.stickyTopPadding = stickyTopPadding
+	local scrollPerformanceIntervalName
+
+	if FFlagAppPageShellScrollTelemetry then
+		scrollPerformanceIntervalName = props.scrollPerformanceIntervalName
+	end
+
+	v14.scrollPerformanceIntervalName = scrollPerformanceIntervalName
 	v13.Content = createElement2(Page, v14)
 
 	v13.StateOverlay = stateOverlay

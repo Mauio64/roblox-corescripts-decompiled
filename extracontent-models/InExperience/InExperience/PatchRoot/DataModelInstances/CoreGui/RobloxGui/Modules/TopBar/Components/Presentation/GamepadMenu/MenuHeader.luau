@@ -5,7 +5,6 @@ local t = require(CorePackages.Packages.t)
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local Foundation = require(CorePackages.Packages.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
 
 local withStyle = UIBlox.Core.Style.withStyle
@@ -61,86 +60,66 @@ function extended.render(p)
 			})
 		end
 
-		local createElement = Roact.createElement
-		local v = {
-			LayoutOrder = p.props.layoutOrder,
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 0, p.props.height)
-		}
-
-		local createElement2 = Roact.createElement
-		local v2 = { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1) }
-		local v3 = {
-			Layout = Roact.createElement("UIListLayout", {
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				FillDirection = Enum.FillDirection.Horizontal,
-				HorizontalAlignment = Enum.HorizontalAlignment.Left,
-				VerticalAlignment = Enum.VerticalAlignment.Center,
-				Padding = UDim.new(0, 20)
-			}),
-			Padding = Roact.createElement("UIPadding", {
-				PaddingLeft = UDim.new(0, 20),
-				PaddingRight = UDim.new(0, 20)
-			}),
-			GameIcon = gameIcon,
-			TextFrame = 0
-		}
-
-		local createElement3 = Roact.createElement
-		local v4 = { LayoutOrder = 2, BackgroundTransparency = 1, Size = UDim2.new(1, -100, 1, 0) }
-
-		local createElement4 = Roact.createElement
-		local v5 = {
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 1, -45),
-			Position = UDim2.fromOffset(0, 25),
-			Font = 0,
-			FontFace = 0,
-			Text = 0,
-			TextSize = 0,
-			TextColor3 = 0,
-			TextTransparency = 0,
-			TextXAlignment = 0,
-			TextYAlignment = 0,
-			TextTruncate = 0,
-			TextWrapped = true
-		}
-		local font2
-
-		if not FoundationFontFaceMigration then
-			font2 = font.Header1.Font
-		end
-
-		v5.Font = font2
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(props.Tokens.Typography.HeadingSmall.Font)
-		end
-
-		v5.FontFace = fontFace
-
-		v5.Text = p.props.gameName
-		v5.TextSize = font.BaseSize * font.Header1.RelativeSize
-		v5.TextColor3 = theme.TextEmphasis.Color
-		v5.TextTransparency = theme.TextEmphasis.TextTransparency
-		v5.TextXAlignment = Enum.TextXAlignment.Left
-		v5.TextYAlignment = Enum.TextYAlignment.Top
-		v5.TextTruncate = Enum.TextTruncate.AtEnd
-		v3.TextFrame = createElement3("Frame", v4, {
-			TextLabel = createElement4("TextLabel", v5)
-		})
-		return createElement("Frame", v, {
-			ContentsFrame = createElement2("Frame", v2, v3),
-			Divider = Roact.createElement("Frame", {
-				BorderSizePixel = 0,
-				Size = UDim2.new(1, 0, 0, 1),
-				Position = UDim2.fromScale(0, 1),
-				AnchorPoint = Vector2.new(0, 1),
-				BackgroundTransparency = theme.Divider.Transparency,
-				BackgroundColor3 = theme.Divider.Color
-			})
-		})
+		return Roact.createElement(
+			"Frame",
+			{
+				LayoutOrder = p.props.layoutOrder,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 0, p.props.height)
+			},
+			{
+				ContentsFrame = Roact.createElement(
+					"Frame",
+					{ BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1) },
+					{
+						Layout = Roact.createElement("UIListLayout", {
+							SortOrder = Enum.SortOrder.LayoutOrder,
+							FillDirection = Enum.FillDirection.Horizontal,
+							HorizontalAlignment = Enum.HorizontalAlignment.Left,
+							VerticalAlignment = Enum.VerticalAlignment.Center,
+							Padding = UDim.new(0, 20)
+						}),
+						Padding = Roact.createElement("UIPadding", {
+							PaddingLeft = UDim.new(0, 20),
+							PaddingRight = UDim.new(0, 20)
+						}),
+						GameIcon = gameIcon,
+						TextFrame = Roact.createElement(
+							"Frame",
+							{
+								LayoutOrder = 2,
+								BackgroundTransparency = 1,
+								Size = UDim2.new(1, -100, 1, 0)
+							},
+							{
+								TextLabel = Roact.createElement("TextLabel", {
+									BackgroundTransparency = 1,
+									Size = UDim2.new(1, 0, 1, -45),
+									Position = UDim2.fromOffset(0, 25),
+									FontFace = normalizeFontFace(props.Tokens.Typography.HeadingSmall.Font),
+									Text = p.props.gameName,
+									TextSize = font.BaseSize * font.Header1.RelativeSize,
+									TextColor3 = theme.TextEmphasis.Color,
+									TextTransparency = theme.TextEmphasis.TextTransparency,
+									TextXAlignment = Enum.TextXAlignment.Left,
+									TextYAlignment = Enum.TextYAlignment.Top,
+									TextTruncate = Enum.TextTruncate.AtEnd,
+									TextWrapped = true
+								})
+							}
+						)
+					}
+				),
+				Divider = Roact.createElement("Frame", {
+					BorderSizePixel = 0,
+					Size = UDim2.new(1, 0, 0, 1),
+					Position = UDim2.fromScale(0, 1),
+					AnchorPoint = Vector2.new(0, 1),
+					BackgroundTransparency = theme.Divider.Transparency,
+					BackgroundColor3 = theme.Divider.Color
+				})
+			}
+		)
 	end)
 end
 

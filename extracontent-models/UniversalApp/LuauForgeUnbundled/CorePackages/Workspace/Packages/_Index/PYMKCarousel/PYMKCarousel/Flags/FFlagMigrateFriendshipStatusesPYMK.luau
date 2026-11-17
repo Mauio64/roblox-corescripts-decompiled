@@ -1,1 +1,0 @@
-return game:DefineFastFlag("MigrateFriendshipStatusesPYMK_v1", false)

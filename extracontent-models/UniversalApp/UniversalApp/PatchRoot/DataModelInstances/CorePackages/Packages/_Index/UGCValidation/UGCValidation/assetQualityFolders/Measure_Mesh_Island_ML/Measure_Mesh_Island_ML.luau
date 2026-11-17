@@ -7,7 +7,6 @@ local defineFastInt = game:DefineFastInt("UGCValidationMeshIslandMLMinScore", 9)
 
 return {
 	categories = { ValidationEnums.UploadCategory.FULL_BODY },
-	["fflag"] = require(parent.flags.getFFlagUGCValidateAQMeshIslandML),
 	run = function(object, p)
 		local measure_Mesh_Island_ML = p.aqsSummaryData.Measure_Mesh_Island_ML
 

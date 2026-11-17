@@ -11,7 +11,7 @@ local response = Response.Response
 local Request = require(script.Parent.Request)
 local request = Request.Request
 
-local function parseResponse(data)
+local function parseResponse(data) -- 1 equivalent call inferred from this helper
 	local body = data.Body
 
 	return response.new(body, {
@@ -37,13 +37,8 @@ local function buildFetch(object)
 					CachePolicy = result.cache
 				}):Start(function(p3, data)
 					if p3 then
-						local body = data.Body
-
-						callback((response.new(body, {
-							status = data.StatusCode,
-							statusText = data.StatusMessage,
-							headers = data.Headers
-						})))
+						local response2 = parseResponse(data) -- inferred equivalent call
+						callback(response2)
 					else
 						result.signal:fire()
 						callback2(Error.new(data.ErrorMessage))

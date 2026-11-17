@@ -374,13 +374,13 @@ local function NumberInput(p, ref5)
 	end
 
 	local step = v3.step
-	local v45
+	local v46
 
 	if Flags.FoundationNumberInputScrubCallbackProps then
-		v45 = v3.onScrubStarted
+		v46 = v3.onScrubStarted
 	end
 
-	local v46 = useCallback(fn, { v28, step, v14, v45, v9 })
+	local v47 = useCallback(fn, { v28, step, v14, v46, v9 })
 
 	local useCallback2 = React.useCallback
 	local function fn2()
@@ -395,13 +395,13 @@ local function NumberInput(p, ref5)
 		ref3.current = false
 	end
 
-	local v48
+	local v49
 
 	if Flags.FoundationNumberInputScrubCallbackProps then
-		v48 = v3.onScrubEnded
+		v49 = v3.onScrubEnded
 	end
 
-	local v49 = useCallback2(fn2, { v48 })
+	local v50 = useCallback2(fn2, { v49 })
 
 	local color3 = nil
 	local transparency, transparency2
@@ -432,12 +432,12 @@ local function NumberInput(p, ref5)
 		transparency2 = v4.Color.Shift.Shift_100.Transparency
 	end
 
-	local v50
+	local v51
 
 	if math.abs(v3.maximum) < 1e999 then
-		v50 = math.abs(v3.minimum) < 1e999
+		v51 = math.abs(v3.minimum) < 1e999
 	else
-		v50 = false
+		v51 = false
 	end
 
 	local offset = nil
@@ -455,55 +455,55 @@ local function NumberInput(p, ref5)
 
 		offset = React.useMemo(function()
 			return mapBindable(v3.value, function(p2)
-				local v53
+				local v54
 
-				if p2 and v50 then
-					local v54 = v10(p2)
-					v53 = v3.maximum == v3.minimum and 1 or (v54 - v3.minimum) / (v3.maximum - v3.minimum)
+				if p2 and v51 then
+					local v55 = v10(p2)
+					v54 = v3.maximum == v3.minimum and 1 or (v55 - v3.minimum) / (v3.maximum - v3.minimum)
 				else
-					v53 = 0
+					v54 = 0
 				end
 
-				if v53 <= 0 then
+				if v54 <= 0 then
 					return Vector2.new(-1, 0)
 				end
 
-				if v53 >= 1 then
+				if v54 >= 1 then
 					return Vector2.new(1, 0)
 				end
 
-				return Vector2.new(v53 - 0.5, 0)
+				return Vector2.new(v54 - 0.5, 0)
 			end)
-		end, { v3.value, v10, v3.maximum, v3.minimum, v50 })
+		end, { v3.value, v10, v3.maximum, v3.minimum, v51 })
 	else
 		transparency3 = React.useMemo(function()
 			return mapBindable(v3.value, function(p2)
-				local v53
+				local v54
 
 				if p2 and v3.maximum and v3.minimum then
-					local v54 = v10(p2)
-					v53 = v3.maximum == v3.minimum and 1 or (v54 - v3.minimum) / (v3.maximum - v3.minimum)
+					local v55 = v10(p2)
+					v54 = v3.maximum == v3.minimum and 1 or (v55 - v3.minimum) / (v3.maximum - v3.minimum)
 				else
-					v53 = 0
+					v54 = 0
 				end
 
-				if v53 == 0 then
+				if v54 == 0 then
 					return NumberSequence.new(transparency2)
-				elseif v53 == 1 then
+				elseif v54 == 1 then
 					return NumberSequence.new(transparency)
 				end
 
-				if not (v53 > 0 or v53 < 1) then
+				if not (v54 > 0 or v54 < 1) then
 					return NumberSequence.new(transparency2)
 				end
 
 				local numberSequenceKeypoints = {
 					NumberSequenceKeypoint.new(0, transparency),
-					NumberSequenceKeypoint.new(v53, transparency),
-					NumberSequenceKeypoint.new(math.min(v53 + 0.001, 1), transparency2)
+					NumberSequenceKeypoint.new(v54, transparency),
+					NumberSequenceKeypoint.new(math.min(v54 + 0.001, 1), transparency2)
 				}
 
-				if v53 < 0.999 then
+				if v54 < 0.999 then
 					table.insert(numberSequenceKeypoints, NumberSequenceKeypoint.new(1, transparency2))
 				end
 
@@ -529,9 +529,9 @@ local function NumberInput(p, ref5)
 		hint = v3.hint,
 		textBoxRef = textBoxRef,
 		input = function(ref4)
-			local v53 = v29 and v30
+			local v54 = v29 and v30
 			local createElement = React.createElement
-			local v54 = {
+			local v55 = {
 				inputRef = v3.inputRef,
 				text = joinBindables({ text = text, value = v3.value }, function(p2)
 					if v6() then
@@ -577,39 +577,39 @@ local function NumberInput(p, ref5)
 			end
 
 			horizontalPadding.innerLeft = innerLeft
-			v54.horizontalPadding = horizontalPadding
+			v55.horizontalPadding = horizontalPadding
 
-			v54.focusBehavior = p.focusBehavior
-			v54.onChanged = onChanged
-			v54.onFocusLost = onFocusLost
-			v54.onFocus = onFocus
+			v55.focusBehavior = p.focusBehavior
+			v55.onChanged = onChanged
+			v55.onFocusLost = onFocusLost
+			v55.onFocus = onFocus
 			local onDragStarted
 
 			if v8 then
 				onDragStarted = v32
 			end
 
-			v54.onDragStarted = onDragStarted
+			v55.onDragStarted = onDragStarted
 			local onDrag
 
 			if v8 then
-				onDrag = v46
+				onDrag = v47
 			end
 
-			v54.onDrag = onDrag
+			v55.onDrag = onDrag
 			local onDragEnded
 
 			if v8 then
-				onDragEnded = v49
+				onDragEnded = v50
 			end
 
-			v54.onDragEnded = onDragEnded
-			v54.onReturnPressed = v3.onReturnPressed
-			v54.ref = ref4
+			v55.onDragEnded = onDragEnded
+			v55.onReturnPressed = v3.onReturnPressed
+			v55.ref = ref4
 			local backgroundGradient
 
 			if Flags.FoundationNumberInputScrubbingUsesOffset then
-				if v8 and v50 then
+				if v8 and v51 then
 					backgroundGradient = React.createElement("UIGradient", {
 						Color = ColorSequence.new(color3),
 						Transparency = transparency3,
@@ -633,7 +633,7 @@ local function NumberInput(p, ref5)
 				})
 			end
 
-			v54.backgroundGradient = backgroundGradient
+			v55.backgroundGradient = backgroundGradient
 			local trailingElement
 
 			if v3.trailingIcon then
@@ -648,7 +648,7 @@ local function NumberInput(p, ref5)
 				)
 			end
 
-			v54.trailingElement = trailingElement
+			v55.trailingElement = trailingElement
 			local leadingElement
 
 			if v3.leadingIcon then
@@ -663,12 +663,12 @@ local function NumberInput(p, ref5)
 				)
 			end
 
-			v54.leadingElement = leadingElement
+			v55.leadingElement = leadingElement
 
-			v54.isDisabled = v3.isDisabled
-			v54.LayoutOrder = v53 and 0 or nil
-			v54.testId = `{v3.testId}--field`
-			local element = createElement(InternalTextInput, v54)
+			v55.isDisabled = v3.isDisabled
+			v55.LayoutOrder = v54 and 0 or nil
+			v55.testId = `{v3.testId}--field`
+			local element = createElement(InternalTextInput, v55)
 			local units
 
 			if v17 then
@@ -693,7 +693,7 @@ local function NumberInput(p, ref5)
 			})
 
 			local createElement2 = React.createElement
-			local v64 = {
+			local v65 = {
 				Size = UDim2.new(width.Scale - v31.Scale, width.Offset - v31.Offset, 0, 0),
 				tag = "row align-y-center auto-y",
 				layout = {
@@ -704,11 +704,11 @@ local function NumberInput(p, ref5)
 			}
 			local controls2
 
-			if v53 then
+			if v54 then
 				controls2 = v30
 			end
 
-			return createElement2(View, v64, { InputField = element2, Controls = controls2 })
+			return createElement2(View, v65, { InputField = element2, Controls = controls2 })
 		end
 	}))
 end

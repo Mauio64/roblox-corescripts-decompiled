@@ -52,10 +52,9 @@ local function getUnifiedPurchaseFlowEligibility(p, p2)
 
 			local unifiedPurchaseFlowMetadata = p3.unifiedPurchaseFlowMetadata
 			local isUserEligibleForUnifiedPurchaseFlow = unifiedPurchaseFlowMetadata.isUserEligibleForUnifiedPurchaseFlow
-			persistUnifiedPurchaseFlowMetadata( -- inferred equivalent call
-				isUserEligibleForUnifiedPurchaseFlow,
-				v + (unifiedPurchaseFlowMetadata.expiresInSeconds or 0)
-			)
+			local expiresInSeconds = unifiedPurchaseFlowMetadata.expiresInSeconds or 0
+
+			persistUnifiedPurchaseFlowMetadata(isUserEligibleForUnifiedPurchaseFlow, v + expiresInSeconds) -- inferred equivalent call
 
 			return Promise.resolve(isUserEligibleForUnifiedPurchaseFlow)
 		end, function(_)

@@ -7,23 +7,18 @@ local parent = GameInfosRodux.Parent
 local tutils = require(parent.tutils)
 local DataHydration = require(parent.DataHydration)
 require(parent.DiscoveryTypes)
-local SharedFlags = require(parent.SharedFlags)
-local FFlagMigrateGameInfoToStore = SharedFlags.FFlagMigrateGameInfoToStore
 
 local function parseAndAddGameInfos(_, object, items, callback, callback2, callback3)
 	local v = object:getState().Personalization[GameInfosReducer.key]
 
-	local v2 = FFlagMigrateGameInfoToStore and {} or nil
+	local v2 = {}
 	local v3 = {}
 	local universeIds = {}
 
 	for _, item in items do
 		callback(item):match(function(p)
 			local universeId = p.universeId
-
-			if FFlagMigrateGameInfoToStore then
-				v2[universeId] = p
-			end
+			v2[universeId] = p
 
 			if not tutils.shallowEqual(p, v[universeId]) then
 				v3[universeId] = p
@@ -45,7 +40,7 @@ local function parseAndAddGameInfos(_, object, items, callback, callback2, callb
 		object:dispatch(AddGames(v3))
 	end
 
-	if FFlagMigrateGameInfoToStore and next(v2) then
+	if next(v2) then
 		syncGameInfosToStore(v2)
 	end
 

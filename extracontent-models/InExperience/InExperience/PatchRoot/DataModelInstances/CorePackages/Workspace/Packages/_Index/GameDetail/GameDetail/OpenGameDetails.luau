@@ -18,6 +18,7 @@ local SharedFlags = require(parent.SharedFlags)
 local FFlagSignalsNavP2NavigationPrimitives = SharedFlags.FFlagSignalsNavP2NavigationPrimitives
 local FFlagSignalsNavP3fGameDetails = SharedFlags.FFlagSignalsNavP3fGameDetails
 local FFlagSignalsNavP3Dispatch = SharedFlags.FFlagSignalsNavP3Dispatch
+local FFlagSignalsNavPendingLock = SharedFlags.FFlagSignalsNavPendingLock
 local FFlagUseNavigationSelectors = SharedFlags.FFlagUseNavigationSelectors
 local FFlagLuaAppSduiEdpEnabled = SharedFlags.FFlagLuaAppSduiEdpEnabled
 local FFlagFixSduiEdpTtiPeekCategory = SharedFlags.FFlagFixSduiEdpTtiPeekCategory
@@ -65,7 +66,11 @@ return function(p, p2, extraProps, p3)
 		local viewState = state.GameDetailsPeekView.viewState
 
 		if FFlagSignalsNavP3fGameDetails then
-			if appNavigationRegistry.get().getIsNavigating() then
+			if FFlagSignalsNavPendingLock then
+				if appNavigationRegistry.isNavigationLocked(false) then
+					return
+				end
+			elseif appNavigationRegistry.get().getIsNavigating() then
 				return
 			end
 		elseif FFlagUseNavigationSelectors then

@@ -10,8 +10,9 @@ local BadgeVariant = Foundation.Enums.BadgeVariant
 local Localization = require(parent.Localization)
 local useLocalization = Localization.Hooks.useLocalization
 local FFlagRobloxPlusUpsellBannerUseTryItForFree = require(RobloxSubscriptionPurchaseApp.Flags.FFlagRobloxPlusUpsellBannerUseTryItForFree)
+local FFlagTTOnboardingSheet = require(RobloxSubscriptionPurchaseApp.Flags.FFlagTTOnboardingSheet)
 
-local function RobloxPlusUpsellBannerCTA(p)
+local function RobloxPlusUpsellBannerCTA(props)
 	local v = useLocalization({
 		getFreeTrialText = FFlagRobloxPlusUpsellBannerUseTryItForFree and "Feature.RobloxSubscription.Action.TryItForFree" or "Feature.RobloxSubscription.Label.FreeTrialText",
 		subscribe = "Feature.RobloxSubscription.Action.Subscribe",
@@ -19,14 +20,18 @@ local function RobloxPlusUpsellBannerCTA(p)
 	})
 
 	local v2 = React.useCallback(function()
-		if p.productInfo.isFreeTrial then
+		if FFlagTTOnboardingSheet and props.ctaText then
+			return props.ctaText
+		end
+
+		if props.productInfo.isFreeTrial then
 			return v.getFreeTrialText
 		end
 
 		return v.subscribe
-	end, { p.productInfo.isFreeTrial, v.getFreeTrialText, v.subscribe })
+	end, { props.productInfo.isFreeTrial, v.getFreeTrialText, v.subscribe, props.ctaText })
 
-	if p.shouldShowNewBadge then
+	if props.shouldShowNewBadge then
 		return React.createElement(
 			View,
 			{

@@ -5,8 +5,7 @@ local useStyle = dependencies.UIBlox.Core.Style.useStyle
 require(parent.type)
 
 local react = dependencies.React
-local Foundation = require(parent2.Foundation)
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+require(parent2.Foundation)
 
 local v = {
 	highlight = function(p: string)
@@ -106,18 +105,12 @@ return function(props)
 	}
 	local font
 
-	if not (FoundationFontFaceMigration and props.FontFace) then
+	if not props.FontFace then
 		font = props.Font or v2.Font.Body.Font
 	end
 
 	v3.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = props.FontFace
-	end
-
-	v3.FontFace = fontFace
+	v3.FontFace = props.FontFace
 
 	v3.AutomaticSize = props.AutomaticSize
 	v3.Size = props.Size

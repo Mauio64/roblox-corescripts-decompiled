@@ -1,5 +1,3 @@
-local TextService = game:GetService("TextService")
-
 local Groups = script:FindFirstAncestor("Groups")
 local parent = Groups.Parent
 
@@ -8,7 +6,6 @@ local Enums = require(parent.ProfilePlatform.Enums)
 local Foundation = require(parent.Foundation)
 local Style = require(parent.Style)
 local GetTextSize = Style.GetTextSize
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local Localization = require(parent.Localization)
 local React = require(parent.React)
 local UIBlox = require(parent.UIBlox)
@@ -290,17 +287,13 @@ return function(props)
 	local medium = v2.Padding.Medium
 
 	local title = React.useMemo(function()
-		if not text2 or text2 == "" or not (state and state > 0) then
-			return nil
-		end
-
-		if FoundationFontFaceMigration then
+		if text2 and text2 ~= "" and state and state > 0 then
 			return (GetTextSize(text2, fontSize, font, Vector2.new(state, 1e999), {
 				addTemporaryPadding = false
 			}))
 		end
 
-		return (TextService:GetTextSize(text2, fontSize, font, Vector2.new(state, 1e999)))
+		return nil
 	end, { text2, state, font, fontSize })
 
 	local subText = React.useMemo(function()
@@ -308,13 +301,9 @@ return function(props)
 			local v13 = state2 - medium * 2
 
 			if v13 > 0 then
-				if FoundationFontFaceMigration then
-					return (GetTextSize(text, fontSize2, font2, Vector2.new(v13, 1e999), {
-						addTemporaryPadding = false
-					}))
-				end
-
-				return (TextService:GetTextSize(text, fontSize2, font2, Vector2.new(v13, 1e999)))
+				return (GetTextSize(text, fontSize2, font2, Vector2.new(v13, 1e999), {
+					addTemporaryPadding = false
+				}))
 			end
 		end
 

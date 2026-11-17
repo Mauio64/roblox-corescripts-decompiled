@@ -1,2 +1,0 @@
-return game:GetEngineFeature("EnableFacsDisableOverride2")
-	and game:DefineFastFlag("HeadRefinementFacialAnimationToggle4", false)

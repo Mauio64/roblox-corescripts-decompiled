@@ -34,6 +34,8 @@ local getPrivatePlaytestersStore = PrivatePlaytesters.getPrivatePlaytestersStore
 local FFlagBuildExperiencePrivateInvites = require(BuildExperience.Flags.FFlagBuildExperiencePrivateInvites)
 local FFlagBuildExperienceMonetizationNativeUI = require(BuildExperience.Flags.FFlagBuildExperienceMonetizationNativeUI)
 local FFlagBuildCheckGamePermissions = require(BuildExperience.Flags.FFlagBuildCheckGamePermissions)
+local FFlagBuildExperienceConfigurationRowTelemetry = require(BuildExperience.Flags.FFlagBuildExperienceConfigurationRowTelemetry)
+local sendConfigurationRowClick = require(BuildExperience.Telemetry.sendConfigurationRowClick)
 
 local Text = Foundation.Text
 local View = Foundation.View
@@ -113,7 +115,7 @@ local function GameConfigurationContent(props)
 	local v5 = not FFlagBuildCheckGamePermissions or v3.canMonetize
 	local v6 = not FFlagBuildCheckGamePermissions or v3.canViewOnCreatorHub
 	local v7 = useOpenWebView()
-	local v8 = useArchiveGameFlow()
+	local v8 = useArchiveGameFlow({ context = "settings" })
 	local v9
 
 	if FFlagBuildExperiencePrivateInvites then
@@ -410,10 +412,31 @@ local function GameConfigurationContent(props)
 	end
 
 	local v30 = FFlagBuildExperienceMonetizationNativeUI
+	local onRowActivated
+
+	if FFlagBuildExperienceConfigurationRowTelemetry then
+		onRowActivated = React.useCallback(function(p: string)
+			sendConfigurationRowClick(
+				"settings",
+				{
+					universeId = props.universeId,
+					placeId = props.placeId,
+					sessionId = props.sessionId
+				},
+				p
+			)
+		end, { props.universeId, props.placeId, props.sessionId })
+	else
+		onRowActivated = nil
+	end
 
 	local onActivated3 = React.useCallback(function()
+		if FFlagBuildExperienceConfigurationRowTelemetry and onRowActivated ~= nil then
+			onRowActivated("archive-game")
+		end
+
 		v8.requestArchive(props.universeId)
-	end, { v8.requestArchive, props.universeId })
+	end, { v8.requestArchive, props.universeId, onRowActivated })
 
 	local createElement = React.createElement
 	local v31 = {
@@ -428,6 +451,7 @@ local function GameConfigurationContent(props)
 			title = gameDetails,
 			body = gameDetailsBody,
 			rows = rows,
+			onRowActivated = onRowActivated,
 			testId = `{testId}-game-details`
 		}),
 		Access = 0,
@@ -452,6 +476,7 @@ local function GameConfigurationContent(props)
 			title = title,
 			body = accessBody,
 			rows = rows2,
+			onRowActivated = onRowActivated,
 			testId = `{testId}-access`
 		}),
 		BuildMaturityBanner = 0
@@ -475,6 +500,7 @@ local function GameConfigurationContent(props)
 			title = v.gameConfiguration,
 			body = v.gameConfigurationBody,
 			rows = rows4,
+			onRowActivated = onRowActivated,
 			testId = `{testId}-game-configuration`
 		})
 	end
@@ -485,6 +511,7 @@ local function GameConfigurationContent(props)
 		layoutOrder = v30 and 4 or 3,
 		title = creatorHub,
 		rows = rows3,
+		onRowActivated = onRowActivated,
 		testId = `{testId}-creator-hub`
 	})
 

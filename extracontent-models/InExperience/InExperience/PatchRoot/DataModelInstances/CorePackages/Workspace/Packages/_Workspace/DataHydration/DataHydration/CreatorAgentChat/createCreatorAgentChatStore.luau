@@ -32,6 +32,7 @@ require(script.Parent.types)
 local withCsrfRetry = require(DataHydration.withCsrfRetry)
 
 local FFlagBuildExperienceModelPickerData = SharedFlags.FFlagBuildExperienceModelPickerData
+local FFlagBuildExperienceChatOpenId = SharedFlags.FFlagBuildExperienceChatOpenId
 local FFlagBuildExperiencePromptFailureTelemetry = SharedFlags.FFlagBuildExperiencePromptFailureTelemetry
 local FFlagBuildExperienceLibrary = SharedFlags.FFlagBuildExperienceLibrary
 
@@ -248,7 +249,8 @@ local function createCreatorAgentChatStore(options)
 			project = data.project,
 			model = 0,
 			experiment = 0,
-			application = 0
+			application = 0,
+			chatOpenId = 0
 		}
 		local model
 
@@ -259,6 +261,13 @@ local function createCreatorAgentChatStore(options)
 		v3.model = model
 		v3.experiment = data.experiment
 		v3.application = data.application
+		local chatOpenId
+
+		if FFlagBuildExperienceChatOpenId then
+			chatOpenId = data.chatOpenId
+		end
+
+		v3.chatOpenId = chatOpenId
 		return rpcCallSync(sessionNew2, buildSessionNewWireParams(v3))
 	end
 

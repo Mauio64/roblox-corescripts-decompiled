@@ -6,6 +6,10 @@ local React = require(parent.React)
 local SignalsReact = require(parent.SignalsReact)
 local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
+local StatusIndicator = Foundation.StatusIndicator
+local StatusIndicatorShape = Foundation.Enums.StatusIndicatorShape
+local StatusIndicatorSize = Foundation.Enums.StatusIndicatorSize
+local StatusIndicatorVariant = Foundation.Enums.StatusIndicatorVariant
 local Localization = require(parent.Localization)
 local useLocalization = Localization.Hooks.useLocalization
 
@@ -23,6 +27,10 @@ local getAndFetchUserNamesByUserIds = DataHydration.UserProfile.getAndFetchUserN
 
 local SharedFlags = require(parent.SharedFlags)
 local FFlagHomeFriendNamesUseUserProfileHydration = SharedFlags.FFlagHomeFriendNamesUseUserProfileHydration
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagSduiActiveFriendsFooterTreatment = SharedFlags2.FFlagSduiActiveFriendsFooterTreatment
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagSduiGameTileFixFacePileZIndex = SharedFlags3.FFlagSduiGameTileFixFacePileZIndex
 
 local function getUserIdsForFacePile(list, p: number) -- 1 equivalent call inferred from this helper
 	local userIds = {}
@@ -42,6 +50,39 @@ local function getDisplayText(list, separator: string, p: number)
 	end
 
 	return table.concat(displayNames, separator)
+end
+
+local function getFormattedText(list, p: number, props)
+	if p == 0 then
+		return nil
+	end
+
+	local v
+
+	if p == 1 then
+		v = props.textFormatOne
+	else
+		v = if p == 2 then props.textFormatTwo else props.textFormatMany
+	end
+
+	if not v or v == "" then
+		return nil
+	end
+
+	local displayName
+
+	if list[1] then
+		displayName = list[1].displayName
+	end
+
+	if displayName or not v:find("{name}", 1, true) then
+		return (v:gsub("{(%w+)}", {
+			name = displayName or "",
+			count = tostring(p - 1)
+		}))
+	end
+
+	return nil
 end
 
 local function alphabeticalSort(p, p2): boolean
@@ -166,8 +207,14 @@ local function SduiGameTileActiveFriendsFooter(props)
 	end, { userIds, v4, v5 })
 
 	local v7 = math.min(props.maxAvatars or 3, #v6)
+	local leftText
 
-	local displayText = getDisplayText(v6, v2.separator, v7)
+	if FFlagSduiActiveFriendsFooterTreatment then
+		leftText = getFormattedText(v6, #userIds, props) or getDisplayText(v6, v2.separator, v7)
+	else
+		leftText = getDisplayText(v6, v2.separator, v7)
+	end
+
 	local userIdsForFacePile = getUserIdsForFacePile(v6, v7) -- inferred equivalent call
 	local children = {}
 
@@ -181,11 +228,20 @@ local function SduiGameTileActiveFriendsFooter(props)
 			BackgroundColor3 = v.Color.Content.Muted.Color3,
 			Image = `rbxthumb://type=AvatarHeadShot&id={v8}&w=100&h=100`,
 			Size = UDim2.fromOffset(iconWidth, iconWidth),
-			Position = UDim2.fromOffset((i - 1) * iconWidth / 2, 0)
+			Position = UDim2.fromOffset((i - 1) * iconWidth / 2, 0),
+			ZIndex = 0
 		}
+		local zIndex2
+
+		if FFlagSduiGameTileFixFacePileZIndex then
+			zIndex2 = v7 - i + 1
+		end
+
+		v9.ZIndex = zIndex2
 		local v10 = {
 			BorderRadius = React.createElement("UICorner", { CornerRadius = UDim.new(0.5, 0) }),
-			Border = 0
+			Border = 0,
+			PresenceDot = 0
 		}
 		local border
 
@@ -199,10 +255,24 @@ local function SduiGameTileActiveFriendsFooter(props)
 		end
 
 		v10.Border = border
+		local presenceDot
+
+		if FFlagSduiActiveFriendsFooterTreatment and props.showPresenceDot then
+			presenceDot = React.createElement(StatusIndicator, {
+				variant = StatusIndicatorVariant.Success,
+				shape = StatusIndicatorShape.Circle,
+				size = StatusIndicatorSize.XSmall,
+				AnchorPoint = Vector2.new(1, 1),
+				Position = UDim2.fromScale(1, 1)
+			})
+		end
+
+		v10.PresenceDot = presenceDot
 		children[formatted] = createElement("ImageLabel", v9, v10)
 	end
 
-	return React.createElement(SduiTileFooter, {
+	local createElement = React.createElement
+	local v8 = {
 		position = position,
 		anchorPoint = anchorPoint,
 		automaticSize = automaticSize,
@@ -210,21 +280,34 @@ local function SduiGameTileActiveFriendsFooter(props)
 		layoutOrder = layoutOrder,
 		zIndex = zIndex,
 		sduiContext = props.sduiContext,
-		textIconGap = v.Gap.Small,
-		leftText = displayText,
-		leftTextFlexMode = Enum.UIFlexMode.Shrink,
-		leftIconComponent = React.createElement(
-			"Frame",
-			{
-				AutomaticSize = Enum.AutomaticSize.XY,
-				BackgroundTransparency = 1,
-				BorderSizePixel = 0
-			},
-			children
-		),
-		onActivated = onActivated,
-		testId = props.testId
-	})
+		textIconGap = 0,
+		leftText = 0,
+		leftTextFlexMode = 0,
+		leftIconComponent = 0,
+		onActivated = 0,
+		testId = 0
+	}
+	local textIconGap
+
+	if FFlagSduiActiveFriendsFooterTreatment then
+		textIconGap = props.textIconGap or v.Gap.Small
+	else
+		textIconGap = v.Gap.Small
+	end
+
+	v8.textIconGap = textIconGap
+
+	v8.leftText = leftText
+	v8.leftTextFlexMode = Enum.UIFlexMode.Shrink
+	v8.leftIconComponent = React.createElement(
+		"Frame",
+		{ AutomaticSize = Enum.AutomaticSize.XY, BackgroundTransparency = 1, BorderSizePixel = 0 },
+		children
+	)
+
+	v8.onActivated = onActivated
+	v8.testId = props.testId
+	return createElement(SduiTileFooter, v8)
 end
 
 return React.memo(SduiGameTileActiveFriendsFooter)

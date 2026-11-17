@@ -15,8 +15,6 @@ local SharedFlags = require(parent.SharedFlags)
 local FFlagUserListCtaAnalyticsEnabled = SharedFlags.FFlagUserListCtaAnalyticsEnabled
 local FFlagUserListCanonicalCtaAnalytics = require(UserList.Flags.FFlagUserListCanonicalCtaAnalytics)
 local reportCtaActivated = require(UserList.Analytics.reportCtaActivated)
-local SharedFlags2 = require(parent.SharedFlags)
-local FFlagSharedChatEntryPointAction = SharedFlags2.FFlagSharedChatEntryPointAction
 local FFlagUserListRowViewCta = require(UserList.Flags.FFlagUserListRowViewCta)
 local useEntitySelectionHandler = require(UserList.Hooks.useEntitySelectionHandler)
 
@@ -58,7 +56,7 @@ local function useCtaActionHandlers(data)
 
 	local chatEntryPoint
 
-	if FFlagSharedChatEntryPointAction and data then
+	if data then
 		chatEntryPoint = data.chatEntryPoint
 	else
 		chatEntryPoint = nil
@@ -101,7 +99,7 @@ local function useCtaActionHandlers(data)
 					reportCtaActivated(analytics, ButtonTypes.Chat, userId, p)
 				end
 
-				if FFlagSharedChatEntryPointAction and chatEntryPoint ~= nil then
+				if chatEntryPoint ~= nil then
 					dispatch(EnteredChatFromEntryPoint(chatEntryPoint))
 				end
 

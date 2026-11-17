@@ -1,3 +1,0 @@
-return game:DefineFastFlag("UIScaleEngineOptions", false)
-	and game:GetEngineFeature("RUUserScalePreferenceAPI")
-	and game:GetEngineFeature("ResponsiveUnits")

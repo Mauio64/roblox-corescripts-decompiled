@@ -31,16 +31,14 @@ local useChatSettingsRetrievalStatus = require(AppChat.Hooks.useChatSettingsRetr
 local useIsGroupChatEnabled = require(AppChat.Hooks.useIsGroupChatEnabled)
 local RobloxAppNavigation = require(parent.RobloxAppNavigation)
 local isNavigationAvailable = RobloxAppNavigation.isNavigationAvailable
-local SharedFlags = require(parent.SharedFlags)
-local FFlagShareSheetFriendsSort = SharedFlags.FFlagShareSheetFriendsSort
 
 local _ = { Success = "success", Failure = "failure", Declined = "declined" }
 
-local function makeSendResult(status: string, id: string?) -- 17 equivalent calls inferred from this helper
+local function makeSendResult(status: string, id: string?) -- 10 equivalent calls inferred from this helper
 	return { conversationId = id, status = status }
 end
 
-local function isSuccessfulResponse(data): boolean -- 2 equivalent calls inferred from this helper
+local function isSuccessfulResponse(data): boolean -- 1 equivalent call inferred from this helper
 	if data then
 		if data.responseCode == StatusCodes.OK then
 			data = data.responseBody and data.responseBody.messages and data.responseBody.messages[1]
@@ -153,58 +151,20 @@ local function useExternalChatMessageSender(flag: boolean)
 		local v10 = p.source == "friends"
 		local v11
 
-		if v10 then
-			v11 = createConversationFromFriendPlaceholder(p, v4)
-
-			if v11 == nil then
-				return Promise.resolve(makeSendResult("failure")) -- inferred equivalent call
-			end
-		else
+		if not v10 then
 			v11 = Promise.resolve(p)
-		end
 
-		if FFlagShareSheetFriendsSort then
 			return v9(v11, v10, p2)
 		end
 
-		return v11:andThen(function(p3)
-			local id = p3 and p3.id
+		v11 = createConversationFromFriendPlaceholder(p, v4)
 
-			if p3 == nil or id == nil or id == "" or p3.source == "friends" or v8(p3, v10) ~= "eligible" then
-				return makeSendResult("failure") -- inferred equivalent call
-			end
+		if v11 == nil then
+			return Promise.resolve(makeSendResult("failure")) -- inferred equivalent call
+		end
 
-			if v10 then
-				dispatch(ReceivedConversation(p3))
-			end
-
-			return Promise.new(function(callback)
-				local function sendMessage()
-					dispatch(SendTextMessage(id, p2, nil)):andThen(function(data)
-						callback(isSuccessfulResponse(data) and makeSendResult("success", id) or makeSendResult("failure")) -- inferred equivalent call
-					end, function()
-						callback(makeSendResult("failure")) -- inferred equivalent call
-					end)
-				end
-
-				navigateWithOsaGate({
-					conversationId = id,
-					dispatch = dispatch,
-					onAccepted = function()
-						sendMessage()
-					end,
-					onDeclined = function()
-						callback(makeSendResult("declined")) -- inferred equivalent call
-					end,
-					onError = function()
-						callback(makeSendResult("failure")) -- inferred equivalent call
-					end
-				})
-			end)
-		end):catch(function()
-			return makeSendResult("failure") -- inferred equivalent call
-		end)
-	end, { canSendToConversation, dispatch, v8, v4, v9 })
+		return v9(v11, v10, p2)
+	end, { canSendToConversation, v4, v9 })
 
 	local sendToUser = React.useCallback(function(p: string, p2: string)
 		if canSendToUser(p) then

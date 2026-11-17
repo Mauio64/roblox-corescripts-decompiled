@@ -15,7 +15,6 @@ local withFoundationOrUIBloxStyle = CoreGuiCommon.withFoundationOrUIBloxStyle
 
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagCoreUiMigrateUIBloxToFoundation = SharedFlags.FFlagCoreUiMigrateUIBloxToFoundation
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local parent = script.Parent.Parent
 local connection = parent.Connection
@@ -93,53 +92,47 @@ end
 
 function extended:render()
 	return WithLayoutValues(function(data)
-		return withFoundationOrUIBloxStyle(function(p, p2)
-			local tokens
-
-			if FoundationFontFaceMigration then
-				tokens = p
-			end
-
+		return withFoundationOrUIBloxStyle(function(tokens, p)
 			return {
 				Tokens = tokens,
 				Theme = {
 					BackgroundContrast = {
-						Color = p.Color.Surface.Surface_100.Color3,
-						Transparency = p.Color.Surface.Surface_100.Transparency
+						Color = tokens.Color.Surface.Surface_100.Color3,
+						Transparency = tokens.Color.Surface.Surface_100.Transparency
 					},
 					BackgroundOnHover = {
-						Color = p.Color.State.Hover.Color3,
-						Transparency = p.Color.State.Hover.Transparency
+						Color = tokens.Color.State.Hover.Color3,
+						Transparency = tokens.Color.State.Hover.Transparency
 					},
 					BackgroundOnPress = {
-						Color = p.Color.State.Press.Color3,
-						Transparency = p.Color.State.Press.Transparency
+						Color = tokens.Color.State.Press.Color3,
+						Transparency = tokens.Color.State.Press.Transparency
 					},
 					BackgroundUIContrast = {
-						Color = p.Color.OverMedia.OverMedia_0.Color3,
-						Transparency = p.Color.OverMedia.OverMedia_0.Transparency
+						Color = tokens.Color.OverMedia.OverMedia_0.Color3,
+						Transparency = tokens.Color.OverMedia.OverMedia_0.Transparency
 					},
 					Divider = {
-						Color = p.Color.Stroke.Emphasis.Color3,
-						Transparency = p.Color.Stroke.Emphasis.Transparency
+						Color = tokens.Color.Stroke.Emphasis.Color3,
+						Transparency = tokens.Color.Stroke.Emphasis.Transparency
 					},
 					IconEmphasis = {
-						Color = p.Color.Content.Emphasis.Color3,
-						Transparency = p.Color.Content.Emphasis.Transparency
+						Color = tokens.Color.Content.Emphasis.Color3,
+						Transparency = tokens.Color.Content.Emphasis.Transparency
 					},
 					TextEmphasis = {
-						Color = p.Color.Content.Emphasis.Color3,
-						Transparency = p.Color.Content.Emphasis.Transparency
+						Color = tokens.Color.Content.Emphasis.Color3,
+						Transparency = tokens.Color.Content.Emphasis.Transparency
 					}
 				},
 				Font = {
 					BaseSize = 1,
 					Header2 = {
-						Font = p.Typography.TitleLarge.Font,
-						RelativeSize = p.Typography.TitleLarge.FontSize
+						Font = tokens.Typography.TitleLarge.Font,
+						RelativeSize = tokens.Typography.TitleLarge.FontSize
 					}
 				},
-				Settings = { PreferredTransparency = p2.preferredTransparency }
+				Settings = { PreferredTransparency = p.preferredTransparency }
 			}
 		end, function(props)
 			local color
@@ -352,7 +345,7 @@ function extended:render()
 				BorderSizePixel = 0
 			}
 
-			local children2 = {
+			local v12 = {
 				InitalPadding = Roact.createElement("UIPadding", {
 					PaddingLeft = UDim.new(0, data.DropDownPadding)
 				}),
@@ -363,47 +356,22 @@ function extended:render()
 					Padding = UDim.new(0, data.DropDownPadding)
 				}),
 				Icon = icon2,
-				Text = 0,
+				Text = Roact.createElement("TextLabel", {
+					LayoutOrder = 2,
+					Size = UDim2.new(1, -v7, 1, 0),
+					Text = self.props.text,
+					FontFace = normalizeFontFace(props.Tokens.Typography.TitleLarge.Font),
+					TextSize = props.Font.BaseSize * props.Font.Header2.RelativeSize,
+					TextColor3 = props.Theme.TextEmphasis.Color,
+					TextTransparency = props.Theme.TextEmphasis.Transparency,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextTruncate = Enum.TextTruncate.AtEnd,
+					BackgroundTransparency = 1
+				}),
 				ButtonContainer = 0
 			}
 
 			local createElement3 = Roact.createElement
-			local v12 = {
-				LayoutOrder = 2,
-				Size = UDim2.new(1, -v7, 1, 0),
-				Text = self.props.text,
-				Font = 0,
-				FontFace = 0,
-				TextSize = 0,
-				TextColor3 = 0,
-				TextTransparency = 0,
-				TextXAlignment = 0,
-				TextTruncate = 0,
-				BackgroundTransparency = 1
-			}
-			local font
-
-			if not FoundationFontFaceMigration then
-				font = props.Font.Header2.Font
-			end
-
-			v12.Font = font
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(props.Tokens.Typography.TitleLarge.Font)
-			end
-
-			v12.FontFace = fontFace
-
-			v12.TextSize = props.Font.BaseSize * props.Font.Header2.RelativeSize
-			v12.TextColor3 = props.Theme.TextEmphasis.Color
-			v12.TextTransparency = props.Theme.TextEmphasis.Transparency
-			v12.TextXAlignment = Enum.TextXAlignment.Left
-			v12.TextTruncate = Enum.TextTruncate.AtEnd
-			children2.Text = createElement3("TextLabel", v12)
-
-			local createElement4 = Roact.createElement
 			local v13 = {
 				LayoutOrder = 3,
 				Visible = visible,
@@ -436,11 +404,11 @@ function extended:render()
 				}) or nil
 			end
 
-			children2.ButtonContainer = createElement4("Frame", v13, {
+			v12.ButtonContainer = createElement3("Frame", v13, {
 				ConfirmButton = confirmButton,
 				DeclineButton = declineButton
 			})
-			children.HoverBackground = createElement2("ImageLabel", v11, children2)
+			children.HoverBackground = createElement2("ImageLabel", v11, v12)
 
 			children.DismissInputHandler = Roact.createElement("ImageButton", {
 				Image = "",

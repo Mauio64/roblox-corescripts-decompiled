@@ -1,6 +1,8 @@
 local parent = script:FindFirstAncestor("PurchasePrompt").Parent
 
 local React = require(parent.React)
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local getFirstFocusableDescendant = FocusNavigationUtils.getFirstFocusableDescendant
 local Foundation = require(parent.Foundation)
 local View = Foundation.View
 local Text = Foundation.Text
@@ -13,14 +15,13 @@ local Chip = Foundation.Chip
 local Menu = Foundation.Menu
 local ScrollView = Foundation.ScrollView
 local useTokens = Foundation.Hooks.useTokens
-local Dialog = Foundation.Dialog
+local Sheet = Foundation.Sheet
 local AvatarSize = Foundation.Enums.AvatarSize
 local ButtonVariant = Foundation.Enums.ButtonVariant
-local DialogSize = Foundation.Enums.DialogSize
+local FillBehavior = Foundation.Enums.FillBehavior
 local IconName = Foundation.Enums.IconName
 local InputFocusBehavior = Foundation.Enums.InputFocusBehavior
 local InputSize = Foundation.Enums.InputSize
-local Orientation = Foundation.Enums.Orientation
 
 local function renderPlayerRow(p, props, k: number)
 	local createElement = React.createElement
@@ -130,20 +131,28 @@ local function PeopleSearch(p)
 	local viewProps = p.viewProps
 	local ref = React.useRef(nil)
 	local state, setState = React.useState(0)
-	local state2, setState2 = React.useState(false)
+	local state2, setState2 = React.useState(nil)
 
 	local searchResults = viewProps.searchResults
-	local onSearchTextChanged = viewProps.onSearchTextChanged
 
 	local items = React.useMemo(function()
 		local result = {}
 
-		for _, searchResult in searchResults do
-			table.insert(result, {
+		for k, searchResult in searchResults do
+			local v = {
 				id = searchResult.userId,
 				text = searchResult.displayName,
-				leading = { type = "Avatar", userId = searchResult.userId }
-			})
+				leading = { type = "Avatar", userId = searchResult.userId },
+				ref = 0
+			}
+			local ref2
+
+			if k == 1 then
+				ref2 = setState2
+			end
+
+			v.ref = ref2
+			table.insert(result, v)
 		end
 
 		return result
@@ -158,18 +167,32 @@ local function PeopleSearch(p)
 		end
 	end, { searchResults })
 
-	local onChanged = React.useCallback(function(p2: string)
-		setState2(false)
-		onSearchTextChanged(p2)
-	end, { onSearchTextChanged })
-
-	local onPressedOutside = React.useCallback(function()
-		setState2(true)
-	end, {})
-
 	local onAbsoluteSizeChanged = React.useCallback(function(p2)
 		setState(p2.AbsoluteSize.X)
 	end, {})
+
+	React.useEffect(function()
+		local nextSelectionUp
+
+		if ref.current then
+			nextSelectionUp = getFirstFocusableDescendant(ref.current)
+		else
+			nextSelectionUp = nil
+		end
+
+		local nextSelectionDown = state2
+
+		if nextSelectionUp == nil or nextSelectionDown == nil then
+			return nil
+		end
+
+		nextSelectionUp.NextSelectionDown = nextSelectionDown
+		nextSelectionDown.NextSelectionUp = nextSelectionUp
+		return function()
+			nextSelectionUp.NextSelectionDown = nil
+			nextSelectionDown.NextSelectionUp = nil
+		end
+	end, { state2 })
 
 	return React.createElement(
 		View,
@@ -184,17 +207,17 @@ local function PeopleSearch(p)
 				testId = "--purchase-prompt-searchinput-people",
 				text = viewProps.searchText,
 				placeholder = viewProps.locales.searchPeople,
-				onChanged = onChanged,
+				onChanged = viewProps.onSearchTextChanged,
 				width = UDim.new(1, 0)
 			}),
 			Results = React.createElement(Menu, {
 				testId = "--purchase-prompt-menu-search-results",
-				isOpen = #items > 0 and not state2,
+				isOpen = viewProps.isSearchMenuOpen,
 				items = items,
 				anchorRef = ref,
 				width = UDim.new(0, state),
 				maxHeight = 240,
-				onPressedOutside = onPressedOutside,
+				onPressedOutside = viewProps.onSearchMenuDismissed,
 				onActivated = onActivated
 			})
 		}
@@ -284,29 +307,27 @@ local function VIPServerConfigurationView(props)
 	local v = useTokens()
 
 	local createElement = React.createElement
-	local root = Dialog.Root
+	local root = Sheet.Root
 	local v2 = {
-		size = DialogSize.Medium,
-		onClose = 0,
-		disablePortal = true,
+		onClose = props.onDismiss,
+		preferCenterSheet = true,
+		ref = props.focusRootRef,
 		testId = "VIPServerConfigurationView"
 	}
-	local onClose
-
-	if not props.isSaving then
-		onClose = props.onCancel
-	end
-
-	v2.onClose = onClose
 
 	local children = {
-		Title = React.createElement(Dialog.Title, { LayoutOrder = 1, text = props.locales.title }),
+		Header = React.createElement(Sheet.Header, {}, {
+			Title = React.createElement(Text, {
+				Text = props.locales.title,
+				tag = "auto-xy text-heading-small text-align-x-left content-default"
+			})
+		}),
 		Content = 0,
 		Actions = 0
 	}
 
 	local createElement2 = React.createElement
-	local content = Dialog.Content
+	local content = Sheet.Content
 
 	local createElement3 = React.createElement
 
@@ -398,18 +419,15 @@ local function VIPServerConfigurationView(props)
 		Body = createElement3(View, { tag = "col gap-large size-full-0 auto-y" }, v3)
 	})
 
-	children.Actions = React.createElement(Dialog.Actions, {
-		LayoutOrder = 3,
-		orientation = Orientation.Horizontal,
-		actions = {
-			{
-				testId = "--purchase-prompt-button-continue",
-				text = props.locales.continue,
-				variant = ButtonVariant.Emphasis,
-				onActivated = props.onSave,
-				isLoading = props.isSaving
-			}
-		}
+	children.Actions = React.createElement(Sheet.Actions, { LayoutOrder = 3 }, {
+		Continue = React.createElement(Button, {
+			testId = "--purchase-prompt-button-continue",
+			text = props.locales.continue,
+			variant = ButtonVariant.Emphasis,
+			fillBehavior = FillBehavior.Fill,
+			onActivated = props.onSave,
+			isLoading = props.isSaving
+		})
 	})
 	return createElement(root, v2, children)
 end

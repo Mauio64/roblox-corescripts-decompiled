@@ -17,6 +17,8 @@ local FFlagProfileCTAHydratePresenceFromMetadata = require(DataHydration.Flags.F
 
 local SharedFlags = require(parent.SharedFlags)
 local FFlagJoinabilityCTARefactor = SharedFlags.FFlagJoinabilityCTARefactor
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagUserListActionsV2 = SharedFlags2.FFlagUserListActionsV2
 
 game:DefineFastInt("ProfileCTAStoreProcessDelaySec", 1)
 
@@ -27,6 +29,15 @@ local v2 = {
 }
 
 local v3 = {
+	{
+		component = "Actions",
+		excludeContextualActions = true,
+		isActionsV2Supported = true,
+		supportedActions = require(DataHydration.Profile.UserListSupportedActions)
+	}
+}
+
+local v4 = {
 	{ component = "JoinUserActions" }
 }
 
@@ -44,15 +55,15 @@ local function createProfileCTAStore(p)
 		cache = nil
 	end
 
-	local v4
+	local v5
 
 	if FFlagJoinabilityCTARefactor and p and p.components then
-		v4 = p.components
+		v5 = p.components
 	else
-		v4 = v2
+		v5 = if FFlagUserListActionsV2 then v3 else v2
 	end
 
-	local v5 = not (FFlagJoinabilityCTARefactor and v4[1]) and "Actions" or v4[1].component
+	local v6 = not (FFlagJoinabilityCTARefactor and v5[1]) and "Actions" or v5[1].component
 
 	local function fetchComponent(p2, p3, p4: string, flag: boolean?) -- 1 equivalent call inferred from this helper
 		local keys = Cryo.Dictionary.keys(p2)
@@ -61,12 +72,12 @@ local function createProfileCTAStore(p)
 
 			if p5.responseBody and p5.responseBody.profiles then
 				for _, key in keys do
-					local v6 = tostring(key)
-					local profile = p5.responseBody.profiles[v6]
-					result[v6] = profile and profile.components and profile.components[p4] or {}
+					local v7 = tostring(key)
+					local profile = p5.responseBody.profiles[v7]
+					result[v7] = profile and profile.components and profile.components[p4] or {}
 
 					if FFlagProfileCTAHydratePresenceFromMetadata and flag then
-						hydratePresenceFromProfileMetadata(v6, profile and profile.metadata)
+						hydratePresenceFromProfileMetadata(v7, profile and profile.metadata)
 					end
 				end
 			end
@@ -81,21 +92,28 @@ local function createProfileCTAStore(p)
 		requestBatchSize = 25,
 		fetchFn = function(p2)
 			if FFlagJoinabilityCTARefactor then
-				return fetchComponent(p2, v4, v5, true)
+				return fetchComponent(p2, v5, v6, true)
 			end
 
 			local keys = Cryo.Dictionary.keys(p2)
-			return Requests.GetUserProfileCTA(keys):andThen(function(p3)
+			local getUserProfileCTA = Requests.GetUserProfileCTA
+			local v7
+
+			if FFlagUserListActionsV2 then
+				v7 = v3
+			end
+
+			return getUserProfileCTA(keys, v7):andThen(function(p3)
 				local actions = {}
 
 				if p3.responseBody and p3.responseBody.profiles then
 					for _, key in keys do
-						local v6 = tostring(key)
-						local profile = p3.responseBody.profiles[v6]
-						actions[v6] = profile and profile.components and profile.components.Actions or {}
+						local v8 = tostring(key)
+						local profile = p3.responseBody.profiles[v8]
+						actions[v8] = profile and profile.components and profile.components.Actions or {}
 
 						if FFlagProfileCTAHydratePresenceFromMetadata then
-							hydratePresenceFromProfileMetadata(v6, profile and profile.metadata)
+							hydratePresenceFromProfileMetadata(v8, profile and profile.metadata)
 						end
 					end
 				end
@@ -106,10 +124,10 @@ local function createProfileCTAStore(p)
 			end)
 		end
 	})
-	local v6
+	local v7
 
 	if FFlagJoinabilityCTARefactor then
-		v6 = createDataResolver({
+		v7 = createDataResolver({
 			cache = cache,
 			queueProcessDelaySec = defineFastInt,
 			requestBatchSize = 25,
@@ -118,7 +136,7 @@ local function createProfileCTAStore(p)
 				v:warning(`Failed to fetch JoinUserActions: {tostring(p2)}`)
 			end,
 			fetchFn = function(p2)
-				local component = fetchComponent(p2, v3, v3[1].component, true) -- inferred equivalent call
+				local component = fetchComponent(p2, v4, v4[1].component, true) -- inferred equivalent call
 
 				local JoinUserActionsTelemetry = require(DataHydration.Profile.JoinUserActionsTelemetry)
 
@@ -132,17 +150,17 @@ local function createProfileCTAStore(p)
 			end
 		})
 	else
-		v6 = nil
+		v7 = nil
 	end
 
 	local function getCTA(p2: string, flag: boolean?)
 		local fn2
 
 		if flag ~= nil then
-			local v7 = flag == true
+			local v8 = flag == true
 
 			fn2 = function(_)
-				return v7
+				return v8
 			end
 		end
 
@@ -156,10 +174,10 @@ local function createProfileCTAStore(p)
 			local count = 0
 			fn2 = function(_): boolean
 				count += 1
-				local v7 = p2[count]
+				local v8 = p2[count]
 
-				if v7 then
-					return p3[v7] == true
+				if v8 then
+					return p3[v8] == true
 				end
 
 				return false
@@ -175,7 +193,7 @@ local function createProfileCTAStore(p)
 
 		if FFlagJoinabilityCTARefactor then
 			cache.clear()
-			v6.clear()
+			v7.clear()
 		end
 	end
 
@@ -183,7 +201,7 @@ local function createProfileCTAStore(p)
 		dataResolver.dispose()
 
 		if FFlagJoinabilityCTARefactor then
-			v6.dispose()
+			v7.dispose()
 		end
 	end
 
@@ -194,14 +212,14 @@ local function createProfileCTAStore(p)
 			local fn2
 
 			if flag ~= nil then
-				local v7 = flag == true
+				local v8 = flag == true
 
 				fn2 = function(_)
-					return v7
+					return v8
 				end
 			end
 
-			return v6.getAndFetchItem(p2, fn2)
+			return v7.getAndFetchItem(p2, fn2)
 		end or nil,
 		clear = clear,
 		dispose = dispose

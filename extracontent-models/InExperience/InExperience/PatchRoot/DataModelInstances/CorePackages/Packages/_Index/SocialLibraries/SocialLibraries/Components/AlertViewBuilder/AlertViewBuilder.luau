@@ -3,8 +3,6 @@ local dependencies = require(SocialLibraries.dependencies)
 local roact = dependencies.Roact
 local cryo = dependencies.Cryo
 local uiBlox = dependencies.UIBlox
-local text = dependencies.Text
-local foundationFontFaceMigration = dependencies.Foundation.Utility.Flags.FoundationFontFaceMigration
 local getTextBoundsAsync = dependencies.Foundation.Utility.getTextBoundsAsync
 local Components = SocialLibraries.Components
 local AlertViewLabel = require(Components.AlertView.AlertViewLabel)
@@ -43,67 +41,60 @@ function extended:init()
 
 	self.state = { numTextboxes = count }
 
-	if foundationFontFaceMigration then
-		self.isMounted = false
-		self.textMeasurements = {}
+	self.isMounted = false
+	self.textMeasurements = {}
 
-		function self.flushTextMeasurements()
-			for k, textMeasurement in self.textMeasurements do
-				if self.props.textboxes[k] then
-					for k2, v in textMeasurement do
-						if v.height ~= nil or v.inFlight then
-							continue
-						end
-
-						v.inFlight = true
-						local v2 = v
-						local v3 = k2
-						task.spawn(function()
-							local textBoundsAsync = getTextBoundsAsync(v2.text, v2.font, v2.fontSize, v2.width)
-
-							v2.inFlight = false
-
-							local textMeasurement2 = self.textMeasurements[k]
-
-							if
-								textBoundsAsync
-								and self.isMounted
-								and textMeasurement2
-								and textMeasurement2[v3] == v2
-							then
-								v2.height = textBoundsAsync.Y
-								self:setState(function(p)
-									return {
-										textMeasurementVersion = (p.textMeasurementVersion or 0) + 1
-									}
-								end)
-							end
-						end)
+	function self.flushTextMeasurements()
+		for k, textMeasurement in self.textMeasurements do
+			if self.props.textboxes[k] then
+				for k2, v in textMeasurement do
+					if v.height ~= nil or v.inFlight then
+						continue
 					end
-				else
-					self.textMeasurements[k] = nil
+
+					v.inFlight = true
+					local v2 = v
+					local v3 = k2
+					task.spawn(function()
+						local textBoundsAsync = getTextBoundsAsync(v2.text, v2.font, v2.fontSize, v2.width)
+
+						v2.inFlight = false
+
+						local textMeasurement2 = self.textMeasurements[k]
+
+						if textBoundsAsync and self.isMounted and textMeasurement2 and textMeasurement2[v3] == v2 then
+							v2.height = textBoundsAsync.Y
+							self:setState(function(p)
+								return {
+									textMeasurementVersion = (p.textMeasurementVersion or 0) + 1
+								}
+							end)
+						end
+					end)
 				end
+			else
+				self.textMeasurements[k] = nil
 			end
-		end
-
-		function self.scheduleTextMeasurementFlush()
-			if self.textMeasurementFlushScheduled then
-				return
-			end
-
-			self.textMeasurementFlushScheduled = true
-			task.defer(function()
-				self.textMeasurementFlushScheduled = false
-
-				if self.isMounted then
-					self.flushTextMeasurements()
-				end
-			end)
 		end
 	end
 
-	self.calcTextboxTextHeight = foundationFontFaceMigration and function(p, text2: string?, p2: string, p3: string)
-		if text2 and text2 ~= "" then
+	function self.scheduleTextMeasurementFlush()
+		if self.textMeasurementFlushScheduled then
+			return
+		end
+
+		self.textMeasurementFlushScheduled = true
+		task.defer(function()
+			self.textMeasurementFlushScheduled = false
+
+			if self.isMounted then
+				self.flushTextMeasurements()
+			end
+		end)
+	end
+
+	function self.calcTextboxTextHeight(p, text: string?, p2: string, p3: string)
+		if text and text ~= "" then
 			local fontSize = p.Font.Body.RelativeSize * p.Font.BaseSize
 			local font = p.Font.Body.Font
 			local childComponentWidth = self.props.childComponentWidth
@@ -118,20 +109,16 @@ function extended:init()
 
 			if
 				v2
-				and v2.text == text2
+				and v2.text == text
 				and v2.font == font
 				and v2.fontSize == fontSize
 				and v2.width == childComponentWidth
 			then
-				if v2.height == nil then
-					return fontSize
-				end
-
-				return v2.height
+				return if v2.height == nil then fontSize else v2.height
 			end
 
 			v[p3] = {
-				text = text2,
+				text = text,
 				font = font,
 				fontSize = fontSize,
 				width = childComponentWidth,
@@ -149,19 +136,12 @@ function extended:init()
 
 			return 0
 		end
-	end or function(p, p2: string?)
-		local v = p.Font.Body.RelativeSize * p.Font.BaseSize
-		local font = p.Font.Body.Font
-
-		return (not p2 or p2 == "") and 0 or text.GetTextHeight(p2, font, v, self.props.childComponentWidth)
 	end
 end
 
 function extended:didMount()
-	if foundationFontFaceMigration then
-		self.isMounted = true
-		self.flushTextMeasurements()
-	end
+	self.isMounted = true
+	self.flushTextMeasurements()
 
 	if type(self.props.onModalOpen) == "function" then
 		self.props.onModalOpen()
@@ -169,15 +149,11 @@ function extended:didMount()
 end
 
 function extended.didUpdate(p)
-	if foundationFontFaceMigration then
-		p.flushTextMeasurements()
-	end
+	p.flushTextMeasurements()
 end
 
 function extended:willUnmount()
-	if foundationFontFaceMigration then
-		self.isMounted = false
-	end
+	self.isMounted = false
 end
 
 function extended:reset()

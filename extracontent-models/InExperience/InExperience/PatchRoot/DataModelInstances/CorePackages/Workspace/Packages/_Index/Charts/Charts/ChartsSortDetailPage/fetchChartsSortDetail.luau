@@ -86,7 +86,8 @@ local function resetStickyGenreIfStale(chartsSortDetailPageKey: string) -- 1 equ
 end
 
 local function fetchChartsSortDetail(sortId: string, loadTimer)
-	local chartsSortDetailPageKey = getChartsSortDetailPageKey(sortId, nil, (getInheritedFilterSelections())) -- inferred equivalent call
+	local inheritedFilterSelections = getInheritedFilterSelections() -- inferred equivalent call
+	local chartsSortDetailPageKey = getChartsSortDetailPageKey(sortId, nil, inheritedFilterSelections)
 
 	if FFlagSduiChartsSortDetailGenreFilter then
 		resetStickyGenreIfStale(chartsSortDetailPageKey) -- inferred equivalent call

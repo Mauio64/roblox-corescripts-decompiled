@@ -11,54 +11,67 @@ local GetSearchQueryStore = require(BuildExperience.Stores.GetSearchQueryStore)
 require(BuildExperience.Stores.GetSearchQueryStore.createSearchQueryStore)
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
 local useBuildHomeTabsPageLayout = require(script.Parent.useBuildHomeTabsPageLayout)
+local sendBuildExperienceEvent = require(BuildExperience.Telemetry.sendBuildExperienceEvent)
+local FFlagBuildExperienceHomeTelemetry = require(BuildExperience.Flags.FFlagBuildExperienceHomeTelemetry)
 
 local BUILD_HOME_TAB = createBuildHomeTabStore.BUILD_HOME_TAB
 local useLocalization = Localization.Hooks.useLocalization
 
-local function useBuildHomeTabsViewModel(p)
-	local tabStore = p.tabStore or GetBuildHomeTabStore()
-	local activeTab = tabStore.useTab()
-	local v = (p.searchQueryStore or GetSearchQueryStore()).useIsSearchActive()
+local function useBuildHomeTabsViewModel(data)
+	local tabStore = data.tabStore or GetBuildHomeTabStore()
+	local v = tabStore.useTab()
+	local v2 = (data.searchQueryStore or GetSearchQueryStore()).useIsSearchActive()
 
-	local v2 = useLocalization({
+	local v3 = useLocalization({
 		games = LocalizationStrings.BUILD_HOME_TAB_GAMES,
 		previews = LocalizationStrings.BUILD_HOME_TAB_PREVIEWS
 	})
 
 	local tabs = React.useMemo(function()
 		return {
-			{ id = BUILD_HOME_TAB.Games, text = v2.games },
-			{ id = BUILD_HOME_TAB.Previews, text = v2.previews }
+			{ id = BUILD_HOME_TAB.Games, text = v3.games },
+			{ id = BUILD_HOME_TAB.Previews, text = v3.previews }
 		}
-	end, { v2.games, v2.previews })
+	end, { v3.games, v3.previews })
 
-	local onTabActivated = React.useCallback(function(p2)
-		if p2 ~= BUILD_HOME_TAB.Games and p2 ~= BUILD_HOME_TAB.Previews then
+	local onTabActivated = React.useCallback(function(p)
+		if p ~= BUILD_HOME_TAB.Games and p ~= BUILD_HOME_TAB.Previews then
 			return
 		end
 
-		tabStore.setTab(p2)
+		if FFlagBuildExperienceHomeTelemetry then
+			sendBuildExperienceEvent("TAB_CLICK", {}, { tab = tostring(p), context = "build_home" })
+		end
+
+		tabStore.setTab(p)
 	end, { tabStore })
 
-	local showTabs = not v
+	local showTabs = not v2
 
 	if not showTabs then
-		activeTab = BUILD_HOME_TAB.Games
+		v = BUILD_HOME_TAB.Games
 	end
 
-	local v3 = useBuildHomeTabsPageLayout({
-		tabs = tabs,
-		activeTab = activeTab,
-		showTabs = showTabs
-	})
+	local v4 = useBuildHomeTabsPageLayout({ tabs = tabs, activeTab = v, showTabs = showTabs })
+
+	if FFlagBuildExperienceHomeTelemetry then
+		local v5 = showTabs and data.isFocused ~= false
+		React.useEffect(function()
+			if not v5 then
+				return
+			end
+
+			sendBuildExperienceEvent("TAB_IMPRESSION", {}, { tab = v, context = "build_home" })
+		end, { v, v5 })
+	end
 
 	return {
 		showTabs = showTabs,
-		activeTab = activeTab,
+		activeTab = v,
 		tabs = tabs,
 		onTabActivated = onTabActivated,
-		pageOffset = v3.pageOffset,
-		tabOrder = v3.tabOrder
+		pageOffset = v4.pageOffset,
+		tabOrder = v4.tabOrder
 	}
 end
 

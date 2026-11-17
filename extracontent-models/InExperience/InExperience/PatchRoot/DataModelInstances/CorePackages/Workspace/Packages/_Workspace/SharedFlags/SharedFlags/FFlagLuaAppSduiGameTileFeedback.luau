@@ -1,3 +1,1 @@
-local FFlagLuaAppExtractNotInterestedHelper = require(script.Parent.FFlagLuaAppExtractNotInterestedHelper)
-
-return game:DefineFastFlag("LuaAppSduiGameTileFeedback4", false) and FFlagLuaAppExtractNotInterestedHelper
+return game:DefineFastFlag("LuaAppSduiGameTileFeedback4", false)

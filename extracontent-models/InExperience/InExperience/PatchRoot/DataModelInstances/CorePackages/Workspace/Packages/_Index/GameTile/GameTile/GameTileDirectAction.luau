@@ -18,7 +18,7 @@ local View = Foundation.View
 
 local gameTileOverflowMenuAction = DiscoveryAnalytics.Events.gameTileOverflowMenuAction
 
-local FFlagLuaAppEnableHomepageOneByTwoTile = SharedFlags.FFlagLuaAppEnableHomepageOneByTwoTile
+local FFlagLuaAppEnableNxMRoduxApportioning = SharedFlags.FFlagLuaAppEnableNxMRoduxApportioning
 local FFlagLuaAppGameTileDirectActionTelemetry = SharedFlags.FFlagLuaAppGameTileDirectActionTelemetry
 
 local function GameTileDirectAction(props)
@@ -43,7 +43,7 @@ local function GameTileDirectAction(props)
 			}
 			local contentType
 
-			if FFlagLuaAppEnableHomepageOneByTwoTile then
+			if FFlagLuaAppEnableNxMRoduxApportioning then
 				contentType = props.contentType
 			end
 
@@ -56,7 +56,7 @@ local function GameTileDirectAction(props)
 		local collectionId = props.collectionId
 		local v3
 
-		if FFlagLuaAppEnableHomepageOneByTwoTile then
+		if FFlagLuaAppEnableNxMRoduxApportioning then
 			v3 = props.contentType
 		end
 

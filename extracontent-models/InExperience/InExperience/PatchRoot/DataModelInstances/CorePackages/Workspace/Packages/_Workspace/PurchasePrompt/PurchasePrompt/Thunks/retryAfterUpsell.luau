@@ -136,45 +136,43 @@ local function retryAfterUpsell(p)
 					end
 
 					object:dispatch(purchaseItem())
-				else
-					if purchaseFlow == PurchaseFlow.LargeRobuxUpsell then
-						return getRobuxUpsellSuggestions(
-							playerPrice,
-							robux,
-							getPaymentPlatform((v5.getPlatform())),
-							isEligibleForRobuxUpsellPlusButton(
-								state3.isUserEligibleForUnifiedPurchaseFlow,
-								state3.robloxSubscriptionProducts,
-								state3.productPayload,
-								selectPrice(state3),
-								state3.promptRequest.requestType
-							)
-						):andThen(
-							function(data)
-								if not hasPendingRequest(object:getState()) then
-									return
-								end
-
-								object:dispatch(PromptNativeUpsellSuggestions(
-									data.products,
-									1,
-									data.virtualItemBadgeType,
-									data.experimentVariant
-								))
-
-								object:dispatch(sendCounter(Counter.UpsellModalShownAgain))
-							end,
-							function()
-								if not hasPendingRequest(object:getState()) then
-									return
-								end
-
-								object:dispatch(SetPromptState(PromptState.LargeRobuxUpsell))
-								object:dispatch(sendCounter(Counter.UpsellGenericModalShownAgain))
-							end
+				elseif purchaseFlow == PurchaseFlow.LargeRobuxUpsell then
+					return getRobuxUpsellSuggestions(
+						playerPrice,
+						robux,
+						getPaymentPlatform((v5.getPlatform())),
+						isEligibleForRobuxUpsellPlusButton(
+							state3.isUserEligibleForUnifiedPurchaseFlow,
+							state3.robloxSubscriptionProducts,
+							state3.productPayload,
+							selectPrice(state3),
+							state3.promptRequest.requestType
 						)
-					end
+					):andThen(
+						function(data)
+							if not hasPendingRequest(object:getState()) then
+								return
+							end
 
+							object:dispatch(PromptNativeUpsellSuggestions(
+								data.products,
+								1,
+								data.virtualItemBadgeType,
+								data.experimentVariant
+							))
+
+							object:dispatch(sendCounter(Counter.UpsellModalShownAgain))
+						end,
+						function()
+							if not hasPendingRequest(object:getState()) then
+								return
+							end
+
+							object:dispatch(SetPromptState(PromptState.LargeRobuxUpsell))
+							object:dispatch(sendCounter(Counter.UpsellGenericModalShownAgain))
+						end
+					)
+				else
 					if upsellFlow == UpsellFlow.Web then
 						object:dispatch(ErrorOccurred(PurchaseError.InvalidFundsUnknown))
 					else

@@ -62,8 +62,9 @@ local function ExperienceDetailsNotifyChip(p)
 		local v5 = not isFollowing
 
 		if rootPlaceId then
+			local userId = Players.LocalPlayer and Players.LocalPlayer.UserId
 			local v6 = {
-				uid = tostring(Players.LocalPlayer and Players.LocalPlayer.UserId),
+				uid = tostring(userId),
 				placeId = rootPlaceId,
 				state = v5 and "on" or "off",
 				ctx = "ExperienceDetailsNotifyChip",

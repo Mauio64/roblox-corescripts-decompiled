@@ -56,8 +56,8 @@ local FFlagEnableConsoleExpControls = SharedFlags.FFlagEnableConsoleExpControls
 local FFlagExpChatWindowSyncUnibar = SharedFlags.FFlagExpChatWindowSyncUnibar
 local FFlagExpChatInitializeWindowFromGameSettings = SharedFlags.FFlagExpChatInitializeWindowFromGameSettings
 local FFlagRemoveFriendsChatUnibarEntrypoints = SharedFlags.FFlagRemoveFriendsChatUnibarEntrypoints
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
 local FFlagExpChatCanShowFriendsTab = SharedFlags.FFlagExpChatCanShowFriendsTab
+local FFlagSideSheetHeaderChatIcon = SharedFlags.FFlagSideSheetHeaderChatIcon
 local FFlagExpChatHistoricalMessagesUnibarUnread = SharedFlags.FFlagExpChatHistoricalMessagesUnibarUnread
 local FFlagExpChatContinuousListeningChatIconDot = SharedFlags.FFlagExpChatContinuousListeningChatIconDot
 local RedDot
@@ -94,6 +94,8 @@ local isInExperienceUIVREnabled = SharedExperimentDefinition.isInExperienceUIVRE
 local SharedExperimentDefinition2 = require(CorePackages.Workspace.Packages.SharedExperimentDefinition)
 local InExperienceUIVRIXP = SharedExperimentDefinition2.InExperienceUIVRIXP
 local ExpChatPerfTracker = ExpChat.ExpChatPerfTracker
+local ExpChatJoinIntent = require(CorePackages.Workspace.Packages.ExpChatJoinIntent)
+local FStringOpenChatOnJoinNotificationTypes = ExpChatJoinIntent.FStringOpenChatOnJoinNotificationTypes
 
 local total = 0
 local v
@@ -128,7 +130,7 @@ local function getHistoricalUnreadCount() -- 1 equivalent call inferred from thi
 	return historicalWindowMessageCount - v3
 end
 
-local function acknowledgeHistoricalMessages() -- 3 equivalent calls inferred from this helper
+local function acknowledgeHistoricalMessages() -- 2 equivalent calls inferred from this helper
 	v3 = readHistoricalWindowMessageCount(false) -- inferred equivalent call
 end
 
@@ -143,11 +145,6 @@ local function updateUnreadNotification()
 		v5 = getHistoricalUnreadCount() -- inferred equivalent call
 	else
 		v5 = 0
-	end
-
-	if not FFlagExpChatEnableFriendsTab then
-		v2.notification:fireCount(total + v5)
-		return
 	end
 
 	local unreadCountToDisplay = GetFriendsChatIconUnreadStore(false).getUnreadCountToDisplay(false)
@@ -226,27 +223,17 @@ end, function()
 	v = visibility
 	v4 = true
 
-	if FFlagExpChatEnableFriendsTab then
-		if visibility then
-			total = 0
-
-			if FFlagExpChatHistoricalMessagesUnibarUnread then
-				acknowledgeHistoricalMessages() -- inferred equivalent call
-			end
-
-			GetFriendsChatIconUnreadStore(false).clearDisplayCount()
-		end
-
-		updateUnreadNotification()
-	elseif visibility and total and v2.notification then
+	if visibility then
 		total = 0
 
 		if FFlagExpChatHistoricalMessagesUnibarUnread then
 			acknowledgeHistoricalMessages() -- inferred equivalent call
 		end
 
-		v2.notification:clear()
+		GetFriendsChatIconUnreadStore(false).clearDisplayCount()
 	end
+
+	updateUnreadNotification()
 end)
 
 local function hideAppChat() -- 2 equivalent calls inferred from this helper
@@ -266,7 +253,7 @@ local function revealChat() -- 2 equivalent calls inferred from this helper
 	end
 end
 
-local function isChatOpenAvailable(): boolean -- 1 equivalent call inferred from this helper
+local function isChatOpenAvailable(): boolean -- 2 equivalent calls inferred from this helper
 	return v2.availability:get() ~= Service.AvailabilitySignal.Unavailable
 end
 
@@ -290,7 +277,7 @@ end
 
 local sideSheetPlacement
 
-if FFlagRemoveFriendsChatUnibarEntrypoints and FFlagExpChatCanShowFriendsTab then
+if FFlagSideSheetHeaderChatIcon or FFlagRemoveFriendsChatUnibarEntrypoints and FFlagExpChatCanShowFriendsTab then
 	sideSheetPlacement = SideSheetPlacement.Unibar
 else
 	sideSheetPlacement = SideSheetPlacement.None
@@ -397,9 +384,7 @@ v2 = Service:register({
 	}
 })
 
-v2.chatOpenCapability = FFlagExpChatEnableFriendsTab
-	and { isAvailable = isChatOpenAvailable, ensureOpenChat = ensureOpenChat }
-	or nil
+v2.chatOpenCapability = { isAvailable = isChatOpenAvailable, ensureOpenChat = ensureOpenChat }
 
 if defineFastFlag2 then
 	SignalsUtils.createDetachedEffect(function(p)
@@ -416,7 +401,9 @@ if defineFastFlag2 then
 		end
 	end)
 
-	ChromeUtils.setCoreGuiAvailability(v2, Enum.CoreGuiType.Chat, function(p)
+	local setCoreGuiAvailability = ChromeUtils.setCoreGuiAvailability
+	local v5 = v2
+	setCoreGuiAvailability(v5, Enum.CoreGuiType.Chat, function(p)
 		default.setCoreGuiEnabled(p)
 	end)
 end
@@ -431,12 +418,10 @@ if FFlagEnableConsoleExpControls then
 	end)
 end
 
-if FFlagExpChatEnableFriendsTab then
-	SignalsUtils.createDetachedEffect(function(p)
-		GetFriendsChatIconUnreadStore(p).getUnreadCountToDisplay(p)
-		updateUnreadNotification()
-	end)
-end
+SignalsUtils.createDetachedEffect(function(p)
+	GetFriendsChatIconUnreadStore(p).getUnreadCountToDisplay(p)
+	updateUnreadNotification()
+end)
 
 if FFlagExpChatHistoricalMessagesUnibarUnread then
 	SignalsUtils.createDetachedEffect(function(p)
@@ -532,6 +517,48 @@ local function setChatVisibilityOnLoad() -- 1 equivalent call inferred from this
 	ChatSelector:SetVisible(v6)
 end
 
+if FStringOpenChatOnJoinNotificationTypes ~= "" then
+	local NotificationsCommon = require(CorePackages.Workspace.Packages.NotificationsCommon)
+	NotificationsCommon.DeeplinkTapListeners.connect(ExpChatJoinIntent.handleDeeplinkTap)
+end
+
+local function openChatForJoinIntent(flag: boolean)
+	local v6 = ExpChatJoinIntent.read(game.PlaceId)
+
+	if v6.result == "none" then
+		return
+	end
+
+	local v7 = v6.result
+
+	if v6.result == "accepted" then
+		if not game:IsLoaded() then
+			game.Loaded:Wait()
+		end
+
+		local chatWindowConfiguration = TextChatService:FindFirstChildOfClass("ChatWindowConfiguration")
+
+		v7 = flag
+			and (v and "alreadyOpen" or not isChatOpenAvailable() and "chatUnavailable" or chatWindowConfiguration and not chatWindowConfiguration.Enabled and "chatWindowDisabled" or "opened") -- inferred equivalent call
+			or "cannotChat"
+	end
+
+	if v7 == "opened" then
+		gameSettings.ChatVisible = true
+		v = true
+		ChatSelector:SetVisible(true)
+	end
+
+	local intent = v6.intent
+	ExpChatShared.Analytics.FireClientAnalyticsWithEventName("joinIntentChatOpen", {
+		result = v7,
+		notificationType = not intent and "" or intent.notificationType,
+		notificationId = intent and intent.notificationId or "",
+		chatTarget = intent and intent.chatTarget or "",
+		source = not intent and "" or intent.source
+	})
+end
+
 coroutine.wrap(function()
 	local localPlayer = Players.LocalPlayer
 
@@ -574,6 +601,10 @@ coroutine.wrap(function()
 
 		v = v7
 		ChatSelector:SetVisible(v7)
+	end
+
+	if FStringOpenChatOnJoinNotificationTypes ~= "" then
+		openChatForJoinIntent(v6)
 	end
 end)()
 

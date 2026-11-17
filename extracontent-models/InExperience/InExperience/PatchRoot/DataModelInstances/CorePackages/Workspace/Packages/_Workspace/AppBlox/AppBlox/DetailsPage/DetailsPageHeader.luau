@@ -2,7 +2,6 @@ local parent = script:FindFirstAncestor("AppBlox").Parent
 local UIBlox = require(parent.UIBlox)
 local Foundation = require(parent.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local withStyle = UIBlox.Core.Style.withStyle
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
@@ -28,7 +27,6 @@ local SharedFlags2 = require(parent.SharedFlags)
 local FFlagUIBloxEnableActionBarButtonOverride = SharedFlags2.UIBlox.FFlagUIBloxEnableActionBarButtonOverride
 local SharedFlags3 = require(parent.SharedFlags)
 local FFlagUIBloxAddTestIdToActionBar = SharedFlags3.UIBlox.FFlagUIBloxAddTestIdToActionBar
-local defineFastFlag2 = game:DefineFastFlag("FFlagFixDetailsPageIconShadowSlicing", false)
 
 local extended = Roact.PureComponent:extend("DetailsPageHeader")
 
@@ -88,8 +86,7 @@ function extended:renderThumbnail(p, p2, p3, p4)
 	local dropShadow
 
 	if p2 > 0 then
-		local createElement2 = Roact.createElement
-		local v3 = {
+		dropShadow = Roact.createElement(ImageSetLabel, {
 			Size = UDim2.new(1, 0, 0, 28),
 			Position = UDim2.fromScale(0, 1),
 			BackgroundTransparency = 1,
@@ -97,18 +94,8 @@ function extended:renderThumbnail(p, p2, p3, p4)
 			ImageColor3 = p.Theme.DropShadow.Color,
 			ImageTransparency = p.Theme.DropShadow.Transparency,
 			ScaleType = Enum.ScaleType.Slice,
-			SliceCenter = 0
-		}
-		local sliceCenter
-
-		if defineFastFlag2 then
-			sliceCenter = Rect.new(32, 0, 33, 1)
-		else
-			sliceCenter = Rect.new(32, 0, 33, 28)
-		end
-
-		v3.SliceCenter = sliceCenter
-		dropShadow = createElement2(ImageSetLabel, v3)
+			SliceCenter = Rect.new(32, 0, 33, 1)
+		})
 	end
 
 	v2.DropShadow = dropShadow
@@ -219,35 +206,20 @@ function extended:renderDesktopMode(p)
 		local actionBarLabel
 
 		if self.props.actionBarLabelText then
-			local createElement4 = Roact.createElement
-			local actionBarLabelRefsByRef = {}
-			actionBarLabelRefsByRef.Size = UDim2.new(1, 0, 0, 0)
-			actionBarLabelRefsByRef.AutomaticSize = Enum.AutomaticSize.Y
-			actionBarLabelRefsByRef.Text = self.props.actionBarLabelText
-			actionBarLabelRefsByRef.TextXAlignment = Enum.TextXAlignment.Left
-			actionBarLabelRefsByRef.TextWrapped = true
-			actionBarLabelRefsByRef.BackgroundTransparency = 1
-			local font
-
-			if not FoundationFontFaceMigration then
-				font = p.Tokens.Typography.BodyLarge.Font
-			end
-
-			actionBarLabelRefsByRef.Font = font
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(p.Tokens.Typography.BodyLarge.Font)
-			end
-
-			actionBarLabelRefsByRef.FontFace = fontFace
-
-			actionBarLabelRefsByRef.TextSize = p.Tokens.FontSize.FontSize_350
-			actionBarLabelRefsByRef.TextColor3 = p.Tokens.Color.Content.Emphasis.Color3
-			actionBarLabelRefsByRef.TextTransparency = p.Tokens.Color.Content.Emphasis.Transparency
-			actionBarLabelRefsByRef.LayoutOrder = 3
-			actionBarLabelRefsByRef[Roact.Ref] = self.actionBarLabelRef
-			actionBarLabel = createElement4("TextLabel", actionBarLabelRefsByRef)
+			actionBarLabel = Roact.createElement("TextLabel", {
+				Size = UDim2.new(1, 0, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				Text = self.props.actionBarLabelText,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				TextWrapped = true,
+				BackgroundTransparency = 1,
+				FontFace = normalizeFontFace(p.Tokens.Typography.BodyLarge.Font),
+				TextSize = p.Tokens.FontSize.FontSize_350,
+				TextColor3 = p.Tokens.Color.Content.Emphasis.Color3,
+				TextTransparency = p.Tokens.Color.Content.Emphasis.Transparency,
+				LayoutOrder = 3,
+				[Roact.Ref] = self.actionBarLabelRef
+			})
 		end
 
 		children.ActionBarLabel = actionBarLabel

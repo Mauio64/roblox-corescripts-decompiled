@@ -96,38 +96,38 @@ local function buildSearchItemList(items, p: string?, flag: boolean)
 	return searchItemList
 end
 
-local function useConversationSearchListProps(p: string?, flag: boolean, p2: string?, flag2: boolean, callback)
-	local v3 = useConversationSearch(p, flag)
+local function useConversationSearchListProps(p: string?, flag: boolean, p2: string?, flag2: boolean, callback, p3: string?)
+	local v3 = useConversationSearch(p, flag, p3)
 	local v4 = useDispatch()
 	local v5 = useStore()
 
-	local navigateToConversation = React.useCallback(function(p3: string)
-		local conversation = GetConversationStore(false).getConversation(p3, false)
+	local navigateToConversation = React.useCallback(function(p4: string)
+		local conversation = GetConversationStore(false).getConversation(p4, false)
 		local state = v5:getState()
 		local v6
 
 		if conversation == nil then
 			v6 = false
 		else
-			v6 = state.ChatAppReducer.Conversations[p3] == nil
+			v6 = state.ChatAppReducer.Conversations[p4] == nil
 		end
 
-		if v6 or searchIntroducedConversationIds.has(p3) then
+		if v6 or searchIntroducedConversationIds.has(p4) then
 			SignalsExperimental.batch(function()
 				if v6 then
 					v4(ReceivedConversation(ConversationRoduxSeed.normalizeStoreConversationForRodux(conversation)))
 				end
 
-				searchIntroducedConversationIds.remove(p3)
+				searchIntroducedConversationIds.remove(p4)
 			end)
 
-			if not ConversationRoduxSeed.isFriendsPlaceholderConversationId(p3) then
-				v4(fetchLatestConversationDetails(p3))
+			if not ConversationRoduxSeed.isFriendsPlaceholderConversationId(p4) then
+				v4(fetchLatestConversationDetails(p4))
 			end
 		end
 
 		if callback ~= nil then
-			callback(p3)
+			callback(p4)
 		end
 	end, { v4, callback, v5 })
 

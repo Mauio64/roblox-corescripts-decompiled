@@ -14,6 +14,8 @@ local useAppPolicy = UniversalAppPolicy.useAppPolicy
 local useProfileShareLink = ProfileShareLinks.Hooks.useProfileShareLink
 local ProfileSharePolicyEnum = ProfileShareLinks.Enums.ProfileSharePolicyEnum
 local RoactUtils = require(parent.RoactUtils)
+local AppBlox = require(parent.AppBlox)
+local useCloseWithBackButton = AppBlox.useCloseWithBackButton
 
 local Button = UIBlox.App.Button.Button
 local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
@@ -57,6 +59,7 @@ local useLastInputMode = FocusNavigationUtils.useLastInputMode
 local color = Color3.new(1, 1, 1)
 
 local FFlagProfileQRCodeFixFocusNavigation = require(ProfileQRCode.Flags.FFlagProfileQRCodeFixFocusNavigation)
+local FFlagProfileQRCodeGamepadBackFix = require(ProfileQRCode.Flags.FFlagProfileQRCodeGamepadBackFix)
 local SharedFlags2 = require(parent.SharedFlags)
 local FFlagQRCodeCopyUpdates = SharedFlags2.FFlagQRCodeCopyUpdates
 local SharedFlags3 = require(parent.SharedFlags)
@@ -130,6 +133,12 @@ return function(props)
 		v7 = nil
 	end
 
+	local ref2
+
+	if FFlagProfileQRCodeGamepadBackFix then
+		ref2 = useCloseWithBackButton(nil, props.onClose)
+	end
+
 	local v8 = useProfileShareLink({ context = Contexts.ProfileQRCode })
 	local v9
 
@@ -180,7 +189,12 @@ return function(props)
 	end
 
 	local createElement = React.createElement
-	local v10 = { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, BorderSizePixel = 0 }
+	local v10 = {
+		Size = UDim2.fromScale(1, 1),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		ref = ref2
+	}
 	local widePanel
 
 	if FFlagQRCodePageVisualRefresh and v4 then
@@ -431,13 +445,13 @@ return function(props)
 			onActivated = v8.onActivated,
 			ref = 0
 		}
-		local ref2
+		local ref3
 
 		if FFlagProfileQRCodeFixFocusNavigation then
-			ref2 = ref
+			ref3 = ref
 		end
 
-		v17.ref = ref2
+		v17.ref = ref3
 		v16.ProfileShareButton = createElement6(Button, v17)
 		profileShareButtonContainer = createElement5("Frame", v15, v16)
 	end

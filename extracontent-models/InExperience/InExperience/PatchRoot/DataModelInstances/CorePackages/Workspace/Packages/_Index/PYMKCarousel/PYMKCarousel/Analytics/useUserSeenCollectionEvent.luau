@@ -25,6 +25,7 @@ local FIntUserSeenCollectionBatchTimeMs = SharedFlags.FIntUserSeenCollectionBatc
 local FFlagLuaAppUserSeenCollectionUnifiedFields = SharedFlags.FFlagLuaAppUserSeenCollectionUnifiedFields
 local FFlagLuaAppEnableSduiHomePage = SharedFlags.FFlagLuaAppEnableSduiHomePage
 local FFlagPYMKCarouselStableSelectors = require(parent.Flags.FFlagPYMKCarouselStableSelectors)
+local FFlagPymkCarouselExtendProps = SharedFlags.FFlagPymkCarouselExtendProps
 
 local frozen = table.freeze({})
 local v
@@ -268,7 +269,13 @@ return function(callback, data)
 
 		local v10
 
-		if FFlagLuaAppEnableSduiHomePage then
+		if FFlagPymkCarouselExtendProps then
+			if FFlagLuaAppEnableSduiHomePage or data2.hasIncomingFriendRequest ~= nil then
+				v10 = data2.hasIncomingFriendRequest
+			else
+				v10 = v4[userId]
+			end
+		elseif FFlagLuaAppEnableSduiHomePage then
 			v10 = data2.hasIncomingFriendRequest
 		else
 			v10 = v4[userId]

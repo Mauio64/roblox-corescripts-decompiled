@@ -1,7 +1,10 @@
 local TextChatService = game:GetService("TextChatService")
 
 local TextChannelWindow = script:FindFirstAncestor("TextChannelWindow")
+local isDirectChatChannel = require(TextChannelWindow.isDirectChatChannel)
 local FFlagExpChatUniverseChatPresetEnabled = require(TextChannelWindow.Flags.FFlagExpChatUniverseChatPresetEnabled)
+
+local FFlagExpChatTextChannelWindowQuickWordsNonDirect = require(TextChannelWindow.Flags.FFlagExpChatTextChannelWindowQuickWordsNonDirect)
 local Logger = require(TextChannelWindow.Logger)
 
 local function getRBXGeneralChannel()
@@ -15,7 +18,11 @@ local function getRBXGeneralChannel()
 end
 
 local function sendPreset(p: string, textChannel): string
-	if textChannel ~= nil and textChannel.Name ~= "RBXGeneral" then
+	if FFlagExpChatTextChannelWindowQuickWordsNonDirect then
+		if textChannel ~= nil and isDirectChatChannel(textChannel) then
+			return "DirectChat"
+		end
+	elseif textChannel ~= nil and textChannel.Name ~= "RBXGeneral" then
 		textChannel = TextChatService:FindFirstChild("RBXGeneral", true)
 
 		if not (textChannel and textChannel:IsA("TextChannel")) then

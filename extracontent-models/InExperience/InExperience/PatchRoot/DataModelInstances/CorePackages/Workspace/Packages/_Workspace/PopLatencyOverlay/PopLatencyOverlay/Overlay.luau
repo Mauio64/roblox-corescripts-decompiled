@@ -45,7 +45,13 @@ local function PopLatencyOverlay(props)
 
 	React.useEffect(function()
 		local inputBeganConnection = UserInputService.InputBegan:Connect(function(input)
-			if not (isToggleChord(input) and canToggleForProbe(ref.current or v(), failClosedOnProbeCheck)) then
+			if not isToggleChord(input) then
+				return
+			end
+
+			local current = ref.current or v()
+
+			if not canToggleForProbe(current, failClosedOnProbeCheck) then
 				return
 			end
 

@@ -1,3 +1,5 @@
+local Flags = require(script:FindFirstAncestor("ViewRecyclerReact").Flags)
+local FFlagViewRecyclerReact084 = Flags.FFlagViewRecyclerReact084
 local ViewRecyclerReact = script:FindFirstAncestor("ViewRecyclerReact")
 require(ViewRecyclerReact.Parent.ViewRecyclerRoblox)
 
@@ -6,7 +8,20 @@ local function toCorePinnedItem(data) -- 2 equivalent calls inferred from this h
 		return nil
 	end
 
-	return { key = data.key, value = data.value, itemViewType = data.itemType }
+	local v = {
+		key = data.key,
+		value = data.value,
+		itemViewType = data.itemType,
+		estimatedLength = 0
+	}
+	local estimatedLength
+
+	if FFlagViewRecyclerReact084 then
+		estimatedLength = data.estimatedLength
+	end
+
+	v.estimatedLength = estimatedLength
+	return v
 end
 
 local function virtualizerConfiguration(p, p2)

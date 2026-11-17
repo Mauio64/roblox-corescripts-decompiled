@@ -6,7 +6,6 @@ local dependencies = require(parent.dependencies)
 local uiBlox = dependencies.UIBlox
 local Foundation = require(parent.Parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local useLocalization = dependencies.Localization.Hooks.useLocalization
 local kind = require(parent.type)
 local buttonStack = uiBlox.App.Button.ButtonStack
@@ -51,12 +50,7 @@ local function fn(buttonStyle) -- 1 equivalent call inferred from this helper
 end
 
 local function fn2(list, p, handleActions, ref)
-	local v
-
-	if FoundationFontFaceMigration then
-		v = useTokens()
-	end
-
+	local v = useTokens()
 	local v2 = useNotificationCardData()
 
 	local v3 = {}
@@ -85,15 +79,10 @@ local function fn2(list, p, handleActions, ref)
 		end
 
 		local buttonType2 = fn(item.buttonStyle) -- inferred equivalent call
-		local fontStyle
-
-		if FoundationFontFaceMigration then
-			fontStyle = v.Typography.TitleLarge
-		end
 
 		local props = {
 			text = text,
-			fontStyle = fontStyle,
+			fontStyle = v.Typography.TitleLarge,
 			onActivated = function()
 				if handleActions then
 					handleActions(item)

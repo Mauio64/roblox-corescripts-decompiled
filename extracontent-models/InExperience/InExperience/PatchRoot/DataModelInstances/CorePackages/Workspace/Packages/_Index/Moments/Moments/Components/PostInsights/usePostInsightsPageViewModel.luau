@@ -7,7 +7,7 @@ require(parent.AnalyticsMetricChart)
 local BuilderIcons = require(parent.BuilderIcons)
 local Foundation = require(parent.Foundation)
 local Localization = require(parent.Localization)
-require(parent.MomentsCommon)
+local MomentsCommon = require(parent.MomentsCommon)
 local MomentsTypes = require(parent.MomentsTypes)
 local React = require(parent.React)
 local SignalsReact = require(parent.SignalsReact)
@@ -22,11 +22,29 @@ local ReactionType = MomentsTypes.Enums.ReactionType
 local CreatorAnalytics = require(parent.DataHydration.CreatorAnalytics)
 
 require(script.Parent.createPostInsightsPageStore)
+local makeFeedActionFields = require(Moments.Analytics.makeFeedActionFields)
 local postInsightsStrings = require(script.Parent.postInsightsStrings)
 local usePostInsightsAnalytics = require(script.Parent.usePostInsightsAnalytics)
 local toMediaItem = require(Moments.Components.Feed.Media.toMediaItem)
 
 local DataStatus = CreatorAnalytics.DataStatus
+local EventNames = MomentsCommon.Analytics.EventNames
+
+local function isAwaitingQueries(items) -- 3 equivalent calls inferred from this helper
+	local v = false
+
+	for _, item in items do
+		if item == DataStatus.Failed then
+			return false
+		end
+
+		if item == DataStatus.NotReady then
+			v = true
+		end
+	end
+
+	return v
+end
 
 local function getPlayableSeconds(metadata) -- 1 equivalent call inferred from this helper
 	local trim
@@ -65,7 +83,7 @@ local v = {
 	ReactionType.Skull
 }
 
-local function usePostInsightsPageViewModel(p, onBack)
+local function usePostInsightsPageViewModel(p, callback)
 	local v2 = useTokens()
 	local v3 = useLocalization(postInsightsStrings.PAGE_KEYS)
 	local moment = p.moment
@@ -108,24 +126,97 @@ local function usePostInsightsPageViewModel(p, onBack)
 	local v8 = usePostInsightsAnalytics(moment)
 	local robloxLocaleId = LocalizationService.RobloxLocaleId
 
-	local v9 = v8.lifetimeViews
+	local function logPageEvent(postInsightsBackButtonPressed, p2: string, p3: number?) -- 1 equivalent call inferred from this helper
+		local recommendationMetadata = moment.recommendationMetadata
+
+		local momentId = moment.momentId
+		local feedItemId
+
+		if recommendationMetadata ~= nil then
+			feedItemId = recommendationMetadata.feedItemId
+		end
+
+		local v9
+
+		if recommendationMetadata ~= nil then
+			v9 = recommendationMetadata.tracingId
+		end
+
+		local feedActionFields = makeFeedActionFields(momentId, feedItemId, v9, p2)
+
+		if feedActionFields ~= nil then
+			if p3 ~= nil then
+				feedActionFields.durationMs = tostring(p3)
+			end
+
+			MomentsCommon.Analytics.fireAnalyticsEvent(postInsightsBackButtonPressed, feedActionFields)
+		end
+	end
+
+	local v9
+
+	if v8.viewsStatus == DataStatus.NotReady then
+		v9 = false
+	else
+		v9 = v8.lifetimeStatus ~= DataStatus.NotReady
+	end
+
+	local ref = React.useRef(false)
+	React.useEffect(function()
+		if not v9 or ref.current then
+			return
+		end
+
+		ref.current = true
+		local postInsightsPageImpression = EventNames.PostInsightsPageImpression
+		local recommendationMetadata = moment.recommendationMetadata
+
+		local momentId = moment.momentId
+		local feedItemId
+
+		if recommendationMetadata ~= nil then
+			feedItemId = recommendationMetadata.feedItemId
+		end
+
+		local v10
+
+		if recommendationMetadata ~= nil then
+			v10 = recommendationMetadata.tracingId
+		end
+
+		local feedActionFields = makeFeedActionFields(momentId, feedItemId, v10, "post_insights_impression")
+
+		if feedActionFields ~= nil then
+			MomentsCommon.Analytics.fireAnalyticsEvent(postInsightsPageImpression, feedActionFields)
+		end
+	end, { v9 })
+
+	local ref2 = React.useRef(os.clock())
+
+	local onBack = React.useCallback(function()
+		local v10 = math.round((os.clock() - ref2.current) * 1000)
+		logPageEvent(EventNames.PostInsightsBackButtonPressed, "post_insights_back", v10) -- inferred equivalent call
+		callback()
+	end, { callback, moment })
+
+	local lifetimeViews = v8.lifetimeViews
 	local v10 = nil
 	local v11 = nil
 	local v12 = nil
 
-	if v9 ~= nil and v9 > 0 then
+	if lifetimeViews ~= nil and lifetimeViews > 0 then
 		if v8.lifetimeWatchTimeSeconds ~= nil then
-			local v13 = v8.lifetimeWatchTimeSeconds / v9
-			v10 = math.round(v13)
-			local playableSeconds = getPlayableSeconds(moment.metadata) -- inferred equivalent call
+			v10 = math.round(v8.lifetimeWatchTimeSeconds / lifetimeViews)
+		end
 
-			if playableSeconds ~= nil then
-				v11 = math.min(v13 / playableSeconds, 1)
-			end
+		local playableSeconds = getPlayableSeconds(moment.metadata) -- inferred equivalent call
+
+		if v8.lifetimeWatchTimeNoReplaySeconds ~= nil and playableSeconds ~= nil then
+			v11 = math.min(v8.lifetimeWatchTimeNoReplaySeconds / lifetimeViews / playableSeconds, 1)
 		end
 
 		if v8.lifetimeJoins ~= nil then
-			v12 = v8.lifetimeJoins / v9
+			v12 = v8.lifetimeJoins / lifetimeViews
 		end
 	end
 
@@ -144,50 +235,96 @@ local function usePostInsightsPageViewModel(p, onBack)
 		v12 or false,
 		robloxLocaleId
 	})))
+	local dateTime
 
+	if moment.createdAt ~= nil then
+		dateTime = DateTime.fromIsoDate(moment.createdAt)
+	end
+
+	local v14
+
+	if dateTime == nil then
+		v14 = nil
+	else
+		v14 = dateTime:FormatLocalTime("L", robloxLocaleId)
+	end
+
+	local v15 = useLocalization((React.useMemo(function()
+		return {
+			postedOn = {
+				postInsightsStrings.POSTED_ON_DATE_KEY,
+				date = v14 or ""
+			}
+		}
+	end, { v14 or false })))
+
+	local awaitingQueries = isAwaitingQueries({ v8.lifetimeViewsStatus, v8.lifetimeWatchTimeStatus }) -- inferred equivalent call
+
+	local awaitingQueries2 = isAwaitingQueries({ v8.lifetimeViewsStatus, v8.lifetimeWatchTimeNoReplayStatus }) -- inferred equivalent call
+	local awaitingQueries3 = isAwaitingQueries({ v8.lifetimeViewsStatus, v8.lifetimeJoinsStatus }) -- inferred equivalent call
 	local overviewMetrics = {
 		{
 			key = "averageWatchTime",
 			label = v3.averageWatchTime,
-			valueText = v10 == nil and "—" or v13.averageWatchTime
+			valueText = v10 == nil and "—" or v13.averageWatchTime,
+			isLoading = awaitingQueries
 		},
 		{
 			key = "averageCompletion",
 			label = v3.averageCompletion,
-			valueText = v11 == nil and "—" or v13.averageCompletion
+			valueText = v11 == nil and "—" or v13.averageCompletion,
+			isLoading = awaitingQueries2
 		},
 		{
 			key = "gameJoinConversion",
 			label = v3.gameJoinConversion,
-			valueText = v12 == nil and "—" or v13.gameJoinConversion
+			valueText = v12 == nil and "—" or v13.gameJoinConversion,
+			isLoading = awaitingQueries3
 		}
 	}
 
 	local viewsSeries = v8.viewsSeries
-	local v14
+	local v16
 
 	if v8.window == nil then
-		v14 = false
+		v16 = false
 	else
-		v14 = v8.window.granularity == CreatorAnalytics.MetricGranularity.OneHour
+		v16 = v8.window.granularity == CreatorAnalytics.MetricGranularity.OneHour
 	end
 
 	local function formatTime(value: string) -- 1 equivalent call inferred from this helper
-		local dateTime = DateTime.fromIsoDate(value)
+		local dateTime2 = DateTime.fromIsoDate(value)
 
-		if dateTime == nil then
+		if dateTime2 == nil then
 			return value
 		end
 
-		if v14 then
-			return (dateTime:FormatLocalTime("LT", robloxLocaleId))
+		if v16 then
+			return (dateTime2:FormatLocalTime("LT", robloxLocaleId))
 		end
 
-		return (dateTime:FormatUniversalTime("MMM D", robloxLocaleId))
+		return (dateTime2:FormatUniversalTime("MMM D", robloxLocaleId))
 	end
 
-	if v9 == nil then
-		v9 = if viewsSeries ~= nil then viewsSeries.total else nil
+	local isViewsChartLoading = v8.viewsStatus == DataStatus.NotReady
+
+	local v17 = not (viewsSeries == nil) and viewsSeries.hasData
+
+	local v18 = v8.lifetimeViewsStatus == DataStatus.NotReady
+
+	if not v17 and lifetimeViews == 0 then
+		lifetimeViews = nil
+	end
+
+	local v19 = lifetimeViews == nil and "—" or abbreviateCount(lifetimeViews, robloxLocaleId)
+
+	if not (v17 or isViewsChartLoading) then
+		table.insert(overviewMetrics, 1, {
+			key = "totalViews",
+			label = v3.totalViews,
+			valueText = v19,
+			isLoading = v18
+		})
 	end
 
 	local viewsChart = {
@@ -195,9 +332,10 @@ local function usePostInsightsPageViewModel(p, onBack)
 		series = viewsSeries ~= nil and {
 			{ id = "views", name = v3.totalViews, points = viewsSeries.points }
 		} or nil,
-		hasData = viewsSeries ~= nil and viewsSeries.hasData,
+		hasData = v17,
+		hideHeader = true,
 		title = v3.totalViews,
-		valueText = v9 == nil and "—" or abbreviateCount(v9, robloxLocaleId),
+		valueText = v19,
 		isDeltaPositive = false,
 		yAxisFormatter = function(p2)
 			return abbreviateCount(p2.value, robloxLocaleId)
@@ -215,7 +353,15 @@ local function usePostInsightsPageViewModel(p, onBack)
 	}
 
 	local description = moment.metadata.description
-	local v15 = {
+	local v20
+
+	if moment.comments == nil then
+		v20 = false
+	else
+		v20 = moment.comments.countIsCapped == true
+	end
+
+	local v21 = {
 		title = v3.title,
 		overviewHeading = v3.overview,
 		engagementHeading = v3.engagement,
@@ -223,9 +369,14 @@ local function usePostInsightsPageViewModel(p, onBack)
 		onBack = onBack,
 		mediaItem = mediaItem,
 		caption = 0,
+		postedOnText = 0,
 		interactionCounts = 0,
+		totalViewsLabel = 0,
+		totalViewsText = 0,
+		isTotalViewsLoading = 0,
 		viewsChart = 0,
 		isViewsChartLoading = 0,
+		isViewsChartVisible = 0,
 		overviewMetrics = 0,
 		totalReactionsText = 0,
 		reactionCounts = 0
@@ -235,8 +386,15 @@ local function usePostInsightsPageViewModel(p, onBack)
 		description = nil
 	end
 
-	v15.caption = description
-	v15.interactionCounts = {
+	v21.caption = description
+	local postedOnText
+
+	if v14 ~= nil then
+		postedOnText = v15.postedOn
+	end
+
+	v21.postedOnText = postedOnText
+	v21.interactionCounts = {
 		{
 			key = "likes",
 			icon = BuilderIcons.Icon.ThumbUp,
@@ -245,7 +403,7 @@ local function usePostInsightsPageViewModel(p, onBack)
 		{
 			key = "comments",
 			icon = BuilderIcons.Icon.SpeechBubbleAlignLeft,
-			countText = abbreviateCount(v6 or 0, LocalizationService.RobloxLocaleId)
+			countText = abbreviateCount(v6 or 0, LocalizationService.RobloxLocaleId) .. (v20 and "+" or "")
 		},
 		{
 			key = "shares",
@@ -254,12 +412,16 @@ local function usePostInsightsPageViewModel(p, onBack)
 		}
 	}
 
-	v15.viewsChart = viewsChart
-	v15.isViewsChartLoading = v8.viewsStatus == DataStatus.NotReady
-	v15.overviewMetrics = overviewMetrics
-	v15.totalReactionsText = abbreviateCount(v4 or 0, LocalizationService.RobloxLocaleId)
-	v15.reactionCounts = reactionCounts
-	return v15
+	v21.totalViewsLabel = v3.totalViews
+	v21.totalViewsText = v19
+	v21.isTotalViewsLoading = v18
+	v21.viewsChart = viewsChart
+	v21.isViewsChartLoading = isViewsChartLoading
+	v21.isViewsChartVisible = v17
+	v21.overviewMetrics = overviewMetrics
+	v21.totalReactionsText = abbreviateCount(v4 or 0, LocalizationService.RobloxLocaleId)
+	v21.reactionCounts = reactionCounts
+	return v21
 end
 
 return usePostInsightsPageViewModel

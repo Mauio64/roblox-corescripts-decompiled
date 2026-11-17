@@ -22,7 +22,9 @@ local SharedFlags3 = require(parent.SharedFlags)
 local FFlagSduiChartsSortDetailGenreFilter = SharedFlags3.FFlagSduiChartsSortDetailGenreFilter
 local SharedFlags4 = require(parent.SharedFlags)
 local FFlagSduiOptionSelectorAnchorTag = SharedFlags4.FFlagSduiOptionSelectorAnchorTag
-local defineFastFlag = game:DefineFastFlag("LuaAppNilCheckOptionItemConfigs", false)
+
+local SharedFlags5 = require(parent.SharedFlags)
+local FFlagSduiOptionSelectorSkipSelectedRefresh = SharedFlags5.FFlagSduiOptionSelectorSkipSelectedRefresh
 
 local function SduiOptionSelectorCollection(props)
 	local sduiContext = props.sduiContext
@@ -40,7 +42,8 @@ local function SduiOptionSelectorCollection(props)
 		setState(nil)
 	end, { props.selectedOption })
 
-	local v3 = React.useCallback(function(selectedOption)
+	local useCallback = React.useCallback
+	local function fn(selectedOption)
 		if typeof(selectedOption) ~= "string" or selectedOption == "" then
 			sduiContext.dependencies.logger.reportError(
 				SduiErrorType.InvalidActionParams,
@@ -54,7 +57,15 @@ local function SduiOptionSelectorCollection(props)
 			return
 		end
 
-		if state == selectedOption then
+		local v3
+
+		if FFlagSduiOptionSelectorSkipSelectedRefresh then
+			v3 = v2
+		else
+			v3 = state
+		end
+
+		if v3 == selectedOption then
 			return
 		end
 
@@ -69,10 +80,10 @@ local function SduiOptionSelectorCollection(props)
 			current = ref.current
 		end
 
-		local v3 = props.onOptionActivated(nil, nil, { selectedOption = selectedOption })
+		local v4 = props.onOptionActivated(nil, nil, { selectedOption = selectedOption })
 
 		if FFlagSduiChartsSortDetailGenreFilter then
-			if v3 == nil then
+			if v4 == nil then
 				return
 			end
 
@@ -82,8 +93,8 @@ local function SduiOptionSelectorCollection(props)
 			current = ref.current
 		end
 
-		if typeof(v3) == "table" and typeof(v3.finally) == "function" then
-			v3:finally(function()
+		if typeof(v4) == "table" and typeof(v4.finally) == "function" then
+			v4:finally(function()
 				if ref.current == current then
 					setState(nil)
 				end
@@ -101,10 +112,25 @@ local function SduiOptionSelectorCollection(props)
 			sduiContext.appPage
 		)
 		setState(nil)
-	end, { props.onOptionActivated, sduiContext, state, ref })
+	end
+
+	local onOptionActivated = props.onOptionActivated
+	local v3
+
+	if not FFlagSduiOptionSelectorSkipSelectedRefresh then
+		v3 = state
+	end
+
+	local v4
+
+	if FFlagSduiOptionSelectorSkipSelectedRefresh then
+		v4 = v2
+	end
+
+	local v5 = useCallback(fn, { onOptionActivated, sduiContext, v3, ref, v4 })
 
 	local items, itemTags = React.useMemo(function()
-		if defineFastFlag and not (props.optionItemConfigs and props.optionsData) then
+		if not (props.optionItemConfigs and props.optionsData) then
 			sduiContext.dependencies.logger.reportError(SduiErrorType.InvalidProps, {
 				componentType = SduiComponentType.OptionSelectorCollection,
 				message = `Missing {props.optionItemConfigs and "optionsData" or "optionItemConfigs"} prop`,
@@ -118,11 +144,11 @@ local function SduiOptionSelectorCollection(props)
 		local clones = {}
 
 		for k, optionItemConfig in props.optionItemConfigs do
-			local v4 = props.optionsData[k]
+			local v6 = props.optionsData[k]
 			local id
 
-			if v4 then
-				id = v4.id
+			if v6 then
+				id = v6.id
 			else
 				id = nil
 			end
@@ -130,8 +156,8 @@ local function SduiOptionSelectorCollection(props)
 			if FFlagSduiOptionSelectorAnchorTag and anchorTags then
 				local anchorTag
 
-				if v4 then
-					anchorTag = v4.anchorTag
+				if v6 then
+					anchorTag = v6.anchorTag
 				end
 
 				if anchorTag == "" then
@@ -145,16 +171,16 @@ local function SduiOptionSelectorCollection(props)
 
 			local join = Cryo.Dictionary.join
 			local props2 = optionItemConfig.props or {}
-			local v5 = {
+			local v7 = {
 				isChecked = id ~= nil and id == v2,
 				onActivated = 0
 			}
 
-			function v5.onActivated()
-				v3(id)
+			function v7.onActivated()
+				v5(id)
 			end
 
-			clone.props = join(props2, v5)
+			clone.props = join(props2, v7)
 
 			table.insert(clones, clone)
 		end
@@ -164,7 +190,7 @@ local function SduiOptionSelectorCollection(props)
 		end
 
 		return clones, nil
-	end, { props.optionItemConfigs, props.optionsData, v2, v3 })
+	end, { props.optionItemConfigs, props.optionsData, v2, v5 })
 
 	local real = React.useMemo(function()
 		local extraLocalProps = props.collectionComponent.props and props.collectionComponent.props.extraLocalProps
@@ -193,7 +219,7 @@ local function SduiOptionSelectorCollection(props)
 	})
 
 	local createElement = React.createElement
-	local v4 = {
+	local v6 = {
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
@@ -211,7 +237,7 @@ local function SduiOptionSelectorCollection(props)
 	}
 
 	local createElement2 = React.createElement
-	local v5 = {
+	local v7 = {
 		sduiContext = sduiContext,
 		analyticsContext = props.analyticsContext,
 		componentConfig = props.componentConfig,
@@ -241,50 +267,50 @@ local function SduiOptionSelectorCollection(props)
 		debugName = `{props.debugName}.OptionSelector`
 	end
 
-	v5.debugName = debugName
-	v5.index = props.index
+	v7.debugName = debugName
+	v7.index = props.index
 	local impressionEventName
 
 	if FFlagSduiOptionImpressionsEventName then
 		impressionEventName = props.optionImpressionEventName
 	end
 
-	v5.impressionEventName = impressionEventName
+	v7.impressionEventName = impressionEventName
 	local skipItemImpressionsLog
 
 	if FFlagSduiOptionImpressionsEventName then
 		skipItemImpressionsLog = props.skipOptionItemImpressionsLog
 	end
 
-	v5.skipItemImpressionsLog = skipItemImpressionsLog
+	v7.skipItemImpressionsLog = skipItemImpressionsLog
 
-	v5.scrollViewPositionChangedSignal = props.scrollViewPositionChangedSignal
-	v5.verticalScrollingFrameRef = props.verticalScrollingFrameRef
-	v5.selectionOrderBase = props.selectionOrderBase
-	v5.startRow = props.startRow
-	v5.numUpdatesToDelayImpressions = props.numUpdatesToDelayImpressions
-	v5.appCompositionEnabled = props.appCompositionEnabled
+	v7.scrollViewPositionChangedSignal = props.scrollViewPositionChangedSignal
+	v7.verticalScrollingFrameRef = props.verticalScrollingFrameRef
+	v7.selectionOrderBase = props.selectionOrderBase
+	v7.startRow = props.startRow
+	v7.numUpdatesToDelayImpressions = props.numUpdatesToDelayImpressions
+	v7.appCompositionEnabled = props.appCompositionEnabled
 
-	v5.items = items
+	v7.items = items
 
 	if not FFlagSduiOptionSelectorAnchorTag then
 		itemTags = nil
 	end
 
-	v5.itemTags = itemTags
-	v5.itemHeight = props.itemHeight
-	v5.itemPadding = props.itemPadding
+	v7.itemTags = itemTags
+	v7.itemHeight = props.itemHeight
+	v7.itemPadding = props.itemPadding
 
-	v5.scrollButtonsEnabled = props.scrollButtonsEnabled
+	v7.scrollButtonsEnabled = props.scrollButtonsEnabled
 	local headerComponent
 
 	if FFlagSduiOptionSelectorHeaderComponent then
 		headerComponent = props.headerComponent
 	end
 
-	v5.headerComponent = headerComponent
-	v5.title = props.title
-	children.OptionSelector = createElement2(SduiVariableItemWidthCarousel, v5)
+	v7.headerComponent = headerComponent
+	v7.title = props.title
+	children.OptionSelector = createElement2(SduiVariableItemWidthCarousel, v7)
 
 	children.Collection = React.createElement(SduiPlaceholderWrapper, {
 		isPlaceholder = state ~= nil,
@@ -294,7 +320,7 @@ local function SduiOptionSelectorCollection(props)
 		real = real,
 		placeholder = props.placeholderCollectionComponent
 	})
-	return createElement("Frame", v4, children)
+	return createElement("Frame", v6, children)
 end
 
 return React.memo(SduiOptionSelectorCollection)

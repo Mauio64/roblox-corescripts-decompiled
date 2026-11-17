@@ -8,6 +8,7 @@ local SharedFlags = require(parent.SharedFlags)
 local FFlagMomentsOptimisticProfilePending = SharedFlags.FFlagMomentsOptimisticProfilePending
 local createPendingFeedOverlay = require(script.Parent.createPendingFeedOverlay)
 local GetDeletedMomentsStore = require(Moments.Stores.GetDeletedMomentsStore)
+local FFlagMomentsParentTimeLimit = MomentsCommon.Flags.FFlagMomentsParentTimeLimit
 
 local Analytics = MomentsCommon.Analytics
 local MomentsSurfaceLoadManager = MomentsCommon.Performance.MomentsSurfaceLoadManager
@@ -33,7 +34,7 @@ local function isSentinel(p): boolean
 	return p.kind == "skeleton" or p.kind == "endState" or p.kind == "caughtUp"
 end
 
-local function createFeedStore(data, callback, flag: boolean?, p: number?)
+local function createFeedStore(data, callback, flag: boolean?, p: number?, p2)
 	local endsWithCaughtUp = data.endsWithCaughtUp == true
 	local pagerStore = createPagerStore()
 	local v4
@@ -59,21 +60,25 @@ local function createFeedStore(data, callback, flag: boolean?, p: number?)
 	local nextCursor = nil
 	local v12 = false
 	local flag2 = false
+	local v13 = false
+	local v14 = nil
 
-	local v13 = 0
+	local v15 = nil
+
+	local v16 = 0
 
 	local count = 0
 
 	local set = {}
 
-	local v14 = p
-	local signal6, v15 = createSignal(false)
+	local v17 = p
+	local signal6, v18 = createSignal(false)
 
-	local signal7, v16 = createSignal(false)
+	local signal7, v19 = createSignal(false)
 
-	local v17 = {}
+	local v20 = {}
 
-	local function stripTrailingSkeleton() -- 3 equivalent calls inferred from this helper
+	local function stripTrailingSkeleton() -- 6 equivalent calls inferred from this helper
 		local items = pagerStore.getItems(false)
 		local item = items[#items]
 
@@ -109,7 +114,7 @@ local function createFeedStore(data, callback, flag: boolean?, p: number?)
 		return result
 	end
 
-	local function countRealItems(items) -- 17 equivalent calls inferred from this helper
+	local function countRealItems(items) -- 20 equivalent calls inferred from this helper
 		local count2 = 0
 
 		for _, item in items do
@@ -121,83 +126,85 @@ local function createFeedStore(data, callback, flag: boolean?, p: number?)
 		return count2
 	end
 
-	local function publishStatus() -- 2 equivalent calls inferred from this helper
-		local v18 = v8
+	local function publishStatus() -- 3 equivalent calls inferred from this helper
+		local v21 = v8
 
-		if v4 ~= nil then
+		if FFlagMomentsParentTimeLimit and v13 then
+			v21 = "LimitReached"
+		elseif v4 ~= nil then
 			if countRealItems(pagerStore.getItems(false)) > 0 then -- inferred equivalent call
-				v18 = v8 == "LoadingMore" and "LoadingMore" or "Loaded"
+				v21 = v8 == "LoadingMore" and "LoadingMore" or "Loaded"
 			else
-				v18 = v8 == "Loaded" and "Empty" or v18
+				v21 = v8 == "Loaded" and "Empty" or v21
 			end
 		end
 
-		v7(v18)
+		v7(v21)
 	end
 
-	local function setStatus(p2) -- 1 equivalent call inferred from this helper
-		v8 = p2
+	local function setStatus(p3) -- 1 equivalent call inferred from this helper
+		v8 = p3
 		publishStatus() -- inferred equivalent call
 	end
 
 	local function getRetainedItems() -- 2 equivalent calls inferred from this helper
 		local clone = table.clone(pagerStore.getItems(false))
 
-		for _, v18 in v17 do
-			table.insert(clone, v18)
+		for _, v21 in v20 do
+			table.insert(clone, v21)
 		end
 
 		return clone
 	end
 
 	local function maybeAppendEndState()
-		if v14 == nil or signal6(false) then
+		if v17 == nil or signal6(false) then
 			return
 		end
 
 		local items = pagerStore.getItems(false)
 
-		if countRealItems(items) < v14 then -- inferred equivalent call
+		if countRealItems(items) < v17 then -- inferred equivalent call
 			return
 		end
 
 		local count3 = countRealItems(items) -- inferred equivalent call
 
-		if v14 < count3 then
+		if v17 < count3 then
 			local count2 = 0
-			local v18 = {}
+			local v21 = {}
 
 			for _, item in items do
 				if not (item.kind ~= "skeleton" and item.kind ~= "endState" and item.kind ~= "caughtUp") then
 					continue
 				end
 
-				if count2 < v14 then
+				if count2 < v17 then
 					count2 += 1
-					table.insert(v18, item)
+					table.insert(v21, item)
 				else
-					table.insert(v17, item)
+					table.insert(v20, item)
 				end
 			end
 
-			pagerStore.setItems(v18)
+			pagerStore.setItems(v21)
 		end
 
-		assert(v16, "end-state fixes require the eligibility signal")(signal4(false) or #v17 > 0)
+		assert(v19, "end-state fixes require the eligibility signal")(signal4(false) or #v20 > 0)
 
-		v15(true)
+		v18(true)
 		pagerStore.addItems({ v2 })
 	end
 
 	local function appendTerminalPage()
 		local items = pagerStore.getItems(false)
 
-		if not endsWithCaughtUp or signal4(false) or #v17 ~= 0 then
+		if not endsWithCaughtUp or signal4(false) or #v20 ~= 0 then
 			maybeAppendEndState()
 			return
 		end
 
-		if v14 ~= nil and not (countRealItems(items) <= v14) then -- inferred equivalent call
+		if v17 ~= nil and not (countRealItems(items) <= v17) then -- inferred equivalent call
 			maybeAppendEndState()
 			return
 		end
@@ -209,45 +216,45 @@ local function createFeedStore(data, callback, flag: boolean?, p: number?)
 		end
 	end
 
-	local function commitItems(p2)
+	local function commitItems(p3)
 		if v4 == nil then
-			pagerStore.setItems(p2)
+			pagerStore.setItems(p3)
 			return
 		end
 
 		local currentItem = pagerStore.getCurrentItem(false)
-		local v18
+		local v21
 
 		if currentItem == nil then
-			v18 = nil
+			v21 = nil
 		else
-			v18 = v4.identity(currentItem)
+			v21 = v4.identity(currentItem)
 		end
 
 		v4.retireMissing(getRetainedItems()) -- inferred equivalent call
-		local merged = v4.merge(p2)
+		local merged = v4.merge(p3)
 		SignalsExperimental.batch(function()
 			pagerStore.setItems(merged)
 
-			for k, v19 in merged do
-				local identity = v4.identity(v19)
+			for k, v22 in merged do
+				local identity = v4.identity(v22)
 
-				if v18 ~= nil and identity == v18 then
+				if v21 ~= nil and identity == v21 then
 					pagerStore.goToItem(k)
 				end
 			end
 		end)
 
 		if callback ~= nil then
-			for _, v19 in merged do
-				if v19.kind ~= "moment" then
+			for _, v22 in merged do
+				if v22.kind ~= "moment" then
 					continue
 				end
 
-				local v20 = callback(v19)
+				local v23 = callback(v22)
 
-				if v20 ~= nil then
-					set[v20] = true
+				if v23 ~= nil then
+					set[v23] = true
 				end
 			end
 		end
@@ -258,13 +265,13 @@ local function createFeedStore(data, callback, flag: boolean?, p: number?)
 			return nil
 		end
 
-		local v18 = assert(v4, "initial identity resolution requires the pending overlay")
+		local v21 = assert(v4, "initial identity resolution requires the pending overlay")
 
-		for k, v19 in pagerStore.getItems(false) do
+		for k, v22 in pagerStore.getItems(false) do
 			if
-				v19.kind == "moment"
-				and (v18.identity(v19) == initialMomentId or v19.moment.momentId == initialMomentId)
-				or v19.kind == "unavailableMoment" and v19.targetId == initialMomentId
+				v22.kind == "moment"
+				and (v21.identity(v22) == initialMomentId or v22.moment.momentId == initialMomentId)
+				or v22.kind == "unavailableMoment" and v22.targetId == initialMomentId
 			then
 				return k
 			end
@@ -282,16 +289,16 @@ local function createFeedStore(data, callback, flag: boolean?, p: number?)
 	end
 
 	local function runFetch(flag3: boolean, flag4: boolean?)
-		if flag2 or not (flag3 or signal4(false)) then
+		if flag2 or not (flag3 or signal4(false)) or FFlagMomentsParentTimeLimit and v13 then
 			return
 		end
 
 		count += 1
-		local v18 = count
+		local v21 = count
 		v12 = true
 		v11(false)
 
-		local v19 = nil
+		local v22 = nil
 
 		if flag3 then
 			Analytics.reportMomentsFeedLoadAttempt(recommendationSource)
@@ -304,32 +311,38 @@ local function createFeedStore(data, callback, flag: boolean?, p: number?)
 			end
 
 			v8 = "Loading"
-			local v20 = v8
+			local v23 = v8
 
-			if v4 ~= nil then
+			if FFlagMomentsParentTimeLimit and v13 then
+				v23 = "LimitReached"
+			elseif v4 ~= nil then
 				if countRealItems(pagerStore.getItems(false)) > 0 then -- inferred equivalent call
 					if v8 == "LoadingMore" then
-						v20 = "LoadingMore"
+						v23 = "LoadingMore"
 					else
-						v20 = "Loaded"
+						v23 = "Loaded"
 					end
 				elseif v8 == "Loaded" then
-					v20 = "Empty"
+					v23 = "Empty"
 				end
 			end
 
-			v7(v20)
+			v7(v23)
 
-			v14 = p
-			v15(false)
-			assert(v16, "end-state fixes require the eligibility signal")(false)
-			table.clear(v17)
+			v17 = p
+			v18(false)
+			assert(v19, "end-state fixes require the eligibility signal")(false)
+			table.clear(v20)
 
 			if flag then
 				MomentsSurfaceLoadManager.start()
 				MomentsSurfaceLoadManager.primaryDataStarted()
 				MomentsSurfaceLoadManager.primaryDataNetworkFetch()
-				v19 = MomentsSurfaceLoadManager.getSessionGeneration()
+				v22 = MomentsSurfaceLoadManager.getSessionGeneration()
+
+				if FFlagMomentsParentTimeLimit then
+					v15 = v22
+				end
 			end
 		else
 			Analytics.reportMomentsFeedLoadMore("attempted", recommendationSource)
@@ -339,208 +352,270 @@ local function createFeedStore(data, callback, flag: boolean?, p: number?)
 			end
 
 			v8 = "LoadingMore"
-			local v20 = v8
+			local v23 = v8
 
-			if v4 ~= nil then
+			if FFlagMomentsParentTimeLimit and v13 then
+				v23 = "LimitReached"
+			elseif v4 ~= nil then
 				if countRealItems(pagerStore.getItems(false)) > 0 then -- inferred equivalent call
 					if v8 == "LoadingMore" then
-						v20 = "LoadingMore"
+						v23 = "LoadingMore"
 					else
-						v20 = "Loaded"
+						v23 = "Loaded"
 					end
 				elseif v8 == "Loaded" then
-					v20 = "Empty"
+					v23 = "Empty"
 				end
 			end
 
-			v7(v20)
+			v7(v23)
 		end
 
-		local v20
+		local v23
 
 		if flag3 then
-			v20 = nil
+			v23 = nil
 		else
-			v20 = nextCursor
+			v23 = nextCursor
 		end
 
 		task.spawn(function()
-			local success, result = pcall(data.fetchAsync, v20)
+			local success, result = pcall(data.fetchAsync, v23)
 
-			if flag2 or v18 ~= count then
+			if flag2 or v21 ~= count then
 				return
 			end
 
 			v12 = false
 
-			local v21 = flag and flag3
+			local v24 = flag and flag3
 
-			if v21 then
-				if v19 == nil then
-					v21 = false
+			if v24 then
+				if v22 == nil then
+					v24 = false
 				else
-					v21 = MomentsSurfaceLoadManager.getSessionGeneration() == v19
+					v24 = MomentsSurfaceLoadManager.getSessionGeneration() == v22
 				end
 			end
 
-			if v21 then
+			if v24 then
 				MomentsSurfaceLoadManager.primaryDataResponseReceived()
 			end
 
-			local v22
+			local v25
 
-			if success and type(result) == "table" and type(result.items) == "table" then
-				v22 = result
+			if FFlagMomentsParentTimeLimit and not success and p2 ~= nil then
+				local MomentsParseMomentsLimitError = require(parent.DataHydration.MomentsParseMomentsLimitError)
+				v25 = MomentsParseMomentsLimitError(result)
 			end
 
-			if v22 == nil then
-				if flag3 then
-					if v4 == nil then
-						pagerStore.reset()
-					else
-						commitItems({})
-						local momentIndex = findMomentIndex(data.initialMomentId)
+			if v25 == nil then
+				local v26
 
-						v6(momentIndex)
-					end
+				if success and type(result) == "table" and type(result.items) == "table" then
+					v26 = result
+				end
 
-					v9(success and "Malformed feed batch" or tostring(result))
-					v8 = "Failed"
-					local v23 = v8
+				if v26 == nil then
+					if flag3 then
+						if v4 == nil then
+							pagerStore.reset()
+						else
+							commitItems({})
+							local momentIndex = findMomentIndex(data.initialMomentId)
 
-					if v4 ~= nil then
-						if countRealItems(pagerStore.getItems(false)) > 0 then -- inferred equivalent call
-							if v8 == "LoadingMore" then
-								v23 = "LoadingMore"
-							else
-								v23 = "Loaded"
-							end
-						elseif v8 == "Loaded" then
-							v23 = "Empty"
+							v6(momentIndex)
 						end
-					end
 
-					v7(v23)
+						v9(success and "Malformed feed batch" or tostring(result))
+						v8 = "Failed"
+						local v27 = v8
 
-					Analytics.reportMomentsFeedState(
-						"failed",
-						recommendationSource,
-						success and "malformedResponse" or "requestFailed"
-					)
+						if FFlagMomentsParentTimeLimit and v13 then
+							v27 = "LimitReached"
+						elseif v4 ~= nil then
+							if countRealItems(pagerStore.getItems(false)) > 0 then -- inferred equivalent call
+								if v8 == "LoadingMore" then
+									v27 = "LoadingMore"
+								else
+									v27 = "Loaded"
+								end
+							elseif v8 == "Loaded" then
+								v27 = "Empty"
+							end
+						end
 
-					if v21 then
-						MomentsSurfaceLoadManager.abort("failed")
+						v7(v27)
+
+						Analytics.reportMomentsFeedState(
+							"failed",
+							recommendationSource,
+							success and "malformedResponse" or "requestFailed"
+						)
+
+						if v24 then
+							MomentsSurfaceLoadManager.abort("failed")
+						end
+					else
+						stripTrailingSkeleton() -- inferred equivalent call
+						v11(true)
+						v8 = pagerStore.getCount(false) == 0 and "Empty" or "Loaded"
+						local v27 = v8
+
+						if FFlagMomentsParentTimeLimit and v13 then
+							v27 = "LimitReached"
+						elseif v4 ~= nil then
+							if countRealItems(pagerStore.getItems(false)) > 0 then -- inferred equivalent call
+								if v8 == "LoadingMore" then
+									v27 = "LoadingMore"
+								else
+									v27 = "Loaded"
+								end
+							elseif v8 == "Loaded" then
+								v27 = "Empty"
+							end
+						end
+
+						v7(v27)
+
+						Analytics.reportMomentsFeedLoadMore(
+							"failed",
+							recommendationSource,
+							success and "malformedResponse" or "requestFailed"
+						)
 					end
 				else
-					stripTrailingSkeleton() -- inferred equivalent call
-					v11(true)
-					v8 = pagerStore.getCount(false) == 0 and "Empty" or "Loaded"
-					local v23 = v8
+					local v27
 
-					if v4 ~= nil then
+					if flag3 then
+						set = {}
+						v27 = dedupeAndTrack(v26.items)
+						commitItems(v27)
+
+						if v4 ~= nil then
+							local momentIndex = findMomentIndex(data.initialMomentId)
+
+							v6(momentIndex)
+
+							local momentIndex2 = findMomentIndex(v26.initialMomentId)
+
+							if momentIndex2 ~= nil then
+								pagerStore.goToItem(momentIndex2)
+							end
+						end
+					else
+						v27 = dedupeAndTrack(v26.items)
+						local clone = table.clone(pagerStore.getItems(false))
+						local v28 = clone[#clone]
+
+						if v28 ~= nil and v28.kind == "skeleton" then
+							table.remove(clone)
+						end
+
+						for _, v29 in v27 do
+							table.insert(clone, v29)
+						end
+
+						commitItems(clone)
+					end
+
+					nextCursor = v26.nextCursor
+
+					v16 = (flag3 or #v27 ~= 0) and 0 or v16 + 1
+					v10(v26.nextCursor ~= nil and v16 < 3)
+					local v28 = pagerStore.getCount(false) == 0 and "Empty" or "Loaded"
+					v8 = v28
+					local v29 = v8
+
+					if FFlagMomentsParentTimeLimit and v13 then
+						v29 = "LimitReached"
+					elseif v4 ~= nil then
 						if countRealItems(pagerStore.getItems(false)) > 0 then -- inferred equivalent call
 							if v8 == "LoadingMore" then
-								v23 = "LoadingMore"
+								v29 = "LoadingMore"
 							else
-								v23 = "Loaded"
+								v29 = "Loaded"
 							end
 						elseif v8 == "Loaded" then
-							v23 = "Empty"
+							v29 = "Empty"
 						end
 					end
 
-					v7(v23)
+					v7(v29)
 
-					Analytics.reportMomentsFeedLoadMore(
-						"failed",
-						recommendationSource,
-						success and "malformedResponse" or "requestFailed"
-					)
+					if flag3 then
+						Analytics.reportMomentsFeedState(
+							v28 == "Loaded" and "loaded" or "empty",
+							recommendationSource,
+							nil
+						)
+					end
+
+					if v24 then
+						local currentItem = pagerStore.getCurrentItem(false)
+
+						if
+							FFlagMomentsModeratedMomentPage
+							and currentItem ~= nil
+							and currentItem.kind == "unavailableMoment"
+						then
+							MomentsSurfaceLoadManager.abort("unavailable")
+						elseif v28 == "Loaded" then
+							MomentsSurfaceLoadManager.primaryDataReady()
+						else
+							MomentsSurfaceLoadManager.abort("empty")
+						end
+					end
+
+					if v26.onAccepted ~= nil then
+						v26.onAccepted()
+					end
+
+					if p ~= nil or endsWithCaughtUp then
+						appendTerminalPage()
+					end
 				end
 			else
-				local v23
+				if flag3 and v4 ~= nil then
+					commitItems({})
+					local momentIndex = findMomentIndex(data.initialMomentId)
 
-				if flag3 then
-					set = {}
-					v23 = dedupeAndTrack(v22.items)
-					commitItems(v23)
-
-					if v4 ~= nil then
-						local momentIndex = findMomentIndex(data.initialMomentId)
-
-						v6(momentIndex)
-
-						local momentIndex2 = findMomentIndex(v22.initialMomentId)
-
-						if momentIndex2 ~= nil then
-							pagerStore.goToItem(momentIndex2)
-						end
-					end
+					v6(momentIndex)
 				else
-					v23 = dedupeAndTrack(v22.items)
-					local clone = table.clone(pagerStore.getItems(false))
-					local v24 = clone[#clone]
-
-					if v24 ~= nil and v24.kind == "skeleton" then
-						table.remove(clone)
-					end
-
-					for _, v25 in v23 do
-						table.insert(clone, v25)
-					end
-
-					commitItems(clone)
+					stripTrailingSkeleton() -- inferred equivalent call
 				end
 
-				nextCursor = v22.nextCursor
+				v13 = true
+				v8 = pagerStore.getCount(false) == 0 and "Empty" or "Loaded"
+				local v26 = v8
 
-				v13 = (flag3 or #v23 ~= 0) and 0 or v13 + 1
-				v10(v22.nextCursor ~= nil and v13 < 3)
-				local v24 = pagerStore.getCount(false) == 0 and "Empty" or "Loaded"
-				v8 = v24
-				local v25 = v8
-
-				if v4 ~= nil then
+				if FFlagMomentsParentTimeLimit and v13 then
+					v26 = "LimitReached"
+				elseif v4 ~= nil then
 					if countRealItems(pagerStore.getItems(false)) > 0 then -- inferred equivalent call
 						if v8 == "LoadingMore" then
-							v25 = "LoadingMore"
+							v26 = "LoadingMore"
 						else
-							v25 = "Loaded"
+							v26 = "Loaded"
 						end
 					elseif v8 == "Loaded" then
-						v25 = "Empty"
+						v26 = "Empty"
 					end
 				end
 
-				v7(v25)
+				v7(v26)
 
 				if flag3 then
-					Analytics.reportMomentsFeedState(v24 == "Loaded" and "loaded" or "empty", recommendationSource, nil)
+					Analytics.reportMomentsFeedState("failed", recommendationSource, "parentalTimeLimitReached")
+				else
+					Analytics.reportMomentsFeedLoadMore("failed", recommendationSource, "parentalTimeLimitReached")
 				end
 
-				if v21 then
-					local currentItem = pagerStore.getCurrentItem(false)
-
-					if
-						FFlagMomentsModeratedMomentPage
-						and currentItem ~= nil
-						and currentItem.kind == "unavailableMoment"
-					then
-						MomentsSurfaceLoadManager.abort("unavailable")
-					elseif v24 == "Loaded" then
-						MomentsSurfaceLoadManager.primaryDataReady()
-					else
-						MomentsSurfaceLoadManager.abort("empty")
-					end
+				if v24 then
+					MomentsSurfaceLoadManager.abort("parentalTimeLimitReached")
 				end
 
-				if v22.onAccepted ~= nil then
-					v22.onAccepted()
-				end
-
-				if p ~= nil or endsWithCaughtUp then
-					appendTerminalPage()
-				end
+				p2.markLimitReached(v25.limitSeconds)
 			end
 		end)
 	end
@@ -558,24 +633,26 @@ local function createFeedStore(data, callback, flag: boolean?, p: number?)
 			return
 		end
 
-		if flag2 or not signal4(false) then
+		if flag2 or not signal4(false) or FFlagMomentsParentTimeLimit and v13 then
 			return
 		end
 
 		count += 1
-		local v18 = count
+		local v21 = count
 		v12 = true
 		v11(false)
 
-		local v19 = nil
+		local v22 = nil
 
 		Analytics.reportMomentsFeedLoadMore("attempted", recommendationSource)
 
 		pagerStore.addItems({ v })
 		v8 = "LoadingMore"
-		local v20 = v8
+		local v23 = v8
 
-		if v4 ~= nil then
+		if FFlagMomentsParentTimeLimit and v13 then
+			v23 = "LimitReached"
+		elseif v4 ~= nil then
 			local items = pagerStore.getItems(false)
 			local count2 = 0
 
@@ -589,252 +666,312 @@ local function createFeedStore(data, callback, flag: boolean?, p: number?)
 
 			if count2 > 0 then
 				if v8 == "LoadingMore" then
-					v20 = "LoadingMore"
+					v23 = "LoadingMore"
 				else
-					v20 = "Loaded"
+					v23 = "Loaded"
 				end
 			elseif v8 == "Loaded" then
-				v20 = "Empty"
+				v23 = "Empty"
 			end
 		end
 
-		v7(v20)
+		v7(v23)
 
-		local v21 = nextCursor
+		local v24 = nextCursor
 
 		local flag3 = false
 		task.spawn(function()
-			local success, result = pcall(data.fetchAsync, v21)
+			local success, result = pcall(data.fetchAsync, v24)
 
-			if flag2 or v18 ~= count then
+			if flag2 or v21 ~= count then
 				return
 			end
 
 			v12 = false
 
-			local v22 = flag and flag3
+			local v25 = flag and flag3
 
-			if v22 then
-				if v19 == nil then
-					v22 = false
+			if v25 then
+				if v22 == nil then
+					v25 = false
 				else
-					v22 = MomentsSurfaceLoadManager.getSessionGeneration() == v19
+					v25 = MomentsSurfaceLoadManager.getSessionGeneration() == v22
 				end
 			end
 
-			if v22 then
+			if v25 then
 				MomentsSurfaceLoadManager.primaryDataResponseReceived()
 			end
 
-			local v23
+			local v26
 
-			if success and type(result) == "table" and type(result.items) == "table" then
-				v23 = result
+			if FFlagMomentsParentTimeLimit and not success and p2 ~= nil then
+				local MomentsParseMomentsLimitError = require(parent.DataHydration.MomentsParseMomentsLimitError)
+				v26 = MomentsParseMomentsLimitError(result)
 			end
 
-			if v23 == nil then
-				if flag3 then
-					if v4 == nil then
-						pagerStore.reset()
-					else
-						commitItems({})
-						local momentIndex = findMomentIndex(data.initialMomentId)
+			if v26 == nil then
+				local v27
 
-						v6(momentIndex)
-					end
+				if success and type(result) == "table" and type(result.items) == "table" then
+					v27 = result
+				end
 
-					v9(success and "Malformed feed batch" or tostring(result))
-					v8 = "Failed"
-					local v24 = v8
+				if v27 == nil then
+					if flag3 then
+						if v4 == nil then
+							pagerStore.reset()
+						else
+							commitItems({})
+							local momentIndex = findMomentIndex(data.initialMomentId)
 
-					if v4 ~= nil then
-						if countRealItems(pagerStore.getItems(false)) > 0 then -- inferred equivalent call
-							if v8 == "LoadingMore" then
-								v24 = "LoadingMore"
-							else
-								v24 = "Loaded"
-							end
-						elseif v8 == "Loaded" then
-							v24 = "Empty"
+							v6(momentIndex)
 						end
-					end
 
-					v7(v24)
+						v9(success and "Malformed feed batch" or tostring(result))
+						v8 = "Failed"
+						local v28 = v8
 
-					Analytics.reportMomentsFeedState(
-						"failed",
-						recommendationSource,
-						success and "malformedResponse" or "requestFailed"
-					)
+						if FFlagMomentsParentTimeLimit and v13 then
+							v28 = "LimitReached"
+						elseif v4 ~= nil then
+							if countRealItems(pagerStore.getItems(false)) > 0 then -- inferred equivalent call
+								if v8 == "LoadingMore" then
+									v28 = "LoadingMore"
+								else
+									v28 = "Loaded"
+								end
+							elseif v8 == "Loaded" then
+								v28 = "Empty"
+							end
+						end
 
-					if v22 then
-						MomentsSurfaceLoadManager.abort("failed")
+						v7(v28)
+
+						Analytics.reportMomentsFeedState(
+							"failed",
+							recommendationSource,
+							success and "malformedResponse" or "requestFailed"
+						)
+
+						if v25 then
+							MomentsSurfaceLoadManager.abort("failed")
+						end
+					else
+						stripTrailingSkeleton() -- inferred equivalent call
+						v11(true)
+						v8 = pagerStore.getCount(false) == 0 and "Empty" or "Loaded"
+						local v28 = v8
+
+						if FFlagMomentsParentTimeLimit and v13 then
+							v28 = "LimitReached"
+						elseif v4 ~= nil then
+							if countRealItems(pagerStore.getItems(false)) > 0 then -- inferred equivalent call
+								if v8 == "LoadingMore" then
+									v28 = "LoadingMore"
+								else
+									v28 = "Loaded"
+								end
+							elseif v8 == "Loaded" then
+								v28 = "Empty"
+							end
+						end
+
+						v7(v28)
+
+						Analytics.reportMomentsFeedLoadMore(
+							"failed",
+							recommendationSource,
+							success and "malformedResponse" or "requestFailed"
+						)
 					end
 				else
-					stripTrailingSkeleton() -- inferred equivalent call
-					v11(true)
-					v8 = pagerStore.getCount(false) == 0 and "Empty" or "Loaded"
-					local v24 = v8
+					local v28
 
-					if v4 ~= nil then
+					if flag3 then
+						set = {}
+						v28 = dedupeAndTrack(v27.items)
+						commitItems(v28)
+
+						if v4 ~= nil then
+							local momentIndex = findMomentIndex(data.initialMomentId)
+
+							v6(momentIndex)
+
+							local momentIndex2 = findMomentIndex(v27.initialMomentId)
+
+							if momentIndex2 ~= nil then
+								pagerStore.goToItem(momentIndex2)
+							end
+						end
+					else
+						v28 = dedupeAndTrack(v27.items)
+						local clone = table.clone(pagerStore.getItems(false))
+						local v29 = clone[#clone]
+
+						if v29 ~= nil and v29.kind == "skeleton" then
+							table.remove(clone)
+						end
+
+						for _, v30 in v28 do
+							table.insert(clone, v30)
+						end
+
+						commitItems(clone)
+					end
+
+					nextCursor = v27.nextCursor
+
+					v16 = (flag3 or #v28 ~= 0) and 0 or v16 + 1
+					v10(v27.nextCursor ~= nil and v16 < 3)
+					local v29 = pagerStore.getCount(false) == 0 and "Empty" or "Loaded"
+					v8 = v29
+					local v30 = v8
+
+					if FFlagMomentsParentTimeLimit and v13 then
+						v30 = "LimitReached"
+					elseif v4 ~= nil then
 						if countRealItems(pagerStore.getItems(false)) > 0 then -- inferred equivalent call
 							if v8 == "LoadingMore" then
-								v24 = "LoadingMore"
+								v30 = "LoadingMore"
 							else
-								v24 = "Loaded"
+								v30 = "Loaded"
 							end
 						elseif v8 == "Loaded" then
-							v24 = "Empty"
+							v30 = "Empty"
 						end
 					end
 
-					v7(v24)
+					v7(v30)
 
-					Analytics.reportMomentsFeedLoadMore(
-						"failed",
-						recommendationSource,
-						success and "malformedResponse" or "requestFailed"
-					)
+					if flag3 then
+						Analytics.reportMomentsFeedState(
+							v29 == "Loaded" and "loaded" or "empty",
+							recommendationSource,
+							nil
+						)
+					end
+
+					if v25 then
+						local currentItem = pagerStore.getCurrentItem(false)
+
+						if
+							FFlagMomentsModeratedMomentPage
+							and currentItem ~= nil
+							and currentItem.kind == "unavailableMoment"
+						then
+							MomentsSurfaceLoadManager.abort("unavailable")
+						elseif v29 == "Loaded" then
+							MomentsSurfaceLoadManager.primaryDataReady()
+						else
+							MomentsSurfaceLoadManager.abort("empty")
+						end
+					end
+
+					if v27.onAccepted ~= nil then
+						v27.onAccepted()
+					end
+
+					if p ~= nil or endsWithCaughtUp then
+						appendTerminalPage()
+					end
 				end
 			else
-				local v24
+				if flag3 and v4 ~= nil then
+					commitItems({})
+					local momentIndex = findMomentIndex(data.initialMomentId)
 
-				if flag3 then
-					set = {}
-					v24 = dedupeAndTrack(v23.items)
-					commitItems(v24)
-
-					if v4 ~= nil then
-						local momentIndex = findMomentIndex(data.initialMomentId)
-
-						v6(momentIndex)
-
-						local momentIndex2 = findMomentIndex(v23.initialMomentId)
-
-						if momentIndex2 ~= nil then
-							pagerStore.goToItem(momentIndex2)
-						end
-					end
+					v6(momentIndex)
 				else
-					v24 = dedupeAndTrack(v23.items)
-					local clone = table.clone(pagerStore.getItems(false))
-					local v25 = clone[#clone]
-
-					if v25 ~= nil and v25.kind == "skeleton" then
-						table.remove(clone)
-					end
-
-					for _, v26 in v24 do
-						table.insert(clone, v26)
-					end
-
-					commitItems(clone)
+					stripTrailingSkeleton() -- inferred equivalent call
 				end
 
-				nextCursor = v23.nextCursor
+				v13 = true
+				v8 = pagerStore.getCount(false) == 0 and "Empty" or "Loaded"
+				local v27 = v8
 
-				v13 = (flag3 or #v24 ~= 0) and 0 or v13 + 1
-				v10(v23.nextCursor ~= nil and v13 < 3)
-				local v25 = pagerStore.getCount(false) == 0 and "Empty" or "Loaded"
-				v8 = v25
-				local v26 = v8
-
-				if v4 ~= nil then
+				if FFlagMomentsParentTimeLimit and v13 then
+					v27 = "LimitReached"
+				elseif v4 ~= nil then
 					if countRealItems(pagerStore.getItems(false)) > 0 then -- inferred equivalent call
 						if v8 == "LoadingMore" then
-							v26 = "LoadingMore"
+							v27 = "LoadingMore"
 						else
-							v26 = "Loaded"
+							v27 = "Loaded"
 						end
 					elseif v8 == "Loaded" then
-						v26 = "Empty"
+						v27 = "Empty"
 					end
 				end
 
-				v7(v26)
+				v7(v27)
 
 				if flag3 then
-					Analytics.reportMomentsFeedState(v25 == "Loaded" and "loaded" or "empty", recommendationSource, nil)
+					Analytics.reportMomentsFeedState("failed", recommendationSource, "parentalTimeLimitReached")
+				else
+					Analytics.reportMomentsFeedLoadMore("failed", recommendationSource, "parentalTimeLimitReached")
 				end
 
-				if v22 then
-					local currentItem = pagerStore.getCurrentItem(false)
-
-					if
-						FFlagMomentsModeratedMomentPage
-						and currentItem ~= nil
-						and currentItem.kind == "unavailableMoment"
-					then
-						MomentsSurfaceLoadManager.abort("unavailable")
-					elseif v25 == "Loaded" then
-						MomentsSurfaceLoadManager.primaryDataReady()
-					else
-						MomentsSurfaceLoadManager.abort("empty")
-					end
+				if v25 then
+					MomentsSurfaceLoadManager.abort("parentalTimeLimitReached")
 				end
 
-				if v23.onAccepted ~= nil then
-					v23.onAccepted()
-				end
-
-				if p ~= nil or endsWithCaughtUp then
-					appendTerminalPage()
-				end
+				p2.markLimitReached(v26.limitSeconds)
 			end
 		end)
 	end
 
 	local function loadBeyondLimit()
-		if flag2 or p == nil or not signal6(false) or not signal4(false) and #v17 == 0 then
+		if flag2 or p == nil or not signal6(false) or not signal4(false) and #v20 == 0 then
 			return
 		end
 
 		local items = pagerStore.getItems(false)
 		local clone = table.clone(items)
-		local v18 = clone[#clone]
-		local v19
+		local v21 = clone[#clone]
+		local v22
 
-		if v18 == nil then
-			v19 = false
+		if v21 == nil then
+			v22 = false
 		else
-			v19 = v18.kind == "endState"
+			v22 = v21.kind == "endState"
 		end
 
-		if v19 then
+		if v22 then
 			table.remove(clone)
 		end
 
-		if FFlagMomentsLoadMoreKeepsPosition and v19 then
+		if FFlagMomentsLoadMoreKeepsPosition and v22 then
 			pagerStore.goToItem(#items)
 		end
 
-		if not FFlagMomentsLoadMoreKeepsPosition and v19 then
+		if not FFlagMomentsLoadMoreKeepsPosition and v22 then
 			pagerStore.removeItem(#items)
 		end
 
-		local v20
+		local v23
 
 		if FFlagMomentsLoadMoreKeepsPosition then
-			v20 = countRealItems(clone) + p -- inferred equivalent call
+			v23 = countRealItems(clone) + p -- inferred equivalent call
 		else
-			v20 = countRealItems(pagerStore.getItems(false)) + p -- inferred equivalent call
+			v23 = countRealItems(pagerStore.getItems(false)) + p -- inferred equivalent call
 		end
 
-		v14 = v20
+		v17 = v23
 
-		v15(false)
-		local v21 = false
+		v18(false)
+		local v24 = false
 
-		if #v17 > 0 then
+		if #v20 > 0 then
 			if not FFlagMomentsLoadMoreKeepsPosition then
 				clone = table.clone(pagerStore.getItems(false))
 			end
 
-			for _, v22 in v17 do
-				table.insert(clone, v22)
+			for _, v25 in v20 do
+				table.insert(clone, v25)
 			end
 
-			table.clear(v17)
+			table.clear(v20)
 			pagerStore.setItems(clone)
 
 			appendTerminalPage()
@@ -845,34 +982,36 @@ local function createFeedStore(data, callback, flag: boolean?, p: number?)
 		elseif FFlagMomentsLoadMoreKeepsPosition then
 			table.insert(clone, v)
 			pagerStore.setItems(clone)
-			v21 = true
+			v24 = true
 		end
 
 		if not FFlagMomentsLoadMoreKeepsPosition then
-			v21 = nil
+			v24 = nil
 		end
 
-		if flag2 or not signal4(false) then
+		if flag2 or not signal4(false) or FFlagMomentsParentTimeLimit and v13 then
 			return
 		end
 
 		count += 1
-		local v22 = count
+		local v25 = count
 		v12 = true
 		v11(false)
 
-		local v23 = nil
+		local v26 = nil
 
 		Analytics.reportMomentsFeedLoadMore("attempted", recommendationSource)
 
-		if not (FFlagMomentsLoadMoreKeepsPosition and v21) then
+		if not (FFlagMomentsLoadMoreKeepsPosition and v24) then
 			pagerStore.addItems({ v })
 		end
 
 		v8 = "LoadingMore"
-		local v24 = v8
+		local v27 = v8
 
-		if v4 ~= nil then
+		if FFlagMomentsParentTimeLimit and v13 then
+			v27 = "LimitReached"
+		elseif v4 ~= nil then
 			local items2 = pagerStore.getItems(false)
 			local count2 = 0
 
@@ -886,209 +1025,269 @@ local function createFeedStore(data, callback, flag: boolean?, p: number?)
 
 			if count2 > 0 then
 				if v8 == "LoadingMore" then
-					v24 = "LoadingMore"
+					v27 = "LoadingMore"
 				else
-					v24 = "Loaded"
+					v27 = "Loaded"
 				end
 			elseif v8 == "Loaded" then
-				v24 = "Empty"
+				v27 = "Empty"
 			end
 		end
 
-		v7(v24)
+		v7(v27)
 
-		local v25 = nextCursor
+		local v28 = nextCursor
 
 		local flag3 = false
 		task.spawn(function()
-			local success, result = pcall(data.fetchAsync, v25)
+			local success, result = pcall(data.fetchAsync, v28)
 
-			if flag2 or v22 ~= count then
+			if flag2 or v25 ~= count then
 				return
 			end
 
 			v12 = false
 
-			local v26 = flag and flag3
+			local v29 = flag and flag3
 
-			if v26 then
-				if v23 == nil then
-					v26 = false
+			if v29 then
+				if v26 == nil then
+					v29 = false
 				else
-					v26 = MomentsSurfaceLoadManager.getSessionGeneration() == v23
+					v29 = MomentsSurfaceLoadManager.getSessionGeneration() == v26
 				end
 			end
 
-			if v26 then
+			if v29 then
 				MomentsSurfaceLoadManager.primaryDataResponseReceived()
 			end
 
-			local v27
+			local v30
 
-			if success and type(result) == "table" and type(result.items) == "table" then
-				v27 = result
+			if FFlagMomentsParentTimeLimit and not success and p2 ~= nil then
+				local MomentsParseMomentsLimitError = require(parent.DataHydration.MomentsParseMomentsLimitError)
+				v30 = MomentsParseMomentsLimitError(result)
 			end
 
-			if v27 == nil then
-				if flag3 then
-					if v4 == nil then
-						pagerStore.reset()
-					else
-						commitItems({})
-						local momentIndex = findMomentIndex(data.initialMomentId)
+			if v30 == nil then
+				local v31
 
-						v6(momentIndex)
-					end
+				if success and type(result) == "table" and type(result.items) == "table" then
+					v31 = result
+				end
 
-					v9(success and "Malformed feed batch" or tostring(result))
-					v8 = "Failed"
-					local v28 = v8
+				if v31 == nil then
+					if flag3 then
+						if v4 == nil then
+							pagerStore.reset()
+						else
+							commitItems({})
+							local momentIndex = findMomentIndex(data.initialMomentId)
 
-					if v4 ~= nil then
-						if countRealItems(pagerStore.getItems(false)) > 0 then -- inferred equivalent call
-							if v8 == "LoadingMore" then
-								v28 = "LoadingMore"
-							else
-								v28 = "Loaded"
-							end
-						elseif v8 == "Loaded" then
-							v28 = "Empty"
+							v6(momentIndex)
 						end
-					end
 
-					v7(v28)
+						v9(success and "Malformed feed batch" or tostring(result))
+						v8 = "Failed"
+						local v32 = v8
 
-					Analytics.reportMomentsFeedState(
-						"failed",
-						recommendationSource,
-						success and "malformedResponse" or "requestFailed"
-					)
+						if FFlagMomentsParentTimeLimit and v13 then
+							v32 = "LimitReached"
+						elseif v4 ~= nil then
+							if countRealItems(pagerStore.getItems(false)) > 0 then -- inferred equivalent call
+								if v8 == "LoadingMore" then
+									v32 = "LoadingMore"
+								else
+									v32 = "Loaded"
+								end
+							elseif v8 == "Loaded" then
+								v32 = "Empty"
+							end
+						end
 
-					if v26 then
-						MomentsSurfaceLoadManager.abort("failed")
+						v7(v32)
+
+						Analytics.reportMomentsFeedState(
+							"failed",
+							recommendationSource,
+							success and "malformedResponse" or "requestFailed"
+						)
+
+						if v29 then
+							MomentsSurfaceLoadManager.abort("failed")
+						end
+					else
+						stripTrailingSkeleton() -- inferred equivalent call
+						v11(true)
+						v8 = pagerStore.getCount(false) == 0 and "Empty" or "Loaded"
+						local v32 = v8
+
+						if FFlagMomentsParentTimeLimit and v13 then
+							v32 = "LimitReached"
+						elseif v4 ~= nil then
+							if countRealItems(pagerStore.getItems(false)) > 0 then -- inferred equivalent call
+								if v8 == "LoadingMore" then
+									v32 = "LoadingMore"
+								else
+									v32 = "Loaded"
+								end
+							elseif v8 == "Loaded" then
+								v32 = "Empty"
+							end
+						end
+
+						v7(v32)
+
+						Analytics.reportMomentsFeedLoadMore(
+							"failed",
+							recommendationSource,
+							success and "malformedResponse" or "requestFailed"
+						)
 					end
 				else
-					stripTrailingSkeleton() -- inferred equivalent call
-					v11(true)
-					v8 = pagerStore.getCount(false) == 0 and "Empty" or "Loaded"
-					local v28 = v8
+					local v32
 
-					if v4 ~= nil then
+					if flag3 then
+						set = {}
+						v32 = dedupeAndTrack(v31.items)
+						commitItems(v32)
+
+						if v4 ~= nil then
+							local momentIndex = findMomentIndex(data.initialMomentId)
+
+							v6(momentIndex)
+
+							local momentIndex2 = findMomentIndex(v31.initialMomentId)
+
+							if momentIndex2 ~= nil then
+								pagerStore.goToItem(momentIndex2)
+							end
+						end
+					else
+						v32 = dedupeAndTrack(v31.items)
+						local clone2 = table.clone(pagerStore.getItems(false))
+						local v34 = clone2[#clone2]
+
+						if v34 ~= nil and v34.kind == "skeleton" then
+							table.remove(clone2)
+						end
+
+						for _, v35 in v32 do
+							table.insert(clone2, v35)
+						end
+
+						commitItems(clone2)
+					end
+
+					nextCursor = v31.nextCursor
+
+					v16 = (flag3 or #v32 ~= 0) and 0 or v16 + 1
+					v10(v31.nextCursor ~= nil and v16 < 3)
+					local v35 = pagerStore.getCount(false) == 0 and "Empty" or "Loaded"
+					v8 = v35
+					local v36 = v8
+
+					if FFlagMomentsParentTimeLimit and v13 then
+						v36 = "LimitReached"
+					elseif v4 ~= nil then
 						if countRealItems(pagerStore.getItems(false)) > 0 then -- inferred equivalent call
 							if v8 == "LoadingMore" then
-								v28 = "LoadingMore"
+								v36 = "LoadingMore"
 							else
-								v28 = "Loaded"
+								v36 = "Loaded"
 							end
 						elseif v8 == "Loaded" then
-							v28 = "Empty"
+							v36 = "Empty"
 						end
 					end
 
-					v7(v28)
+					v7(v36)
 
-					Analytics.reportMomentsFeedLoadMore(
-						"failed",
-						recommendationSource,
-						success and "malformedResponse" or "requestFailed"
-					)
+					if flag3 then
+						Analytics.reportMomentsFeedState(
+							v35 == "Loaded" and "loaded" or "empty",
+							recommendationSource,
+							nil
+						)
+					end
+
+					if v29 then
+						local currentItem = pagerStore.getCurrentItem(false)
+
+						if
+							FFlagMomentsModeratedMomentPage
+							and currentItem ~= nil
+							and currentItem.kind == "unavailableMoment"
+						then
+							MomentsSurfaceLoadManager.abort("unavailable")
+						elseif v35 == "Loaded" then
+							MomentsSurfaceLoadManager.primaryDataReady()
+						else
+							MomentsSurfaceLoadManager.abort("empty")
+						end
+					end
+
+					if v31.onAccepted ~= nil then
+						v31.onAccepted()
+					end
+
+					if p ~= nil or endsWithCaughtUp then
+						appendTerminalPage()
+					end
 				end
 			else
-				local v28
+				if flag3 and v4 ~= nil then
+					commitItems({})
+					local momentIndex = findMomentIndex(data.initialMomentId)
 
-				if flag3 then
-					set = {}
-					v28 = dedupeAndTrack(v27.items)
-					commitItems(v28)
-
-					if v4 ~= nil then
-						local momentIndex = findMomentIndex(data.initialMomentId)
-
-						v6(momentIndex)
-
-						local momentIndex2 = findMomentIndex(v27.initialMomentId)
-
-						if momentIndex2 ~= nil then
-							pagerStore.goToItem(momentIndex2)
-						end
-					end
+					v6(momentIndex)
 				else
-					v28 = dedupeAndTrack(v27.items)
-					local clone2 = table.clone(pagerStore.getItems(false))
-					local v29 = clone2[#clone2]
-
-					if v29 ~= nil and v29.kind == "skeleton" then
-						table.remove(clone2)
-					end
-
-					for _, v30 in v28 do
-						table.insert(clone2, v30)
-					end
-
-					commitItems(clone2)
+					stripTrailingSkeleton() -- inferred equivalent call
 				end
 
-				nextCursor = v27.nextCursor
+				v13 = true
+				v8 = pagerStore.getCount(false) == 0 and "Empty" or "Loaded"
+				local v31 = v8
 
-				v13 = (flag3 or #v28 ~= 0) and 0 or v13 + 1
-				v10(v27.nextCursor ~= nil and v13 < 3)
-				local v29 = pagerStore.getCount(false) == 0 and "Empty" or "Loaded"
-				v8 = v29
-				local v30 = v8
-
-				if v4 ~= nil then
+				if FFlagMomentsParentTimeLimit and v13 then
+					v31 = "LimitReached"
+				elseif v4 ~= nil then
 					if countRealItems(pagerStore.getItems(false)) > 0 then -- inferred equivalent call
 						if v8 == "LoadingMore" then
-							v30 = "LoadingMore"
+							v31 = "LoadingMore"
 						else
-							v30 = "Loaded"
+							v31 = "Loaded"
 						end
 					elseif v8 == "Loaded" then
-						v30 = "Empty"
+						v31 = "Empty"
 					end
 				end
 
-				v7(v30)
+				v7(v31)
 
 				if flag3 then
-					Analytics.reportMomentsFeedState(v29 == "Loaded" and "loaded" or "empty", recommendationSource, nil)
+					Analytics.reportMomentsFeedState("failed", recommendationSource, "parentalTimeLimitReached")
+				else
+					Analytics.reportMomentsFeedLoadMore("failed", recommendationSource, "parentalTimeLimitReached")
 				end
 
-				if v26 then
-					local currentItem = pagerStore.getCurrentItem(false)
-
-					if
-						FFlagMomentsModeratedMomentPage
-						and currentItem ~= nil
-						and currentItem.kind == "unavailableMoment"
-					then
-						MomentsSurfaceLoadManager.abort("unavailable")
-					elseif v29 == "Loaded" then
-						MomentsSurfaceLoadManager.primaryDataReady()
-					else
-						MomentsSurfaceLoadManager.abort("empty")
-					end
+				if v29 then
+					MomentsSurfaceLoadManager.abort("parentalTimeLimitReached")
 				end
 
-				if v27.onAccepted ~= nil then
-					v27.onAccepted()
-				end
-
-				if p ~= nil or endsWithCaughtUp then
-					appendTerminalPage()
-				end
+				p2.markLimitReached(v30.limitSeconds)
 			end
 		end)
 	end
 
-	local function prependItem(p2)
-		local v18 = dedupeAndTrack({ p2 })
+	local function prependItem(p3)
+		local v21 = dedupeAndTrack({ p3 })
 
-		if #v18 == 0 then
+		if #v21 == 0 then
 			return
 		end
 
-		pagerStore.addItemAt(1, v18[1])
+		pagerStore.addItemAt(1, v21[1])
 
 		if signal2(false) == "Empty" then
 			setStatus("Loaded") -- inferred equivalent call
@@ -1110,11 +1309,38 @@ local function createFeedStore(data, callback, flag: boolean?, p: number?)
 			v5()
 		end
 
+		if FFlagMomentsParentTimeLimit and v14 ~= nil then
+			v14()
+		end
+
 		if data.dispose then
 			data.dispose()
 		end
 
 		pagerStore.dispose()
+	end
+
+	if FFlagMomentsParentTimeLimit and p2 ~= nil then
+		local getIsLimitReached = p2.getIsLimitReached
+		v14 = Signals.createEffect(function(p3)
+			local isLimitReached = getIsLimitReached(p3)
+
+			if isLimitReached == v13 then
+				return
+			end
+
+			v13 = isLimitReached
+
+			if isLimitReached then
+				publishStatus() -- inferred equivalent call
+
+				if flag and v15 == MomentsSurfaceLoadManager.getSessionGeneration() then
+					MomentsSurfaceLoadManager.abort("parentalTimeLimitReached")
+				end
+			else
+				runFetch(true)
+			end
+		end)
 	end
 
 	if v4 ~= nil and data.getPendingItems ~= nil then
@@ -1123,8 +1349,8 @@ local function createFeedStore(data, callback, flag: boolean?, p: number?)
 		end
 
 		local getPendingItems = data.getPendingItems
-		v5 = Signals.createEffect(function(p2)
-			local v18 = v4.update(getPendingItems(p2), GetDeletedMomentsStore(false).getDeletedIds(p2))
+		v5 = Signals.createEffect(function(p3)
+			local v21 = v4.update(getPendingItems(p3), GetDeletedMomentsStore(false).getDeletedIds(p3))
 			local retainedItems = getRetainedItems() -- inferred equivalent call
 
 			for i = #retainedItems, 1, -1 do
@@ -1135,13 +1361,13 @@ local function createFeedStore(data, callback, flag: boolean?, p: number?)
 
 			SignalsExperimental.batch(function()
 				commitItems(retainedItems)
-				table.clear(v17)
+				table.clear(v20)
 				resolveInitialIndex(false) -- inferred equivalent call
-				v15(false)
+				v18(false)
 				appendTerminalPage()
 				publishStatus() -- inferred equivalent call
 
-				if v18 and data.recommendationSource == "Trending" then
+				if v21 and data.recommendationSource == "Trending" then
 					pagerStore.goToItem(1)
 				end
 			end)

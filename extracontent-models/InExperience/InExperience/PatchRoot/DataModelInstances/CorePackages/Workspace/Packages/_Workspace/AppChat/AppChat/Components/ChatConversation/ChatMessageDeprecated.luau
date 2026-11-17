@@ -5,9 +5,7 @@ local Cryo = require(parent.Cryo)
 local React = require(parent.React)
 local Roact = require(parent.Roact)
 local AppCommonLib = require(parent.AppCommonLib)
-local Text = AppCommonLib.Text
-local AppCommonLib2 = require(parent.AppCommonLib)
-local memoize = AppCommonLib2.memoize
+local memoize = AppCommonLib.memoize
 local Style = require(parent.Style)
 local GetTextSize = Style.GetTextSize
 local PlainText = require(script.Parent.PlainText)
@@ -28,8 +26,6 @@ local pruneConsecutiveNewLines = SocialLibraries.Utils.pruneConsecutiveNewLines
 local getModeratedMaskText = require(AppChat.Utils.getModeratedMaskText)
 local FFlagAppChatEnableAutotranslation = require(AppChat.Flags.FFlagAppChatEnableAutotranslation)
 local FFlagAppChatConsoleFocusFixes = require(AppChat.Flags.FFlagAppChatConsoleFocusFixes)
-local Foundation = require(parent.Foundation)
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local MessageModel = require(AppChat.Models.MessageModel)
 local ChatMessageContainerConstants = require(script.Parent.ChatMessageContainerConstants)
 
@@ -51,8 +47,8 @@ local function getMessageComponent(p) -- 2 equivalent calls inferred from this h
 	return v[p.messageType]
 end
 
-local Foundation2 = require(parent.Foundation)
-local useTokens = Foundation2.Hooks.useTokens
+local Foundation = require(parent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
 
 local extended = Roact.PureComponent:extend("ChatMessage")
 
@@ -116,52 +112,18 @@ function extended:init()
 
 	if FFlagAppChatEnableAutotranslation then
 		self.getBubbleMaxWidth = memoize(function(p, p2, p3, p4, p5)
-			if p5 then
-				local v3
-
-				if FoundationFontFaceMigration then
-					v3 = GetTextSize(p2, self.props.autotranslationOriginalTextFontSize, p4, Vector2.new(p, 10000))
-				else
-					v3 = Text.GetTextBounds(
-						p2,
-						p4,
-						self.props.autotranslationOriginalTextFontSize,
-						Vector2.new(p, 10000)
-					)
-				end
-
-				local v4
-
-				if FoundationFontFaceMigration then
-					v4 = GetTextSize(p5, p3, p4, Vector2.new(p, 10000))
-				else
-					v4 = Text.GetTextBounds(p5, p4, p3, Vector2.new(p, 10000))
-				end
-
-				return math.max(v3.X, v4.X) + BUBBLE_PADDING * 2
-			else
-				local v3
-
-				if FoundationFontFaceMigration then
-					v3 = GetTextSize(p2, p3, p4, Vector2.new(p, 10000))
-				else
-					v3 = Text.GetTextBounds(p2, p4, p3, Vector2.new(p, 10000))
-				end
-
-				return v3.X + BUBBLE_PADDING * 2
+			if not p5 then
+				return GetTextSize(p2, p3, p4, Vector2.new(p, 10000)).X + BUBBLE_PADDING * 2
 			end
+
+			local textSize = GetTextSize(p2, self.props.autotranslationOriginalTextFontSize, p4, Vector2.new(p, 10000))
+
+			local textSize2 = GetTextSize(p5, p3, p4, Vector2.new(p, 10000))
+			return math.max(textSize.X, textSize2.X) + BUBBLE_PADDING * 2
 		end)
 	else
 		self.getBubbleMaxWidth = memoize(function(p, p2, p3, p4)
-			local v3
-
-			if FoundationFontFaceMigration then
-				v3 = GetTextSize(p2, p3, p4, Vector2.new(p, 10000))
-			else
-				v3 = Text.GetTextBounds(p2, p4, p3, Vector2.new(p, 10000))
-			end
-
-			return v3.X + BUBBLE_PADDING * 2
+			return GetTextSize(p2, p3, p4, Vector2.new(p, 10000)).X + BUBBLE_PADDING * 2
 		end)
 	end
 end
@@ -227,37 +189,26 @@ function extended.render(data)
 				local repliesTo
 
 				if content then
-					local createElement3 = Roact.createElement
-					local component = getMessageComponent(data.props.repliesTo).component -- inferred equivalent call
-					local messageSizeChangedsByAbsoluteSize = {}
-					messageSizeChangedsByAbsoluteSize.additionalProps = data.props.additionalProps
-					local font
-
-					if FoundationFontFaceMigration then
-						font = p.Tokens.Typography.BodyLarge.Font
-					else
-						font = body.Font
-					end
-
-					messageSizeChangedsByAbsoluteSize.font = font
-
-					messageSizeChangedsByAbsoluteSize.hasTail = false
-					messageSizeChangedsByAbsoluteSize.innerPadding = BUBBLE_PADDING
-					messageSizeChangedsByAbsoluteSize.isIncoming = data.props.isIncoming
-					messageSizeChangedsByAbsoluteSize.isPending = false
-					messageSizeChangedsByAbsoluteSize.isUnfiltered = data.props.isUnfiltered
-					messageSizeChangedsByAbsoluteSize.isRepliedTo = true
-					messageSizeChangedsByAbsoluteSize.isLastMessageInMessageGroup = data.props.isLastMessageInMessageGroup
-					messageSizeChangedsByAbsoluteSize.maxWidth = messageMaxWidth
-					messageSizeChangedsByAbsoluteSize.messageDefaultNoticeText = data.props.messageDefaultNoticeText
-					messageSizeChangedsByAbsoluteSize.messageModeratedNoticeText = data.props.messageModeratedNoticeText
-					messageSizeChangedsByAbsoluteSize.parentWidth = data.props.parentWidth
-					messageSizeChangedsByAbsoluteSize.text = data.props.repliesTo.content
-					messageSizeChangedsByAbsoluteSize.textSize = textSize2
-					messageSizeChangedsByAbsoluteSize.wideMode = data.props.wideMode
-					messageSizeChangedsByAbsoluteSize[Roact.Change.AbsoluteSize] = data.messageSizeChanged
-					messageSizeChangedsByAbsoluteSize.LayoutOrder = 1
-					repliesTo = createElement3(component, messageSizeChangedsByAbsoluteSize)
+					repliesTo = Roact.createElement(getMessageComponent(data.props.repliesTo).component, { -- inferred equivalent call
+						additionalProps = data.props.additionalProps,
+						font = p.Tokens.Typography.BodyLarge.Font,
+						hasTail = false,
+						innerPadding = BUBBLE_PADDING,
+						isIncoming = data.props.isIncoming,
+						isPending = false,
+						isUnfiltered = data.props.isUnfiltered,
+						isRepliedTo = true,
+						isLastMessageInMessageGroup = data.props.isLastMessageInMessageGroup,
+						maxWidth = messageMaxWidth,
+						messageDefaultNoticeText = data.props.messageDefaultNoticeText,
+						messageModeratedNoticeText = data.props.messageModeratedNoticeText,
+						parentWidth = data.props.parentWidth,
+						text = data.props.repliesTo.content,
+						textSize = textSize2,
+						wideMode = data.props.wideMode,
+						[Roact.Change.AbsoluteSize] = data.messageSizeChanged,
+						LayoutOrder = 1
+					})
 				end
 
 				children.repliesTo = repliesTo
@@ -300,16 +251,7 @@ function extended.render(data)
 				local component = messageComponent.component
 				local messageSizeChangedsByAbsoluteSize2 = {}
 				messageSizeChangedsByAbsoluteSize2.additionalProps = data.props.additionalProps
-				local font
-
-				if FoundationFontFaceMigration then
-					font = p.Tokens.Typography.BodyLarge.Font
-				else
-					font = body.Font
-				end
-
-				messageSizeChangedsByAbsoluteSize2.font = font
-
+				messageSizeChangedsByAbsoluteSize2.font = p.Tokens.Typography.BodyLarge.Font
 				messageSizeChangedsByAbsoluteSize2.hasTail = data.props.isNewSender
 				messageSizeChangedsByAbsoluteSize2.innerPadding = BUBBLE_PADDING
 				messageSizeChangedsByAbsoluteSize2.isIncoming = data.props.isIncoming
@@ -336,27 +278,20 @@ function extended.render(data)
 				local maxWidth
 
 				if FFlagAppChatEnableAutotranslation then
-					local getBubbleMaxWidth = data.getBubbleMaxWidth
-					local v6
-
-					if FoundationFontFaceMigration then
-						v6 = p.Tokens.Typography.BodyLarge.Font
-					else
-						v6 = body.Font
-					end
-
-					maxWidth = getBubbleMaxWidth(messageMaxWidth, text, textSize, v6, data.props.translatedText)
+					maxWidth = data.getBubbleMaxWidth(
+						messageMaxWidth,
+						text,
+						textSize,
+						p.Tokens.Typography.BodyLarge.Font,
+						data.props.translatedText
+					)
 				else
-					local getBubbleMaxWidth = data.getBubbleMaxWidth
-					local v6
-
-					if FoundationFontFaceMigration then
-						v6 = p.Tokens.Typography.BodyLarge.Font
-					else
-						v6 = body.Font
-					end
-
-					maxWidth = getBubbleMaxWidth(messageMaxWidth, text, textSize, v6)
+					maxWidth = data.getBubbleMaxWidth(
+						messageMaxWidth,
+						text,
+						textSize,
+						p.Tokens.Typography.BodyLarge.Font
+					)
 				end
 
 				messageSizeChangedsByAbsoluteSize2.maxWidth = maxWidth

@@ -3,58 +3,22 @@ local parent = BuildExperience.Parent
 
 require(BuildExperience.Components.ModelPicker.ModelPickerTypes)
 local FFlagBuildExperienceModelPicker = require(BuildExperience.Flags.FFlagBuildExperienceModelPicker)
-
-local FFlagBuildExperienceChatImageAttachments = require(BuildExperience.Flags.FFlagBuildExperienceChatImageAttachments)
 local FFlagBuildEnableFTUXChips = require(BuildExperience.Flags.FFlagBuildEnableFTUXChips)
 
 local FFlagBuildExperienceFTUXChipExhaustedTelemetry = require(BuildExperience.Flags.FFlagBuildExperienceFTUXChipExhaustedTelemetry)
-local isImageAttachmentSupported
-
-if FFlagBuildExperienceChatImageAttachments then
-	isImageAttachmentSupported = require(BuildExperience.utils.isImageAttachmentSupported)
-else
-	isImageAttachmentSupported = nil
-end
+local isImageAttachmentSupported = require(BuildExperience.utils.isImageAttachmentSupported)
 
 local Foundation = require(parent.Foundation)
 local React = require(parent.React)
-local createGalleryCaptureSource
 
-if FFlagBuildExperienceChatImageAttachments then
-	createGalleryCaptureSource = require(parent.Moments.createGalleryCaptureSource)
-else
-	createGalleryCaptureSource = nil
-end
+local createGalleryCaptureSource = require(parent.Moments.createGalleryCaptureSource)
 
 require(BuildExperience.Chat.chatTypes)
-local ChatCaptureGalleryContainer
-
-if FFlagBuildExperienceChatImageAttachments then
-	ChatCaptureGalleryContainer = require(script.Parent.ChatCaptureGallery.ChatCaptureGalleryContainer)
-else
-	ChatCaptureGalleryContainer = nil
-end
-
+local ChatCaptureGalleryContainer = require(script.Parent.ChatCaptureGallery.ChatCaptureGalleryContainer)
 local ChatComposer = require(script.Parent.ChatComposer)
-local ChatImagePreviewList
-
-if FFlagBuildExperienceChatImageAttachments then
-	ChatImagePreviewList = require(script.Parent.ChatImagePreviewList)
-else
-	ChatImagePreviewList = nil
-end
-
+local ChatImagePreviewList = require(script.Parent.ChatImagePreviewList)
 local PromptChipGroup = require(script.Parent.PromptChipGroup)
-
-local SharedFlags = require(parent.SharedFlags)
-local FFlagBuildExperienceChatResourceAttachments = SharedFlags.FFlagBuildExperienceChatResourceAttachments
-local ChatResourceAttachmentList
-
-if FFlagBuildExperienceChatResourceAttachments then
-	ChatResourceAttachmentList = require(script.Parent.ChatResourceAttachmentList)
-else
-	ChatResourceAttachmentList = nil
-end
+local ChatResourceAttachmentList = require(script.Parent.ChatResourceAttachmentList)
 
 local View = Foundation.View
 
@@ -62,33 +26,19 @@ local function ChatActions(props)
 	local images = props.images or {}
 	local resourceAttachments = props.resourceAttachments or {}
 	local promptChips = props.promptChips or {}
-	local v = FFlagBuildExperienceChatImageAttachments and #images > 0
-	local v2 = FFlagBuildExperienceChatResourceAttachments and #resourceAttachments > 0
+	local v = #images > 0
+	local v2 = #resourceAttachments > 0
 	local v3 = FFlagBuildEnableFTUXChips and (#promptChips > 0 or props.isPromptChipsLoading == true)
 	local layoutOrder = v2 and (v and 3 or 2) or v and 2 or 1
-	local state, setState, ref, ref2
+	local state, setState = React.useState("unmounted")
+	local ref = React.useRef(nil)
+	local ref2 = React.useRef(false)
+	local isAttachmentSupported
 
-	if FFlagBuildExperienceChatImageAttachments then
-		state, setState = React.useState("unmounted")
-
-		ref = React.useRef(nil)
-
-		ref2 = React.useRef(false)
+	if props.allowImageAttachments == false then
+		isAttachmentSupported = false
 	else
-		ref = nil
-		ref2 = nil
-		setState = nil
-		state = "unmounted"
-	end
-
-	local isAttachmentSupported = FFlagBuildExperienceChatImageAttachments
-
-	if isAttachmentSupported then
-		if props.allowImageAttachments == false then
-			isAttachmentSupported = false
-		else
-			isAttachmentSupported = isImageAttachmentSupported()
-		end
+		isAttachmentSupported = isImageAttachmentSupported()
 	end
 
 	local function setCapturedImages(items)
@@ -115,19 +65,13 @@ local function ChatActions(props)
 	end
 
 	local function openCaptureGallery()
-		if ref == nil or ref2 == nil or setState == nil then
-			return
-		end
-
 		ref2.current = true
 		ref.current = createGalleryCaptureSource(nil, nil, { Enum.CaptureType.Screenshot })
 		setState("open")
 	end
 
 	local function requestCloseCaptureGallery() -- 1 equivalent call inferred from this helper
-		if setState ~= nil then
-			setState("closing")
-		end
+		setState("closing")
 	end
 
 	local function confirmCaptureGallery(p)
@@ -136,9 +80,7 @@ local function ChatActions(props)
 	end
 
 	local function handleCaptureGalleryClosed()
-		if setState ~= nil then
-			setState("unmounted")
-		end
+		setState("unmounted")
 	end
 
 	local function removeImage(p: number)
@@ -204,28 +146,17 @@ local function ChatActions(props)
 		canStopAssistantResponse = props.canStopAssistantResponse,
 		canSendWhileResponding = props.canSendWhileResponding,
 		allowsTypingWhileResponding = props.allowsTypingWhileResponding,
-		images = 0,
-		isSendBlocked = 0,
-		isReadOnly = 0,
-		tracksExternalText = 0,
-		isAttachmentSupported = 0,
+		images = images,
+		isSendBlocked = props.isSendBlocked,
+		isReadOnly = props.isReadOnly,
+		tracksExternalText = props.tracksExternalText,
+		isAttachmentSupported = isAttachmentSupported,
 		onOpenCaptureGallery = 0,
 		onSend = 0,
 		onStop = 0,
 		maxLines = 0,
 		composerDebug = 0
 	}
-	local images3
-
-	if FFlagBuildExperienceChatImageAttachments then
-		images3 = images
-	end
-
-	v5.images = images3
-	v5.isSendBlocked = props.isSendBlocked
-	v5.isReadOnly = props.isReadOnly
-	v5.tracksExternalText = props.tracksExternalText
-	v5.isAttachmentSupported = isAttachmentSupported
 
 	if not isAttachmentSupported then
 		openCaptureGallery = nil
@@ -267,7 +198,7 @@ local function ChatActions(props)
 	v6.PromptChips = promptChips2
 	local gallery
 
-	if FFlagBuildExperienceChatImageAttachments and state ~= "unmounted" and ref ~= nil and ref.current ~= nil then
+	if not (state == "unmounted" or ref.current == nil) then
 		gallery = React.createElement(ChatCaptureGalleryContainer, {
 			captureSource = ref.current,
 			initialCaptures = captures,
@@ -275,7 +206,7 @@ local function ChatActions(props)
 			maxSelections = 2,
 			onClose = handleCaptureGalleryClosed,
 			onConfirm = confirmCaptureGallery,
-			shouldProgressivelyLoad = ref2 ~= nil and ref2.current
+			shouldProgressivelyLoad = ref2.current
 		})
 	end
 

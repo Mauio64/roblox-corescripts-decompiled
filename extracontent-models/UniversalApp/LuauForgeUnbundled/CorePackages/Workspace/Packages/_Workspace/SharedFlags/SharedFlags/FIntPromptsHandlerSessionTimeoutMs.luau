@@ -1,1 +1,0 @@
-return game:DefineFastInt("PromptsHandlerSessionTimeoutMs", 1000)

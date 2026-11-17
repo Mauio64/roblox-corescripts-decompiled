@@ -1,6 +1,0 @@
-local FFlagForceEnableSquadRegroup = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagForceEnableSquadRegroup")
-local defineFastFlag = game:DefineFastFlag("EnableSquadRegroupExperimentation1", false)
-
-local FFlagEnableSquadRegroupExperimentationSmallScreenFix = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagEnableSquadRegroupExperimentationSmallScreenFix")
-
-return FFlagForceEnableSquadRegroup or defineFastFlag or FFlagEnableSquadRegroupExperimentationSmallScreenFix

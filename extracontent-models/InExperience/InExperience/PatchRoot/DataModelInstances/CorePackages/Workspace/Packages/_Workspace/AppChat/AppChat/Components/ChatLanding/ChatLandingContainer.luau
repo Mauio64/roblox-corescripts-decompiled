@@ -86,6 +86,7 @@ local SignalsMigrationConfig = require(AppChat.Flags.SignalsMigrationConfig)
 local AppChatPerfTracker = require(AppChat.Telemetry.AppChatPerfTracker)
 local FFlagAppChatConsoleFocusFixes = require(AppChat.Flags.FFlagAppChatConsoleFocusFixes)
 local FFlagAppChatServerSideConversationSearch = require(AppChat.Flags.FFlagAppChatServerSideConversationSearch)
+local FFlagAppChatSearchSendPlacement = require(AppChat.Flags.FFlagAppChatSearchSendPlacement)
 local FFlagAppChatSkipSearchWhenChatDisabled = require(AppChat.Flags.FFlagAppChatSkipSearchWhenChatDisabled)
 
 local useCallback = React.useCallback
@@ -102,6 +103,25 @@ local NoFriendsView = Components.NoFriendsView
 local FFlagAppIaScrollAway = SharedFlags.FFlagAppIaScrollAway
 local FFlagEnableScrollAwayContentScrollableFix = SharedFlags.FFlagEnableScrollAwayContentScrollableFix
 local FFlagSignalsNavP3hMisc = SharedFlags.FFlagSignalsNavP3hMisc
+local FFlagSignalsNavDeferProjection = SharedFlags.FFlagSignalsNavDeferProjection
+local useSignalsEffect
+
+if FFlagSignalsNavDeferProjection then
+	local RobloxAppHooks2 = require(parent.RobloxAppHooks)
+	useSignalsEffect = RobloxAppHooks2.useSignalsEffect
+else
+	useSignalsEffect = nil
+end
+
+local isChatVisible
+
+if FFlagSignalsNavDeferProjection then
+	local getIsChatVisibleNow = require(AppChat.Utils.getIsChatVisibleNow)
+	isChatVisible = getIsChatVisibleNow.isChatVisible
+else
+	isChatVisible = nil
+end
+
 local getFFlagChatTabHideGroupsLinkOnVR = require(AppChat.Flags.getFFlagChatTabHideGroupsLinkOnVR)
 local GetTopBarStore = require(AppChat.Stores.GetTopBarStore)
 local SocialExperiments = require(parent.SocialExperiments)
@@ -155,6 +175,14 @@ local function areConversationIdsEqual(conversationIds, conversationIds2): boole
 	end
 
 	return true
+end
+
+local function finishChatLandingTTIIfReady(isInteractive: boolean, numElementsRendered: number) -- 1 equivalent call inferred from this helper
+	if isInteractive and AppChatPerfTracker.isActive(AppChatPerfTracker.Events.ChatLandingTTI) then
+		AppChatPerfTracker.finish(AppChatPerfTracker.Events.ChatLandingTTI, {
+			numElementsRendered = numElementsRendered
+		})
+	end
 end
 
 local function encodeConversationIds(conversationIds) -- 2 equivalent calls inferred from this helper
@@ -294,13 +322,16 @@ function ChatLandingContainer(p)
 			v25 = v25 and v6
 		end
 
-		v23, v24 = useConversationSearchListProps(
-			joined.filterText,
-			v25,
-			localUserId,
-			v7,
-			joined.navigateToConversation
-		)
+		local filterText = joined.filterText
+
+		local navigateToConversation = joined.navigateToConversation
+		local v26
+
+		if FFlagAppChatSearchSendPlacement then
+			v26 = v4.chatPlacement
+		end
+
+		v23, v24 = useConversationSearchListProps(filterText, v25, localUserId, v7, navigateToConversation, v26)
 	else
 		v23 = false
 		v24 = {}
@@ -762,6 +793,25 @@ function ChatLandingContainer(p)
 			v6,
 			#itemList
 		})
+
+		if FFlagSignalsNavDeferProjection then
+			local current2 = {
+				isInteractive = not v54 and v6,
+				numElementsRendered = #itemList
+			}
+			local ref = React.useRef(current2)
+
+			if v57 then
+				ref.current = current2
+			end
+
+			useSignalsEffect(isChatVisible, function(flag: boolean)
+				if flag then
+					local current = ref.current
+					finishChatLandingTTIIfReady(current.isInteractive, current.numElementsRendered) -- inferred equivalent call
+				end
+			end)
+		end
 	end
 
 	local ref = React.useRef({ isChatEnabled = v6, isChatLoading = isChatLoading })

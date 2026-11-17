@@ -10,7 +10,6 @@ local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local BaseCell = require(script.Parent.BaseCell)
 
@@ -44,12 +43,7 @@ local function IconWithTextCell(p)
 	local style = joined.style
 	local theme = style.Theme
 	local font = style.Font
-	local v2
-
-	if FoundationFontFaceMigration then
-		v2 = useTokens()
-	end
-
+	local v2 = useTokens()
 	local v3 = joined.primaryIcon == nil
 
 	local createElement = React.createElement
@@ -113,38 +107,17 @@ local function IconWithTextCell(p)
 
 	v6.imageFrame = imageFrame
 
-	local createElement3 = React.createElement
-	local v7 = {
+	v6.text = React.createElement("TextLabel", {
 		Size = UDim2.new(1, v3 and 0 or -joined.iconCellWidth, 1, 0),
 		Text = joined.Text,
 		TextSize = font.Header2.RelativeSize * font.BaseSize,
-		Font = 0,
-		FontFace = 0,
-		TextColor3 = 0,
-		TextXAlignment = 0,
-		TextTruncate = 0,
+		FontFace = normalizeFontFace(v2.Typography.TitleLarge.Font),
+		TextColor3 = theme.TextEmphasis.Color,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextTruncate = Enum.TextTruncate.AtEnd,
 		BackgroundTransparency = 1,
 		LayoutOrder = 2
-	}
-	local font2
-
-	if not FoundationFontFaceMigration then
-		font2 = font.Header2.Font
-	end
-
-	v7.Font = font2
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(v2.Typography.TitleLarge.Font)
-	end
-
-	v7.FontFace = fontFace
-
-	v7.TextColor3 = theme.TextEmphasis.Color
-	v7.TextXAlignment = Enum.TextXAlignment.Left
-	v7.TextTruncate = Enum.TextTruncate.AtEnd
-	v6.text = createElement3("TextLabel", v7)
+	})
 	return createElement(BaseCell, v4, {
 		leftFrame = createElement2("Frame", v5, v6),
 		rightFrame = React.createElement("Frame", {

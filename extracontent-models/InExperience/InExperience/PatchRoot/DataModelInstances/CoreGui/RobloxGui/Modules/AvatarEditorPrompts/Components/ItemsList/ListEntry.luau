@@ -10,13 +10,9 @@ local Foundation = require(CorePackages.Packages.Foundation)
 local Style = require(CorePackages.Workspace.Packages.Style)
 local GetTextSize = Style.GetTextSize
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
-local v = SharedFlags.FFlagFontFaceAX and FoundationFontFaceMigration
-
+local FFlagFontFaceAX = SharedFlags.FFlagFontFaceAX
 local AvatarExperienceDeps = require(CorePackages.Packages.AvatarExperienceDeps)
-local AppCommonLib = require(CorePackages.Workspace.Packages.AppCommonLib)
-local Text = AppCommonLib.Text
 
 local RoactFitComponents = AvatarExperienceDeps.RoactFitComponents
 local FitTextLabel = RoactFitComponents.FitTextLabel
@@ -43,19 +39,13 @@ function extended.render(p)
 
 		local font2 = font.CaptionBody.Font
 		local textSize = font.BaseSize * font.CaptionBody.RelativeSize
-		local v2
 
-		if FoundationFontFaceMigration then
-			v2 = GetTextSize("• ", textSize, props.Tokens.Typography.BodySmall.Font, Vector2.new(10000, 10000)).X
-		else
-			v2 = Text.GetTextWidth("• ", font2, textSize)
-		end
-
+		local x = GetTextSize("• ", textSize, props.Tokens.Typography.BodySmall.Font, Vector2.new(10000, 10000)).X
 		local forwardRef = p.props.forwardRef
 
 		local createElement = Roact.createElement
 		local fitFrameVertical = RoactFitComponents.FitFrameVertical
-		local v3 = {
+		local v = {
 			width = UDim.new(1, 0),
 			FillDirection = Enum.FillDirection.Horizontal,
 			VerticalAlignment = Enum.VerticalAlignment.Top,
@@ -68,48 +58,24 @@ function extended.render(p)
 			NextSelectionDown = p.props.NextSelectionDown,
 			[Roact.Ref] = forwardRef
 		}
-
-		local bullet = p.props.hasBullet
-
-		if bullet then
-			local createElement2 = Roact.createElement
-			local v4 = {
+		local v2 = {
+			Bullet = p.props.hasBullet and Roact.createElement("TextLabel", {
 				BackgroundTransparency = 1,
-				Size = UDim2.fromOffset(v2, textSize),
+				Size = UDim2.fromOffset(x, textSize),
 				Text = "• ",
-				Font = 0,
-				FontFace = 0,
-				TextSize = 0,
-				TextColor3 = 0,
-				TextTransparency = 0,
-				TextXAlignment = 0,
+				FontFace = normalizeFontFace(props.Tokens.Typography.BodySmall.Font),
+				TextSize = textSize,
+				TextColor3 = theme.TextDefault.Color,
+				TextTransparency = theme.TextDefault.Transparency,
+				TextXAlignment = Enum.TextXAlignment.Left,
 				LayoutOrder = 1
-			}
-			local font3
-
-			if not FoundationFontFaceMigration then
-				font3 = font2
-			end
-
-			v4.Font = font3
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(props.Tokens.Typography.BodySmall.Font)
-			end
-
-			v4.FontFace = fontFace
-
-			v4.TextSize = textSize
-			v4.TextColor3 = theme.TextDefault.Color
-			v4.TextTransparency = theme.TextDefault.Transparency
-			v4.TextXAlignment = Enum.TextXAlignment.Left
-			bullet = createElement2("TextLabel", v4)
-		end
+			}),
+			Text = 0
+		}
 
 		local createElement2 = Roact.createElement
-		local v4 = {
-			width = UDim.new(1, p.props.hasBullet and -v2 or 0),
+		local v3 = {
+			width = UDim.new(1, p.props.hasBullet and -x or 0),
 			BackgroundTransparency = 1,
 			Text = p.props.text,
 			Font = 0,
@@ -120,20 +86,18 @@ function extended.render(p)
 			LayoutOrder = 2
 		}
 
-		if v then
+		if FFlagFontFaceAX then
 			font2 = normalizeFontFace(props.Tokens.Typography.BodySmall.Font)
 		end
 
-		v4.Font = font2
+		v3.Font = font2
 
-		v4.TextSize = textSize
-		v4.TextColor3 = theme.TextDefault.Color
-		v4.TextTransparency = theme.TextDefault.Transparency
-		v4.TextXAlignment = Enum.TextXAlignment.Left
-		return createElement(fitFrameVertical, v3, {
-			Bullet = bullet,
-			Text = createElement2(FitTextLabel, v4)
-		})
+		v3.TextSize = textSize
+		v3.TextColor3 = theme.TextDefault.Color
+		v3.TextTransparency = theme.TextDefault.Transparency
+		v3.TextXAlignment = Enum.TextXAlignment.Left
+		v2.Text = createElement2(FitTextLabel, v3)
+		return createElement(fitFrameVertical, v, v2)
 	end)
 end
 

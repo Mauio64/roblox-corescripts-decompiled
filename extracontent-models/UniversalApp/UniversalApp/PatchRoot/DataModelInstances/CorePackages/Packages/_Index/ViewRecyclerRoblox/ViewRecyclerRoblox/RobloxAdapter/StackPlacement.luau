@@ -1,3 +1,5 @@
+local Flags = require(script:FindFirstAncestor("ViewRecyclerRoblox").Flags)
+local FFlagViewRecyclerReact084 = Flags.FFlagViewRecyclerReact084
 local ViewRecyclerRoblox = script:FindFirstAncestor("ViewRecyclerRoblox")
 local ViewRecycler = require(ViewRecyclerRoblox.Parent.ViewRecycler)
 
@@ -74,13 +76,21 @@ function StackPlacement.new(parent, p, p2: number, flag: boolean)
 	local v6 = {}
 	local v7 = 0
 	local v8 = {}
-	local v9 = {}
+	local v9
+
+	if FFlagViewRecyclerReact084 then
+		v9 = setmetatable({}, { __mode = "k" })
+	else
+		v9 = nil
+	end
+
 	local v10 = {}
 	local v11 = {}
+	local v12 = {}
 	local set = {}
 	local flag2 = false
-	local v12 = true
-	local v13 = nil
+	local v13 = true
+	local v14 = nil
 
 	local function frameFor(p3: number) -- 3 equivalent calls inferred from this helper
 		return if p3 < v4 then stackFrame else stackFrame2
@@ -91,51 +101,51 @@ function StackPlacement.new(parent, p, p2: number, flag: boolean)
 	end
 
 	local function releasePlaceholder(p3: number) -- 2 equivalent calls inferred from this helper
-		local v14 = v10[p3]
+		local v15 = v11[p3]
 
-		if v14 ~= nil then
-			v10[p3] = nil
-			v14.Parent = nil
-			table.insert(v11, v14)
+		if v15 ~= nil then
+			v11[p3] = nil
+			v15.Parent = nil
+			table.insert(v12, v15)
 		end
 	end
 
 	local function refresh(layoutOrder: number)
-		if contains(layoutOrder) and not ((v9[layoutOrder] or 0) > 0) then -- inferred equivalent call
-			local v14 = v10[layoutOrder]
+		if contains(layoutOrder) and not ((v10[layoutOrder] or 0) > 0) then -- inferred equivalent call
+			local v15 = v11[layoutOrder]
 
-			if v14 == nil then
-				v14 = table.remove(v11)
+			if v15 == nil then
+				v15 = table.remove(v12)
 
-				if v14 == nil then
-					v14 = transparentFrame("Placeholder")
+				if v15 == nil then
+					v15 = transparentFrame("Placeholder")
 				end
 
-				v10[layoutOrder] = v14
+				v11[layoutOrder] = v15
 			end
 
-			local v15 = v6[layoutOrder] or 0
-			local v16 = math.round(v15 + (v5[layoutOrder] or 0)) - math.round(v15)
+			local v16 = v6[layoutOrder] or 0
+			local v17 = math.round(v16 + (v5[layoutOrder] or 0)) - math.round(v16)
 			local udim2
 
 			if v then
-				udim2 = UDim2.new(1, 0, 0, v16)
+				udim2 = UDim2.new(1, 0, 0, v17)
 			else
-				udim2 = UDim2.new(0, v16, 1, 0)
+				udim2 = UDim2.new(0, v17, 1, 0)
 			end
 
-			if v14.Size ~= udim2 then
-				v14.Size = udim2
+			if v15.Size ~= udim2 then
+				v15.Size = udim2
 			end
 
-			if v14.LayoutOrder ~= layoutOrder then
-				v14.LayoutOrder = layoutOrder
+			if v15.LayoutOrder ~= layoutOrder then
+				v15.LayoutOrder = layoutOrder
 			end
 
 			local parent3 = frameFor(layoutOrder) -- inferred equivalent call
 
-			if v14.Parent ~= parent3 then
-				v14.Parent = parent3
+			if v15.Parent ~= parent3 then
+				v15.Parent = parent3
 			end
 		else
 			releasePlaceholder(layoutOrder) -- inferred equivalent call
@@ -143,13 +153,13 @@ function StackPlacement.new(parent, p, p2: number, flag: boolean)
 	end
 
 	local function setOffset(stackFrame3, p3: number) -- 2 equivalent calls inferred from this helper
-		local v14 = math.round(p3 + v7)
+		local v15 = math.round(p3 + v7)
 		local udim2
 
 		if v then
-			udim2 = UDim2.fromOffset(0, v14)
+			udim2 = UDim2.fromOffset(0, v15)
 		else
-			udim2 = UDim2.fromOffset(v14, 0)
+			udim2 = UDim2.fromOffset(v15, 0)
 		end
 
 		if stackFrame3.Position ~= udim2 then
@@ -158,9 +168,9 @@ function StackPlacement.new(parent, p, p2: number, flag: boolean)
 	end
 
 	local function positionFrames() -- 2 equivalent calls inferred from this helper
-		local v14 = v6[v4] or 0
-		setOffset(stackFrame, v14 - p2) -- inferred equivalent call
-		setOffset(stackFrame2, v14) -- inferred equivalent call
+		local v15 = v6[v4] or 0
+		setOffset(stackFrame, v15 - p2) -- inferred equivalent call
+		setOffset(stackFrame2, v15) -- inferred equivalent call
 	end
 
 	local function setOccupying(p3: number?, p4: number?) -- 1 equivalent call inferred from this helper
@@ -169,17 +179,17 @@ function StackPlacement.new(parent, p, p2: number, flag: boolean)
 		end
 
 		if p4 ~= nil then
-			v9[p4] -= 1
+			v10[p4] -= 1
 
-			if v9[p4] == 0 then
-				v9[p4] = nil
+			if v10[p4] == 0 then
+				v10[p4] = nil
 			end
 
 			set[p4] = true
 		end
 
 		if p3 ~= nil then
-			v9[p3] = (v9[p3] or 0) + 1
+			v10[p3] = (v10[p3] or 0) + 1
 			set[p3] = true
 		end
 	end
@@ -191,9 +201,9 @@ function StackPlacement.new(parent, p, p2: number, flag: boolean)
 		setWindow = function(data, p3)
 			local mountedRange = data.mountedRange
 			local lengthsByIndex = {}
-			local v14 = 1e999
+			local v15 = 1e999
 			local maxValue = -1e999
-			local v15 = 0
+			local v16 = 0
 
 			for _, mountedView in data.mountedViews do
 				local state = mountedView.state
@@ -205,45 +215,45 @@ function StackPlacement.new(parent, p, p2: number, flag: boolean)
 
 				lengthsByIndex[index] = state.itemLayout.length
 
-				if index < v14 then
-					v15 = state.itemLayout.startOffset + state.contentStartOffset
-					v14 = index
+				if index < v15 then
+					v16 = state.itemLayout.startOffset + state.contentStartOffset
+					v15 = index
 				end
 
 				maxValue = math.max(maxValue, index)
 			end
 
-			if maxValue < v14 then
-				v14 = 1
+			if maxValue < v15 then
+				v15 = 1
 				maxValue = 0
-				v15 = 0
+				v16 = 0
 			end
 
 			local scrollAnchor = data.scrollAnchor
-			local v16
+			local v17
 
 			if scrollAnchor == nil then
-				v16 = v14
+				v17 = v15
 			elseif scrollAnchor.alignment == ViewRecycler.ScrollAlignment.End then
-				v16 = scrollAnchor.index + 1
+				v17 = scrollAnchor.index + 1
 			else
-				v16 = scrollAnchor.index
+				v17 = scrollAnchor.index
 			end
 
-			v2 = v14
+			v2 = v15
 			v3 = maxValue
 			v5 = lengthsByIndex
-			v4 = math.clamp(v16, v14, (math.max(v14, maxValue + 1)))
+			v4 = math.clamp(v17, v15, (math.max(v15, maxValue + 1)))
 			table.clear(v6)
 
-			for i = v14, maxValue + 1 do
-				v6[i] = v15
-				v15 += (lengthsByIndex[i] or 0) + p2
+			for i = v15, maxValue + 1 do
+				v6[i] = v16
+				v16 += (lengthsByIndex[i] or 0) + p2
 			end
 
 			v7 = p3
 			flag2 = true
-			v12 = true
+			v13 = true
 			positionFrames() -- inferred equivalent call
 		end,
 		setOriginOffset = function(p3)
@@ -254,10 +264,10 @@ function StackPlacement.new(parent, p, p2: number, flag: boolean)
 		end,
 		place = function(p3, p4, data, p5)
 			local index = data.index
-			local v14 = v8[p3]
+			local v15 = v8[p3]
 
-			if v14 == nil then
-				v14 = {
+			if v15 == nil then
+				v15 = {
 					index = index,
 					geometry = {},
 					inWindow = false,
@@ -265,7 +275,11 @@ function StackPlacement.new(parent, p, p2: number, flag: boolean)
 					restoreLayoutOrder = p3.LayoutOrder
 				}
 
-				v8[p3] = v14
+				v8[p3] = v15
+
+				if FFlagViewRecyclerReact084 then
+					v9[p3] = nil
+				end
 			end
 
 			local visible
@@ -282,70 +296,78 @@ function StackPlacement.new(parent, p, p2: number, flag: boolean)
 				p,
 				flag,
 				0,
-				v14.geometry
+				v15.geometry
 			)
 
 			geometry.position = udim
 			CanvasItemPlacer.place(p3, frameFor(index), geometry, p4, visible) -- inferred equivalent call
-			local v15
-
-			if visible then
-				v15 = index
-			end
-
 			local v16
 
-			if v14.visible then
-				v16 = v14.index
+			if visible then
+				v16 = index
 			end
 
-			setOccupying(v15, v16) -- inferred equivalent call
-			v14.index = index
-			v14.inWindow = contains(index) -- inferred equivalent call
-			v14.visible = visible
+			local v17
+
+			if v15.visible then
+				v17 = v15.index
+			end
+
+			setOccupying(v16, v17) -- inferred equivalent call
+			v15.index = index
+			v15.inWindow = contains(index) -- inferred equivalent call
+			v15.visible = visible
 
 			if p3.LayoutOrder ~= index then
 				p3.LayoutOrder = index
 			end
 
-			v12 = true
+			v13 = true
 			return visible
 		end,
 		remove = function(p3)
-			local v14 = v8[p3]
+			local v15 = v8[p3]
 
-			if v14 == nil then
+			if v15 == nil then
 				return
 			end
 
 			v8[p3] = nil
+
+			if FFlagViewRecyclerReact084 then
+				v9[p3] = true
+			end
+
 			local index
 
-			if v14.visible then
-				index = v14.index
+			if v15.visible then
+				index = v15.index
 			end
 
 			if index ~= nil and index ~= nil then
-				v9[index] -= 1
+				v10[index] -= 1
 
-				if v9[index] == 0 then
-					v9[index] = nil
+				if v10[index] == 0 then
+					v10[index] = nil
 				end
 
 				set[index] = true
 			end
 
-			p3.LayoutOrder = v14.restoreLayoutOrder
-			v12 = true
+			p3.LayoutOrder = v15.restoreLayoutOrder
+			v13 = true
 		end,
 		isStacked = function(p3): boolean
 			return v8[p3] ~= nil
 		end,
+		isStackFrame = FFlagViewRecyclerReact084 and function(p3): boolean
+			return p3 == stackFrame or p3 == stackFrame2
+		end or nil,
 		getStaleHosts = function()
 			local staleHosts = {}
 
-			for k, v14 in v8 do
-				if contains(v14.index) == v14.inWindow and k.Parent == frameFor(v14.index) then -- inferred equivalent call
+			for k, v15 in v8 do
+				if contains(v15.index) == v15.inWindow and k.Parent == frameFor(v15.index) then -- inferred equivalent call
 					continue
 				end
 
@@ -355,17 +377,17 @@ function StackPlacement.new(parent, p, p2: number, flag: boolean)
 			return staleHosts
 		end,
 		takeChanged = function()
-			local v14 = uiListLayout.AbsoluteContentSize + uiListLayout2.AbsoluteContentSize
-			local v15 = v12 or v14 ~= v13
-			v12 = false
-			v13 = v14
-			return v15
+			local v15 = uiListLayout.AbsoluteContentSize + uiListLayout2.AbsoluteContentSize
+			local v16 = v13 or v15 ~= v14
+			v13 = false
+			v14 = v15
+			return v16
 		end,
 		commit = function()
 			if flag2 then
 				flag2 = false
 
-				for k in v10 do
+				for k in v11 do
 					if not contains(k) then -- inferred equivalent call
 						releasePlaceholder(k) -- inferred equivalent call
 					end
@@ -383,14 +405,24 @@ function StackPlacement.new(parent, p, p2: number, flag: boolean)
 			table.clear(set)
 		end,
 		destroy = function()
-			for k, v14 in v8 do
-				k.LayoutOrder = v14.restoreLayoutOrder
+			for k, v15 in v8 do
+				k.LayoutOrder = v15.restoreLayoutOrder
+			end
+
+			if FFlagViewRecyclerReact084 then
+				for k in v9 do
+					if k.Parent == stackFrame or k.Parent == stackFrame2 then
+						k.Parent = parent
+					end
+				end
+
+				table.clear(v9)
 			end
 
 			table.clear(v8)
-			table.clear(v9)
 			table.clear(v10)
 			table.clear(v11)
+			table.clear(v12)
 			table.clear(set)
 			parent2:Destroy()
 		end

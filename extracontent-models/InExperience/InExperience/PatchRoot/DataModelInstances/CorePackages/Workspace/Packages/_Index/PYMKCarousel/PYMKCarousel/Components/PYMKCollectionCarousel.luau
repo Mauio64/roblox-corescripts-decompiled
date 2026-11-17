@@ -58,6 +58,15 @@ local SharedFlags3 = require(parent.SharedFlags)
 local FFlagLuaAppUserSeenCollectionUnifiedFields = SharedFlags3.FFlagLuaAppUserSeenCollectionUnifiedFields
 local SharedFlags4 = require(parent.SharedFlags)
 local FFlagLuaAppEnableSduiHomePage = SharedFlags4.FFlagLuaAppEnableSduiHomePage
+local SharedFlags5 = require(parent.SharedFlags)
+local FFlagPymkCarouselExtendProps = SharedFlags5.FFlagPymkCarouselExtendProps
+local HttpService
+
+if FFlagPymkCarouselExtendProps then
+	HttpService = game:GetService("HttpService")
+else
+	HttpService = nil
+end
 
 local count = 0
 
@@ -94,6 +103,10 @@ end
 local function PYMKCollectionCarousel(props)
 	local ref = React.useRef(nil)
 
+	local impressionsTag = not FFlagPymkCarouselExtendProps and "PYMKCollectionCarousel" or React.useMemo(function()
+		return `PYMKCollectionCarousel{HttpService:GenerateGUID(false)}`
+	end, {})
+
 	local scrollViewPositionChangedSignal, v = useCollectionImpressionsSignal(props.scrollViewPositionChangedSignal)
 
 	local recommendationsById = nil
@@ -107,6 +120,29 @@ local function PYMKCollectionCarousel(props)
 		recommendationIds = v2.recommendationIds
 
 		recommendationsById = v2.recommendationsById
+	elseif FFlagPymkCarouselExtendProps then
+		local function fn(p)
+			return getPYMKSortedRecommendationIds(p.LocalUserId)(p)
+		end
+
+		local v2
+
+		if FFlagPYMKCarouselStableSelectors then
+			v2 = tutils.deepEqual
+		else
+			v2 = tutils.shallowEqual
+		end
+
+		recommendationIds = useSelector(fn, v2)
+
+		local v3 = React.useMemo(function()
+			return buildDirectRecommendationOverrides(props.recommendations or {})
+		end, { props.recommendations })
+
+		if props.recommendations then
+			recommendationIds = v3.recommendationIds
+			recommendationsById = v3.recommendationsById
+		end
 	else
 		local function fn(p)
 			return getPYMKSortedRecommendationIds(p.LocalUserId)(p)
@@ -203,6 +239,15 @@ local function PYMKCollectionCarousel(props)
 		count += 1
 		setState(os.clock())
 	end, { recommendationSessionId, v2 })
+
+	if FFlagPymkCarouselExtendProps then
+		local v5 = v2 > 0
+		React.useEffect(function()
+			if v5 and props.onRecommendationsShown then
+				props.onRecommendationsShown()
+			end
+		end, { v5, props.onRecommendationsShown })
+	end
 
 	local onTitleActivated = React.useCallback(function()
 		fireAnalyticsEvent(EventNames.CarouselGenericTileClicked, {
@@ -307,7 +352,7 @@ local function PYMKCollectionCarousel(props)
 	local entities = usePYMKCarouselUserEntitiesList(v3)
 	local v12
 
-	if FFlagLuaAppEnableSduiHomePage then
+	if FFlagPymkCarouselExtendProps or FFlagLuaAppEnableSduiHomePage then
 		v12 = recommendationsById
 	end
 
@@ -324,9 +369,10 @@ local function PYMKCollectionCarousel(props)
 			absolutePosition = absolutePosition,
 			recommendationSessionId = props.recommendationSessionId,
 			openProfilePeekView = props.openProfilePeekView,
-			impressionsTag = "PYMKCollectionCarousel",
+			impressionsTag = impressionsTag,
 			forceFetchUserPresence = 0,
-			recommendation = 0
+			recommendation = 0,
+			analyticsSurface = 0
 		}
 		local forceFetchUserPresence
 
@@ -337,11 +383,18 @@ local function PYMKCollectionCarousel(props)
 		v14.forceFetchUserPresence = forceFetchUserPresence
 		local recommendation
 
-		if FFlagLuaAppEnableSduiHomePage and recommendationsById then
+		if (FFlagPymkCarouselExtendProps or FFlagLuaAppEnableSduiHomePage) and recommendationsById then
 			recommendation = recommendationsById[tostring(entity.id)]
 		end
 
 		v14.recommendation = recommendation
+		local analyticsSurface
+
+		if FFlagPymkCarouselExtendProps then
+			analyticsSurface = props.analyticsSurface
+		end
+
+		v14.analyticsSurface = analyticsSurface
 		return createElement(PYMKUser, v14)
 	end
 
@@ -357,8 +410,20 @@ local function PYMKCollectionCarousel(props)
 
 	local v15
 
-	if FFlagLuaAppEnableSduiHomePage then
+	if FFlagPymkCarouselExtendProps or FFlagLuaAppEnableSduiHomePage then
 		v15 = recommendationsById
+	end
+
+	local analyticsSurface
+
+	if FFlagPymkCarouselExtendProps then
+		analyticsSurface = props.analyticsSurface
+	end
+
+	local v16
+
+	if FFlagPymkCarouselExtendProps then
+		v16 = impressionsTag
 	end
 
 	local renderRow = useCallback2(fn2, {
@@ -367,7 +432,9 @@ local function PYMKCollectionCarousel(props)
 		recommendationSessionId2,
 		openProfilePeekView,
 		v14,
-		v15
+		v15,
+		analyticsSurface,
+		v16
 	})
 
 	if #v3 == 0 then
@@ -376,7 +443,7 @@ local function PYMKCollectionCarousel(props)
 
 	local createElement = React.createElement
 	local fragment = React.Fragment
-	local v16 = {
+	local v17 = {
 		ContactsContextProvider = React.createElement(ContactsContext.Provider, { value = v13 }, {
 			PYMKCarousel = React.createElement(HorizontalUserList, {
 				entities = entities,
@@ -395,23 +462,23 @@ local function PYMKCollectionCarousel(props)
 	}
 
 	local createElement2 = React.createElement
-	local v17
+	local v18
 
 	if FFlagLuaAppUseFrameBoundsImpressions then
-		v17 = FrameBoundsImpressionsTracker
+		v18 = FrameBoundsImpressionsTracker
 	else
-		v17 = ScreenSizeImpressionsTracker
+		v18 = ScreenSizeImpressionsTracker
 	end
 
-	v16.ScreenSizeImpressionsTracker = createElement2(v17, {
+	v17.ScreenSizeImpressionsTracker = createElement2(v18, {
 		pageContext = props.pageContext,
 		parentRef = ref,
-		impressionsTag = "PYMKCollectionCarousel",
+		impressionsTag = impressionsTag,
 		scrollViewPositionChangedSignal = scrollViewPositionChangedSignal,
 		sendImpressions = sendImpressions,
 		dataUpdatedTimestamp = state
 	})
-	return createElement(fragment, nil, v16)
+	return createElement(fragment, nil, v17)
 end
 
 return React.memo(PYMKCollectionCarousel)

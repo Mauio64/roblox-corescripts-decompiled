@@ -53,10 +53,11 @@ local v5 = -v2
 local v6 = { total = 0, offScreenDiscardCount = 0, tooCloseDiscardCount = 0, wasSkipped = false }
 
 local function fn(worldToFullViewportPointNormalized: Vector2): boolean -- 1 equivalent call inferred from this helper
-	return v4 < worldToFullViewportPointNormalized.Y
-		or worldToFullViewportPointNormalized.Y < v5
-		or v4 < worldToFullViewportPointNormalized.X
-		or worldToFullViewportPointNormalized.X < v5
+	if v4 < worldToFullViewportPointNormalized.Y or worldToFullViewportPointNormalized.Y < v5 then
+		return true
+	end
+
+	return v4 < worldToFullViewportPointNormalized.X or worldToFullViewportPointNormalized.X < v5
 end
 
 function getCoveringPolygon(list, p, p2)

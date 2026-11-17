@@ -518,20 +518,20 @@ function PermissionsProtocol:openNotificationSettings()
 end
 
 function PermissionsProtocol.getPushNotificationsEnabled(p)
-	if getPlatform() == Enum.Platform.Android and isAndroidNotificationSettingsGateOpen() then -- inferred equivalent call
-		return callPushNotificationSettingsMethod(
-			p,
-			p.GET_PUSH_NOTIFICATIONS_ENABLED_PROTOCOL_METHOD_REQUEST_DESCRIPTOR,
-			p.GET_PUSH_NOTIFICATIONS_ENABLED_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR
-		):timeout(
-			PermissionsProtocol._getPushNotificationsEnabledTimeoutSeconds,
-			"TIMEOUT"
-		):andThen(function(p2)
-			return { enabled = p2.enabled }
-		end)
+	if getPlatform() ~= Enum.Platform.Android or not isAndroidNotificationSettingsGateOpen() then -- inferred equivalent call
+		return Promise.reject("UNSUPPORTED")
 	end
 
-	return Promise.reject("UNSUPPORTED")
+	return callPushNotificationSettingsMethod(
+		p,
+		p.GET_PUSH_NOTIFICATIONS_ENABLED_PROTOCOL_METHOD_REQUEST_DESCRIPTOR,
+		p.GET_PUSH_NOTIFICATIONS_ENABLED_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR
+	):timeout(
+		PermissionsProtocol._getPushNotificationsEnabledTimeoutSeconds,
+		"TIMEOUT"
+	):andThen(function(p2)
+		return { enabled = p2.enabled }
+	end)
 end
 
 PermissionsProtocol.default = PermissionsProtocol.new()

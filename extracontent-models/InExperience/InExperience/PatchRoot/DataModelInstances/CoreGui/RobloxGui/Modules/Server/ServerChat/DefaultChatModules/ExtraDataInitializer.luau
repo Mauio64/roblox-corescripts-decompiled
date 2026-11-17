@@ -20,11 +20,13 @@ local function MakeIsInGroup(groupId, rank) -- 1 equivalent call inferred from t
 
 		local v2 = false
 		local success, result = pcall(function()
-			if rank then
-				v2 = rank < object:GetRankInGroup(groupId)
-			else
+			if not rank then
 				v2 = object:IsInGroup(groupId)
+
+				return
 			end
+
+			v2 = rank < object:GetRankInGroup(groupId)
 		end)
 
 		if not success and result then

@@ -1,5 +1,5 @@
-local index = script.Parent.Parent.Parent._Index
+local Workspace = script.Parent.Parent.Parent._Workspace
 
-local SystemInfoProtocol = require(index.SystemInfoProtocol.SystemInfoProtocol)
+local SystemInfoProtocol = require(Workspace.SystemInfoProtocol.SystemInfoProtocol)
 
 return SystemInfoProtocol

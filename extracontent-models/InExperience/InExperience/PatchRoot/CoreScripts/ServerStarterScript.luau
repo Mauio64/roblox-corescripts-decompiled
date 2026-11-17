@@ -74,6 +74,11 @@ local SendChatAnalytics = require(RobloxGui.Modules.Server.SendChatAnalytics)
 
 ScriptContext:AddCoreScriptLocal("ServerCoreScripts/ServerDialog", script.Parent)
 
+if game:GetEngineFeature("LuauRewardedVideoServer") then
+	local RewardedVideoServer = require(CorePackages.Workspace.Packages.RewardedVideoServer)
+	RewardedVideoServer.serverStarterScript()
+end
+
 local getServerVersion = Instance.new("RemoteFunction")
 getServerVersion.Name = "GetServerVersion"
 getServerVersion.Parent = RobloxReplicatedStorage

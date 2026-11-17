@@ -23,7 +23,6 @@ local useVerifiedBadge = UserProfiles.Hooks.useVerifiedBadge
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagEnableVerifiedBadgeStore = SharedFlags.FFlagEnableVerifiedBadgeStore
 local FFlagCoreUiMigrateUIBloxToFoundation = SharedFlags.FFlagCoreUiMigrateUIBloxToFoundation
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local EmojiTextLabel = UIBlox.Core.Text.EmojiTextLabel
 local Emoji = UIBlox.App.Emoji.Enum.Emoji
@@ -37,45 +36,39 @@ extended.validateProps = t.strictInterface({
 
 function extended.render(p)
 	return WithLayoutValues(function(data)
-		return withFoundationOrUIBloxStyle(function(p2)
-			local tokens
-
-			if FoundationFontFaceMigration then
-				tokens = p2
-			end
-
+		return withFoundationOrUIBloxStyle(function(tokens)
 			return {
 				Tokens = tokens,
 				Theme = {
 					Divider = {
-						Color = p2.Color.Stroke.Emphasis.Color3,
-						Transparency = p2.Color.Stroke.Emphasis.Transparency
+						Color = tokens.Color.Stroke.Emphasis.Color3,
+						Transparency = tokens.Color.Stroke.Emphasis.Transparency
 					},
 					TextEmphasis = {
-						Color = p2.Color.Content.Emphasis.Color3,
-						Transparency = p2.Color.Content.Emphasis.Transparency
+						Color = tokens.Color.Content.Emphasis.Color3,
+						Transparency = tokens.Color.Content.Emphasis.Transparency
 					},
 					TextMuted = {
-						Color = p2.Color.Content.Muted.Color3,
-						Transparency = p2.Color.Content.Muted.Transparency
+						Color = tokens.Color.Content.Muted.Color3,
+						Transparency = tokens.Color.Content.Muted.Transparency
 					}
 				},
 				Font = {
 					BaseSize = 1,
 					CaptionHeader = {
-						Font = p2.Typography.CaptionLarge.Font,
-						RelativeSize = p2.Typography.CaptionLarge.FontSize
+						Font = tokens.Typography.CaptionLarge.Font,
+						RelativeSize = tokens.Typography.CaptionLarge.FontSize
 					},
 					Footer = {
-						Font = p2.Typography.CaptionSmall.Font,
-						RelativeSize = p2.Typography.CaptionSmall.FontSize
+						Font = tokens.Typography.CaptionSmall.Font,
+						RelativeSize = tokens.Typography.CaptionSmall.FontSize
 					},
 					Header2 = {
-						Font = p2.Typography.TitleLarge.Font,
-						RelativeSize = p2.Typography.TitleLarge.FontSize,
-						FontSize = p2.Typography.TitleLarge.FontSize,
-						LineHeight = p2.Typography.TitleLarge.LineHeight,
-						LetterSpacing = p2.Typography.TitleLarge.LetterSpacing
+						Font = tokens.Typography.TitleLarge.Font,
+						RelativeSize = tokens.Typography.TitleLarge.FontSize,
+						FontSize = tokens.Typography.TitleLarge.FontSize,
+						LineHeight = tokens.Typography.TitleLarge.LineHeight,
+						LetterSpacing = tokens.Typography.TitleLarge.LetterSpacing
 					}
 				}
 			}
@@ -89,171 +82,97 @@ function extended.render(p)
 				v = UserLib.Utils.isPlayerVerified(player)
 			end
 
-			local fontStyle
+			local join = Cryo.Dictionary.join
+			local header2 = props.Font.Header2
+			local v2 = { Font = props.Tokens.Typography.TitleLarge.Font, RelativeSize = 0 }
+			local relativeSize
 
-			if FoundationFontFaceMigration then
-				local join = Cryo.Dictionary.join
-				local header2 = props.Font.Header2
-				local v2 = { Font = props.Tokens.Typography.TitleLarge.Font, RelativeSize = 0 }
-				local relativeSize
-
-				if FFlagPlayerListFixDropDownVerifiedBadgeSize and FFlagCoreUiMigrateUIBloxToFoundation then
-					relativeSize = Cryo.None
-				end
-
-				v2.RelativeSize = relativeSize
-				fontStyle = join(header2, v2)
-			elseif FFlagCoreUiMigrateUIBloxToFoundation and props.Font.Header2.FontSize then
-				fontStyle = {
-					Font = props.Font.Header2.Font,
-					FontSize = props.Font.Header2.FontSize,
-					LineHeight = props.Font.Header2.LineHeight,
-					LetterSpacing = props.Font.Header2.LetterSpacing
-				}
-			else
-				fontStyle = props.Font.Header2
+			if FFlagPlayerListFixDropDownVerifiedBadgeSize and FFlagCoreUiMigrateUIBloxToFoundation then
+				relativeSize = Cryo.None
 			end
 
-			local createElement = Roact.createElement
-			local v2 = {
+			v2.RelativeSize = relativeSize
+			local fontStyle = join(header2, v2)
+
+			return Roact.createElement("TextButton", {
 				BackgroundTransparency = 1,
 				Text = "",
 				Size = UDim2.new(1, 0, 0, data.DropDownHeaderSizeY),
 				LayoutOrder = 0,
 				Selectable = false
-			}
-
-			local createElement2 = Roact.createElement
-			local v3 = {
-				BackgroundTransparency = 1,
-				Image = "rbxasset://textures/ui/PlayerList/NewAvatarBackground.png",
-				ImageTransparency = 0,
-				Size = UDim2.new(1, 0, 0, data.DropDownHeaderBackgroundSize),
-				Position = UDim2.new(0, 0, 1, 0),
-				AnchorPoint = Vector2.new(0, 1)
-			}
-
-			local createElement3 = Roact.createElement
-			local v4 = {
-				BackgroundTransparency = 1,
-				Size = UDim2.new(1, -124, 1, 0),
-				Position = UDim2.new(0, 107, 0, 0)
-			}
-			local v5 = {
-				Layout = Roact.createElement("UIListLayout", {
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					FillDirection = Enum.FillDirection.Vertical,
-					Padding = UDim.new(0, 0),
-					VerticalAlignment = Enum.VerticalAlignment.Center
-				}),
-				DisplayName = 0,
-				PlayerName = 0
-			}
-
-			local displayName = v and Roact.createElement(EmojiTextLabel, {
-				fontStyle = fontStyle,
-				colorStyle = props.Theme.TextEmphasis,
-				fluidSizing = false,
-				emoji = Emoji.Verified,
-				maxSize = Vector2.new(data.PlayerDropDownSizeX - 124, 22),
-				LayoutOrder = 1,
-				Text = player.DisplayName,
-				TextXAlignment = Enum.TextXAlignment.Left,
-				TextTruncate = Enum.TextTruncate.AtEnd,
-				BackgroundTransparency = 1,
-				TextScaled = true
-			})
-
-			if not displayName then
-				local createElement4 = Roact.createElement
-				local v6 = {
-					LayoutOrder = 1,
-					Size = UDim2.new(1, 0, 0, 22),
-					Text = player.DisplayName,
-					Font = 0,
-					FontFace = 0,
-					TextSize = 0,
-					TextColor3 = 0,
-					TextTransparency = 0,
-					TextXAlignment = 0,
-					TextTruncate = 0,
+			}, {
+				Background = Roact.createElement("ImageLabel", {
 					BackgroundTransparency = 1,
-					TextScaled = true
-				}
-				local font
-
-				if not FoundationFontFaceMigration then
-					font = props.Font.Header2.Font
-				end
-
-				v6.Font = font
-				local fontFace
-
-				if FoundationFontFaceMigration then
-					fontFace = normalizeFontFace(props.Tokens.Typography.TitleLarge.Font)
-				end
-
-				v6.FontFace = fontFace
-
-				v6.TextSize = props.Font.BaseSize * props.Font.Header2.RelativeSize
-				v6.TextColor3 = props.Theme.TextEmphasis.Color
-				v6.TextTransparency = props.Theme.TextEmphasis.Transparency
-				v6.TextXAlignment = Enum.TextXAlignment.Left
-				v6.TextTruncate = Enum.TextTruncate.AtEnd
-				displayName = createElement4("TextLabel", v6, {
-					SizeConstraint = Roact.createElement("UITextSizeConstraint", {
-						MaxTextSize = props.Font.BaseSize * props.Font.Header2.RelativeSize,
-						MinTextSize = props.Font.BaseSize * props.Font.Footer.RelativeSize
-					})
-				})
-			end
-
-			v5.DisplayName = displayName
-
-			local createElement4 = Roact.createElement
-			local v6 = {
-				LayoutOrder = 2,
-				Size = UDim2.new(1, 0, 0, 22),
-				Text = "@" .. player.Name,
-				Font = 0,
-				FontFace = 0,
-				TextSize = 0,
-				TextColor3 = 0,
-				TextTransparency = 0,
-				TextXAlignment = 0,
-				TextTruncate = 0,
-				BackgroundTransparency = 1,
-				TextScaled = true
-			}
-			local font
-
-			if not FoundationFontFaceMigration then
-				font = props.Font.CaptionHeader.Font
-			end
-
-			v6.Font = font
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(props.Tokens.Typography.CaptionLarge.Font)
-			end
-
-			v6.FontFace = fontFace
-
-			v6.TextSize = props.Font.BaseSize * props.Font.CaptionHeader.RelativeSize
-			v6.TextColor3 = props.Theme.TextMuted.Color
-			v6.TextTransparency = props.Theme.TextMuted.Transparency
-			v6.TextXAlignment = Enum.TextXAlignment.Left
-			v6.TextTruncate = Enum.TextTruncate.AtEnd
-			v5.PlayerName = createElement4("TextLabel", v6, {
-				SizeConstraint = Roact.createElement("UITextSizeConstraint", {
-					MaxTextSize = props.Font.BaseSize * props.Font.CaptionHeader.RelativeSize,
-					MinTextSize = props.Font.BaseSize * props.Font.Footer.RelativeSize
-				})
-			})
-			return createElement("TextButton", v2, {
-				Background = createElement2("ImageLabel", v3, {
-					TextContainerFrame = createElement3("Frame", v4, v5)
+					Image = "rbxasset://textures/ui/PlayerList/NewAvatarBackground.png",
+					ImageTransparency = 0,
+					Size = UDim2.new(1, 0, 0, data.DropDownHeaderBackgroundSize),
+					Position = UDim2.new(0, 0, 1, 0),
+					AnchorPoint = Vector2.new(0, 1)
+				}, {
+					TextContainerFrame = Roact.createElement(
+						"Frame",
+						{
+							BackgroundTransparency = 1,
+							Size = UDim2.new(1, -124, 1, 0),
+							Position = UDim2.new(0, 107, 0, 0)
+						},
+						{
+							Layout = Roact.createElement("UIListLayout", {
+								SortOrder = Enum.SortOrder.LayoutOrder,
+								FillDirection = Enum.FillDirection.Vertical,
+								Padding = UDim.new(0, 0),
+								VerticalAlignment = Enum.VerticalAlignment.Center
+							}),
+							DisplayName = v and Roact.createElement(EmojiTextLabel, {
+								fontStyle = fontStyle,
+								colorStyle = props.Theme.TextEmphasis,
+								fluidSizing = false,
+								emoji = Emoji.Verified,
+								maxSize = Vector2.new(data.PlayerDropDownSizeX - 124, 22),
+								LayoutOrder = 1,
+								Text = player.DisplayName,
+								TextXAlignment = Enum.TextXAlignment.Left,
+								TextTruncate = Enum.TextTruncate.AtEnd,
+								BackgroundTransparency = 1,
+								TextScaled = true
+							}) or Roact.createElement("TextLabel", {
+								LayoutOrder = 1,
+								Size = UDim2.new(1, 0, 0, 22),
+								Text = player.DisplayName,
+								FontFace = normalizeFontFace(props.Tokens.Typography.TitleLarge.Font),
+								TextSize = props.Font.BaseSize * props.Font.Header2.RelativeSize,
+								TextColor3 = props.Theme.TextEmphasis.Color,
+								TextTransparency = props.Theme.TextEmphasis.Transparency,
+								TextXAlignment = Enum.TextXAlignment.Left,
+								TextTruncate = Enum.TextTruncate.AtEnd,
+								BackgroundTransparency = 1,
+								TextScaled = true
+							}, {
+								SizeConstraint = Roact.createElement("UITextSizeConstraint", {
+									MaxTextSize = props.Font.BaseSize * props.Font.Header2.RelativeSize,
+									MinTextSize = props.Font.BaseSize * props.Font.Footer.RelativeSize
+								})
+							}),
+							PlayerName = Roact.createElement("TextLabel", {
+								LayoutOrder = 2,
+								Size = UDim2.new(1, 0, 0, 22),
+								Text = "@" .. player.Name,
+								FontFace = normalizeFontFace(props.Tokens.Typography.CaptionLarge.Font),
+								TextSize = props.Font.BaseSize * props.Font.CaptionHeader.RelativeSize,
+								TextColor3 = props.Theme.TextMuted.Color,
+								TextTransparency = props.Theme.TextMuted.Transparency,
+								TextXAlignment = Enum.TextXAlignment.Left,
+								TextTruncate = Enum.TextTruncate.AtEnd,
+								BackgroundTransparency = 1,
+								TextScaled = true
+							}, {
+								SizeConstraint = Roact.createElement("UITextSizeConstraint", {
+									MaxTextSize = props.Font.BaseSize * props.Font.CaptionHeader.RelativeSize,
+									MinTextSize = props.Font.BaseSize * props.Font.Footer.RelativeSize
+								})
+							})
+						}
+					)
 				}),
 				AvatarImage = Roact.createElement("ImageLabel", {
 					Position = UDim2.new(0, 56, 0, 0),

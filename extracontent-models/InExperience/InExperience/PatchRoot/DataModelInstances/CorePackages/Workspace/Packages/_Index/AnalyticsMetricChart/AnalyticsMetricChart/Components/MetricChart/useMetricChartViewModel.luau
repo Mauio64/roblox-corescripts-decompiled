@@ -4,8 +4,6 @@ local parent = AnalyticsMetricChart.Parent
 local Foundation = require(parent.Foundation)
 local React = require(parent.React)
 
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
-
 require(script.Parent.MetricChartTypes)
 require(script.Parent.MetricChartView)
 local deriveChartAxes = require(AnalyticsMetricChart.Utils.deriveChartAxes)
@@ -15,11 +13,7 @@ local function useMetricChartViewModel(data)
 	local v2 = Foundation.Hooks.useTextSizeOffset()
 
 	local bodySmall = v.Typography.BodySmall
-	local labelFont = bodySmall.Font
-
-	if not FoundationFontFaceMigration and typeof(labelFont) ~= "EnumItem" then
-		labelFont = Enum.Font.BuilderSans
-	end
+	local font = bodySmall.Font
 
 	local labelFontSize = bodySmall.FontSize + (v2 or 0)
 
@@ -127,6 +121,7 @@ local function useMetricChartViewModel(data)
 		deltaText = data.deltaText,
 		isDeltaPositive = data.isDeltaPositive,
 		hasData = data.hasData,
+		hideHeader = data.hideHeader == true,
 		points = v4.points,
 		minX = v4.minX,
 		maxX = v4.maxX,
@@ -134,7 +129,7 @@ local function useMetricChartViewModel(data)
 		maxY = v4.maxY,
 		yTicks = yTicks,
 		xAxisLabels = xAxisLabels,
-		labelFont = labelFont,
+		labelFont = font,
 		labelFontSize = labelFontSize,
 		inspectedIndex = state,
 		tooltip = tooltip,

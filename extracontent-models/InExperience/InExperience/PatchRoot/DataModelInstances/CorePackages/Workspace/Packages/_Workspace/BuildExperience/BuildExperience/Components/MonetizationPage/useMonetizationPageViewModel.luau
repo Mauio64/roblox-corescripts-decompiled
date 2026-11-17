@@ -1124,7 +1124,8 @@ local function useMonetizationPageViewModel(data)
 			placeId = data.placeId,
 			conversationId = data.sessionId,
 			messageId = nil,
-			turnId = nil
+			turnId = nil,
+			chatOpenId = nil
 		}
 	end, { data.placeId or 0, data.sessionId or "", data.universeId or 0 })
 	local current = React.useMemo(function()

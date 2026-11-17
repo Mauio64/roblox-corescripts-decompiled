@@ -113,9 +113,10 @@ local function handleCopyLink(universeId: string, placeId: string, ctx: string, 
 	fetchShareLinkId(universeId):andThen(function(linkId)
 		local url, stamp = generateExperienceDetailsShareLinkUrl(linkId, universeId, placeId)
 
+		local userId = Players.LocalPlayer and Players.LocalPlayer.UserId
 		local v = {
 			ctx = ctx,
-			uid = tostring(Players.LocalPlayer and Players.LocalPlayer.UserId),
+			uid = tostring(userId),
 			placeId = placeId,
 			stamp = stamp,
 			targetId = 0
@@ -163,9 +164,10 @@ local function useExperienceDetailsShare(universeId: string, placeId: string?, c
 			fetchShareLinkId(universeId):andThen(function(linkId)
 				local url, stamp = generateExperienceDetailsShareLinkUrl(linkId, universeId, placeId)
 
+				local userId = Players.LocalPlayer and Players.LocalPlayer.UserId
 				local v3 = {
 					ctx = ctx,
-					uid = tostring(Players.LocalPlayer and Players.LocalPlayer.UserId),
+					uid = tostring(userId),
 					placeId = placeId,
 					shortShareLinkFailed = not linkId,
 					shareToAppsflyer = true,
@@ -189,9 +191,10 @@ local function useExperienceDetailsShare(universeId: string, placeId: string?, c
 					placeId = placeId
 				})
 
+				local userId = Players.LocalPlayer and Players.LocalPlayer.UserId
 				local v3 = {
 					ctx = ctx,
-					uid = tostring(Players.LocalPlayer and Players.LocalPlayer.UserId),
+					uid = tostring(userId),
 					placeId = placeId,
 					shortShareLinkFailed = true,
 					shareToAppsflyer = true,

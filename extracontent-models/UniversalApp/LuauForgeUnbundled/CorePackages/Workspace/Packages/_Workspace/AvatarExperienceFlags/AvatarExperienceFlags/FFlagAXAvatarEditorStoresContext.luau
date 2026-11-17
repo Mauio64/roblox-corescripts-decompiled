@@ -1,1 +1,0 @@
-return game:DefineFastFlag("AXAvatarEditorStoresContext2", false)

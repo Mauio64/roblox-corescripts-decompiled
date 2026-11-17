@@ -7,11 +7,8 @@ local uiBlox = dependencies.UIBlox
 local styledTextLabel = uiBlox.App.Text.StyledTextLabel
 local style = uiBlox.Style
 
-local getTextHeight = require(script.Parent.getTextHeight)
 require(script.Parent.StyleTypes)
 local Constants = require(script.Parent.Constants)
-
-local foundationFontFaceMigration = dependencies.Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local v = { width = Constants.TILE_SIZE }
 
@@ -22,10 +19,6 @@ return function(p)
 		local theme = p2.Theme
 		local font = p2.Font
 		local v2 = font.BaseSize * font.CaptionHeader.RelativeSize
-
-		if not foundationFontFaceMigration then
-			v2 = getTextHeight(joined.name, font.CaptionHeader.Font, v2)
-		end
 
 		return roact.createElement(styledTextLabel, {
 			layoutOrder = joined.layoutOrder,

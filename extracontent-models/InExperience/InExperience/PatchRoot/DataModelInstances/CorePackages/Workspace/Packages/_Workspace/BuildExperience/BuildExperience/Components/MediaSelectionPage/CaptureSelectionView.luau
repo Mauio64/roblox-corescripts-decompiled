@@ -1,4 +1,5 @@
-local parent = script:FindFirstAncestor("BuildExperience").Parent
+local BuildExperience = script:FindFirstAncestor("BuildExperience")
+local parent = BuildExperience.Parent
 
 local React = require(parent.React)
 local Foundation = require(parent.Foundation)
@@ -9,6 +10,7 @@ local ButtonVariant = Foundation.Enums.ButtonVariant
 local InputSize = Foundation.Enums.InputSize
 local View = Foundation.View
 
+local FFlagBuildExperienceLocalizeCaptureShowMore = require(BuildExperience.Flags.FFlagBuildExperienceLocalizeCaptureShowMore)
 local MediaPreview = require(script.Parent.MediaPreview)
 local CaptureGridItem = require(script.Parent.CaptureGridItem)
 local useCaptureSelectionViewModel = require(script.Parent.useCaptureSelectionViewModel)
@@ -59,7 +61,7 @@ local function CaptureSelectionView(props)
 				renderEmptyState = renderEmptyState,
 				renderItem = renderItem,
 				shouldShowShowMoreButton = not props.isFinished,
-				showMoreButtonText = "Show More"
+				showMoreButtonText = not FFlagBuildExperienceLocalizeCaptureShowMore and "Show More" or props.showMoreText
 			})
 		}),
 		ConfirmButton = React.createElement(View, { LayoutOrder = 3, tag = "size-full-0 auto-y" }, {

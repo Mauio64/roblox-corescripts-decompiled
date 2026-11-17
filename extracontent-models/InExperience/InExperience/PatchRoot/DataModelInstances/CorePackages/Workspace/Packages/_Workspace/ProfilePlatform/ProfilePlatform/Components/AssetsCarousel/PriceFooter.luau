@@ -4,7 +4,6 @@ local React = require(parent.React)
 local UIBlox = require(parent.UIBlox)
 local Foundation = require(parent.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local useStyle = UIBlox.Core.Style.useStyle
@@ -78,42 +77,18 @@ local function PriceFooter(props)
 
 	v4.Icon = icon
 
-	local createElement2 = React.createElement
-	local v5 = {
+	v4.Text = React.createElement("TextLabel", {
 		LayoutOrder = 2,
 		BackgroundTransparency = 1,
 		Size = UDim2.new(1, not flag and 0 or -(vector2.X + 4), 1, 0),
-		Font = 0,
-		FontFace = 0,
-		TextColor3 = 0,
-		TextTransparency = 0,
-		TextSize = 0,
-		Text = 0,
-		TextXAlignment = 0,
-		TextYAlignment = 0
-	}
-	local font2
-
-	if not FoundationFontFaceMigration then
-		font2 = font.SubHeader1.Font
-	end
-
-	v5.Font = font2
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(v.Tokens.Typography.TitleLarge.Font)
-	end
-
-	v5.FontFace = fontFace
-
-	v5.TextColor3 = theme.SecondaryContent.Color
-	v5.TextTransparency = theme.SecondaryContent.Transparency
-	v5.TextSize = textSize
-	v5.Text = text
-	v5.TextXAlignment = Enum.TextXAlignment.Left
-	v5.TextYAlignment = Enum.TextYAlignment.Center
-	v4.Text = createElement2("TextLabel", v5)
+		FontFace = normalizeFontFace(v.Tokens.Typography.TitleLarge.Font),
+		TextColor3 = theme.SecondaryContent.Color,
+		TextTransparency = theme.SecondaryContent.Transparency,
+		TextSize = textSize,
+		Text = text,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextYAlignment = Enum.TextYAlignment.Center
+	})
 	return createElement("Frame", v3, v4)
 end
 

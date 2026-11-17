@@ -15,7 +15,6 @@ local enum = UIBlox.App.Button.Enum
 local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local useChatPagePadding = require(AppChat.Contexts.ChatPagePadding.useChatPagePadding)
 local useIsInExperience = require(AppChat.Hooks.useIsInExperience)
@@ -152,44 +151,19 @@ local function ConversationModal(p)
 	v11.VerticalAlignment = Enum.VerticalAlignment.Top
 	children.UIListLayout = createElement3("UIListLayout", v11)
 
-	local createElement4 = React.createElement
-	local v12 = {
+	children.Body = React.createElement("TextLabel", {
 		BackgroundTransparency = 1,
 		TextSize = style.Tokens.FontSize.FontSize_300,
-		Font = 0,
-		FontFace = 0,
+		FontFace = normalizeFontFace(v3.Typography.BodyLarge.Font),
 		LayoutOrder = 1,
-		Size = 0,
-		AutomaticSize = 0,
-		Text = 0,
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		Text = joined.bodyText,
 		TextWrapped = true,
-		TextColor3 = 0,
-		TextXAlignment = 0,
-		TextYAlignment = 0
-	}
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = style.Font.Body.Font
-	end
-
-	v12.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(v3.Typography.BodyLarge.Font)
-	end
-
-	v12.FontFace = fontFace
-
-	v12.Size = UDim2.new(1, 0, 0, 0)
-	v12.AutomaticSize = Enum.AutomaticSize.Y
-	v12.Text = joined.bodyText
-
-	v12.TextColor3 = style.Theme.TextDefault.Color
-	v12.TextXAlignment = Enum.TextXAlignment.Left
-	v12.TextYAlignment = Enum.TextYAlignment.Center
-	children.Body = createElement4("TextLabel", v12)
+		TextColor3 = style.Theme.TextDefault.Color,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextYAlignment = Enum.TextYAlignment.Center
+	})
 	local buttons2
 
 	if #buttons > 0 then

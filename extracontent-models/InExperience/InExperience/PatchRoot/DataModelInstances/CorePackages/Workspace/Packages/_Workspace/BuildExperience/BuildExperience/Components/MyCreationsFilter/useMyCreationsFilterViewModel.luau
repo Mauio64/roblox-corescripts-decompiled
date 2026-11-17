@@ -10,6 +10,7 @@ local useLocalization = Localization.Hooks.useLocalization
 local useSignalState = SignalsReact.useSignalState
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
 
+local FFlagBuildExperienceFiltersSaveLabel = require(BuildExperience.Flags.FFlagBuildExperienceFiltersSaveLabel)
 local FFlagBuildExperiencePreviewsTab = require(BuildExperience.Flags.FFlagBuildExperiencePreviewsTab)
 local GamesFilter = require(BuildExperience.Stores.GetMyCreationsFilterStore.GamesFilter)
 local GetMyCreationsFilterStore = require(BuildExperience.Stores.GetMyCreationsFilterStore)
@@ -50,24 +51,44 @@ local function useMyCreationsFilterViewModel(data)
 		v6 = data.options or v6
 	end
 
-	local v7 = useLocalization({
+	local v7 = {
 		all = LocalizationStrings.MY_CREATIONS_FILTER_ALL,
 		allGames = LocalizationStrings.MY_CREATIONS_FILTER_ALL_GAMES,
-		apply = LocalizationStrings.MY_CREATIONS_FILTER_APPLY,
-		games = LocalizationStrings.MY_CREATIONS_FILTER_GAMES,
-		groupGames = LocalizationStrings.MY_CREATIONS_FILTER_GROUP_GAMES,
-		groups = LocalizationStrings.MY_CREATIONS_FILTER_GROUPS,
-		myGames = LocalizationStrings.MY_CREATIONS_FILTER_MY_GAMES,
-		reset = LocalizationStrings.MY_CREATIONS_FILTER_RESET,
-		searchGroups = LocalizationStrings.MY_CREATIONS_FILTER_SEARCH_GROUPS,
-		sharedGames = LocalizationStrings.MY_CREATIONS_FILTER_SHARED_GAMES,
-		title = LocalizationStrings.MY_CREATIONS_FILTER_TITLE
-	})
-	local all = v7.all
-	local label = v7.allGames
-	local groupGames = v7.groupGames
-	local myGames = v7.myGames
-	local sharedGames = v7.sharedGames
+		apply = 0,
+		games = 0,
+		groupGames = 0,
+		groups = 0,
+		myGames = 0,
+		reset = 0,
+		searchGroups = 0,
+		sharedGames = 0,
+		title = 0
+	}
+	local apply
+
+	if FFlagBuildExperienceFiltersSaveLabel then
+		apply = LocalizationStrings.MY_CREATIONS_FILTER_SAVE
+	else
+		apply = LocalizationStrings.MY_CREATIONS_FILTER_APPLY
+	end
+
+	v7.apply = apply
+
+	v7.games = LocalizationStrings.MY_CREATIONS_FILTER_GAMES
+	v7.groupGames = LocalizationStrings.MY_CREATIONS_FILTER_GROUP_GAMES
+	v7.groups = LocalizationStrings.MY_CREATIONS_FILTER_GROUPS
+	v7.myGames = LocalizationStrings.MY_CREATIONS_FILTER_MY_GAMES
+	v7.reset = LocalizationStrings.MY_CREATIONS_FILTER_RESET
+	v7.searchGroups = LocalizationStrings.MY_CREATIONS_FILTER_SEARCH_GROUPS
+	v7.sharedGames = LocalizationStrings.MY_CREATIONS_FILTER_SHARED_GAMES
+	v7.title = LocalizationStrings.MY_CREATIONS_FILTER_TITLE
+
+	local v8 = useLocalization(v7)
+	local all = v8.all
+	local label = v8.allGames
+	local groupGames = v8.groupGames
+	local myGames = v8.myGames
+	local sharedGames = v8.sharedGames
 
 	local state, setState = React.useState(v3)
 	local state2, setState2 = React.useState("")
@@ -79,33 +100,33 @@ local function useMyCreationsFilterViewModel(data)
 		setState3(true)
 	end, { filterStore })
 
-	local v8 = React.useCallback(function()
+	local v9 = React.useCallback(function()
 		setState3(false)
 	end, {})
 
 	local focusRootRef = useClosableFocusRoot({
 		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.PopUp,
 		isOpen = state3,
-		onClose = v8
+		onClose = v9
 	})
 
 	local onGamesChanged = React.useCallback(function(games: string)
 		if table.find(v6, games) then
 			setState(function(p)
-				local v9 = { games = games, groupId = 0 }
+				local v10 = { games = games, groupId = 0 }
 				local groupId
 
 				if games == "GroupGames" then
 					groupId = p.groupId
 				end
 
-				v9.groupId = groupId
-				return v9
+				v10.groupId = groupId
+				return v10
 			end)
 		end
 	end, { v6 })
 
-	local v9 = React.useCallback(function(p: number)
+	local v10 = React.useCallback(function(p: number)
 		setState(function(p2)
 			local groupId
 
@@ -127,11 +148,11 @@ local function useMyCreationsFilterViewModel(data)
 		setState2("")
 	end, { v5 })
 
-	local v10 = groups == nil or #groups == 0
+	local v11 = groups == nil or #groups == 0
 
 	local gamesOptions = React.useMemo(function()
 		if FFlagBuildExperiencePreviewsTab then
-			local v11 = {
+			local v12 = {
 				[GamesFilter.All] = all,
 				[GamesFilter.MyGames] = myGames,
 				[GamesFilter.GroupGames] = groupGames,
@@ -140,27 +161,27 @@ local function useMyCreationsFilterViewModel(data)
 
 			local result = {}
 
-			for _, v12 in v6 do
-				if not v10 or v12 ~= GamesFilter.GroupGames then
-					table.insert(result, { value = v12, label = v11[v12] })
+			for _, v13 in v6 do
+				if not v11 or v13 ~= GamesFilter.GroupGames then
+					table.insert(result, { value = v13, label = v12[v13] })
 				end
 			end
 
 			return result
 		else
-			local v11 = {
+			local v12 = {
 				{ value = "All", label = all },
 				{ value = "MyGames", label = myGames }
 			}
 
-			if not v10 then
-				table.insert(v11, { value = "GroupGames", label = groupGames })
+			if not v11 then
+				table.insert(v12, { value = "GroupGames", label = groupGames })
 			end
 
-			table.insert(v11, { value = "SharedGames", label = sharedGames })
-			return v11
+			table.insert(v12, { value = "SharedGames", label = sharedGames })
+			return v12
 		end
-	end, { all, groupGames, v10, myGames, sharedGames, v6 })
+	end, { all, groupGames, v11, myGames, sharedGames, v6 })
 
 	local groupId = state.groupId
 	local groups2 = React.useMemo(function()
@@ -175,20 +196,20 @@ local function useMyCreationsFilterViewModel(data)
 				continue
 			end
 
-			local v11 = {
+			local v12 = {
 				id = group.id,
 				name = group.name,
 				icon = getGroupIcon(group.id), -- inferred equivalent call
 				isSelected = group.id == groupId,
 				onActivated = function()
-					v9(group.id)
+					v10(group.id)
 				end
 			}
-			table.insert(result, v11)
+			table.insert(result, v12)
 		end
 
 		return result
-	end, { state2, groups, v9, groupId })
+	end, { state2, groups, v10, groupId })
 
 	local name = nil
 
@@ -218,21 +239,21 @@ local function useMyCreationsFilterViewModel(data)
 		label = label,
 		onOpenSheet = onOpenSheet,
 		isSheetOpen = state3,
-		onSheetClosed = v8,
+		onSheetClosed = v9,
 		focusRootRef = focusRootRef,
-		titleText = v7.title,
-		gamesLegend = v7.games,
+		titleText = v8.title,
+		gamesLegend = v8.games,
 		gamesOptions = gamesOptions,
 		selectedGames = state.games,
 		onGamesChanged = onGamesChanged,
 		isGroupsVisible = state.games == "GroupGames" and groups ~= nil and #groups > 0,
-		groupsLegend = v7.groups,
+		groupsLegend = v8.groups,
 		groupSearchText = state2,
-		groupSearchPlaceholder = v7.searchGroups,
+		groupSearchPlaceholder = v8.searchGroups,
 		onGroupSearchTextChanged = setState2,
 		groups = groups2,
-		applyText = v7.apply,
-		resetText = v7.reset,
+		applyText = v8.apply,
+		resetText = v8.reset,
 		onApply = onApply,
 		onReset = onReset,
 		testId = data.testId

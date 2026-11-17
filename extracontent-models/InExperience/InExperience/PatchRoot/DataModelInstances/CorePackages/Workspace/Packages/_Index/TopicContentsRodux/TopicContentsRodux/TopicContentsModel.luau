@@ -9,7 +9,7 @@ local GameCollectionItemType = DiscoveryTypes.GameCollectionItemTypes.GameCollec
 local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
 
 local SharedFlags = require(parent.SharedFlags)
-local FFlagLuaAppEnableHomepageOneByTwoTile = SharedFlags.FFlagLuaAppEnableHomepageOneByTwoTile
+local FFlagLuaAppEnableNxMRoduxApportioning = SharedFlags.FFlagLuaAppEnableNxMRoduxApportioning
 
 local SharedFlags2 = require(parent.SharedFlags)
 local FFlagLuaAppEnableOneByTwoTileFunnelTelemetry = SharedFlags2.FFlagLuaAppEnableOneByTwoTileFunnelTelemetry
@@ -77,7 +77,7 @@ function TopicContentsModel.fromContentList(list, callback, callback2, updatedTi
 
 		fromOmniRecommendations(item, v2):match(function(data)
 			if
-				FFlagLuaAppEnableHomepageOneByTwoTile
+				FFlagLuaAppEnableNxMRoduxApportioning
 				and data.componentType == GameCollectionItemType.OneByTwoTile
 				and not (data.primaryVideoAssetId and data.primaryImageAssetId)
 			then
@@ -91,7 +91,7 @@ function TopicContentsModel.fromContentList(list, callback, callback2, updatedTi
 					}
 				)
 			elseif
-				FFlagLuaAppEnableHomepageOneByTwoTile
+				FFlagLuaAppEnableNxMRoduxApportioning
 				and data.contentType == OmniRecommendationsContentType.AdLink
 			then
 				if not data.clickoutUrl or data.clickoutUrl == "" then

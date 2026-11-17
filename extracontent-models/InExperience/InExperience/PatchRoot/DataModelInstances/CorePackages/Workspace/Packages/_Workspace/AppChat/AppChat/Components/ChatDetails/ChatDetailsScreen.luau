@@ -12,34 +12,12 @@ local FFlagAppChatIxpScreenExposure = require(AppChat.Flags.FFlagAppChatIxpScree
 
 local IXPNavigationUtils = require(AppChat.Utils.IXPNavigationUtils)
 local GetTopBarStore = require(AppChat.Stores.GetTopBarStore)
-local FFlagDebugAppChatEnableDomLocators = require(AppChat.Flags.FFlagDebugAppChatEnableDomLocators)
-local DomLocators = require(AppChat.Utils.DomLocators)
-local getFFlagAppChatEnableRootedNavigation = require(AppChat.Flags.getFFlagAppChatEnableRootedNavigation)
 local GetRootedNavigationStore = require(AppChat.Stores.GetRootedNavigationStore)
 
 local extended = Roact.PureComponent:extend("ChatDetailsScreen")
 extended.defaultProps = { navigation = nil }
 
-local function navigationOptions()
-	local v = {
-		headerText = ChatDetailsNavigationOptions.getHeaderText(),
-		backButtonTestId = 0
-	}
-	local backButtonTestId
-
-	if FFlagDebugAppChatEnableDomLocators then
-		backButtonTestId = DomLocators.chatDetailsTopBarActionButton("back")
-	end
-
-	v.backButtonTestId = backButtonTestId
-	return v
-end
-
-if getFFlagAppChatEnableRootedNavigation() then
-	navigationOptions = ChatDetailsNavigationOptions.getNavigationOptions
-end
-
-extended.navigationOptions = navigationOptions
+extended.navigationOptions = ChatDetailsNavigationOptions.getNavigationOptions
 
 function extended:init()
 	local ixpSubscription
@@ -52,13 +30,10 @@ function extended:init()
 
 	function self.navigateToEditChatMembers(conversation)
 		Logger:info("Navigate To EditChatMembers from {screen}")
-		local v = getFFlagAppChatEnableRootedNavigation()
-			and {
-				conversation = conversation,
-				isRooted = self.props.navigation.getParam("isRooted", false)
-			}
-			or { conversation = conversation }
-		self.props.navigation.navigate(EnumScreens.EditChatMembers, v)
+		self.props.navigation.navigate(EnumScreens.EditChatMembers, {
+			conversation = conversation,
+			isRooted = self.props.navigation.getParam("isRooted", false)
+		})
 	end
 
 	function self.navigateToToast(p)
@@ -71,21 +46,19 @@ function extended:init()
 		self.props.navigation.navigate(p, p2)
 	end
 
-	if getFFlagAppChatEnableRootedNavigation() then
-		function self.closeRootedChatDetails()
-			local screenProps = self.props.navigation.getScreenProps("navigateToRootStack", nil)
+	function self.closeRootedChatDetails()
+		local screenProps = self.props.navigation.getScreenProps("navigateToRootStack", nil)
 
-			if screenProps then
-				screenProps()
-			elseif self.props.navigation.isFocused() then
-				self.props.navigation.goBack()
-			end
+		if screenProps then
+			screenProps()
+		elseif self.props.navigation.isFocused() then
+			self.props.navigation.goBack()
 		end
 	end
 
 	function self.navigateBack()
 		if self.props.navigation.isFocused() then
-			if getFFlagAppChatEnableRootedNavigation() and self.props.navigation.getParam("isRooted", false) then
+			if self.props.navigation.getParam("isRooted", false) then
 				self.closeRootedChatDetails()
 			else
 				self.props.navigation.goBack()
@@ -95,19 +68,16 @@ function extended:init()
 
 	function self.navigateToConversation(conversationId)
 		Logger:info("Navigate To Conversation from {screen}")
-		local v = getFFlagAppChatEnableRootedNavigation()
-			and {
-				conversationId = conversationId,
-				isRooted = self.props.navigation.getParam("isRooted", false)
-			}
-			or { conversationId = conversationId }
-		self.props.navigation.navigate(EnumScreens.ChatConversation, v)
+		self.props.navigation.navigate(EnumScreens.ChatConversation, {
+			conversationId = conversationId,
+			isRooted = self.props.navigation.getParam("isRooted", false)
+		})
 	end
 
 	function self.navigateToChatLanding()
 		Logger:info("Navigate To ChatLanding from {screen}")
 
-		if getFFlagAppChatEnableRootedNavigation() and self.props.navigation.getParam("isRooted", false) then
+		if self.props.navigation.getParam("isRooted", false) then
 			self.closeRootedChatDetails()
 		elseif self.props.navigation.getScreenProps("wideMode", false) then
 			self.props.navigation.navigate(EnumScreens.EmptyConversation)
@@ -149,7 +119,7 @@ function extended.didMount(p)
 		ChatDetailsNavigationOptions.getTopBarConfig(p.props.navigation)
 	)
 
-	if getFFlagAppChatEnableRootedNavigation() and p.props.navigation.getParam("isRooted", false) then
+	if p.props.navigation.getParam("isRooted", false) then
 		GetRootedNavigationStore(false).completeNavigation(p.props.navigation.getParam("rootedNavigationRequestId", nil))
 	end
 end

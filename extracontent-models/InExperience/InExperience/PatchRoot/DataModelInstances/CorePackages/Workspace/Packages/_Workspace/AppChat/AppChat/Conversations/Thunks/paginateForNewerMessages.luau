@@ -1,11 +1,14 @@
 local AppChat = script:FindFirstAncestor("AppChat")
 local parent = AppChat.Parent
 local AppChatNetworking = require(parent.AppChatNetworking)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAppChatEnableReactions = SharedFlags.FFlagAppChatEnableReactions
 
 local Logger = require(AppChat.Logger)
 local v = Logger:new("AppChat.paginateForNewerMessages")
 
 require(AppChat.Models.ConversationChannels)
+local GetMessageReactionsStore = require(AppChat.Stores.GetMessageReactionsStore)
 
 local defineFastInt = game:DefineFastInt("AppChatNewMessageFetchMaxDepth", 10)
 
@@ -15,6 +18,10 @@ end
 
 local function fetchOlderMessages(p, p2, p3: number)
 	return function(object)
+		if FFlagAppChatEnableReactions and p2.responseBody then
+			GetMessageReactionsStore(false).ingestMessageReactions(p2.responseBody.messages)
+		end
+
 		if defineFastInt <= p3 then
 			v:warning("Reached max depth {} of fetching new messages", defineFastInt)
 			return
@@ -66,6 +73,10 @@ return function(p)
 			local v2 = p
 			local v3 = 0
 			return object:dispatch(function(object2)
+				if FFlagAppChatEnableReactions and p2.responseBody then
+					GetMessageReactionsStore(false).ingestMessageReactions(p2.responseBody.messages)
+				end
+
 				if defineFastInt <= v3 then
 					v:warning("Reached max depth {} of fetching new messages", defineFastInt)
 					return

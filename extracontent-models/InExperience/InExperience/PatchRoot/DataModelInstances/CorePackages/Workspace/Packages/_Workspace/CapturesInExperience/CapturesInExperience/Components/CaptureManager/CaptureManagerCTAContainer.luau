@@ -8,7 +8,6 @@ local SocialStopwatch = require(parent2.SocialStopwatch)
 local UIBlox = require(parent2.UIBlox)
 local Foundation = require(parent2.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local IconButton = UIBlox.App.Button.IconButton
 local IconSize = UIBlox.App.Constant.IconSize
@@ -55,7 +54,14 @@ end)(function(props)
 
 	local count = #v5
 	local isDisabled = #v5 == 0 or #v5 > 1
-	local isDisabled2 = #v5 == 0 or defineFastInt < #v5
+	local isDisabled2
+
+	if #v5 == 0 then
+		isDisabled2 = true
+	else
+		isDisabled2 = defineFastInt < #v5
+	end
+
 	local isDisabled3 = #v5 == 0
 	local fillDirection
 
@@ -192,16 +198,14 @@ end)(function(props)
 		props.deleteItem()
 	end, { v8, isDisabled3, props.deleteItem, props.isDisabled, v9 })
 
-	local createElement = React.createElement
-	local v10 = {
+	return React.createElement("Frame", {
 		BackgroundColor3 = v3.Theme.BackgroundContrast.Color,
 		BackgroundTransparency = v3.Theme.BackgroundContrast.Transparency,
 		BorderSizePixel = 0,
 		LayoutOrder = props.LayoutOrder,
 		Size = UDim2.new(1, 0, 0, props.height),
 		ZIndex = props.ZIndex
-	}
-	local children = {
+	}, {
 		Layout = React.createElement("UIListLayout", {
 			FillDirection = fillDirection,
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
@@ -210,91 +214,61 @@ end)(function(props)
 			VerticalAlignment = Enum.VerticalAlignment.Center
 		}),
 		Padding = React.createElement("UIPadding", { PaddingRight = UDim.new(0, 16) }),
-		CapturesLabel = 0,
-		CTAContainer = 0
-	}
-
-	local createElement2 = React.createElement
-	local v11 = {
-		AnchorPoint = Vector2.new(1, 0.5),
-		AutomaticSize = Enum.AutomaticSize.X,
-		BackgroundTransparency = 1,
-		Font = 0,
-		FontFace = 0,
-		LayoutOrder = 1,
-		Position = 0,
-		Size = 0,
-		Text = 0,
-		TextColor3 = 0,
-		TextSize = 0,
-		TextXAlignment = 0,
-		TextYAlignment = 0,
-		ZIndex = 1
-	}
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = v3.Font.Header2.Font
-	end
-
-	v11.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(v3.Tokens.Typography.TitleLarge.Font)
-	end
-
-	v11.FontFace = fontFace
-
-	v11.Position = UDim2.new(1, 0, 1, 0)
-	v11.Size = udim2
-	v11.Text = v7()
-	v11.TextColor3 = v3.Theme.TextEmphasis.Color
-	v11.TextSize = v3.Font.BaseSize * v3.Font.CaptionHeader.RelativeSize
-	v11.TextXAlignment = textXAlignment
-	v11.TextYAlignment = Enum.TextYAlignment.Center
-	children.CapturesLabel = createElement2("TextLabel", v11)
-
-	children.CTAContainer = React.createElement("Frame", {
-		BackgroundColor3 = v3.Theme.BackgroundContrast.Color,
-		BackgroundTransparency = v3.Theme.BackgroundContrast.Transparency,
-		BorderSizePixel = 0,
-		LayoutOrder = props.LayoutOrder,
-		Size = udim3,
-		ZIndex = props.ZIndex
-	}, {
-		Layout = React.createElement("UIListLayout", {
-			FillDirection = Enum.FillDirection.Horizontal,
-			HorizontalAlignment = Enum.HorizontalAlignment.Center,
-			SortOrder = Enum.SortOrder.LayoutOrder,
-			VerticalAlignment = Enum.VerticalAlignment.Center
+		CapturesLabel = React.createElement("TextLabel", {
+			AnchorPoint = Vector2.new(1, 0.5),
+			AutomaticSize = Enum.AutomaticSize.X,
+			BackgroundTransparency = 1,
+			FontFace = normalizeFontFace(v3.Tokens.Typography.TitleLarge.Font),
+			LayoutOrder = 1,
+			Position = UDim2.new(1, 0, 1, 0),
+			Size = udim2,
+			Text = v7(),
+			TextColor3 = v3.Theme.TextEmphasis.Color,
+			TextSize = v3.Font.BaseSize * v3.Font.CaptionHeader.RelativeSize,
+			TextXAlignment = textXAlignment,
+			TextYAlignment = Enum.TextYAlignment.Center,
+			ZIndex = 1
 		}),
-		BulkSaveButton = React.createElement(IconButton, {
-			backgroundColor = v3.Theme.BackgroundUIContrast,
-			icon = Images["icons/actions/download_medium"],
-			iconSize = IconSize.Medium,
-			isDisabled = isDisabled2,
-			layoutOrder = 1,
-			onActivated = onActivated,
-			size = udim
-		}),
-		BulkShareButton = props.enableShareCaptureCTA and React.createElement(IconButton, {
-			backgroundColor = v3.Theme.BackgroundUIContrast,
-			icon = Images["icons/actions/share"],
-			iconSize = IconSize.Medium,
-			isDisabled = isDisabled,
-			layoutOrder = 1,
-			onActivated = onActivated2,
-			size = udim
-		}),
-		BulkDeleteButton = React.createElement(IconButton, {
-			icon = Images["icons/actions/edit/delete"],
-			iconSize = IconSize.Medium,
-			isDisabled = isDisabled3,
-			layoutOrder = 2,
-			onActivated = onActivated3,
-			size = udim
+		CTAContainer = React.createElement("Frame", {
+			BackgroundColor3 = v3.Theme.BackgroundContrast.Color,
+			BackgroundTransparency = v3.Theme.BackgroundContrast.Transparency,
+			BorderSizePixel = 0,
+			LayoutOrder = props.LayoutOrder,
+			Size = udim3,
+			ZIndex = props.ZIndex
+		}, {
+			Layout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Horizontal,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				VerticalAlignment = Enum.VerticalAlignment.Center
+			}),
+			BulkSaveButton = React.createElement(IconButton, {
+				backgroundColor = v3.Theme.BackgroundUIContrast,
+				icon = Images["icons/actions/download_medium"],
+				iconSize = IconSize.Medium,
+				isDisabled = isDisabled2,
+				layoutOrder = 1,
+				onActivated = onActivated,
+				size = udim
+			}),
+			BulkShareButton = props.enableShareCaptureCTA and React.createElement(IconButton, {
+				backgroundColor = v3.Theme.BackgroundUIContrast,
+				icon = Images["icons/actions/share"],
+				iconSize = IconSize.Medium,
+				isDisabled = isDisabled,
+				layoutOrder = 1,
+				onActivated = onActivated2,
+				size = udim
+			}),
+			BulkDeleteButton = React.createElement(IconButton, {
+				icon = Images["icons/actions/edit/delete"],
+				iconSize = IconSize.Medium,
+				isDisabled = isDisabled3,
+				layoutOrder = 2,
+				onActivated = onActivated3,
+				size = udim
+			})
 		})
 	})
-	return createElement("Frame", v10, children)
 end))

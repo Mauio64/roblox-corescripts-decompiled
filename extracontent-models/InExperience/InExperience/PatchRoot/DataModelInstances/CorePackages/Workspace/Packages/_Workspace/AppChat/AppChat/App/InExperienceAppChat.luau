@@ -63,13 +63,11 @@ local SocialExperiments = require(parent.SocialExperiments)
 local PartyPageCarouselExperimentation = SocialExperiments.PartyPageCarouselExperimentation
 local SharedFlags4 = require(parent.SharedFlags)
 local FFlagEnableAppChatSnoozeMenuFocus = SharedFlags4.FFlagEnableAppChatSnoozeMenuFocus
-local SharedFlags5 = require(parent.SharedFlags)
-local FFlagExpChatEnableFriendsTab = SharedFlags5.FFlagExpChatEnableFriendsTab
 local isSideSheetEnabled = require(parent.InExperienceSideSheetUtils.isSideSheetEnabled)
+local SharedFlags5 = require(parent.SharedFlags)
+local FFlagSideSheetFocusNav = SharedFlags5.FFlagSideSheetFocusNav
 local SharedFlags6 = require(parent.SharedFlags)
-local FFlagSideSheetFocusNav = SharedFlags6.FFlagSideSheetFocusNav
-local SharedFlags7 = require(parent.SharedFlags)
-local FFlagEnableDrawerAnimatingHook = SharedFlags7.FFlagEnableDrawerAnimatingHook
+local FFlagEnableDrawerAnimatingHook = SharedFlags6.FFlagEnableDrawerAnimatingHook
 
 local FocusNavigationUtils = require(parent.FocusNavigationUtils)
 local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
@@ -231,24 +229,18 @@ function InExperienceAppChat()
 	end
 
 	local navigateToChat = React.useCallback(function(p: string)
-		local function openLegacyAppChat() -- 2 equivalent calls inferred from this helper
+		local function openLegacyAppChat() -- 1 equivalent call inferred from this helper
 			showParentContainer()
 			setState(p)
 			v(EnteredChatFromEntryPoint(SocialCommon.Enums.ChatEntryPointNames.ToastInExp))
 		end
+		return v3.openFriendsChatConversation(p):andThen(function(p2)
+			if not p2 then
+				openLegacyAppChat() -- inferred equivalent call
+			end
 
-		if FFlagExpChatEnableFriendsTab then
-			return v3.openFriendsChatConversation(p):andThen(function(p2)
-				if not p2 then
-					openLegacyAppChat() -- inferred equivalent call
-				end
-
-				return p2
-			end)
-		end
-
-		openLegacyAppChat() -- inferred equivalent call
-		return nil
+			return p2
+		end)
 	end, { v, v3.openFriendsChatConversation, showParentContainer })
 
 	if isSideSheetEnabled and FFlagSideSheetFocusNav and FFlagEnableDrawerAnimatingHook then

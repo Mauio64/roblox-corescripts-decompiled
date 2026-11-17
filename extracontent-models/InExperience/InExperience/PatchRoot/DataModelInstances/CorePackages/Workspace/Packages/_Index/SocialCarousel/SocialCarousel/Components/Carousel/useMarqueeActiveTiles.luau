@@ -1,13 +1,36 @@
+local GuiService = game:GetService("GuiService")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 
-local parent = script:FindFirstAncestor("SocialCarousel").Parent
+local SocialCarousel = script:FindFirstAncestor("SocialCarousel")
+local parent = SocialCarousel.Parent
 local React = require(parent.React)
 local Signals = require(parent.Signals)
 
 local marqueeEligibility = require(script.Parent.marqueeEligibility)
 local scrollPause = require(script.Parent.scrollPause)
 local tileVisibility = require(script.Parent.tileVisibility)
+local Enums = require(SocialCarousel.Common.Enums)
+
+local function defaultPointerPosition() -- 1 equivalent call inferred from this helper
+	return UserInputService:GetMouseLocation() - GuiService:GetGuiInset()
+end
+
+local function tileIdUnderPointer(vector2: Vector2, callback)
+	for _, parent2 in ipairs(callback(vector2.X, vector2.Y)) do
+		while parent2 ~= nil do
+			local attribute = parent2:GetAttribute(Enums.MarqueeFriendIdAttribute)
+
+			if typeof(attribute) == "string" then
+				return attribute
+			end
+
+			parent2 = parent2.Parent
+		end
+	end
+
+	return nil
+end
 
 local function drawsOnTop(guiObject): boolean
 	if not (guiObject:IsA("GuiObject") and guiObject.Visible) then
@@ -39,7 +62,7 @@ local function isCoveredAt(current, callback, p: number, p2: number): boolean
 	return false
 end
 
-local function indexOfTileId(tiles, current: string) -- 2 equivalent calls inferred from this helper
+local function indexOfTileId(tiles, current: string) -- 4 equivalent calls inferred from this helper
 	for i, item in ipairs(tiles) do
 		if item.id == current then
 			return i
@@ -71,9 +94,24 @@ local function lastLocationFor(tiles, p: string)
 end
 
 return {
-	useMarqueeActiveTiles = function(p, current, p2, p3, callback)
-		local state, setState = React.useState({})
-		local state2, setState2 = React.useState(false)
+	useMarqueeActiveTiles = function(p, current, p2, p3, callback, callback2)
+		local v
+
+		if not (current.restoredTileId == nil or current.tiles == nil) then
+			local tiles = current.tiles
+			local restoredTileId = current.restoredTileId
+
+			for i, tile in ipairs(tiles) do
+				if tile.id == restoredTileId then
+					v = i
+					break
+				end
+			end
+		end
+
+		local state, setState = React.useState(v == nil and {} or { [v] = true })
+
+		local state2, setState2 = React.useState(v ~= nil)
 		local ref = React.useRef(scrollPause.initialState())
 
 		local ref2 = React.useRef({})
@@ -82,9 +120,9 @@ return {
 			ref2.current = current.loopsRemainingStore.getLoopsRemaining(false)
 		end
 
-		local ref3 = React.useRef(nil)
+		local ref3 = React.useRef(current.restoredTileId)
 
-		local ref4 = React.useRef(nil)
+		local ref4 = React.useRef(v)
 		local state3, setState3 = React.useState(0)
 		local ref5 = React.useRef(0)
 		local ref6 = React.useRef(current)
@@ -92,7 +130,67 @@ return {
 
 		local ref7 = React.useRef(function() end)
 
-		local ref8 = React.useRef(0)
+		local ref8 = React.useRef(current.restoredTileId == nil and 0 or 1)
+
+		local ref9 = React.useRef(current.restoredTileId ~= nil)
+
+		local ref10 = React.useRef(current.restoredTileId ~= nil)
+
+		local ref11 = React.useRef(nil)
+
+		local ref12 = React.useRef(false)
+
+		local function refUserId(p4) -- 2 equivalent calls inferred from this helper
+			return if p4 ~= nil then p4.current else nil
+		end
+
+		local function joinCardUserId(data) -- 1 equivalent call inferred from this helper
+			if data.joinPopoverUserId ~= nil then
+				return data.joinPopoverUserId
+			end
+
+			local selected = refUserId(data.joinSheetUserIdRef) -- inferred equivalent call
+
+			if selected ~= nil then
+				return selected
+			end
+
+			return refUserId(data.joinPopoverUserIdRef) -- inferred equivalent call
+		end
+
+		local function joinCardIsOpen(data): boolean -- 3 equivalent calls inferred from this helper
+			return data.homeBlurredOrJoinCardOpen == true or joinCardUserId(data) ~= nil -- inferred equivalent call
+		end
+
+		local function cardHoldsTile(current2, current3: string): boolean -- 2 equivalent calls inferred from this helper
+			if not joinCardIsOpen(current2) then -- inferred equivalent call
+				return false
+			end
+
+			local v2
+
+			if current2.joinPopoverUserId == nil then
+				local joinSheetUserIdRef = current2.joinSheetUserIdRef
+
+				if joinSheetUserIdRef ~= nil then
+					v2 = joinSheetUserIdRef.current
+				end
+
+				if v2 == nil then
+					local joinPopoverUserIdRef = current2.joinPopoverUserIdRef
+
+					if joinPopoverUserIdRef == nil then
+						v2 = nil
+					else
+						v2 = joinPopoverUserIdRef.current
+					end
+				end
+			else
+				v2 = current2.joinPopoverUserId
+			end
+
+			return v2 == nil or v2 == current3
+		end
 
 		local function loopsRemainingMap() -- 5 equivalent calls inferred from this helper
 			local loopsRemainingStore = ref6.current.loopsRemainingStore
@@ -104,7 +202,7 @@ return {
 			return loopsRemainingStore.getLoopsRemaining(false)
 		end
 
-		local function publishIndex(current2: number?) -- 5 equivalent calls inferred from this helper
+		local function publishIndex(current2: number?) -- 1 equivalent call inferred from this helper
 			if ref4.current == current2 then
 				return
 			end
@@ -118,7 +216,13 @@ return {
 			end
 		end
 
+		local function clearActiveTile() -- 8 equivalent calls inferred from this helper
+			ref3.current = nil
+			publishIndex(nil) -- inferred equivalent call
+		end
+
 		local onMarqueeFinished = React.useCallback(function(p4: string)
+			ref10.current = false
 			local current2 = ref6.current
 
 			if current2.idleSequenceEnabled ~= true then
@@ -126,15 +230,15 @@ return {
 			end
 
 			local tiles = current2.tiles or {}
-			local v = lastLocationFor(tiles, p4)
+			local v2 = lastLocationFor(tiles, p4)
 
-			if v == nil then
+			if v2 == nil then
 				return
 			end
 
-			marqueeEligibility.recordFinishedLoop(loopsRemainingMap(), p4, v) -- inferred equivalent call
+			marqueeEligibility.recordFinishedLoop(loopsRemainingMap(), p4, v2) -- inferred equivalent call
 
-			local v2 = {
+			local v3 = {
 				direction = current2.direction or Enum.TextDirection.LeftToRight,
 				reducedMotion = current2.reducedMotion == true,
 				interacting = false,
@@ -145,47 +249,47 @@ return {
 				gap = current2.columnGap
 			}
 
-			local current3 = marqueeEligibility.resolveActiveTileId(tiles, v2, p4)
+			local current3 = marqueeEligibility.resolveActiveTileId(tiles, v3, p4)
 
 			if current3 ~= p4 then
-				current3 = marqueeEligibility.nextEligibleAfter(tiles, p4, v2)
+				current3 = marqueeEligibility.nextEligibleAfter(tiles, p4, v3)
 			end
 
 			ref3.current = current3
-			local v3
+			local v4
 
 			if current3 ~= nil then
 				for i, tile in ipairs(tiles) do
 					if tile.id == current3 then
-						v3 = i
+						v4 = i
 						break
 					end
 				end
 			end
 
-			publishIndex(v3)
+			publishIndex(v4)
 
 			if current3 == nil then
 				return
 			end
 
-			local v4 = lastLocationFor(tiles, current3)
+			local v5 = lastLocationFor(tiles, current3)
 
-			if v4 == nil then
+			if v5 == nil then
 				return
 			end
 
-			local v5 = loopsRemainingMap()[marqueeEligibility.loopKey(current3, v4)] -- inferred equivalent call
+			local v6 = loopsRemainingMap()[marqueeEligibility.loopKey(current3, v5)] -- inferred equivalent call
 
-			if v5 ~= nil and v5 < marqueeEligibility.DEFAULT_LOOPS then
+			if v6 ~= nil and v6 < marqueeEligibility.DEFAULT_LOOPS then
 				ref5.current += 1
 				setState3(ref5.current)
 			end
 		end, {})
 
-		local function tileById(tiles, current2: string) -- 1 equivalent call inferred from this helper
+		local function tileById(tiles, p4: string) -- 2 equivalent calls inferred from this helper
 			for _, item in ipairs(tiles) do
-				if item.id == current2 then
+				if item.id == p4 then
 					return item
 				end
 			end
@@ -207,6 +311,12 @@ return {
 				return
 			end
 
+			ref11.current = nil
+
+			if ref3.current == current2 and ref4.current ~= nil then
+				return
+			end
+
 			ref3.current = current2
 			publishIndex(indexOfTileId(tiles, current2)) -- inferred equivalent call
 
@@ -214,27 +324,38 @@ return {
 			setState3(ref5.current)
 		end, {})
 
-		local onManualMarqueeEnd = React.useCallback(function(p4: string)
-			if not (ref6.current.manualMarqueeEnabled == true and ref3.current == p4) then
+		local onManualMarqueeEnd = React.useCallback(function(current2: string)
+			local current3 = ref6.current
+
+			if joinCardIsOpen(current3) then -- inferred equivalent call
+				if ref3.current == current2 then
+					ref11.current = current2
+				end
+			else
+				if not (current3.manualMarqueeEnabled == true and ref3.current == current2) then
+					return
+				end
+
+				clearActiveTile() -- inferred equivalent call
+			end
+		end, {})
+
+		local ref13 = React.useRef({})
+
+		React.useEffect(function()
+			if current.marqueeEnabled == false then
 				return
 			end
 
-			ref3.current = nil
-			publishIndex(nil) -- inferred equivalent call
-		end, {})
-
-		local ref9 = React.useRef({})
-
-		React.useEffect(function()
 			local current2 = p.current
 
 			if current2 == nil then
 				return
 			end
 
-			local v = p2 or RunService.Heartbeat
-			local v2 = p3 or UserInputService
-			local v3 = callback or function(p4: number, p5: number)
+			local v2 = p2 or RunService.Heartbeat
+			local v3 = p3 or UserInputService
+			local v4 = callback or function(p4: number, p5: number)
 				local basePlayerGui = current2:FindFirstAncestorWhichIsA("BasePlayerGui")
 
 				if basePlayerGui == nil then
@@ -245,8 +366,8 @@ return {
 			end
 
 			local connection = nil
-			local current3 = ref9.current
-			local v4 = {
+			local current3 = ref13.current
+			local v5 = {
 				current = next(current3) ~= nil
 			}
 
@@ -268,65 +389,80 @@ return {
 
 			local function verticalPage()
 				local parent2 = current2.Parent
-				local v5 = nil
-				local v6 = 0
+				local v6 = nil
+				local v7 = 0
 
 				while parent2 ~= nil do
 					if parent2:IsA("ScrollingFrame") then
-						local v7 = scrollRange(parent2) -- inferred equivalent call
+						local v8 = scrollRange(parent2) -- inferred equivalent call
 
-						if v6 < v7 then
-							v6 = v7
-							v5 = parent2
+						if v7 < v8 then
+							v7 = v8
+							v6 = parent2
 						end
 					end
 
 					parent2 = parent2.Parent
 				end
 
-				return v5
+				return v6
 			end
 
 			local function verticalCanvasY() -- 1 equivalent call inferred from this helper
-				local v5 = verticalPage()
+				local v6 = verticalPage()
 
-				if v5 == nil then
+				if v6 == nil then
 					return nil
 				end
 
-				return v5.CanvasPosition.Y
+				return v6.CanvasPosition.Y
+			end
+
+			local function rowIsInsidePage() -- 1 equivalent call inferred from this helper
+				local v6 = verticalPage()
+
+				if v6 == nil then
+					return true
+				end
+
+				return tileVisibility.isAtLeast70PercentVerticallyVisible(
+					current2.AbsolutePosition.Y,
+					current2.AbsoluteSize.Y,
+					v6.AbsolutePosition.Y,
+					v6.AbsoluteSize.Y
+				)
 			end
 
 			local function rowIsVerticallyEligible(): boolean
-				local v5 = verticalPage()
+				if not rowIsInsidePage() then -- inferred equivalent call
+					return false
+				end
 
-				if v5 == nil then
+				local v6 = verticalPage()
+
+				if v6 == nil then
 					return true
 				end
 
 				local y = current2.AbsolutePosition.Y
 				local y2 = current2.AbsoluteSize.Y
-				local y3 = v5.AbsolutePosition.Y
-				local y4 = v5.AbsoluteSize.Y
+				local y3 = v6.AbsolutePosition.Y
+				local y4 = v6.AbsoluteSize.Y
 
-				if not tileVisibility.isAtLeast70PercentVerticallyVisible(y, y2, y3, y4) then
-					return false
-				end
-
-				local v6 = current2.AbsolutePosition.X + current2.AbsoluteSize.X / 2
+				local v7 = current2.AbsolutePosition.X + current2.AbsoluteSize.X / 2
 				local count = 0
 
 				for i = 1, 20 do
-					local v7 = y + (i - 0.5) * y2 / 20
-					local v8
+					local v8 = y + (i - 0.5) * y2 / 20
+					local v9
 
-					if y3 <= v7 then
-						v8 = v7 <= y3 + y4
+					if y3 <= v8 then
+						v9 = v8 <= y3 + y4
 					else
-						v8 = false
+						v9 = false
 					end
 
-					if not v8 or isCoveredAt(current2, v3, v6, v7) then
+					if not v9 or isCoveredAt(current2, v4, v7, v8) then
 						continue
 					end
 
@@ -338,33 +474,91 @@ return {
 
 			local function publish(canvasX: number, flag: boolean?)
 				local current4 = ref6.current
+				local current6 = joinCardIsOpen(current4) -- inferred equivalent call
+				local v6 = ref12.current and not current6
+				ref12.current = current6
+				local restoredTileId = current4.restoredTileId
 
-				if current4.manualMarqueeEnabled == true then
+				if ref10.current and restoredTileId ~= nil then
 					local tiles = current4.tiles or {}
-					local current5 = ref3.current
-					local v5
+					local item = tileById(tiles, restoredTileId) -- inferred equivalent call
+					local v7
 
-					if current5 ~= nil then
-						for _, tile in ipairs(tiles) do
-							if tile.id == current5 then
-								v5 = tile
+					if item ~= nil then
+						for i, tile in ipairs(tiles) do
+							if tile.id == restoredTileId then
+								v7 = i
 								break
 							end
 						end
 					end
 
-					if v5 == nil or current4.reducedMotion == true then
-						ref3.current = nil
-						publishIndex(nil) -- inferred equivalent call
-					elseif marqueeEligibility.isHoverEligible(v5) then
+					if v7 == nil or not marqueeEligibility.isHoverEligible(item) then
+						ref10.current = false
+					else
+						ref3.current = restoredTileId
+
+						if current4.homeBlurredOrJoinCardOpen == true then
+							setState2(true)
+						end
+
+						publishIndex(v7)
+						return
+					end
+				end
+
+				if current4.manualMarqueeEnabled == true then
+					if v6 then
+						ref11.current = nil
+
+						if current4.isDesktop == true then
+							local v7
+
+							if callback2 == nil then
+								v7 = defaultPointerPosition() -- inferred equivalent call
+							else
+								v7 = callback2()
+							end
+
+							local v8 = tileIdUnderPointer(v7, v4)
+
+							if v8 == nil then
+								clearActiveTile() -- inferred equivalent call
+							else
+								onManualMarqueeStart(v8)
+
+								if ref3.current ~= v8 then
+									clearActiveTile() -- inferred equivalent call
+								end
+							end
+
+							return
+						end
+					end
+
+					local tiles = current4.tiles or {}
+					local current5 = ref3.current
+					local v7
+
+					if current5 ~= nil then
+						for _, tile in ipairs(tiles) do
+							if tile.id == current5 then
+								v7 = tile
+								break
+							end
+						end
+					end
+
+					if v7 == nil or current4.reducedMotion == true then
+						clearActiveTile() -- inferred equivalent call
+					elseif marqueeEligibility.isHoverEligible(v7) then
 						publishIndex(indexOfTileId(tiles, current5)) -- inferred equivalent call
 					else
-						ref3.current = nil
-						publishIndex(nil) -- inferred equivalent call
+						clearActiveTile() -- inferred equivalent call
 					end
 				elseif current4.idleSequenceEnabled == true then
 					local tiles = current4.tiles or {}
-					local v5 = {
+					local v7 = {
 						direction = current4.direction or Enum.TextDirection.LeftToRight,
 						reducedMotion = current4.reducedMotion == true,
 						interacting = false,
@@ -377,27 +571,39 @@ return {
 					local current5
 
 					if flag then
-						current5 = marqueeEligibility.resolveActiveTileId(tiles, v5, ref3.current)
+						current5 = marqueeEligibility.resolveActiveTileId(tiles, v7, ref3.current)
 					else
-						current5 = marqueeEligibility.leadingEligible(tiles, v5)
+						current5 = marqueeEligibility.leadingEligible(tiles, v7)
 					end
 
 					ref3.current = current5
-					local v6
+					local v8
 
 					if current5 ~= nil then
 						for i, tile in ipairs(tiles) do
 							if tile.id == current5 then
-								v6 = i
+								v8 = i
 								break
 							end
 						end
 					end
 
-					publishIndex(v6)
+					publishIndex(v8)
 				else
-					ref3.current = nil
-					publishIndex(nil) -- inferred equivalent call
+					local current5 = ref3.current
+
+					if current5 ~= nil and cardHoldsTile(current4, current5) then -- inferred equivalent call
+						local current7 = indexOfTileId(current4.tiles or {}, current5) -- inferred equivalent call
+
+						if current7 ~= nil then
+							publishIndex(current7)
+							return
+						end
+					end
+
+					ref11.current = nil
+					setState2(false)
+					clearActiveTile() -- inferred equivalent call
 				end
 			end
 
@@ -406,7 +612,7 @@ return {
 					return
 				end
 
-				connection = v:Connect(function(p4: number)
+				connection = v2:Connect(function(p4: number)
 					local canvasX = ref.current.canvasX
 
 					if canvasX == nil then
@@ -420,24 +626,47 @@ return {
 
 			apply = function(canvasX: number, p4: number, flag: boolean?, flag2: boolean?)
 				local current4 = ref.current
-				local current5 = scrollPause.advance(current4, canvasX, p4, v4.current, verticalCanvasY()) -- inferred equivalent call
+				local current5 = scrollPause.advance(current4, canvasX, p4, v5.current, verticalCanvasY()) -- inferred equivalent call
 				ref.current = current5
 
 				if current5.interacting then
 					setState2(true)
 					startHeartbeat()
 				elseif rowIsVerticallyEligible() then
+					local v6 = ref9.current
+					ref9.current = false
 					ref8.current = 0
 					stopHeartbeat() -- inferred equivalent call
 
-					if current4.interacting or flag or ref4.current == nil then
+					if current4.interacting or flag or ref4.current == nil or v6 then
+						if current4.interacting then
+							ref10.current = false
+						end
+
 						setState2(false)
-						publish(canvasX, flag2 == true and not current4.interacting)
+
+						if flag2 == true or v6 then
+							v6 = not current4.interacting
+						end
+
+						publish(canvasX, v6)
 					end
 				else
-					setState2(false)
-					ref3.current = nil
-					publishIndex(nil) -- inferred equivalent call
+					local current6 = ref3.current
+
+					if current6 == nil then
+						ref9.current = false
+						setState2(false)
+						clearActiveTile() -- inferred equivalent call
+					elseif cardHoldsTile(ref6.current, current6) or ref8.current > 0 then -- inferred equivalent call
+						ref9.current = true
+						setState2(true)
+						publishIndex(indexOfTileId(ref6.current.tiles or {}, current6)) -- inferred equivalent call
+					else
+						ref9.current = false
+						setState2(false)
+						clearActiveTile() -- inferred equivalent call
+					end
 
 					if ref8.current > 0 then
 						startHeartbeat()
@@ -453,29 +682,29 @@ return {
 					return
 				end
 
-				local v5 = verticalPage()
+				local v6 = verticalPage()
 				local absolutePosition
 
-				if v5 == nil then
+				if v6 == nil then
 					absolutePosition = current2.AbsolutePosition
 				else
-					absolutePosition = v5.AbsolutePosition
+					absolutePosition = v6.AbsolutePosition
 				end
 
-				local v6
+				local v7
 
-				if v5 == nil then
-					v6 = current2.AbsoluteSize
+				if v6 == nil then
+					v7 = current2.AbsoluteSize
 				else
-					v6 = v5.AbsoluteSize
+					v7 = v6.AbsoluteSize
 				end
 
-				if not scrollPause.pointerIsInside(absolutePosition, v6, Vector2.new(p4.Position.X, p4.Position.Y)) then
+				if not scrollPause.pointerIsInside(absolutePosition, v7, Vector2.new(p4.Position.X, p4.Position.Y)) then
 					return
 				end
 
 				current3[p4] = true
-				v4.current = true
+				v5.current = true
 				apply(current2.CanvasPosition.X, 0)
 			end
 
@@ -488,7 +717,7 @@ return {
 					current3[p4] = nil
 				end
 
-				v4.current = next(current3) ~= nil
+				v5.current = next(current3) ~= nil
 				apply(current2.CanvasPosition.X, 0)
 			end
 
@@ -512,14 +741,14 @@ return {
 				startHeartbeat()
 			end
 
-			local v5 = nil
+			local v6 = nil
 			local canvasPositionChangedConnection = nil
 			local connections = {}
 
 			local function bindVerticalScroller() -- 2 equivalent calls inferred from this helper
-				local v6 = verticalPage()
+				local v7 = verticalPage()
 
-				if v6 == v5 then
+				if v7 == v6 then
 					return
 				end
 
@@ -528,10 +757,10 @@ return {
 					canvasPositionChangedConnection = nil
 				end
 
-				v5 = v6
+				v6 = v7
 
-				if v6 ~= nil then
-					canvasPositionChangedConnection = v6:GetPropertyChangedSignal("CanvasPosition"):Connect(onCanvasPositionChanged)
+				if v7 ~= nil then
+					canvasPositionChangedConnection = v7:GetPropertyChangedSignal("CanvasPosition"):Connect(onCanvasPositionChanged)
 				end
 			end
 
@@ -541,10 +770,10 @@ return {
 			while parent2 ~= nil do
 				if parent2:IsA("ScrollingFrame") then
 					table.insert(connections, parent2:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(function()
-						local v6 = v5
+						local v7 = v6
 						bindVerticalScroller() -- inferred equivalent call
 
-						if v5 ~= v6 then
+						if v6 ~= v7 then
 							apply(current2.CanvasPosition.X, 0)
 						end
 					end))
@@ -554,8 +783,8 @@ return {
 			end
 
 			local canvasPositionChangedConnection2 = current2:GetPropertyChangedSignal("CanvasPosition"):Connect(onCanvasPositionChanged)
-			local inputBeganConnection = v2.InputBegan:Connect(onInputBegan)
-			local inputEndedConnection = v2.InputEnded:Connect(function(input)
+			local inputBeganConnection = v3.InputBegan:Connect(onInputBegan)
+			local inputEndedConnection = v3.InputEnded:Connect(function(input)
 				if input == nil then
 					table.clear(current3)
 				elseif current3[input] == nil then
@@ -564,16 +793,16 @@ return {
 					current3[input] = nil
 				end
 
-				v4.current = next(current3) ~= nil
+				v5.current = next(current3) ~= nil
 				apply(current2.CanvasPosition.X, 0)
 			end)
 			local windowFocusReleasedConnection
 
-			if v2.WindowFocusReleased then
-				windowFocusReleasedConnection = v2.WindowFocusReleased:Connect(function()
+			if v3.WindowFocusReleased then
+				windowFocusReleasedConnection = v3.WindowFocusReleased:Connect(function()
 					table.clear(current3)
 
-					v4.current = next(current3) ~= nil
+					v5.current = next(current3) ~= nil
 					apply(current2.CanvasPosition.X, 0)
 				end)
 			else
@@ -606,6 +835,7 @@ return {
 			p2,
 			p3,
 			callback,
+			callback2,
 			current.tileCount,
 			current.containerWidth,
 			current.tileWidth,
@@ -615,10 +845,16 @@ return {
 			current.reducedMotion,
 			current.idleSequenceEnabled,
 			current.manualMarqueeEnabled,
-			current.loopsRemainingStore
+			current.joinPopoverUserId,
+			current.loopsRemainingStore,
+			current.marqueeEnabled
 		})
 
 		React.useEffect(function()
+			if current.marqueeEnabled == false then
+				return
+			end
+
 			local loopsRemainingStore = current.loopsRemainingStore
 			local getHomeFocusVersion
 
@@ -632,24 +868,24 @@ return {
 				return
 			end
 
-			local v = nil
+			local v2 = nil
 			return Signals.createEffect(function(p4)
 				local homeFocusVersion = getHomeFocusVersion(p4)
 
-				if v == homeFocusVersion then
+				if v2 == homeFocusVersion then
 					return
 				end
 
-				local v2 = v == nil
-				v = homeFocusVersion
+				local v3 = v2 == nil
+				v2 = homeFocusVersion
 
-				if v2 then
+				if v3 then
 					return
 				end
 
 				ref7.current()
 			end)
-		end, { current.loopsRemainingStore })
+		end, { current.loopsRemainingStore, current.marqueeEnabled })
 
 		return {
 			activeByIndex = state,

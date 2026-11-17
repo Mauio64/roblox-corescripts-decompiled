@@ -21,6 +21,7 @@ local VideoUtils = require(parent.VideoUtils)
 local refreshHomePage = require(Home.refreshHomePage)
 local fetchHomePage = require(Home.fetchHomePage)
 local useHomeCollectionLayoutSync = require(Home.useHomeCollectionLayoutSync)
+local useHomeStartupSnapshot = require(Home.useHomeStartupSnapshot)
 local HomeConstants = require(Home.HomeConstants)
 local HomePageSession = require(Home.HomePageSession)
 local SharedFlags = require(parent.SharedFlags)
@@ -36,12 +37,16 @@ local SharedFlags5 = require(parent.SharedFlags)
 local FFlagSduiDismissPromptPageScope = SharedFlags5.FFlagSduiDismissPromptPageScope
 local SharedFlags6 = require(parent.SharedFlags)
 local FFlagAppPageShellScrollToTopFocus = SharedFlags6.FFlagAppPageShellScrollToTopFocus
-
 local SharedFlags7 = require(parent.SharedFlags)
-local FFlagHomePageRefetchOnDataHydrationAccountReset = SharedFlags7.FFlagHomePageRefetchOnDataHydrationAccountReset
-local FFlagLuaAppSduiHomeSponsoredAdViewability = require(Home.Flags.FFlagLuaAppSduiHomeSponsoredAdViewability)
+local FFlagAppPageShellScrollTelemetry = SharedFlags7.FFlagAppPageShellScrollTelemetry
+
 local SharedFlags8 = require(parent.SharedFlags)
-local FFlagAppThemeHalloween2026HomeBackground = SharedFlags8.FFlagAppThemeHalloween2026HomeBackground
+local FFlagHomePageRefetchOnDataHydrationAccountReset = SharedFlags8.FFlagHomePageRefetchOnDataHydrationAccountReset
+local FFlagLuaAppSduiHomeSponsoredAdViewability = require(Home.Flags.FFlagLuaAppSduiHomeSponsoredAdViewability)
+local SharedFlags9 = require(parent.SharedFlags)
+local FFlagAppThemeHalloween2026HomeBackground = SharedFlags9.FFlagAppThemeHalloween2026HomeBackground
+local SharedFlags10 = require(parent.SharedFlags)
+local FFlagSduiHomeStartupSnapshot = SharedFlags10.FFlagSduiHomeStartupSnapshot
 
 local function getFromPropsOrNavigationParams(props, p: string) -- 1 equivalent call inferred from this helper
 	return props[p] or props.navigation and props.navigation.getParam(p)
@@ -121,6 +126,23 @@ local function HomeContentEntryPoint(props)
 			SignalsReact.useSignalState(getCommittedHomeSessionId),
 			AppLifecycleObserverService
 		)
+	else
+		setState = nil
+	end
+
+	local ref
+
+	if FFlagSduiHomeStartupSnapshot then
+		local state, setState2 = React.useState(nil)
+
+		useHomeStartupSnapshot(state, props.navigation)
+		ref = React.useCallback(function(p)
+			setState2(p)
+
+			if setState then
+				setState(p)
+			end
+		end, { setState })
 	end
 
 	if FFlagLuaAppSduiSuppressVideoDetectorDuringScroll then
@@ -160,17 +182,22 @@ local function HomeContentEntryPoint(props)
 
 	local createElement = React.createElement
 
-	if not FFlagLuaAppSduiHomeSponsoredAdViewability then
-		setState = nil
+	if not FFlagSduiHomeStartupSnapshot then
+		if FFlagLuaAppSduiHomeSponsoredAdViewability then
+			ref = setState
+		else
+			ref = nil
+		end
 	end
 
 	local v3 = {
-		ref = setState,
+		ref = ref,
 		appPage = AppPage.Home,
 		configKey = configKey,
 		contentIdentifier = HomeConstants.ContentIdentifier,
 		pageTimer = pageTimer,
 		refresh = refreshHomePage,
+		scrollPerformanceIntervalName = FFlagAppPageShellScrollTelemetry and "LuaApp_Home_Scroll" or nil,
 		pageTopPadding = props.pageTopPadding,
 		feedTopMargin = 0,
 		stickyTopPadding = 0,

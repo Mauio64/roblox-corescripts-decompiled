@@ -192,6 +192,7 @@ local function BottomSheet(p, p2)
 
 	if defineFastFlag then
 		v5 = useStableScreenHeight() -- inferred equivalent call
+
 		state = useStableGuiHeight(v3)
 		safeAreaPadding = useStableBottomSafeAreaPadding(v3)
 	else

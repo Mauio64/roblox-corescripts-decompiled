@@ -10,6 +10,7 @@ local SharedFlags = require(parent.SharedFlags)
 
 local FFlagEnableExperienceShopGlobalIcon = require(InExperienceShop.Flags.FFlagEnableExperienceShopGlobalIcon)
 local FFlagEnableShopIconTelemetry = require(InExperienceShop.Flags.FFlagEnableShopIconTelemetry)
+local FFlagEnableFreeTrialBlueDot = require(InExperienceShop.Flags.FFlagEnableFreeTrialBlueDot)
 local FFlagOfferNotifyOnGlobalIcon = SharedFlags.FFlagOfferNotifyOnGlobalIcon
 local FFlagEnableAnyFreeTrialToolTip = require(InExperienceShop.Flags.FFlagEnableAnyFreeTrialToolTip)
 local defineFastInt = game:DefineFastInt("ShopGlobalIconAnimGracePeriodMs", 3000)
@@ -271,6 +272,14 @@ local function ShopGlobalIcon(props)
 	end
 
 	local function onActivated()
+		if FFlagEnableFreeTrialBlueDot then
+			local submitFreeTrialBlueDot = require(InExperienceShop.submitFreeTrialBlueDot)
+
+			if submitFreeTrialBlueDot.isShopIconBlueDotShowing(false) then
+				submitFreeTrialBlueDot.reportActivated()
+			end
+		end
+
 		if FFlagEnableShopIconTelemetry and not RunService:IsStudio() then
 			local LoggingProtocol = require(parent.LoggingProtocol)
 			local ShopIconClickEvent = require(InExperienceShop.Events.ShopIconClickEvent)

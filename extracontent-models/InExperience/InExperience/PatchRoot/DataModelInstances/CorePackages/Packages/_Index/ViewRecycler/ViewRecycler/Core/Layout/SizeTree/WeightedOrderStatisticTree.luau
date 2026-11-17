@@ -1,8 +1,11 @@
+local Flags = require(script:FindFirstAncestor("ViewRecycler").Flags)
+local FFlagViewRecyclerReact084 = Flags.FFlagViewRecyclerReact084
+
 local function nodeHeight(p) -- 12 equivalent calls inferred from this helper
 	return if p == nil then 0 else p.height
 end
 
-local function nodeItemCount(p) -- 11 equivalent calls inferred from this helper
+local function nodeItemCount(p) -- 14 equivalent calls inferred from this helper
 	return if p == nil then 0 else p.subtreeItemCount
 end
 
@@ -10,8 +13,17 @@ local function nodeMeasuredCount(p) -- 2 equivalent calls inferred from this hel
 	return if p == nil then 0 else p.subtreeMeasuredCount
 end
 
-local function nodeMeasuredSum(p) -- 2 equivalent calls inferred from this helper
-	return if p == nil then 0 else p.subtreeMeasuredSum
+local nodeFixedCount
+local nodeMeasuredSum
+
+if FFlagViewRecyclerReact084 then
+	nodeFixedCount = function(p)
+		return if p == nil then 0 else p.subtreeFixedCount
+	end
+else
+	nodeMeasuredSum = function(p)
+		return if p == nil then 0 else p.subtreeMeasuredSum
+	end
 end
 
 local function nodeCount(p) -- 2 equivalent calls inferred from this helper
@@ -23,45 +35,202 @@ local function nodeEffectiveSum(left, p: number) -- 3 equivalent calls inferred 
 		return 0
 	end
 
-	return left.subtreeMeasuredSum + (left.subtreeItemCount - left.subtreeMeasuredCount) * p
-end
+	local v
 
-local function ownEffectiveSum(data, p: number) -- 2 equivalent calls inferred from this helper
-	if data.measuredSize == nil then
-		return data.itemCount * p
+	if FFlagViewRecyclerReact084 then
+		v = left.subtreeFixedSum
+	else
+		v = left.subtreeMeasuredSum
 	end
 
-	return data.measuredSize
+	local subtreeItemCount = left.subtreeItemCount
+	local v2
+
+	if FFlagViewRecyclerReact084 then
+		v2 = left.subtreeFixedCount
+	else
+		v2 = left.subtreeMeasuredCount
+	end
+
+	return v + (subtreeItemCount - v2) * p
+end
+
+local unitSize = FFlagViewRecyclerReact084 and function(p, p2: number)
+	return p.measuredSize or p.estimatedSize or p2
+end or nil
+
+local function ownEffectiveSum(data, p: number)
+	if data.measuredSize ~= nil then
+		return data.measuredSize
+	end
+
+	local itemCount = data.itemCount
+	p = FFlagViewRecyclerReact084 and data.estimatedSize or p
+	return itemCount * p
 end
 
 local function refresh(state)
-	assert(state.itemCount >= 1, "WeightedOrderStatisticTree: node itemCount must be positive")
-	assert(
-		state.measuredSize == nil or state.itemCount == 1,
-		"WeightedOrderStatisticTree: measured nodes must represent exactly one item"
-	)
-	state.subtreeItemCount = nodeItemCount(state.left) + state.itemCount + nodeItemCount(state.right) -- inferred equivalent call
-	state.subtreeMeasuredCount = nodeMeasuredCount(state.left) + (state.measuredSize == nil and 0 or 1) + nodeMeasuredCount(state.right) -- inferred equivalent call
-	state.subtreeMeasuredSum = nodeMeasuredSum(state.left) + (state.measuredSize or 0) + nodeMeasuredSum(state.right) -- inferred equivalent call
-	state.subtreeNodeCount = nodeCount(state.left) + 1 + nodeCount(state.right) -- inferred equivalent call
-	state.height = math.max(nodeHeight(state.left), nodeHeight(state.right)) + 1 -- inferred equivalent call
+	local subtreeItemCount, measuredSize
+
+	if FFlagViewRecyclerReact084 then
+		subtreeItemCount = state.itemCount
+		measuredSize = state.measuredSize
+	end
+
+	local v
+
+	if FFlagViewRecyclerReact084 then
+		v = subtreeItemCount
+	else
+		v = state.itemCount
+	end
+
+	assert(v >= 1, "WeightedOrderStatisticTree: node itemCount must be positive")
+
+	local v2 = true
+	local v3
+
+	if FFlagViewRecyclerReact084 then
+		v3 = measuredSize
+	else
+		v3 = state.measuredSize
+	end
+
+	if v3 ~= nil then
+		local v4
+
+		if FFlagViewRecyclerReact084 then
+			v4 = subtreeItemCount
+		else
+			v4 = state.itemCount
+		end
+
+		v2 = v4 == 1
+	end
+
+	assert(v2, "WeightedOrderStatisticTree: measured nodes must represent exactly one item")
+	local subtreeMeasuredCount, subtreeFixedCount, subtreeFixedSum, subtreeNodeCount, v4, v5
+
+	if FFlagViewRecyclerReact084 then
+		subtreeMeasuredCount = 0
+		subtreeFixedCount = 0
+		subtreeFixedSum = 0
+		subtreeNodeCount = 1
+		v4 = 0
+		v5 = 0
+
+		if measuredSize == nil then
+			local estimatedSize = state.estimatedSize
+
+			if estimatedSize ~= nil then
+				subtreeFixedSum = subtreeItemCount * estimatedSize
+				subtreeFixedCount = subtreeItemCount
+			end
+		else
+			subtreeFixedSum = measuredSize
+			subtreeMeasuredCount = 1
+			subtreeFixedCount = 1
+		end
+
+		local left = state.left
+
+		if left ~= nil then
+			subtreeItemCount += left.subtreeItemCount
+			subtreeMeasuredCount += left.subtreeMeasuredCount
+			subtreeFixedCount += left.subtreeFixedCount
+			subtreeFixedSum += left.subtreeFixedSum
+			subtreeNodeCount += left.subtreeNodeCount
+			v4 = left.height
+		end
+
+		local right = state.right
+
+		if right ~= nil then
+			subtreeItemCount += right.subtreeItemCount
+			subtreeMeasuredCount += right.subtreeMeasuredCount
+			subtreeFixedCount += right.subtreeFixedCount
+			subtreeFixedSum += right.subtreeFixedSum
+			subtreeNodeCount += right.subtreeNodeCount
+			v5 = right.height
+		end
+	else
+		subtreeItemCount = nil
+	end
+
+	if not FFlagViewRecyclerReact084 then
+		subtreeItemCount = nodeItemCount(state.left) + state.itemCount + nodeItemCount(state.right) -- inferred equivalent call
+	end
+
+	state.subtreeItemCount = subtreeItemCount
+
+	if not FFlagViewRecyclerReact084 then
+		subtreeMeasuredCount = nodeMeasuredCount(state.left) + (state.measuredSize == nil and 0 or 1) + nodeMeasuredCount(state.right) -- inferred equivalent call
+	end
+
+	state.subtreeMeasuredCount = subtreeMeasuredCount
+
+	if FFlagViewRecyclerReact084 then
+		state.subtreeFixedCount = subtreeFixedCount
+		state.subtreeFixedSum = subtreeFixedSum
+	else
+		state.subtreeMeasuredSum = nodeMeasuredSum(state.left) + (state.measuredSize or 0) + nodeMeasuredSum(state.right)
+	end
+
+	if not FFlagViewRecyclerReact084 then
+		subtreeNodeCount = nodeCount(state.left) + 1 + nodeCount(state.right) -- inferred equivalent call
+	end
+
+	state.subtreeNodeCount = subtreeNodeCount
+
+	if FFlagViewRecyclerReact084 then
+		if v5 < v4 then
+			v5 = v4
+		end
+	else
+		v5 = math.max(nodeHeight(state.left), nodeHeight(state.right)) -- inferred equivalent call
+	end
+
+	state.height = 1 + v5
 end
 
-local function newNode(p: number, measuredSize: number?) -- 4 equivalent calls inferred from this helper
-	local node = {
-		itemCount = p,
-		measuredSize = measuredSize,
-		subtreeItemCount = p,
-		subtreeMeasuredCount = measuredSize == nil and 0 or 1,
-		subtreeMeasuredSum = measuredSize or 0,
-		subtreeNodeCount = 1,
-		height = 1,
-		left = nil,
-		right = nil
-	}
+local newNode
 
-	refresh(node)
-	return node
+if FFlagViewRecyclerReact084 then
+	newNode = function(p: number, measuredSize: number?, estimatedSize: number?)
+		local node = {
+			itemCount = p,
+			measuredSize = measuredSize,
+			estimatedSize = estimatedSize,
+			subtreeItemCount = p,
+			subtreeMeasuredCount = 0,
+			subtreeFixedCount = 0,
+			subtreeFixedSum = 0,
+			subtreeNodeCount = 1,
+			height = 1,
+			left = nil,
+			right = nil
+		}
+
+		refresh(node)
+		return node
+	end
+else
+	newNode = function(p: number, measuredSize: number?)
+		local node = {
+			itemCount = p,
+			measuredSize = measuredSize,
+			subtreeItemCount = p,
+			subtreeMeasuredCount = measuredSize == nil and 0 or 1,
+			subtreeMeasuredSum = measuredSize or 0,
+			subtreeNodeCount = 1,
+			height = 1,
+			left = nil,
+			right = nil
+		}
+
+		refresh(node)
+		return node
+	end
 end
 
 local function rotateRight(right) -- 2 equivalent calls inferred from this helper
@@ -153,7 +322,7 @@ local function popMaximum(right)
 	end
 end
 
-local function concatenate(left, state) -- 2 equivalent calls inferred from this helper
+local function concatenate(left, state) -- 3 equivalent calls inferred from this helper
 	if left == nil then
 		return state
 	end
@@ -239,16 +408,32 @@ local function splitByItems(state, p: number)
 		assert(state.measuredSize == nil, "WeightedOrderStatisticTree: cannot split a measured node")
 		local v3 = p - v
 		local v4 = state.itemCount - v3
-		local v5 = concatenate(state.left, newNode(v3)) -- inferred equivalent call
-		local node = newNode(v4) -- inferred equivalent call
+		local left
+
+		if FFlagViewRecyclerReact084 then
+			left = state.left
+			left = concatenate(left, newNode(v3, nil, state.estimatedSize)) -- inferred equivalent call
+		else
+			left = state.left
+			left = concatenate(left, newNode(v3, nil)) -- inferred equivalent call
+		end
+
+		local v5
+
+		if FFlagViewRecyclerReact084 then
+			v5 = newNode(v4, nil, state.estimatedSize)
+		else
+			v5 = newNode(v4, nil)
+		end
+
 		local right = state.right
 
-		if node == nil then
-			return v5, right
+		if v5 == nil then
+			return left, right
 		end
 
 		if right == nil then
-			return v5, node
+			return left, v5
 		end
 
 		local v6, v7
@@ -260,26 +445,46 @@ local function splitByItems(state, p: number)
 			refresh(right)
 			v7 = right
 		else
-			local left
-			left, v7 = popMinimum(right.left)
-			right.left = left
+			local left2
+			left2, v7 = popMinimum(right.left)
+			right.left = left2
 			v6 = balance(right)
 		end
 
-		return v5, (join(node, v7, v6))
+		return left, (join(v5, v7, v6))
 	end
 end
 
-local function insertUnitAt(state, p: number, measuredSize: number?)
-	if state == nil then
-		return newNode(1, measuredSize) -- inferred equivalent call
-	else
+local insertUnitAt
+
+if FFlagViewRecyclerReact084 then
+	insertUnitAt = function(state, p: number, p2: number?, p3: number?)
+		if state == nil then
+			return newNode(1, p2, p3)
+		end
+
 		local v = nodeItemCount(state.left) + 1 -- inferred equivalent call
 
 		if p <= v then
-			state.left = insertUnitAt(state.left, p, measuredSize)
+			state.left = insertUnitAt(state.left, p, p2, p3)
 		else
-			state.right = insertUnitAt(state.right, p - v, measuredSize)
+			state.right = insertUnitAt(state.right, p - v, p2, p3)
+		end
+
+		return (balance(state))
+	end
+else
+	insertUnitAt = function(state, p: number, p2: number?)
+		if state == nil then
+			return newNode(1, p2)
+		end
+
+		local v = nodeItemCount(state.left) + 1 -- inferred equivalent call
+
+		if p <= v then
+			state.left = insertUnitAt(state.left, p, p2)
+		else
+			state.right = insertUnitAt(state.right, p - v, p2)
 		end
 
 		return (balance(state))
@@ -321,6 +526,11 @@ local function removeUnitAt(state, p: number)
 		end
 
 		state.measuredSize = v2.measuredSize
+
+		if FFlagViewRecyclerReact084 then
+			state.estimatedSize = v2.estimatedSize
+		end
+
 		state.itemCount = v2.itemCount
 		state.right = removeUnitAt(state.right, 1)
 	end
@@ -384,6 +594,49 @@ local function measuredAt(data, p: number)
 	return data.measuredSize
 end
 
+local unitSizeAt, estimatedAt
+
+if FFlagViewRecyclerReact084 then
+	unitSizeAt = function(data, p: number, p2: number)
+		if data == nil then
+			return p2
+		end
+
+		local v = nodeItemCount(data.left) -- inferred equivalent call
+
+		if p <= v then
+			return unitSizeAt(data.left, p, p2)
+		end
+
+		if v + data.itemCount < p then
+			return unitSizeAt(data.right, p - v - data.itemCount, p2)
+		end
+
+		return unitSize(data, p2)
+	end
+
+	estimatedAt = function(data, p: number)
+		if data == nil then
+			return nil
+		end
+
+		local v = nodeItemCount(data.left) -- inferred equivalent call
+
+		if p <= v then
+			return estimatedAt(data.left, p)
+		end
+
+		if v + data.itemCount < p then
+			return estimatedAt(data.right, p - v - data.itemCount)
+		end
+
+		return data.estimatedSize
+	end
+else
+	estimatedAt = nil
+	unitSizeAt = nil
+end
+
 local function prefixSumUpTo(data, p: number, p2: number)
 	if data == nil or p <= 0 then
 		return 0
@@ -399,7 +652,15 @@ local function prefixSumUpTo(data, p: number, p2: number)
 	local v3
 
 	if data.measuredSize == nil then
-		v3 = v2 * p2
+		local v4
+
+		if FFlagViewRecyclerReact084 then
+			v4 = data.estimatedSize or p2
+		else
+			v4 = p2
+		end
+
+		v3 = v2 * v4
 	else
 		v3 = data.measuredSize
 	end
@@ -425,15 +686,60 @@ local function entryAtPrefixSum(data, p: number, p2: number)
 	end
 
 	local v2 = nodeItemCount(data.left) -- inferred equivalent call
-	local v3 = ownEffectiveSum(data, p2) -- inferred equivalent call
+	local v3
+
+	if data.measuredSize == nil then
+		local itemCount = data.itemCount
+		local v4
+
+		if FFlagViewRecyclerReact084 then
+			v4 = data.estimatedSize or p2
+		else
+			v4 = p2
+		end
+
+		v3 = itemCount * v4
+	else
+		v3 = data.measuredSize
+	end
 
 	if p < v + v3 then
 		if data.measuredSize ~= nil then
 			return v2 + 1, v, data.measuredSize
 		end
 
-		local v4 = math.floor((p - v) / p2)
-		return v2 + v4 + 1, v + v4 * p2, p2
+		local estimatedSize
+
+		if FFlagViewRecyclerReact084 then
+			estimatedSize = data.estimatedSize or p2
+		end
+
+		local v4 = p - v
+		local v5
+
+		if FFlagViewRecyclerReact084 then
+			v5 = estimatedSize
+		else
+			v5 = p2
+		end
+
+		local v6 = math.floor(v4 / v5)
+		local v7 = v2 + v6 + 1
+		local v8
+
+		if FFlagViewRecyclerReact084 then
+			v8 = estimatedSize
+		else
+			v8 = p2
+		end
+
+		local v9 = v + v6 * v8
+
+		if FFlagViewRecyclerReact084 then
+			return v7, v9, estimatedSize
+		end
+
+		return v7, v9, p2
 	else
 		local v4, v5, v6 = entryAtPrefixSum(data.right, p - v - v3, p2)
 
@@ -462,7 +768,13 @@ local function fillRangeFromNode(left, p: number, p2: number, p3: number, p4: nu
 	local v5 = math.min(p4, v2)
 
 	if v4 <= v5 then
-		local measuredSize = left.measuredSize or p5
+		local length
+
+		if FFlagViewRecyclerReact084 then
+			length = unitSize(left, p5)
+		else
+			length = left.measuredSize or p5
+		end
 
 		for i = v4, v5 do
 			local v6 = i - p3 + 1
@@ -473,13 +785,31 @@ local function fillRangeFromNode(left, p: number, p2: number, p3: number, p4: nu
 				p6[v6] = v7
 			end
 
-			v7.startOffset = v3 + (i - v) * measuredSize
-			v7.length = measuredSize
+			v7.startOffset = v3 + (i - v) * length
+			v7.length = length
 		end
 	end
 
 	if v2 < p4 then
-		fillRangeFromNode(left.right, v2, v3 + ownEffectiveSum(left, p5), p3, p4, p5, p6) -- inferred equivalent call
+		local right = left.right
+		local v6
+
+		if left.measuredSize == nil then
+			local itemCount = left.itemCount
+			local v7
+
+			if FFlagViewRecyclerReact084 then
+				v7 = left.estimatedSize or p5
+			else
+				v7 = p5
+			end
+
+			v6 = itemCount * v7
+		else
+			v6 = left.measuredSize
+		end
+
+		fillRangeFromNode(right, v2, v3 + v6, p3, p4, p5, p6)
 	end
 end
 
@@ -490,49 +820,75 @@ local function buildBalanced(p, p2: number, p3: number)
 
 	local v = (p2 + p3) // 2
 	local v2 = p[v]
-	local node = newNode(v2.itemCount, v2.measuredSize) -- inferred equivalent call
-	node.left = buildBalanced(p, p2, v - 1)
-	node.right = buildBalanced(p, v + 1, p3)
-	refresh(node)
-	return node
+	local selected
+
+	if FFlagViewRecyclerReact084 then
+		selected = newNode(v2.itemCount, v2.measuredSize, v2.estimatedSize)
+	else
+		selected = newNode(v2.itemCount, v2.measuredSize)
+	end
+
+	selected.left = buildBalanced(p, p2, v - 1)
+	selected.right = buildBalanced(p, v + 1, p3)
+	refresh(selected)
+	return selected
 end
 
-local function appendToArray(data, measuredSizes, p: number)
+local function appendToArray(data, list, p: number)
 	if data == nil then
 		return
 	end
 
-	appendToArray(data.left, measuredSizes, p)
-	local measuredSize = data.measuredSize or p
+	appendToArray(data.left, list, p)
+	local v
 
-	for _ = 1, data.itemCount do
-		table.insert(measuredSizes, measuredSize)
+	if FFlagViewRecyclerReact084 then
+		v = unitSize(data, p)
+	else
+		v = data.measuredSize or p
 	end
 
-	appendToArray(data.right, measuredSizes, p)
+	for _ = 1, data.itemCount do
+		table.insert(list, v)
+	end
+
+	appendToArray(data.right, list, p)
 end
 
-return {
-	["newNode"] = newNode,
-	refresh = refresh,
-	balance = balance,
-	join = join,
-	popMinimum = popMinimum,
-	popMaximum = popMaximum,
-	concatenate = concatenate,
-	splitByItems = splitByItems,
-	insertUnitAt = insertUnitAt,
-	removeUnitAt = removeUnitAt,
-	updateUnitAt = updateUnitAt,
-	updateAt = updateAt,
-	measuredAt = measuredAt,
-	prefixSumUpTo = prefixSumUpTo,
-	entryAtPrefixSum = entryAtPrefixSum,
-	fillRangeFromNode = fillRangeFromNode,
-	buildBalanced = buildBalanced,
-	appendToArray = appendToArray,
-	nodeItemCount = nodeItemCount,
-	nodeMeasuredCount = nodeMeasuredCount,
-	nodeCount = nodeCount,
-	nodeEffectiveSum = nodeEffectiveSum
-}
+local WeightedOrderStatisticTree = {}
+WeightedOrderStatisticTree.newNode = newNode
+WeightedOrderStatisticTree.refresh = refresh
+WeightedOrderStatisticTree.balance = balance
+WeightedOrderStatisticTree.join = join
+WeightedOrderStatisticTree.popMinimum = popMinimum
+WeightedOrderStatisticTree.popMaximum = popMaximum
+WeightedOrderStatisticTree.concatenate = concatenate
+WeightedOrderStatisticTree.splitByItems = splitByItems
+WeightedOrderStatisticTree.insertUnitAt = insertUnitAt
+WeightedOrderStatisticTree.removeUnitAt = removeUnitAt
+WeightedOrderStatisticTree.updateUnitAt = updateUnitAt
+WeightedOrderStatisticTree.updateAt = updateAt
+WeightedOrderStatisticTree.measuredAt = measuredAt
+
+if FFlagViewRecyclerReact084 then
+	WeightedOrderStatisticTree.estimatedAt = estimatedAt
+	WeightedOrderStatisticTree.unitSize = unitSize
+	WeightedOrderStatisticTree.unitSizeAt = unitSizeAt
+end
+
+WeightedOrderStatisticTree.prefixSumUpTo = prefixSumUpTo
+WeightedOrderStatisticTree.entryAtPrefixSum = entryAtPrefixSum
+WeightedOrderStatisticTree.fillRangeFromNode = fillRangeFromNode
+WeightedOrderStatisticTree.buildBalanced = buildBalanced
+WeightedOrderStatisticTree.appendToArray = appendToArray
+WeightedOrderStatisticTree.nodeItemCount = nodeItemCount
+WeightedOrderStatisticTree.nodeMeasuredCount = nodeMeasuredCount
+
+if FFlagViewRecyclerReact084 then
+	WeightedOrderStatisticTree.nodeFixedCount = nodeFixedCount
+end
+
+WeightedOrderStatisticTree.nodeCount = nodeCount
+WeightedOrderStatisticTree.nodeEffectiveSum = nodeEffectiveSum
+
+return WeightedOrderStatisticTree

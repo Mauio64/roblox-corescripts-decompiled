@@ -1,5 +1,7 @@
 local Flags = require(script:FindFirstAncestor("ViewRecyclerReact").Flags)
-local FFlagViewRecyclerReact08 = Flags.FFlagViewRecyclerReact08
+local FFlagViewRecyclerReact084 = Flags.FFlagViewRecyclerReact084
+local Flags2 = require(script:FindFirstAncestor("ViewRecyclerReact").Flags)
+local FFlagViewRecyclerReact08 = Flags2.FFlagViewRecyclerReact08
 local ViewRecyclerReact = script:FindFirstAncestor("ViewRecyclerReact")
 local ViewRecycler = require(ViewRecyclerReact.Parent.ViewRecycler)
 local ViewRecyclerRoblox = require(ViewRecyclerReact.Parent.ViewRecyclerRoblox)
@@ -33,7 +35,7 @@ local function createRecyclingViewport(p)
 	local function RecyclingViewport(props)
 		local v2
 
-		if not FFlagViewRecyclerReact08 then
+		if not (FFlagViewRecyclerReact084 or FFlagViewRecyclerReact08) then
 			v2 = React.useContext(RecyclingScopeContext)
 		end
 
@@ -100,7 +102,7 @@ local function createRecyclingViewport(p)
 			Viewport = createElement("ScrollingFrame", scrollingFrameProps, props.children)
 		})
 
-		if FFlagViewRecyclerReact08 or v2 == nil then
+		if FFlagViewRecyclerReact084 or FFlagViewRecyclerReact08 or v2 == nil then
 			return createElement(v, {
 				maxPoolSize = props.maxPoolSize,
 				diagnostics = props.diagnostics

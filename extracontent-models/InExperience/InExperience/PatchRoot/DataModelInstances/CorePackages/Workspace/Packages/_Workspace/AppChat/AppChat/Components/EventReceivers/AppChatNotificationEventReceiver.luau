@@ -15,9 +15,6 @@ local useUnreadMessagesDispatch = require(AppChat.Contexts.UnreadMessages.useUnr
 local useChatIsVisible = require(AppChat.Hooks.useChatIsVisible)
 local InExperienceAppChatModal = require(AppChat.App.InExperienceAppChatModal)
 
-local SharedFlags = require(parent.SharedFlags)
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
-
 local GetUnreadMessageCountStore = require(AppChat.Stores.GetUnreadMessageCountStore)
 
 local Logger = require(AppChat.Logger)
@@ -43,8 +40,8 @@ local function AppChatNotificationEventReceiver(p): nil
 		end
 	end, {})
 
-	if FFlagExpChatEnableFriendsTab and p.isInExperience then
-		v6 = state
+	if not p.isInExperience then
+		state = v6
 	end
 
 	React.useEffect(function()
@@ -54,7 +51,7 @@ local function AppChatNotificationEventReceiver(p): nil
 			local global_unread_message_count = p2.responseBody.global_unread_message_count
 			v:info("Initial unread message count: {}", global_unread_message_count)
 
-			if FFlagExpChatEnableFriendsTab and p.isInExperience then
+			if p.isInExperience then
 				InExperienceAppChatModal:markInitialUnreadCountReceived(global_unread_message_count or 0)
 			end
 
@@ -76,7 +73,7 @@ local function AppChatNotificationEventReceiver(p): nil
 		if p2.Type == "ChannelMetadataUpdated" or p2.Type == "ChannelMarkedRead" then
 			v:info("Received event {}, fetching conversation metadata to get unread count", p2.Type)
 
-			if v6 then
+			if state then
 				v:info("Chat tab is visible during realtime event, calling clear endpoint")
 				v4(AppChatNetworking.rodux.ClearGlobalUnreadCount.API()):catch(function(p3)
 					v:error("Failure in ClearGlobalUnreadCount. Error: {}", (tostring(p3)))
@@ -87,13 +84,13 @@ local function AppChatNotificationEventReceiver(p): nil
 				end)
 			end
 		end
-	end, { v4, v6 })
+	end, { v4, state })
 
 	RealtimeDelivery.useRealtimeConnectionStateChanged("CommunicationChannels", function(p2, p3)
 		if p2 == Enum.ConnectionState.Connected and p3 then
 			v:info("Connection re-established, fetching conversation metadata to get unread count")
 
-			if v6 then
+			if state then
 				v:info("Chat tab is visible during connection recovery, calling clear endpoint")
 				v4(AppChatNetworking.rodux.ClearGlobalUnreadCount.API()):catch(function(p4)
 					v:error("Failure in ClearGlobalUnreadCount. Error: {}", (tostring(p4)))
@@ -104,7 +101,7 @@ local function AppChatNotificationEventReceiver(p): nil
 				end)
 			end
 		end
-	end, { v4, v6 })
+	end, { v4, state })
 
 	return nil
 end

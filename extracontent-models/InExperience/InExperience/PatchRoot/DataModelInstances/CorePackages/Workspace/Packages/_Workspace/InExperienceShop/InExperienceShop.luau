@@ -1,4 +1,5 @@
 local FFlagEnableExperienceShopGlobalIcon = require(script.Flags.FFlagEnableExperienceShopGlobalIcon)
+local FFlagEnableFreeTrialTopBarChip = require(script.Flags.FFlagEnableFreeTrialTopBarChip)
 
 local InExperienceShop = {
 	["jest.config"] = nil,
@@ -54,4 +55,12 @@ InExperienceShop.FFlagExperienceShopNewIconography = require(script.Flags.FFlagE
 InExperienceShop.FFlagEnableFreeTrialShopMenuBadge = require(script.Flags.FFlagEnableFreeTrialShopMenuBadge)
 InExperienceShop.FFlagMenuBadgePreferFreeTrialOverOffer = require(script.Flags.FFlagMenuBadgePreferFreeTrialOverOffer)
 InExperienceShop.FFlagEnableFreeTrialBlueDot = require(script.Flags.FFlagEnableFreeTrialBlueDot)
+InExperienceShop.FFlagEnableFreeTrialTopBarChip = FFlagEnableFreeTrialTopBarChip
+local freeTrialTopBarSlot
+
+if FFlagEnableFreeTrialTopBarChip then
+	freeTrialTopBarSlot = require(script.Components.FreeTrialTopBarSlot)
+end
+
+InExperienceShop.FreeTrialTopBarSlot = freeTrialTopBarSlot
 return InExperienceShop

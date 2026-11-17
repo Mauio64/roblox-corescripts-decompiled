@@ -7,11 +7,18 @@ local HomeOmniFeedCache = DiscoveryUtils.HomeOmniFeedCache
 local SduiSharedUtilities = require(parent.SduiSharedUtilities)
 local getSduiTemplateStore = SduiSharedUtilities.getSduiTemplateStore
 
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSduiUniverseItemConnectionsPlayed = SharedFlags.FFlagSduiUniverseItemConnectionsPlayed
+
 local v = {
 	universe = { "player_count" }
 }
 
-local function cloneMessage(p) -- 11 equivalent calls inferred from this helper
+local v2 = FFlagSduiUniverseItemConnectionsPlayed
+	and { "connection_played_display_name", "connection_played_num_others", "connection_played_total_count" }
+	or nil
+
+local function cloneMessage(p) -- 14 equivalent calls inferred from this helper
 	return table.clone(p)
 end
 
@@ -60,7 +67,61 @@ local function readPoolId(p) -- 2 equivalent calls inferred from this helper
 	return nil
 end
 
-local function takeItems(list, p: number) -- 2 equivalent calls inferred from this helper
+local function hasViewerScopedItemField(p): boolean -- 2 equivalent calls inferred from this helper
+	for _, v3 in v2 do
+		if p[v3] ~= nil then
+			return true
+		end
+	end
+
+	return false
+end
+
+local function clearViewerFields(p) -- 1 equivalent call inferred from this helper
+	if not hasViewerScopedItemField(p) then -- inferred equivalent call
+		return p
+	end
+
+	local message = cloneMessage(p) -- inferred equivalent call
+
+	for _, v3 in v2 do
+		message[v3] = nil
+	end
+
+	return message
+end
+
+local function clearItemViewerFields(p)
+	if type(p) ~= "table" then
+		return p
+	end
+
+	local kind = p.kind
+
+	if type(kind) == "table" and type(kind.value) == "table" then
+		local value = kind.value
+
+		if hasViewerScopedItemField(value) then -- inferred equivalent call
+			value = cloneMessage(value) -- inferred equivalent call
+
+			for _, v3 in v2 do
+				value[v3] = nil
+			end
+		end
+
+		if value == kind.value then
+			return p
+		end
+
+		local message = cloneMessage(p) -- inferred equivalent call
+		message.kind = { type = kind.type, value = value }
+		return message
+	end
+
+	return clearViewerFields(p) -- inferred equivalent call
+end
+
+local function takeItems(list, p: number)
 	local result = {}
 
 	if list == nil then
@@ -68,7 +129,15 @@ local function takeItems(list, p: number) -- 2 equivalent calls inferred from th
 	end
 
 	for i = 1, math.min(#list, p) do
-		result[i] = list[i]
+		local v3
+
+		if FFlagSduiUniverseItemConnectionsPlayed then
+			v3 = clearItemViewerFields(list[i])
+		else
+			v3 = list[i]
+		end
+
+		result[i] = v3
 	end
 
 	return result
@@ -139,21 +208,21 @@ local function pruneFeed(data, topicIdToNumCacheItems)
 	local messages = {}
 	local messages2 = {}
 
-	local v2 = {}
+	local v3 = {}
 	local set = {}
 
 	if data.entry_order ~= nil then
-		for _, v3 in data.entry_order do
-			if set[v3] then
+		for _, v4 in data.entry_order do
+			if set[v4] then
 				continue
 			end
 
-			set[v3] = true
-			table.insert(v2, v3)
+			set[v4] = true
+			table.insert(v3, v4)
 		end
 	end
 
-	local v3 = {}
+	local v4 = {}
 
 	for k in data.entry_map do
 		if set[k] then
@@ -161,67 +230,67 @@ local function pruneFeed(data, topicIdToNumCacheItems)
 		end
 
 		set[k] = true
-		table.insert(v3, k)
+		table.insert(v4, k)
 	end
 
-	table.sort(v3)
+	table.sort(v4)
 
-	for _, v4 in v3 do
-		table.insert(v2, v4)
+	for _, v5 in v4 do
+		table.insert(v3, v5)
 	end
 
-	for _, v4 in v2 do
-		local v5 = data.entry_map[v4]
+	for _, v5 in v3 do
+		local v6 = data.entry_map[v5]
 
-		if v5 == nil then
+		if v6 == nil then
 			continue
 		end
 
-		local inputValue = readInputValue(v5.input_data) -- inferred equivalent call
+		local inputValue = readInputValue(v6.input_data) -- inferred equivalent call
 
 		if type(inputValue) ~= "table" then
 			continue
 		end
 
 		local pool_id = readPoolId(inputValue) -- inferred equivalent call
-		local v6 = itemListFields(inputValue)
+		local v7 = itemListFields(inputValue)
 
-		if not (pool_id ~= nil or #v6 ~= 0) then
+		if not (pool_id ~= nil or #v7 ~= 0) then
 			continue
 		end
 
-		local v7 = topicIdToNumCacheItems[readSortId(v4, inputValue)] -- inferred equivalent call
+		local v8 = topicIdToNumCacheItems[readSortId(v5, inputValue)] -- inferred equivalent call
 
-		if v7 == nil then
+		if v8 == nil then
 			continue
 		end
 
 		local message = cloneMessage(inputValue) -- inferred equivalent call
 
 		if pool_id == nil then
-			for _, v8 in v6 do
-				local result = takeItems(inputValue[v8], math.max(v7.cap - v7.count, 0)) -- inferred equivalent call
-				v7.count += #result
-				message[v8] = result
+			for _, v9 in v7 do
+				local v10 = takeItems(inputValue[v9], math.max(v8.cap - v8.count, 0))
+				v8.count += #v10
+				message[v9] = v10
 			end
 		else
-			local v8 = (data.content_pools or {})[pool_id]
+			local v9 = (data.content_pools or {})[pool_id]
 
-			if v8 == nil then
+			if v9 == nil then
 				continue
 			end
 
 			if messages2[pool_id] == nil then
-				local message2 = cloneMessage(v8) -- inferred equivalent call
-				message2.items = takeItems(v8.items, math.max(v7.cap - v7.count, 0)) -- inferred equivalent call
-				v7.count += #message2.items
+				local message2 = cloneMessage(v9) -- inferred equivalent call
+				message2.items = takeItems(v9.items, math.max(v8.cap - v8.count, 0))
+				v8.count += #message2.items
 				messages2[pool_id] = message2
 			end
 		end
 
-		local message2 = cloneMessage(v5) -- inferred equivalent call
-		message2.input_data = replaceInputValue(v5.input_data, message) -- inferred equivalent call
-		messages[v4] = message2
+		local message2 = cloneMessage(v6) -- inferred equivalent call
+		message2.input_data = replaceInputValue(v6.input_data, message) -- inferred equivalent call
+		messages[v5] = message2
 	end
 
 	if next(messages) == nil then
@@ -258,19 +327,19 @@ local function pruneHydration(hydration_data, p)
 			continue
 		end
 
-		local v2 = v[k]
+		local v3 = v[k]
 		local messages = {}
 
-		for k2, v3 in item do
-			if not (type(v3) == "table" and p[tostring(k2)]) then
+		for k2, v4 in item do
+			if not (type(v4) == "table" and p[tostring(k2)]) then
 				continue
 			end
 
-			local message2 = cloneMessage(v3) -- inferred equivalent call
+			local message2 = cloneMessage(v4) -- inferred equivalent call
 
-			if v2 ~= nil then
-				for _, v4 in v2 do
-					message2[v4] = nil
+			if v3 ~= nil then
+				for _, v5 in v3 do
+					message2[v5] = nil
 				end
 			end
 
@@ -295,15 +364,15 @@ local function fillMissingTemplatesFromStore(message)
 	local ServiceContractsProto = require(parent.ServiceContractsProto)
 	local templateEntry = ServiceContractsProto.apppageplatform.shared.template_entry.TemplateEntry
 
-	for k, v2 in cachedRobloxComponentToTemplateId do
-		if message2[v2] ~= nil then
+	for k, v3 in cachedRobloxComponentToTemplateId do
+		if message2[v3] ~= nil then
 			continue
 		end
 
-		local template = sduiTemplateStore.getTemplate(v2)
+		local template = sduiTemplateStore.getTemplate(v3)
 
 		if template ~= nil then
-			message2[v2] = templateEntry.new({ template = template, roblox_component = k })
+			message2[v3] = templateEntry.new({ template = template, roblox_component = k })
 		end
 	end
 
@@ -326,25 +395,25 @@ function SduiHomePageCachePayload.buildSduiHomePageCachePayload(p)
 	local topicIdToNumCacheItems = HomeOmniFeedCache.getTopicIdToNumCacheItems()
 
 	local messages = {}
-	local v2 = {}
+	local v3 = {}
 
-	for _, v3 in p.page_entries or {} do
-		local inputValue = readInputValue(v3.input_data) -- inferred equivalent call
+	for _, v4 in p.page_entries or {} do
+		local inputValue = readInputValue(v4.input_data) -- inferred equivalent call
 
 		if not isFeed(inputValue) then -- inferred equivalent call
 			continue
 		end
 
-		local v4 = pruneFeed(inputValue, topicIdToNumCacheItems)
+		local v5 = pruneFeed(inputValue, topicIdToNumCacheItems)
 
-		if v4 == nil then
+		if v5 == nil then
 			continue
 		end
 
-		local message = cloneMessage(v3) -- inferred equivalent call
-		message.input_data = replaceInputValue(v3.input_data, v4) -- inferred equivalent call
+		local message = cloneMessage(v4) -- inferred equivalent call
+		message.input_data = replaceInputValue(v4.input_data, v5) -- inferred equivalent call
 		table.insert(messages, message)
-		collectReferencedKeys(message, v2)
+		collectReferencedKeys(message, v3)
 	end
 
 	if #messages == 0 then
@@ -353,7 +422,7 @@ function SduiHomePageCachePayload.buildSduiHomePageCachePayload(p)
 
 	local message = cloneMessage(p) -- inferred equivalent call
 	message.page_entries = messages
-	message.hydration_data = pruneHydration(p.hydration_data, v2)
+	message.hydration_data = pruneHydration(p.hydration_data, v3)
 
 	message.request_id = ""
 	fillMissingTemplatesFromStore(message)
@@ -368,30 +437,30 @@ end
 SduiHomePageCachePayload.deserializeSduiHomePageCache = deserializeSduiHomePageCache
 
 function SduiHomePageCachePayload.getSduiHomePageItemsForSortId(p: string)
-	local v2 = deserializeSduiHomePageCache(HomeOmniFeedCache.getCachedSduiHomePageData()) -- inferred equivalent call
+	local v3 = deserializeSduiHomePageCache(HomeOmniFeedCache.getCachedSduiHomePageData()) -- inferred equivalent call
 
-	if v2 == nil then
+	if v3 == nil then
 		return nil
 	end
 
-	for _, page_entry in v2.page_entries do
+	for _, page_entry in v3.page_entries do
 		local inputValue = readInputValue(page_entry.input_data) -- inferred equivalent call
 
 		if not isFeed(inputValue) then -- inferred equivalent call
 			continue
 		end
 
-		for k, v3 in inputValue.entry_map do
-			local inputValue2 = readInputValue(v3.input_data) -- inferred equivalent call
+		for k, v4 in inputValue.entry_map do
+			local inputValue2 = readInputValue(v4.input_data) -- inferred equivalent call
 
 			if type(inputValue2) ~= "table" then
 				continue
 			end
 
 			local pool_id = readPoolId(inputValue2) -- inferred equivalent call
-			local v4 = itemListFields(inputValue2)
+			local v5 = itemListFields(inputValue2)
 
-			if not (pool_id ~= nil or #v4 ~= 0) then
+			if not (pool_id ~= nil or #v5 ~= 0) then
 				continue
 			end
 
@@ -399,13 +468,13 @@ function SduiHomePageCachePayload.getSduiHomePageItemsForSortId(p: string)
 
 			if k == p then
 				if pool_id == nil then
-					return inputValue2[v4[1]]
+					return inputValue2[v5[1]]
 				end
 
 				local result = {}
 
-				for _, v5 in ((inputValue.content_pools or {})[pool_id] or {}).items or {} do
-					local inputValue3 = readInputValue(v5) -- inferred equivalent call
+				for _, v6 in ((inputValue.content_pools or {})[pool_id] or {}).items or {} do
+					local inputValue3 = readInputValue(v6) -- inferred equivalent call
 
 					if inputValue3 ~= nil then
 						table.insert(result, inputValue3)

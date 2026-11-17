@@ -19,6 +19,8 @@ local Drawer = require(parent.Drawer)
 local useSetDrawerVisible = Drawer.Hooks.useSetDrawerVisible
 local useLocalization = Localization.Hooks.useLocalization
 
+local SharedFlags = require(parent.SharedFlags)
+local FFlagMomentsCreateAvatarPosts = SharedFlags.FFlagMomentsCreateAvatarPosts
 local GetFFlagMomentsAndroidTvEnabled = require(Moments.Flags.GetFFlagMomentsAndroidTvEnabled)
 local FFlagMomentsFtuxTooltipCreateCopy = require(Moments.Flags.FFlagMomentsFtuxTooltipCreateCopy)
 local FFlagMomentsFixFeedForDeviceSafeInsets = require(Moments.Flags.FFlagMomentsFixFeedForDeviceSafeInsets)
@@ -72,9 +74,11 @@ local function useMomentsHeaderViewModel(data, flag: boolean, showHamburger: boo
 	end
 
 	local feedTypeChips = nil
+	local showMyMomentsButton = false
+	local v9 = 0
 
 	if FFlagMomentsFollowingFeed then
-		local v9 = useLocalization(v2)
+		local v10 = useLocalization(v2)
 
 		local text = useTrendingFeedLabel()
 		local onFeedTypeSelected = data.onFeedTypeSelected
@@ -92,13 +96,19 @@ local function useMomentsHeaderViewModel(data, flag: boolean, showHamburger: boo
 				},
 				{
 					id = MomentsFeedType.Following,
-					text = v9.following,
+					text = v10.following,
 					isChecked = selectedFeedType == MomentsFeedType.Following,
 					onActivated = function()
 						onFeedTypeSelected(MomentsFeedType.Following)
 					end
 				}
 			}
+
+			showMyMomentsButton = true
+
+			if data.variant == "base" then
+				v9 = v3.Size.Size_200
+			end
 		end
 	end
 
@@ -132,7 +142,7 @@ local function useMomentsHeaderViewModel(data, flag: boolean, showHamburger: boo
 
 	local headerPadding = {
 		left = UDim.new(0, (math.max(v4.left, margin))),
-		right = UDim.new(0, (math.max(v4.right, margin))),
+		right = UDim.new(0, (math.max(v4.right, margin - v9))),
 		top = UDim.new(0, v8)
 	}
 
@@ -154,32 +164,62 @@ local function useMomentsHeaderViewModel(data, flag: boolean, showHamburger: boo
 		layoutOrder = data.layoutOrder
 	end
 
-	return {
+	local v10 = {
 		layoutOrder = layoutOrder,
 		variant = data.variant,
 		showFtuxTooltip = showFtuxTooltip,
 		ftuxTooltipTitle = ftuxTooltipTitle,
 		ftuxTooltipText = ftuxTooltipText,
 		onCreateMomentButtonPressed = onCreateMomentButtonPressed,
-		onFtuxTooltipClosed = onFtuxTooltipClosed,
-		onHamburgerPressed = onHamburgerPressed,
-		onBack = data.onBack or noop,
-		onClose = data.onClose or noop,
-		onNavigateToTrending = data.onNavigateToTrending or noop,
-		onNavigateToMyMoments = data.onNavigateToMyMoments or noop,
-		title = data.title or "",
-		showTopScrim = data.showTopScrim == true,
-		showInteractiveButtons = not (GetFFlagMomentsAndroidTvEnabled() and v6),
-		showHamburger = showHamburger,
-		showCreateButton = data.onCreatePressed ~= nil,
-		showNavigationMenu = data.onNavigateToTrending ~= nil and data.onNavigateToMyMoments ~= nil,
-		headerHeight = size_1400,
-		headerPadding = headerPadding,
-		titleTextStyle = v3.Color.Content.Emphasis,
-		scrimHeight = scrimHeight,
-		scrimTopOffset = scrimTopOffset,
-		feedTypeChips = feedTypeChips
+		onCreateAvatarMomentPressed = 0,
+		onFtuxTooltipClosed = 0,
+		onHamburgerPressed = 0,
+		onBack = 0,
+		onClose = 0,
+		onNavigateToTrending = 0,
+		onNavigateToMyMoments = 0,
+		title = 0,
+		showTopScrim = 0,
+		showInteractiveButtons = 0,
+		showHamburger = 0,
+		showCreateButton = 0,
+		showNavigationMenu = 0,
+		showMyMomentsButton = 0,
+		headerHeight = 0,
+		headerPadding = 0,
+		titleTextStyle = 0,
+		scrimHeight = 0,
+		scrimTopOffset = 0,
+		feedTypeChips = 0
 	}
+	local onCreateAvatarMomentPressed
+
+	if FFlagMomentsCreateAvatarPosts then
+		onCreateAvatarMomentPressed = data.onCreateAvatarMomentPressed
+	end
+
+	v10.onCreateAvatarMomentPressed = onCreateAvatarMomentPressed
+
+	v10.onFtuxTooltipClosed = onFtuxTooltipClosed
+	v10.onHamburgerPressed = onHamburgerPressed
+	v10.onBack = data.onBack or noop
+	v10.onClose = data.onClose or noop
+	v10.onNavigateToTrending = data.onNavigateToTrending or noop
+	v10.onNavigateToMyMoments = data.onNavigateToMyMoments or noop
+	v10.title = data.title or ""
+	v10.showTopScrim = data.showTopScrim == true
+	v10.showInteractiveButtons = not (GetFFlagMomentsAndroidTvEnabled() and v6)
+	v10.showHamburger = showHamburger
+	v10.showCreateButton = data.onCreatePressed ~= nil
+	v10.showNavigationMenu = data.onNavigateToTrending ~= nil and data.onNavigateToMyMoments ~= nil
+	v10.showMyMomentsButton = showMyMomentsButton
+	v10.headerHeight = size_1400
+	v10.headerPadding = headerPadding
+	v10.titleTextStyle = v3.Color.Content.Emphasis
+	v10.scrimHeight = scrimHeight
+	v10.scrimTopOffset = scrimTopOffset
+	v10.feedTypeChips = feedTypeChips
+	return v10
 end
 
 return useMomentsHeaderViewModel

@@ -9,6 +9,9 @@ local FFlagAXVirtualizedFeedVerticalPadding = SharedFlags.FFlagAXVirtualizedFeed
 
 local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
 local FFlagAXSduiFeedBackToTopAndNavClearance = AvatarExperienceFlags.FFlagAXSduiFeedBackToTopAndNavClearance
+
+local AvatarExperienceFlags2 = require(parent.AvatarExperienceFlags)
+local FFlagAXSduiFeedSkipScrollWithoutContent = AvatarExperienceFlags2.FFlagAXSduiFeedSkipScrollWithoutContent
 local FFlagAXFixVirtualizedFeedUpdateDepth = require(script.Parent.FFlagAXFixVirtualizedFeedUpdateDepth)
 local Foundation = require(parent.Foundation)
 local Button = Foundation.Button
@@ -18,6 +21,7 @@ local Loading = Foundation.Loading
 local IconSize = Foundation.Enums.IconSize
 local VirtualizedList = require(parent.VirtualizedList)
 local FlatList = VirtualizedList.FlatList
+local ScrollView = VirtualizedList.ScrollView
 local isFeedContentScrollable = require(script.Parent.isFeedContentScrollable)
 local SharedFlags2 = require(parent.SharedFlags)
 local FFlagVirtualizedFeedFooterWrapperProp = SharedFlags2.FFlagVirtualizedFeedFooterWrapperProp
@@ -49,6 +53,17 @@ local function getNativeScrollingFrameRef(ref) -- 1 equivalent call inferred fro
 	end
 
 	return nil
+end
+
+local function renderScrollViewSkippingScrollsWithoutContent(p)
+	local onScroll = p.onScroll
+	local clone = table.clone(p)
+	function clone.onScroll(instance)
+		if onScroll ~= nil and instance:GetChildren()[1] ~= nil then
+			onScroll(instance)
+		end
+	end
+	return React.createElement(ScrollView, clone)
 end
 
 local function VirtualizedFeedBackToTopButton(p)
@@ -339,7 +354,8 @@ local function VirtualizedFeed(props, ref)
 		showDefaultLoadingIndicators = true,
 		ListHeaderComponent = 0,
 		ListFooterComponent = 0,
-		scrollEnabled = 0
+		scrollEnabled = 0,
+		renderScrollComponent = 0
 	}
 
 	if not FFlagAXSduiFeedBackToTopAndNavClearance then
@@ -353,6 +369,13 @@ local function VirtualizedFeed(props, ref)
 	v6.ListHeaderComponent = props.ListHeaderComponent
 	v6.ListFooterComponent = listFooterComponent
 	v6.scrollEnabled = props.scrollEnabled
+	local renderScrollComponent
+
+	if FFlagAXSduiFeedSkipScrollWithoutContent and props.skipScrollWithoutContent then
+		renderScrollComponent = renderScrollViewSkippingScrollsWithoutContent
+	end
+
+	v6.renderScrollComponent = renderScrollComponent
 	return createElement("Frame", v5, {
 		UIPadding = uiPadding,
 		FeedFlatList = createElement2(FlatList, v6)

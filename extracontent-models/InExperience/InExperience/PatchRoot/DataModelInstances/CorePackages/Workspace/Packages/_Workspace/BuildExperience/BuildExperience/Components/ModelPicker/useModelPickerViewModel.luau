@@ -149,12 +149,12 @@ local function useModelPickerViewModel(data)
 			and internalTesting.previewHash ~= nil
 			and internalTesting.previewHash ~= ""
 		then
-			internalTesting.onSaveSpec(nil)
+			internalTesting.onSaveSpec(nil, internalTesting.previewSpecName)
 		end
 	end, { isOpen, isSelected, data.isDisabled, internalTesting })
-	local onSaveSpec = React.useCallback(function(p: string?)
+	local onSaveSpec = React.useCallback(function(p: string?, p2)
 		if isSpecOpen and not data.isDisabled and internalTesting then
-			internalTesting.onSaveSpec(p)
+			internalTesting.onSaveSpec(p, p2)
 		end
 	end, { isSpecOpen, data.isDisabled, internalTesting })
 	local onCloseSpec = React.useCallback(function()
@@ -245,6 +245,7 @@ local function useModelPickerViewModel(data)
 		internalTesting = internalTesting and {
 			isSelected = isSelected,
 			previewHash = internalTesting.previewHash,
+			previewSpecName = internalTesting.previewSpecName,
 			onSelect = onSelect,
 			onSaveSpec = onSaveSpec,
 			onOpenSpec = onOpenSpec,

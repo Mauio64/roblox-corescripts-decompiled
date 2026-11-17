@@ -13,7 +13,6 @@ local FFlagAppChatIxpScreenExposure = require(AppChat.Flags.FFlagAppChatIxpScree
 
 local IXPNavigationUtils = require(AppChat.Utils.IXPNavigationUtils)
 
-local getFFlagAppChatEnableRootedNavigation = require(AppChat.Flags.getFFlagAppChatEnableRootedNavigation)
 local EditChatMembersContainer = require(script.Parent.EditChatMembersContainer)
 local Logger = require(script.Parent.Logger)
 
@@ -80,13 +79,10 @@ function extended:init()
 
 	function self.navigateToConversation(conversationId)
 		Logger:info("Navigate To Conversation: {} from {screen}", conversationId)
-		local v = getFFlagAppChatEnableRootedNavigation()
-			and {
-				conversationId = conversationId,
-				isRooted = self.props.navigation.getParam("isRooted", false)
-			}
-			or { conversationId = conversationId }
-		self.props.navigation.navigate(EnumScreens.ChatConversation, v)
+		self.props.navigation.navigate(EnumScreens.ChatConversation, {
+			conversationId = conversationId,
+			isRooted = self.props.navigation.getParam("isRooted", false)
+		})
 	end
 
 	function self.navigateToToast(p)
@@ -117,7 +113,7 @@ function extended.render(props)
 		return nil
 	end
 
-	if getFFlagAppChatEnableRootedNavigation() and notNil.getParam("isRooted", false) then
+	if notNil.getParam("isRooted", false) then
 		return Roact.createElement(RootedEditChatMembersContainer, {
 			navigation = notNil,
 			conversation = param,

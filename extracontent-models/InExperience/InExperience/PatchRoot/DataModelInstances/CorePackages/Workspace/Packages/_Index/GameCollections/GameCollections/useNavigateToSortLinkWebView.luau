@@ -92,11 +92,16 @@ local function useNavigateToSortLinkWebView()
 						end
 					}
 				})
-			elseif default:isInternalDlicEnabled() then
-				default:detectDeeplinkIntent((default:createInternalDlic(detail, DeepLinkSource.LuaInternal)))
-			else
-				default:detectURL(detail)
+
+				return
 			end
+
+			if not default:isInternalDlicEnabled() then
+				default:detectURL(detail)
+				return
+			end
+
+			default:detectDeeplinkIntent((default:createInternalDlic(detail, DeepLinkSource.LuaInternal)))
 		end)
 	end, { v, webViewSupported })
 end

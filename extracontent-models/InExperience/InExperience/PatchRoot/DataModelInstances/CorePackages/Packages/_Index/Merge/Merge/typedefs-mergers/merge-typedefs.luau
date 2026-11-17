@@ -102,40 +102,38 @@ local function visitTypeSources(callback, data, p, object)
 		end
 
 		return callbacks
+	elseif Boolean.toJSBoolean(isSchema(callback)) then
+		visitTypeSources(getDocumentNodeFromSchema(callback, data).definitions, data, callbacks, object)
+		return callbacks
 	else
-		if Boolean.toJSBoolean(isSchema(callback)) then
-			visitTypeSources(getDocumentNodeFromSchema(callback, data).definitions, data, callbacks, object)
-			return callbacks
-		end
-
 		local toJSBoolean2 = Boolean.toJSBoolean
 		local stringTypes = isStringTypes(callback)
 
 		if toJSBoolean2(Boolean.toJSBoolean(stringTypes) and stringTypes or isSourceTypes(callback)) then
 			visitTypeSources(parse(callback, data).definitions, data, callbacks, object)
 			return callbacks
-		end
-
-		local toJSBoolean3 = Boolean.toJSBoolean
-		local v2
-
-		if typeof(callback) == "table" then
-			v2 = isDefinitionNode(callback)
 		else
-			v2 = false
-		end
+			local toJSBoolean3 = Boolean.toJSBoolean
+			local v2
 
-		if toJSBoolean3(v2) then
-			table.insert(callbacks, callback)
-			return callbacks
-		end
+			if typeof(callback) == "table" then
+				v2 = isDefinitionNode(callback)
+			else
+				v2 = false
+			end
 
-		if isDocumentNode(callback) then
-			visitTypeSources(callback.definitions, data, callbacks, object)
-			return callbacks
-		end
+			if toJSBoolean3(v2) then
+				table.insert(callbacks, callback)
+				return callbacks
+			end
 
-		error(Error.new(("typeDefs must contain only strings, documents, schemas, or functions, got %s"):format((tostring((typeof(callback)))))))
+			if isDocumentNode(callback) then
+				visitTypeSources(callback.definitions, data, callbacks, object)
+				return callbacks
+			end
+
+			error(Error.new(("typeDefs must contain only strings, documents, schemas, or functions, got %s"):format((tostring((typeof(callback)))))))
+		end
 	end
 
 	return callbacks

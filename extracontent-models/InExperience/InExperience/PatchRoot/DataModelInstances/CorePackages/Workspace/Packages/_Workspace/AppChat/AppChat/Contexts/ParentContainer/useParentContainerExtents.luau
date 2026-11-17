@@ -75,7 +75,9 @@ local function useParentContainerExtents()
 
 			local v12 = fn(absolutePosition, Vector2.zero, v11) -- inferred equivalent call
 
-			v5((fn(absoluteSize, Vector2.zero, v11 - v12))) -- inferred equivalent call
+			local v13 = fn(absoluteSize, Vector2.zero, v11 - v12) -- inferred equivalent call
+
+			v5(v13)
 			v8(v12)
 		end
 

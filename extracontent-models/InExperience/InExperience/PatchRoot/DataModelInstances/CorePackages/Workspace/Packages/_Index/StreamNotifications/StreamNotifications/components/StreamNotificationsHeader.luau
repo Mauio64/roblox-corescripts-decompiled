@@ -13,7 +13,6 @@ local Foundation = require(parent.Foundation)
 local useStyle = UIBlox.Core.Style.useStyle
 local useTokens = Foundation.Hooks.useTokens
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local IconButton = UIBlox.App.Button.IconButton
 local IconSize = UIBlox.App.ImageSet.Enum.IconSize
 local UserInputService = game:GetService("UserInputService")
@@ -36,33 +35,9 @@ end
 
 return function(p)
 	local v = useStyle()
-	local v2
-
-	if FoundationFontFaceMigration then
-		v2 = useTokens()
-	end
-
-	local font = v.Font
-	local font2
-
-	if not FoundationFontFaceMigration then
-		font2 = font.Header1.Font
-	end
-
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(v2.Typography.HeadingSmall.Font)
-	end
-
-	local textSize
-
-	if FoundationFontFaceMigration then
-		textSize = v2.Typography.HeadingSmall.FontSize
-	else
-		textSize = font.BaseSize * font.Header1.RelativeSize
-	end
-
+	local v2 = useTokens()
+	local fontFace = normalizeFontFace(v2.Typography.HeadingSmall.Font)
+	local fontSize = v2.Typography.HeadingSmall.FontSize
 	local v3 = not (UserInputService.StatusBarSize and p.isSmallScreen) and 0 or UserInputService.StatusBarSize.Y
 
 	local v4 = useLocalization({ headerText = constants.Text.HeaderKey })
@@ -99,9 +74,8 @@ return function(p)
 		local v7 = {
 			HeaderText = React.createElement("TextLabel", {
 				Text = v4 and v4.headerText,
-				Font = font2,
 				FontFace = fontFace,
-				TextSize = textSize,
+				TextSize = fontSize,
 				TextColor3 = v.Theme.TextEmphasis.Color,
 				TextXAlignment = Enum.TextXAlignment.Left,
 				TextYAlignment = Enum.TextYAlignment.Center,
@@ -182,9 +156,8 @@ return function(p)
 			CloseModal = createElement3(IconButton, v8),
 			HeaderText = React.createElement("TextLabel", {
 				Text = v4 and v4.headerText,
-				Font = font2,
 				FontFace = fontFace,
-				TextSize = textSize,
+				TextSize = fontSize,
 				TextColor3 = v.Theme.TextEmphasis.Color,
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				Position = UDim2.new(0.5, 0, 0.5, 0),

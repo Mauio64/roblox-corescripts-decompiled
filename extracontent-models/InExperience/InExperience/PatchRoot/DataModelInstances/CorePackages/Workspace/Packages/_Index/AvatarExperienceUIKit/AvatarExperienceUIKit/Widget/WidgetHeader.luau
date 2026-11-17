@@ -18,7 +18,6 @@ local useDesignTokens = Style.useDesignTokens
 local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
 local FFlagAXWidgetHeaderTreatEmptyTextAsNil = AvatarExperienceFlags.FFlagAXWidgetHeaderTreatEmptyTextAsNil
 local FFlagAXCatalogItemInformationPopover = AvatarExperienceFlags.FFlagAXCatalogItemInformationPopover
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local FFlagAXWidgetHeaderFlexLayout = AvatarExperienceFlags.FFlagAXWidgetHeaderFlexLayout
 
 local function nonEmptyOrNil(p: string?) -- 4 equivalent calls inferred from this helper
@@ -75,23 +74,10 @@ local function WidgetHeader(props)
 
 	if text then
 		local createElement = React.createElement
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = v3.Typography.HeadingSmall.Font
-		end
-
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(v3.Typography.HeadingSmall.Font)
-		end
-
 		local v6 = {
 			LayoutOrder = 1,
 			Text = text,
-			Font = font,
-			FontFace = fontFace,
+			FontFace = normalizeFontFace(v3.Typography.HeadingSmall.Font),
 			TextSize = v3.Typography.HeadingSmall.FontSize,
 			LineHeight = v3.Typography.HeadingSmall.LineHeight,
 			TextColor3 = v3.Color.Content.Emphasis.Color3,
@@ -250,24 +236,10 @@ local function WidgetHeader(props)
 		local description
 
 		if text2 then
-			local createElement3 = React.createElement
-			local font
-
-			if not FoundationFontFaceMigration then
-				font = v3.Typography.BodyLarge.Font
-			end
-
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(v3.Typography.BodyLarge.Font)
-			end
-
-			description = createElement3("TextLabel", {
+			description = React.createElement("TextLabel", {
 				LayoutOrder = 2,
 				Text = text2,
-				Font = font,
-				FontFace = fontFace,
+				FontFace = normalizeFontFace(v3.Typography.BodyLarge.Font),
 				TextSize = v3.Typography.BodyLarge.FontSize,
 				TextColor3 = v3.Color.Content.Default.Color3,
 				TextTransparency = v3.Color.Content.Default.Transparency,

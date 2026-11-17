@@ -16,6 +16,9 @@ local FFlagBuildExperienceMonetizationNativeUI = require(BuildExperience.Flags.F
 
 local FFlagBuildExperienceDeveloperProductContext = require(BuildExperience.Flags.FFlagBuildExperienceDeveloperProductContext)
 local useChatSessionCore = require(BuildExperience.Chat.useChatSessionCore)
+
+local FFlagBuildExperienceChatSheetDesktopAutoFocus = require(BuildExperience.Flags.FFlagBuildExperienceChatSheetDesktopAutoFocus)
+local Responsive = require(parent.Responsive)
 require(BuildExperience.Components.BuildPillMenu.BuildPillMenuPortal)
 local GetAssistantBuildStore = require(BuildExperience.Stores.GetAssistantBuildStore)
 local GetCreatorAgentResumeStore = require(BuildExperience.Stores.GetCreatorAgentResumeStore)
@@ -24,11 +27,9 @@ local getCurrentExperienceProject = require(BuildExperience.utils.getCurrentExpe
 require(script.Parent.ChatSheetView)
 local SharedFlags = require(parent.SharedFlags)
 local FFlagBuildExperienceAnalytics = SharedFlags.FFlagBuildExperienceAnalytics
-local fFlagBuildExperienceChatResourceAttachments = SharedFlags.FFlagBuildExperienceInstanceSelection
-	and SharedFlags.FFlagBuildExperienceChatResourceAttachments
-local FFlagBuildExperienceChatImageAttachments = require(BuildExperience.Flags.FFlagBuildExperienceChatImageAttachments)
-local v = SharedFlags.FFlagBuildExperienceInGameCaptureToChat and FFlagBuildExperienceChatImageAttachments
+local FFlagBuildExperienceInstanceSelection = SharedFlags.FFlagBuildExperienceInstanceSelection
 
+local FFlagBuildExperienceInGameCaptureToChat = SharedFlags.FFlagBuildExperienceInGameCaptureToChat
 local FFlagBuildCheckGamePermissions = require(BuildExperience.Flags.FFlagBuildCheckGamePermissions)
 local useGamePermissions = require(BuildExperience.useGamePermissions)
 
@@ -38,31 +39,38 @@ local function noop() end
 
 local function useChatSheetViewModel(data)
 	local onClose = data.onClose or noop
-	local v2 = data.isOpen == nil or data.isOpen
+	local v = data.isOpen == nil or data.isOpen
 	local assistantBuildStore = GetAssistantBuildStore()
-	local v3 = SignalsReact.useSignalState(assistantBuildStore.getIsDisabled)
+	local v2 = SignalsReact.useSignalState(assistantBuildStore.getIsDisabled)
 	local creatorAgentResumeStore = GetCreatorAgentResumeStore()
 	local currentExperienceProject = getCurrentExperienceProject()
 	local universeId = data.universeId or currentExperienceProject.universeId
 	local placeId = data.placeId or currentExperienceProject.placeId
-	local chatPermissions, v4, isChatReadOnly
+	local chatPermissions, v3, isChatReadOnly
 
 	if FFlagBuildCheckGamePermissions then
-		chatPermissions, v4 = useGamePermissions({ universeId = universeId })
+		chatPermissions, v3 = useGamePermissions({ universeId = universeId })
 
 		isChatReadOnly = not chatPermissions.canEditOnBuild
 	else
 		isChatReadOnly = false
-		v4 = false
+		v3 = false
 	end
 
-	local v5 = useChatSessionCore({
+	local autoFocusComposer = data.autoFocusComposer == true
+
+	if FFlagBuildExperienceChatSheetDesktopAutoFocus then
+		local v4 = Responsive.usePreferredInput() == Responsive.Input.Pointer
+		autoFocusComposer = autoFocusComposer or v4
+	end
+
+	local v4 = useChatSessionCore({
 		universeId = universeId,
 		placeId = placeId,
 		sessionId = data.sessionId,
-		autoFocusComposer = data.autoFocusComposer == true,
-		focusComposerWhen = v2,
-		hydrateHistoryWhen = v2,
+		autoFocusComposer = autoFocusComposer,
+		focusComposerWhen = v,
+		hydrateHistoryWhen = v,
 		sendMessageWhen = not isChatReadOnly
 	})
 	local modelPicker
@@ -72,48 +80,48 @@ local function useChatSheetViewModel(data)
 			universeId,
 			data.modelSelectionDraftId,
 			data.modelPicker,
-			v5.modelSessionModels,
-			v5.hasPreparedModelSession,
-			v5.internalTesting
+			v4.modelSessionModels,
+			v4.hasPreparedModelSession,
+			v4.internalTesting
 		)
 	end
 
 	if FFlagBuildExperienceMonetizationNativeUI then
 		local sessionId = data.sessionId
-		local setPrefilledComposerText = v5.setPrefilledComposerText
-		local sendMessage = v5.sendMessage
-		local v6
+		local setPrefilledComposerText = v4.setPrefilledComposerText
+		local sendMessage = v4.sendMessage
+		local v5
 
 		if FFlagBuildExperienceDeveloperProductContext then
-			v6 = v5
+			v5 = v4
 		end
 
-		useBuildPromptDraft(universeId, sessionId, setPrefilledComposerText, sendMessage, v2 and not v3, v6)
+		useBuildPromptDraft(universeId, sessionId, setPrefilledComposerText, sendMessage, v and not v2, v5)
 	end
 
-	local v6 = useChatPlaytestFooter(v5, "ChatSheetPlaytestCta")
+	local v5 = useChatPlaytestFooter(v4, "ChatSheetPlaytestCta")
 
-	if fFlagBuildExperienceChatResourceAttachments then
+	if FFlagBuildExperienceInstanceSelection then
 		local playButtonStore = GetPlayButtonStore()
 
-		local v7 = SignalsReact.useSignalState(playButtonStore.getPendingResourceAttachment)
+		local v6 = SignalsReact.useSignalState(playButtonStore.getPendingResourceAttachment)
 
 		React.useEffect(function()
-			if v7 == nil then
+			if v6 == nil then
 				return
 			end
 
-			local resourceAttachmentUri = chatTypes.getResourceAttachmentUri(v7)
+			local resourceAttachmentUri = chatTypes.getResourceAttachmentUri(v6)
 
-			if v5.findComposerResourceAttachmentIndexByUri(resourceAttachmentUri) == nil then
-				v5.addComposerResourceAttachment(v7)
+			if v4.findComposerResourceAttachmentIndexByUri(resourceAttachmentUri) == nil then
+				v4.addComposerResourceAttachment(v6)
 			end
 
 			playButtonStore.setPendingResourceAttachment(nil)
-		end, { v7, v5.addComposerResourceAttachment, v5.findComposerResourceAttachmentIndexByUri })
+		end, { v6, v4.addComposerResourceAttachment, v4.findComposerResourceAttachmentIndexByUri })
 	end
 
-	if v then
+	if FFlagBuildExperienceInGameCaptureToChat then
 		local ref = React.useRef(nil)
 
 		React.useEffect(function()
@@ -122,14 +130,14 @@ local function useChatSheetViewModel(data)
 			end
 
 			ref.current = data.captureToAttach
-			local clone = table.clone(v5.composerImages)
+			local clone = table.clone(v4.composerImages)
 
 			if #clone >= 2 then
 				table.remove(clone, 1)
 			end
 
 			table.insert(clone, { capture = data.captureToAttach })
-			v5.setComposerImages(clone)
+			v4.setComposerImages(clone)
 
 			if data.onCaptureAttached ~= nil then
 				data.onCaptureAttached()
@@ -137,8 +145,8 @@ local function useChatSheetViewModel(data)
 		end, {
 			data.captureToAttach,
 			data.onCaptureAttached,
-			v5.composerImages,
-			v5.setComposerImages
+			v4.composerImages,
+			v4.setComposerImages
 		})
 	end
 
@@ -148,31 +156,31 @@ local function useChatSheetViewModel(data)
 		local state, setState = React.useState(nil)
 
 		onOpenChat = React.useCallback(function(p: string)
-			v5.setComposerText(p)
+			v4.setComposerText(p)
 			setState(p)
-		end, { v5.setComposerText })
+		end, { v4.setComposerText })
 
 		React.useEffect(function()
 			if state == nil then
 				return
 			end
 
-			v5.setComposerText(state)
+			v4.setComposerText(state)
 
-			if v5.sendMessage() then
+			if v4.sendMessage() then
 				setState(nil)
 			end
-		end, { state, v5.sendMessage, v5.setComposerText })
+		end, { state, v4.sendMessage, v4.setComposerText })
 	end
 
 	React.useEffect(function()
-		if v2 and v3 then
+		if v and v2 then
 			onClose()
 		end
-	end, { v2, v3, onClose })
+	end, { v, v2, onClose })
 
 	React.useEffect(function()
-		if v2 then
+		if v then
 			creatorAgentResumeStore.setActiveTarget({
 				universeId = universeId,
 				sessionId = data.sessionId
@@ -184,62 +192,62 @@ local function useChatSheetViewModel(data)
 		end
 
 		creatorAgentResumeStore.setActiveTarget(nil)
-	end, { creatorAgentResumeStore, v2, universeId, data.sessionId })
+	end, { creatorAgentResumeStore, v, universeId, data.sessionId })
 	local creatorCreditRecovery
 
 	if FFlagBuildExperienceModelPicker then
-		creatorCreditRecovery = useChatSheetFundingRecovery(v5, modelPicker, universeId, placeId, data.sessionId)
+		creatorCreditRecovery = useChatSheetFundingRecovery(v4, modelPicker, universeId, placeId, data.sessionId)
 	end
 
-	local v7 = {}
-	v7.isOpen = v2
-	v7.creatorCreditRecovery = creatorCreditRecovery
-	v7.onClose = onClose
-	v7.snapPoints = data.snapPoints
-	v7.defaultSnapPointIndex = data.defaultSnapPointIndex
-	v7.messages = v5.messages
-	v7.localToolActions = v5.localToolActions
+	local v6 = {}
+	v6.isOpen = v
+	v6.creatorCreditRecovery = creatorCreditRecovery
+	v6.onClose = onClose
+	v6.snapPoints = data.snapPoints
+	v6.defaultSnapPointIndex = data.defaultSnapPointIndex
+	v6.messages = v4.messages
+	v6.localToolActions = v4.localToolActions
 	local answerForm
 
 	if FFlagBuildExperienceAnswerForm then
-		answerForm = v5.answerForm
+		answerForm = v4.answerForm
 	end
 
-	v7.answerForm = answerForm
+	v6.answerForm = answerForm
 	local onSubmitAnswerText
 
 	if FFlagBuildExperienceAnswerForm then
-		onSubmitAnswerText = v5.submitAnswerText
+		onSubmitAnswerText = v4.submitAnswerText
 	end
 
-	v7.onSubmitAnswerText = onSubmitAnswerText
-	v7.clockBinding = v5.clockBinding
-	v7.onPlaytest = v6.onPlaytest
-	v7.isPlaytestLoading = v6.isPlaytestLoading
-	v7.isHistoryLoading = v5.isHistoryLoading or v4
-	v7.scrollingFrameRef = v5.setScrollingFrame
-	v7.anchorScrollToInstance = v5.anchorScrollToInstance
-	v7.modelPicker = modelPicker
-	v7.composerText = v5.composerText
-	v7.composerErrorText = v5.composerErrorText
-	v7.onComposerChanged = v5.setComposerText
-	v7.composerImages = v5.composerImages
-	v7.onComposerImagesChanged = v5.setComposerImages
-	v7.onRetryComposerImage = v5.retryComposerImage
-	v7.composerResourceAttachments = v5.composerResourceAttachments
-	v7.onRemoveComposerResourceAttachment = v5.removeComposerResourceAttachmentAtIndex
-	v7.isComposerSendBlocked = v5.isComposerSendBlocked
-	v7.textBoxRef = v5.textBoxRef
-	v7.isAssistantResponding = v5.isAssistantResponding
-	v7.canStopAssistantResponse = v5.canStopAssistantResponse
-	v7.canSendWhileResponding = v5.canSendWhileResponding
-	v7.isChatReadOnly = isChatReadOnly
-	v7.chatPermissions = chatPermissions
-	v7.onSend = v5.sendMessage
-	v7.onStop = v5.stopAssistantResponse
-	v7.onOpenChat = onOpenChat
-	v7.topBarPillMenuTarget = data.topBarPillMenuTarget
-	return v7
+	v6.onSubmitAnswerText = onSubmitAnswerText
+	v6.clockBinding = v4.clockBinding
+	v6.onPlaytest = v5.onPlaytest
+	v6.isPlaytestLoading = v5.isPlaytestLoading
+	v6.isHistoryLoading = v4.isHistoryLoading or v3
+	v6.scrollingFrameRef = v4.setScrollingFrame
+	v6.anchorScrollToInstance = v4.anchorScrollToInstance
+	v6.modelPicker = modelPicker
+	v6.composerText = v4.composerText
+	v6.composerErrorText = v4.composerErrorText
+	v6.onComposerChanged = v4.setComposerText
+	v6.composerImages = v4.composerImages
+	v6.onComposerImagesChanged = v4.setComposerImages
+	v6.onRetryComposerImage = v4.retryComposerImage
+	v6.composerResourceAttachments = v4.composerResourceAttachments
+	v6.onRemoveComposerResourceAttachment = v4.removeComposerResourceAttachmentAtIndex
+	v6.isComposerSendBlocked = v4.isComposerSendBlocked
+	v6.textBoxRef = v4.textBoxRef
+	v6.isAssistantResponding = v4.isAssistantResponding
+	v6.canStopAssistantResponse = v4.canStopAssistantResponse
+	v6.canSendWhileResponding = v4.canSendWhileResponding
+	v6.isChatReadOnly = isChatReadOnly
+	v6.chatPermissions = chatPermissions
+	v6.onSend = v4.sendMessage
+	v6.onStop = v4.stopAssistantResponse
+	v6.onOpenChat = onOpenChat
+	v6.topBarPillMenuTarget = data.topBarPillMenuTarget
+	return v6
 end
 
 return useChatSheetViewModel

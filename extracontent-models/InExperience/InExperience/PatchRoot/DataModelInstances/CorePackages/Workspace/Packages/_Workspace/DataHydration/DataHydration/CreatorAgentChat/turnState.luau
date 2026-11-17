@@ -1,4 +1,5 @@
 require(script.Parent.types)
+local FFlagBuildExperienceThoughtStatus = require(script.Parent.FFlagBuildExperienceThoughtStatus)
 
 local function getSequenceIndex(p) -- 2 equivalent calls inferred from this helper
 	local sequenceNumber
@@ -14,7 +15,7 @@ local function getSequenceIndex(p) -- 2 equivalent calls inferred from this help
 	return nil
 end
 
-local function getMessageId(data) -- 2 equivalent calls inferred from this helper
+local function getMessageId(data) -- 3 equivalent calls inferred from this helper
 	local messageId = data.messageId
 
 	if typeof(messageId) == "string" and messageId ~= "" then
@@ -131,6 +132,8 @@ local function buildActivityItems(activitySlots, toolCalls)
 
 		if item.kind == "agent_message" then
 			table.insert(activityItems, { kind = "agent_message", text = item.text })
+		elseif FFlagBuildExperienceThoughtStatus and item.kind == "thought" then
+			table.insert(activityItems, { kind = "thought", text = item.text })
 		elseif item.kind == "tool_call" then
 			local v3 = toolCalls[item.toolCallId]
 			local v4 = { kind = "tool_call", toolCallId = item.toolCallId, title = 0, status = 0 }
@@ -170,7 +173,7 @@ local function recordActivitySlotAtIndex(state, p: number, p2) -- 3 equivalent c
 	refreshActivityItems(state) -- inferred equivalent call
 end
 
-local function recordActivitySlot(p, p2, p3) -- 1 equivalent call inferred from this helper
+local function recordActivitySlot(p, p2, p3) -- 2 equivalent calls inferred from this helper
 	local sequenceIndex = getSequenceIndex(p2) -- inferred equivalent call
 
 	if sequenceIndex == nil then
@@ -494,7 +497,10 @@ function TurnState.applySessionUpdate(p, data, p2)
 		clone.status = "streaming"
 	end
 
-	if sessionUpdate ~= "agent_message_chunk" then
+	if
+		sessionUpdate ~= "agent_message_chunk"
+		and (not FFlagBuildExperienceThoughtStatus or sessionUpdate ~= "agent_thought_chunk")
+	then
 		if sessionUpdate == "state_change" and data.state == "idle" then
 			flushPendingAgentMessageToAssistant(clone)
 		else
@@ -566,6 +572,19 @@ function TurnState.applySessionUpdate(p, data, p2)
 
 				clone.status = clone.stopReason == "cancelled" and "cancelled" or "succeeded"
 				clone.isDone = true
+				return clone
+			end
+		elseif sessionUpdate == "agent_thought_chunk" then
+			local content = data.content
+
+			if
+				FFlagBuildExperienceThoughtStatus
+				and typeof(content) == "table"
+				and typeof(content.text) == "string"
+				and content.text ~= ""
+			then
+				clone.latestThought = { messageId = getMessageId(data), text = content.text } -- inferred equivalent call
+				recordActivitySlot(clone, p2, { kind = "thought", text = content.text }) -- inferred equivalent call
 				return clone
 			end
 		elseif sessionUpdate == "session_info_update" then

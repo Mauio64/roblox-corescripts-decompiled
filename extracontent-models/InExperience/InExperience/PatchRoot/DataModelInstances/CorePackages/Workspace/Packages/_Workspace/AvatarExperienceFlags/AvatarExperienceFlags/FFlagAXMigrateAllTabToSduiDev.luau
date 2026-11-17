@@ -17,9 +17,12 @@ local FFlagAXCatalogSduiUseOpaqueRouteForSearch = require(script.Parent.FFlagAXC
 local FFlagAXSduiFeedBackToTopAndNavClearance = require(script.Parent.FFlagAXSduiFeedBackToTopAndNavClearance)
 local FFlagAXCategoryMenuVisualFixes = require(script.Parent.FFlagAXCategoryMenuVisualFixes)
 local FFlagAXScrollHighlightedTabIntoView = require(script.Parent.FFlagAXScrollHighlightedTabIntoView)
+local FFlagAXTabGroupScrollOnlyWhenClipped = require(script.Parent.FFlagAXTabGroupScrollOnlyWhenClipped)
 local FFlagAXCatalogUseFixedWidgetPadding = require(script.Parent.FFlagAXCatalogUseFixedWidgetPadding)
+local FFlagAXUnmountHiddenSduiCatalogFeed = require(script.Parent.FFlagAXUnmountHiddenSduiCatalogFeed)
+local FFlagAXSduiFeedMaintainScrollOnSeeAll = require(script.Parent.FFlagAXSduiFeedMaintainScrollOnSeeAll)
 
-return game:DefineFastFlag("AXMigrateAllTabToSdui10", false)
+return game:DefineFastFlag("AXMigrateAllTabToSdui12", false)
 	and FFlagSduiFeatureEntryPointTakesAbsoluteSizeHandler
 	and FFlagMarketplaceCatalogSortTrackLastReceived
 	and FFlagMarketplaceCatalogCategoryTrackLastReceived
@@ -32,8 +35,11 @@ return game:DefineFastFlag("AXMigrateAllTabToSdui10", false)
 	and FFlagAXSduiFeedBackToTopAndNavClearance
 	and FFlagAXCategoryMenuVisualFixes
 	and FFlagAXScrollHighlightedTabIntoView
+	and FFlagAXTabGroupScrollOnlyWhenClipped
 	and FFlagAXCatalogUseFixedWidgetPadding
 	and FFlagSduiCatalogVirtualizedFeed
 	and FFlagSduiCatalogCategoryMenu
 	and FFlagSduiMarketplaceCatalogSortSupport
 	and FFlagSduiSkipEmptyCatalogCategoryHydration
+	and FFlagAXUnmountHiddenSduiCatalogFeed
+	and FFlagAXSduiFeedMaintainScrollOnSeeAll

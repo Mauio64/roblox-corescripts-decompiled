@@ -3,16 +3,8 @@ local SocialLuaAnalytics = script:FindFirstAncestor("SocialLuaAnalytics")
 require(script.Parent.telemetryNewConfig)
 local fireTelemetry = require(SocialLuaAnalytics.Analytics.FireEvent.fireTelemetry)
 
-local defineFastFlag = game:DefineFastFlag("SocialLuaAnalyticsUseTelemetryServiceAsDefault", false)
-
 local function telemetrySetup(data)
-	local shouldUseTelemetryService
-
-	if data.shouldUseTelemetryService == nil then
-		shouldUseTelemetryService = defineFastFlag
-	else
-		shouldUseTelemetryService = data.shouldUseTelemetryService
-	end
+	local shouldUseTelemetryService = data.shouldUseTelemetryService == nil or data.shouldUseTelemetryService
 
 	local function emitTelemetry(p, p2)
 		return fireTelemetry({

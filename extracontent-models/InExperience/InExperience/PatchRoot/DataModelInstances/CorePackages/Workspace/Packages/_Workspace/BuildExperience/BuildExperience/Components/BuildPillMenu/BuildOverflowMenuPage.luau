@@ -8,6 +8,7 @@ local useLocalization = Localization.Hooks.useLocalization
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
 local FFlagBuildExperienceMonetizationNativeUI = require(BuildExperience.Flags.FFlagBuildExperienceMonetizationNativeUI)
 local FFlagBuildCheckGamePermissions = require(BuildExperience.Flags.FFlagBuildCheckGamePermissions)
+local FFlagBuildExperienceConfigurationRowTelemetry = require(BuildExperience.Flags.FFlagBuildExperienceConfigurationRowTelemetry)
 
 local GameConfigurationContent = require(BuildExperience.Components.GameConfigurations.GameConfigurationContent.GameConfigurationContent)
 
@@ -70,13 +71,33 @@ local function BuildOverflowMenuPageComponent(props)
 		local createElement = React.createElement
 		local v4 = {
 			universeId = props.target.universeId,
-			onOpenTitleDescriptionPage = props.onOpenTitleDescriptionPage,
-			onOpenMediaSelectionPage = props.onOpenMediaSelectionPage,
-			onOpenVersionTitleDescriptionPage = props.onOpenVersionTitleDescriptionPage,
-			onOpenVersionHistory = props.onOpenVersionHistory,
+			placeId = 0,
+			sessionId = 0,
+			onOpenTitleDescriptionPage = 0,
+			onOpenMediaSelectionPage = 0,
+			onOpenVersionTitleDescriptionPage = 0,
+			onOpenVersionHistory = 0,
 			isNewGame = 0,
 			layoutOrder = 2
 		}
+		local placeId
+
+		if FFlagBuildExperienceConfigurationRowTelemetry then
+			placeId = props.target.placeId
+		end
+
+		v4.placeId = placeId
+		local sessionId
+
+		if FFlagBuildExperienceConfigurationRowTelemetry then
+			sessionId = props.target.sessionId
+		end
+
+		v4.sessionId = sessionId
+		v4.onOpenTitleDescriptionPage = props.onOpenTitleDescriptionPage
+		v4.onOpenMediaSelectionPage = props.onOpenMediaSelectionPage
+		v4.onOpenVersionTitleDescriptionPage = props.onOpenVersionTitleDescriptionPage
+		v4.onOpenVersionHistory = props.onOpenVersionHistory
 		local isNewGame
 
 		if FFlagBuildCheckGamePermissions then
@@ -90,15 +111,27 @@ local function BuildOverflowMenuPageComponent(props)
 		local v4 = {
 			universeId = props.target.universeId,
 			placeId = props.target.placeId,
-			experienceName = experienceName,
-			onOpenAudiencePage = props.onOpenAudiencePage,
-			onOpenTitleDescriptionPage = props.onOpenTitleDescriptionPage,
-			onOpenMediaSelectionPage = props.onOpenMediaSelectionPage,
+			sessionId = 0,
+			experienceName = 0,
+			onOpenAudiencePage = 0,
+			onOpenTitleDescriptionPage = 0,
+			onOpenMediaSelectionPage = 0,
 			onOpenMonetizationPage = 0,
 			onOpenPlaytestPicker = 0,
 			onOpenPlaytestManagement = 0,
 			isNewGame = 0
 		}
+		local sessionId
+
+		if FFlagBuildExperienceConfigurationRowTelemetry then
+			sessionId = props.target.sessionId
+		end
+
+		v4.sessionId = sessionId
+		v4.experienceName = experienceName
+		v4.onOpenAudiencePage = props.onOpenAudiencePage
+		v4.onOpenTitleDescriptionPage = props.onOpenTitleDescriptionPage
+		v4.onOpenMediaSelectionPage = props.onOpenMediaSelectionPage
 		local onOpenMonetizationPage
 
 		if FFlagBuildExperienceMonetizationNativeUI then

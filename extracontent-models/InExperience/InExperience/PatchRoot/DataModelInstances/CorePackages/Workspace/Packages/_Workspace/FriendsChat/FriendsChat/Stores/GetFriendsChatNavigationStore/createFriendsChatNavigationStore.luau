@@ -2,7 +2,6 @@ local parent = script:FindFirstAncestor("FriendsChat").Parent
 local Signals = require(parent.Signals)
 local createSignal = Signals.createSignal
 local GetConversationStore = require(parent.AppChat.GetConversationStore)
-local getFFlagAppChatEnableRootedNavigation = require(parent.AppChat.getFFlagAppChatEnableRootedNavigation)
 
 return function()
 	local signal, setSelectedConversationId = createSignal(nil)
@@ -11,44 +10,17 @@ return function()
 
 	local signal3, v2 = createSignal(nil)
 	local signal4, setInputBarFocused = createSignal(false)
-	local getEffectiveConversationId, cleanup
+	local getEffectiveConversationId = Signals.createComputed(function(p)
+		local v3 = signal(p)
 
-	if getFFlagAppChatEnableRootedNavigation() then
-		getEffectiveConversationId = Signals.createComputed(function(p)
-			local v3 = signal(p)
+		if not (v3 ~= nil and GetConversationStore(p).getConversation(v3, p) ~= nil) then
+			return nil
+		end
 
-			if not (v3 ~= nil and GetConversationStore(p).getConversation(v3, p) ~= nil) then
-				return nil
-			end
+		return v3
+	end)
 
-			return v3
-		end)
-
-		local v3 = nil
-		cleanup = Signals.createEffect(function(p)
-			local v4 = signal(p)
-			local v5 = getEffectiveConversationId(p)
-
-			if v5 ~= nil then
-				v3 = v5
-				return
-			end
-
-			if v4 == nil or v4 ~= v3 then
-				v3 = nil
-
-				return
-			end
-
-			v3 = nil
-			setSelectedConversationId(nil)
-		end)
-	else
-		getEffectiveConversationId = signal
-
-		cleanup = function() end
-	end
-
+	local v3 = nil
 	return {
 		getSelectedConversationId = signal,
 		getEffectiveConversationId = getEffectiveConversationId,
@@ -69,6 +41,23 @@ return function()
 		end,
 		getIsInputBarFocused = signal4,
 		setInputBarFocused = setInputBarFocused,
-		cleanup = cleanup
+		cleanup = Signals.createEffect(function(p)
+			local v4 = signal(p)
+			local v5 = getEffectiveConversationId(p)
+
+			if v5 ~= nil then
+				v3 = v5
+				return
+			end
+
+			if v4 == nil or v4 ~= v3 then
+				v3 = nil
+
+				return
+			end
+
+			v3 = nil
+			setSelectedConversationId(nil)
+		end)
 	}
 end

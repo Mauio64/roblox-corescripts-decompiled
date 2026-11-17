@@ -17,11 +17,11 @@ local function createUserProfileNameGetter(callback, computed, fn) -- 3 equivale
 
 		local v = callback(p)
 
-		if v.data and #v.data ~= 0 then
-			return fn(v.data[1].names) or ""
+		if not v.data or #v.data == 0 then
+			return ""
 		end
 
-		return ""
+		return fn(v.data[1].names) or ""
 	end)
 end
 
@@ -47,19 +47,22 @@ local function useUserData(p: string)
 		return displayName or username
 	end
 
-	local displayName = useSignalBinding((createUserProfileNameGetter(v2, computed, fn))) -- inferred equivalent call
+	local userProfileNameGetter = createUserProfileNameGetter(v2, computed, fn) -- inferred equivalent call
+	local displayName = useSignalBinding(userProfileNameGetter)
 
 	local function fn2(p2)
 		return p2.getUsername(false)
 	end
 
-	local username = useSignalBinding((createUserProfileNameGetter(v2, computed, fn2))) -- inferred equivalent call
+	local userProfileNameGetter2 = createUserProfileNameGetter(v2, computed, fn2) -- inferred equivalent call
+	local username = useSignalBinding(userProfileNameGetter2)
 
 	local function fn3(p2)
 		return p2.getCombinedName(false)
 	end
 
-	local combinedName = useSignalBinding((createUserProfileNameGetter(v2, computed, fn3))) -- inferred equivalent call
+	local userProfileNameGetter3 = createUserProfileNameGetter(v2, computed, fn3) -- inferred equivalent call
+	local combinedName = useSignalBinding(userProfileNameGetter3)
 
 	local v3 = useFoundationPresence(p)
 

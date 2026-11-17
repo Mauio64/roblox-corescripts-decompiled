@@ -5,12 +5,16 @@ local Foundation = require(parent.Foundation)
 local Enums = require(UserList.Common.Enums)
 require(UserList.Common.Types)
 
-local FFlagUserListChatCtaStandardVariant = require(UserList.Flags.FFlagUserListChatCtaStandardVariant)
 local FFlagUserListCanonicalCtaAnalytics = require(UserList.Flags.FFlagUserListCanonicalCtaAnalytics)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagUserListActionsV2 = SharedFlags.FFlagUserListActionsV2
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagUserListHideNotJoinableJoin = SharedFlags2.FFlagUserListHideNotJoinableJoin
 
 local IconName = Foundation.Enums.IconName
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local ButtonTypes = Enums.ButtonTypes
+local Joinability = Enums.Joinability
 
 local v = {
 	AddFriend = { buttonType = ButtonTypes.Add, handlerKey = ButtonTypes.Add },
@@ -21,20 +25,13 @@ local v = {
 	},
 	PendingFriendRequest = { buttonType = ButtonTypes.Pending, isDisabled = true },
 	CannotAddFriend = { buttonType = ButtonTypes.Add, isDisabled = true },
-	Chat = 0,
-	JoinExperience = 0
+	Chat = {
+		buttonType = ButtonTypes.Chat,
+		handlerKey = ButtonTypes.Chat,
+		variant = ButtonVariant.Standard
+	},
+	JoinExperience = { buttonType = ButtonTypes.Join }
 }
-local chat = { buttonType = ButtonTypes.Chat, handlerKey = ButtonTypes.Chat, variant = 0 }
-local variant
-
-if FFlagUserListChatCtaStandardVariant then
-	variant = ButtonVariant.Standard
-end
-
-chat.variant = variant
-v.Chat = chat
-
-v.JoinExperience = { buttonType = ButtonTypes.Join }
 
 local function fn() end
 
@@ -52,6 +49,14 @@ local function isSupported(supportedActions, kind: string): boolean -- 1 equival
 	return false
 end
 
+local function isJoinable(p, p2): boolean
+	if p2 and p2.enableJoinabilityCheck and p.type == ButtonTypes.JoinExperience then
+		return p.joinability ~= Joinability.NotJoinable
+	end
+
+	return true
+end
+
 local function mapServerActionsToRowCta(p, p2, p3: string, data, p4: number?)
 	if not (p and p.buttons) then
 		return { primaryCta = nil, secondaryCta = nil }
@@ -66,7 +71,11 @@ local function mapServerActionsToRowCta(p, p2, p3: string, data, p4: number?)
 	for _, button in p.buttons do
 		local v2 = v[button.type]
 
-		if v2 and isSupported(supportedActions, button.type) then -- inferred equivalent call
+		if
+			(not FFlagUserListHideNotJoinableJoin or not data or not data.enableJoinabilityCheck or button.type ~= ButtonTypes.JoinExperience or button.joinability ~= Joinability.NotJoinable)
+			and v2
+			and isSupported(supportedActions, button.type) -- inferred equivalent call
+		then
 			local v3
 
 			if v2.handlerKey then
@@ -101,16 +110,18 @@ local function mapServerActionsToRowCta(p, p2, p3: string, data, p4: number?)
 			end
 
 			primaryCta.onActivated = onActivated
+			local isDisabled
 
-			primaryCta.isDisabled = v2.isDisabled
-			primaryCta.disabledReason = button.disabledReason
-			local variant2
-
-			if FFlagUserListChatCtaStandardVariant then
-				variant2 = v2.variant
+			if FFlagUserListActionsV2 then
+				isDisabled = (v2.isDisabled or button.disabledReason ~= nil) and true or nil
+			else
+				isDisabled = v2.isDisabled
 			end
 
-			primaryCta.variant = variant2
+			primaryCta.isDisabled = isDisabled
+
+			primaryCta.disabledReason = button.disabledReason
+			primaryCta.variant = v2.variant
 			local minWidth
 
 			if data then

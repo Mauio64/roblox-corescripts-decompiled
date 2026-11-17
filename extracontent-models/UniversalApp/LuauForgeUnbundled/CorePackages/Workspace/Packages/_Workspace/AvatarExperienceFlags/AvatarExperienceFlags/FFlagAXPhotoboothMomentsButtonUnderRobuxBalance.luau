@@ -1,3 +1,0 @@
-local FFlagAXAvatarPreviewPhotoboothMomentsButton = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagAXAvatarPreviewPhotoboothMomentsButton")
-
-return game:DefineFastFlag("AXPhotoboothMomentsButtonUnderRobuxBalance", false) and FFlagAXAvatarPreviewPhotoboothMomentsButton

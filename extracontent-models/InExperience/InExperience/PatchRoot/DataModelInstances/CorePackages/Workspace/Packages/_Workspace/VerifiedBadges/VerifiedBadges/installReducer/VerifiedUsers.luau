@@ -7,12 +7,6 @@ local dependencies = require(VerifiedBadges.dependencies)
 local usersNetworking = dependencies.UsersNetworking
 local friendsNetworking = dependencies.FriendsNetworking
 
-local SharedFlags = require(VerifiedBadges.Parent.SharedFlags)
-local FFlagLuaAppEdpBackendV2HydrateLegacyDefault = SharedFlags.FFlagLuaAppEdpBackendV2HydrateLegacyDefault
-
-local SharedFlags2 = require(VerifiedBadges.Parent.SharedFlags)
-local FFlagLuaAppEdpBackendV2HydrateLegacyIxp = SharedFlags2.FFlagLuaAppEdpBackendV2HydrateLegacyIxp
-
 local function fn(p, list)
 	local v = {}
 
@@ -45,7 +39,7 @@ return Rodux.createReducer({}, {
 
 		return Cryo.Dictionary.join(p, v)
 	end,
-	AddGameDetailsV2 = (FFlagLuaAppEdpBackendV2HydrateLegacyDefault or FFlagLuaAppEdpBackendV2HydrateLegacyIxp) and function(p, p2)
+	AddGameDetailsV2 = function(p, p2)
 		local v = {}
 
 		for _, gameDetail in pairs(p2.gameDetails) do
@@ -59,7 +53,7 @@ return Rodux.createReducer({}, {
 		end
 
 		return Cryo.Dictionary.join(p, v)
-	end or nil,
+	end,
 	SetAssetInfoFromCatalogItemAction = function(p, p2)
 		if p2.assetData.creatorType ~= Enum.CreatorType.User.Name then
 			return p

@@ -12,6 +12,8 @@ local GameTileLayoutType = GameTile.GameTileTypes.GameTileLayoutType
 local AppGameTile = GameTile.AppGameTile
 local getTileBadgeByPositionConfigFromEntry = GameTile.getTileBadgeByPositionConfigFromEntry
 local useTriggerGameTileFeedbackCallbacks = require(GameCollections.useTriggerGameTileFeedbackCallbacks)
+local InteractionFeedback = require(parent.InteractionFeedback)
+local useTriggerFeedback = InteractionFeedback.useTriggerFeedback
 local SeeAllTile = require(GameCollections.SeeAllTile)
 local GameTile2 = require(parent.GameTile)
 local useNavigateToGameDetails = GameTile2.useNavigateToGameDetails
@@ -29,47 +31,59 @@ local FFlagLuaAppNarrowTileHideRating = SharedFlags3.FFlagLuaAppNarrowTileHideRa
 local SharedFlags4 = require(parent.SharedFlags)
 local FFlagLuaAppNarrowTileHidePlayerCount = SharedFlags4.FFlagLuaAppNarrowTileHidePlayerCount
 local SharedFlags5 = require(parent.SharedFlags)
-local FFlagLuaAppEnableHomepageOneByTwoTile = SharedFlags5.FFlagLuaAppEnableHomepageOneByTwoTile
+local FFlagLuaAppEnableNxMRoduxApportioning = SharedFlags5.FFlagLuaAppEnableNxMRoduxApportioning
 
 local SharedFlags6 = require(parent.SharedFlags)
 local FFlagLuaAppUsePrevalidatedVideoGamePlayability = SharedFlags6.FFlagLuaAppUsePrevalidatedVideoGamePlayability
 local SharedFlags7 = require(parent.SharedFlags)
 local FFlagLuaAppEmphasisGameTileVideo = SharedFlags7.FFlagLuaAppEmphasisGameTileVideo
 
+local SharedFlags8 = require(parent.SharedFlags)
+local FFlagLuaAppSduiGameTileInteractionFeedback = SharedFlags8.FFlagLuaAppSduiGameTileInteractionFeedback
+
 local GameCollectionItemType = GameCollectionItemTypes.GameCollectionItemType
 
 local function useRenderGameCollectionItem(playerCountStyle, isSponsoredFooterAllowed: boolean?, gameTileLayoutType, friendFooterEnabled: boolean?, showFriendActivity: boolean?, impressionsTag: string, flag: boolean?, reportGameDetailOpened, reportExperienceLaunched, launchExperienceEventContext: string?, referralSource: string?, source: string?, onActivated, topicId: string?, p: number?, hideGameStats: boolean?, playButtonStyle: string?, isContained: boolean?, hideTitle: boolean?, hideMetadata: boolean?, onSelectionGained, onSelectionLost, callback, textSizeOffset: number?, contentTextLineCount: number?, useExperienceTileMetadata: boolean?, forceHideAgeRatings: boolean?, videoAnalytics, onPeekViewClosed, p2: number?, enableExplicitFeedback: boolean?, p3, setGameHidden, appPage: string?, sponsoredUserCohort: string?, enableSponsoredFeedback: boolean?, enableReportAd: boolean?, flag2: boolean?, maxItemIndex: number?, isSponsoredRatingFooterAllowed: boolean?, _: string?, _: boolean?, _: boolean?, compactMetadataFormat: boolean?, flag3: boolean?, flag4: boolean?, videoPlaybackContext, flag5: boolean?, flag6: boolean?, p4: string?)
 	local v = usePreferredInput()
 	local navigateToGameDetails = useNavigateToGameDetails()
+	local v2
 
-	local onGuiStateChanged, onActivated2 = useTriggerGameTileFeedbackCallbacks()
+	if FFlagLuaAppSduiGameTileInteractionFeedback then
+		v2 = useTriggerFeedback()
+	end
 
-	local v2 = flag and v == Responsive.Input.Pointer
-	local v3
+	if not FFlagLuaAppSduiGameTileInteractionFeedback then
+		v2 = nil
+	end
+
+	local onGuiStateChanged, onActivated2 = useTriggerGameTileFeedbackCallbacks(v2)
+
+	local v3 = flag and v == Responsive.Input.Pointer
+	local v4
 
 	if FFlagLuaAppContinueSortInstantPlay then
-		v3 = v == Responsive.Input.Touch
+		v4 = v == Responsive.Input.Touch
 	else
-		v3 = nil
+		v4 = nil
 	end
 
 	local useGridTile = gameTileLayoutType == "Wide" or gameTileLayoutType == "Event"
 
-	local v4 = useBreakpointXOrSmaller(Responsive.Keys.Small)
+	local v5 = useBreakpointXOrSmaller(Responsive.Keys.Small)
 	local isNarrowScreenXSmall = useBreakpointXOrSmaller(Responsive.Keys.XSmall)
-	local v5 = FFlagLuaAppNarrowTileHideRating and flag3 or FFlagLuaAppNarrowTileHidePlayerCount and flag4
+	local v6 = FFlagLuaAppNarrowTileHideRating and flag3 or FFlagLuaAppNarrowTileHidePlayerCount and flag4
 
-	if v4 then
+	if v5 then
 		if textSizeOffset > 0 then
-			v4 = not v5
+			v5 = not v6
 		else
-			v4 = false
+			v5 = false
 		end
 	end
 
 	local metadataTextLineCount
 
-	if v4 then
+	if v5 then
 		metadataTextLineCount = GameTileConstants.TileTextLines[gameTileLayoutType or GameTileLayoutType.Narrow].largeMetadataTextLines
 	else
 		metadataTextLineCount = GameTileConstants.TileTextLines[gameTileLayoutType or GameTileLayoutType.Narrow].metadataTextLines
@@ -102,60 +116,60 @@ local function useRenderGameCollectionItem(playerCountStyle, isSponsoredFooterAl
 
 		if entry.customRenderFunction then
 			local customRenderFunction = entry.customRenderFunction
-			local v6 = {}
-			v6.item = entry
-			v6.index = layoutOrder
-			v6.itemSize = p5
-			v6.rowNum = rowNum
-			v6.zIndex = -layoutOrder
-			v6.maxItemIndex = maxItemIndex
-			v6.SelectionOrder = selectionOrder
-			v6.isDisabled = isDisabled
-			v6.onSelectionGained = onSelectionGained
-			v6.onSelectionLost = onSelectionLost
-			v6.topicId = topicId
-			v6.source = source
-			v6.referralSource = referralSource
-			v6.playerCountStyle = playerCountStyle
-			v6.hideGameStats = hideGameStats
-			v6.gameTileLayoutType = gameTileLayoutType
-			v6.hoverTileEnabled = v2
-			v6.isContained = isContained
-			v6.reportGameDetailOpened = reportGameDetailOpened
-			v6.reportExperienceLaunched = reportExperienceLaunched
-			v6.launchExperienceEventContext = launchExperienceEventContext
-			v6.onPeekViewClosed = onPeekViewClosed
-			v6.navigateToGameDetails = navigateToGameDetails
-			v6.impressionsTag = impressionsTag
-			v6.textSizeOffset = textSizeOffset
-			v6.appPage = appPage
-			v6.setGameHidden = setGameHidden
-			v6.isHidden = isHidden
-			v6.sponsoredUserCohort = sponsoredUserCohort
-			v6.enableSponsoredFeedback = enableSponsoredFeedback
-			v6.enableReportAd = enableReportAd
+			local v7 = {}
+			v7.item = entry
+			v7.index = layoutOrder
+			v7.itemSize = p5
+			v7.rowNum = rowNum
+			v7.zIndex = -layoutOrder
+			v7.maxItemIndex = maxItemIndex
+			v7.SelectionOrder = selectionOrder
+			v7.isDisabled = isDisabled
+			v7.onSelectionGained = onSelectionGained
+			v7.onSelectionLost = onSelectionLost
+			v7.topicId = topicId
+			v7.source = source
+			v7.referralSource = referralSource
+			v7.playerCountStyle = playerCountStyle
+			v7.hideGameStats = hideGameStats
+			v7.gameTileLayoutType = gameTileLayoutType
+			v7.hoverTileEnabled = v3
+			v7.isContained = isContained
+			v7.reportGameDetailOpened = reportGameDetailOpened
+			v7.reportExperienceLaunched = reportExperienceLaunched
+			v7.launchExperienceEventContext = launchExperienceEventContext
+			v7.onPeekViewClosed = onPeekViewClosed
+			v7.navigateToGameDetails = navigateToGameDetails
+			v7.impressionsTag = impressionsTag
+			v7.textSizeOffset = textSizeOffset
+			v7.appPage = appPage
+			v7.setGameHidden = setGameHidden
+			v7.isHidden = isHidden
+			v7.sponsoredUserCohort = sponsoredUserCohort
+			v7.enableSponsoredFeedback = enableSponsoredFeedback
+			v7.enableReportAd = enableReportAd
 			local enableReportExperience
 
 			if FFlagLuaAppEnableReportExperience then
 				enableReportExperience = flag2
 			end
 
-			v6.enableReportExperience = enableReportExperience
-			v6.enableExplicitFeedback = enableExplicitFeedback
-			v6.videoPlaybackContext = videoPlaybackContext
+			v7.enableReportExperience = enableReportExperience
+			v7.enableExplicitFeedback = enableExplicitFeedback
+			v7.videoPlaybackContext = videoPlaybackContext
 			local videoAnalytics2
 
-			if FFlagLuaAppEmphasisGameTileVideo or FFlagLuaAppEnableHomepageOneByTwoTile then
+			if FFlagLuaAppEmphasisGameTileVideo or FFlagLuaAppEnableNxMRoduxApportioning then
 				videoAnalytics2 = videoAnalytics
 			end
 
-			v6.videoAnalytics = videoAnalytics2
-			return customRenderFunction(v6)
+			v7.videoAnalytics = videoAnalytics2
+			return customRenderFunction(v7)
 		else
 			local tileBadgeByPositionConfigFromEntry = getTileBadgeByPositionConfigFromEntry(entry)
 
 			local createElement = React.createElement
-			local v6 = {
+			local v7 = {
 				Size = p5,
 				entry = entry,
 				layoutOrder = layoutOrder,
@@ -170,7 +184,7 @@ local function useRenderGameCollectionItem(playerCountStyle, isSponsoredFooterAl
 				playerCountStyle = playerCountStyle,
 				isSponsoredFooterAllowed = isSponsoredFooterAllowed,
 				gameTileLayoutType = gameTileLayoutType,
-				useHoverTile = v2,
+				useHoverTile = v3,
 				topicId = topicId,
 				launchExperienceEventContext = launchExperienceEventContext,
 				referralSource = referralSource,
@@ -210,59 +224,59 @@ local function useRenderGameCollectionItem(playerCountStyle, isSponsoredFooterAl
 				enableReportExperience = flag2
 			end
 
-			v6.enableReportExperience = enableReportExperience
-			v6.isSponsoredRatingFooterAllowed = isSponsoredRatingFooterAllowed
-			v6.badgeOverride = tileBadgeByPositionConfigFromEntry
-			v6.compactMetadataFormat = compactMetadataFormat
+			v7.enableReportExperience = enableReportExperience
+			v7.isSponsoredRatingFooterAllowed = isSponsoredRatingFooterAllowed
+			v7.badgeOverride = tileBadgeByPositionConfigFromEntry
+			v7.compactMetadataFormat = compactMetadataFormat
 			local hideRating
 
 			if FFlagLuaAppNarrowTileHideRating then
 				hideRating = flag3
 			end
 
-			v6.hideRating = hideRating
+			v7.hideRating = hideRating
 			local hidePlayerCount
 
 			if FFlagLuaAppNarrowTileHidePlayerCount then
 				hidePlayerCount = flag4
 			end
 
-			v6.hidePlayerCount = hidePlayerCount
+			v7.hidePlayerCount = hidePlayerCount
 			local hasPrevalidatedVideoGamePlayability
 
 			if FFlagLuaAppUsePrevalidatedVideoGamePlayability then
 				hasPrevalidatedVideoGamePlayability = flag5
 			end
 
-			v6.hasPrevalidatedVideoGamePlayability = hasPrevalidatedVideoGamePlayability
+			v7.hasPrevalidatedVideoGamePlayability = hasPrevalidatedVideoGamePlayability
 
-			v6.videoPlaybackContext = videoPlaybackContext
+			v7.videoPlaybackContext = videoPlaybackContext
 			local enableInstantPlay
 
 			if FFlagLuaAppContinueSortInstantPlay then
 				enableInstantPlay = flag6
 			end
 
-			v6.enableInstantPlay = enableInstantPlay
+			v7.enableInstantPlay = enableInstantPlay
 			local instantPlayTreatment
 
 			if FFlagLuaAppContinueSortInstantPlay then
 				instantPlayTreatment = p4
 			end
 
-			v6.instantPlayTreatment = instantPlayTreatment
+			v7.instantPlayTreatment = instantPlayTreatment
 			local isTouchPreferredInput
 
 			if FFlagLuaAppContinueSortInstantPlay then
-				isTouchPreferredInput = v3
+				isTouchPreferredInput = v4
 			end
 
-			v6.isTouchPreferredInput = isTouchPreferredInput
-			return createElement(AppGameTile, v6), GameCollectionItemType.GameTile
+			v7.isTouchPreferredInput = isTouchPreferredInput
+			return createElement(AppGameTile, v7), GameCollectionItemType.GameTile
 		end
 	end
 
-	local v6 = {
+	local v7 = {
 		useGridTile,
 		friendFooterEnabled,
 		hideGameStats,
@@ -279,7 +293,7 @@ local function useRenderGameCollectionItem(playerCountStyle, isSponsoredFooterAl
 		source,
 		referralSource,
 		p,
-		v2,
+		v3,
 		playButtonStyle,
 		isContained,
 		hideTitle,
@@ -317,51 +331,51 @@ local function useRenderGameCollectionItem(playerCountStyle, isSponsoredFooterAl
 		nil,
 		nil
 	}
-	local v7
-
-	if FFlagLuaAppEnableReportExperience then
-		v7 = flag2
-	end
-
 	local v8
 
-	if FFlagLuaAppNarrowTileHideRating then
-		v8 = flag3
+	if FFlagLuaAppEnableReportExperience then
+		v8 = flag2
 	end
 
 	local v9
 
-	if FFlagLuaAppNarrowTileHidePlayerCount then
-		v9 = flag4
+	if FFlagLuaAppNarrowTileHideRating then
+		v9 = flag3
 	end
 
-	v6[33], v6[34], v6[35], v6[36], v6[37], v6[38], v6[39], v6[40], v6[41], v6[42], v6[43], v6[44], v6[45], v6[46], v6[47], v6[48] = p2, metadataTextLineCount, enableExplicitFeedback, p3, setGameHidden, appPage, isNarrowScreenXSmall, sponsoredUserCohort, enableSponsoredFeedback, enableReportAd, v7, navigateToGameDetails, isSponsoredRatingFooterAllowed, compactMetadataFormat, v8, v9
 	local v10
 
-	if FFlagLuaAppUsePrevalidatedVideoGamePlayability then
-		v10 = flag5
+	if FFlagLuaAppNarrowTileHidePlayerCount then
+		v10 = flag4
 	end
 
+	v7[33], v7[34], v7[35], v7[36], v7[37], v7[38], v7[39], v7[40], v7[41], v7[42], v7[43], v7[44], v7[45], v7[46], v7[47], v7[48] = p2, metadataTextLineCount, enableExplicitFeedback, p3, setGameHidden, appPage, isNarrowScreenXSmall, sponsoredUserCohort, enableSponsoredFeedback, enableReportAd, v8, navigateToGameDetails, isSponsoredRatingFooterAllowed, compactMetadataFormat, v9, v10
 	local v11
 
-	if FFlagLuaAppContinueSortInstantPlay then
-		v11 = flag6
+	if FFlagLuaAppUsePrevalidatedVideoGamePlayability then
+		v11 = flag5
 	end
 
 	local v12
 
 	if FFlagLuaAppContinueSortInstantPlay then
-		v12 = p4
+		v12 = flag6
 	end
 
 	local v13
 
 	if FFlagLuaAppContinueSortInstantPlay then
-		v13 = v3
+		v13 = p4
 	end
 
-	v6[49], v6[50], v6[51], v6[52], v6[53] = v10, videoPlaybackContext, v11, v12, v13
-	return (useCallback(fn, v6))
+	local v14
+
+	if FFlagLuaAppContinueSortInstantPlay then
+		v14 = v4
+	end
+
+	v7[49], v7[50], v7[51], v7[52], v7[53] = v11, videoPlaybackContext, v12, v13, v14
+	return (useCallback(fn, v7))
 end
 
 return useRenderGameCollectionItem

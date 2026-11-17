@@ -50,6 +50,10 @@ local FFlagAppChatSignalsReplyStore = require(AppChat.Flags.FFlagAppChatSignalsR
 local SmartSuggestionsChipRowContainer = require(script.Parent.SmartSuggestions.SmartSuggestionsChipRowContainer)
 local FFlagAppChatSmartSuggestions = require(AppChat.Flags.FFlagAppChatSmartSuggestions)
 
+local GetEmojiSetsStore = require(AppChat.Stores.GetEmojiSetsStore)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAppChatEnableReactions = SharedFlags.FFlagAppChatEnableReactions
+
 local ConversationExitType = require(AppChat.Analytics.Enums.ConversationExitType)
 local SendMessageError = require(AppChat.Analytics.Enums.SendMessageError)
 local withRoactChatAnalytics = require(AppChat.LegacyAnalytics.withRoactChatAnalytics)
@@ -505,6 +509,10 @@ function extended:didMount()
 	if defineFastFlag and self.props.shouldShowChatInputBar then
 		IXPService:LogFlagLinkedUserLayerExposure(defineFastString)
 	end
+
+	if FFlagAppChatEnableReactions then
+		GetEmojiSetsStore(false).getAndFetchEmojiSets()
+	end
 end
 
 function extended.willUpdate(p, p2, _)
@@ -572,6 +580,10 @@ function extended.didUpdate(object, data, p)
 		end
 
 		object.markAsRead(object.props.markConversationAsRead, object.props.conversationId, false)()
+
+		if FFlagAppChatEnableReactions then
+			GetEmojiSetsStore(false).getAndFetchEmojiSets()
+		end
 	end
 
 	if FFlagAppChatPerfTracking and data.shouldShowChatInputBar ~= object.props.shouldShowChatInputBar then

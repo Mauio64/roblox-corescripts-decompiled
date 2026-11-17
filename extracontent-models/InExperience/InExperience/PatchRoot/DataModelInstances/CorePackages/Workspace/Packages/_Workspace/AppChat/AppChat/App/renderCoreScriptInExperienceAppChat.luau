@@ -17,12 +17,8 @@ local InExperienceAppChatProviders = require(AppChat.App.InExperienceAppChatProv
 
 local FFlagAppChatSignalsMessageStore = require(AppChat.Flags.FFlagAppChatSignalsMessageStore)
 local FFlagAppChatConversationStore = require(AppChat.Flags.FFlagAppChatConversationStore)
-local FFlagAppChatFriendsTabIxpEnabled = require(AppChat.Flags.FFlagAppChatFriendsTabIxpEnabled)
-local FFlagAppChatUseDataHydrationForChatTimeouts = require(AppChat.Flags.FFlagAppChatUseDataHydrationForChatTimeouts)
 local SharedFlags = require(parent.SharedFlags)
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
-local SharedFlags2 = require(parent.SharedFlags)
-local FFlagUseSignalsForSquadExperienceInvite = SharedFlags2.FFlagUseSignalsForSquadExperienceInvite
+local FFlagUseSignalsForSquadExperienceInvite = SharedFlags.FFlagUseSignalsForSquadExperienceInvite
 local ChatModerationStatusHydrationMiddleware = require(AppChat.Middleware.ChatModerationStatusHydrationMiddleware)
 local SignalsConversationMiddleware = require(AppChat.Middleware.SignalsConversationMiddleware)
 local SignalsMessageIngestionMiddleware = require(AppChat.Middleware.SignalsMessageIngestionMiddleware)
@@ -55,14 +51,9 @@ return function(apolloClient, parentContainerContext, updateAppChatUnreadMessage
 		table.insert(v, SignalsConversationMiddleware)
 	end
 
-	if FFlagAppChatFriendsTabIxpEnabled or FFlagExpChatEnableFriendsTab then
-		table.insert(v, require(AppChat.Middleware.SignalsFriendsChatSettingsMiddleware))
-	end
+	table.insert(v, require(AppChat.Middleware.SignalsFriendsChatSettingsMiddleware))
 
-	if FFlagExpChatEnableFriendsTab or FFlagAppChatUseDataHydrationForChatTimeouts then
-		table.insert(v, ChatModerationStatusHydrationMiddleware)
-	end
-
+	table.insert(v, ChatModerationStatusHydrationMiddleware)
 	table.insert(v, SignalsUnreadMessageCountMiddleware)
 
 	if FFlagUseSignalsForSquadExperienceInvite then

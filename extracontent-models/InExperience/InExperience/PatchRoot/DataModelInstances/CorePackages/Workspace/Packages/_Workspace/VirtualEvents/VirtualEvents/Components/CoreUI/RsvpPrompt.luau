@@ -1,5 +1,3 @@
-local TextService = game:GetService("TextService")
-
 local parent = script.Parent.Parent.Parent
 local parent2 = parent.Parent
 
@@ -22,6 +20,7 @@ local Style = require(parent2.Style)
 local useDesignTokens = Style.useDesignTokens
 
 local constants = require(parent.constants)
+local logger = require(parent.logger)
 
 local postRsvpStatus = require(parent.Common.postRsvpStatus)
 local formatDateLocalized = require(parent.Common.formatDateLocalized)
@@ -40,7 +39,6 @@ local View = Foundation.View
 local useTokens = Foundation.Hooks.useTokens
 local getTextBoundsAsync = Foundation.Utility.getTextBoundsAsync
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local GameTileThumbnailBadges = GameTile.GameTileThumbnailBadges
 
@@ -48,6 +46,8 @@ local ScrollView = Foundation.ScrollView
 local ScrollBarVisibility = Foundation.Enums.ScrollBarVisibility
 
 local defineFastFlag = game:DefineFastFlag("LuaAppFixRsvpPromptDescriptionScrolling", false)
+local SharedFlags = require(parent2.SharedFlags)
+local FFlagInGameRsvpPushUpsellEnabled = SharedFlags.FFlagInGameRsvpPushUpsellEnabled
 
 return function(props)
 	local screenSize = useScreenSize()
@@ -145,6 +145,12 @@ return function(props)
 					toastTitle = toastTitle,
 					sequenceNumber = DateTime.now().UnixTimestamp
 				})
+
+				if FFlagInGameRsvpPushUpsellEnabled and props.onRsvpGoingSucceeded then
+					xpcall(props.onRsvpGoingSucceeded, function(p)
+						logger:warning("Error starting the push upsell: {}", (tostring(p)))
+					end, props.promptData.eventId)
+				end
 			end, function(p)
 				socialService:PromptRsvpToEventCompleted(props.promptData.eventId, false, Enum.RsvpStatus.None, v6)
 
@@ -153,7 +159,7 @@ return function(props)
 		end
 
 		props.closePrompt()
-	end, { socialService, props.closePrompt, v5 })
+	end, { socialService, props.closePrompt, v5, props.onRsvpGoingSucceeded })
 
 	local onCloseClicked = React.useCallback(function()
 		local v8 = Enum.RsvpStatus.None
@@ -233,7 +239,7 @@ return function(props)
 			if ref2.current then
 				setState3(ref2.current.AbsoluteSize.Y)
 			end
-		elseif FoundationFontFaceMigration then
+		else
 			local current = ref.current
 
 			if not current then
@@ -262,21 +268,6 @@ return function(props)
 
 			return function()
 				v11 = true
-			end
-		else
-			if not ref.current then
-				return
-			end
-
-			local getTextBoundsParams = Instance.new("GetTextBoundsParams")
-			getTextBoundsParams.Text = displayDescription
-			getTextBoundsParams.Font = ref.current.FontFace
-			getTextBoundsParams.Size = ref.current.TextSize
-			getTextBoundsParams.Width = ref.current.AbsoluteSize.X
-			setState2(TextService:GetTextBoundsAsync(getTextBoundsParams).Y * ref.current.LineHeight)
-
-			if ref2.current then
-				setState3(ref2.current.AbsoluteSize.Y)
 			end
 		end
 	end, { ref, state.X, displayDescription, v10 })
@@ -392,8 +383,7 @@ return function(props)
 
 		if defineFastFlag then
 			local v16 = not (state2 > 0) and 10000 or state2
-			local createElement2 = React.createElement
-			local v17 = {
+			bodyScrollView = React.createElement("ScrollingFrame", {
 				LayoutOrder = 3,
 				Size = udim2,
 				CanvasSize = UDim2.new(0, 0, 0, v16 + 2),
@@ -402,36 +392,24 @@ return function(props)
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
 				ClipsDescendants = true
-			}
-
-			local createElement3 = React.createElement
-			local v18 = {}
-			v18.Size = UDim2.new(1, 0, 0, v16)
-			v18.BackgroundTransparency = 1
-			v18.BorderSizePixel = 0
-			v18.Text = displayDescription
-			v18.TextTruncate = Enum.TextTruncate.None
-			v18.TextWrapped = true
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(bodyLarge.Font)
-			else
-				fontFace = Font.fromEnum(bodyLarge.Font)
-			end
-
-			v18.FontFace = fontFace
-
-			v18.TextSize = bodyLarge.FontSize
-			v18.LineHeight = bodyLarge.LineHeight
-			v18.TextColor3 = v9.Color.Content.Emphasis.Color3
-			v18.TextTransparency = v9.Color.Content.Emphasis.Transparency
-			v18.TextXAlignment = Enum.TextXAlignment.Left
-			v18.TextYAlignment = Enum.TextYAlignment.Top
-			v18[React.Change.TextBounds] = v8
-			v18.ref = ref
-			bodyScrollView = createElement2("ScrollingFrame", v17, {
-				Body = createElement3("TextLabel", v18)
+			}, {
+				Body = React.createElement("TextLabel", {
+					Size = UDim2.new(1, 0, 0, v16),
+					BackgroundTransparency = 1,
+					BorderSizePixel = 0,
+					Text = displayDescription,
+					TextTruncate = Enum.TextTruncate.None,
+					TextWrapped = true,
+					FontFace = normalizeFontFace(bodyLarge.Font),
+					TextSize = bodyLarge.FontSize,
+					LineHeight = bodyLarge.LineHeight,
+					TextColor3 = v9.Color.Content.Emphasis.Color3,
+					TextTransparency = v9.Color.Content.Emphasis.Transparency,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextYAlignment = Enum.TextYAlignment.Top,
+					[React.Change.TextBounds] = v8,
+					ref = ref
+				})
 			})
 		else
 			bodyScrollView = React.createElement(ScrollView, {

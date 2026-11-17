@@ -9,7 +9,6 @@ return {
 	FFlagExpChatUseUnifiedTooltipStore = require(script.FFlagExpChatUseUnifiedTooltipStore),
 	FFlagExpChatUseUpdatedUserCountStrings = require(script.FFlagExpChatUseUpdatedUserCountStrings),
 	GetFFlagExpChatSyntheticSystemMessageRichText = require(script.GetFFlagExpChatSyntheticSystemMessageRichText),
-	GetFFlagEnableExpChatUniverseChatTabNames = require(script.GetFFlagEnableExpChatUniverseChatTabNames),
 	GetFFlagExpChatSuppressWelcomeMessageTabUnread = require(script.GetFFlagExpChatSuppressWelcomeMessageTabUnread),
 	GetFFlagExpChatUseIsDefaultTextChannel = require(script.GetFFlagExpChatUseIsDefaultTextChannel),
 	GetFFlagTextChatEnableUniverseChatTabs = require(script.GetFFlagTextChatEnableUniverseChatTabs),

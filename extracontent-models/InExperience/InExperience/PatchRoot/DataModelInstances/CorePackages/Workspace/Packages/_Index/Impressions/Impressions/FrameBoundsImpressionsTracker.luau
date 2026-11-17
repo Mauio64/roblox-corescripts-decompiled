@@ -15,6 +15,7 @@ local FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions = SharedFlags.FFla
 local FFlagLuaAppRespectClipAncestorImpressions = SharedFlags.FFlagLuaAppRespectClipAncestorImpressions
 local FFlagUnifyShortcutBarFixImpressions = SharedFlags.FFlagUnifyShortcutBarFixImpressions
 local FFlagOptionalNavigation = SharedFlags.FFlagOptionalNavigation
+local FFlagLuaAppSduiGameDwell = SharedFlags.FFlagLuaAppSduiGameDwell
 
 return function(props)
 	local v
@@ -76,6 +77,10 @@ return function(props)
 	end
 
 	v3.viewPortFillBounds = viewPortFillBounds
+
+	if FFlagLuaAppSduiGameDwell then
+		v3.visibilityObserver = props.visibilityObserver
+	end
 
 	if not FFlagOptionalNavigation or v ~= nil then
 		return React.createElement(ImpressionsTracker, v3)

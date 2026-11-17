@@ -45,11 +45,11 @@ return function(p: string, p2: number)
 			local v4 = data and data[1]
 			return v4 and v4.rootPlaceId or nil
 		end):andThen(function(p3: number?)
-			if p3 then
-				return object:dispatch(SendTextMessage(p, `{Url.BASE_URL}games/{p3}`, nil))
+			if not p3 then
+				return Promise.reject(`no root place id for universe {p2}`)
 			end
 
-			return Promise.reject(`no root place id for universe {p2}`)
+			return object:dispatch(SendTextMessage(p, `{Url.BASE_URL}games/{p3}`, nil))
 		end):catch(function(p3)
 			v:warning(`SendGameLinkMessage failed for universe {p2}: {tostring(p3)}`)
 			return Promise.reject(p3)

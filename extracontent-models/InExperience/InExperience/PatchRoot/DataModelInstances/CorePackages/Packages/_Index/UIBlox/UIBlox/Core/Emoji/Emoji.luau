@@ -9,11 +9,11 @@ local Emoji = require(parent.Enum.Emoji)
 local constants = require(parent.constants)
 
 local function getEmojiString(emoji: string) -- 1 equivalent call inferred from this helper
-	if Emoji.isEnumValue(emoji) then
-		return constants[emoji.rawValue()]
+	if not Emoji.isEnumValue(emoji) then
+		return ""
 	end
 
-	return ""
+	return constants[emoji.rawValue()]
 end
 
 local function Emoji2(props)

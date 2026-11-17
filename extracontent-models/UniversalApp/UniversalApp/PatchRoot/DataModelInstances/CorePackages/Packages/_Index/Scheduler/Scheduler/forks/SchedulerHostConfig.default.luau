@@ -291,8 +291,7 @@ end
 local function wrapPerformWorkWithCoroutine(performWorkUntilDeadline2) -- 1 equivalent call inferred from this helper
 	local thread = coroutine.create(function()
 		while true do
-			local thread = coroutine.wrap(performWorkUntilDeadline2)
-			local success, result = pcall(thread)
+			local success, result = pcall((coroutine.wrap(performWorkUntilDeadline2)))
 			coroutine.yield(success, result)
 		end
 	end)

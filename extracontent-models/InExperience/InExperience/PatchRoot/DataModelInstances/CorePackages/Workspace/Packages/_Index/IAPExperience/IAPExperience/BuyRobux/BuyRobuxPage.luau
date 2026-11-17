@@ -21,7 +21,6 @@ local useStyleMetadata = UIBlox.Core.Style.useStyleMetadata
 local Foundation = require(parent3.Foundation)
 local ColorMode = Foundation.Enums.ColorMode
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local RoactFitComponents = require(parent3.RoactFitComponents)
 local FitFrameHorizontal = RoactFitComponents.FitFrameHorizontal
@@ -545,29 +544,11 @@ function extended:renderWithLocale(data, callback)
 			Size = UDim2.new(1, 0, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
 			TextXAlignment = Enum.TextXAlignment.Left,
-			Font = 0,
-			FontFace = 0,
-			Text = 0,
-			TextSize = 0,
+			FontFace = normalizeFontFace(props2.Tokens.Typography.HeadingLarge.Font),
+			Text = data.BannerTitle,
+			TextSize = 46 * self:getScale(),
 			TextColor3 = 0
 		}
-		local font2
-
-		if not FoundationFontFaceMigration then
-			font2 = font.Title.Font
-		end
-
-		v10.Font = font2
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(props2.Tokens.Typography.HeadingLarge.Font)
-		end
-
-		v10.FontFace = fontFace
-
-		v10.Text = data.BannerTitle
-		v10.TextSize = 46 * self:getScale()
 		local textColor2
 
 		if props.showBackground then
@@ -587,29 +568,11 @@ function extended:renderWithLocale(data, callback)
 			AutomaticSize = Enum.AutomaticSize.Y,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextWrapped = isConsoleSize and true or nil,
-			Font = 0,
-			FontFace = 0,
-			Text = 0,
-			TextSize = 0,
+			FontFace = normalizeFontFace(props2.Tokens.Typography.HeadingSmall.Font),
+			Text = data.BannerText,
+			TextSize = 38 * self:getScale(),
 			TextColor3 = 0
 		}
-		local font3
-
-		if not FoundationFontFaceMigration then
-			font3 = font.Header1.Font
-		end
-
-		v11.Font = font3
-		local fontFace2
-
-		if FoundationFontFaceMigration then
-			fontFace2 = normalizeFontFace(props2.Tokens.Typography.HeadingSmall.Font)
-		end
-
-		v11.FontFace = fontFace2
-
-		v11.Text = data.BannerText
-		v11.TextSize = 38 * self:getScale()
 		local textColor3
 
 		if props.showBackground then

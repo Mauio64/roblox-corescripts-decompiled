@@ -27,12 +27,14 @@ local getFFlagPYMKDisableButtonsOnFetch = require(parent.Flags.getFFlagPYMKDisab
 local FFlagMigrateFriendshipStatusesPYMK = require(parent.Flags.FFlagMigrateFriendshipStatusesPYMK)
 local SharedFlags = require(parent2.SharedFlags)
 local FFlagLuaAppEnableSduiHomePage = SharedFlags.FFlagLuaAppEnableSduiHomePage
+local SharedFlags2 = require(parent2.SharedFlags)
+local FFlagPymkCarouselExtendProps = SharedFlags2.FFlagPymkCarouselExtendProps
 local FriendsHydrationReact = require(parent2.FriendsHydrationReact)
 local useGetFriendshipStatus = FriendsHydrationReact.useGetFriendshipStatus
 local friendsStoreChallengeNetwork = require(parent.friendsStoreChallengeNetwork)
 
-local SharedFlags2 = require(parent2.SharedFlags)
-local FFlagEnableFriendsStoreChallengeInterceptor = SharedFlags2.FFlagEnableFriendsStoreChallengeInterceptor
+local SharedFlags3 = require(parent2.SharedFlags)
+local FFlagEnableFriendsStoreChallengeInterceptor = SharedFlags3.FFlagEnableFriendsStoreChallengeInterceptor
 local DataHydration = require(parent2.DataHydration)
 local v = DataHydration.Friends.FriendsStore.get()
 local FocusNavigationUtils = require(parent2.FocusNavigationUtils)
@@ -70,6 +72,23 @@ local function usePYMKCarouselUserButtons(data)
 		v6 = data.recommendation or {}
 
 		v7 = data.recommendation and data.recommendation.hasIncomingFriendRequest == true
+	elseif FFlagPymkCarouselExtendProps then
+		v6 = useSelector(function(p)
+			return roduxFriends.Selectors.selectRecommendationsForUserId(p)(currentUserId)[userId] or {}
+		end)
+
+		v7 = useSelector(function(p)
+			return getDeepValue(
+					p,
+					string.format("PYMKCarousel.Friends.recommendations.hasIncomingFriendRequest.%s", userId)
+				)
+				or false
+		end)
+
+		if data.recommendation then
+			v6 = data.recommendation
+			v7 = data.recommendation.hasIncomingFriendRequest == true
+		end
 	else
 		v6 = useSelector(function(p)
 			return roduxFriends.Selectors.selectRecommendationsForUserId(p)(currentUserId)[userId] or {}

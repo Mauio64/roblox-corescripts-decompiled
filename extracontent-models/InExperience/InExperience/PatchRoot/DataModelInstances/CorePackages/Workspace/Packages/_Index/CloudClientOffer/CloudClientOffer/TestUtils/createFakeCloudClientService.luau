@@ -17,6 +17,7 @@ local function createFakeCloudClientService()
 	local eligibilityChecks = {}
 	local reservations = {}
 	local releasedTokens = {}
+	local reportedDecisions = {}
 	local v = {}
 
 	return {
@@ -45,6 +46,13 @@ local function createFakeCloudClientService()
 			releaseReservation = function(p: string)
 				table.insert(releasedTokens, p)
 			end,
+			reportDecision = function(reservationToken: string, decision)
+				table.insert(reportedDecisions, {
+					reservationToken = reservationToken,
+					decision = decision,
+					wasReleased = table.find(releasedTokens, reservationToken) ~= nil
+				})
+			end,
 			onReservationExpired = function(callback)
 				v[callback] = true
 				return {
@@ -57,6 +65,7 @@ local function createFakeCloudClientService()
 		eligibilityChecks = eligibilityChecks,
 		reservations = reservations,
 		releasedTokens = releasedTokens,
+		reportedDecisions = reportedDecisions,
 		getExpiredListenerCount = function()
 			local count = 0
 

@@ -164,9 +164,7 @@ function extended:loadFriends()
 				if result.IsFinished then
 					callback((Cryo.List.sort(v, sortFriends)))
 					break
-				end
-
-				if not pcall(function()
+				elseif not pcall(function()
 					result:AdvanceToNextPageAsync()
 				end) then
 					callback2("Error loading friends")

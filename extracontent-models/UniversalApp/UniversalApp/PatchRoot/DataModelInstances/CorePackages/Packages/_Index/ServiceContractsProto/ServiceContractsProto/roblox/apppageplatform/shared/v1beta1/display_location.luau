@@ -73,6 +73,8 @@ v.DisplayLocation = {
 			return "DISPLAY_LOCATION_USER_PROFILE_FRIEND_RECOMMENDATIONS"
 		elseif p == 33 then
 			return "DISPLAY_LOCATION_GAME_ITEM_DETAILS"
+		elseif p == 34 then
+			return "DISPLAY_LOCATION_CAMPAIGN"
 		end
 
 		return nil
@@ -146,6 +148,8 @@ v.DisplayLocation = {
 			return 32
 		elseif p == "DISPLAY_LOCATION_GAME_ITEM_DETAILS" then
 			return 33
+		elseif p == "DISPLAY_LOCATION_CAMPAIGN" then
+			return 34
 		end
 
 		return p
@@ -219,6 +223,8 @@ v.DisplayLocation = {
 			return "DISPLAY_LOCATION_USER_PROFILE_FRIEND_RECOMMENDATIONS"
 		elseif p == "DISPLAY_LOCATION_GAME_ITEM_DETAILS" then
 			return "DISPLAY_LOCATION_GAME_ITEM_DETAILS"
+		elseif p == "DISPLAY_LOCATION_CAMPAIGN" then
+			return "DISPLAY_LOCATION_CAMPAIGN"
 		end
 
 		return nil

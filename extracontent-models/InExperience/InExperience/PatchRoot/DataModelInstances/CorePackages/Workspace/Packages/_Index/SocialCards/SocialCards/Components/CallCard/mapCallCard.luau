@@ -14,7 +14,7 @@ local function formatDuration(durationSeconds: number) -- 1 equivalent call infe
 	return `{durationSeconds} sec`
 end
 
-local function mapCallCard(data, callback, callback2)
+local function mapCallCard(data, onActivated, callback, callback2)
 	local isRinging = data.status == CallCardStatus.Ringing or data.status == CallCardStatus.Active
 	local icon
 
@@ -25,26 +25,28 @@ local function mapCallCard(data, callback, callback2)
 	end
 
 	local title = "Voice call"
-
-	local onActivated = nil
 	local description
 
 	if isRinging then
 		description = "Ringing"
-	elseif data.status == CallCardStatus.Ongoing then
-		description = "Ongoing"
 
-		if data.enableJoin then
-			onActivated = callback
+		if data.isInitiator then
+			onActivated = nil
 		end
+	elseif data.status == CallCardStatus.Ongoing then
+		onActivated = callback2
+		description = "Ongoing"
 	elseif data.status == CallCardStatus.Answered or data.status == CallCardStatus.Ended then
 		if data.durationSeconds ~= nil then
 			description = formatDuration(data.durationSeconds) -- inferred equivalent call
 		end
+
+		onActivated = callback
 	elseif data.isInitiator then
+		onActivated = callback
 		description = "No answer"
 	else
-		onActivated = callback2
+		onActivated = callback
 		title = "Missed voice call"
 		description = "Tap to call back"
 	end

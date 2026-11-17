@@ -19,6 +19,7 @@ local FFlagBuildExperienceManageMonetizationTool = SharedFlags.FFlagBuildExperie
 
 local FFlagBuildExperienceChatAccordionScrollAnchor = require(BuildExperience.Flags.FFlagBuildExperienceChatAccordionScrollAnchor)
 local FFlagBuildExperiencePromptStallMessage = require(BuildExperience.Flags.FFlagBuildExperiencePromptStallMessage)
+local FFlagBuildExperienceToolDisplaySummary = require(BuildExperience.Flags.FFlagBuildExperienceToolDisplaySummary)
 
 local Icon = Foundation.Icon
 local ScrollView = Foundation.ScrollView
@@ -144,6 +145,15 @@ local function localizeActivityLabel(p: string, data, p2, tool: string, object)
 		return p
 	end
 
+	if
+		FFlagBuildExperienceToolDisplaySummary
+		and data.status ~= "failed"
+		and typeof(data.displaySummary) == "string"
+		and data.displaySummary ~= ""
+	then
+		return data.displaySummary
+	end
+
 	local title
 
 	if typeof(data.title) == "string" and data.title ~= "" then
@@ -240,11 +250,11 @@ local function TurnActivitySummary(props)
 	end
 
 	local function fn(p, k: number)
-		if p.kind == "tool_call" then
-			return createActivityText(localizeActivityLabel(LocalizationStrings.CHAT_TOOL, p, v6, v3.tool, v4), k)
+		if p.kind ~= "tool_call" then
+			return nil
 		end
 
-		return nil
+		return createActivityText(localizeActivityLabel(LocalizationStrings.CHAT_TOOL, p, v6, v3.tool, v4), k)
 	end
 
 	local v7 = useReactiveValue(segment.isLoading or false)

@@ -36,6 +36,7 @@ local resetForSquadLobbyForWideMode = require(AppChat.Utils.resetForSquadLobbyFo
 local ChatSearchBox = require(script.Parent.ChatSearchBox)
 local ChatLandingSearchRow = require(AppChat.Components.TopBar.ChatLandingSearchRow)
 local FFlagAppChatWideAlwaysVisibleSearchBox = require(AppChat.Flags.FFlagAppChatWideAlwaysVisibleSearchBox)
+local FFlagAppChatFixInExpSearchRowLayoutOrder = require(AppChat.Flags.FFlagAppChatFixInExpSearchRowLayoutOrder)
 local ChatLandingContainer = require(script.Parent.ChatLandingContainer)
 local Logger = require(script.Parent.Logger)
 local getCurrentRoute = require(script.Parent.Utils.getCurrentRoute)
@@ -47,9 +48,8 @@ local useIsChatSearchAllowed = require(AppChat.Hooks.useIsChatSearchAllowed)
 
 local SharedFlags = require(parent.SharedFlags)
 local GetFFlagEnableAppChatInExperience = SharedFlags.GetFFlagEnableAppChatInExperience
-
-local defineFastFlag = game:DefineFastFlag("AppChatFixChatLandingContainerKeyPropConflict", false)
 local FFlagAppChatConsoleFocusFixes = require(AppChat.Flags.FFlagAppChatConsoleFocusFixes)
+local FFlagAppChatFoundationHeaderBar = require(AppChat.Flags.FFlagAppChatFoundationHeaderBar)
 
 local function LeftContainerTelemetryProviders(p)
 	local get, set = useGetAndSetRef({})
@@ -300,7 +300,8 @@ function extended.render(data)
 										p2.setScreenTopBar(EnumScreens.ChatLanding, {
 											filterText = filterText
 										})
-									end
+									end,
+									layoutOrder = FFlagAppChatFixInExpSearchRowLayoutOrder and 0 or nil
 								})
 							end
 						end
@@ -329,7 +330,7 @@ function extended.render(data)
 						leftContainerRefsByRef.SelectionBehaviorUp = selectionBehaviorUp
 
 						leftContainerRefsByRef[Roact.Ref] = data.leftContainerRef
-						local v4 = {
+						return createElement("Frame", leftContainerRefsByRef, {
 							layout = Roact.createElement("UIListLayout", {
 								SortOrder = Enum.SortOrder.LayoutOrder
 							}),
@@ -338,68 +339,38 @@ function extended.render(data)
 								navigation = notNil
 							}),
 							filterBox = filterBox,
-							content = 0
-						}
-
-						local createElement2 = Roact.createElement
-						local v5 = {
-							value = {
-								left = notNil.getScreenProps("appChatOuterPadding", 12),
-								right = notNil.getScreenProps("appChatInnerPadding", 12)
-							}
-						}
-
-						local createElement3 = Roact.createElement
-						local v6 = {
-							BorderSizePixel = 0,
-							Size = UDim2.new(
-								1,
-								0,
-								1,
-								-notNil.getScreenProps("topBarHeight", 0) - (not v3 and 0 or screenProps2)
-							),
-							LayoutOrder = 2,
-							BackgroundTransparency = p.Tokens.Color.None.Transparency
-						}
-						local chatLandingContainer
-
-						if not defineFastFlag then
-							chatLandingContainer = Roact.createElement(ChatLandingContainer, {
-								isShowingFilterBox = shouldRenderCenter,
-								filterText = screenTopBar.filterText,
-								navigateToConversation = data.navigateToConversation,
-								navigateToCreateChat = data.navigateToCreateChat,
-								navigateToPrivacy = data.navigateToPrivacy,
-								navigateToSquadLobby = data.navigateToSquadLobby,
-								navigateToToast = data.navigateToToast,
-								navigateToAddFriends = data.props.navigation.getScreenProps("navigateToAddFriends", {}),
-								key = "ChatLanding" .. v
-							})
-						end
-
-						local v7
-
-						if defineFastFlag then
-							v7 = Roact.createElement(ChatLandingContainer, {
-								isShowingFilterBox = shouldRenderCenter,
-								filterText = screenTopBar.filterText,
-								navigateToConversation = data.navigateToConversation,
-								navigateToCreateChat = data.navigateToCreateChat,
-								navigateToPrivacy = data.navigateToPrivacy,
-								navigateToSquadLobby = data.navigateToSquadLobby,
-								navigateToToast = data.navigateToToast,
-								navigateToAddFriends = data.props.navigation.getScreenProps("navigateToAddFriends", {}),
-								key = "ChatLanding" .. v
-							})
-						end
-
-						v4.content = createElement2(Provider, v5, {
-							ChatLanding = createElement3("Frame", v6, {
-								ChatLandingContainer = chatLandingContainer,
-								v7
+							content = Roact.createElement(Provider, {
+								value = {
+									left = notNil.getScreenProps("appChatOuterPadding", 12),
+									right = notNil.getScreenProps("appChatInnerPadding", 12)
+								}
+							}, {
+								ChatLanding = Roact.createElement("Frame", {
+									BorderSizePixel = 0,
+									Size = UDim2.new(
+										1,
+										0,
+										1,
+										-notNil.getScreenProps("topBarHeight", 0) - (not v3 and 0 or screenProps2)
+									),
+									LayoutOrder = 2,
+									BackgroundTransparency = p.Tokens.Color.None.Transparency
+								}, { Roact.createElement(ChatLandingContainer, {
+										isShowingFilterBox = shouldRenderCenter,
+										filterText = screenTopBar.filterText,
+										navigateToConversation = data.navigateToConversation,
+										navigateToCreateChat = data.navigateToCreateChat,
+										navigateToPrivacy = data.navigateToPrivacy,
+										navigateToSquadLobby = data.navigateToSquadLobby,
+										navigateToToast = data.navigateToToast,
+										navigateToAddFriends = data.props.navigation.getScreenProps(
+											"navigateToAddFriends",
+											{}
+										),
+										key = "ChatLanding" .. v
+									}) })
 							})
 						})
-						return createElement("Frame", leftContainerRefsByRef, v4)
 					end
 				})
 			}
@@ -446,17 +417,28 @@ function extended.render(data)
 		end
 
 		rightContainerRefsByRef.SelectionBehaviorUp = selectionBehaviorUp
+
+		local createElement3 = Roact.createElement
+		local v3 = {
+			value = {
+				left = notNil.getScreenProps("appChatInnerPadding", 12),
+				right = notNil.getScreenProps("appChatOuterPadding", 12)
+			}
+		}
+
+		local createElement4 = Roact.createElement
+		local v4 = { navigation = notNil, screenProps = 0 }
+		local screenProps4
+
+		if FFlagAppChatFoundationHeaderBar then
+			screenProps4 = data.props.screenProps
+		end
+
+		v4.screenProps = screenProps4
 		v2.RightContainerProviders = createElement(RightContainerTelemetryProviders, {}, {
 			RightContainer = createElement2("Frame", rightContainerRefsByRef, {
-				Content = Roact.createElement(Provider, {
-					value = {
-						left = notNil.getScreenProps("appChatInnerPadding", 12),
-						right = notNil.getScreenProps("appChatOuterPadding", 12)
-					}
-				}, {
-					ConversationSwitchNavigator = Roact.createElement(conversationSwitchNavigator, {
-						navigation = notNil
-					})
+				Content = createElement3(Provider, v3, {
+					ConversationSwitchNavigator = createElement4(conversationSwitchNavigator, v4)
 				})
 			})
 		})

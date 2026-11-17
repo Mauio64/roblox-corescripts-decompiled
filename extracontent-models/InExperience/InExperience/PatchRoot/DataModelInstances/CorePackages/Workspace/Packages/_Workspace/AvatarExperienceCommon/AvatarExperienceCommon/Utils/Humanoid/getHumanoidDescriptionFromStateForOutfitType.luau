@@ -9,6 +9,7 @@ local setHumanoidDescriptionColorsFromBodyColor3s = require(script.Parent.setHum
 local setMakeupDescriptions = require(script.Parent.setMakeupDescriptions)
 local createHumanoidDescriptionAccessoryInfo = require(script.Parent.createHumanoidDescriptionAccessoryInfo)
 local isMakeupAssetType = require(AvatarExperienceCommon.Utils.isMakeupAssetType)
+local isSpawnEffectAssetType = require(AvatarExperienceCommon.Utils.isSpawnEffectAssetType)
 local isValidAssetTypeForOutfitType = require(AvatarExperienceCommon.Utils.isValidAssetTypeForOutfitType)
 
 local Constants2 = require(AvatarExperienceCommon.Constants)
@@ -16,6 +17,7 @@ local Constants2 = require(AvatarExperienceCommon.Constants)
 local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
 local FFlagParseHeadShapeFromAPIResponse = AvatarExperienceFlags.FFlagParseHeadShapeFromAPIResponse
 local FFlagHeadRefinementFacialAnimationToggle = AvatarExperienceFlags.FFlagHeadRefinementFacialAnimationToggle
+local FFlagAXSpawnEffectSaveRoundTrip = AvatarExperienceFlags.FFlagAXSpawnEffectSaveRoundTrip
 
 require(AvatarExperienceCommon.Types.CategoryTypes.CategoryTypes)
 
@@ -87,7 +89,10 @@ return function(p, p2)
 				else
 					humanoidDescription[v4] = joined
 				end
-			elseif k ~= Constants2.ASSET_TYPE_NAME_TO_ID_STRING.Gear and not isMakeupAssetType(k) then
+			elseif
+				k ~= Constants2.ASSET_TYPE_NAME_TO_ID_STRING.Gear
+				and not (isMakeupAssetType(k) or FFlagAXSpawnEffectSaveRoundTrip and isSpawnEffectAssetType(k))
+			then
 				mutedError(string.format(
 					"assetTypeId: %s not recognized as member of humanoidDescription",
 					(tostring(k))

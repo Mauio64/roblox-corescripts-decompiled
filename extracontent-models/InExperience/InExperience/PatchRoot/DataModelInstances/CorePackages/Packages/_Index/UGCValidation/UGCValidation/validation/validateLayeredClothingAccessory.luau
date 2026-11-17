@@ -6,25 +6,16 @@ local Constants = require(parent.Constants)
 
 local validateLCCageQuality = require(parent.validation.validateLCCageQuality)
 local validateInstanceTree = require(parent.validation.validateInstanceTree)
-local validateMeshTriangles = require(parent.validation.validateMeshTriangles)
 local validateTags = require(parent.validation.validateTags)
-local validateMeshBounds = require(parent.validation.validateMeshBounds)
-local validateMeshVertColors = require(parent.validation.validateMeshVertColors)
 local validateSingleInstance = require(parent.validation.validateSingleInstance)
 local ValidateMeshSizeProperty = require(parent.validation.ValidateMeshSizeProperty)
 local ValidatePropertiesSensible = require(parent.validation.ValidatePropertiesSensible)
 local validateDependencies = require(parent.validation.validateDependencies)
 local validateSkinningTransfer = require(parent.validation.validateSkinningTransfer)
 
-local validateTotalSurfaceArea = require(parent.validation.validateTotalSurfaceArea)
-local validateCoplanarIntersection = require(parent.validation.validateCoplanarIntersection)
-local validateMaxCubeDensity = require(parent.validation.validateMaxCubeDensity)
-local ValidateTexturePack = require(parent.validation.ValidateTexturePack)
-
 local RigidOrLayeredAllowed = require(parent.util.RigidOrLayeredAllowed)
 local createLayeredClothingSchema = require(parent.util.createLayeredClothingSchema)
 local createEyebrowEyelashSchema = require(parent.util.createEyebrowEyelashSchema)
-local getAttachment = require(parent.util.getAttachment)
 local getMeshSize = require(parent.util.getMeshSize)
 local getEditableMeshFromContext = require(parent.util.getEditableMeshFromContext)
 local getEditableImageFromContext = require(parent.util.getEditableImageFromContext)
@@ -34,7 +25,6 @@ local pcallDeferred = require(parent.util.pcallDeferred)
 local getFIntUGCValidationLCHandleScaleOffsetMaximum = require(parent.flags.getFIntUGCValidationLCHandleScaleOffsetMaximum)
 
 local getEngineFeatureEngineUGCValidatePropertiesSensible = require(parent.flags.getEngineFeatureEngineUGCValidatePropertiesSensible)
-local getFFlagUGCValidateTexturePack = require(parent.flags.getFFlagUGCValidateTexturePack)
 
 local getFFlagUGCValidateEyebrowEyelashThumbnailSchema = require(parent.flags.getFFlagUGCValidateEyebrowEyelashThumbnailSchema)
 
@@ -184,9 +174,10 @@ local function validateLayeredClothingAccessory(p)
 				) }
 	end
 
-	local vector = getExpectedPartSize(handle, p) / v14
-
-	if not vector:FuzzyEq(Vector3.new(1, 1, 1), getFIntUGCValidationLCHandleScaleOffsetMaximum() / 1000) then
+	if not (getExpectedPartSize(handle, p) / v14):FuzzyEq(
+		Vector3.new(1, 1, 1),
+		getFIntUGCValidationLCHandleScaleOffsetMaximum() / 1000
+	) then
 		Analytics.reportFailure(Analytics.ErrorType.validateLayeredClothingAccessory_HandleIsScaled, nil, p)
 
 		table.insert(
@@ -198,10 +189,6 @@ local function validateLayeredClothingAccessory(p)
 		)
 		v10 = false
 	end
-
-	local attachment = getAttachment(handle, v.attachmentNames)
-
-	local bound = v.bounds[attachment.Name]
 
 	local v15, v16 = validateTags(instance, p)
 
@@ -224,83 +211,32 @@ local function validateLayeredClothingAccessory(p)
 	end
 
 	do
-		local v17, v18 = validateTotalSurfaceArea(v11, vector, p)
+		local v17, v18 = ValidateMeshSizeProperty.validateSingleMeshPart(handle, p)
 
 		if not v17 then
 			table.insert(result, table.concat(v18, "\n"))
 			v10 = false
 		end
-
-		local v19, v20 = ValidateMeshSizeProperty.validateSingleMeshPart(handle, p)
-
-		if not v19 then
-			table.insert(result, table.concat(v20, "\n"))
-			v10 = false
-		end
-
-		local v21, v22 = validateMeshBounds(handle, attachment, v11, vector, bound, assetTypeEnum.Name, p)
-
-		if not v21 then
-			table.insert(result, table.concat(v22, "\n"))
-			v10 = false
-		end
-
-		local v23, v24 = validateMeshTriangles(v11, nil, p)
-
-		if not v23 then
-			table.insert(result, table.concat(v24, "\n"))
-			v10 = false
-		end
-
-		local v25, v26 = validateMeshVertColors(v11, false, p)
-
-		if not v25 then
-			table.insert(result, table.concat(v26, "\n"))
-			v10 = false
-		end
-
-		local v27, v28 = validateCoplanarIntersection(v11, vector, p)
-
-		if not v27 then
-			table.insert(result, table.concat(v28, "\n"))
-			v10 = false
-		end
 	end
 
-	local v17, v18 = validateMaxCubeDensity(v11, p, vector)
+	local v17, v18 = validateLCCageQuality(instance, v11, p)
 
 	if not v17 then
-		table.insert(result, table.concat(v18, "\n"))
-		v10 = false
-	end
-
-	local v19, v20 = validateLCCageQuality(instance, v11, p)
-
-	if not v19 then
-		for _, v21 in v20 do
-			table.insert(result, v21)
+		for _, v19 in v18 do
+			table.insert(result, v19)
 		end
 
 		v10 = false
-	end
-
-	if getFFlagUGCValidateTexturePack() then
-		local v21, v22 = ValidateTexturePack.validate(instance, false, p)
-
-		if not v21 then
-			table.insert(result, table.concat(v22, "\n"))
-			v10 = false
-		end
 	end
 
 	if getEngineFeatureEngineUGCValidationConsolidateAccessorySkinning() then
 		return v10, result
 	end
 
-	local v21, v22 = validateSkinningTransfer(handle, p)
+	local v19, v20 = validateSkinningTransfer(handle, p)
 
-	if not v21 then
-		table.insert(result, table.concat(v22, "\n"))
+	if not v19 then
+		table.insert(result, table.concat(v20, "\n"))
 		v10 = false
 	end
 
@@ -308,10 +244,10 @@ local function validateLayeredClothingAccessory(p)
 		return v10, result
 	end
 
-	local v23, v24 = ValidateMeshPartOnlySkinnedToR15.validateMeshPart(handle, p)
+	local v21, v22 = ValidateMeshPartOnlySkinnedToR15.validateMeshPart(handle, p)
 
-	if not v23 then
-		table.insert(result, table.concat(v24, "\n"))
+	if not v21 then
+		table.insert(result, table.concat(v22, "\n"))
 		v10 = false
 	end
 

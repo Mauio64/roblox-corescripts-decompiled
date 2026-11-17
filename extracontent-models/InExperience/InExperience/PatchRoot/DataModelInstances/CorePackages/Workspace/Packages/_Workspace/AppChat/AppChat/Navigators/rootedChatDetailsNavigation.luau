@@ -7,7 +7,6 @@ local ConversationChannels = require(AppChat.Models.ConversationChannels)
 local GetConversationStore = require(AppChat.Stores.GetConversationStore)
 local ReceivedConversation = require(AppChat.Conversations.Actions.ReceivedConversation)
 local EnumScreens = require(AppChat.EnumScreens)
-local getFFlagAppChatEnableRootedNavigation = require(AppChat.Flags.getFFlagAppChatEnableRootedNavigation)
 local ConversationRoduxSeed = require(AppChat.Utils.ConversationRoduxSeed)
 local isFriendsPlaceholderConversationId = ConversationRoduxSeed.isFriendsPlaceholderConversationId
 local normalizeStoreConversationForRodux = ConversationRoduxSeed.normalizeStoreConversationForRodux
@@ -35,7 +34,7 @@ end
 function RootedChatDetailsNavigation.tryNavigateToRootedChatDetails(data, data2): boolean
 	local conversationId = data2 and data2.conversationId
 
-	if not conversationId or data2.rooted ~= true or not getFFlagAppChatEnableRootedNavigation() then
+	if not conversationId or data2.rooted ~= true then
 		return false
 	end
 

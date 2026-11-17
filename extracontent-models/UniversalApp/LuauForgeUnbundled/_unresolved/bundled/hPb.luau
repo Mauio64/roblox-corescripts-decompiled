@@ -1,5 +1,0 @@
-local InExperienceInterventionEventReceiver = require("@game/CorePackages/Workspace/Packages/_Workspace/InExperienceIntervention/InExperienceIntervention/InExperienceInterventionEventReceiver")
-return {
-	InAppInterventionContainer = require("@game/CorePackages/Workspace/Packages/_Workspace/InExperienceIntervention/InExperienceIntervention/InExperienceInterventionDialogManager"),
-	InAppInterventionEventReceiver = InExperienceInterventionEventReceiver
-}

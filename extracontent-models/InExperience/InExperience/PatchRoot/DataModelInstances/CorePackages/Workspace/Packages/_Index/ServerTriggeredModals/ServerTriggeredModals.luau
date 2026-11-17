@@ -9,9 +9,18 @@ local FFlagEnableHomepagePromptsForModalsAndBanners = SharedFlags.FFlagEnableHom
 local FFlagPromptsHandlerEnabled = SharedFlags.FFlagPromptsHandlerEnabled
 local FFlagEdpGameLeavePromptsHandlerEnabled = SharedFlags.FFlagEdpGameLeavePromptsHandlerEnabled
 local FFlagEdpOpenPromptsHandlerEnabled = SharedFlags.FFlagEdpOpenPromptsHandlerEnabled
+local FFlagChatPushUpsellPromptsEnabled = SharedFlags.FFlagChatPushUpsellPromptsEnabled
 local FFlagNotificationStreamPromptsHandlerEnabled = SharedFlags.FFlagNotificationStreamPromptsHandlerEnabled
 
 local ServerTriggeredModals = {
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
 	["jest.config"] = nil,
 	["jest.config"] = nil,
 	["jest.config"] = nil,
@@ -114,6 +123,13 @@ if FFlagEdpOpenPromptsHandlerEnabled then
 end
 
 ServerTriggeredModals.EdpOpenPromptsHandler = edpOpenPromptsHandler
+local chatPromptsHandler
+
+if FFlagChatPushUpsellPromptsEnabled then
+	chatPromptsHandler = require(script.SduiV2.ChatPromptsHandler)
+end
+
+ServerTriggeredModals.ChatPromptsHandler = chatPromptsHandler
 local streamPromptsHandler
 
 if FFlagNotificationStreamPromptsHandlerEnabled then

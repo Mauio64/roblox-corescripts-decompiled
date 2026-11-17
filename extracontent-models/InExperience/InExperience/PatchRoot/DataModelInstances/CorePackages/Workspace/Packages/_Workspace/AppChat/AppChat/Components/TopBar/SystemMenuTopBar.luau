@@ -20,8 +20,10 @@ local function SystemMenuTopBar(p)
 
 	local systemButtonEnabled = v.systemButtonEnabled
 	local systemButtonActivated = v.systemButtonActivated
+	local systemButtonText = v.systemButtonText or "Feature.Chat.Action.Add"
+
 	local localizedStrings = useLocalization({
-		systemButtonText = v.systemButtonText or "Feature.Chat.Action.Add",
+		systemButtonText = systemButtonText,
 		networkErrorText = "Feature.Chat.Response.NetworkError",
 		invalidParticipantText = "Feature.Chat.Toast.Error.InvalidUserSelected",
 		cannotExpandToGroupChatActivePartyText = "Feature.Squads.Description.OneOnOneExpandedChatFeaturesActivePartyError"

@@ -21,11 +21,9 @@ local function ExperienceDetailsShareChip(p)
 	local v = useLocalization({ share = "Feature.SocialShare.Action.Share" })
 
 	local v2 = SignalsReact.useSignalState(Game.getGameInfoStore(false).getAndFetchGameInfo(universeId).data)
-	local onActivated = useExperienceDetailsShare(
-		universeId,
-		v2 and v2.rootPlaceId or nil,
-		"ExperienceDetailsShareChip"
-	)
+	local rootPlaceId = v2 and v2.rootPlaceId or nil
+
+	local onActivated = useExperienceDetailsShare(universeId, rootPlaceId, "ExperienceDetailsShareChip")
 
 	return React.createElement(SduiChip, {
 		text = v.share,

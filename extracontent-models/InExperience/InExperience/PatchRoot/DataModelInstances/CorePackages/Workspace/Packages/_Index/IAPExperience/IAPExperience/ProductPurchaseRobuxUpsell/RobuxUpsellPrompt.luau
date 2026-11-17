@@ -13,7 +13,6 @@ local Colors = Style.Colors
 local UIBlox = require(parent3.UIBlox)
 local Foundation = require(parent3.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local withStyle = UIBlox.Core.Style.withStyle
@@ -267,27 +266,12 @@ function extended:renderAlert(data)
 					RichText = true,
 					AutomaticSize = Enum.AutomaticSize.Y,
 					TextWrapped = true,
-					Font = 0,
-					FontFace = 0,
+					FontFace = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font),
 					Text = 0,
 					TextSize = 0,
 					TextColor3 = 0,
 					TextTransparency = 0
 				}
-				local font2
-
-				if not FoundationFontFaceMigration then
-					font2 = font.Body.Font
-				end
-
-				v9.Font = font2
-				local fontFace
-
-				if FoundationFontFaceMigration then
-					fontFace = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
-				end
-
-				v9.FontFace = fontFace
 				local text2
 
 				if self.props.isQuest then
@@ -326,28 +310,13 @@ function extended:renderAlert(data)
 					LayoutOrder = 1,
 					BackgroundTransparency = 1,
 					AutomaticSize = Enum.AutomaticSize.XY,
-					Font = 0,
-					FontFace = 0,
+					FontFace = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font),
 					Text = 0,
 					TextSize = 0,
 					TextColor3 = 0,
 					TextTransparency = 0,
 					TextWrapped = true
 				}
-				local font3
-
-				if not FoundationFontFaceMigration then
-					font3 = font.Body.Font
-				end
-
-				v11.Font = font3
-				local fontFace2
-
-				if FoundationFontFaceMigration then
-					fontFace2 = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
-				end
-
-				v11.FontFace = fontFace2
 				local text3
 
 				if self.props.isQuest then
@@ -368,8 +337,7 @@ function extended:renderAlert(data)
 				local disclosureTermsFrame
 
 				if not self.props.isQuest then
-					local createElement7 = Roact.createElement
-					local v13 = {
+					disclosureTermsFrame = Roact.createElement(FitFrameVertical, {
 						LayoutOrder = 2,
 						BackgroundTransparency = 1,
 						width = UDim.new(1, 0),
@@ -377,108 +345,41 @@ function extended:renderAlert(data)
 						HorizontalAlignment = Enum.HorizontalAlignment.Center,
 						VerticalAlignment = Enum.VerticalAlignment.Center,
 						contentPadding = UDim.new(0, 1)
-					}
-
-					local createElement8 = Roact.createElement
-					local v14 = {
-						LayoutOrder = 0,
-						BackgroundTransparency = 1,
-						AutomaticSize = Enum.AutomaticSize.XY,
-						Font = 0,
-						FontFace = 0,
-						Text = 0,
-						TextSize = 0,
-						TextColor3 = 0,
-						TextTransparency = 0
-					}
-					local font4
-
-					if not FoundationFontFaceMigration then
-						font4 = font.Body.Font
-					end
-
-					v14.Font = font4
-					local fontFace3
-
-					if FoundationFontFaceMigration then
-						fontFace3 = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
-					end
-
-					v14.FontFace = fontFace3
-
-					v14.Text = v6[1]
-					v14.TextSize = textSize
-					v14.TextColor3 = theme.TextDefault.Color
-					v14.TextTransparency = theme.TextDefault.Transparency
-					local children2 = {
-						BeforeDisclosureText = createElement8("TextLabel", v14),
-						TermsOfUse = 0,
-						AfterDisclosureText = 0
-					}
-
-					local createElement9 = Roact.createElement
-					local termsOfUseActivatedsByActivated = {}
-					termsOfUseActivatedsByActivated.LayoutOrder = 1
-					termsOfUseActivatedsByActivated.BackgroundTransparency = 1
-					termsOfUseActivatedsByActivated.RichText = true
-					termsOfUseActivatedsByActivated.AutomaticSize = Enum.AutomaticSize.XY
-					local font5
-
-					if not FoundationFontFaceMigration then
-						font5 = font.Body.Font
-					end
-
-					termsOfUseActivatedsByActivated.Font = font5
-					local fontFace4
-
-					if FoundationFontFaceMigration then
-						fontFace4 = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
-					end
-
-					termsOfUseActivatedsByActivated.FontFace = fontFace4
-
-					termsOfUseActivatedsByActivated.Text = text
-					termsOfUseActivatedsByActivated.TextSize = textSize
-					termsOfUseActivatedsByActivated.TextColor3 = theme.TextDefault.Color
-					termsOfUseActivatedsByActivated.TextTransparency = theme.TextDefault.Transparency
-					termsOfUseActivatedsByActivated.Selectable = props.termsOfUseActivated ~= nil
-
-					termsOfUseActivatedsByActivated[Roact.Event.Activated] = props.termsOfUseActivated
-					children2.TermsOfUse = createElement9("TextButton", termsOfUseActivatedsByActivated)
-
-					local createElement10 = Roact.createElement
-					local v15 = {
-						LayoutOrder = 2,
-						BackgroundTransparency = 1,
-						AutomaticSize = Enum.AutomaticSize.XY,
-						Font = 0,
-						FontFace = 0,
-						Text = 0,
-						TextSize = 0,
-						TextColor3 = 0,
-						TextTransparency = 0
-					}
-					local font6
-
-					if not FoundationFontFaceMigration then
-						font6 = font.Body.Font
-					end
-
-					v15.Font = font6
-					local fontFace5
-
-					if FoundationFontFaceMigration then
-						fontFace5 = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
-					end
-
-					v15.FontFace = fontFace5
-
-					v15.Text = v6[2]
-					v15.TextSize = textSize
-					v15.TextColor3 = theme.TextDefault.Color
-					v15.TextTransparency = theme.TextDefault.Transparency
-					children2.AfterDisclosureText = createElement10("TextLabel", v15)
-					disclosureTermsFrame = createElement7(FitFrameVertical, v13, children2)
+					}, {
+						BeforeDisclosureText = Roact.createElement("TextLabel", {
+							LayoutOrder = 0,
+							BackgroundTransparency = 1,
+							AutomaticSize = Enum.AutomaticSize.XY,
+							FontFace = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font),
+							Text = v6[1],
+							TextSize = textSize,
+							TextColor3 = theme.TextDefault.Color,
+							TextTransparency = theme.TextDefault.Transparency
+						}),
+						TermsOfUse = Roact.createElement("TextButton", {
+							LayoutOrder = 1,
+							BackgroundTransparency = 1,
+							RichText = true,
+							AutomaticSize = Enum.AutomaticSize.XY,
+							FontFace = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font),
+							Text = text,
+							TextSize = textSize,
+							TextColor3 = theme.TextDefault.Color,
+							TextTransparency = theme.TextDefault.Transparency,
+							Selectable = props.termsOfUseActivated ~= nil,
+							[Roact.Event.Activated] = props.termsOfUseActivated
+						}),
+						AfterDisclosureText = Roact.createElement("TextLabel", {
+							LayoutOrder = 2,
+							BackgroundTransparency = 1,
+							AutomaticSize = Enum.AutomaticSize.XY,
+							FontFace = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font),
+							Text = v6[2],
+							TextSize = textSize,
+							TextColor3 = theme.TextDefault.Color,
+							TextTransparency = theme.TextDefault.Transparency
+						})
+					})
 				end
 
 				v12.DisclosureTermsFrame = disclosureTermsFrame
@@ -705,27 +606,12 @@ function extended:renderAlertNewProductDetails(_)
 						RichText = true,
 						AutomaticSize = Enum.AutomaticSize.Y,
 						TextWrapped = true,
-						Font = 0,
-						FontFace = 0,
+						FontFace = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font),
 						Text = 0,
 						TextSize = 0,
 						TextColor3 = 0,
 						TextTransparency = 0
 					}
-					local font2
-
-					if not FoundationFontFaceMigration then
-						font2 = font.Body.Font
-					end
-
-					v10.Font = font2
-					local fontFace
-
-					if FoundationFontFaceMigration then
-						fontFace = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
-					end
-
-					v10.FontFace = fontFace
 					local text2
 
 					if self.props.isQuest then
@@ -765,28 +651,13 @@ function extended:renderAlertNewProductDetails(_)
 						LayoutOrder = 1,
 						BackgroundTransparency = 1,
 						AutomaticSize = Enum.AutomaticSize.XY,
-						Font = 0,
-						FontFace = 0,
+						FontFace = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font),
 						Text = 0,
 						TextSize = 0,
 						TextColor3 = 0,
 						TextTransparency = 0,
 						TextWrapped = true
 					}
-					local font3
-
-					if not FoundationFontFaceMigration then
-						font3 = font.Body.Font
-					end
-
-					v12.Font = font3
-					local fontFace2
-
-					if FoundationFontFaceMigration then
-						fontFace2 = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
-					end
-
-					v12.FontFace = fontFace2
 					local text3
 
 					if self.props.isQuest then
@@ -807,8 +678,7 @@ function extended:renderAlertNewProductDetails(_)
 					local disclosureTermsFrame
 
 					if not self.props.isQuest then
-						local createElement6 = Roact.createElement
-						local v14 = {
+						disclosureTermsFrame = Roact.createElement(FitFrameVertical, {
 							LayoutOrder = 2,
 							BackgroundTransparency = 1,
 							width = UDim.new(1, 0),
@@ -816,108 +686,41 @@ function extended:renderAlertNewProductDetails(_)
 							HorizontalAlignment = Enum.HorizontalAlignment.Center,
 							VerticalAlignment = Enum.VerticalAlignment.Center,
 							contentPadding = UDim.new(0, 1)
-						}
-
-						local createElement7 = Roact.createElement
-						local v15 = {
-							LayoutOrder = 0,
-							BackgroundTransparency = 1,
-							AutomaticSize = Enum.AutomaticSize.XY,
-							Font = 0,
-							FontFace = 0,
-							Text = 0,
-							TextSize = 0,
-							TextColor3 = 0,
-							TextTransparency = 0
-						}
-						local font4
-
-						if not FoundationFontFaceMigration then
-							font4 = font.Body.Font
-						end
-
-						v15.Font = font4
-						local fontFace3
-
-						if FoundationFontFaceMigration then
-							fontFace3 = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
-						end
-
-						v15.FontFace = fontFace3
-
-						v15.Text = v6[1]
-						v15.TextSize = textSize
-						v15.TextColor3 = theme.TextDefault.Color
-						v15.TextTransparency = theme.TextDefault.Transparency
-						local children2 = {
-							BeforeDisclosureText = createElement7("TextLabel", v15),
-							TermsOfUse = 0,
-							AfterDisclosureText = 0
-						}
-
-						local createElement8 = Roact.createElement
-						local termsOfUseActivatedsByActivated = {}
-						termsOfUseActivatedsByActivated.LayoutOrder = 1
-						termsOfUseActivatedsByActivated.BackgroundTransparency = 1
-						termsOfUseActivatedsByActivated.RichText = true
-						termsOfUseActivatedsByActivated.AutomaticSize = Enum.AutomaticSize.XY
-						local font5
-
-						if not FoundationFontFaceMigration then
-							font5 = font.Body.Font
-						end
-
-						termsOfUseActivatedsByActivated.Font = font5
-						local fontFace4
-
-						if FoundationFontFaceMigration then
-							fontFace4 = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
-						end
-
-						termsOfUseActivatedsByActivated.FontFace = fontFace4
-
-						termsOfUseActivatedsByActivated.Text = text
-						termsOfUseActivatedsByActivated.TextSize = textSize
-						termsOfUseActivatedsByActivated.TextColor3 = theme.TextDefault.Color
-						termsOfUseActivatedsByActivated.TextTransparency = theme.TextDefault.Transparency
-						termsOfUseActivatedsByActivated.Selectable = props.termsOfUseActivated ~= nil
-
-						termsOfUseActivatedsByActivated[Roact.Event.Activated] = props.termsOfUseActivated
-						children2.TermsOfUse = createElement8("TextButton", termsOfUseActivatedsByActivated)
-
-						local createElement9 = Roact.createElement
-						local v16 = {
-							LayoutOrder = 2,
-							BackgroundTransparency = 1,
-							AutomaticSize = Enum.AutomaticSize.XY,
-							Font = 0,
-							FontFace = 0,
-							Text = 0,
-							TextSize = 0,
-							TextColor3 = 0,
-							TextTransparency = 0
-						}
-						local font6
-
-						if not FoundationFontFaceMigration then
-							font6 = font.Body.Font
-						end
-
-						v16.Font = font6
-						local fontFace5
-
-						if FoundationFontFaceMigration then
-							fontFace5 = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
-						end
-
-						v16.FontFace = fontFace5
-
-						v16.Text = v6[2]
-						v16.TextSize = textSize
-						v16.TextColor3 = theme.TextDefault.Color
-						v16.TextTransparency = theme.TextDefault.Transparency
-						children2.AfterDisclosureText = createElement9("TextLabel", v16)
-						disclosureTermsFrame = createElement6(FitFrameVertical, v14, children2)
+						}, {
+							BeforeDisclosureText = Roact.createElement("TextLabel", {
+								LayoutOrder = 0,
+								BackgroundTransparency = 1,
+								AutomaticSize = Enum.AutomaticSize.XY,
+								FontFace = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font),
+								Text = v6[1],
+								TextSize = textSize,
+								TextColor3 = theme.TextDefault.Color,
+								TextTransparency = theme.TextDefault.Transparency
+							}),
+							TermsOfUse = Roact.createElement("TextButton", {
+								LayoutOrder = 1,
+								BackgroundTransparency = 1,
+								RichText = true,
+								AutomaticSize = Enum.AutomaticSize.XY,
+								FontFace = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font),
+								Text = text,
+								TextSize = textSize,
+								TextColor3 = theme.TextDefault.Color,
+								TextTransparency = theme.TextDefault.Transparency,
+								Selectable = props.termsOfUseActivated ~= nil,
+								[Roact.Event.Activated] = props.termsOfUseActivated
+							}),
+							AfterDisclosureText = Roact.createElement("TextLabel", {
+								LayoutOrder = 2,
+								BackgroundTransparency = 1,
+								AutomaticSize = Enum.AutomaticSize.XY,
+								FontFace = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font),
+								Text = v6[2],
+								TextSize = textSize,
+								TextColor3 = theme.TextDefault.Color,
+								TextTransparency = theme.TextDefault.Transparency
+							})
+						})
 					end
 
 					v13.DisclosureTermsFrame = disclosureTermsFrame
@@ -1148,27 +951,12 @@ function extended:renderNewAlert()
 						RichText = true,
 						AutomaticSize = Enum.AutomaticSize.Y,
 						TextWrapped = true,
-						Font = 0,
-						FontFace = 0,
+						FontFace = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font),
 						Text = 0,
 						TextSize = 0,
 						TextColor3 = 0,
 						TextTransparency = 0
 					}
-					local font2
-
-					if not FoundationFontFaceMigration then
-						font2 = font.Body.Font
-					end
-
-					v10.Font = font2
-					local fontFace
-
-					if FoundationFontFaceMigration then
-						fontFace = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
-					end
-
-					v10.FontFace = fontFace
 					local text2
 
 					if self.props.isQuest then
@@ -1208,28 +996,13 @@ function extended:renderNewAlert()
 						LayoutOrder = 1,
 						BackgroundTransparency = 1,
 						AutomaticSize = Enum.AutomaticSize.XY,
-						Font = 0,
-						FontFace = 0,
+						FontFace = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font),
 						Text = 0,
 						TextSize = 0,
 						TextColor3 = 0,
 						TextTransparency = 0,
 						TextWrapped = true
 					}
-					local font3
-
-					if not FoundationFontFaceMigration then
-						font3 = font.Body.Font
-					end
-
-					v12.Font = font3
-					local fontFace2
-
-					if FoundationFontFaceMigration then
-						fontFace2 = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
-					end
-
-					v12.FontFace = fontFace2
 					local text3
 
 					if self.props.isQuest then
@@ -1250,8 +1023,7 @@ function extended:renderNewAlert()
 					local disclosureTermsFrame
 
 					if not self.props.isQuest then
-						local createElement7 = Roact.createElement
-						local v14 = {
+						disclosureTermsFrame = Roact.createElement(FitFrameVertical, {
 							LayoutOrder = 2,
 							BackgroundTransparency = 1,
 							width = UDim.new(1, 0),
@@ -1259,108 +1031,41 @@ function extended:renderNewAlert()
 							HorizontalAlignment = Enum.HorizontalAlignment.Center,
 							VerticalAlignment = Enum.VerticalAlignment.Center,
 							contentPadding = UDim.new(0, 1)
-						}
-
-						local createElement8 = Roact.createElement
-						local v15 = {
-							LayoutOrder = 0,
-							BackgroundTransparency = 1,
-							AutomaticSize = Enum.AutomaticSize.XY,
-							Font = 0,
-							FontFace = 0,
-							Text = 0,
-							TextSize = 0,
-							TextColor3 = 0,
-							TextTransparency = 0
-						}
-						local font4
-
-						if not FoundationFontFaceMigration then
-							font4 = font.Body.Font
-						end
-
-						v15.Font = font4
-						local fontFace3
-
-						if FoundationFontFaceMigration then
-							fontFace3 = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
-						end
-
-						v15.FontFace = fontFace3
-
-						v15.Text = v6[1]
-						v15.TextSize = textSize2
-						v15.TextColor3 = theme.TextDefault.Color
-						v15.TextTransparency = theme.TextDefault.Transparency
-						local children2 = {
-							BeforeDisclosureText = createElement8("TextLabel", v15),
-							TermsOfUse = 0,
-							AfterDisclosureText = 0
-						}
-
-						local createElement9 = Roact.createElement
-						local termsOfUseActivatedsByActivated = {}
-						termsOfUseActivatedsByActivated.LayoutOrder = 1
-						termsOfUseActivatedsByActivated.BackgroundTransparency = 1
-						termsOfUseActivatedsByActivated.RichText = true
-						termsOfUseActivatedsByActivated.AutomaticSize = Enum.AutomaticSize.XY
-						local font5
-
-						if not FoundationFontFaceMigration then
-							font5 = font.Body.Font
-						end
-
-						termsOfUseActivatedsByActivated.Font = font5
-						local fontFace4
-
-						if FoundationFontFaceMigration then
-							fontFace4 = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
-						end
-
-						termsOfUseActivatedsByActivated.FontFace = fontFace4
-
-						termsOfUseActivatedsByActivated.Text = text
-						termsOfUseActivatedsByActivated.TextSize = textSize2
-						termsOfUseActivatedsByActivated.TextColor3 = theme.TextDefault.Color
-						termsOfUseActivatedsByActivated.TextTransparency = theme.TextDefault.Transparency
-						termsOfUseActivatedsByActivated.Selectable = props.termsOfUseActivated ~= nil
-
-						termsOfUseActivatedsByActivated[Roact.Event.Activated] = props.termsOfUseActivated
-						children2.TermsOfUse = createElement9("TextButton", termsOfUseActivatedsByActivated)
-
-						local createElement10 = Roact.createElement
-						local v16 = {
-							LayoutOrder = 2,
-							BackgroundTransparency = 1,
-							AutomaticSize = Enum.AutomaticSize.XY,
-							Font = 0,
-							FontFace = 0,
-							Text = 0,
-							TextSize = 0,
-							TextColor3 = 0,
-							TextTransparency = 0
-						}
-						local font6
-
-						if not FoundationFontFaceMigration then
-							font6 = font.Body.Font
-						end
-
-						v16.Font = font6
-						local fontFace5
-
-						if FoundationFontFaceMigration then
-							fontFace5 = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
-						end
-
-						v16.FontFace = fontFace5
-
-						v16.Text = v6[2]
-						v16.TextSize = textSize2
-						v16.TextColor3 = theme.TextDefault.Color
-						v16.TextTransparency = theme.TextDefault.Transparency
-						children2.AfterDisclosureText = createElement10("TextLabel", v16)
-						disclosureTermsFrame = createElement7(FitFrameVertical, v14, children2)
+						}, {
+							BeforeDisclosureText = Roact.createElement("TextLabel", {
+								LayoutOrder = 0,
+								BackgroundTransparency = 1,
+								AutomaticSize = Enum.AutomaticSize.XY,
+								FontFace = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font),
+								Text = v6[1],
+								TextSize = textSize2,
+								TextColor3 = theme.TextDefault.Color,
+								TextTransparency = theme.TextDefault.Transparency
+							}),
+							TermsOfUse = Roact.createElement("TextButton", {
+								LayoutOrder = 1,
+								BackgroundTransparency = 1,
+								RichText = true,
+								AutomaticSize = Enum.AutomaticSize.XY,
+								FontFace = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font),
+								Text = text,
+								TextSize = textSize2,
+								TextColor3 = theme.TextDefault.Color,
+								TextTransparency = theme.TextDefault.Transparency,
+								Selectable = props.termsOfUseActivated ~= nil,
+								[Roact.Event.Activated] = props.termsOfUseActivated
+							}),
+							AfterDisclosureText = Roact.createElement("TextLabel", {
+								LayoutOrder = 2,
+								BackgroundTransparency = 1,
+								AutomaticSize = Enum.AutomaticSize.XY,
+								FontFace = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font),
+								Text = v6[2],
+								TextSize = textSize2,
+								TextColor3 = theme.TextDefault.Color,
+								TextTransparency = theme.TextDefault.Transparency
+							})
+						})
 					end
 
 					v13.DisclosureTermsFrame = disclosureTermsFrame
@@ -1487,40 +1192,18 @@ function extended:renderFooterExperiment(p, text, text2)
 		HorizontalAlignment = Enum.HorizontalAlignment.Center,
 		VerticalAlignment = Enum.VerticalAlignment.Center
 	}
-
-	local createElement4 = Roact.createElement
 	local v5 = {
-		LayoutOrder = 1,
-		BackgroundTransparency = 1,
-		AutomaticSize = Enum.AutomaticSize.XY,
-		RichText = true,
-		Font = 0,
-		FontFace = 0,
-		Text = 0,
-		TextSize = 0,
-		TextColor3 = 0,
-		TextWrapped = true
-	}
-	local font2
-
-	if not FoundationFontFaceMigration then
-		font2 = font.Footer.Font
-	end
-
-	v5.Font = font2
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(p.Tokens.Typography.CaptionSmall.Font)
-	end
-
-	v5.FontFace = fontFace
-
-	v5.Text = text
-	v5.TextSize = font.BaseSize * font.Footer.RelativeSize
-	v5.TextColor3 = flint
-	local v6 = {
-		BonusBefore = createElement4("TextLabel", v5),
+		BonusBefore = Roact.createElement("TextLabel", {
+			LayoutOrder = 1,
+			BackgroundTransparency = 1,
+			AutomaticSize = Enum.AutomaticSize.XY,
+			RichText = true,
+			FontFace = normalizeFontFace(p.Tokens.Typography.CaptionSmall.Font),
+			Text = text,
+			TextSize = font.BaseSize * font.Footer.RelativeSize,
+			TextColor3 = flint,
+			TextWrapped = true
+		}),
 		InfoIcon = 0
 	}
 	local infoIcon
@@ -1534,10 +1217,10 @@ function extended:renderFooterExperiment(p, text, text2)
 		})
 	end
 
-	v6.InfoIcon = infoIcon
+	v5.InfoIcon = infoIcon
 	return createElement(FitFrameVertical, v2, {
 		Banner = createElement2("ImageLabel", v3, {
-			BannerContent = createElement3(FitFrameVertical, v4, v6)
+			BannerContent = createElement3(FitFrameVertical, v4, v5)
 		})
 	})
 end

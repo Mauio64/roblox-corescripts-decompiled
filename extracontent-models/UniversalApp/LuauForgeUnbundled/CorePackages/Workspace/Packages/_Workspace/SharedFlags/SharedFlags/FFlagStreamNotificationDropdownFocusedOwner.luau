@@ -1,4 +1,0 @@
-local FFlagAppChatRemoveNotifications = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagAppChatRemoveNotifications")
-local FFlagStreamNotificationDropdownSingleOwner = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagStreamNotificationDropdownSingleOwner")
-
-return game:DefineFastFlag("StreamNotificationDropdownFocusedOwner", false) and FFlagAppChatRemoveNotifications and FFlagStreamNotificationDropdownSingleOwner

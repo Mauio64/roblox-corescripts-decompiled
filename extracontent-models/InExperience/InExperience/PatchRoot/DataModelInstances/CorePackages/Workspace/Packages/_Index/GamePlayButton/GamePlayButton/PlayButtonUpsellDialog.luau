@@ -10,7 +10,6 @@ local DialogSize = Foundation.Enums.DialogSize
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local useTokens = Foundation.Hooks.useTokens
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local RoactUtils = require(parent.RoactUtils)
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
@@ -82,34 +81,21 @@ local function PlayButtonUpsellDialog(props)
 		})
 	else
 		local createElement3 = React.createElement
-		local v7 = {}
-		v7.AutomaticSize = Enum.AutomaticSize.Y
-		v7.BackgroundTransparency = 1
-		v7.RichText = true
-		v7.Size = UDim2.new(1, 0, 0, 0)
-		v7.Text = v4.styledText
-		v7.TextSize = v.Typography.BodyLarge.FontSize
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = v.Typography.BodyLarge.Font
-		end
-
-		v7.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(v.Typography.BodyLarge.Font)
-		end
-
-		v7.FontFace = fontFace
-
-		v7.TextWrapped = true
-		v7.TextXAlignment = Enum.TextXAlignment.Left
-		v7.TextYAlignment = Enum.TextYAlignment.Center
-		v7.TextColor3 = v.Color.Content.Emphasis.Color3
-		v7.Active = v4.link ~= nil
-		v7.Selectable = v4.link ~= nil
+		local v7 = {
+			["AutomaticSize"] = Enum.AutomaticSize.Y,
+			BackgroundTransparency = 1,
+			RichText = true,
+			Size = UDim2.new(1, 0, 0, 0),
+			Text = v4.styledText,
+			TextSize = v.Typography.BodyLarge.FontSize,
+			FontFace = normalizeFontFace(v.Typography.BodyLarge.Font),
+			TextWrapped = true,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextYAlignment = Enum.TextYAlignment.Center,
+			TextColor3 = v.Color.Content.Emphasis.Color3,
+			Active = v4.link ~= nil,
+			Selectable = v4.link ~= nil
+		}
 		local activated = React.Event.Activated
 
 		if not v4.link then

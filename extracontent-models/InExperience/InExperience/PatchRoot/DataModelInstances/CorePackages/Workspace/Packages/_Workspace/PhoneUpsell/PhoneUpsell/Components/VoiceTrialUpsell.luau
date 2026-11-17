@@ -5,7 +5,6 @@ local React = require(parent.React)
 local UIBlox = require(parent.UIBlox)
 local Foundation = require(parent.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local useStyle = UIBlox.Core.Style.useStyle
 local Localization = require(parent.Localization)
 local useLocalization = Localization.Hooks.useLocalization
@@ -125,51 +124,30 @@ local function VoiceTrialUpsell(p)
 
 	v7.onCloseClicked = union.onClose
 	function v7.middleContent()
-		local createElement3 = React.createElement
-		local v8 = {
-			BackgroundTransparency = 1,
-			AutomaticSize = Enum.AutomaticSize.Y,
-			Size = UDim2.new(1, 0, 0, 0)
-		}
-
-		local createElement4 = React.createElement
-		local v9 = {
-			LayoutOrder = 0,
-			BackgroundTransparency = 1,
-			Text = v4.descriptionKey,
-			TextSize = baseSize,
-			TextColor3 = v3.Theme.TextDefault.Color,
-			TextTransparency = v3.Theme.TextDefault.Transparency,
-			Font = 0,
-			FontFace = 0,
-			TextXAlignment = 0,
-			TextWrapped = true,
-			Size = 0,
-			AutomaticSize = 0,
-			RichText = true
-		}
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = v3.Font.Body.Font
-		end
-
-		v9.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(v3.Tokens.Typography.BodyLarge.Font)
-		end
-
-		v9.FontFace = fontFace
-
-		v9.TextXAlignment = Enum.TextXAlignment.Left
-
-		v9.Size = UDim2.new(1, 0, 0, 0)
-		v9.AutomaticSize = Enum.AutomaticSize.Y
-		return createElement3("Frame", v8, {
-			BodyText = createElement4("TextLabel", v9)
-		})
+		return React.createElement(
+			"Frame",
+			{
+				BackgroundTransparency = 1,
+				AutomaticSize = Enum.AutomaticSize.Y,
+				Size = UDim2.new(1, 0, 0, 0)
+			},
+			{
+				BodyText = React.createElement("TextLabel", {
+					LayoutOrder = 0,
+					BackgroundTransparency = 1,
+					Text = v4.descriptionKey,
+					TextSize = baseSize,
+					TextColor3 = v3.Theme.TextDefault.Color,
+					TextTransparency = v3.Theme.TextDefault.Transparency,
+					FontFace = normalizeFontFace(v3.Tokens.Typography.BodyLarge.Font),
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextWrapped = true,
+					Size = UDim2.new(1, 0, 0, 0),
+					AutomaticSize = Enum.AutomaticSize.Y,
+					RichText = true
+				})
+			}
+		)
 	end
 
 	return createElement(FocusNavigableSurfaceWrapper, v6, {

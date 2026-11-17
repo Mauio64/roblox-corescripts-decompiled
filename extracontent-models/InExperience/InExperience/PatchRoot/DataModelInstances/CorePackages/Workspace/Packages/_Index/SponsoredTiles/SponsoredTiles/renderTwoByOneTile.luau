@@ -11,9 +11,7 @@ local getTileBadgeByPositionConfigFromEntry = GameTile.getTileBadgeByPositionCon
 local resolveWideAssetId = GameTile.resolveWideAssetId
 require(parent.VideoUtils)
 local SharedFlags = require(parent.SharedFlags)
-local FFlagMigrateGameInfoToStore = SharedFlags.FFlagMigrateGameInfoToStore
-local SharedFlags2 = require(parent.SharedFlags)
-local FFlagLuaAppEnableReportExperience = SharedFlags2.FFlagLuaAppEnableReportExperience
+local FFlagLuaAppEnableReportExperience = SharedFlags.FFlagLuaAppEnableReportExperience
 
 local memo = React.memo(function(props)
 	local zIndex = -((props.maxItemIndex or 0) + 1)
@@ -71,27 +69,9 @@ local memo = React.memo(function(props)
 	v.launchDataOverride = props.item.launchDataOverride
 	v.onSelectionGained = onSelectionGained
 	v.onSelectionLost = props.onSelectionLost
-	local primaryWideImageAssetId
 
-	if not FFlagMigrateGameInfoToStore then
-		primaryWideImageAssetId = props.item.primaryWideImageAssetId
-	end
-
-	v.primaryWideImageAssetId = primaryWideImageAssetId
-	local wideAssetId
-
-	if FFlagMigrateGameInfoToStore then
-		wideAssetId = resolveWideAssetId(props.item.primaryWideImageAssetId, props.item, props.topicId)
-	end
-
-	v.wideAssetId = wideAssetId
-	local ageRatingLabel
-
-	if FFlagMigrateGameInfoToStore then
-		ageRatingLabel = props.item.ageRecommendationDisplayName
-	end
-
-	v.ageRatingLabel = ageRatingLabel
+	v.wideAssetId = resolveWideAssetId(props.item.primaryWideImageAssetId, props.item, props.topicId)
+	v.ageRatingLabel = props.item.ageRecommendationDisplayName
 	v.videoPlaybackContext = props.videoPlaybackContext
 	v.SelectionOrder = props.SelectionOrder
 	return createElement(TwoByOneGameTile, v)

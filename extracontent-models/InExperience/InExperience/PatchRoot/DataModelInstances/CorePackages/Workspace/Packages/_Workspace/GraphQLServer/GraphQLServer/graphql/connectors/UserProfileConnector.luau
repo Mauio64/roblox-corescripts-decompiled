@@ -52,53 +52,54 @@ local function fetchProfilesByIds(userIds, fields, p)
 			end
 
 			callback(v3)
-		else
-			local expect = v2(v, {
-				body = HttpService:JSONEncode({
-					UserIds = userIds,
-					Fields = fields,
-					includePlatformProfile = FFlagUserProfilePlatformProfile and PlatformProfileRequest.hasPlatformFields(fields) and true or nil
-				}),
-				method = "POST",
-				headers = { ["Content-Type"] = "application/json", Accept = "application/json" }
-			}):catch(function(p2)
-				if not FFlagUserProfileBetterErrors then
-					return Response.error()
-				end
+			return
+		end
 
-				local v3 = Response.error()
-				v3.statusText = p2.message
-				return v3
+		local expect = v2(v, {
+			body = HttpService:JSONEncode({
+				UserIds = userIds,
+				Fields = fields,
+				includePlatformProfile = FFlagUserProfilePlatformProfile and PlatformProfileRequest.hasPlatformFields(fields) and true or nil
+			}),
+			method = "POST",
+			headers = { ["Content-Type"] = "application/json", Accept = "application/json" }
+		}):catch(function(p2)
+			if not FFlagUserProfileBetterErrors then
+				return Response.error()
+			end
+
+			local v3 = Response.error()
+			v3.statusText = p2.message
+			return v3
+		end):expect()
+
+		if expect.ok then
+			local expect2 = expect:json():catch(function(): nil
+				return nil
 			end):expect()
 
-			if expect.ok then
-				local expect2 = expect:json():catch(function(): nil
-					return nil
-				end):expect()
-
-				if not expect then
-					callback2(GraphQLError.new(`Failed to decode HTTP response as JSON for user matching id: {userIds[1]}`))
-					return
-				end
-
-				local profileDetails = expect2.profileDetails
-
-				if FFlagUserProfilePlatformProfile then
-					profileDetails = PlatformProfileRequest.normalizeProfiles(profileDetails, fields)
-				end
-
-				if FFlagUserProfileMergeCachedNames then
-					profileDetails = fillRequestedNames(profileDetails, fields)
-				end
-
-				callback(profileDetails)
-			elseif FFlagUserProfileBetterErrors then
-				callback2(GraphQLError.new(expect.statusText, nil, nil, nil, nil, {
-					extensions = { status = expect.status, statusText = expect.statusText }
-				}))
-			else
-				callback2(GraphQLError.new(`Failed to fetch user profiles. Error code: {expect.status}`))
+			if not expect then
+				callback2(GraphQLError.new(`Failed to decode HTTP response as JSON for user matching id: {userIds[1]}`))
+				return
 			end
+
+			local profileDetails = expect2.profileDetails
+
+			if FFlagUserProfilePlatformProfile then
+				profileDetails = PlatformProfileRequest.normalizeProfiles(profileDetails, fields)
+			end
+
+			if FFlagUserProfileMergeCachedNames then
+				profileDetails = fillRequestedNames(profileDetails, fields)
+			end
+
+			callback(profileDetails)
+		elseif FFlagUserProfileBetterErrors then
+			callback2(GraphQLError.new(expect.statusText, nil, nil, nil, nil, {
+				extensions = { status = expect.status, statusText = expect.statusText }
+			}))
+		else
+			callback2(GraphQLError.new(`Failed to fetch user profiles. Error code: {expect.status}`))
 		end
 	end)
 end

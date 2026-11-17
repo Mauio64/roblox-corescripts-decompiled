@@ -265,9 +265,7 @@ local function createMessagesStore(callback)
 	end
 
 	local function updateMessagesBySenderId(userId: string, fn) -- 4 equivalent calls inferred from this helper
-		if FFlagExpChatMessagesStoreUseProxy then
-			v4[userId] = fn(v4[userId])
-		else
+		if not FFlagExpChatMessagesStoreUseProxy then
 			v3(function(p)
 				local v15 = fn(p[userId])
 
@@ -277,7 +275,11 @@ local function createMessagesStore(callback)
 
 				return dictionary.join(p, { [userId] = v15 })
 			end)
+
+			return
 		end
+
+		v4[userId] = fn(v4[userId])
 	end
 
 	local function resolveChannelNameForMapOrder(state, channelNameOverride: string?)

@@ -1,1 +1,0 @@
-return game:DefineFastFlag("SocialCarouselUpdateVerticalSpacing_v2", false)

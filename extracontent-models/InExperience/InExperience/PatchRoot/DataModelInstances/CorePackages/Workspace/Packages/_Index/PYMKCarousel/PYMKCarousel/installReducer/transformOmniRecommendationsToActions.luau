@@ -9,8 +9,6 @@ require(PYMKCarousel.Common.OmniTypes)
 local getRecommendationsMetadata = require(script.Parent.getRecommendationsMetadata)
 local ContextualInfoTypes = SocialCommon.Enums.ContextualInfoTypes
 
-local getFFlagTempFixInfiniteHomePYMK = require(PYMKCarousel.Flags.getFFlagTempFixInfiniteHomePYMK)
-
 local function fn(item, treatmentType: string)
 	local sorts = item.sorts or {}
 	local where = llama.List.findWhere(sorts, function(p): boolean
@@ -34,7 +32,7 @@ return function(items, p, callback, callback2)
 		local v = fn(item, treatmentType)
 		local recommendations = v and v.recommendations or {}
 
-		if not (not getFFlagTempFixInfiniteHomePYMK() or #recommendations ~= 0) then
+		if #recommendations == 0 then
 			continue
 		end
 

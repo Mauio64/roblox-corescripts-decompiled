@@ -18,7 +18,6 @@ local SignalsReact = require(parent.SignalsReact)
 
 local useTokens = Foundation.Hooks.useTokens
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local engineFeature = game:GetEngineFeature("QueuePositionEnabled")
 local SharedFlags = require(parent.SharedFlags)
@@ -151,54 +150,27 @@ return React.memo(function(props)
 		})
 	end
 
-	local createElement3 = React.createElement
 	local v8 = {
-		AutoLocalize = true,
-		AutomaticSize = Enum.AutomaticSize.Y,
-		BackgroundTransparency = 1,
-		LayoutOrder = 2,
-		Size = UDim2.new(1, 0, 0, 0),
-		Font = 0,
-		FontFace = 0,
-		TextSize = 0,
-		TextWrapped = true,
-		TextScaled = false,
-		TextColor3 = 0,
-		TextStrokeTransparency = 1,
-		Text = 0,
-		TextXAlignment = 0,
-		TextYAlignment = 0,
-		ZIndex = 2,
-		RootLocalizationTable = 0
-	}
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = v2.Typography.TitleMedium.Font
-	end
-
-	v8.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(v2.Typography.TitleMedium.Font)
-	end
-
-	v8.FontFace = fontFace
-
-	v8.TextSize = v2.Typography.TitleMedium.FontSize
-
-	v8.TextColor3 = v2.Color.System.Contrast.Color3
-
-	v8.Text = text
-	v8.TextXAlignment = Enum.TextXAlignment.Center
-	v8.TextYAlignment = Enum.TextYAlignment.Center
-
-	v8.RootLocalizationTable = CoreGui:FindFirstChild("CoreScriptLocalization")
-	local v9 = {
 		ServerStatusContainer = createElement2(view2, v7, {
 			QueuedDescriptionText = queuedDescriptionText,
-			ServerStatusText = createElement3("TextLabel", v8)
+			ServerStatusText = React.createElement("TextLabel", {
+				AutoLocalize = true,
+				AutomaticSize = Enum.AutomaticSize.Y,
+				BackgroundTransparency = 1,
+				LayoutOrder = 2,
+				Size = UDim2.new(1, 0, 0, 0),
+				FontFace = normalizeFontFace(v2.Typography.TitleMedium.Font),
+				TextSize = v2.Typography.TitleMedium.FontSize,
+				TextWrapped = true,
+				TextScaled = false,
+				TextColor3 = v2.Color.System.Contrast.Color3,
+				TextStrokeTransparency = 1,
+				Text = text,
+				TextXAlignment = Enum.TextXAlignment.Center,
+				TextYAlignment = Enum.TextYAlignment.Center,
+				ZIndex = 2,
+				RootLocalizationTable = CoreGui:FindFirstChild("CoreScriptLocalization")
+			})
 		}),
 		ActionContainer = 0
 	}
@@ -223,6 +195,6 @@ return React.memo(function(props)
 		)
 	end
 
-	v9.ActionContainer = actionContainer
-	return createElement(view, v6, v9)
+	v8.ActionContainer = actionContainer
+	return createElement(view, v6, v8)
 end)

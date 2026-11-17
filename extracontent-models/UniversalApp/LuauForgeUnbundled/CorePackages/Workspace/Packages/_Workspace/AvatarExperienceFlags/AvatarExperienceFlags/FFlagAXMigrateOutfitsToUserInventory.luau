@@ -1,4 +1,0 @@
-local FFlagAXInventoryDurablesSupport = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagAXInventoryDurablesSupport")
-local FFlagAXAvatarEditorStoresContext = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagAXAvatarEditorStoresContext")
-
-return game:DefineFastFlag("AXMigrateOutfitsToUserInventory2", false) and FFlagAXInventoryDurablesSupport and FFlagAXAvatarEditorStoresContext

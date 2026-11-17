@@ -33,12 +33,12 @@ local function buildApplyConfig(data)
 	return applyConfig
 end
 
-local function applyProfileConfiguration(avatarEditorService, p): boolean
-	local v = avatarEditorService:NoPromptApplyProfileConfiguration(p)
+local function applyProfileConfiguration(avatarEditorService, applyConfig): boolean
+	local v = avatarEditorService:NoPromptApplyProfileConfiguration(applyConfig)
 
 	while not v do
 		avatarEditorService.PromptApplyProfileConfigurationCompleted:Wait()
-		v = avatarEditorService:NoPromptApplyProfileConfiguration(p)
+		v = avatarEditorService:NoPromptApplyProfileConfiguration(applyConfig)
 	end
 
 	return avatarEditorService.PromptApplyProfileConfigurationCompleted:Wait() == Enum.AvatarPromptResult.Success
@@ -46,10 +46,9 @@ end
 
 return {
 	saveCloseupAndFullBody = function(p)
-		if applyProfileConfiguration(
-			p.avatarEditorService or game:GetService("AvatarEditorService"),
-			buildApplyConfig(p)
-		) then
+		local avatarEditorService = p.avatarEditorService or game:GetService("AvatarEditorService")
+
+		if applyProfileConfiguration(avatarEditorService, buildApplyConfig(p)) then
 			return { ok = true }
 		end
 

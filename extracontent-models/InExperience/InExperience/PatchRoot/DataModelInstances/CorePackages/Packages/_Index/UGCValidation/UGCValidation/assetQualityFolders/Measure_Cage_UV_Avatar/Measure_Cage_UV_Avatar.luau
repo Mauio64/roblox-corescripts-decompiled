@@ -11,7 +11,6 @@ local defineFastInt2 = game:DefineFastInt("UGCValidateLCCageUVAvatarMinScore", 9
 
 return {
 	categories = { ValidationEnums.UploadCategory.FULL_BODY },
-	["fflag"] = require(parent.flags.getFFlagUGCValidateAQCageQualityAvatar),
 	run = function(object, p)
 		local measure_Cage_UV_Avatar = p.aqsSummaryData.Measure_Cage_UV_Avatar
 

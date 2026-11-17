@@ -114,7 +114,9 @@ end
 
 local function normalizeTaxonomy(p)
 	local v = extractShowCatalogContentActionRequestParams(p)
-	local notEmptyString, v2 = normalizeNotEmptyString(v and v.taxonomyId)
+	local taxonomyId = v and v.taxonomyId
+
+	local notEmptyString, v2 = normalizeNotEmptyString(taxonomyId)
 	return notEmptyString, v2
 end
 
@@ -172,7 +174,8 @@ local function normalizeTimeToRefresh(p)
 end
 
 local function normalizeCameraFocus(p) -- 1 equivalent call inferred from this helper
-	local notEmptyString, v = normalizeNotEmptyString(p.props and p.props.cameraFocus)
+	local cameraFocus = p.props and p.props.cameraFocus
+	local notEmptyString, v = normalizeNotEmptyString(cameraFocus)
 	return notEmptyString, v
 end
 
@@ -262,7 +265,8 @@ local function normalizeDisableFilters(p)
 end
 
 local function normalizePageType(p) -- 1 equivalent call inferred from this helper
-	local notEmptyString, v = normalizeNotEmptyString(p.props and p.props.pageType)
+	local pageType = p.props and p.props.pageType
+	local notEmptyString, v = normalizeNotEmptyString(pageType)
 	return notEmptyString, v
 end
 
@@ -279,17 +283,20 @@ local function normalizeLooksWidgetContextForOrganicContent(p)
 end
 
 local function normalizeTooltipKey(p) -- 1 equivalent call inferred from this helper
-	local notEmptyString, v = normalizeNotEmptyString(p.props and p.props.tooltipKey)
+	local tooltipKey = p.props and p.props.tooltipKey
+	local notEmptyString, v = normalizeNotEmptyString(tooltipKey)
 	return notEmptyString, v
 end
 
 local function normalizeTooltipBody(p) -- 1 equivalent call inferred from this helper
-	local notEmptyString, v = normalizeNotEmptyString(p.props and p.props.tooltipBody)
+	local tooltipBody = p.props and p.props.tooltipBody
+	local notEmptyString, v = normalizeNotEmptyString(tooltipBody)
 	return notEmptyString, v
 end
 
 local function normalizeTileType(p) -- 1 equivalent call inferred from this helper
-	local notEmptyString, v = normalizeNotEmptyString(p.props and p.props.tileType)
+	local tileType = p.props and p.props.tileType
+	local notEmptyString, v = normalizeNotEmptyString(tileType)
 	return notEmptyString, v
 end
 
@@ -430,8 +437,9 @@ local function normalizeCategoryOrSubcategory(p, p2)
 
 	if FFlagAXCatalogCategoriesSDUI then
 		local v11 = extractShowCatalogContentActionRequestParams(p)
+		local taxonomyId = v11 and v11.taxonomyId
 		local v12
-		taxonomyUuid, v12 = normalizeNotEmptyString(v11 and v11.taxonomyId)
+		taxonomyUuid, v12 = normalizeNotEmptyString(taxonomyId)
 
 		if v12 then
 			table.insert(v, "Taxonomy: " .. v12)

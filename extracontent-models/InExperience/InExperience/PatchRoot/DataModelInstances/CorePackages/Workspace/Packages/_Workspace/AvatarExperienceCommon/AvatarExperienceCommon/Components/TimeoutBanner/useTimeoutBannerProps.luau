@@ -43,7 +43,8 @@ local function useTimeoutBannerProps(p)
 		end
 	end, { v, timeoutStatusStore })
 
-	local time = formatTimeoutEndTime(v3.timeoutAction and v3.timeoutAction.endTime or v3.details and v3.details.endDate)
+	local endTime = v3.timeoutAction and v3.timeoutAction.endTime or v3.details and v3.details.endDate
+	local time = formatTimeoutEndTime(endTime)
 
 	local v5 = useLocalization({
 		messageText = time and {

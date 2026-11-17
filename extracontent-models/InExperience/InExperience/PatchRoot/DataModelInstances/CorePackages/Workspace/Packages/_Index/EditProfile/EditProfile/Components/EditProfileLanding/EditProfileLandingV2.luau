@@ -23,13 +23,16 @@ local UserTile = require(parent.UserTile)
 
 local EditProfileHeaderBar = require(EditProfile.BaseComponents.EditProfileHeaderBar)
 local TextKeys = require(EditProfile.Common.TextKeys)
+local FFlagEditProfileAlignBioTranslationKeys = require(EditProfile.Flags.FFlagEditProfileAlignBioTranslationKeys)
 local SharedFlags = require(parent.SharedFlags)
 local FFlagAXEnableProfileTab = SharedFlags.FFlagAXEnableProfileTab
-local FFlagFixNonTruncatedText = require(EditProfile.Flags.FFlagFixNonTruncatedText)
 local SharedFlags2 = require(parent.SharedFlags)
+local FFlagSplitPaneFullBleedEditProfile = SharedFlags2.FFlagSplitPaneFullBleedEditProfile
+local FFlagFixNonTruncatedText = require(EditProfile.Flags.FFlagFixNonTruncatedText)
+local SharedFlags3 = require(parent.SharedFlags)
 local EditProfileProfileFramesSection
 
-if SharedFlags2.FFlagEditProfileFramesEnabled then
+if SharedFlags3.FFlagEditProfileFramesEnabled then
 	EditProfileProfileFramesSection = require(EditProfile.Components.EditProfileLanding.EditProfileProfileFramesSection)
 else
 	EditProfileProfileFramesSection = nil
@@ -67,7 +70,7 @@ end
 local function EditProfileLandingV2(props)
 	local v3 = useProfileCardWidth()
 	local v4 = useTokens()
-	local sizefullfull = FFlagAXEnableProfileTab and props.fullBleed == true
+	local sizefullfull = (FFlagAXEnableProfileTab or FFlagSplitPaneFullBleedEditProfile) and props.fullBleed == true
 	local displayNameLabel
 
 	if props.isPolicyEnabled then
@@ -76,26 +79,37 @@ local function EditProfileLandingV2(props)
 		displayNameLabel = TextKeys.DisplayName
 	end
 
-	local v5 = useLocalization({
+	local v5 = {
 		TopBarTitle = TextKeys.Title,
 		UsernameLabel = TextKeys.Username,
 		DisplayNameLabel = displayNameLabel,
-		BioLabel = TextKeys.About,
-		BioPlaceholder = TextKeys.AboutPlaceholder
-	})
-	local v6
+		BioLabel = 0,
+		BioPlaceholder = 0
+	}
+	local bioLabel
+
+	if FFlagEditProfileAlignBioTranslationKeys then
+		bioLabel = TextKeys.Bio
+	else
+		bioLabel = TextKeys.About
+	end
+
+	v5.BioLabel = bioLabel
+	v5.BioPlaceholder = TextKeys.AboutPlaceholder
+	local v6 = useLocalization(v5)
+	local v7
 
 	if props.bioText == "" or props.bioText == nil then
-		v6 = v5.BioPlaceholder
+		v7 = v6.BioPlaceholder
 	else
-		v6 = string.gsub(props.bioText, "\n", " ")
+		v7 = string.gsub(props.bioText, "\n", " ")
 	end
 
 	local size_400 = v4.Size.Size_400
 
 	local createElement = React.createElement
-	local v7 = {
-		tag = FFlagAXEnableProfileTab and {
+	local v8 = {
+		tag = (FFlagAXEnableProfileTab or FFlagSplitPaneFullBleedEditProfile) and {
 			["col items-start bg-surface-0"] = true,
 			["position-top-right anchor-top-right"] = not sizefullfull,
 			["size-full-full"] = sizefullfull
@@ -108,18 +122,18 @@ local function EditProfileLandingV2(props)
 		size = UDim2.new(0, v3, 1, 0)
 	end
 
-	v7.Size = size
-	local v8 = {
+	v8.Size = size
+	local v9 = {
 		TopBar = React.createElement(EditProfileHeaderBar, {
 			onClose = props.onClose,
-			headerText = v5.TopBarTitle
+			headerText = v6.TopBarTitle
 		}),
 		EditableComponents = 0
 	}
 
 	local createElement2 = React.createElement
 
-	local v9 = {
+	local v10 = {
 		AvatarEditRow = React.createElement(View, { tag = "size-full-2400", LayoutOrder = 1 }, {
 			AvatarContainer = React.createElement(
 				View,
@@ -156,7 +170,7 @@ local function EditProfileLandingV2(props)
 
 	local createElement3 = React.createElement
 	local root = List.Root
-	local v10 = {
+	local v11 = {
 		testId = "TextComponentsList",
 		LayoutOrder = 2,
 		isContained = v2.isContained,
@@ -165,9 +179,9 @@ local function EditProfileLandingV2(props)
 
 	local createElement4 = React.createElement
 	local item = List.Item
-	local v11 = {
+	local v12 = {
 		testId = "EditDisplayNameRow",
-		title = v5.DisplayNameLabel,
+		title = v6.DisplayNameLabel,
 		trailing = 0,
 		onActivated = 0,
 		LayoutOrder = 1,
@@ -176,30 +190,30 @@ local function EditProfileLandingV2(props)
 
 	local areNamesLoading = props.areNamesLoading
 	local displayName = props.displayName
-	local v12
+	local v13
 
 	if FFlagFixNonTruncatedText then
-		v12 = v3
+		v13 = v3
 	end
 
-	v11.trailing = renderRowTrailing(areNamesLoading, displayName, size_400, v12)
+	v12.trailing = renderRowTrailing(areNamesLoading, displayName, size_400, v13)
 
-	v11.onActivated = not props.areNamesLoading and {
+	v12.onActivated = not props.areNamesLoading and {
 		onActivated = props.settingButtonOnActivated.displayName
 	} or nil
 
-	v11.ref = props.firstItemRef
+	v12.ref = props.firstItemRef
 	local children = {
-		EditDisplayNameRow = createElement4(item, v11),
+		EditDisplayNameRow = createElement4(item, v12),
 		UsernameEditRow = 0,
 		BioEditRow = 0
 	}
 
 	local createElement5 = React.createElement
 	local item2 = List.Item
-	local v13 = {
+	local v14 = {
 		testId = "UsernameEditRow",
-		title = v5.UsernameLabel,
+		title = v6.UsernameLabel,
 		trailing = 0,
 		onActivated = 0,
 		LayoutOrder = 2
@@ -207,24 +221,24 @@ local function EditProfileLandingV2(props)
 
 	local areNamesLoading2 = props.areNamesLoading
 	local username = props.username
-	local v14
+	local v15
 
 	if FFlagFixNonTruncatedText then
-		v14 = v3
+		v15 = v3
 	end
 
-	v13.trailing = renderRowTrailing(areNamesLoading2, username, size_400, v14)
+	v14.trailing = renderRowTrailing(areNamesLoading2, username, size_400, v15)
 
-	v13.onActivated = not props.areNamesLoading and {
+	v14.onActivated = not props.areNamesLoading and {
 		onActivated = props.settingButtonOnActivated.username
 	} or nil
-	children.UsernameEditRow = createElement5(item2, v13)
+	children.UsernameEditRow = createElement5(item2, v14)
 
 	local createElement6 = React.createElement
 	local item3 = List.Item
-	local v15 = {
+	local v16 = {
 		testId = "BioEditRow",
-		title = v5.BioLabel,
+		title = v6.BioLabel,
 		trailing = 0,
 		onActivated = 0,
 		LayoutOrder = 3
@@ -236,13 +250,13 @@ local function EditProfileLandingV2(props)
 		v3 = nil
 	end
 
-	v15.trailing = renderRowTrailing(isBioLoading, v6, size_400, v3)
+	v16.trailing = renderRowTrailing(isBioLoading, v7, size_400, v3)
 
-	v15.onActivated = not props.isBioLoading and {
+	v16.onActivated = not props.isBioLoading and {
 		onActivated = props.settingButtonOnActivated.bio
 	} or nil
-	children.BioEditRow = createElement6(item3, v15)
-	v9.TextComponentsList = createElement3(root, v10, children)
+	children.BioEditRow = createElement6(item3, v16)
+	v10.TextComponentsList = createElement3(root, v11, children)
 	local profileFramesList
 
 	if EditProfileProfileFramesSection ~= nil then
@@ -253,11 +267,11 @@ local function EditProfileLandingV2(props)
 		})
 	end
 
-	v9.ProfileFramesList = profileFramesList
-	v8.EditableComponents = createElement2(View, {
+	v10.ProfileFramesList = profileFramesList
+	v9.EditableComponents = createElement2(View, {
 		tag = "col gap-xxlarge size-full-0 auto-y padding-xlarge"
-	}, v9)
-	return createElement(View, v7, v8)
+	}, v10)
+	return createElement(View, v8, v9)
 end
 
 return EditProfileLandingV2

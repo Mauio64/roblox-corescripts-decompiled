@@ -20,6 +20,7 @@ local VariantsContext = require(Foundation.Providers.Style.VariantsContext)
 local devAssert = require(Foundation.Utility.devAssert)
 
 local Constants = require(Foundation.Constants)
+local getStatusIndicatorSize = require(script.Parent.getStatusIndicatorSize)
 
 local font = Font.new(Constants.BUILDER_SANS_FONT_ASSET, Enum.FontWeight.SemiBold, Enum.FontStyle.Normal)
 
@@ -91,69 +92,82 @@ function variantsFactory(data)
 		}
 	}
 
+	local function squareSize(p, flag: boolean, value: number?) -- 12 equivalent calls inferred from this helper
+		local v = getStatusIndicatorSize(data, p, flag) * (value or 1)
+		return UDim2.fromOffset(v, v)
+	end
+
 	local sizes = {
 		[StatusIndicatorSize.XSmall] = {
 			container = {
-				size = UDim2.fromOffset(data.Size.Size_150, data.Size.Size_150)
+				size = squareSize(StatusIndicatorSize.XSmall, false) -- inferred equivalent call
 			},
 			ring = {
-				size = UDim2.fromOffset(data.Size.Size_150 / 2, data.Size.Size_150 / 2)
+				size = squareSize(StatusIndicatorSize.XSmall, false, 0.5) -- inferred equivalent call
 			},
 			stroke = not Flags.FoundationStatusIndicatorDesignUpdate and {
 				Thickness = data.Stroke.Standard
 			} or nil
-		},
-		[StatusIndicatorSize.Small] = {
-			container = {
-				size = UDim2.fromOffset(data.Size.Size_200, data.Size.Size_200)
-			},
-			ring = {
-				size = UDim2.fromOffset(data.Size.Size_200 / 2, data.Size.Size_200 / 2)
-			},
-			stroke = not Flags.FoundationStatusIndicatorDesignUpdate and {
-				Thickness = data.Size.Size_50
-			} or nil
-		},
-		[StatusIndicatorSize.Medium] = {
-			container = {
-				size = UDim2.fromOffset(data.Size.Size_250, data.Size.Size_250)
-			},
-			ring = {
-				size = UDim2.fromOffset(data.Size.Size_250 / 2, data.Size.Size_250 / 2)
-			},
-			stroke = not Flags.FoundationStatusIndicatorDesignUpdate and {
-				Thickness = data.Size.Size_50
-			} or nil
-		},
-		[StatusIndicatorSize.Large] = {
-			container = {
-				size = UDim2.fromOffset(data.Size.Size_500, data.Size.Size_500)
-			},
-			ring = {
-				size = UDim2.fromOffset(data.Size.Size_500 / 2, data.Size.Size_500 / 2)
-			},
-			stroke = { Thickness = data.Stroke.Thicker }
-		},
-		[StatusIndicatorSize.Pictogram] = {
-			container = {
-				size = UDim2.fromOffset(data.Size.Size_500, data.Size.Size_500)
-			},
-			ring = {
-				size = UDim2.fromOffset(data.Size.Size_500 / 2, data.Size.Size_500 / 2)
-			},
-			stroke = { Thickness = data.Stroke.Thicker }
 		}
+	}
+
+	local small = StatusIndicatorSize.Small
+	sizes[small] = {
+		container = {
+			size = squareSize(StatusIndicatorSize.Small, false) -- inferred equivalent call
+		},
+		ring = {
+			size = squareSize(StatusIndicatorSize.Small, false, 0.5) -- inferred equivalent call
+		},
+		stroke = not Flags.FoundationStatusIndicatorDesignUpdate and {
+			Thickness = data.Size.Size_50
+		} or nil
+	}
+
+	local medium = StatusIndicatorSize.Medium
+	sizes[medium] = {
+		container = {
+			size = squareSize(StatusIndicatorSize.Medium, false) -- inferred equivalent call
+		},
+		ring = {
+			size = squareSize(StatusIndicatorSize.Medium, false, 0.5) -- inferred equivalent call
+		},
+		stroke = not Flags.FoundationStatusIndicatorDesignUpdate and {
+			Thickness = data.Size.Size_50
+		} or nil
+	}
+
+	local large = StatusIndicatorSize.Large
+	sizes[large] = {
+		container = {
+			size = squareSize(StatusIndicatorSize.Large, false) -- inferred equivalent call
+		},
+		ring = {
+			size = squareSize(StatusIndicatorSize.Large, false, 0.5) -- inferred equivalent call
+		},
+		stroke = { Thickness = data.Stroke.Thicker }
+	}
+
+	local pictogram = StatusIndicatorSize.Pictogram
+	sizes[pictogram] = {
+		container = {
+			size = squareSize(StatusIndicatorSize.Pictogram, false) -- inferred equivalent call
+		},
+		ring = {
+			size = squareSize(StatusIndicatorSize.Pictogram, false, 0.5) -- inferred equivalent call
+		},
+		stroke = { Thickness = data.Stroke.Thicker }
 	}
 
 	local v = {
 		container = {
-			size = UDim2.fromOffset(data.Size.Size_400, data.Size.Size_400)
+			size = squareSize(StatusIndicatorSize.Small, true) -- inferred equivalent call
 		}
 	}
 
 	local v2 = {
 		container = {
-			size = UDim2.fromOffset(data.Size.Size_500, data.Size.Size_500)
+			size = squareSize(StatusIndicatorSize.Large, true) -- inferred equivalent call
 		},
 		content = { typography = data.Typography.LabelMedium }
 	}

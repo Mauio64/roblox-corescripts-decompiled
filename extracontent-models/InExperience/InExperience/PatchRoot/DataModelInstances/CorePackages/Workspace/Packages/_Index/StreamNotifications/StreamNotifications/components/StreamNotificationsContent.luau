@@ -27,6 +27,14 @@ local NotificationsCommon = require(parent.NotificationsCommon)
 local JoinExperience = NotificationsCommon.JoinExperience
 local kind = NotificationsCommon.type
 local NotificationHelper = NotificationsCommon.NotificationHelper
+local FFlagNotificationDeeplinkTapListenersEnabled = NotificationsCommon.FFlagNotificationDeeplinkTapListenersEnabled
+local deeplinkTapListeners
+
+if FFlagNotificationDeeplinkTapListenersEnabled then
+	deeplinkTapListeners = NotificationsCommon.DeeplinkTapListeners
+else
+	deeplinkTapListeners = nil
+end
 
 local EnumStreamNotificationsDisplayState = require(StreamNotifications.EnumStreamNotificationsDisplayState)
 local EnumStreamNotificationsLoadingMoreState = require(StreamNotifications.EnumStreamNotificationsLoadingMoreState)
@@ -296,7 +304,8 @@ return function(props)
 
 			setState3(EnumStreamNotificationsDisplayState.Default)
 			clearUnreadNotifications(v3)
-			ref2.current = (tonumber(ref2.current) or 0) + constants.DefaultMaxRows
+			local current = tonumber(ref2.current) or 0
+			ref2.current = current + constants.DefaultMaxRows
 
 			if defineFastFlag2 then
 				if ref4.current < constants.DefaultMaxRows then
@@ -471,6 +480,16 @@ return function(props)
 				end
 
 				if action.actionType == kind.ActionTypeEnum.Deeplink then
+					if FFlagNotificationDeeplinkTapListenersEnabled then
+						deeplinkTapListeners.notify({
+							notificationType = v12.content and v12.content.notificationType,
+							notificationId = v12.id,
+							url = action.path or "",
+							source = "stream",
+							isInExperience = false
+						})
+					end
+
 					if JoinExperience(action.path, false) then
 						props.displayStream(false)
 						SessionService:SetSession(
@@ -493,13 +512,14 @@ return function(props)
 						})
 					end
 				elseif action.actionType == kind.ActionTypeEnum.NotificationApi then
-					local v13
+					local id
 
 					if v12 then
-						v13 = v12.id or nil
+						id = v12.id or nil
 					end
 
-					postNotificationsApi(v3, v13, action.path or nil):andThen(function(_)
+					local path = action.path or nil
+					postNotificationsApi(v3, id, path):andThen(function(_)
 						if action.nextState ~= nil and action.nextState ~= "" then
 							fn2(action.nextState, v12)
 						end

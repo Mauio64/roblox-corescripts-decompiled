@@ -5,7 +5,6 @@ local Foundation = require(parent.Foundation)
 local IconSize = Foundation.Enums.IconSize
 local Loading = Foundation.Loading
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local React = require(parent.React)
 local Localization = require(parent.Localization)
@@ -35,7 +34,6 @@ local function IDVWithQRCodeUpsell(props)
 	local v2 = useStyle()
 	local onClose = props.onClose
 	local openPrivacyPolicyLink = props.openPrivacyPolicyLink
-	local font = v2.Font.Body.Font
 	local baseSize = v2.Font.BaseSize
 	local transparency = v2.Theme.TextEmphasis.Transparency
 	local textSize = baseSize * v2.Font.CaptionBody.RelativeSize
@@ -230,43 +228,19 @@ local function IDVWithQRCodeUpsell(props)
 	local disclaimer
 
 	if not v4 then
-		local createElement6 = React.createElement
-		local v10 = {
+		disclaimer = React.createElement("TextLabel", {
 			Text = v.disclaimer,
-			Font = 0,
-			FontFace = 0,
-			TextSize = 0,
-			TextColor3 = 0,
-			TextTransparency = 0,
-			TextXAlignment = 0,
+			FontFace = normalizeFontFace(v2.Tokens.Typography.BodyLarge.Font),
+			TextSize = textSize,
+			TextColor3 = v2.Theme.TextDefault.Color,
+			TextTransparency = transparency,
+			TextXAlignment = Enum.TextXAlignment.Center,
 			TextWrapped = true,
-			AutomaticSize = 0,
-			Size = 0,
+			AutomaticSize = Enum.AutomaticSize.XY,
+			Size = UDim2.new(1, 0, 0, 24),
 			BackgroundTransparency = 1,
 			LayoutOrder = 1
-		}
-
-		if FoundationFontFaceMigration then
-			font = nil
-		end
-
-		v10.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(v2.Tokens.Typography.BodyLarge.Font)
-		end
-
-		v10.FontFace = fontFace
-
-		v10.TextSize = textSize
-		v10.TextColor3 = v2.Theme.TextDefault.Color
-		v10.TextTransparency = transparency
-		v10.TextXAlignment = Enum.TextXAlignment.Center
-
-		v10.AutomaticSize = Enum.AutomaticSize.XY
-		v10.Size = UDim2.new(1, 0, 0, 24)
-		disclaimer = createElement6("TextLabel", v10)
+		})
 	end
 
 	v9.Disclaimer = disclaimer

@@ -18,12 +18,15 @@ local bottomInsetBackground = dependencies.SocialCommon.Components.BottomInsetBa
 local compose = socialLibraries.RoduxTools.compose
 local mapStateToProps = require(script.mapStateToProps)
 local mapDispatchToProps = require(script.mapDispatchToProps)
+local getInitialFilter = require(script.getInitialFilter)
 local withLocalization = dependencies.withLocalization
 
 local getFStringSocialAddFriendsPageLayer = dependencies.getFStringSocialAddFriendsPageLayer
 
 local SharedFlags = require(parent.SharedFlags)
 local FFlagFriendsPageAlwaysOpenPPV = SharedFlags.FFlagFriendsPageAlwaysOpenPPV
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagFriendsDeepLinkInitialFilter = SharedFlags2.FFlagFriendsDeepLinkInitialFilter
 
 local function fn() end
 
@@ -48,6 +51,10 @@ function extended:init()
 			[EnumScreens.FriendsLanding] = { shouldRenderCenter = false }
 		}
 	}
+
+	if FFlagFriendsDeepLinkInitialFilter then
+		self.state.filter = getInitialFilter(self.props.initialFilter)
+	end
 
 	self.localization = { pageError = "CommonUI.Messages.Response.PageError" }
 

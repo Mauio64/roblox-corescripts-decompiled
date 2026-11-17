@@ -14,10 +14,11 @@ require(GenericAbuseReporting.BeduiV2.Utils.Translate.translate)
 local arTranslation = require(GenericAbuseReporting.BeduiV2.Utils.Translate.arTranslation)
 local useArTranslation = arTranslation.useArTranslation
 
-local defineFastFlag = game:DefineFastFlag("AddFontStyleToTextWithTranslation", false)
-
 local telemetryEventType = analyticsService.TelemetryEventType
 local useOptionalAbuseReportAnalytics = AbuseReportAnalyticsContext.useOptionalAbuseReportAnalytics
+
+local FFlagAbuseReportTranslateColorWrapper = require(GenericAbuseReporting.Flags.FFlagAbuseReportTranslateColorWrapper)
+local defineFastFlag = game:DefineFastFlag("AddFontStyleToTextWithTranslation", false)
 
 local function TextWithTranslation(props)
 	local translateIntoString = useArTranslation().translateIntoString
@@ -34,15 +35,16 @@ local function TextWithTranslation(props)
 		sendEvent = nil
 	end
 
-	local text, v3 = React.useMemo(function()
-		return translateIntoRichTextString(props.input)
-	end, { props.input, translateIntoRichTextString })
+	local v3 = FFlagAbuseReportTranslateColorWrapper and state
+	local text, v4 = React.useMemo(function()
+		return translateIntoRichTextString(props.input, v3)
+	end, { props.input, translateIntoRichTextString, v3 })
 
 	local onActivated = React.useCallback(function()
 		local href
 
-		if v3 ~= nil then
-			href = v3.href
+		if v4 ~= nil then
+			href = v4.href
 		end
 
 		if sendEvent and href then
@@ -53,7 +55,7 @@ local function TextWithTranslation(props)
 		end
 
 		v(translateIntoString(props.input), href)
-	end, { v3, props.input, v, translateIntoString, sendEvent, props.linkId, props.linkSource })
+	end, { v4, props.input, v, translateIntoString, sendEvent, props.linkId, props.linkSource })
 
 	local onStateChanged = React.useCallback(function(p)
 		if p == ControlState.Hover then
@@ -65,11 +67,11 @@ local function TextWithTranslation(props)
 
 	local createElement = React.createElement
 
-	if state then
+	if state and not FFlagAbuseReportTranslateColorWrapper then
 		text = `<u>{text}</u>`
 	end
 
-	local v4 = {
+	local v5 = {
 		Text = text,
 		RichText = true,
 		TextWrapped = true,
@@ -86,22 +88,22 @@ local function TextWithTranslation(props)
 		fontStyle = props.fontStyle
 	end
 
-	v4.fontStyle = fontStyle
-	v4.tag = props.tag
-	v4.LayoutOrder = props.layoutOrder
+	v5.fontStyle = fontStyle
+	v5.tag = props.tag
+	v5.LayoutOrder = props.layoutOrder
 
-	if v3 == nil then
+	if v4 == nil then
 		onActivated = nil
 	end
 
-	v4.onActivated = onActivated
+	v5.onActivated = onActivated
 
-	if v3 == nil then
+	if v4 == nil then
 		onStateChanged = nil
 	end
 
-	v4.onStateChanged = onStateChanged
-	return createElement(Text, v4)
+	v5.onStateChanged = onStateChanged
+	return createElement(Text, v5)
 end
 
 return React.memo(TextWithTranslation)

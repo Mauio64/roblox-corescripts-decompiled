@@ -9,6 +9,7 @@ local defineFastFlag = game:DefineFastFlag("LuaAppPromptsHomepageConfigName", fa
 local FFlagEdpGameLeavePromptsHandlerEnabled = SharedFlags.FFlagEdpGameLeavePromptsHandlerEnabled
 local FFlagEdpOpenPromptsHandlerEnabled = SharedFlags.FFlagEdpOpenPromptsHandlerEnabled
 local FFlagLuaAppEnableSduiHomePage = SharedFlags.FFlagLuaAppEnableSduiHomePage
+local FFlagChatPushUpsellPromptsEnabled = SharedFlags.FFlagChatPushUpsellPromptsEnabled
 local FFlagNotificationStreamPromptsHandlerEnabled = SharedFlags.FFlagNotificationStreamPromptsHandlerEnabled
 
 local v = {}
@@ -49,6 +50,12 @@ v[PromptsEntryPoint.ExperienceDetailsPageOpen] = FFlagEdpOpenPromptsHandlerEnabl
 	appPage = AppPage.ExperienceDetail,
 	surfaceKey = "ExperienceDetailsOpenPrompts",
 	configKey = "Prompts" .. PromptsEntryPoint.ExperienceDetailsPageOpen
+} or nil
+
+v[PromptsEntryPoint.ChatLandingOpen] = FFlagChatPushUpsellPromptsEnabled and {
+	appPage = AppPage.Chat,
+	surfaceKey = "ChatLandingPrompts",
+	configKey = "Prompts" .. PromptsEntryPoint.ChatLandingOpen
 } or nil
 
 v[PromptsEntryPoint.NotificationStreamOpen] = FFlagNotificationStreamPromptsHandlerEnabled and {

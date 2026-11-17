@@ -22,7 +22,8 @@ return function(p, list)
 				local v = {}
 				local mapped = Functional.Map(responseBody, function(p3)
 					local v2 = PlaceInfoModel.fromWeb(p3)
-					table.insert(v, (ConvertUniverseIdToString(v2.universeId)))
+					local convertUniverseIdToString = ConvertUniverseIdToString(v2.universeId)
+					table.insert(v, convertUniverseIdToString)
 					return v2
 				end)
 

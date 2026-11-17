@@ -1,3 +1,0 @@
-local FFlagBuildExperienceMonetizationNativeUI = require("@game/CorePackages/Workspace/Packages/_Workspace/BuildExperience/BuildExperience/Flags/FFlagBuildExperienceMonetizationNativeUI")
-
-return require("@game/CorePackages/Workspace/Packages/_Workspace/BuildExperience/DataHydration/FFlagBuildExperienceMonetizationMultiKind") and FFlagBuildExperienceMonetizationNativeUI

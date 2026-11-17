@@ -4,10 +4,7 @@ local parent = BuildExperience.Parent
 local CreatorAgentChat = require(parent.DataHydration.CreatorAgentChat)
 local chatTypes = require(script.Parent.chatTypes)
 local FFlagBuildAdUpsell = require(BuildExperience.Flags.FFlagBuildAdUpsell)
-local FFlagBuildExperienceChatImageAttachments = require(BuildExperience.Flags.FFlagBuildExperienceChatImageAttachments)
-
-local SharedFlags = require(parent.SharedFlags)
-local FFlagBuildExperienceChatResourceAttachments = SharedFlags.FFlagBuildExperienceChatResourceAttachments
+local FFlagBuildExperienceThoughtStatus = CreatorAgentChat.FFlagBuildExperienceThoughtStatus
 
 local PublishToolUtils = CreatorAgentChat.PublishToolUtils
 local TurnStateReducer = CreatorAgentChat.TurnStateReducer
@@ -22,17 +19,11 @@ local function contentBlockToText(p) -- 2 equivalent calls inferred from this he
 end
 
 local function contentBlockToImage(p) -- 2 equivalent calls inferred from this helper
-	if
-		FFlagBuildExperienceChatImageAttachments
-		and p ~= nil
-		and p.type == "image"
-		and typeof(p.uri) == "string"
-		and p.uri ~= ""
-	then
-		return { uri = p.uri }
+	if p == nil or p.type ~= "image" or typeof(p.uri) ~= "string" or p.uri == "" then
+		return nil
 	end
 
-	return nil
+	return { uri = p.uri }
 end
 
 local function contentBlockToResourceAttachment(data)
@@ -151,21 +142,45 @@ local function getMessageId(item) -- 1 equivalent call inferred from this helper
 	return nil
 end
 
-local function isAssistantTurnUpdate(sessionUpdate): boolean -- 1 equivalent call inferred from this helper
+local function isAssistantTurnUpdate(sessionUpdate) -- 1 equivalent call inferred from this helper
 	return sessionUpdate == "agent_message"
 		or sessionUpdate == "agent_message_chunk"
 		or sessionUpdate == "tool_call_update"
 		or sessionUpdate == "tool_call_content_chunk"
 		or sessionUpdate == "state_change"
+		or FFlagBuildExperienceThoughtStatus and sessionUpdate == "agent_thought_chunk"
 end
 
 local function hasAssistantTurnContent(data): boolean -- 2 equivalent calls inferred from this helper
 	return data.assistantText ~= "" or #data.activityItems > 0 or data.toolCallCount > 0
 end
 
-local function shouldEmitAssistantTurn(data) -- 1 equivalent call inferred from this helper
-	return hasAssistantTurnContent(data) -- inferred equivalent call
+local function hasContentBeyondThoughts(data): boolean -- 1 equivalent call inferred from this helper
+	if data.assistantText ~= "" or data.toolCallCount > 0 then
+		return true
+	end
+
+	for _, activityItem in data.activityItems do
+		if activityItem.kind ~= "thought" then
+			return true
+		end
+	end
+
+	return false
+end
+
+local function shouldEmitAssistantTurn(data, flag: boolean?)
+	local v
+
+	if FFlagBuildExperienceThoughtStatus then
+		v = hasContentBeyondThoughts(data) -- inferred equivalent call
+	else
+		v = hasAssistantTurnContent(data) -- inferred equivalent call
+	end
+
+	return v
 		or #data.pendingAgentMessageContent > 0
+		or FFlagBuildExperienceThoughtStatus and flag and data.latestThought ~= nil and not data.isDone
 		or data.status == "cancelled"
 		or data.stopReason == "cancelled"
 		or data.stopReason == "error"
@@ -188,15 +203,23 @@ local function parseChatItems(clone, p: string)
 	local sequenceIds = {}
 	local v = false
 
-	local function flushActiveTurn()
-		if turnState ~= nil and v and shouldEmitAssistantTurn(turnState) then -- inferred equivalent call
-			table.insert(chatItems, {
-				kind = "assistant_turn",
-				startSequenceId = startSequenceId,
-				endSequenceId = endSequenceId,
-				sequenceIds = sequenceIds,
-				turnState = turnState
-			})
+	local function flushActiveTurn(flag: boolean?)
+		if turnState ~= nil and v then
+			local v2 = turnState
+
+			if not FFlagBuildExperienceThoughtStatus then
+				flag = nil
+			end
+
+			if shouldEmitAssistantTurn(v2, flag) then
+				table.insert(chatItems, {
+					kind = "assistant_turn",
+					startSequenceId = startSequenceId,
+					endSequenceId = endSequenceId,
+					sequenceIds = sequenceIds,
+					turnState = turnState
+				})
+			end
 		end
 
 		turnState = nil
@@ -268,19 +291,15 @@ local function parseChatItems(clone, p: string)
 
 			local v4
 
-			if FFlagBuildExperienceChatResourceAttachments then
-				if sessionUpdate == "user_message" then
-					v4 = contentBlocksToResourceAttachments(item.content)
-				else
-					v4 = {}
-					local v5 = contentBlockToResourceAttachment(item.content)
-
-					if v5 ~= nil then
-						table.insert(v4, v5)
-					end
-				end
+			if sessionUpdate == "user_message" then
+				v4 = contentBlocksToResourceAttachments(item.content)
 			else
 				v4 = {}
+				local v5 = contentBlockToResourceAttachment(item.content)
+
+				if v5 ~= nil then
+					table.insert(v4, v5)
+				end
 			end
 
 			appendUserMessage(getMessageId(item), sequenceId, v2, v3, v4) -- inferred equivalent call
@@ -315,7 +334,7 @@ local function parseChatItems(clone, p: string)
 		end
 	end
 
-	flushActiveTurn()
+	flushActiveTurn(FFlagBuildExperienceThoughtStatus and true or nil)
 	return chatItems
 end
 
@@ -332,19 +351,12 @@ local function buildUserMessageItem(data, sessionId: string?)
 		kind = "user_message",
 		id = id,
 		text = data.text,
-		images = 0,
+		images = data.images,
 		resourceAttachments = 0
 	}
-	local images
-
-	if FFlagBuildExperienceChatImageAttachments then
-		images = data.images
-	end
-
-	userMessageItem.images = images
 	local resourceAttachments
 
-	if FFlagBuildExperienceChatResourceAttachments and #data.resourceAttachments > 0 then
+	if #data.resourceAttachments > 0 then
 		resourceAttachments = data.resourceAttachments
 	end
 
@@ -513,10 +525,7 @@ local function parseSessionStream(items, data)
 	local isAwaitingUserMessageEcho = false
 	local pendingUserMessage = data.pendingUserMessage
 	local pendingUserImages = data.pendingUserImages or {}
-
-	local pendingUserResourceAttachments = FFlagBuildExperienceChatResourceAttachments
-		and data.pendingUserResourceAttachments
-		or {}
+	local pendingUserResourceAttachments = data.pendingUserResourceAttachments or {}
 
 	if
 		pendingUserMessage ~= nil and pendingUserMessage ~= ""
@@ -547,27 +556,13 @@ local function parseSessionStream(items, data)
 				id = `{sessionId}{chatTypes.PENDING_USER_MESSAGE_ID_SUFFIX}`
 			end
 
-			local v4 = {
+			table.insert(messages, {
 				kind = "user_message",
 				id = id,
 				text = pendingUserMessage or "",
-				images = nil,
-				resourceAttachments = nil
-			}
-
-			if not FFlagBuildExperienceChatImageAttachments then
-				pendingUserImages = nil
-			end
-
-			v4.images = pendingUserImages
-
-			if not FFlagBuildExperienceChatResourceAttachments then
-				pendingUserResourceAttachments = nil
-			end
-
-			v4.resourceAttachments = pendingUserResourceAttachments
-
-			table.insert(messages, v4)
+				images = pendingUserImages,
+				resourceAttachments = pendingUserResourceAttachments
+			})
 		end
 	end
 

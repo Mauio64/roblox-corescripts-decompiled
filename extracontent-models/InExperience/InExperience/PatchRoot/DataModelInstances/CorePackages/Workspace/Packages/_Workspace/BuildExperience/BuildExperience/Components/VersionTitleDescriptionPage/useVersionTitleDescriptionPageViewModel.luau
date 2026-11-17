@@ -7,6 +7,8 @@ local SignalsReact = require(parent.SignalsReact)
 local PlaceVersionHistory = require(parent.DataHydration.PlaceVersionHistory)
 
 local GetVersionInformationStore = require(BuildExperience.Stores.GetVersionInformationStore)
+local ConfigurationActionTelemetry = require(BuildExperience.Telemetry.ConfigurationActionTelemetry)
+local FFlagBuildExperienceActionOutcomeTelemetry = require(BuildExperience.Flags.FFlagBuildExperienceActionOutcomeTelemetry)
 require(script.Parent.VersionTitleDescriptionPageView)
 
 local DataStatus = DataHydration.DataStatus
@@ -84,6 +86,21 @@ local function useVersionTitleDescriptionPageViewModel(data)
 		end
 
 		versionInformationStore.setDraft(data.placeId, current3, current4)
+
+		if FFlagBuildExperienceActionOutcomeTelemetry then
+			ConfigurationActionTelemetry.sendSuccess(
+				ConfigurationActionTelemetry.Action.VersionDetailsSave,
+				{ placeId = data.placeId },
+				nil,
+				{
+					changedFields = ConfigurationActionTelemetry.getChangedFields(
+						current3 ~= ref.current,
+						current4 ~= ref2.current
+					)
+				}
+			)
+		end
+
 		ref.current = current3
 		ref2.current = current4
 	end, { descriptionText, state, data.placeId, titleText, versionInformationStore })

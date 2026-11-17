@@ -33,8 +33,12 @@ local MomentContext = require(script.Parent.Parent.MomentContext)
 
 local getExperienceDetailsSheetStore = require(Moments.ExperienceDetailsSheet.Sheet.getExperienceDetailsSheetStore)
 local JoinButton = require(Moments.ExperienceDetailsSheet.Join.JoinButton)
+local PostStatusRowContainer = require(Moments.Components.PostFeedback.PostStatusRow.PostStatusRowContainer)
+local usePendingMomentRecord = require(Moments.Components.PostFeedback.usePendingMomentRecord)
 local SharedFlags = require(parent.SharedFlags)
 local FFlagMomentsServeEDPVideos = SharedFlags.FFlagMomentsServeEDPVideos
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagMomentsPostFeedback = SharedFlags2.FFlagMomentsPostFeedback
 
 local defineFastFlag = game:DefineFastFlag("MomentsFixExperienceHandleVerifiedSpacing", false)
 
@@ -42,6 +46,7 @@ local FFlagMomentsFixRecommendationImpressionLifecycle = require(Moments.Flags.F
 local FFlagMomentsUpdateExperienceActionLabelText = require(Moments.Flags.FFlagMomentsUpdateExperienceActionLabelText)
 local FFlagMomentsJoinImpression = require(Moments.Flags.FFlagMomentsJoinImpression)
 local FFlagMomentsFollowingFeed = require(Moments.Flags.FFlagMomentsFollowingFeed)
+local FFlagMomentsRecommendationFeedType = require(Moments.Flags.FFlagMomentsRecommendationFeedType)
 local VerifiedBadge
 
 if defineFastFlag then
@@ -100,7 +105,11 @@ local function CallToActionBar(p)
 	local v12 = useScaledValue(160)
 	local v13
 
-	if FFlagMomentsFixRecommendationImpressionLifecycle or FFlagMomentsFollowingFeed then
+	if
+		FFlagMomentsFixRecommendationImpressionLifecycle
+		or FFlagMomentsFollowingFeed
+		or FFlagMomentsRecommendationFeedType
+	then
 		v13 = FeedContext.useFeedOptional()
 	else
 		v13 = nil
@@ -108,10 +117,16 @@ local function CallToActionBar(p)
 
 	local recommendationSource
 
-	if FFlagMomentsFollowingFeed and v13 ~= nil then
+	if (FFlagMomentsFollowingFeed or FFlagMomentsRecommendationFeedType) and v13 ~= nil then
 		recommendationSource = v13.recommendationSource
 	else
 		recommendationSource = nil
+	end
+
+	local v14
+
+	if FFlagMomentsPostFeedback then
+		v14 = usePendingMomentRecord(data.momentId)
 	end
 
 	local image
@@ -124,6 +139,13 @@ local function CallToActionBar(p)
 		image = getRbxThumb(Foundation.Enums.ThumbnailType.Asset, placeId)
 	else
 		image = getRbxThumb(Foundation.Enums.ThumbnailType.GameIcon, universeId)
+	end
+
+	if v14 ~= nil and data.kind == "experience" and data.isPending then
+		return React.createElement(PostStatusRowContainer, {
+			momentId = data.momentId,
+			LayoutOrder = p.LayoutOrder
+		})
 	end
 
 	if not v5 and placeId == 0 and not v11 then
@@ -154,12 +176,12 @@ local function CallToActionBar(p)
 		end
 	end
 
-	local v14
+	local v15
 
 	if v5 then
-		v14 = not (advertiser == nil) and advertiser.isVerified
+		v15 = not (advertiser == nil) and advertiser.isVerified
 	else
-		v14 = v10.isCreatorVerified == true
+		v15 = v10.isCreatorVerified == true
 	end
 
 	local text3
@@ -170,7 +192,7 @@ local function CallToActionBar(p)
 		text3 = v3.join
 	end
 
-	if not defineFastFlag and text2 and v14 then
+	if not defineFastFlag and text2 and v15 then
 		text2 = `{text2} {v2}`
 	end
 
@@ -206,7 +228,7 @@ local function CallToActionBar(p)
 	if defineFastFlag and text2 then
 		local createElement2 = React.createElement
 
-		local v15 = {
+		local v16 = {
 			Handle = React.createElement(Text, {
 				LayoutOrder = 1,
 				tag = "shrink auto-xy text-body-medium text-align-x-left text-align-y-center text-truncate-end content-default",
@@ -216,7 +238,7 @@ local function CallToActionBar(p)
 		}
 		local verifiedBadge
 
-		if v14 then
+		if v15 then
 			verifiedBadge = React.createElement(VerifiedBadge, {
 				LayoutOrder = 2,
 				size = IconSize.XSmall,
@@ -224,7 +246,7 @@ local function CallToActionBar(p)
 			})
 		end
 
-		v15.VerifiedBadge = verifiedBadge
+		v16.VerifiedBadge = verifiedBadge
 		subtitle = createElement2(
 			View,
 			{
@@ -232,7 +254,7 @@ local function CallToActionBar(p)
 				tag = "row align-x-left align-y-center gap-xsmall size-full-0 auto-y",
 				testId = "moments-experience-handle"
 			},
-			v15
+			v16
 		)
 	elseif text2 then
 		subtitle = React.createElement(Text, {
@@ -254,7 +276,7 @@ local function CallToActionBar(p)
 		testId = "moments-experience-row",
 		onActivated = not v5 and not v7 and (not FFlagMomentsServeEDPVideos or placeId ~= 0) and function()
 			local open = getExperienceDetailsSheetStore(false).open
-			local v15 = {
+			local v16 = {
 				placeId = placeId,
 				universeId = universeId,
 				feedItemId = data.feedItemId,
@@ -269,8 +291,8 @@ local function CallToActionBar(p)
 				onBeforeJoin = v13.flushView
 			end
 
-			v15.onBeforeJoin = onBeforeJoin
-			open(v15)
+			v16.onBeforeJoin = onBeforeJoin
+			open(v16)
 		end or nil,
 		stateLayer = not v5 and not v7 and (not FFlagMomentsServeEDPVideos or placeId ~= 0) and {
 			affordance = Foundation.Enums.StateLayerAffordance.None
@@ -279,7 +301,7 @@ local function CallToActionBar(p)
 	}, { Thumbnail = element, Metadata = element2 })
 
 	local createElement2 = React.createElement
-	local v15 = {
+	local v16 = {
 		LayoutOrder = p.LayoutOrder,
 		tag = "row align-x-left align-y-center gap-medium size-full-0 auto-y"
 	}
@@ -313,7 +335,7 @@ local function CallToActionBar(p)
 		end
 	end
 
-	return createElement2(View, v15, { MediaAndMetadata = element3, CtaButton = ctaButton })
+	return createElement2(View, v16, { MediaAndMetadata = element3, CtaButton = ctaButton })
 end
 
 return React.memo(CallToActionBar)

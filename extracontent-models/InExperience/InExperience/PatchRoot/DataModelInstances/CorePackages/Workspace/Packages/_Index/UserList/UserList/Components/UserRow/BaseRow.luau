@@ -12,7 +12,6 @@ local TextKeys = require(UserList.Common.TextKeys)
 local Localization = require(parent.Localization)
 local useLocalization = Localization.Hooks.useLocalization
 
-local defineFastFlag = game:DefineFastFlag("UserListUseActionAddTranslation", false)
 local SharedFlags = require(parent.SharedFlags)
 local FFlagFriendsPageViewBtnEnabled = SharedFlags.FFlagFriendsPageViewBtnEnabled
 local SharedFlags2 = require(parent.SharedFlags)
@@ -20,11 +19,9 @@ local FFlagEnableBlackbirdCheck = SharedFlags2.FFlagEnableBlackbirdCheck
 local SharedFlags3 = require(parent.SharedFlags)
 local FFlagUserListCtaIntegrationEnabled = SharedFlags3.FFlagUserListCtaIntegrationEnabled
 local SharedFlags4 = require(parent.SharedFlags)
-local FFlagAddStatusIndicatorToBaseRow = SharedFlags4.FFlagAddStatusIndicatorToBaseRow
+local FFlagUserListSurfaceExtensions = SharedFlags4.FFlagUserListSurfaceExtensions
 local SharedFlags5 = require(parent.SharedFlags)
-local FFlagUserListSurfaceExtensions = SharedFlags5.FFlagUserListSurfaceExtensions
-local SharedFlags6 = require(parent.SharedFlags)
-local FFlagUserListInviteCta = SharedFlags6.FFlagUserListInviteCta
+local FFlagUserListInviteCta = SharedFlags5.FFlagUserListInviteCta
 
 local View = Foundation.View
 local Button = Foundation.Button
@@ -49,45 +46,42 @@ local v = {
 local function BaseRow(props)
 	local v2 = useTokens()
 	local v3 = FFlagUserListSurfaceExtensions and props.disableRowActivation == true
-	local v4
 
-	if defineFastFlag then
-		local v5 = {
-			["Accept"] = TextKeys.Accept,
-			Add = TextKeys.Add,
-			Chat = TextKeys.Chat,
-			Join = TextKeys.Join,
-			Pending = TextKeys.Pending
-		}
-		local invite = Enums.ButtonTypes.Invite
-		local v6
+	local v4 = {
+		["Accept"] = TextKeys.Accept,
+		Add = TextKeys.Add,
+		Chat = TextKeys.Chat,
+		Join = TextKeys.Join,
+		Pending = TextKeys.Pending
+	}
+	local invite = Enums.ButtonTypes.Invite
+	local v5
 
-		if FFlagUserListInviteCta then
-			v6 = TextKeys.Invite
-		end
-
-		v5[invite] = v6
-		local invited = Enums.ButtonTypes.Invited
-		local v7
-
-		if FFlagUserListInviteCta then
-			v7 = TextKeys.Invited
-		end
-
-		v5[invited] = v7
-		local view = Enums.ButtonTypes.View
-		local v8
-
-		if FFlagFriendsPageViewBtnEnabled or FFlagUserListCtaIntegrationEnabled then
-			v8 = TextKeys.View
-		end
-
-		v5[view] = v8
-		v4 = useLocalization(v5)
+	if FFlagUserListInviteCta then
+		v5 = TextKeys.Invite
 	end
 
+	v4[invite] = v5
+	local invited = Enums.ButtonTypes.Invited
+	local v6
+
+	if FFlagUserListInviteCta then
+		v6 = TextKeys.Invited
+	end
+
+	v4[invited] = v6
+	local view = Enums.ButtonTypes.View
+	local v7
+
+	if FFlagFriendsPageViewBtnEnabled or FFlagUserListCtaIntegrationEnabled then
+		v7 = TextKeys.View
+	end
+
+	v4[view] = v7
+	local v8 = useLocalization(v4)
+
 	local createElement = React.createElement
-	local v5 = {
+	local v9 = {
 		LayoutOrder = props.layoutOrder,
 		tag = {
 			["size-full-0 auto-y align-y-center"] = true,
@@ -97,7 +91,7 @@ local function BaseRow(props)
 	}
 
 	local createElement2 = React.createElement
-	local v6 = {
+	local v10 = {
 		tag = {
 			fill = props.layoutMode == Enums.RowLayoutMode.Wide,
 			["size-full-0 auto-y"] = props.layoutMode == Enums.RowLayoutMode.Compact
@@ -111,10 +105,10 @@ local function BaseRow(props)
 		size = UDim2.new(0, 0, 0, Constants.USER_ROW_HEIGHT)
 	end
 
-	v6.Size = size
+	v10.Size = size
 
 	local createElement3 = React.createElement
-	local v7 = {
+	local v11 = {
 		userId = props.userId or "",
 		avatarThumbnailUrl = props.avatarThumbnailUrl,
 		userPresenceType = props.userPresenceType or Foundation.Enums.UserPresence.None,
@@ -137,36 +131,36 @@ local function BaseRow(props)
 		onActivated = props.onActivated
 	end
 
-	v7.onActivated = onActivated
-	v7.selectable = not v3 and (props.selectable == nil or props.selectable)
+	v11.onActivated = onActivated
+	v11.selectable = not v3 and (props.selectable == nil or props.selectable)
 
-	v7.isTitleLoading = props.isTitleLoading
-	v7.isSubtitleLoading = props.isSubtitleLoading
-	v7.contextualInfo = props.contextualInfo and props.contextualInfo.text
-	v7.isContextualInfoLoading = props.isContextualInfoLoading
+	v11.isTitleLoading = props.isTitleLoading
+	v11.isSubtitleLoading = props.isSubtitleLoading
+	v11.contextualInfo = props.contextualInfo and props.contextualInfo.text
+	v11.isContextualInfoLoading = props.isContextualInfoLoading
 	local avatarSize
 
 	if props.layoutMode == Enums.RowLayoutMode.Compact then
 		avatarSize = UDim2.new(0, v2.Size.Size_1400, 0, v2.Size.Size_1400)
 	end
 
-	v7.avatarSize = avatarSize
+	v11.avatarSize = avatarSize
 
-	v7.trustedConnectionIndicatorEnabled = props.trustedConnectionIndicatorEnabled
+	v11.trustedConnectionIndicatorEnabled = props.trustedConnectionIndicatorEnabled
 	local isRobloxSubscriber
 
 	if FFlagEnableBlackbirdCheck then
 		isRobloxSubscriber = props.isRobloxSubscriber
 	end
 
-	v7.isRobloxSubscriber = isRobloxSubscriber
+	v11.isRobloxSubscriber = isRobloxSubscriber
 	local children = {
-		UserTileContainer = createElement2(View, v6, { UserTile = createElement3(userTile, v7) }),
+		UserTileContainer = createElement2(View, v10, { UserTile = createElement3(userTile, v11) }),
 		TrailingSection = 0
 	}
 
 	local createElement4 = React.createElement
-	local v8 = {
+	local v12 = {
 		tag = {
 			["gap-xsmall"] = true,
 			["row align-y-center auto-xy"] = props.layoutMode == Enums.RowLayoutMode.Wide,
@@ -181,10 +175,10 @@ local function BaseRow(props)
 		selectionGroup = v
 	end
 
-	v8.selectionGroup = selectionGroup
+	v12.selectionGroup = selectionGroup
 	local statusIndicatorContainer
 
-	if FFlagAddStatusIndicatorToBaseRow and props.shouldShowNewIndicator then
+	if props.shouldShowNewIndicator then
 		statusIndicatorContainer = React.createElement(View, {
 			LayoutOrder = 1,
 			tag = "auto-xy padding-right-small"
@@ -200,11 +194,6 @@ local function BaseRow(props)
 	if props.primaryCta and props.primaryCta.onActivated then
 		if props.layoutMode == Enums.RowLayoutMode.Wide then
 			local createElement5 = React.createElement
-			local v9 = {
-				LayoutOrder = FFlagAddStatusIndicatorToBaseRow and 2 or 1,
-				tag = "auto-xy",
-				sizeConstraint = 0
-			}
 			local minSize
 
 			if props.primaryCta.minWidth then
@@ -217,19 +206,9 @@ local function BaseRow(props)
 				maxSize = Vector2.new(props.primaryCta.maxWidth, 1e999)
 			end
 
-			v9.sizeConstraint = { MinSize = minSize, MaxSize = maxSize }
-
 			local createElement6 = React.createElement
-			local text
-
-			if defineFastFlag then
-				text = v4[props.primaryCta.type]
-			else
-				text = props.primaryCta.type
-			end
-
-			local v10 = {
-				text = text,
+			local v13 = {
+				text = v8[props.primaryCta.type],
 				size = InputSize.Small,
 				variant = 0,
 				onActivated = 0,
@@ -245,31 +224,27 @@ local function BaseRow(props)
 				variant = ButtonVariant.SoftEmphasis
 			end
 
-			v10.variant = variant
+			v13.variant = variant
 
-			v10.onActivated = props.primaryCta.onActivated
-			v10.isDisabled = props.primaryCta.isDisabled
-			v10.isLoading = props.primaryCta.isLoading
-			v10.fillBehavior = FillBehavior.Fill
-			primaryActionCta = createElement5(View, v9, { Button = createElement6(Button, v10) })
+			v13.onActivated = props.primaryCta.onActivated
+			v13.isDisabled = props.primaryCta.isDisabled
+			v13.isLoading = props.primaryCta.isLoading
+			v13.fillBehavior = FillBehavior.Fill
+			primaryActionCta = createElement5(View, {
+				LayoutOrder = 2,
+				tag = "auto-xy",
+				sizeConstraint = { MinSize = minSize, MaxSize = maxSize }
+			}, { Button = createElement6(Button, v13) })
 		else
 			local createElement5 = React.createElement
-			local text
-
-			if defineFastFlag then
-				text = v4[props.primaryCta.type]
-			else
-				text = props.primaryCta.type
-			end
-
-			local v9 = {
-				text = text,
+			local v13 = {
+				text = v8[props.primaryCta.type],
 				size = InputSize.Small,
 				variant = 0,
 				onActivated = 0,
 				isDisabled = 0,
 				isLoading = 0,
-				LayoutOrder = 0,
+				LayoutOrder = 2,
 				width = 0
 			}
 			local variant
@@ -280,24 +255,23 @@ local function BaseRow(props)
 				variant = ButtonVariant.SoftEmphasis
 			end
 
-			v9.variant = variant
+			v13.variant = variant
 
-			v9.onActivated = props.primaryCta.onActivated
-			v9.isDisabled = props.primaryCta.isDisabled
-			v9.isLoading = props.primaryCta.isLoading
-			v9.LayoutOrder = FFlagAddStatusIndicatorToBaseRow and 2 or 1
+			v13.onActivated = props.primaryCta.onActivated
+			v13.isDisabled = props.primaryCta.isDisabled
+			v13.isLoading = props.primaryCta.isLoading
 			local width
 
 			if props.layoutMode == Enums.RowLayoutMode.Compact then
 				width = UDim.new(1, 0)
 			end
 
-			v9.width = width
-			primaryActionCta = createElement5(Button, v9)
+			v13.width = width
+			primaryActionCta = createElement5(Button, v13)
 		end
 	elseif FFlagUserListCtaIntegrationEnabled and props.ctaLoading and props.layoutMode == Enums.RowLayoutMode.Wide then
 		primaryActionCta = React.createElement(Skeleton, {
-			LayoutOrder = FFlagAddStatusIndicatorToBaseRow and 2 or 1,
+			LayoutOrder = 2,
 			Size = UDim2.fromOffset(props.ctaLoading.minWidth or 0, v2.Size.Size_800),
 			radius = Radius.Medium
 		})
@@ -318,26 +292,25 @@ local function BaseRow(props)
 			onActivated = props.secondaryCta.onActivated,
 			isDisabled = props.secondaryCta.isDisabled,
 			isLoading = props.secondaryCta.isLoading,
-			LayoutOrder = FFlagAddStatusIndicatorToBaseRow and 3 or 2
+			LayoutOrder = 3
 		})
 	end
 
 	local trailingContentWrapper
 
 	if props.layoutMode == Enums.RowLayoutMode.Wide and props.trailingContent then
-		trailingContentWrapper = React.createElement(View, {
-			tag = "auto-xy",
-			LayoutOrder = FFlagAddStatusIndicatorToBaseRow and 4 or 3
-		}, { Content = props.trailingContent })
+		trailingContentWrapper = React.createElement(View, { tag = "auto-xy", LayoutOrder = 4 }, {
+			Content = props.trailingContent
+		})
 	end
 
-	children.TrailingSection = createElement4(View, v8, {
+	children.TrailingSection = createElement4(View, v12, {
 		StatusIndicatorContainer = statusIndicatorContainer,
 		PrimaryActionCta = primaryActionCta,
 		SecondaryActionCta = secondaryActionCta,
 		TrailingContentWrapper = trailingContentWrapper
 	})
-	return createElement(View, v5, children)
+	return createElement(View, v9, children)
 end
 
 return React.memo(BaseRow)

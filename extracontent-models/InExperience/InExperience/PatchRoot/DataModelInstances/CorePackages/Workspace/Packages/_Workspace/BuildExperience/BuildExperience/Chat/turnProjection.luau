@@ -8,6 +8,12 @@ local FFlagBuildExperienceAnswerForm = require(BuildExperience.Flags.FFlagBuildE
 local turnDisplay = require(script.Parent.turnDisplay)
 local FFlagBuildExperienceManageDevProduct = require(BuildExperience.Flags.FFlagBuildExperienceManageDevProduct)
 local FFlagBuildAgentAdCampaignCard = require(BuildExperience.Flags.FFlagBuildAgentAdCampaignCard)
+local FFlagBuildExperienceToolDisplaySummary = require(BuildExperience.Flags.FFlagBuildExperienceToolDisplaySummary)
+local toolDisplaySummary = require(script.Parent.toolDisplaySummary)
+local getToolDisplaySummary = toolDisplaySummary.getToolDisplaySummary
+local FFlagBuildExperienceThoughtStatus = CreatorAgentChat.FFlagBuildExperienceThoughtStatus
+local thoughtHeading = require(script.Parent.thoughtHeading)
+local getThoughtHeading = thoughtHeading.getThoughtHeading
 
 local PublishToolUtils = CreatorAgentChat.PublishToolUtils
 local adCampaignEligibilityTool
@@ -106,13 +112,23 @@ local function getSortedActivitySlotIndexes(data) -- 1 equivalent call inferred 
 	return sortedActivitySlotIndexes
 end
 
-local function makeTurnActivityItem(data, activitySlot) -- 2 equivalent calls inferred from this helper
+local function makeTurnActivityItem(data, activitySlot)
+	if FFlagBuildExperienceThoughtStatus and activitySlot.kind == "thought" then
+		return { kind = "thought", text = activitySlot.text }
+	end
+
 	if activitySlot.kind ~= "tool_call" then
 		return nil
 	end
 
 	local toolCall = data.toolCalls[activitySlot.toolCallId]
-	local v2 = { kind = "tool_call", toolCallId = activitySlot.toolCallId, title = 0, status = 0 }
+	local v2 = {
+		kind = "tool_call",
+		toolCallId = activitySlot.toolCallId,
+		title = 0,
+		status = 0,
+		displaySummary = 0
+	}
 	local title
 
 	if toolCall then
@@ -127,6 +143,13 @@ local function makeTurnActivityItem(data, activitySlot) -- 2 equivalent calls in
 	end
 
 	v2.status = status
+	local displaySummary
+
+	if FFlagBuildExperienceToolDisplaySummary and toolCall then
+		displaySummary = getToolDisplaySummary(toolCall.title, toolCall.rawInput)
+	end
+
+	v2.displaySummary = displaySummary
 	return v2
 end
 
@@ -145,7 +168,7 @@ local function makeAgentMessageSegment(p: string, text: string, isError: boolean
 end
 
 local function makeCompletedActivitySummary(turnActivityItems, segmentKey: string)
-	if #turnActivityItems == 0 then
+	if #turnActivityItems == 0 or FFlagBuildExperienceThoughtStatus and countToolCalls(turnActivityItems) == 0 then
 		return nil
 	end
 
@@ -160,15 +183,43 @@ local function makeCompletedActivitySummary(turnActivityItems, segmentKey: strin
 	}
 end
 
-local function makeActiveActivitySummary(activityItems, isLoading: boolean, p: string, label: string?, isWaitingForLocalTool: boolean?)
+local function getLatestThoughtHeading(turnActivityItems)
+	for i = #turnActivityItems, 1, -1 do
+		local item = turnActivityItems[i]
+
+		if item.kind == "thought" then
+			return getThoughtHeading(item.text)
+		end
+	end
+
+	return nil
+end
+
+local function makeActiveActivitySummary(activityItems, isLoading: boolean, p: string, p2: string?, isWaitingForLocalTool: boolean?, label: string?)
 	if #activityItems == 0 and not isLoading then
 		return nil
 	end
 
 	local summaryToolActivity
 
-	if label == nil then
+	if p2 == nil then
 		summaryToolActivity = getSummaryToolActivity(activityItems, "active")
+	end
+
+	local v2 = FFlagBuildExperienceToolDisplaySummary
+
+	if v2 then
+		if summaryToolActivity == nil or summaryToolActivity.kind ~= "tool_call" then
+			v2 = false
+		else
+			v2 = summaryToolActivity.displaySummary ~= nil
+		end
+	end
+
+	if FFlagBuildExperienceThoughtStatus and p2 == nil and label ~= nil and not v2 then
+		summaryToolActivity = nil
+	else
+		label = p2
 	end
 
 	if label == nil and summaryToolActivity == nil then
@@ -466,7 +517,17 @@ local function projectWorkSegments(data, turnKey: string, p, flag: boolean)
 		local v4
 
 		if flag and flag2 then
-			v4 = makeActiveActivitySummary(turnActivityItems, true, segmentKey, v2, v3)
+			local activityItems = turnActivityItems
+
+			local v5 = v2
+			local isWaitingForLocalTool = v3
+			local v6
+
+			if FFlagBuildExperienceThoughtStatus then
+				v6 = getLatestThoughtHeading(turnActivityItems)
+			end
+
+			v4 = makeActiveActivitySummary(activityItems, true, segmentKey, v5, isWaitingForLocalTool, v6)
 		else
 			v4 = makeCompletedActivitySummary(turnActivityItems, segmentKey)
 		end
@@ -480,9 +541,45 @@ local function projectWorkSegments(data, turnKey: string, p, flag: boolean)
 		v3 = false
 	end
 
+	local v4 = contentBlocksToText(data.pendingAgentMessageContent)
+	local v5 = false
+	local function emitPendingAgentMessage()
+		v5 = true
+
+		if v4 == "" then
+			return
+		end
+
+		flushActivity(false, data.pendingAgentMessageSequenceIndex)
+		local v6
+
+		if data.pendingAgentMessageSequenceIndex == nil then
+			v6 = makeSegmentKey(turnKey, "pending-agent-message")
+		else
+			v6 = makeSegmentKey(turnKey, "agent-message", data.pendingAgentMessageSequenceIndex)
+		end
+
+		local agentMessageSegment = makeAgentMessageSegment(v6, v4) -- inferred equivalent call
+
+		if agentMessageSegment ~= nil then
+			table.insert(result, agentMessageSegment)
+		end
+	end
+
 	local sortedActivitySlotIndexes = getSortedActivitySlotIndexes(data) -- inferred equivalent call
 
 	for _, sortedActivitySlotIndex in sortedActivitySlotIndexes do
+		local pendingAgentMessageSequenceIndex = data.pendingAgentMessageSequenceIndex
+
+		if
+			FFlagBuildExperienceThoughtStatus
+			and not v5
+			and pendingAgentMessageSequenceIndex ~= nil
+			and pendingAgentMessageSequenceIndex < sortedActivitySlotIndex
+		then
+			emitPendingAgentMessage()
+		end
+
 		local activitySlot = data.activitySlots[sortedActivitySlotIndex]
 
 		if activitySlot.kind == "agent_message" then
@@ -496,8 +593,14 @@ local function projectWorkSegments(data, turnKey: string, p, flag: boolean)
 			if agentMessageSegment ~= nil then
 				table.insert(result, agentMessageSegment)
 			end
+		elseif FFlagBuildExperienceThoughtStatus and activitySlot.kind == "thought" then
+			local turnActivityItem = makeTurnActivityItem(data, activitySlot)
+
+			if turnActivityItem ~= nil then
+				table.insert(turnActivityItems, turnActivityItem)
+			end
 		elseif activitySlot.kind == "tool_call" then
-			local v4 = projectLocalToolSegments(
+			local v6 = projectLocalToolSegments(
 				data,
 				turnKey,
 				activitySlot.toolCallId,
@@ -506,19 +609,19 @@ local function projectWorkSegments(data, turnKey: string, p, flag: boolean)
 				p
 			)
 
-			if #v4 > 0 then
+			if #v6 > 0 then
 				flushActivity(false, sortedActivitySlotIndex)
 
-				for _, v5 in v4 do
-					table.insert(result, v5)
+				for _, v7 in v6 do
+					table.insert(result, v7)
 
-					if v5.isActive then
+					if v7.isActive then
 						v3 = true
 					end
 				end
 
 				if flag then
-					local turnActivityItem = makeTurnActivityItem(data, activitySlot) -- inferred equivalent call
+					local turnActivityItem = makeTurnActivityItem(data, activitySlot)
 
 					if turnActivityItem ~= nil then
 						table.insert(turnActivityItems, turnActivityItem)
@@ -527,7 +630,7 @@ local function projectWorkSegments(data, turnKey: string, p, flag: boolean)
 					v2 = getActiveAskUserActivityLabel(data, activitySlot.toolCallId, p)
 				end
 			else
-				local turnActivityItem = makeTurnActivityItem(data, activitySlot) -- inferred equivalent call
+				local turnActivityItem = makeTurnActivityItem(data, activitySlot)
 
 				if turnActivityItem ~= nil then
 					table.insert(turnActivityItems, turnActivityItem)
@@ -536,23 +639,8 @@ local function projectWorkSegments(data, turnKey: string, p, flag: boolean)
 		end
 	end
 
-	local v4 = contentBlocksToText(data.pendingAgentMessageContent)
-
-	if v4 ~= "" then
-		flushActivity(false, data.pendingAgentMessageSequenceIndex)
-		local v5
-
-		if data.pendingAgentMessageSequenceIndex == nil then
-			v5 = makeSegmentKey(turnKey, "pending-agent-message")
-		else
-			v5 = makeSegmentKey(turnKey, "agent-message", data.pendingAgentMessageSequenceIndex)
-		end
-
-		local agentMessageSegment = makeAgentMessageSegment(v5, v4) -- inferred equivalent call
-
-		if agentMessageSegment ~= nil then
-			table.insert(result, agentMessageSegment)
-		end
+	if not (FFlagBuildExperienceThoughtStatus and v5) then
+		emitPendingAgentMessage()
 	end
 
 	flushActivity(true, nil)

@@ -31,10 +31,12 @@ local function useSwipeLatency(data)
 	ref.current = data.onMeasurement or fireSwipeLatency
 
 	local v2 = React.useMemo(function()
+		local now = data.now or function()
+			return os.clock() * 1000
+		end
+
 		return swipeLatencyMachine({
-			now = data.now or function()
-				return os.clock() * 1000
-			end,
+			now = now,
 			capMs = data.capMs or defineFastInt,
 			onMeasurement = function(p, p2, p3)
 				ref.current(p, p2, p3)

@@ -85,7 +85,10 @@ local cameraZoomRadius = {
 		LipMakeup = game:DefineFastInt("AXLipMakeupZoomRadius", 7),
 		EyeMakeup = game:DefineFastInt("AXEyeMakeupZoomRadius", 7)
 	},
-	Special = { HeadRefinement = 7 }
+	Special = {
+		HeadRefinement = 7,
+		PhotoboothMoments = game:DefineFastInt("AXPhotoboothMomentsZoomRadius", 17)
+	}
 }
 
 local inventoryTypeIdToInventoryOutfitType = {

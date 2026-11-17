@@ -5,7 +5,6 @@ local React = require(parent.React)
 local UIBlox = require(parent.UIBlox)
 local Foundation = require(parent.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local useStyle = UIBlox.Core.Style.useStyle
 
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
@@ -67,95 +66,50 @@ return (React.memo(function(p)
 		local baseSize = v.Font.BaseSize
 		local textSize = math.floor(header2.RelativeSize * baseSize)
 		local textSize2 = math.floor(body.RelativeSize * baseSize)
-		local createElement = React.createElement
-		local v4 = {
-			BackgroundTransparency = 1,
-			AutomaticSize = Enum.AutomaticSize.Y,
-			Size = UDim2.new(1, 0, 0, 0)
-		}
-		local children = {
-			Layout = React.createElement("UIListLayout", {
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				Padding = UDim.new(0, 10),
-				FillDirection = Enum.FillDirection.Vertical,
-				HorizontalAlignment = Enum.HorizontalAlignment.Left
-			}),
-			Header = 0,
-			Hint = 0
-		}
-
-		local createElement2 = React.createElement
-		local v5 = {
-			BackgroundTransparency = 1,
-			Text = text,
-			TextWrapped = true,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			TextYAlignment = Enum.TextYAlignment.Top,
-			TextColor3 = v.Theme.TextEmphasis.Color,
-			TextTransparency = v.Theme.TextEmphasis.Transparency,
-			Font = 0,
-			FontFace = 0,
-			TextSize = 0,
-			Size = 0,
-			AutomaticSize = 0,
-			LayoutOrder = 1
-		}
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = header2.Font
-		end
-
-		v5.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(v.Tokens.Typography.TitleLarge.Font)
-		end
-
-		v5.FontFace = fontFace
-
-		v5.TextSize = textSize
-		v5.Size = UDim2.new(1, 0, 0, 0)
-		v5.AutomaticSize = Enum.AutomaticSize.Y
-		children.Header = createElement2("TextLabel", v5)
-
-		local createElement3 = React.createElement
-		local v6 = {
-			BackgroundTransparency = 1,
-			Text = text2,
-			TextWrapped = true,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			TextYAlignment = Enum.TextYAlignment.Top,
-			TextColor3 = v.Theme.TextMuted.Color,
-			TextTransparency = v.Theme.TextMuted.Transparency,
-			Font = 0,
-			FontFace = 0,
-			TextSize = 0,
-			Size = 0,
-			AutomaticSize = 0,
-			LayoutOrder = 2
-		}
-		local font2
-
-		if not FoundationFontFaceMigration then
-			font2 = body.Font
-		end
-
-		v6.Font = font2
-		local fontFace2
-
-		if FoundationFontFaceMigration then
-			fontFace2 = normalizeFontFace(v.Tokens.Typography.BodyLarge.Font)
-		end
-
-		v6.FontFace = fontFace2
-
-		v6.TextSize = textSize2
-		v6.Size = UDim2.new(1, 0, 0, 0)
-		v6.AutomaticSize = Enum.AutomaticSize.Y
-		children.Hint = createElement3("TextLabel", v6)
-		return createElement("Frame", v4, children)
+		return React.createElement(
+			"Frame",
+			{
+				BackgroundTransparency = 1,
+				AutomaticSize = Enum.AutomaticSize.Y,
+				Size = UDim2.new(1, 0, 0, 0)
+			},
+			{
+				Layout = React.createElement("UIListLayout", {
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					Padding = UDim.new(0, 10),
+					FillDirection = Enum.FillDirection.Vertical,
+					HorizontalAlignment = Enum.HorizontalAlignment.Left
+				}),
+				Header = React.createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					Text = text,
+					TextWrapped = true,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextYAlignment = Enum.TextYAlignment.Top,
+					TextColor3 = v.Theme.TextEmphasis.Color,
+					TextTransparency = v.Theme.TextEmphasis.Transparency,
+					FontFace = normalizeFontFace(v.Tokens.Typography.TitleLarge.Font),
+					TextSize = textSize,
+					Size = UDim2.new(1, 0, 0, 0),
+					AutomaticSize = Enum.AutomaticSize.Y,
+					LayoutOrder = 1
+				}),
+				Hint = React.createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					Text = text2,
+					TextWrapped = true,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextYAlignment = Enum.TextYAlignment.Top,
+					TextColor3 = v.Theme.TextMuted.Color,
+					TextTransparency = v.Theme.TextMuted.Transparency,
+					FontFace = normalizeFontFace(v.Tokens.Typography.BodyLarge.Font),
+					TextSize = textSize2,
+					Size = UDim2.new(1, 0, 0, 0),
+					AutomaticSize = Enum.AutomaticSize.Y,
+					LayoutOrder = 2
+				})
+			}
+		)
 	end, { v, text, text2 })
 
 	local v4 = React.useCallback(function()

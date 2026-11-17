@@ -18,6 +18,10 @@ local TextChatServiceBridge = require(script.Parent.TextChatServiceBridge)
 local useWelcomeSystemMessage = require(script.Parent.useWelcomeSystemMessage)
 local useSummarySystemMessage = require(script.Parent.useSummarySystemMessage)
 local thirdPartySummaryEligibility = require(script.Parent.thirdPartySummaryEligibility)
+local SocialExperiments = require(parent.SocialExperiments)
+local ExpChatMessageHistoryExperimentation = SocialExperiments.ExpChatMessageHistoryExperimentation
+
+local FFlagExpChatTextChannelWindowHistoryReplay = require(script.Parent.Flags.FFlagExpChatTextChannelWindowHistoryReplay)
 
 local TextChatService = game:GetService("TextChatService")
 local useLocalUserChatAvailability = ChatAvailabilityContext.useLocalUserChatAvailability
@@ -176,22 +180,40 @@ return {
 
 		local userId = tostring(localPlayer.UserId)
 
-		local channelMessagesStore = createChannelMessagesStore()
-		local v4 = thirdPartySummaryEligibility.create(userId)
+		local function canLocalUserChat() -- 4 equivalent calls inferred from this helper
+			return ChatAvailabilityContext.resolve(localPlayer.ChatAvailabilityStatus).canChat
+		end
+
+		local v4
+
+		if FFlagExpChatTextChannelWindowHistoryReplay then
+			v4 = createChannelMessagesStore({
+				getHistoryArm = function()
+					return ExpChatMessageHistoryExperimentation.getHistoryArm(canLocalUserChat()) -- inferred equivalent call
+				end,
+				logHistoryExposure = function()
+					ExpChatMessageHistoryExperimentation.logExposure(canLocalUserChat()) -- inferred equivalent call
+				end
+			})
+		else
+			v4 = createChannelMessagesStore()
+		end
+
+		local v5 = thirdPartySummaryEligibility.create(userId)
 
 		local function flushWindowStatus(p)
 			if not TextChannelWindowAnalytics.getFFlagExpChatTelemetryEnabled() then
 				return
 			end
 
-			local v5 = v2[p]
+			local v6 = v2[p]
 
-			if v5 then
-				local v6 = os.clock() - v5.lastChangeTime
-				local v7 = v5.openDuration + (not v5.isOpen and 0 or v6)
+			if v6 then
+				local v7 = os.clock() - v6.lastChangeTime
+				local v8 = v6.openDuration + (not v6.isOpen and 0 or v7)
 				TextChatService:SendExpChatWindowStatusChange(
-					v5.closedDuration + (v5.isOpen and 0 or v6),
-					v7,
+					v6.closedDuration + (v6.isOpen and 0 or v7),
+					v8,
 					0,
 					0,
 					"text_channel_window",
@@ -203,9 +225,9 @@ return {
 		end
 
 		local function onRemoved(props) -- 1 equivalent call inferred from this helper
-			local v5 = v[props]
+			local v6 = v[props]
 
-			if v5 then
+			if v6 then
 				local target = props.Target
 				local name
 
@@ -218,7 +240,7 @@ return {
 				end
 
 				flushWindowStatus(props)
-				v5()
+				v6()
 				v[props] = nil
 			end
 		end
@@ -228,7 +250,7 @@ return {
 				local target = props.Target
 
 				if target and target:IsA("TextChannel") then
-					channelMessagesStore.upsertMessage(target, p)
+					v4.upsertMessage(target, p)
 				end
 			end
 
@@ -236,7 +258,7 @@ return {
 				local target = props.Target
 
 				if target and target:IsA("TextChannel") then
-					channelMessagesStore.removeMessage(target, p)
+					v4.removeMessage(target, p)
 				end
 			end
 
@@ -258,8 +280,8 @@ return {
 								root = React.createElement(TextChannelWindowRoot, {
 									localUserId = userId,
 									textChannelWindow = props,
-									getChannelMessages = channelMessagesStore.getMessagesForChannel,
-									getIsEligibleForSummary = v4.getIsEligible,
+									getChannelMessages = v4.getMessagesForChannel,
+									getIsEligibleForSummary = v5.getIsEligible,
 									loadStartTime = loadStartTime
 								})
 							}
@@ -270,10 +292,10 @@ return {
 
 			TextChannelWindowPerfTracker.startMountTTI(getWindowName(props)) -- inferred equivalent call
 
-			local v5 = mountToTargetInstance(props, element)
+			local v6 = mountToTargetInstance(props, element)
 
-			if v5 then
-				v[props] = v5
+			if v6 then
+				v[props] = v6
 				local targetName = getTargetName(props) -- inferred equivalent call
 				TextChannelWindowAnalytics.emit(TextChannelWindowAnalytics.Counters.Mount, {
 					result = "success",
@@ -290,24 +312,26 @@ return {
 			end
 
 			if TextChannelWindowAnalytics.getFFlagExpChatTelemetryEnabled() then
+				local isRendering = props.IsRendering == true
 				v2[props] = {
-					isOpen = props.IsRendering == true,
+					isOpen = isRendering,
 					lastChangeTime = os.clock(),
 					openDuration = 0,
 					closedDuration = 0
 				}
 
 				props:GetPropertyChangedSignal("IsRendering"):Connect(function()
-					local v6 = v2[props]
+					local v7 = v2[props]
 
-					if v6 then
+					if v7 then
 						local now = os.clock()
-						local v7 = now - v6.lastChangeTime
+						local v8 = now - v7.lastChangeTime
+						local isRendering2 = props.IsRendering == true
 						v2[props] = {
-							isOpen = props.IsRendering == true,
+							isOpen = isRendering2,
 							lastChangeTime = now,
-							openDuration = v6.openDuration + (not v6.isOpen and 0 or v7),
-							closedDuration = v6.closedDuration + (v6.isOpen and 0 or v7)
+							openDuration = v7.openDuration + (not v7.isOpen and 0 or v8),
+							closedDuration = v7.closedDuration + (v7.isOpen and 0 or v8)
 						}
 					end
 				end)
@@ -327,10 +351,30 @@ return {
 		end
 
 		local TextChatService2 = game:GetService("TextChatService")
-		TextChatServiceBridge(TextChatService2, userId, channelMessagesStore)
 
-		for _, v5 in TextChatService2:GetTextChannelWindows() do
-			onAdded(v5)
+		if FFlagExpChatTextChannelWindowHistoryReplay then
+			TextChatServiceBridge(TextChatService2, userId, v4, {
+				whenCanChat = function(callback)
+					if canLocalUserChat() then -- inferred equivalent call
+						callback()
+						return
+					end
+
+					local chatAvailabilityStatusChangedConnection = nil
+					chatAvailabilityStatusChangedConnection = localPlayer:GetPropertyChangedSignal("ChatAvailabilityStatus"):Connect(function()
+						if canLocalUserChat() then -- inferred equivalent call
+							chatAvailabilityStatusChangedConnection:Disconnect()
+							callback()
+						end
+					end)
+				end
+			})
+		else
+			TextChatServiceBridge(TextChatService2, userId, v4)
+		end
+
+		for _, v6 in TextChatService2:GetTextChannelWindows() do
+			onAdded(v6)
 		end
 
 		TextChatService2.TextChannelWindowAdded:Connect(onAdded)

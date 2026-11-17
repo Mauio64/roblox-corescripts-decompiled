@@ -14,6 +14,7 @@ local TriggerSourceType = require(parent.Enums.TriggerSourceType)
 require(parent.Types)
 
 local fetchCapturesFromGallery = require(parent.Utils.fetchCapturesFromGallery)
+local GetLatestCaptureStore = require(parent.Stores.GetLatestCaptureStore)
 local findMatchingCapture = require(parent.Utils.findMatchingCapture)
 local getCaptureObject = require(parent.Utils.getCaptureObject)
 local pendingCaptureToastAction = require(parent.Utils.pendingCaptureToastAction)
@@ -25,6 +26,9 @@ local FFlagMomentsCreationFeatureGate = SharedFlags.FFlagMomentsCreationFeatureG
 local MomentsCommon = require(parent2.MomentsCommon)
 local GetMomentsCapabilities = MomentsCommon.Stores.GetMomentsCapabilities
 
+local FFlagCapturesControlsGalleryButton = require(parent.Flags.FFlagCapturesControlsGalleryButton)
+
+local FIntCapturesControlsGalleryThumbnailSeconds = require(parent.Flags.FIntCapturesControlsGalleryThumbnailSeconds)
 local FFlagCreateMomentsToast = require(parent.Flags.FFlagCreateMomentsToast)
 local FFlagMomentsCaptureEndIxpEnabled = require(parent.Flags.FFlagMomentsCaptureEndIxpEnabled)
 
@@ -76,6 +80,28 @@ local function makeCaptureSavedHandler(object, _, callback)
 
 		object:dispatch(RetrieveCaptures())
 		waitForFlashOverlay(object)
+
+		if
+			FFlagCapturesControlsGalleryButton
+			and p == TriggerSourceType.UserSave
+			and not object:getState()[Constants.RoduxKey].IsMenuOpen
+		then
+			local latestCaptureStore = GetLatestCaptureStore(false)
+			local captureObject = getCaptureObject(captureInfo)
+			local v2
+
+			if typeof(captureInfo) == "table" then
+				v2 = captureInfo.filePath
+			end
+
+			latestCaptureStore.setLatestCapture(captureObject, v2)
+
+			task.delay(FIntCapturesControlsGalleryThumbnailSeconds, function()
+				if latestCaptureStore.getLatestCapture(false) == captureObject then
+					latestCaptureStore.clearLatestCapture()
+				end
+			end)
+		end
 
 		if FFlagBuildExperienceInGameCaptureToChat and p == TriggerSourceType.UserSave then
 			local toastAction = pendingCaptureToastAction.consume()
@@ -171,9 +197,8 @@ local function makeCaptureSavedHandler(object, _, callback)
 			return
 		end
 
-		if FFlagCreateMomentsToast then
-			captureInfo2 = captureInfo2
-				and (findMatchingCapture(fetchCapturesFromGallery(), captureInfo2) or captureInfo2)
+		if FFlagCreateMomentsToast and captureInfo2 then
+			captureInfo2 = findMatchingCapture(fetchCapturesFromGallery(), captureInfo2) or captureInfo2
 		end
 
 		object:dispatch(ToastTriggered(CapturesToastType.CaptureTakenWithMomentsCTA, {

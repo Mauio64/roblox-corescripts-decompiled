@@ -51,6 +51,7 @@ local createPromptLifecycleTelemetry = require(BuildExperience.Telemetry.createP
 local sendBuildExperienceEvent = require(BuildExperience.Telemetry.sendBuildExperienceEvent)
 local FFlagBuildEventsUpdate1 = require(BuildExperience.Flags.FFlagBuildEventsUpdate1)
 local FFlagBuildExperienceHistoryPollTelemetry = SharedFlags.FFlagBuildExperienceHistoryPollTelemetry
+local FFlagBuildExperienceChatOpenId = require(BuildExperience.Flags.FFlagBuildExperienceChatOpenId)
 
 local StudioAskUserTool = CreatorAgentChat.StudioAskUserTool
 local StudioClientDataModelTools = CreatorAgentChat.StudioClientDataModelTools
@@ -413,6 +414,13 @@ local CreatorAgentChat_2 = {}
 function CreatorAgentChat_2.createLiveAssistantTurn(data, prompt, callback, p, callback2, callback3, callback4, sendConfiguration, expectedSessionId: string?, isCancelled)
 	local localToolControllers = createLocalToolControllers(data, p, callback2)
 	local universeId = data.universeId
+	local chatOpenId
+
+	if FFlagBuildExperienceChatOpenId then
+		chatOpenId = CreatorAgentChat.chatOpenTelemetry.getChatOpenIdForUniverse(universeId)
+	else
+		chatOpenId = nil
+	end
 
 	local localTools = {
 		StudioAskUserTool.LOCAL_TOOL_DEFINITION,
@@ -446,7 +454,8 @@ function CreatorAgentChat_2.createLiveAssistantTurn(data, prompt, callback, p, c
 			return {
 				universeId = universeId,
 				placeId = data.placeId,
-				conversationId = data.getCasSessionId()
+				conversationId = data.getCasSessionId(),
+				chatOpenId = chatOpenId
 			}
 		end)
 	else
@@ -458,6 +467,7 @@ function CreatorAgentChat_2.createLiveAssistantTurn(data, prompt, callback, p, c
 			universeId = universeId,
 			placeId = data.placeId,
 			conversationId = data.getCasSessionId(),
+			chatOpenId = chatOpenId,
 			messageId = messageId
 		}
 		local v10
@@ -483,6 +493,7 @@ function CreatorAgentChat_2.createLiveAssistantTurn(data, prompt, callback, p, c
 				universeId = universeId,
 				placeId = data.placeId,
 				conversationId = data.getCasSessionId(),
+				chatOpenId = chatOpenId,
 				turnId = turnId
 			})
 		end
@@ -498,7 +509,8 @@ function CreatorAgentChat_2.createLiveAssistantTurn(data, prompt, callback, p, c
 			sendBuildExperienceEvent("SEND_PROMPT_RECIEVED", {
 				universeId = universeId,
 				placeId = data.placeId,
-				conversationId = data.getCasSessionId()
+				conversationId = data.getCasSessionId(),
+				chatOpenId = chatOpenId
 			})
 		end
 
@@ -535,7 +547,8 @@ function CreatorAgentChat_2.createLiveAssistantTurn(data, prompt, callback, p, c
 					{
 						universeId = universeId,
 						placeId = data.placeId,
-						conversationId = data.getCasSessionId()
+						conversationId = data.getCasSessionId(),
+						chatOpenId = chatOpenId
 					},
 					agentTurnFailureTelemetryParameters
 				)
@@ -561,7 +574,8 @@ function CreatorAgentChat_2.createLiveAssistantTurn(data, prompt, callback, p, c
 				{
 					universeId = universeId,
 					placeId = data.placeId,
-					conversationId = data.getCasSessionId()
+					conversationId = data.getCasSessionId(),
+					chatOpenId = chatOpenId
 				},
 				promptFailureTelemetryParameters
 			)
@@ -668,6 +682,13 @@ end
 
 function CreatorAgentChat_2.createResumedAssistantTurn(data, p, callback, afterSequenceId: number?, p2, callback2)
 	local localToolControllers = createLocalToolControllers(data, p2, callback2)
+	local chatOpenId
+
+	if FFlagBuildExperienceChatOpenId then
+		chatOpenId = CreatorAgentChat.chatOpenTelemetry.getChatOpenIdForUniverse(data.universeId)
+	else
+		chatOpenId = nil
+	end
 
 	local signal = Signals.createSignal(nil)
 
@@ -708,7 +729,8 @@ function CreatorAgentChat_2.createResumedAssistantTurn(data, p, callback, afterS
 					{
 						universeId = data.universeId,
 						placeId = data.placeId,
-						conversationId = data.getCasSessionId()
+						conversationId = data.getCasSessionId(),
+						chatOpenId = chatOpenId
 					},
 					agentTurnFailureTelemetryParameters
 				)
@@ -769,7 +791,8 @@ function CreatorAgentChat_2.createResumedAssistantTurn(data, p, callback, afterS
 			{
 				universeId = data.universeId,
 				placeId = data.placeId,
-				conversationId = data.getCasSessionId()
+				conversationId = data.getCasSessionId(),
+				chatOpenId = chatOpenId
 			},
 			{ isResumedTurn = "true" }
 		)
@@ -787,6 +810,7 @@ function CreatorAgentChat_2.createResumedAssistantTurn(data, p, callback, afterS
 					universeId = data.universeId,
 					placeId = data.placeId,
 					conversationId = data.getCasSessionId(),
+					chatOpenId = chatOpenId,
 					messageId = messageId
 				}
 				local v12

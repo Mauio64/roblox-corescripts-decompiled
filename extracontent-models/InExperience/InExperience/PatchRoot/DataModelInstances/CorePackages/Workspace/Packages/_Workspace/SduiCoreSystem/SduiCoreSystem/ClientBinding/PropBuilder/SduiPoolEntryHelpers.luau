@@ -20,12 +20,9 @@ local SharedFlags3 = require(parent.SharedFlags)
 local FFlagSduiPerSectionPoolSizing = SharedFlags3.FFlagSduiPerSectionPoolSizing
 
 local SharedFlags4 = require(parent.SharedFlags)
-local FFlagSduiVerticalFeedProgressiveFillOnScroll = SharedFlags4.FFlagSduiVerticalFeedProgressiveFillOnScroll
-
+local FFlagLuaAppEnableOneByTwoTileFunnelTelemetrySdui = SharedFlags4.FFlagLuaAppEnableOneByTwoTileFunnelTelemetrySdui
 local SharedFlags5 = require(parent.SharedFlags)
-local FFlagLuaAppEnableOneByTwoTileFunnelTelemetrySdui = SharedFlags5.FFlagLuaAppEnableOneByTwoTileFunnelTelemetrySdui
-local SharedFlags6 = require(parent.SharedFlags)
-local FFlagSduiSamePoolFeedItemSpacing = SharedFlags6.FFlagSduiSamePoolFeedItemSpacing
+local FFlagSduiSamePoolFeedItemSpacing = SharedFlags5.FFlagSduiSamePoolFeedItemSpacing
 
 local v = FFlagLuaAppEnableOneByTwoTileFunnelTelemetrySdui and {} or nil
 
@@ -459,22 +456,13 @@ function SduiPoolEntryHelpers.createPoolEntryFns(items, p, p2, p3, p4, p5, p6)
 
 			local v3 = {
 				startRowGetter = v2.getSectionStartRow(identifier),
-				numberOfRowsGetter = 0,
-				setDisplayedRowCount = 0,
+				numberOfRowsGetter = v2.getSectionRowCount(identifier),
+				setDisplayedRowCount = FFlagSduiCollectionGridRevealRows and function(p8: number?)
+					v2.setSectionDisplayedRowCount(identifier, p8)
+				end or nil,
 				continuesPreviousSection = 0,
 				_requiresDataBinding = true
 			}
-			local numberOfRowsGetter
-
-			if FFlagSduiVerticalFeedProgressiveFillOnScroll then
-				numberOfRowsGetter = v2.getSectionRowCount(identifier)
-			end
-
-			v3.numberOfRowsGetter = numberOfRowsGetter
-
-			v3.setDisplayedRowCount = FFlagSduiCollectionGridRevealRows and function(p8: number?)
-				v2.setSectionDisplayedRowCount(identifier, p8)
-			end or nil
 			local continuesPreviousSection
 
 			if FFlagSduiSamePoolFeedItemSpacing then

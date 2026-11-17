@@ -12,6 +12,8 @@ local FriendCountRefresher = require(Achievements.AchievementDataRefresher.Frien
 local SharedFlags = require(parent.SharedFlags)
 local FFlagLuaAppDefaultHttpRetry = SharedFlags.FFlagLuaAppDefaultHttpRetry
 
+local FFlagInExpAchievementsIsolateStartUpErrors = require(Achievements.Flags.FFlagInExpAchievementsIsolateStartUpErrors)
+
 local config = HttpRequest.config
 local v = {
 	requestFunction = function(p, p2, p3)
@@ -104,9 +106,23 @@ function InExpAchievementManager:startUp()
 		self.achievementService
 	)
 
-	self:_checkStrengthInNumbers(v9)
+	if FFlagInExpAchievementsIsolateStartUpErrors then
+		local success, result = pcall(self._checkStrengthInNumbers, self, v9)
 
-	self:_checkJoinExperienceAchievements(v8)
+		if not success then
+			Logger:warning("Failed to check Strength In Numbers achievement: " .. tostring(result))
+		end
+
+		local success2, result2 = pcall(self._checkJoinExperienceAchievements, self, v8)
+
+		if not success2 then
+			Logger:warning("Failed to check join experience achievements: " .. tostring(result2))
+		end
+	else
+		self:_checkStrengthInNumbers(v9)
+
+		self:_checkJoinExperienceAchievements(v8)
+	end
 end
 
 function InExpAchievementManager:_checkJoinExperienceAchievements(callback)

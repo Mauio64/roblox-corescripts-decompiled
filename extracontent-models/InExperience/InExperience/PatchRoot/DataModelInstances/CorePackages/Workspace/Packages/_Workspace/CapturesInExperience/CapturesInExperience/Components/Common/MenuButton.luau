@@ -1,28 +1,18 @@
 local parent = script.Parent.Parent.Parent.Parent
 
-local AppCommonLib = require(parent.AppCommonLib)
 local React = require(parent.React)
 local UIBlox = require(parent.UIBlox)
-local Foundation = require(parent.Foundation)
 local Style = require(parent.Style)
 local GetTextSize = Style.GetTextSize
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local Button = UIBlox.App.Button.Button
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
-local Text = AppCommonLib.Text
 local useStyle = UIBlox.Core.Style.useStyle
 
 return function(props)
 	local v = useStyle()
-	local font
 
-	if FoundationFontFaceMigration then
-		font = v.Tokens.Typography.TitleLarge.Font
-	else
-		font = v.Font.Header2.Font
-	end
-
+	local font = v.Tokens.Typography.TitleLarge.Font
 	local v2 = v.Font.BaseSize * v.Font.Header2.RelativeSize
 
 	local v3 = React.useMemo(function()
@@ -30,15 +20,7 @@ return function(props)
 			return props.buttonWidth
 		end
 
-		local v3
-
-		if FoundationFontFaceMigration then
-			v3 = GetTextSize(props.text, v2, font, Vector2.new(10000, 10000)).X
-		else
-			v3 = Text.GetTextWidth(props.text, font, v2)
-		end
-
-		return v3 + 24
+		return GetTextSize(props.text, v2, font, Vector2.new(10000, 10000)).X + 24
 	end, { props.text, font, v2, props.buttonWidth })
 	local size
 

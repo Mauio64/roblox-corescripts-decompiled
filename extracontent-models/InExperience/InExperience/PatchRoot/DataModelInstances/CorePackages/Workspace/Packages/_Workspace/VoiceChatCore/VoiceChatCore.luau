@@ -20,7 +20,9 @@ return {
 		GetFFlagEnableSeamlessVoiceFeature = require(Flags.GetFFlagEnableSeamlessVoiceFeature),
 		GetFFlagFixGetPlayerByUserIdStringCast = require(Flags.GetFFlagFixGetPlayerByUserIdStringCast),
 		GetFFlagVoiceVolumeControlsEnableVoiceVolumeImpressionsTelemetry = require(Flags.GetFFlagVoiceVolumeControlsEnableVoiceVolumeImpressionsTelemetry),
-		GetFFlagMicConsumerRegistry = require(Flags.GetFFlagMicConsumerRegistry)
+		GetFFlagMicConsumerRegistry = require(Flags.GetFFlagMicConsumerRegistry),
+		GetFFlagCoreMicManagerRefactor = require(Flags.GetFFlagCoreMicManagerRefactor),
+		FFlagMicSyncVoiceDeviceAcrossRejoin = require(Flags.FFlagMicSyncVoiceDeviceAcrossRejoin)
 	},
 	Requests = {
 		GetShowAgeVerificationOverlay = require(Requests.GetShowAgeVerificationOverlay)

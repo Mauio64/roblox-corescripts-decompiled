@@ -14,11 +14,13 @@ return function(p, p2)
 					return
 				end
 
-				if default:isInternalDlicEnabled() then
-					default:detectDeeplinkIntent((default:createInternalDlic(p, DeepLinkSource.LuaInternal)))
-				else
+				if not default:isInternalDlicEnabled() then
 					default:detectURL(p)
+
+					return
 				end
+
+				default:detectDeeplinkIntent((default:createInternalDlic(p, DeepLinkSource.LuaInternal)))
 			end)
 		elseif default:isInternalDlicEnabled() then
 			local internalDlic = default:createInternalDlic(p, DeepLinkSource.LuaInternal)

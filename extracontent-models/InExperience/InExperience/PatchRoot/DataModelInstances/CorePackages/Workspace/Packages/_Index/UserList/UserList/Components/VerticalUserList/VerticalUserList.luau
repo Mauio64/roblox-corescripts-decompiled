@@ -13,15 +13,16 @@ local Enums = require(UserList.Common.Enums)
 local useEntities = require(UserList.Hooks.useEntities)
 local useEntitySelectionHandler = require(UserList.Hooks.useEntitySelectionHandler)
 local useRenderEntity = require(UserList.Hooks.useRenderEntity)
+local useFixedRowLayout = require(UserList.Hooks.useFixedRowLayout)
 
 local SharedFlags = require(parent.SharedFlags)
 local FFlagUserListCtaIntegrationEnabled = SharedFlags.FFlagUserListCtaIntegrationEnabled
 local SharedFlags2 = require(parent.SharedFlags)
-local FFlagUserListComposeRenderRowWithCta = SharedFlags2.FFlagUserListComposeRenderRowWithCta
-local SharedFlags3 = require(parent.SharedFlags)
-local FFlagUserListSurfaceExtensions = SharedFlags3.FFlagUserListSurfaceExtensions
+local FFlagUserListSurfaceExtensions = SharedFlags2.FFlagUserListSurfaceExtensions
 local FFlagUserListRowSelectionOriginSource = require(UserList.Flags.FFlagUserListRowSelectionOriginSource)
 local FFlagUserListDisableVirtualizationConfig = require(UserList.Flags.FFlagUserListDisableVirtualizationConfig)
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagUserListFixedRowHeightConfig = SharedFlags3.FFlagUserListFixedRowHeightConfig
 local Cta
 
 if FFlagUserListCtaIntegrationEnabled then
@@ -92,10 +93,42 @@ local function VerticalUserList(props)
 
 	v6.firstRowRef = firstRowRef
 	local v7 = useRenderEntity(v6)
+	local v8
 
-	local renderItem = React.useCallback(function(p)
-		return v7(p.item, p.index)
-	end, { v7 })
+	if FFlagUserListFixedRowHeightConfig then
+		local v9
+
+		if props.configs == nil then
+			v9 = false
+		else
+			v9 = props.configs.fixedRowHeight == true
+		end
+
+		v8 = useFixedRowLayout(v9, props.ListHeaderComponent and true or false)
+	else
+		v8 = nil
+	end
+
+	local useCallback = React.useCallback
+	local function fn(p)
+		local item = p.item
+		local index = p.index
+		local v9
+
+		if FFlagUserListFixedRowHeightConfig and v8 then
+			v9 = v8.itemSize
+		end
+
+		return v7(item, index, v9)
+	end
+
+	local v9
+
+	if FFlagUserListFixedRowHeightConfig then
+		v9 = v8
+	end
+
+	local renderItem = useCallback(fn, { v7, v9 })
 
 	if #props.entities == 0 then
 		return nil
@@ -109,11 +142,11 @@ local function VerticalUserList(props)
 				EntityRows = React.createElement(React.Fragment, {}, unpack(React.useMemo(function()
 					local children = {}
 
-					for i, v8 in ipairs(v5) do
+					for i, v10 in ipairs(v5) do
 						children[i] = React.createElement(
 							View,
-							{ key = v8, tag = "size-full-0 auto-y", LayoutOrder = i },
-							{ Content = v7(v8, i) }
+							{ key = v10, tag = "size-full-0 auto-y", LayoutOrder = i },
+							{ Content = v7(v10, i) }
 						)
 					end
 
@@ -124,10 +157,10 @@ local function VerticalUserList(props)
 	end
 
 	local createElement = React.createElement
-	local v8 = { tag = "size-full-0 fill", LayoutOrder = props.layoutOrder }
+	local v10 = { tag = "size-full-0 fill", LayoutOrder = props.layoutOrder }
 
 	local createElement2 = React.createElement
-	local v9 = {
+	local v11 = {
 		data = v5,
 		renderItem = renderItem,
 		keyExtractor = keyExtractor,
@@ -135,19 +168,27 @@ local function VerticalUserList(props)
 		initialNumToRender = 10,
 		onEndReachedThreshold = 2,
 		disableVirtualization = FFlagUserListDisableVirtualizationConfig and props.configs and props.configs.disableVirtualization and true or nil,
+		getItemLayout = 0,
 		onEndReached = 0,
 		style = 0,
 		contentContainerStyle = 0,
 		ListHeaderComponent = 0,
 		ListFooterComponent = 0
 	}
+	local getItemLayout
+
+	if FFlagUserListFixedRowHeightConfig and v8 then
+		getItemLayout = v8.getItemLayout
+	end
+
+	v11.getItemLayout = getItemLayout
 	local onEndReached
 
 	if FFlagUserListSurfaceExtensions then
 		onEndReached = props.onEndReached
 	end
 
-	v9.onEndReached = onEndReached
+	v11.onEndReached = onEndReached
 	local style
 
 	if FFlagUserListSurfaceExtensions and props.configs and props.configs.disableRowActivation then
@@ -156,52 +197,49 @@ local function VerticalUserList(props)
 		style = v
 	end
 
-	v9.style = style
+	v11.style = style
 
-	v9.contentContainerStyle = contentContainerStyle
-	v9.ListHeaderComponent = props.ListHeaderComponent
-	v9.ListFooterComponent = props.ListFooterComponent
-	return createElement(View, v8, { List = createElement2(FlatList, v9) })
+	v11.contentContainerStyle = contentContainerStyle
+	local listHeaderComponent
+
+	if FFlagUserListFixedRowHeightConfig and v8 and props.ListHeaderComponent then
+		listHeaderComponent = React.createElement(
+			View,
+			{ tag = "size-full-0 auto-y", onAbsoluteSizeChanged = v8.onHeaderSizeChanged },
+			{ Header = props.ListHeaderComponent }
+		)
+	else
+		listHeaderComponent = props.ListHeaderComponent
+	end
+
+	v11.ListHeaderComponent = listHeaderComponent
+
+	v11.ListFooterComponent = props.ListFooterComponent
+	return createElement(View, v10, { List = createElement2(FlatList, v11) })
 end
 
 local function VerticalUserListWithCta(p)
 	local v2
 
-	if Cta == nil or p.ctaConfig == nil then
+	if Cta == nil then
 		v2 = false
 	else
-		v2 = p.renderRow == nil
+		v2 = p.ctaConfig ~= nil
 	end
 
-	if FFlagUserListComposeRenderRowWithCta then
-		if Cta == nil then
-			v2 = false
-		else
-			v2 = p.ctaConfig ~= nil
-		end
+	if v2 then
+		return React.createElement(Cta.CtaRenderRowBridge, {
+			ctaConfig = p.ctaConfig,
+			renderRow = p.renderRow,
+			render = function(renderRow)
+				local clone = table.clone(p)
+				clone.renderRow = renderRow
+				return React.createElement(VerticalUserList, clone)
+			end
+		})
 	end
 
-	if not v2 then
-		return React.createElement(VerticalUserList, p)
-	end
-
-	local createElement = React.createElement
-	local ctaRenderRowBridge = Cta.CtaRenderRowBridge
-	local v3 = { ctaConfig = p.ctaConfig, renderRow = 0, render = 0 }
-	local renderRow2
-
-	if FFlagUserListComposeRenderRowWithCta then
-		renderRow2 = p.renderRow
-	end
-
-	v3.renderRow = renderRow2
-	function v3.render(renderRow)
-		local clone = table.clone(p)
-		clone.renderRow = renderRow
-		return React.createElement(VerticalUserList, clone)
-	end
-
-	return createElement(ctaRenderRowBridge, v3)
+	return React.createElement(VerticalUserList, p)
 end
 
 if FFlagUserListCtaIntegrationEnabled then

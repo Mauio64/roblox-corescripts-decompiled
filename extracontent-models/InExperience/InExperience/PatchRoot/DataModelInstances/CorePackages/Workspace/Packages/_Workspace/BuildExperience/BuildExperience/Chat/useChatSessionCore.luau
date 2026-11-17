@@ -1,14 +1,8 @@
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
 local parent = BuildExperience.Parent
-
-local FFlagBuildExperienceChatImageAttachments = require(BuildExperience.Flags.FFlagBuildExperienceChatImageAttachments)
-
-local SharedFlags = require(parent.SharedFlags)
-local FFlagBuildExperienceChatResourceAttachments = SharedFlags.FFlagBuildExperienceChatResourceAttachments
 local FFlagBuildExperienceModelPicker = require(BuildExperience.Flags.FFlagBuildExperienceModelPicker)
+local FFlagBuildExperienceChatOpenId = require(BuildExperience.Flags.FFlagBuildExperienceChatOpenId)
 local engineFeature = game:GetEngineFeature("BuildAppStorageKey")
-
-local FFlagBuildExperienceRefreshChatDraftOnGameLeave = require(BuildExperience.Flags.FFlagBuildExperienceRefreshChatDraftOnGameLeave)
 
 local FFlagBuildExperiencePrefillSkipsDraftPersist = require(BuildExperience.Flags.FFlagBuildExperiencePrefillSkipsDraftPersist)
 
@@ -20,7 +14,7 @@ local UniverseConfiguration = require(parent.DataHydration.UniverseConfiguration
 local UniverseCreate = require(parent.DataHydration.UniverseCreate)
 local React = require(parent.React)
 local ReactUtils = require(parent.ReactUtils)
-local SharedFlags2 = require(parent.SharedFlags)
+local SharedFlags = require(parent.SharedFlags)
 local Signals = require(parent.Signals)
 local SignalsReact = require(parent.SignalsReact)
 local Localization = require(parent.Localization)
@@ -28,11 +22,10 @@ local LocalizationRoactContext = Localization.LocalizationRoactContext
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
 
 local FFlagBuildExperienceChatAccordionScrollAnchor = require(BuildExperience.Flags.FFlagBuildExperienceChatAccordionScrollAnchor)
-local FFlagBuildExperienceChatHistoryPrefetch = require(BuildExperience.Flags.FFlagBuildExperienceChatHistoryPrefetch)
 local FFlagBuildExperienceManageDevProduct = require(BuildExperience.Flags.FFlagBuildExperienceManageDevProduct)
 local FFlagBuildAdUpsell = require(BuildExperience.Flags.FFlagBuildAdUpsell)
-local FFlagBuildExperienceLibrary = SharedFlags2.FFlagBuildExperienceLibrary
-local FFlagBuildExperiencePromptFailureTelemetry = SharedFlags2.FFlagBuildExperiencePromptFailureTelemetry
+local FFlagBuildExperienceLibrary = SharedFlags.FFlagBuildExperienceLibrary
+local FFlagBuildExperiencePromptFailureTelemetry = SharedFlags.FFlagBuildExperiencePromptFailureTelemetry
 local FFlagBuildExperienceNewGameChatDraft = require(BuildExperience.Flags.FFlagBuildExperienceNewGameChatDraft)
 local FFlagBuildExperienceRestoreStoppedPrompt = require(BuildExperience.Flags.FFlagBuildExperienceRestoreStoppedPrompt)
 
@@ -84,21 +77,13 @@ else
 	BuildAppStorage = nil
 end
 
-local uploadCaptureAsync
-
-if FFlagBuildExperienceChatImageAttachments then
-	uploadCaptureAsync = require(BuildExperience.utils.uploadCaptureAsync)
-else
-	uploadCaptureAsync = nil
-end
+local uploadCaptureAsync = require(BuildExperience.utils.uploadCaptureAsync)
 
 local Debug = CreatorAgentChat.debug
 local RequestFailureKind = CreatorAgentChat.RequestFailureKind
 local sendBuildExperienceEvent = require(BuildExperience.Telemetry.sendBuildExperienceEvent)
 local signal = Signals.createSignal(false)
 local function noopSetAgentSpecVersion(_: string?) end
-
-local frozen = table.freeze({})
 
 local _ = { CreateUniverse = "create_universe", ConfigureUniverse = "configure_universe" }
 
@@ -226,14 +211,14 @@ local function trimMessage(current: string) -- 1 equivalent call inferred from t
 	return string.gsub(current, "^%s*(.-)%s*$", "%1")
 end
 
-local function scheduleComposerAutoFocus(p, fn) -- 1 equivalent call inferred from this helper
+local function scheduleComposerAutoFocus(ref, fn) -- 1 equivalent call inferred from this helper
 	local v = 8
 	local function tryFocus()
 		if fn() then
 			return
 		end
 
-		local current = p.current
+		local current = ref.current
 
 		if current then
 			current.focus()
@@ -291,14 +276,7 @@ local function useChatSessionCore(data)
 
 	local v = React.useContext(LocalizationRoactContext)
 	local formatted = v:Format(LocalizationStrings.CHAT_CREATE_UNIVERSE_ERROR)
-	local v2
-
-	if FFlagBuildExperienceChatImageAttachments then
-		v2 = v:Format(LocalizationStrings.CHAT_CAPTURE_UPLOAD_ERROR)
-	else
-		v2 = nil
-	end
-
+	local formatted2 = v:Format(LocalizationStrings.CHAT_CAPTURE_UPLOAD_ERROR)
 	local accountId
 
 	if FFlagBuildExperienceModelPicker then
@@ -319,7 +297,7 @@ local function useChatSessionCore(data)
 	end
 
 	local ref = React.useRef(true)
-	local v3 = React.useCallback(function()
+	local v2 = React.useCallback(function()
 		return ref.current
 	end, { ref })
 	local placeId = data.placeId
@@ -341,21 +319,21 @@ local function useChatSessionCore(data)
 		sessionId = state2.sessionId
 	end
 
-	local v4 = data.hydrateHistoryWhen == nil or data.hydrateHistoryWhen
-	local v5 = data.sendMessageWhen == nil or data.sendMessageWhen
-	local v6 = FFlagBuildExperienceLibrary and data.isLibraryChat == true
-	local v7
+	local v3 = data.hydrateHistoryWhen == nil or data.hydrateHistoryWhen
+	local v4 = data.sendMessageWhen == nil or data.sendMessageWhen
+	local v5 = FFlagBuildExperienceLibrary and data.isLibraryChat == true
+	local v6
 
 	if FFlagBuildAdUpsell then
-		v7 = React.useRef(data.trackAdUpsellTurns == true).current
+		v6 = React.useRef(data.trackAdUpsellTurns == true).current
 	else
-		v7 = false
+		v6 = false
 	end
 
 	local creatorAgentChatStore = CreatorAgentChat.getCreatorAgentChatStore()
 	local agentRollbackRequestStore = GetAgentRollbackRequestStore()
 
-	local v8 = React.useMemo(function()
+	local v7 = React.useMemo(function()
 		if universeId == nil then
 			return nil
 		end
@@ -364,16 +342,16 @@ local function useChatSessionCore(data)
 	end, { universeId, placeId, sessionId, creatorAgentChatStore, accountId })
 
 	React.useLayoutEffect(function()
-		if v8 == nil or sessionId == nil or sessionId == "" then
+		if v7 == nil or sessionId == nil or sessionId == "" then
 			return
 		end
 
-		v8.setCasSessionId(sessionId)
-	end, { v8, sessionId })
-	local ref2, v9, state3, setState3
+		v7.setCasSessionId(sessionId)
+	end, { v7, sessionId })
+	local v8, state3, setState3, v9
 
 	if FFlagBuildExperienceModelPicker then
-		ref2 = React.useRef(true)
+		local ref2 = React.useRef(true)
 
 		React.useLayoutEffect(function()
 			ref2.current = true
@@ -382,7 +360,7 @@ local function useChatSessionCore(data)
 			end
 		end, { ref2 })
 
-		v9 = React.useMemo(function()
+		v8 = React.useMemo(function()
 			return { pending = false, mounted = true }
 		end, {
 			accountId,
@@ -393,17 +371,20 @@ local function useChatSessionCore(data)
 		})
 
 		state3, setState3 = React.useState(false)
+		local v10 = v8
+		local v11 = setState3
 
 		React.useLayoutEffect(function()
-			v9.mounted = true
-			setState3(false)
+			v10.mounted = true
+			v11(false)
 			return function()
-				v9.mounted = false
+				v10.mounted = false
 			end
-		end, { v9, setState3 })
+		end, { v10, v11 })
+		v9 = ref2
 	else
-		ref2 = nil
 		v9 = nil
+		v8 = nil
 		setState3 = nil
 		state3 = false
 	end
@@ -411,37 +392,37 @@ local function useChatSessionCore(data)
 	local v10
 
 	if FFlagBuildExperienceModelPicker then
-		v10 = useBuildModelSession(universeId, data.modelSelectionDraftId, v8)
+		v10 = useBuildModelSession(universeId, data.modelSelectionDraftId, v7)
 	else
 		v10 = nil
 	end
 
 	local v11 = React.useMemo(function()
-		if v8 == nil then
+		if v7 == nil then
 			return signal5
 		end
 
 		return (Signals.createComputed(function(p)
 			return {
-				session = v8,
-				sessionId = v8.getCasSessionId(),
-				events = v8.getMergedHistory(p)
+				session = v7,
+				sessionId = v7.getCasSessionId(),
+				events = v7.getMergedHistory(p)
 			}
 		end))
-	end, { v8 })
+	end, { v7 })
 	local v12 = SignalsReact.useSignalState(v11)
 	local v13
 
-	if v8 == nil then
+	if v7 == nil then
 		v13 = nil
 	else
-		v13 = v8.getCasSessionId()
+		v13 = v7.getCasSessionId()
 	end
 
 	local agentSpecVersion = nil
 	local setAgentSpecVersion = noopSetAgentSpecVersion
 	local v14 = nil
-	local ref3 = nil
+	local v15 = nil
 	local internalTesting = nil
 
 	if FFlagBuildExperienceModelPicker and enabled then
@@ -451,9 +432,9 @@ local function useChatSessionCore(data)
 			entry = v10.entry
 		end
 
-		local v15
-		v15, v14 = useBuildInternalTesting(entry, v8, data.sessionId)
-		internalTesting = v15
+		local v16
+		v16, v14 = useBuildInternalTesting(entry, v7, data.sessionId)
+		internalTesting = v16
 
 		if internalTesting ~= nil then
 			agentSpecVersion = internalTesting.previewHash
@@ -462,115 +443,117 @@ local function useChatSessionCore(data)
 		setAgentSpecVersion = function(p: string?)
 			if internalTesting ~= nil then
 				internalTesting.onSelect()
-				internalTesting.onSaveSpec(p)
+				internalTesting.onSaveSpec(p, internalTesting.previewSpecName)
 			end
 		end
 	elseif enabled then
-		local ref4 = React.useRef(nil)
+		local ref2 = React.useRef(nil)
 
-		if ref4.current == nil then
-			ref4.current = CreatorAgentChat.experimentOverride.createPendingKey()
+		if ref2.current == nil then
+			ref2.current = CreatorAgentChat.experimentOverride.createPendingKey()
 		end
 
-		v14 = ref4.current
+		local current = ref2.current
 
-		ref3 = React.useRef(false)
+		local ref3 = React.useRef(false)
 
-		local v15 = CreatorAgentChat.experimentOverride.getKey(v13) or v14
+		local v16 = CreatorAgentChat.experimentOverride.getKey(v13) or current
 
-		local v16 = React.useMemo(function()
-			return CreatorAgentChat.experimentOverride.getStateSignal(v15)
-		end, { v15 })
+		local v17 = React.useMemo(function()
+			return CreatorAgentChat.experimentOverride.getStateSignal(v16)
+		end, { v16 })
 
-		agentSpecVersion = SignalsReact.useSignalState(v16).specVersion
+		agentSpecVersion = SignalsReact.useSignalState(v17).specVersion
 
 		setAgentSpecVersion = React.useCallback(function(p: string?)
-			local v17
+			local v18
 
-			if v8 ~= nil then
-				v17 = v8.getCasSessionId()
+			if v7 ~= nil then
+				v18 = v7.getCasSessionId()
 			end
 
-			local v18 = CreatorAgentChat.experimentOverride.getKey(v17)
+			local v19 = CreatorAgentChat.experimentOverride.getKey(v18)
 
-			if v18 == nil then
-				v18 = v14
+			if v19 == nil then
+				v19 = current
 				ref3.current = true
 
-				if v8 ~= nil then
-					v8.setPendingExperimentKey(v14)
+				if v7 ~= nil then
+					v7.setPendingExperimentKey(current)
 				end
 			end
 
-			CreatorAgentChat.experimentOverride.set(v18, p)
-		end, { v8, v14 })
+			CreatorAgentChat.experimentOverride.set(v19, p)
+		end, { v7, current })
 
 		React.useEffect(function()
-			if v8 == nil or not ref3.current then
+			if v7 == nil or not ref3.current then
 				return
 			end
 
-			v8.setPendingExperimentKey(v14)
-		end, { v8, v14 })
+			v7.setPendingExperimentKey(current)
+		end, { v7, current })
 
 		React.useEffect(function()
 			return function()
-				CreatorAgentChat.experimentOverride.clear(v14)
+				CreatorAgentChat.experimentOverride.clear(current)
 			end
-		end, { v14 })
+		end, { current })
+		v15 = ref3
+		v14 = current
 	end
 
-	local v15 = (v12.session ~= v8 or v12.sessionId ~= v13) and {} or v12.events
-	local v16
+	local v16 = (v12.session ~= v7 or v12.sessionId ~= v13) and {} or v12.events
+	local v17
 
 	if sessionId == nil then
-		v16 = false
+		v17 = false
 	else
-		v16 = sessionId ~= ""
+		v17 = sessionId ~= ""
 	end
 
-	if not v16 then
+	if not v17 then
 		if universeId == nil then
-			v16 = false
+			v17 = false
 		else
-			v16 = universeId ~= 0
+			v17 = universeId ~= 0
 		end
 	end
 
 	local isLoading
 
-	if v4 then
-		if v8 == nil then
+	if v3 then
+		if v7 == nil then
 			isLoading = false
-		elseif v16 then
-			isLoading = not (v8.hasLoadedHistory() and #v15 > 0)
+		elseif v17 then
+			isLoading = not (v7.hasLoadedHistory() and #v16 > 0)
 		else
-			isLoading = v16
+			isLoading = v17
 		end
 	else
-		isLoading = v4
+		isLoading = v3
 	end
 
 	local state4, setState4 = React.useState(function()
 		return {
-			session = v8,
+			session = v7,
 			sessionId = sessionId,
 			universeId = universeId,
-			hydrateHistoryWhen = v4,
+			hydrateHistoryWhen = v3,
 			isLoading = isLoading
 		}
 	end)
-	local v17
+	local v18
 
-	if state4 == nil or state4.session ~= v8 or state4.sessionId ~= sessionId or state4.universeId ~= universeId then
-		v17 = false
+	if state4 == nil or state4.session ~= v7 or state4.sessionId ~= sessionId or state4.universeId ~= universeId then
+		v18 = false
 	else
-		v17 = state4.hydrateHistoryWhen == v4
+		v18 = state4.hydrateHistoryWhen == v3
 	end
 
 	local isHistoryHydrationComplete
 
-	if v17 then
+	if v18 then
 		isHistoryHydrationComplete = not state4.isLoading
 	else
 		isHistoryHydrationComplete = not isLoading
@@ -579,10 +562,10 @@ local function useChatSessionCore(data)
 	local isHistoryLoading = not isHistoryHydrationComplete
 
 	if not isHistoryLoading then
-		if v8 == nil then
+		if v7 == nil then
 			isHistoryLoading = false
 		else
-			isHistoryLoading = v8.getNextHistoryPageToken() ~= nil
+			isHistoryLoading = v7.getNextHistoryPageToken() ~= nil
 		end
 	end
 
@@ -592,60 +575,63 @@ local function useChatSessionCore(data)
 
 	React.useEffect(function()
 		setState6(nil)
-	end, { v8, sessionId })
-	local v18
+	end, { v7, sessionId })
+	local v19 = sessionId
+	local v20
 
-	if state6 == nil or state6.session ~= v8 then
-		v18 = false
-	elseif sessionId == nil or sessionId == "" or state6.sessionId == sessionId then
-		v18 = true
+	if state6 == nil or state6.session ~= v7 then
+		v20 = false
+	elseif v19 == nil or v19 == "" or state6.sessionId == v19 then
+		v20 = true
 	elseif state6.sessionId == nil then
-		v18 = state6.session.getCasSessionId() == sessionId
+		v20 = state6.session.getCasSessionId() == v19
 	else
-		v18 = false
+		v20 = false
 	end
 
-	if not v18 then
+	if not v20 then
 		state6 = nil
 	end
 
 	local state7, setState7 = React.useState(nil)
-	local ref4 = React.useRef(nil)
-	local ref5 = React.useRef(nil)
-	local ref6 = React.useRef(0)
-	local ref7, state8, setState8
+	local ref2 = React.useRef(nil)
+	local ref3 = React.useRef(nil)
+	local ref4 = React.useRef(0)
+	local ref5, state8, setState8
 
 	if FFlagBuildExperienceModelPicker then
-		ref7 = React.useRef(nil)
+		ref5 = React.useRef(nil)
 
 		state8, setState8 = React.useState(false)
+		local v21 = ref5
+		local v22 = setState8
 
 		local useLayoutEffect = React.useLayoutEffect
 		local function fn()
 			if
 				enabled
-				and ref7.current ~= nil
-				and not ref7.current.started
-				and ref5.current ~= nil
+				and v21.current ~= nil
+				and not v21.current.started
+				and ref3.current ~= nil
 				and data.sessionId ~= nil
 				and data.sessionId ~= ""
-				and ref5.current.sessionId ~= data.sessionId
+				and ref3.current.sessionId ~= data.sessionId
 			then
-				ref7.current.attempt.release()
-				ref7.current = nil
+				v21.current.attempt.release()
+				v21.current = nil
 			end
 
-			if ref7.current == nil then
-				setState8(false)
+			if v21.current == nil then
+				v22(false)
 				setState5(nil)
 			end
 
 			return function()
-				local current = ref7.current
+				local current = v21.current
 
 				if current ~= nil and not (current.started and current.attempt.isCurrent()) then
 					current.attempt.release()
-					ref7.current = nil
+					v21.current = nil
 
 					if current.onTerminal ~= nil then
 						current.onTerminal()
@@ -654,25 +640,25 @@ local function useChatSessionCore(data)
 			end
 		end
 
-		local v19
+		local v23
 
 		if v10 ~= nil then
-			v19 = v10.entry
+			v23 = v10.entry
 		end
 
-		useLayoutEffect(fn, { v19, data.sessionId, setState8, setState5 })
+		useLayoutEffect(fn, { v23, data.sessionId, v22, setState5 })
 	else
-		ref7 = nil
+		ref5 = nil
 		setState8 = nil
 		state8 = false
 	end
 
-	local ref8 = React.useRef(nil)
+	local ref6 = React.useRef(nil)
 
-	local v19 = React.useCallback(function(current, session)
+	local v21 = React.useCallback(function(current, session)
 		assert(current == nil or session ~= nil, "Active turns require an owning session")
-		ref4.current = current
-		ref5.current = current ~= nil and {
+		ref2.current = current
+		ref3.current = current ~= nil and {
 			session = session,
 			sessionId = session.getCasSessionId()
 		} or nil
@@ -680,70 +666,71 @@ local function useChatSessionCore(data)
 		setState7(current)
 	end, { setState7 })
 
-	local current = ref5.current
-	local v20
+	local current = ref3.current
+	local v22 = sessionId
+	local v23
 
-	if current == nil or current.session ~= v8 then
-		v20 = false
-	elseif sessionId == nil or sessionId == "" or current.sessionId == sessionId then
-		v20 = true
+	if current == nil or current.session ~= v7 then
+		v23 = false
+	elseif v22 == nil or v22 == "" or current.sessionId == v22 then
+		v23 = true
 	elseif current.sessionId == nil then
-		v20 = current.session.getCasSessionId() == sessionId
+		v23 = current.session.getCasSessionId() == v22
 	else
-		v20 = false
+		v23 = false
 	end
 
-	local v21
+	local v24
 
-	if v20 then
-		v21 = state7
+	if v23 then
+		v24 = state7
 	else
-		v21 = nil
+		v24 = nil
 	end
 
-	local v22
+	local v25
 
-	if v21 == nil then
-		v22 = signal2
+	if v24 == nil then
+		v25 = signal2
 	else
-		v22 = v21.getOptimisticLocalTools
+		v25 = v24.getOptimisticLocalTools
 	end
 
-	local v23 = if v21 == nil then signal3 else v21.getLocalToolActions
+	local v26 = if v24 == nil then signal3 else v24.getLocalToolActions
 
-	local v24 = if v21 == nil then signal4 else v21.getSetupErrorText
+	local v27 = if v24 == nil then signal4 else v24.getSetupErrorText
 
-	local optimisticLocalTools = SignalsReact.useSignalState(v22)
-	local v25 = SignalsReact.useSignalState(v23)
-	local v26 = SignalsReact.useSignalState(v24)
+	local optimisticLocalTools = SignalsReact.useSignalState(v25)
+	local v28 = SignalsReact.useSignalState(v26)
+	local v29 = SignalsReact.useSignalState(v27)
 
-	if v26 ~= nil then
-		v26 = v:Format(v26)
+	if v29 ~= nil then
+		v29 = v:Format(v29)
 	end
 
 	local liveAssistantMessage = React.useMemo(function()
-		return getLiveAssistantMessage(v21, data.createUniverseOnFirstPrompt, v8, state5, v26) -- inferred equivalent call
-	end, { v21, data.createUniverseOnFirstPrompt, state5, v8, v26 })
+		return getLiveAssistantMessage(v24, data.createUniverseOnFirstPrompt, v7, state5, v29) -- inferred equivalent call
+	end, { v24, data.createUniverseOnFirstPrompt, state5, v7, v29 })
 
-	local v27 = React.useMemo(function()
+	local v30 = React.useMemo(function()
 		local sessionId2
 
-		if v8 == nil then
+		if v7 == nil then
 			sessionId2 = sessionId
 		else
-			sessionId2 = v8.getCasSessionId() or sessionId
+			sessionId2 = v7.getCasSessionId() or sessionId
 		end
 
 		local universeId2
 
-		if v8 == nil then
+		if v7 == nil then
 			universeId2 = universeId
 		else
-			universeId2 = v8.universeId
+			universeId2 = v7.universeId
 		end
 
-		local placeId2 = if v8 == nil then placeId else v8.placeId
-		local v27 = {
+		local placeId2 = if v7 == nil then placeId else v7.placeId
+		local v30 = {
 			sessionId = sessionId2,
 			universeId = universeId2,
 			placeId = placeId2,
@@ -761,49 +748,41 @@ local function useChatSessionCore(data)
 			pendingUserMessage = state5.text
 		end
 
-		v27.pendingUserMessage = pendingUserMessage
+		v30.pendingUserMessage = pendingUserMessage
 		local pendingUserImages
 
-		if
-			FFlagBuildExperienceChatImageAttachments
-			and state5 ~= nil
-			and sessionPromptMessageFilter.shouldOptimisticallyDisplay(state5.text)
-		then
+		if not (state5 == nil or not sessionPromptMessageFilter.shouldOptimisticallyDisplay(state5.text)) then
 			pendingUserImages = state5.images
 		end
 
-		v27.pendingUserImages = pendingUserImages
+		v30.pendingUserImages = pendingUserImages
 		local pendingUserResourceAttachments
 
-		if
-			FFlagBuildExperienceChatResourceAttachments
-			and state5 ~= nil
-			and sessionPromptMessageFilter.shouldOptimisticallyDisplay(state5.text)
-		then
+		if not (state5 == nil or not sessionPromptMessageFilter.shouldOptimisticallyDisplay(state5.text)) then
 			pendingUserResourceAttachments = state5.resourceAttachments
 		end
 
-		v27.pendingUserResourceAttachments = pendingUserResourceAttachments
+		v30.pendingUserResourceAttachments = pendingUserResourceAttachments
 		local pendingUserMessageAfterSequenceId
 
 		if state5 ~= nil then
 			pendingUserMessageAfterSequenceId = state5.afterSequenceId
 		end
 
-		v27.pendingUserMessageAfterSequenceId = pendingUserMessageAfterSequenceId
+		v30.pendingUserMessageAfterSequenceId = pendingUserMessageAfterSequenceId
 
-		v27.liveAssistantMessage = liveAssistantMessage
+		v30.liveAssistantMessage = liveAssistantMessage
 		local optimisticCancelledStartSequenceId
 
 		if state6 ~= nil then
 			optimisticCancelledStartSequenceId = state6.startSequenceId
 		end
 
-		v27.optimisticCancelledStartSequenceId = optimisticCancelledStartSequenceId
-		return parseSessionStream(v15, v27)
+		v30.optimisticCancelledStartSequenceId = optimisticCancelledStartSequenceId
+		return parseSessionStream(v16, v30)
 	end, {
-		v15,
-		v8,
+		v16,
+		v7,
 		sessionId,
 		universeId,
 		placeId,
@@ -812,11 +791,11 @@ local function useChatSessionCore(data)
 		liveAssistantMessage,
 		state6
 	})
-	local v28
+	local v31
 
-	if v7 then
+	if v6 then
 		local useRef = React.useRef
-		local v29 = {
+		local v32 = {
 			isInitialized = false,
 			universeId = universeId,
 			sessionId = 0,
@@ -827,51 +806,51 @@ local function useChatSessionCore(data)
 		}
 		local sessionId2
 
-		if v8 == nil then
+		if v7 == nil then
 			sessionId2 = sessionId
 		else
-			sessionId2 = v8.getCasSessionId() or sessionId
+			sessionId2 = v7.getCasSessionId() or sessionId
 		end
 
-		v29.sessionId = sessionId2
-		v29.historyWatermarkSequenceId = v27.latestSequenceId
+		v32.sessionId = sessionId2
+		v32.historyWatermarkSequenceId = v30.latestSequenceId
 
-		v29.liveTurnIds = {}
-		v29.liveTurnStartSequenceIds = {}
-		v28 = useRef(v29)
+		v32.liveTurnIds = {}
+		v32.liveTurnStartSequenceIds = {}
+		v31 = useRef(v32)
 	else
-		v28 = nil
+		v31 = nil
 	end
 
-	local v29
+	local v32
 
-	if v28 == nil then
-		v29 = nil
+	if v31 == nil then
+		v32 = nil
 	else
-		v29 = React.useCallback(function(p: number?)
+		v32 = React.useCallback(function(p: number?)
 			if p ~= nil then
-				v28.current.liveTurnIds[p] = true
+				v31.current.liveTurnIds[p] = true
 			end
-		end, { v28 })
+		end, { v31 })
 	end
 
-	local messages = v27.messages
-	local v30
+	local messages = v30.messages
+	local v43
 
-	if v8 == nil then
-		v30 = false
+	if v7 == nil then
+		v43 = false
 	else
-		v30 = v8.getNextHistoryPageToken() ~= nil
+		v43 = v7.getNextHistoryPageToken() ~= nil
 	end
 
-	local v31 = v8 == nil or (not v16 or v8.hasLoadedHistory())
+	local v44 = v7 == nil or (not v17 or v7.hasLoadedHistory())
 
-	local v32 = isHistoryHydrationComplete and v31 and (v8 == nil or #messages > 0 or not v30)
+	local v45 = isHistoryHydrationComplete and v44 and (v7 == nil or #messages > 0 or not v43)
 
-	local subagentTaskState = v27.subagentTaskState
-	local includesPublishTool = v27.includesPublishTool
+	local subagentTaskState = v30.subagentTaskState
+	local includesPublishTool = v30.includesPublishTool
 	local message = messages[#messages]
-	local v44 = React.useMemo(function()
+	local v47 = React.useMemo(function()
 		if placeId == nil then
 			return signal
 		end
@@ -879,54 +858,54 @@ local function useChatSessionCore(data)
 		return agentRollbackRequestStore.getIsPendingForPlaceId(placeId)
 	end, { placeId, agentRollbackRequestStore })
 
-	local v45 = SignalsReact.useSignalState(v44)
+	local v48 = SignalsReact.useSignalState(v47)
 	local isAssistantResponding
 
-	if v21 == nil then
+	if v24 == nil then
 		if message == nil or message.kind ~= "assistant_turn" then
-			isAssistantResponding = v45
+			isAssistantResponding = v48
 		else
-			isAssistantResponding = not message.isDone or v45
+			isAssistantResponding = not message.isDone or v48
 		end
 	else
 		isAssistantResponding = true
 	end
 
 	local canSendWhileResponding = isAssistantResponding
-		and not v45
+		and not v48
 		and hasPendingLocalToolResponse(optimisticLocalTools)
 
-	local activeTurnState = v27.activeTurnState
+	local activeTurnState = v30.activeTurnState
 	React.useEffect(function()
-		if v21 == nil or activeTurnState == nil then
+		if v24 == nil or activeTurnState == nil then
 			return
 		end
 
-		v21.syncFromTurnState(activeTurnState)
-	end, { v21, activeTurnState })
+		v24.syncFromTurnState(activeTurnState)
+	end, { v24, activeTurnState })
 
-	if v7 then
+	if v6 then
 		React.useEffect(function()
 			local onAssistantTurnCompleted = data.onAssistantTurnCompleted
 
-			local v48 = v28
+			local v51 = v31
 			local universeId2
 
-			if v8 == nil then
+			if v7 == nil then
 				universeId2 = universeId
 			else
-				universeId2 = v8.universeId or universeId
+				universeId2 = v7.universeId or universeId
 			end
 
 			local sessionId2
 
-			if v8 == nil then
+			if v7 == nil then
 				sessionId2 = sessionId
 			else
-				sessionId2 = v8.getCasSessionId() or sessionId
+				sessionId2 = v7.getCasSessionId() or sessionId
 			end
 
-			local current2 = v48.current
+			local current2 = v51.current
 
 			if isEvolvingAdUpsellScope(current2, universeId2, sessionId2) then -- inferred equivalent call
 				current2.universeId = universeId2 or current2.universeId
@@ -936,31 +915,31 @@ local function useChatSessionCore(data)
 					isInitialized = false,
 					universeId = universeId2,
 					sessionId = sessionId2,
-					historyWatermarkSequenceId = v27.latestSequenceId,
+					historyWatermarkSequenceId = v30.latestSequenceId,
 					lastProcessedSequenceId = nil,
 					liveTurnIds = {},
 					liveTurnStartSequenceIds = {}
 				}
 
-				v48.current = current2
+				v51.current = current2
 			end
 
-			if v32 then
+			if v45 then
 				if not current2.isInitialized then
 					current2.isInitialized = true
 					noteLiveAdUpsellTurns(current2, messages)
-					local v52 = nil
+					local v55 = nil
 
 					for k in current2.liveTurnStartSequenceIds do
-						if v52 == nil or k < v52 then
-							v52 = k
+						if v55 == nil or k < v55 then
+							v55 = k
 						end
 					end
 
-					if v52 == nil then
-						current2.lastProcessedSequenceId = current2.historyWatermarkSequenceId or v27.latestSequenceId
+					if v55 == nil then
+						current2.lastProcessedSequenceId = current2.historyWatermarkSequenceId or v30.latestSequenceId
 					else
-						current2.lastProcessedSequenceId = v52 - 1
+						current2.lastProcessedSequenceId = v55 - 1
 					end
 
 					current2.liveTurnIds = {}
@@ -971,12 +950,12 @@ local function useChatSessionCore(data)
 					return
 				end
 
-				local v52 = current2.lastProcessedSequenceId or -1
+				local v55 = current2.lastProcessedSequenceId or -1
 
 				for _, message2 in messages do
 					local completedTurnSequenceId = getCompletedTurnSequenceId(message2) -- inferred equivalent call
 
-					if completedTurnSequenceId == nil or completedTurnSequenceId <= v52 then
+					if completedTurnSequenceId == nil or completedTurnSequenceId <= v55 then
 						continue
 					end
 
@@ -990,115 +969,93 @@ local function useChatSessionCore(data)
 					end
 
 					current2.lastProcessedSequenceId = completedTurnSequenceId
-					v52 = completedTurnSequenceId
+					v55 = completedTurnSequenceId
 				end
 			else
-				current2.historyWatermarkSequenceId = current2.historyWatermarkSequenceId or v27.latestSequenceId
+				current2.historyWatermarkSequenceId = current2.historyWatermarkSequenceId or v30.latestSequenceId
 				noteLiveAdUpsellTurns(current2, messages)
 			end
 		end, {
 			data.onAssistantTurnCompleted,
-			v8,
+			v7,
 			universeId,
 			sessionId,
-			v32,
+			v45,
 			messages,
-			v27.latestSequenceId
+			v30.latestSequenceId
 		})
 	end
 
-	local composerText, v49 = React.useBinding("")
+	local composerText, v52 = React.useBinding("")
 	local state9, setState9 = React.useState(nil)
 
 	local state10, setState10 = React.useState(false)
-	local v50 = React.useCallback(function(p: string?)
+	local v53 = React.useCallback(function(p: string?)
 		setState9(p)
 		setState10(false)
 	end, {})
-	local v51 = React.useCallback(function(p: string)
+	local v54 = React.useCallback(function(p: string)
 		setState9(p)
 		setState10(true)
 	end, {})
-	local ref9 = React.useRef("")
-	local ref10 = React.useRef("")
-	local ref11
+	local ref7 = React.useRef("")
+	local ref8 = React.useRef("")
+	local ref9
 
 	if FFlagBuildExperiencePrefillSkipsDraftPersist and engineFeature then
-		ref11 = React.useRef(nil)
+		ref9 = React.useRef(nil)
 	else
-		ref11 = nil
+		ref9 = nil
 	end
 
+	local ref10 = React.useRef(nil)
+	local ref11 = React.useRef(v13)
 	local ref12 = React.useRef(nil)
-	local ref13 = React.useRef(v13)
-	local ref14 = React.useRef(nil)
-	ref13.current = v13
-	local v52
+	ref11.current = v13
+	local v55
 
 	if data.createUniverseOnFirstPrompt == true then
-		v52 = universeId == nil
+		v55 = universeId == nil
 	else
-		v52 = false
+		v55 = false
 	end
 
 	local createUniverseOnFirstPrompt = data.createUniverseOnFirstPrompt == true
-	local v53 = not FFlagBuildExperienceNewGameChatDraft and {
+	local v56 = not FFlagBuildExperienceNewGameChatDraft and {
 			current = createUniverseOnFirstPrompt
 		}
 		or React.useRef(createUniverseOnFirstPrompt)
 
-	v53.current = createUniverseOnFirstPrompt
-	local ref15
+	v56.current = createUniverseOnFirstPrompt
+	local ref13
 
 	if FFlagBuildExperienceRestoreStoppedPrompt then
-		ref15 = React.useRef(nil)
+		ref13 = React.useRef(nil)
 	else
-		ref15 = nil
+		ref13 = nil
 	end
 
-	local state11 = not v6 and {} or frozen
-
+	local ref14 = React.useRef({})
+	local ref15 = React.useRef(0)
+	local state11, setState11 = React.useState({})
 	local ref16 = React.useRef({})
-	local ref17 = React.useRef(0)
-	local setState11, v54
 
-	if FFlagBuildExperienceChatImageAttachments then
-		state11, setState11 = React.useState({})
+	local state12, setState12 = React.useState({})
 
-		v54 = React.useRef({})
-	else
-		v54 = { current = {} }
-		setState11 = nil
-	end
+	local ref17 = React.useRef({})
+	local ref18 = React.useRef({ universeId = data.universeId, placeId = data.placeId })
 
-	local v55 = {
-		current = { universeId = data.universeId, placeId = data.placeId }
-	}
-	local state12, setState12, v56
-
-	if FFlagBuildExperienceChatResourceAttachments then
-		state12, setState12 = React.useState({})
-
-		v56 = React.useRef({})
-
-		v55 = React.useRef({ universeId = data.universeId, placeId = data.placeId })
-	else
-		v56 = { current = {} }
-		setState12 = nil
-		state12 = {}
-	end
-
-	local ref18 = React.useRef(nil)
+	local ref19 = React.useRef(nil)
 	local clockBinding = ReactUtils.useClock()
 
-	local v58 = useChatScroll(v6)
+	local v58 = useChatScroll(v5)
 
 	local v59 = React.useCallback(function(p: number, p2)
 		GetPlaytestLoadingStore().setAgentStatusForPlaceId(p, p2)
 	end, {})
 
 	local v60 = React.useCallback(function(callback)
-		local function fn() -- 1 equivalent call inferred from this helper
+		local function fn()
 			if callback == nil then
 				return false
 			end
@@ -1108,58 +1065,34 @@ local function useChatSessionCore(data)
 
 		v58.captureDistanceFromBottom()
 
-		if v8 == nil then
+		if v7 == nil then
 			return
 		end
 
-		if FFlagBuildExperienceChatHistoryPrefetch then
-			v8.requestOlderHistoryWhile(fn, function()
-				return v58.isNearTopRef.current
-			end)
-		else
-			task.spawn(function()
-				if v8.loadOlderHistory(fn) and v8.getNextHistoryPageToken() ~= nil and v58.isAtTopRef.current then
-					task.delay(0.1, function()
-						if fn() then -- inferred equivalent call
-							return
-						end
-
-						if v58.isViewportUnderfilled() then
-							v8.loadOlderHistory(fn)
-						end
-					end)
-				end
-			end)
-		end
-	end, { v8, v58 })
+		v7.requestOlderHistoryWhile(fn, function()
+			return v58.isNearTopRef.current
+		end)
+	end, { v7, v58 })
 
 	local v61 = React.useCallback(function(callback)
 		task.delay(0.1, function()
-			if callback() or v8 == nil or v8.getNextHistoryPageToken() == nil then
-				return
-			end
-
-			if FFlagBuildExperienceChatHistoryPrefetch then
-				if not v58.isNearTopRef.current then
-					return
-				end
-			elseif not v58.isViewportUnderfilled() then
+			if callback() or v7 == nil or v7.getNextHistoryPageToken() == nil or not v58.isNearTopRef.current then
 				return
 			end
 
 			v60(callback)
 		end)
-	end, { v60, v58, v8 })
+	end, { v60, v58, v7 })
 
-	local current5 = React.useCallback(function(callback)
-		if not (v8 ~= nil and v8.getNextHistoryPageToken() ~= nil) then
+	local current7 = React.useCallback(function(callback)
+		if not (v7 ~= nil and v7.getNextHistoryPageToken() ~= nil) then
 			return
 		end
 
 		v61(callback)
-	end, { v61, v8 })
-	local ref19 = React.useRef(current5)
-	ref19.current = current5
+	end, { v61, v7 })
+	local ref20 = React.useRef(current7)
+	ref20.current = current7
 
 	React.useEffect(function()
 		v58.setOnScrolledToTop(function()
@@ -1171,7 +1104,7 @@ local function useChatSessionCore(data)
 	end, { v58.setOnScrolledToTop, v60 })
 
 	React.useEffect(function()
-		if v4 and v8 ~= nil then
+		if v3 and v7 ~= nil then
 			local flag = false
 			local function setHistoryLoading(isLoading2: boolean) -- 1 equivalent call inferred from this helper
 				if setState4 == nil or flag then
@@ -1179,14 +1112,14 @@ local function useChatSessionCore(data)
 				end
 
 				setState4({
-					session = v8,
+					session = v7,
 					sessionId = sessionId,
 					universeId = universeId,
-					hydrateHistoryWhen = v4,
+					hydrateHistoryWhen = v3,
 					isLoading = isLoading2
 				})
 			end
-			setHistoryLoading(not (v8.hasLoadedHistory() and #v8.getMergedHistory(false) > 0)) -- inferred equivalent call
+			setHistoryLoading(not (v7.hasLoadedHistory() and #v7.getMergedHistory(false) > 0)) -- inferred equivalent call
 
 			local v63 = sessionId
 			local function isHydrateCancelled(): boolean -- 5 equivalent calls inferred from this helper
@@ -1194,7 +1127,7 @@ local function useChatSessionCore(data)
 					return true
 				end
 
-				return v63 ~= nil and v63 ~= "" and v8.getCasSessionId() ~= v63
+				return v63 ~= nil and v63 ~= "" and v7.getCasSessionId() ~= v63
 			end
 
 			local function continueAfterSessionReady() -- 2 equivalent calls inferred from this helper
@@ -1202,53 +1135,39 @@ local function useChatSessionCore(data)
 					return
 				end
 
-				ref19.current(isHydrateCancelled)
+				ref20.current(isHydrateCancelled)
 			end
 
 			local function hydrateKnownSession(p: string)
-				-- [DEDUP] synthesized from 3 duplicated terminal regions
-				local function deduplicatedTail()
-					if setState4 ~= nil then
-						if flag then
-							return
-						end
+				v7.setCasSessionId(p)
 
-						setState4({
-							session = v8,
-							sessionId = sessionId,
-							universeId = universeId,
-							hydrateHistoryWhen = v4,
-							isLoading = false
-						})
+				if not v5 or ref2.current == nil then
+					if
+						v5
+						or not v7.hasLoadedHistory()
+						or not (#v7.getMergedHistory(false) > 0)
+						or FFlagBuildExperienceModelPicker and not v7.hasObservedModels(false)
+					then
+						if v7.refreshSession(isHydrateCancelled, true) and not isHydrateCancelled() then -- inferred equivalent call
+							continueAfterSessionReady() -- inferred equivalent call
+						end
+					else
+						continueAfterSessionReady() -- inferred equivalent call
 					end
 				end
 
-				v8.setCasSessionId(p)
-
-				if v6 and ref4.current ~= nil then
-					return deduplicatedTail()
-				elseif
-					v6
-					or not v8.hasLoadedHistory()
-					or not (#v8.getMergedHistory(false) > 0)
-					or FFlagBuildExperienceModelPicker and not v8.hasObservedModels(false)
-				then
-					local v64
-
-					if FFlagBuildExperienceChatHistoryPrefetch then
-						v64 = v8.refreshSession(isHydrateCancelled, true)
-					else
-						v64 = v8.refreshSession(isHydrateCancelled)
+				if setState4 ~= nil then
+					if flag then
+						return
 					end
 
-					if v64 and not isHydrateCancelled() then -- inferred equivalent call
-						continueAfterSessionReady() -- inferred equivalent call
-					end
-
-					return deduplicatedTail()
-				else
-					continueAfterSessionReady() -- inferred equivalent call
-					return deduplicatedTail()
+					setState4({
+						session = v7,
+						sessionId = sessionId,
+						universeId = universeId,
+						hydrateHistoryWhen = v3,
+						isLoading = false
+					})
 				end
 			end
 
@@ -1261,10 +1180,10 @@ local function useChatSessionCore(data)
 						end
 
 						setState4({
-							session = v8,
+							session = v7,
 							sessionId = sessionId,
 							universeId = universeId,
-							hydrateHistoryWhen = v4,
+							hydrateHistoryWhen = v3,
 							isLoading = false
 						})
 					end
@@ -1272,8 +1191,8 @@ local function useChatSessionCore(data)
 
 				local v64 = sessionId
 
-				if v6 and (v64 == nil or v64 == "") then
-					v64 = v8.getCasSessionId()
+				if v5 and (v64 == nil or v64 == "") then
+					v64 = v7.getCasSessionId()
 				end
 
 				if v64 ~= nil and v64 ~= "" then
@@ -1282,13 +1201,13 @@ local function useChatSessionCore(data)
 				end
 
 				if FFlagBuildExperienceModelPicker then
-					local casSessionId = v8.getCasSessionId()
+					local casSessionId = v7.getCasSessionId()
 
 					if
 						casSessionId ~= nil
-						and v8.hasLoadedHistory()
-						and #v8.getMergedHistory(false) > 0
-						and not v8.hasObservedModels(false)
+						and v7.hasLoadedHistory()
+						and #v7.getMergedHistory(false) > 0
+						and not v7.hasObservedModels(false)
 					then
 						hydrateKnownSession(casSessionId)
 						return
@@ -1298,7 +1217,7 @@ local function useChatSessionCore(data)
 				if
 					universeId == nil
 					or universeId == 0
-					or v8.hasLoadedHistory() and #v8.getMergedHistory(false) > 0
+					or v7.hasLoadedHistory() and #v7.getMergedHistory(false) > 0
 				then
 					return deduplicatedTail()
 				else
@@ -1317,12 +1236,12 @@ local function useChatSessionCore(data)
 						task.wait()
 					end
 
-					if v6 then
+					if v5 then
 						if isHydrateCancelled() then -- inferred equivalent call
 							return
 						end
 
-						local casSessionId = v8.getCasSessionId()
+						local casSessionId = v7.getCasSessionId()
 
 						if casSessionId ~= nil and casSessionId ~= "" then
 							hydrateKnownSession(casSessionId)
@@ -1368,7 +1287,7 @@ local function useChatSessionCore(data)
 							v66.accountId = accountId2
 							setState2(v66)
 						else
-							v8.markHistoryLoaded()
+							v7.markHistoryLoaded()
 							return deduplicatedTail()
 						end
 					end
@@ -1380,23 +1299,23 @@ local function useChatSessionCore(data)
 			end
 		elseif setState4 ~= nil then
 			setState4({
-				session = v8,
+				session = v7,
 				sessionId = sessionId,
 				universeId = universeId,
-				hydrateHistoryWhen = v4,
+				hydrateHistoryWhen = v3,
 				isLoading = false
 			})
 		end
-	end, { v8, sessionId, universeId, placeId, creatorAgentChatStore, v4, v6, accountId })
+	end, { v7, sessionId, universeId, placeId, creatorAgentChatStore, v3, v5, accountId })
 
 	React.useEffect(function()
-		if v8 == nil then
+		if v7 == nil then
 			return
 		end
 
 		local v63 = false
 		local function refreshKnownSession()
-			local v64 = v8.getCasSessionId()
+			local v64 = v7.getCasSessionId()
 
 			if (v64 == nil or v64 == "") and sessionId ~= nil and sessionId ~= "" then
 				v64 = sessionId
@@ -1411,16 +1330,8 @@ local function useChatSessionCore(data)
 					return v63
 				end
 
-				local v65
-
-				if FFlagBuildExperienceChatHistoryPrefetch then
-					v65 = v8.refreshSession(isRefreshCancelled, true)
-				else
-					v65 = v8.refreshSession(isRefreshCancelled)
-				end
-
-				if v65 and not v63 then
-					ref19.current(function()
+				if v7.refreshSession(isRefreshCancelled, true) and not v63 then
+					ref20.current(function()
 						return v63
 					end)
 				end
@@ -1430,8 +1341,8 @@ local function useChatSessionCore(data)
 		local connection = MessageBusService:Subscribe(messageId, function(_)
 			ref.current = true
 
-			if FFlagBuildExperienceRefreshChatDraftOnGameLeave and engineFeature then
-				local v64 = v8.getCasSessionId()
+			if engineFeature then
+				local v64 = v7.getCasSessionId()
 
 				if (v64 == nil or v64 == "") and sessionId ~= nil and sessionId ~= "" then
 					v64 = sessionId
@@ -1440,19 +1351,19 @@ local function useChatSessionCore(data)
 				local v65 = FFlagBuildExperiencePrefillSkipsDraftPersist
 
 				if v65 then
-					if ref9.current == "" then
+					if ref7.current == "" then
 						v65 = false
 					else
-						v65 = ref9.current == ref11.current
+						v65 = ref7.current == ref9.current
 					end
 				end
 
 				if v64 ~= nil and v64 ~= "" and not v65 then
 					local current2 = BuildAppStorage.getChatDraft(v64) or ""
-					ref10.current = current2
-					ref9.current = current2
-					v49(current2)
-					v50(nil)
+					ref8.current = current2
+					ref7.current = current2
+					v52(current2)
+					v53(nil)
 				end
 			end
 
@@ -1465,28 +1376,28 @@ local function useChatSessionCore(data)
 			connection:Disconnect()
 			onUnhideConnection:Disconnect()
 		end
-	end, { v8, sessionId, ref })
+	end, { v7, sessionId, ref })
 
 	React.useEffect(function()
-		if not v4 then
+		if not v3 then
 			return
 		end
 
 		v58.lockToBottom()
-	end, { v4, v6, v8, sessionId, v58 })
+	end, { v3, v5, v7, sessionId, v58 })
 
 	local v63 = React.useCallback(function(current2: string)
-		ref9.current = current2
-		v49(current2)
-		v50(nil)
-	end, { v49, v50 })
+		ref7.current = current2
+		v52(current2)
+		v53(nil)
+	end, { v52, v53 })
 	local v64
 
 	if engineFeature then
 		v64 = React.useCallback(function()
-			if ref12.current ~= nil then
-				task.cancel(ref12.current)
-				ref12.current = nil
+			if ref10.current ~= nil then
+				task.cancel(ref10.current)
+				ref10.current = nil
 			end
 		end, {})
 	else
@@ -1497,13 +1408,13 @@ local function useChatSessionCore(data)
 
 	if FFlagBuildExperienceNewGameChatDraft then
 		v65 = React.useCallback(function()
-			local current2 = ref13.current
+			local current2 = ref11.current
 
 			if current2 ~= nil and current2 ~= "" then
 				return current2
 			end
 
-			if v53.current then
+			if v56.current then
 				return getNewGameChatDraftKey()
 			end
 
@@ -1517,22 +1428,22 @@ local function useChatSessionCore(data)
 
 	if engineFeature then
 		v66 = React.useCallback(function(current2: string)
-			ref10.current = current2
+			ref8.current = current2
 			v64()
 			local v67
 
 			if FFlagBuildExperienceNewGameChatDraft then
 				v67 = v65()
 			else
-				v67 = ref13.current
+				v67 = ref11.current
 			end
 
 			if v67 == nil or v67 == "" then
 				return
 			end
 
-			ref12.current = task.delay(0.5, function()
-				ref12.current = nil
+			ref10.current = task.delay(0.5, function()
+				ref10.current = nil
 				BuildAppStorage.setChatDraft(v67, current2)
 			end)
 		end, { v64, v65 })
@@ -1549,14 +1460,14 @@ local function useChatSessionCore(data)
 			if FFlagBuildExperienceNewGameChatDraft then
 				v68 = v65()
 			else
-				v68 = ref13.current
+				v68 = ref11.current
 			end
 
 			if v68 == nil or v68 == "" then
 				return
 			end
 
-			ref10.current = current2
+			ref8.current = current2
 			v64()
 			BuildAppStorage.setChatDraft(v68, current2)
 		end, { v64, v65 })
@@ -1570,7 +1481,7 @@ local function useChatSessionCore(data)
 		v68 = React.useCallback(function(p: string, p2: string?)
 			local v69
 
-			if FFlagBuildExperienceNewGameChatDraft and v53.current then
+			if FFlagBuildExperienceNewGameChatDraft and v56.current then
 				v69 = getNewGameChatDraftKey()
 			end
 
@@ -1578,11 +1489,11 @@ local function useChatSessionCore(data)
 				BuildAppStorage.setChatDraft(v69, "")
 			end
 
-			if p2 == nil or p2 == "" or ref10.current ~= p then
+			if p2 == nil or p2 == "" or ref8.current ~= p then
 				return
 			end
 
-			ref10.current = ""
+			ref8.current = ""
 			v64()
 			BuildAppStorage.setChatDraft(p2, "")
 		end, { v64 })
@@ -1595,13 +1506,13 @@ local function useChatSessionCore(data)
 
 		if engineFeature then
 			if FFlagBuildExperiencePrefillSkipsDraftPersist then
-				local current2 = ref11.current
+				local current2 = ref9.current
 
 				if current2 ~= nil and p == current2 then
 					return
 				end
 
-				ref11.current = nil
+				ref9.current = nil
 			end
 
 			v66(p)
@@ -1611,7 +1522,7 @@ local function useChatSessionCore(data)
 
 	if FFlagBuildExperiencePrefillSkipsDraftPersist and engineFeature then
 		setPrefilledComposerText = React.useCallback(function(current2: string)
-			ref11.current = current2
+			ref9.current = current2
 			v63(current2)
 		end, { v63 })
 	else
@@ -1620,7 +1531,7 @@ local function useChatSessionCore(data)
 
 	if FFlagBuildExperienceNewGameChatDraft and engineFeature then
 		React.useEffect(function()
-			if not v52 or v13 ~= nil and v13 ~= "" then
+			if not v55 or v13 ~= nil and v13 ~= "" then
 				return
 			end
 
@@ -1632,11 +1543,11 @@ local function useChatSessionCore(data)
 
 			local current2 = BuildAppStorage.getChatDraft(newGameChatDraftKey) or ""
 
-			if current2 ~= "" and ref9.current == "" then
-				ref10.current = current2
+			if current2 ~= "" and ref7.current == "" then
+				ref8.current = current2
 				v63(current2)
 			end
-		end, { v52, v13, v63 })
+		end, { v55, v13, v63 })
 	end
 
 	local useEffect = React.useEffect
@@ -1645,32 +1556,32 @@ local function useChatSessionCore(data)
 			return
 		end
 
-		local current2 = ref14.current
-		ref14.current = v13
+		local current2 = ref12.current
+		ref12.current = v13
 		v64()
 
 		if
 			FFlagBuildExperiencePrefillSkipsDraftPersist
 			and current2 == nil
-			and ref9.current ~= ""
-			and ref9.current == ref11.current
+			and ref7.current ~= ""
+			and ref7.current == ref9.current
 		then
-			ref10.current = BuildAppStorage.getChatDraft(v13) or ""
-		elseif current2 == nil and ref9.current ~= "" then
-			ref10.current = ref9.current
-			BuildAppStorage.setChatDraft(v13, ref9.current)
+			ref8.current = BuildAppStorage.getChatDraft(v13) or ""
+		elseif current2 == nil and ref7.current ~= "" then
+			ref8.current = ref7.current
+			BuildAppStorage.setChatDraft(v13, ref7.current)
 		else
 			local current3 = BuildAppStorage.getChatDraft(v13) or ""
-			ref10.current = current3
+			ref8.current = current3
 			v63(current3)
 		end
 
 		return function()
-			local v71 = ref12.current ~= nil
+			local v71 = ref10.current ~= nil
 			v64()
 
 			if v71 then
-				BuildAppStorage.setChatDraft(v13, ref10.current)
+				BuildAppStorage.setChatDraft(v13, ref8.current)
 			end
 		end
 	end
@@ -1678,23 +1589,19 @@ local function useChatSessionCore(data)
 	local v72
 
 	if FFlagBuildExperienceModelPicker then
-		v72 = v8
+		v72 = v7
 	end
 
 	useEffect(fn, { v13, v64, v63, v72 })
 
 	local function commitComposerResourceAttachments(current2) -- 3 equivalent calls inferred from this helper
-		v56.current = current2
-
-		if setState12 ~= nil then
-			setState12(current2)
-		end
-
-		v50(nil)
+		ref17.current = current2
+		setState12(current2)
+		v53(nil)
 	end
 
 	local function findComposerResourceAttachmentIndexByUri(p: string)
-		for k, v73 in v56.current do
+		for k, v73 in ref17.current do
 			if chatTypes.getResourceAttachmentUri(v73) == p then
 				return k
 			end
@@ -1704,13 +1611,13 @@ local function useChatSessionCore(data)
 	end
 
 	local function addComposerResourceAttachment(p)
-		local clone = table.clone(v56.current)
+		local clone = table.clone(ref17.current)
 		table.insert(clone, p)
 		commitComposerResourceAttachments(clone) -- inferred equivalent call
 	end
 
 	local function removeComposerResourceAttachmentAtIndex(p: number)
-		local clone = table.clone(v56.current)
+		local clone = table.clone(ref17.current)
 		table.remove(clone, p)
 		commitComposerResourceAttachments(clone) -- inferred equivalent call
 	end
@@ -1718,27 +1625,21 @@ local function useChatSessionCore(data)
 	local function clearComposerResourceAttachments()
 		commitComposerResourceAttachments({}) -- inferred equivalent call
 	end
-	local ref20 = React.useRef(commitComposerResourceAttachments)
-	ref20.current = commitComposerResourceAttachments
+	local ref21 = React.useRef(commitComposerResourceAttachments)
+	ref21.current = commitComposerResourceAttachments
+	React.useLayoutEffect(function()
+		local current2 = ref18.current
 
-	if FFlagBuildExperienceChatResourceAttachments then
-		React.useLayoutEffect(function()
-			local current2 = v55.current
+		if current2.universeId ~= data.universeId or current2.placeId ~= data.placeId then
+			ref21.current({})
+		end
 
-			if current2.universeId ~= data.universeId or current2.placeId ~= data.placeId then
-				ref20.current({})
-			end
-
-			v55.current = { universeId = data.universeId, placeId = data.placeId }
-		end, { data.universeId, data.placeId })
-	end
+		ref18.current = { universeId = data.universeId, placeId = data.placeId }
+	end, { data.universeId, data.placeId })
 
 	local function commitComposerImages(current2) -- 2 equivalent calls inferred from this helper
-		v54.current = current2
-
-		if setState11 ~= nil then
-			setState11(current2)
-		end
+		ref16.current = current2
+		setState11(current2)
 	end
 
 	local function hasFailedComposerImage(items): boolean -- 3 equivalent calls inferred from this helper
@@ -1752,7 +1653,7 @@ local function useChatSessionCore(data)
 	end
 
 	local function updateComposerImage(p, fn2)
-		local current2 = v54.current
+		local current2 = ref16.current
 		local clone = table.clone(current2)
 
 		for k, v73 in current2 do
@@ -1767,9 +1668,9 @@ local function useChatSessionCore(data)
 	end
 
 	local function beginComposerImageUpload(p)
-		ref17.current += 1
-		local current2 = ref17.current
-		ref16.current[p] = current2
+		ref15.current += 1
+		local current2 = ref15.current
+		ref14.current[p] = current2
 
 		if not hasFailedComposerImage(updateComposerImage(p, function(p2) -- inferred equivalent call
 			local clone = table.clone(p2)
@@ -1778,15 +1679,15 @@ local function useChatSessionCore(data)
 			clone.uploadError = nil
 			return clone
 		end)) then
-			v50(nil)
+			v53(nil)
 		end
 
 		uploadCaptureAsync(p):andThen(function(p2)
-			if ref16.current[p] ~= current2 then
+			if ref14.current[p] ~= current2 then
 				return
 			end
 
-			ref16.current[p] = nil
+			ref14.current[p] = nil
 
 			if not hasFailedComposerImage(updateComposerImage(p, function(p3) -- inferred equivalent call
 				local clone = table.clone(p3)
@@ -1795,14 +1696,14 @@ local function useChatSessionCore(data)
 				clone.uploadError = nil
 				return clone
 			end)) then
-				v50(nil)
+				v53(nil)
 			end
 		end):catch(function(uploadError)
-			if ref16.current[p] ~= current2 then
+			if ref14.current[p] ~= current2 then
 				return
 			end
 
-			ref16.current[p] = nil
+			ref14.current[p] = nil
 			updateComposerImage(p, function(p2)
 				local clone = table.clone(p2)
 				clone.uri = nil
@@ -1811,14 +1712,12 @@ local function useChatSessionCore(data)
 				return clone
 			end)
 
-			if FFlagBuildExperienceChatImageAttachments then
-				v50(v2)
-			end
+			v53(formatted2)
 		end)
 	end
 
 	local function setComposerImages(list)
-		local current2 = v54.current
+		local current2 = ref16.current
 
 		local captures = {}
 		local current3 = {}
@@ -1868,24 +1767,24 @@ local function useChatSessionCore(data)
 				continue
 			end
 
-			ref16.current[v74.capture] = nil
+			ref14.current[v74.capture] = nil
 		end
 
 		commitComposerImages(current3) -- inferred equivalent call
 
 		if not hasFailedComposerImage(current3) then -- inferred equivalent call
-			v50(nil)
+			v53(nil)
 		end
 
 		for _, v74 in captures do
 			beginComposerImageUpload(v74)
 		end
 	end
-	local ref21 = React.useRef(setComposerImages)
-	ref21.current = setComposerImages
+	local ref22 = React.useRef(setComposerImages)
+	ref22.current = setComposerImages
 
 	local function retryComposerImage(p: number)
-		local v73 = v54.current[p]
+		local v73 = ref16.current[p]
 
 		if v73 == nil or v73.capture == nil or v73.uploadStatus ~= "failed" then
 			return
@@ -1905,12 +1804,12 @@ local function useChatSessionCore(data)
 
 	local v75 = React.useCallback(function(p: number)
 		return function(p2: string?, p3: number?)
-			if ref6.current == p then
-				local current2 = ref5.current
+			if ref4.current == p then
+				local current2 = ref3.current
 				local v76 = sessionId
 				local v77
 
-				if current2 == nil or current2.session ~= v8 then
+				if current2 == nil or current2.session ~= v7 then
 					v77 = false
 				elseif v76 == nil or v76 == "" or current2.sessionId == v76 then
 					v77 = true
@@ -1924,7 +1823,7 @@ local function useChatSessionCore(data)
 					local v78 = false
 
 					if FFlagBuildExperienceAnswerForm then
-						local current3 = ref4.current
+						local current3 = ref2.current
 
 						if current3 ~= nil then
 							local getLocalToolActions = current3.getLocalToolActions
@@ -1932,15 +1831,15 @@ local function useChatSessionCore(data)
 						end
 					end
 
-					if p2 ~= nil and ref9.current == "" and not v78 then
+					if p2 ~= nil and ref7.current == "" and not v78 then
 						setComposerText(p2)
 					end
 
-					v50((v:Format((creatorAgentChat.getToolResultFailureComposerError(p3)))))
+					v53((v:Format((creatorAgentChat.getToolResultFailureComposerError(p3)))))
 				end
 			end
 		end
-	end, { v8, sessionId, setComposerText, v50, v })
+	end, { v7, sessionId, setComposerText, v53, v })
 
 	local v76 = data.onPromptFailure
 	local state13
@@ -1949,7 +1848,7 @@ local function useChatSessionCore(data)
 		local setState13
 		state13, setState13 = React.useState(nil)
 
-		if state13 == nil or state13.owner ~= v8 then
+		if state13 == nil or state13.owner ~= v7 then
 			state13 = nil
 		end
 
@@ -1959,7 +1858,7 @@ local function useChatSessionCore(data)
 					return {
 						count = not p2 and 1 or p2.count + 1,
 						reason = reason,
-						owner = v8
+						owner = v7
 					}
 				end)
 			end
@@ -1967,21 +1866,21 @@ local function useChatSessionCore(data)
 			if data.onPromptFailure ~= nil then
 				data.onPromptFailure(p, reason)
 			end
-		end, { v8, data.onPromptFailure })
+		end, { v7, data.onPromptFailure })
 	end
 
 	local v77 = React.useCallback(function(p: number, p2, p3: string?, p4, p5, data2)
-		if ref6.current ~= p then
+		if ref4.current ~= p then
 			return
 		end
 
-		if FFlagBuildExperienceModelPicker and ref2 ~= nil and not ref2.current then
+		if FFlagBuildExperienceModelPicker and v9 ~= nil and not v9.current then
 			GetBuildCreatorCreditRefreshStore(false).settled()
 			return
 		end
 
-		v19(nil)
-		ref8.current = nil
+		v21(nil)
+		ref6.current = nil
 		setState5(nil)
 
 		if FFlagBuildExperienceModelPicker then
@@ -2020,7 +1919,7 @@ local function useChatSessionCore(data)
 
 				task.spawn(function()
 					data2.refreshSession(function(): boolean
-						return ref6.current ~= p
+						return ref4.current ~= p
 					end)
 				end)
 			end
@@ -2033,27 +1932,27 @@ local function useChatSessionCore(data)
 				v59(data2.placeId, "Idle")
 			end
 
-			if FFlagBuildExperienceChatImageAttachments and p4 ~= nil then
-				ref21.current(p4)
+			if p4 ~= nil then
+				ref22.current(p4)
 			end
 
-			if FFlagBuildExperienceChatResourceAttachments and p5 ~= nil then
-				ref20.current(p5)
+			if p5 ~= nil then
+				ref21.current(p5)
 			end
 
 			if p3 ~= nil then
 				setComposerText(p3)
-				v50((v:Format((creatorAgentChat.getPromptFailureComposerError(p2)))))
+				v53((v:Format((creatorAgentChat.getPromptFailureComposerError(p2)))))
 			end
 
 			task.spawn(function()
 				data2.refreshSession(function(): boolean
-					return ref6.current ~= p
+					return ref4.current ~= p
 				end)
 			end)
 		end
 	end, {
-		ref2,
+		v9,
 		data.createUniverseOnFirstPrompt,
 		v76,
 		data.onProjectResolved,
@@ -2063,18 +1962,18 @@ local function useChatSessionCore(data)
 		accountId,
 		v58,
 		setComposerText,
-		v50,
-		v19,
+		v53,
+		v21,
 		setState5,
 		v
 	})
 
-	local ref22 = React.useRef(v4)
+	local ref23 = React.useRef(v3)
 	React.useEffect(function()
-		local v78 = v4 and not ref22.current
-		ref22.current = v4
+		local v78 = v3 and not ref23.current
+		ref23.current = v3
 
-		if v6 or not v4 or not v78 and not isAssistantResponding and v21 == nil then
+		if v5 or not v3 or not v78 and not isAssistantResponding and v24 == nil then
 			return
 		end
 
@@ -2082,21 +1981,21 @@ local function useChatSessionCore(data)
 		task.defer(v58.scrollToBottomUnconditionally)
 		task.delay(0.15, v58.scrollToBottomUnconditionally)
 	end, {
-		v4,
-		v6,
+		v3,
+		v5,
 		isAssistantResponding,
-		v21,
+		v24,
 		#messages,
 		v58
 	})
 
 	React.useEffect(function()
-		if ref4.current ~= nil then
-			local current2 = ref5.current
+		if ref2.current ~= nil then
+			local current2 = ref3.current
 			local v78 = sessionId
 			local v79
 
-			if current2 == nil or current2.session ~= v8 then
+			if current2 == nil or current2.session ~= v7 then
 				v79 = false
 			elseif v78 == nil or v78 == "" or current2.sessionId == v78 then
 				v79 = true
@@ -2111,20 +2010,20 @@ local function useChatSessionCore(data)
 			end
 		end
 
-		if not (state6 == nil and v8 ~= nil) then
+		if not (state6 == nil and v7 ~= nil) then
 			return
 		end
 
-		local resumeSessionKey = getResumeSessionKey(v8) -- inferred equivalent call
+		local resumeSessionKey = getResumeSessionKey(v7) -- inferred equivalent call
 
 		if resumeSessionKey == nil then
 			return
 		end
 
 		local function attachResumedTurn(p, current2: number?)
-			ref6.current += 1
-			local current3 = ref6.current
-			ref8.current = current2
+			ref4.current += 1
+			local current3 = ref4.current
+			ref6.current = current2
 
 			if placeId ~= nil then
 				v59(placeId, "Loading")
@@ -2133,7 +2032,7 @@ local function useChatSessionCore(data)
 			local createResumedAssistantTurn = creatorAgentChat.createResumedAssistantTurn
 
 			local function fn2(p2)
-				v77(current3, p2, nil, nil, nil, v8)
+				v77(current3, p2, nil, nil, nil, v7)
 			end
 
 			local v79
@@ -2142,15 +2041,15 @@ local function useChatSessionCore(data)
 				v79 = current2 - 1
 			end
 
-			local resumedAssistantTurn = createResumedAssistantTurn(v8, p, fn2, v79, v75(current3), v3)
+			local resumedAssistantTurn = createResumedAssistantTurn(v7, p, fn2, v79, v75(current3), v2)
 
-			v19(resumedAssistantTurn, v8)
+			v21(resumedAssistantTurn, v7)
 			resumedAssistantTurn.start()
 			v58.scrollToBottomUnconditionally()
 		end
 
-		if v27.activeTurnState == nil or v27.activeTurnItemIndex == nil or v27.activeTurnState.isDone then
-			ref8.current = nil
+		if v30.activeTurnState == nil or v30.activeTurnItemIndex == nil or v30.activeTurnState.isDone then
+			ref6.current = nil
 
 			local activeTurnHandle = creatorAgentChatStore.getActiveTurnHandle(resumeSessionKey)
 			local v78
@@ -2171,16 +2070,16 @@ local function useChatSessionCore(data)
 				attachResumedTurn(activeTurnHandle, nil)
 			end
 		else
-			local activeTurnStartSequenceId = v27.activeTurnStartSequenceId
+			local activeTurnStartSequenceId = v30.activeTurnStartSequenceId
 
-			if ref8.current == activeTurnStartSequenceId and v21 ~= nil then
+			if ref6.current == activeTurnStartSequenceId and v24 ~= nil then
 				return
 			end
 
 			local v78 = creatorAgentChatStore.resumeTurnFromHistory(
 				resumeSessionKey,
-				v27.activeTurnState,
-				v27.activeTurnSequenceIds
+				v30.activeTurnState,
+				v30.activeTurnSequenceIds
 			)
 
 			if v78 ~= nil then
@@ -2188,20 +2087,20 @@ local function useChatSessionCore(data)
 			end
 		end
 	end, {
-		v27,
-		v8,
+		v30,
+		v7,
 		sessionId,
 		creatorAgentChatStore,
 		isAssistantResponding,
-		v21,
+		v24,
 		placeId,
 		v59,
 		v77,
 		v58,
-		v19,
+		v21,
 		state6,
 		v75,
-		v3
+		v2
 	})
 
 	local v78 = React.useCallback(
@@ -2214,7 +2113,7 @@ local function useChatSessionCore(data)
 					afterSequenceId = afterSequenceId
 				})
 
-				local v79 = v29
+				local v79 = v32
 
 				local fn2 = engineFeature and p3 ~= nil and function(p6: number?)
 					if v79 ~= nil then
@@ -2225,8 +2124,8 @@ local function useChatSessionCore(data)
 				end or v79
 				local v80
 
-				if FFlagBuildExperienceRestoreStoppedPrompt and ref15 ~= nil then
-					local v81 = ref15
+				if FFlagBuildExperienceRestoreStoppedPrompt and ref13 ~= nil then
+					local v81 = ref13
 					v80 = function(p6: number?)
 						v81.current = current2
 
@@ -2287,9 +2186,9 @@ local function useChatSessionCore(data)
 						p4.release()
 
 						if not current3 then
-							if ref4.current == v83 and ref6.current == current2 then
-								v19(nil)
-								ref8.current = nil
+							if ref2.current == v83 and ref4.current == current2 then
+								v21(nil)
+								ref6.current = nil
 								setState5(nil)
 
 								if p.placeId ~= nil then
@@ -2329,7 +2228,7 @@ local function useChatSessionCore(data)
 					p2,
 					fn5,
 					v84,
-					v3,
+					v2,
 					v81,
 					v82,
 					v85,
@@ -2343,7 +2242,7 @@ local function useChatSessionCore(data)
 					v59(p.placeId, "Loading")
 				end
 
-				v19(v83, p)
+				v21(v83, p)
 				v58.scrollToBottomAfterSend()
 				v83.start()
 			end
@@ -2353,7 +2252,7 @@ local function useChatSessionCore(data)
 				return
 			end
 
-			local v79 = ref7
+			local v79 = ref5
 			local v80 = setState8
 			local v81 = p4
 
@@ -2366,18 +2265,13 @@ local function useChatSessionCore(data)
 
 				local creatorCreditStore = CreatorCredit.getCreatorCreditStore(false)
 				local promptExperiment = CreatorAgentChat.experimentOverride.getPromptExperiment(CreatorAgentChat.experimentOverride.getKey(p.getCasSessionId()) or v14)
+				local v82
 
-				local v82 = enabled
-
-				if v82 then
-					if v14 == nil then
-						v82 = false
-					else
-						v82 = CreatorAgentChat.experimentOverride.getInternalSelection(
-							CreatorAgentChat.experimentOverride.getKey(p.getCasSessionId()) or v14,
-							false
-						).isSelected
-					end
+				if enabled and v14 ~= nil then
+					v82 = CreatorAgentChat.experimentOverride.getInternalSelection(
+						CreatorAgentChat.experimentOverride.getKey(p.getCasSessionId()) or v14,
+						false
+					)
 				end
 
 				v81 = beginBuildModelSend(entry, creatorCreditStore, promptExperiment, v82)
@@ -2402,7 +2296,7 @@ local function useChatSessionCore(data)
 				v80(true)
 				task.spawn(function()
 					local success, result, v84 = pcall(attempt.prepare, p)
-					local v85 = not attempt.isCurrent() or ref6.current ~= current2
+					local v85 = not attempt.isCurrent() or ref4.current ~= current2
 
 					if v85 or not success or result == nil then
 						attempt.release()
@@ -2414,7 +2308,7 @@ local function useChatSessionCore(data)
 						end
 
 						if v85 then
-							if ref6.current == current2 and callback3 ~= nil then
+							if ref4.current == current2 and callback3 ~= nil then
 								callback3(true)
 							end
 						else
@@ -2452,7 +2346,7 @@ local function useChatSessionCore(data)
 								callback3(false)
 							end
 
-							v51(v:Format(v86))
+							v54(v:Format(v86))
 						end
 
 						if onTerminal ~= nil then
@@ -2469,34 +2363,34 @@ local function useChatSessionCore(data)
 		{
 			v10,
 			v14,
-			ref7,
-			v9,
+			ref5,
+			v8,
 			setState8,
-			v51,
+			v54,
 			v,
 			v76,
 			v77,
 			v59,
 			v58,
-			v19,
+			v21,
 			setState5,
 			v75,
-			v3,
-			v29,
+			v2,
+			v32,
 			v68,
 			sessionId
 		}
 	)
 
-	local ref23 = React.useRef(v27.latestSequenceId)
-	ref23.current = v27.latestSequenceId
+	local ref24 = React.useRef(v30.latestSequenceId)
+	ref24.current = v30.latestSequenceId
 	local v80 = useAgentRollbackRequest({
 		universeId = universeId,
 		placeId = placeId,
-		session = v8,
-		activeTurnHandleRef = ref4,
+		session = v7,
+		activeTurnHandleRef = ref2,
 		startRollbackTurn = React.useCallback(function(data2, callback, callback2)
-			local v80 = v8
+			local v80 = v7
 
 			if v80 == nil then
 				callback2()
@@ -2504,7 +2398,7 @@ local function useChatSessionCore(data)
 			end
 
 			if FFlagBuildExperienceModelPicker then
-				local current2 = ref7.current
+				local current2 = ref5.current
 
 				if current2 ~= nil and not current2.started and current2.attempt.isCurrent() then
 					callback2()
@@ -2513,8 +2407,8 @@ local function useChatSessionCore(data)
 			end
 
 			v58.captureStickToBottomForSend()
-			ref6.current += 1
-			local current2 = ref6.current
+			ref4.current += 1
+			local current2 = ref4.current
 			setState6(nil)
 			local agentRollbackPrompt = buildAgentRollbackPrompt(
 				data2.versionNumber,
@@ -2522,20 +2416,20 @@ local function useChatSessionCore(data)
 				data2.noteDescription
 			)
 
-			v78(v80, agentRollbackPrompt, agentRollbackPrompt, nil, nil, current2, ref23.current, nil, function()
+			v78(v80, agentRollbackPrompt, agentRollbackPrompt, nil, nil, current2, ref24.current, nil, function()
 				v58.scrollToBottomUnconditionally()
 				callback()
 			end, callback2)
-		end, { v8, ref7, v58, setState6, v78 })
+		end, { v7, ref5, v58, setState6, v78 })
 	})
 
 	React.useLayoutEffect(function()
 		if state7 ~= nil then
-			local current2 = ref5.current
+			local current2 = ref3.current
 			local v81 = sessionId
 			local v82
 
-			if current2 == nil or current2.session ~= v8 then
+			if current2 == nil or current2.session ~= v7 then
 				v82 = false
 			elseif v81 == nil or v81 == "" or current2.sessionId == v81 then
 				v82 = true
@@ -2546,9 +2440,9 @@ local function useChatSessionCore(data)
 			end
 
 			if not v82 then
-				local current3 = ref5.current
-				ref6.current += 1
-				ref8.current = nil
+				local current3 = ref3.current
+				ref4.current += 1
+				ref6.current = nil
 
 				if v80.stopRequestBeforeReceipt(state7) then
 					if current3 ~= nil and current3.session.placeId ~= nil then
@@ -2558,7 +2452,7 @@ local function useChatSessionCore(data)
 					state7.detach()
 
 					if FFlagBuildExperienceModelPicker then
-						local v84 = ref7
+						local v84 = ref5
 						local current4 = v84.current
 
 						if current4 ~= nil and current4.started then
@@ -2568,12 +2462,12 @@ local function useChatSessionCore(data)
 					end
 				end
 
-				v19(nil, nil)
+				v21(nil, nil)
 				setState5(nil)
 				setState6(nil)
 			end
 		end
-	end, { v8, sessionId, state7, v19, v80, v59, ref7 })
+	end, { v7, sessionId, state7, v21, v80, v59, ref5 })
 
 	local v81 = React.useCallback(
 		function(text: string, p, images, resourceAttachments, p2: number, afterSequenceId: number?, p3, callback)
@@ -2592,7 +2486,7 @@ local function useChatSessionCore(data)
 			end
 
 			local v83 = setState3
-			local v84 = v9
+			local v84 = v8
 			local entry
 
 			if v10 == nil then
@@ -2612,7 +2506,15 @@ local function useChatSessionCore(data)
 
 			local lastTime = os.clock()
 			local v85 = nil
-			local v86 = UniverseCreate.getUniverseCreateStore().createUniverse({
+			local chatOpenId
+
+			if FFlagBuildExperienceChatOpenId then
+				chatOpenId = CreatorAgentChat.chatOpenTelemetry.getChatOpenIdForUniverse(nil)
+			else
+				chatOpenId = nil
+			end
+
+			local v87 = UniverseCreate.getUniverseCreateStore().createUniverse({
 				templatePlaceId = getDefaultTemplatePlaceId(),
 				isPublish = true
 			}):andThen(function(p4)
@@ -2630,15 +2532,15 @@ local function useChatSessionCore(data)
 					v85 = { universeId = p4.universeId, placeId = p4.rootPlaceId }
 				end
 
-				local v87
+				local v88
 
 				if FFlagBuildExperienceModelPicker then
-					v87 = not canConfigure() -- inferred equivalent call
+					v88 = not canConfigure() -- inferred equivalent call
 				else
-					v87 = ref6.current ~= p2
+					v88 = ref4.current ~= p2
 				end
 
-				if v87 then
+				if v88 then
 					return nil
 				end
 
@@ -2653,30 +2555,30 @@ local function useChatSessionCore(data)
 
 					return universeConfigurationStore.setTeamCreate(p4.universeId, true)
 				end):andThen(function(): nil
-					local v88
+					local v89
 
 					if FFlagBuildExperienceModelPicker then
-						v88 = not canConfigure() or v84 == nil or not v84.mounted -- inferred equivalent call
+						v89 = not canConfigure() or v84 == nil or not v84.mounted -- inferred equivalent call
 					else
-						v88 = ref6.current ~= p2
+						v89 = ref4.current ~= p2
 					end
 
-					if v88 then
+					if v89 then
 						return nil
 					end
 
-					local v89 = { universeId = p4.universeId, placeId = p4.rootPlaceId }
+					local v90 = { universeId = p4.universeId, placeId = p4.rootPlaceId }
 
 					if FFlagBuildExperienceModelPicker then
-						local clone = table.clone(v89)
+						local clone = table.clone(v90)
 						clone.accountId = accountId
 						setState(clone)
 					else
-						setState(v89)
+						setState(v90)
 					end
 
 					if data.onProjectResolved ~= nil then
-						data.onProjectResolved(v89)
+						data.onProjectResolved(v90)
 					end
 
 					if p3 ~= nil and not p3.isCurrent() then
@@ -2691,7 +2593,7 @@ local function useChatSessionCore(data)
 
 					if
 						enabled
-						and (FFlagBuildExperienceModelPicker and CreatorAgentChat.experimentOverride.has(v14) or ref3 ~= nil and ref3.current)
+						and (FFlagBuildExperienceModelPicker and CreatorAgentChat.experimentOverride.has(v14) or v15 ~= nil and v15.current)
 					then
 						sessionForProject.setPendingExperimentKey(v14)
 					end
@@ -2720,46 +2622,55 @@ local function useChatSessionCore(data)
 					error = err
 				})
 
-				if ref6.current ~= p2 or p3 ~= nil and not p3.isCurrent() then
+				if ref4.current ~= p2 or p3 ~= nil and not p3.isCurrent() then
 					return
 				end
 
 				if FFlagBuildExperiencePromptFailureTelemetry then
-					local v87 = math.round((os.clock() - lastTime) * 1000)
-					local v88 = v85 == nil and {} or {
+					local v88 = math.round((os.clock() - lastTime) * 1000)
+					local v89 = v85 == nil and {} or {
 						universeId = v85.universeId,
 						placeId = v85.placeId
 					}
-					local v89 = {
+
+					local v90 = FFlagBuildExperienceChatOpenId
+						and {
+							universeId = v89.universeId,
+							placeId = v89.placeId,
+							chatOpenId = chatOpenId
+						}
+						or v89
+
+					local v91 = {
 						isContentPolicy = "false",
 						setupStage = v85 == nil and "create_universe" or "configure_universe",
 						errorCopyKey = LocalizationStrings.CHAT_CREATE_UNIVERSE_ERROR,
-						elapsedMs = tostring(v87),
+						elapsedMs = tostring(v88),
 						receivedResponse = "false",
-						stalled = tostring(chatConstants.PROMPT_STALL_SECONDS * 1000 <= v87)
+						stalled = tostring(chatConstants.PROMPT_STALL_SECONDS * 1000 <= v88)
 					}
 
-					v89.failureKind = RequestFailureKind.Unknown
+					v91.failureKind = RequestFailureKind.Unknown
 
 					if typeof(err) == "table" and typeof(err.responseCode) == "number" then
-						v89.failureKind = RequestFailureKind.Http
-						v89.httpStatusCode = tostring(err.responseCode)
+						v91.failureKind = RequestFailureKind.Http
+						v91.httpStatusCode = tostring(err.responseCode)
 					end
 
-					sendBuildExperienceEvent("SEND_PROMPT_START", v88)
-					sendBuildExperienceEvent("SEND_PROMPT_FAILED", v88, v89)
+					sendBuildExperienceEvent("SEND_PROMPT_START", v90)
+					sendBuildExperienceEvent("SEND_PROMPT_FAILED", v90, v91)
 				end
 
-				v19(nil)
+				v21(nil)
 				setState5(nil)
 				setComposerText(text)
 
-				if FFlagBuildExperienceChatImageAttachments and images ~= nil then
-					ref21.current(images)
+				if images ~= nil then
+					ref22.current(images)
 				end
 
-				if FFlagBuildExperienceChatResourceAttachments and resourceAttachments ~= nil then
-					ref20.current(resourceAttachments)
+				if resourceAttachments ~= nil then
+					ref21.current(resourceAttachments)
 				end
 
 				if p3 ~= nil then
@@ -2768,11 +2679,11 @@ local function useChatSessionCore(data)
 					setState8(false)
 				end
 
-				v50(formatted)
+				v53(formatted)
 			end)
 
 			if FFlagBuildExperienceModelPicker then
-				v86:finally(function()
+				v87:finally(function()
 					if v82 ~= nil then
 						v82(universeId2)
 					end
@@ -2788,7 +2699,7 @@ local function useChatSessionCore(data)
 			end
 		end,
 		{
-			v9,
+			v8,
 			v10,
 			setState3,
 			setState8,
@@ -2796,119 +2707,103 @@ local function useChatSessionCore(data)
 			creatorAgentChatStore,
 			data.onProjectResolved,
 			data.modelSelectionDraftId,
-			v19,
+			v21,
 			setComposerText,
-			v50,
+			v53,
 			setState,
 			accountId,
 			setState5,
 			v78,
 			formatted,
 			v14,
-			ref3
+			v15
 		}
 	)
 
 	local sendMessage = React.useCallback(function(callback): boolean
-		if not v5 or v9 ~= nil and v9.pending then
+		if not v4 or v8 ~= nil and v8.pending then
 			return false
 		end
 
-		local text = trimMessage(ref9.current) -- inferred equivalent call
+		local text = trimMessage(ref7.current) -- inferred equivalent call
 
-		local v84 = not FFlagBuildExperienceChatImageAttachments and {} or v54.current
+		local current2 = ref16.current
+		local current3 = ref17.current
 
-		local v85 = not FFlagBuildExperienceChatResourceAttachments and {} or v56.current
-
-		if text == "" and #v84 == 0 then
+		if text == "" and #current2 == 0 then
 			setComposerText("")
 			return false
 		end
 
-		if FFlagBuildExperienceChatImageAttachments then
-			for _, v86 in v84 do
-				if v86.uri == nil or v86.uploadStatus == "uploading" or v86.uploadStatus == "failed" then
-					return false
-				end
+		for _, v84 in current2 do
+			if v84.uri == nil or v84.uploadStatus == "uploading" or v84.uploadStatus == "failed" then
+				return false
 			end
 		end
 
-		local current2 = ref5.current
-		local v86 = sessionId
-		local v87
+		local current4 = ref3.current
+		local v84 = sessionId
+		local v85
 
-		if current2 == nil or current2.session ~= v8 then
-			v87 = false
-		elseif v86 == nil or v86 == "" or current2.sessionId == v86 then
-			v87 = true
-		elseif current2.sessionId == nil then
-			v87 = current2.session.getCasSessionId() == v86
+		if current4 == nil or current4.session ~= v7 then
+			v85 = false
+		elseif v84 == nil or v84 == "" or current4.sessionId == v84 then
+			v85 = true
+		elseif current4.sessionId == nil then
+			v85 = current4.session.getCasSessionId() == v84
 		else
-			v87 = false
+			v85 = false
 		end
 
-		local current3
+		local current5
 
-		if v87 then
-			current3 = ref4.current
+		if v85 then
+			current5 = ref2.current
 		end
 
-		if isAssistantResponding or v6 and current3 ~= nil then
-			if
-				FFlagBuildExperienceChatImageAttachments and #v84 > 0
-				or FFlagBuildExperienceChatResourceAttachments and #v85 > 0
-				or (current3 == nil or not current3.trySubmitComposerText(text))
-			then
+		if isAssistantResponding or v5 and current5 ~= nil then
+			if #current2 > 0 or #current3 > 0 or (current5 == nil or not current5.trySubmitComposerText(text)) then
 				return false
 			end
 
 			setComposerText("")
 
-			if ref18.current then
-				ref18.current.releaseFocus()
+			if ref19.current then
+				ref19.current.releaseFocus()
 			end
 
 			v58.scrollToBottomAfterSend()
 			return true
 		else
-			local v88
+			local v86
 
 			if data.createUniverseOnFirstPrompt == true then
-				v88 = universeId == nil
+				v86 = universeId == nil
 			else
-				v88 = false
+				v86 = false
 			end
 
 			if
-				not v88 and v8 == nil
+				not v86 and v7 == nil
 				or placeId ~= nil and agentRollbackRequestStore.getIsPendingForPlaceId(placeId)(false)
 			then
 				return false
 			end
 
 			local function restoreDraft(flag: boolean)
-				if
-					flag
-					and (ref9.current ~= "" or FFlagBuildExperienceChatImageAttachments and #v54.current > 0 or FFlagBuildExperienceChatResourceAttachments and #v56.current > 0)
-				then
+				if flag and (ref7.current ~= "" or #ref16.current > 0 or #ref17.current > 0) then
 					return
 				end
 
 				setComposerText(text)
-
-				if FFlagBuildExperienceChatImageAttachments then
-					ref21.current(v84)
-				end
-
-				if FFlagBuildExperienceChatResourceAttachments then
-					ref20.current(v85)
-				end
+				ref22.current(current2)
+				ref21.current(current3)
 			end
 
 			local attempt
 
 			if FFlagBuildExperienceModelPicker then
-				v50(nil)
+				v53(nil)
 				local entry
 
 				if v10 ~= nil then
@@ -2918,39 +2813,34 @@ local function useChatSessionCore(data)
 				local creatorCreditStore = CreatorCredit.getCreatorCreditStore(false)
 				local getPromptExperiment = CreatorAgentChat.experimentOverride.getPromptExperiment
 				local getKey = CreatorAgentChat.experimentOverride.getKey
-				local v90
+				local v88
 
-				if v8 ~= nil then
-					v90 = v8.getCasSessionId()
+				if v7 ~= nil then
+					v88 = v7.getCasSessionId()
 				end
 
-				local promptExperiment = getPromptExperiment(getKey(v90) or v14)
+				local promptExperiment = getPromptExperiment(getKey(v88) or v14)
+				local v89
 
-				local v91 = enabled
+				if enabled and v14 ~= nil then
+					local getInternalSelection = CreatorAgentChat.experimentOverride.getInternalSelection
+					local getKey2 = CreatorAgentChat.experimentOverride.getKey
+					local v90
 
-				if v91 then
-					if v14 == nil then
-						v91 = false
-					else
-						local getInternalSelection = CreatorAgentChat.experimentOverride.getInternalSelection
-						local getKey2 = CreatorAgentChat.experimentOverride.getKey
-						local v92
-
-						if v8 ~= nil then
-							v92 = v8.getCasSessionId()
-						end
-
-						v91 = getInternalSelection(getKey2(v92) or v14, false).isSelected
+					if v7 ~= nil then
+						v90 = v7.getCasSessionId()
 					end
+
+					v89 = getInternalSelection(getKey2(v90) or v14, false)
 				end
 
-				attempt = beginBuildModelSend(entry, creatorCreditStore, promptExperiment, v91)
+				attempt = beginBuildModelSend(entry, creatorCreditStore, promptExperiment, v89)
 
 				if attempt == nil then
 					return false
 				end
 
-				ref7.current = { attempt = attempt, started = false, restoreDraft = restoreDraft }
+				ref5.current = { attempt = attempt, started = false, restoreDraft = restoreDraft }
 
 				setState8(true)
 			else
@@ -2958,8 +2848,8 @@ local function useChatSessionCore(data)
 			end
 
 			v58.captureStickToBottomForSend()
-			ref6.current += 1
-			local current4 = ref6.current
+			ref4.current += 1
+			local current6 = ref4.current
 			setState6(nil)
 
 			if engineFeature then
@@ -2967,104 +2857,98 @@ local function useChatSessionCore(data)
 			end
 
 			v63("")
+			ref22.current({})
+			ref21.current({})
 
-			if FFlagBuildExperienceChatImageAttachments then
-				ref21.current({})
-			end
-
-			if FFlagBuildExperienceChatResourceAttachments then
-				ref20.current({})
-			end
-
-			if ref18.current then
-				ref18.current.releaseFocus()
+			if ref19.current then
+				ref19.current.releaseFocus()
 			end
 
 			local function startPrompt(p, p2)
-				if v88 then
-					local latestSequenceId = v27.latestSequenceId
-					local v92
+				if v86 then
+					local latestSequenceId = v30.latestSequenceId
+					local v90
 
 					if FFlagBuildExperienceModelPicker then
-						v92 = restoreDraft
+						v90 = restoreDraft
 					end
 
-					v81(text, p, p2, v85, current4, latestSequenceId, attempt, v92)
+					v81(text, p, p2, current3, current6, latestSequenceId, attempt, v90)
 				else
-					local latestSequenceId = v27.latestSequenceId
-					local v93
+					local latestSequenceId = v30.latestSequenceId
+					local v91
 
 					if FFlagBuildExperienceLibrary then
-						v93 = callback
+						v91 = callback
 					end
 
-					local v95
+					local v93
 
 					if FFlagBuildExperienceModelPicker then
-						v95 = restoreDraft
+						v93 = restoreDraft
 					end
 
-					v78(v8, text, p, p2, v85, current4, latestSequenceId, text, nil, nil, v93, attempt, v95)
+					v78(v7, text, p, p2, current3, current6, latestSequenceId, text, nil, nil, v91, attempt, v93)
 				end
 			end
 
-			if #v84 == 0 and #v85 == 0 then
+			if #current2 == 0 and #current3 == 0 then
 				startPrompt(text, nil)
 				return true
 			end
 
-			local v91 = {}
+			local v89 = {}
 
 			if text ~= "" then
-				table.insert(v91, { type = "text", text = text })
+				table.insert(v89, { type = "text", text = text })
 			end
 
-			for _, v92 in v85 do
-				if v92.type == "resource_link" then
-					table.insert(v91, {
-						type = v92.type,
-						uri = v92.uri,
-						name = v92.name,
-						mimeType = v92.mimeType
+			for _, v90 in current3 do
+				if v90.type == "resource_link" then
+					table.insert(v89, {
+						type = v90.type,
+						uri = v90.uri,
+						name = v90.name,
+						mimeType = v90.mimeType
 					})
 				else
-					table.insert(v91, {
-						type = v92.type,
+					table.insert(v89, {
+						type = v90.type,
 						resource = {
-							uri = v92.resource.uri,
-							text = v92.resource.text,
+							uri = v90.resource.uri,
+							text = v90.resource.text,
 							blob = nil,
-							mimeType = v92.resource.mimeType
+							mimeType = v90.resource.mimeType
 						}
 					})
 				end
 			end
 
-			local v92 = {}
+			local v90 = {}
 
-			for _, v93 in v84 do
-				local uri = v93.uri
-				table.insert(v91, { type = "image", uri = uri })
-				table.insert(v92, { capture = v93.capture, uri = uri, uploadStatus = "uploaded" })
+			for _, v91 in current2 do
+				local uri = v91.uri
+				table.insert(v89, { type = "image", uri = uri })
+				table.insert(v90, { capture = v91.capture, uri = uri, uploadStatus = "uploaded" })
 			end
 
-			startPrompt(v91, v92)
+			startPrompt(v89, v90)
 			return true
 		end
 	end, {
-		v5,
-		v9,
+		v4,
+		v8,
 		v10,
 		v14,
-		ref7,
+		ref5,
 		setState8,
-		v50,
-		v8,
+		v53,
+		v7,
 		sessionId,
 		universeId,
 		placeId,
 		isAssistantResponding,
-		v6,
+		v5,
 		v58,
 		setComposerText,
 		v63,
@@ -3073,14 +2957,14 @@ local function useChatSessionCore(data)
 		v78,
 		data.createUniverseOnFirstPrompt,
 		setState6,
-		v27,
+		v30,
 		agentRollbackRequestStore
 	})
 
 	local useCallback = React.useCallback
 	local function fn2()
 		if FFlagBuildExperienceModelPicker then
-			local v83 = ref7
+			local v83 = ref5
 			local current2 = v83.current
 
 			if current2 ~= nil and not current2.started then
@@ -3090,7 +2974,7 @@ local function useChatSessionCore(data)
 				setState8(false)
 
 				if not current2.started then
-					ref6.current += 1
+					ref4.current += 1
 					setState5(nil)
 
 					if current2.restoreDraft ~= nil then
@@ -3106,11 +2990,11 @@ local function useChatSessionCore(data)
 			end
 		end
 
-		local current2 = ref5.current
+		local current2 = ref3.current
 		local v83 = sessionId
 		local v84
 
-		if current2 == nil or current2.session ~= v8 then
+		if current2 == nil or current2.session ~= v7 then
 			v84 = false
 		elseif v83 == nil or v83 == "" or current2.sessionId == v83 then
 			v84 = true
@@ -3123,7 +3007,7 @@ local function useChatSessionCore(data)
 		local current3
 
 		if v84 then
-			current3 = ref4.current
+			current3 = ref2.current
 		end
 
 		if current3 == nil then
@@ -3135,8 +3019,8 @@ local function useChatSessionCore(data)
 
 			current3.stop()
 		else
-			local current4 = ref6.current
-			ref6.current += 1
+			local current4 = ref4.current
+			ref4.current += 1
 
 			if FFlagBuildExperiencePromptFailureTelemetry and current3.reportUserStop ~= nil then
 				current3.reportUserStop()
@@ -3146,37 +3030,33 @@ local function useChatSessionCore(data)
 				current3.stop()
 			end
 
-			v19(nil)
-			ref8.current = nil
+			v21(nil)
+			ref6.current = nil
 
 			if
 				FFlagBuildExperienceRestoreStoppedPrompt
-				and ref15 ~= nil
-				and ref15.current ~= current4
+				and ref13 ~= nil
+				and ref13.current ~= current4
 				and state5 ~= nil
-				and ref9.current == ""
-				and v27.isAwaitingUserMessageEcho
+				and ref7.current == ""
+				and v30.isAwaitingUserMessageEcho
 			then
 				setComposerText(state5.text)
 
-				if FFlagBuildExperienceChatImageAttachments and state5.images ~= nil and #v54.current == 0 then
-					ref21.current(state5.images)
+				if state5.images ~= nil and #ref16.current == 0 then
+					ref22.current(state5.images)
 				end
 
-				if
-					FFlagBuildExperienceChatResourceAttachments
-					and state5.resourceAttachments ~= nil
-					and #v56.current == 0
-				then
-					ref20.current(state5.resourceAttachments)
+				if state5.resourceAttachments ~= nil and #ref17.current == 0 then
+					ref21.current(state5.resourceAttachments)
 				end
 			end
 
 			setState5(nil)
 			setState6({
-				session = v8,
-				sessionId = v8.getCasSessionId(),
-				startSequenceId = v27.activeTurnStartSequenceId
+				session = v7,
+				sessionId = v7.getCasSessionId(),
+				startSequenceId = v30.activeTurnStartSequenceId
 			})
 
 			if placeId ~= nil then
@@ -3185,58 +3065,58 @@ local function useChatSessionCore(data)
 		end
 	end
 
-	local v84
+	local v88
 
 	if FFlagBuildExperienceRestoreStoppedPrompt then
-		v84 = state5
+		v88 = state5
 	end
 
-	local v85
+	local v89
 
 	if FFlagBuildExperienceRestoreStoppedPrompt then
-		v85 = setComposerText
+		v89 = setComposerText
 	end
 
 	local stopAssistantResponse = useCallback(fn2, {
-		ref7,
+		ref5,
 		setState8,
-		v8,
+		v7,
 		sessionId,
 		placeId,
 		v59,
-		v19,
+		v21,
 		setState5,
 		setState6,
-		v27,
+		v30,
 		v80,
-		v84,
-		v85
+		v88,
+		v89
 	})
 
-	local v87 = data.autoFocusComposer == nil or data.autoFocusComposer
-	local v88
+	local v91 = data.autoFocusComposer == nil or data.autoFocusComposer
+	local v92
 
 	if data.focusComposerWhen == nil then
-		v88 = v87
+		v92 = v91
 	else
-		v88 = data.focusComposerWhen
+		v92 = data.focusComposerWhen
 	end
 
 	React.useEffect(function()
-		if not (v87 and v88) then
+		if not (v91 and v92) then
 			return function() end
 		end
 
-		local v89 = false
+		local v93 = false
 		local function fn3()
-			return v89
+			return v93
 		end
 
-		scheduleComposerAutoFocus(ref18, fn3) -- inferred equivalent call
+		scheduleComposerAutoFocus(ref19, fn3) -- inferred equivalent call
 		return function()
-			v89 = true
+			v93 = true
 		end
-	end, { v87, v88 })
+	end, { v91, v92 })
 
 	local launchPlaytest = React.useCallback(function(p: string)
 		if placeId == nil then
@@ -3257,32 +3137,32 @@ local function useChatSessionCore(data)
 		localToolActions = React.useMemo(function()
 			local onAnswerSelectedByToolCallId = {}
 
-			for k, v93 in v25.onAnswerSelectedByToolCallId do
+			for k, v96 in v28.onAnswerSelectedByToolCallId do
 				onAnswerSelectedByToolCallId[k] = function(p, p2, flag: boolean?)
-					v50(nil)
-					v93(p, p2, flag)
+					v53(nil)
+					v96(p, p2, flag)
 				end
 			end
 
 			local onAnswerConfirmedByToolCallId = {}
 
-			for k, v94 in v25.onAnswerConfirmedByToolCallId do
+			for k, v97 in v28.onAnswerConfirmedByToolCallId do
 				onAnswerConfirmedByToolCallId[k] = function()
-					v50(nil)
-					v94()
+					v53(nil)
+					v97()
 				end
 			end
 
 			return {
 				onAnswerSelectedByToolCallId = onAnswerSelectedByToolCallId,
 				onAnswerConfirmedByToolCallId = onAnswerConfirmedByToolCallId,
-				onPlanAcceptedByToolCallId = v25.onPlanAcceptedByToolCallId,
-				onDevProductApprovedByToolCallId = v25.onDevProductApprovedByToolCallId,
-				onDevProductRejectedByToolCallId = v25.onDevProductRejectedByToolCallId
+				onPlanAcceptedByToolCallId = v28.onPlanAcceptedByToolCallId,
+				onDevProductApprovedByToolCallId = v28.onDevProductApprovedByToolCallId,
+				onDevProductRejectedByToolCallId = v28.onDevProductRejectedByToolCallId
 			}
-		end, { v25, v50 })
+		end, { v28, v53 })
 	else
-		localToolActions = v25
+		localToolActions = v28
 	end
 
 	local answerForm
@@ -3297,57 +3177,57 @@ local function useChatSessionCore(data)
 
 	if FFlagBuildExperienceAnswerForm then
 		submitAnswerText = React.useCallback(function(p: string, p2: string, p3: string)
-			local current2 = ref4.current
+			local current2 = ref2.current
 
 			if current2 == nil then
 				return false
 			end
 
-			local current3 = ref5.current
-			local v94 = sessionId
-			local v95
+			local current3 = ref3.current
+			local v97 = sessionId
+			local v98
 
-			if current3 == nil or current3.session ~= v8 then
-				v95 = false
-			elseif v94 == nil or v94 == "" or current3.sessionId == v94 then
-				v95 = true
+			if current3 == nil or current3.session ~= v7 then
+				v98 = false
+			elseif v97 == nil or v97 == "" or current3.sessionId == v97 then
+				v98 = true
 			elseif current3.sessionId == nil then
-				v95 = current3.session.getCasSessionId() == v94
+				v98 = current3.session.getCasSessionId() == v97
 			else
-				v95 = false
+				v98 = false
 			end
 
-			if v95 then
-				v50(nil)
+			if v98 then
+				v53(nil)
 				return current2.trySubmitAnswerText(p, p2, p3)
 			end
 
 			return false
-		end, { v8, sessionId, v50 })
+		end, { v7, sessionId, v53 })
 	end
 
-	local v94 = {}
-	v94.currentSessionId = v13
-	v94.internalTesting = internalTesting
-	v94.agentSpecVersion = agentSpecVersion
-	v94.setAgentSpecVersion = setAgentSpecVersion
-	v94.messages = messages
-	v94.localToolActions = localToolActions
-	v94.answerForm = answerForm
-	v94.submitAnswerText = submitAnswerText
-	v94.composerText = composerText
-	v94.composerErrorText = state9
-	v94.fundingFailure = state13
-	v94.setComposerText = setComposerText
-	v94.setPrefilledComposerText = setPrefilledComposerText
-	v94.composerImages = not FFlagBuildExperienceChatImageAttachments and {} or state11
-	v94.setComposerImages = setComposerImages
-	v94.retryComposerImage = retryComposerImage
-	v94.composerResourceAttachments = not FFlagBuildExperienceChatResourceAttachments and {} or state12
-	v94.findComposerResourceAttachmentIndexByUri = findComposerResourceAttachmentIndexByUri
-	v94.addComposerResourceAttachment = addComposerResourceAttachment
-	v94.removeComposerResourceAttachmentAtIndex = removeComposerResourceAttachmentAtIndex
-	v94.clearComposerResourceAttachments = clearComposerResourceAttachments
+	local v97 = {}
+	v97.currentSessionId = v13
+	v97.internalTesting = internalTesting
+	v97.agentSpecVersion = agentSpecVersion
+	v97.setAgentSpecVersion = setAgentSpecVersion
+	v97.messages = messages
+	v97.localToolActions = localToolActions
+	v97.answerForm = answerForm
+	v97.submitAnswerText = submitAnswerText
+	v97.composerText = composerText
+	v97.composerErrorText = state9
+	v97.fundingFailure = state13
+	v97.setComposerText = setComposerText
+	v97.setPrefilledComposerText = setPrefilledComposerText
+	v97.composerImages = state11
+	v97.setComposerImages = setComposerImages
+	v97.retryComposerImage = retryComposerImage
+	v97.composerResourceAttachments = state12
+	v97.findComposerResourceAttachmentIndexByUri = findComposerResourceAttachmentIndexByUri
+	v97.addComposerResourceAttachment = addComposerResourceAttachment
+	v97.removeComposerResourceAttachmentAtIndex = removeComposerResourceAttachmentAtIndex
+	v97.clearComposerResourceAttachments = clearComposerResourceAttachments
 	local hasPreparedModelSession
 
 	if FFlagBuildExperienceModelPicker then
@@ -3358,16 +3238,16 @@ local function useChatSessionCore(data)
 		end
 	end
 
-	v94.hasPreparedModelSession = hasPreparedModelSession
+	v97.hasPreparedModelSession = hasPreparedModelSession
 	local modelSessionModels
 
 	if FFlagBuildExperienceModelPicker and v10 ~= nil then
 		modelSessionModels = v10.models
 	end
 
-	v94.modelSessionModels = modelSessionModels
+	v97.modelSessionModels = modelSessionModels
 
-	if not (FFlagBuildExperienceChatImageAttachments and isComposerSendBlocked) then
+	if not isComposerSendBlocked then
 		isComposerSendBlocked = FFlagBuildExperienceModelPicker
 
 		if isComposerSendBlocked then
@@ -3385,38 +3265,38 @@ local function useChatSessionCore(data)
 		end
 	end
 
-	v94.isComposerSendBlocked = isComposerSendBlocked
+	v97.isComposerSendBlocked = isComposerSendBlocked
 
-	v94.isAssistantResponding = isAssistantResponding
-	v94.canStopAssistantResponse = v21 ~= nil or (v45 or FFlagBuildExperienceModelPicker and state8)
+	v97.isAssistantResponding = isAssistantResponding
+	v97.canStopAssistantResponse = v24 ~= nil or (v48 or FFlagBuildExperienceModelPicker and state8)
 
-	v94.canSendWhileResponding = canSendWhileResponding
-	v94.sendMessage = sendMessage
-	v94.stopAssistantResponse = stopAssistantResponse
-	v94.setScrollingFrame = v58.setScrollingFrame
+	v97.canSendWhileResponding = canSendWhileResponding
+	v97.sendMessage = sendMessage
+	v97.stopAssistantResponse = stopAssistantResponse
+	v97.setScrollingFrame = v58.setScrollingFrame
 	local anchorScrollToInstance
 
 	if FFlagBuildExperienceChatAccordionScrollAnchor then
 		anchorScrollToInstance = v58.anchorToInstance
 	end
 
-	v94.anchorScrollToInstance = anchorScrollToInstance
+	v97.anchorScrollToInstance = anchorScrollToInstance
 
-	v94.textBoxRef = ref18
-	v94.clockBinding = clockBinding
-	v94.playtestPlaceId = placeId
+	v97.textBoxRef = ref19
+	v97.clockBinding = clockBinding
+	v97.playtestPlaceId = placeId
 
 	if placeId == nil then
 		launchPlaytest = nil
 	end
 
-	v94.launchPlaytest = launchPlaytest
-	v94.hasPublishedTurn = includesPublishTool
-	v94.subagentTaskState = subagentTaskState
-	v94.isHistoryHydrationComplete = isHistoryHydrationComplete
-	v94.isHistoryLoading = isHistoryLoading
-	v94.isHistoryExhausted = v32 and not v30
-	return v94
+	v97.launchPlaytest = launchPlaytest
+	v97.hasPublishedTurn = includesPublishTool
+	v97.subagentTaskState = subagentTaskState
+	v97.isHistoryHydrationComplete = isHistoryHydrationComplete
+	v97.isHistoryLoading = isHistoryLoading
+	v97.isHistoryExhausted = v45 and not v43
+	return v97
 end
 
 return useChatSessionCore

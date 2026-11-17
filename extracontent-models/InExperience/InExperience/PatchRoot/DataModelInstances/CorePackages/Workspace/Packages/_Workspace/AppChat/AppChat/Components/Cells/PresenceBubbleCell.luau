@@ -8,7 +8,6 @@ local Foundation = require(parent.Foundation)
 local Radius = Foundation.Enums.Radius
 local Skeleton = Foundation.Skeleton
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local useTextSizeOffset = UIBlox.Core.Style.useTextSizeOffset
@@ -291,46 +290,24 @@ local function PresenceBubbleCell(p)
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				Padding = UDim.new(0, 4)
 			}),
-			title = 0,
+			title = React.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				AutomaticSize = Enum.AutomaticSize.X,
+				Size = UDim2.new(0, 0, 0, v4),
+				TextSize = joined.titleTextSize,
+				TextColor3 = joined.titleTextColor3,
+				TextTransparency = joined.titleTextTransparency,
+				FontFace = normalizeFontFace(joined.titleFont),
+				Text = joined.titleText or "",
+				TextTruncate = Enum.TextTruncate.SplitWord,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				LayoutOrder = 1
+			}, {
+				flex = React.createElement("UIFlexItem", { FlexMode = Enum.UIFlexMode.Shrink })
+			}),
 			subscriptionBadge = 0,
 			secondaryTitle = 0
 		}
-
-		local createElement8 = React.createElement
-		local v19 = {
-			BackgroundTransparency = 1,
-			AutomaticSize = Enum.AutomaticSize.X,
-			Size = UDim2.new(0, 0, 0, v4),
-			TextSize = joined.titleTextSize,
-			TextColor3 = joined.titleTextColor3,
-			TextTransparency = joined.titleTextTransparency,
-			Font = 0,
-			FontFace = 0,
-			Text = 0,
-			TextTruncate = 0,
-			TextXAlignment = 0,
-			LayoutOrder = 1
-		}
-		local font
-
-		if not FoundationFontFaceMigration then
-			font = joined.titleFont
-		end
-
-		v19.Font = font
-		local fontFace
-
-		if FoundationFontFaceMigration then
-			fontFace = normalizeFontFace(joined.titleFont)
-		end
-
-		v19.FontFace = fontFace
-		v19.Text = joined.titleText or ""
-		v19.TextTruncate = Enum.TextTruncate.SplitWord
-		v19.TextXAlignment = Enum.TextXAlignment.Left
-		children2.title = createElement8("TextLabel", v19, {
-			flex = React.createElement("UIFlexItem", { FlexMode = Enum.UIFlexMode.Shrink })
-		})
 		local subscriptionBadge
 
 		if FFlagAppChatFixPlusBadgeAlignment then
@@ -364,40 +341,18 @@ local function PresenceBubbleCell(p)
 
 		children2.subscriptionBadge = subscriptionBadge
 
-		local createElement9 = React.createElement
-		local v20 = {
+		children2.secondaryTitle = React.createElement("TextLabel", {
 			BackgroundTransparency = 1,
 			Size = UDim2.new(0, 0, 0, joined.secondaryTitleTextSize),
 			TextSize = joined.secondaryTitleTextSize,
 			TextColor3 = joined.secondaryTitleTextColor3,
 			TextTransparency = joined.secondaryTitleTextTransparency,
-			Font = 0,
-			FontFace = 0,
-			Text = 0,
-			TextTruncate = 0,
-			TextXAlignment = 0,
-			LayoutOrder = 0
-		}
-		local font2
-
-		if not FoundationFontFaceMigration then
-			font2 = joined.secondaryTitleFont
-		end
-
-		v20.Font = font2
-		local fontFace2
-
-		if FoundationFontFaceMigration then
-			fontFace2 = normalizeFontFace(joined.secondaryTitleFont)
-		end
-
-		v20.FontFace = fontFace2
-
-		v20.Text = joined.secondaryTitleText or ""
-		v20.TextTruncate = Enum.TextTruncate.AtEnd
-		v20.TextXAlignment = Enum.TextXAlignment.Left
-		v20.LayoutOrder = FFlagEnableBlackbirdCheck and 3 or 2
-		children2.secondaryTitle = createElement9("TextLabel", v20, {
+			FontFace = normalizeFontFace(joined.secondaryTitleFont),
+			Text = joined.secondaryTitleText or "",
+			TextTruncate = Enum.TextTruncate.AtEnd,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			LayoutOrder = FFlagEnableBlackbirdCheck and 3 or 2
+		}, {
 			flex = React.createElement("UIFlexItem", { FlexMode = Enum.UIFlexMode.Fill })
 		})
 		titleContainer = createElement6("Frame", v18, children2)
@@ -485,7 +440,6 @@ local function PresenceBubbleCell(p)
 				TextXAlignment = Enum.TextXAlignment.Left,
 				Text = joined.subTitleText,
 				TextTruncate = 0,
-				Font = 0,
 				FontFace = 0,
 				LayoutOrder = 2
 			}
@@ -498,20 +452,8 @@ local function PresenceBubbleCell(p)
 			end
 
 			v20.TextTruncate = textTruncate
-			local font
 
-			if not FoundationFontFaceMigration then
-				font = joined.subTitleTextFont
-			end
-
-			v20.Font = font
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(joined.subTitleTextFont)
-			end
-
-			v20.FontFace = fontFace
+			v20.FontFace = normalizeFontFace(joined.subTitleTextFont)
 			userPresenceLabel = createElement7("TextLabel", v20, FFlagAppChatTimestampInSubtitle and {
 				sizeConstraint = React.createElement("UISizeConstraint", { MaxSize = maxSize })
 			} or nil)
@@ -521,38 +463,21 @@ local function PresenceBubbleCell(p)
 		local timestampLabel
 
 		if FFlagAppChatTimestampInSubtitle and joined.subTitleTimestamp and not joined.isLoading then
-			local createElement7 = React.createElement
-			local v20 = {}
-			v20.BackgroundTransparency = 1
-			v20.AutomaticSize = Enum.AutomaticSize.X
-			v20.Size = UDim2.new(0, 0, 0, v5)
-
-			v20.TextSize = joined.subTitleTextSize + 1
-			v20.TextColor3 = joined.subTitleTextColor3
-			v20.TextTransparency = joined.subTitleTextTransparency
-			v20.TextXAlignment = Enum.TextXAlignment.Left
-			v20.Text = text
-			local font
-
-			if not FoundationFontFaceMigration then
-				font = joined.subTitleTextFont
-			end
-
-			v20.Font = font
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(joined.subTitleTextFont)
-			end
-
-			v20.FontFace = fontFace
-
-			v20.LayoutOrder = 3
-			v20[React.Change.AbsoluteSize] = function(p2)
-				v7(p2.AbsoluteSize.X)
-			end
-
-			timestampLabel = createElement7("TextLabel", v20)
+			timestampLabel = React.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				AutomaticSize = Enum.AutomaticSize.X,
+				Size = UDim2.new(0, 0, 0, v5),
+				TextSize = joined.subTitleTextSize + 1,
+				TextColor3 = joined.subTitleTextColor3,
+				TextTransparency = joined.subTitleTextTransparency,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				Text = text,
+				FontFace = normalizeFontFace(joined.subTitleTextFont),
+				LayoutOrder = 3,
+				[React.Change.AbsoluteSize] = function(p2)
+					v7(p2.AbsoluteSize.X)
+				end
+			})
 		end
 
 		v19.timestampLabel = timestampLabel

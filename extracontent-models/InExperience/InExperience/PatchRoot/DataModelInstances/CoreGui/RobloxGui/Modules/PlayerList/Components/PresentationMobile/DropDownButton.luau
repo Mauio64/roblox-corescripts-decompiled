@@ -12,7 +12,6 @@ local IconName = Foundation.Enums.IconName
 local IconVariant = Foundation.Enums.IconVariant
 local IconSize = Foundation.Enums.IconSize
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local useLayoutValues = PlayerList.Common.useLayoutValues
 
@@ -286,8 +285,7 @@ function extended:render()
 				LayoutOrder = 2,
 				Size = UDim2.new(1, -v6, 1, 0),
 				Text = self.props.text,
-				Font = 0,
-				FontFace = 0,
+				FontFace = normalizeFontFace(props.Tokens.Typography.TitleLarge.Font),
 				TextSize = 0,
 				TextColor3 = 0,
 				TextTransparency = 0,
@@ -295,20 +293,6 @@ function extended:render()
 				TextTruncate = 0,
 				BackgroundTransparency = 1
 			}
-			local font
-
-			if not FoundationFontFaceMigration then
-				font = props.Font.Header2.Font
-			end
-
-			v11.Font = font
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(props.Tokens.Typography.TitleLarge.Font)
-			end
-
-			v11.FontFace = fontFace
 			local textSize
 
 			if FFlagEnableMobilePlayerListOnConsole then

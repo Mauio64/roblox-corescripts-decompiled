@@ -32,19 +32,19 @@ local v = {
 	[" "] = true
 }
 
-local function isDollar(value: string, index: number): boolean -- 1 equivalent call inferred from this helper
-	if index == #value then
+local function isDollar(value: string, p: number): boolean
+	if p == #value then
 		return true
 	end
 
-	if byte(value, index + 1) == 10 and index > 0 and byte(value, index - 1 + 1) == 13 then
+	if byte(value, p + 1) == 10 and p > 0 and byte(value, p - 1 + 1) == 13 then
 		return false
 	end
 
-	return v[sub(value, index + 1)] == true
+	return v[sub(value, p + 1)] == true
 end
 
-local function nameAt(value: string, p: number)
+local function nameAt(value: string, p: number) -- 1 equivalent call inferred from this helper
 	local _, v2 = find(value, "^[A-Za-z0-9]*", p + 1)
 
 	return lower((sub(value, p + 1, v2))), v2
@@ -200,10 +200,9 @@ local function isType6Opener(value: string)
 		return false
 	end
 
-	local v3 = byte(value, 2) == 47 and 2 or 1
-	local _, v4 = find(value, "^[A-Za-z0-9]*", v3 + 1)
+	local v3, v4 = nameAt(value, byte(value, 2) == 47 and 2 or 1) -- inferred equivalent call
 
-	if not set[lower((sub(value, v3 + 1, v4)))] then
+	if not set[v3] then
 		return false
 	end
 
@@ -214,7 +213,12 @@ local function isType6Opener(value: string)
 		return v6
 	end
 
-	if v5 == 62 or v5 == 47 and byte(value, v4 + 1 + 1) == 62 then
+	if v5 == 62 then
+		v6 = true
+		return true
+	end
+
+	if v5 == 47 and byte(value, v4 + 1 + 1) == 62 then
 		v6 = true
 		return true
 	end
@@ -234,7 +238,7 @@ local v3 = AsciiMatcher.builder():range(65, 90):range(97, 122):build()
 
 local v4 = AsciiMatcher.builder():range(0, 32):anyOf("\"'=<>`"):build()
 
-local function isType7Opener(value: string)
+local function isType7Opener(value: string): boolean
 	if byte(value, 1) ~= 60 then
 		return false
 	end
@@ -260,7 +264,17 @@ local function isType7Opener(value: string)
 	end
 
 	v5:whitespace()
-	return isDollar(value, v5:position().index) -- inferred equivalent call
+	local index = v5:position().index
+
+	if index == #value then
+		return true
+	end
+
+	if byte(value, index + 1) == 10 and index > 0 and byte(value, index - 1 + 1) == 13 then
+		return false
+	end
+
+	return v[sub(value, index + 1)] == true
 end
 
 local v5 = {

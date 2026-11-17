@@ -33,7 +33,7 @@ local FFlagLuaAppEdpConsoleMediaGalleryVideo = SharedFlags5.FFlagLuaAppEdpConsol
 local SharedFlags6 = require(parent.SharedFlags)
 local FFlagLuaAppMediaGalleryGamepadSupport = SharedFlags6.FFlagLuaAppMediaGalleryGamepadSupport
 local SharedFlags7 = require(parent.SharedFlags)
-local FFlagLuaAppEnableHomepageOneByTwoTile = SharedFlags7.FFlagLuaAppEnableHomepageOneByTwoTile
+local FFlagLuaAppEnableNxMRoduxApportioning = SharedFlags7.FFlagLuaAppEnableNxMRoduxApportioning
 local SharedFlags8 = require(parent.SharedFlags)
 local FFlagLuaAppSduiVideoThumbnail = SharedFlags8.FFlagLuaAppSduiVideoThumbnail
 local SharedFlags9 = require(parent.SharedFlags)
@@ -170,7 +170,7 @@ local function VideoPlayer(props)
 		FFlagLuaAppEdpMediaGalleryAutoAdvance
 		or FFlagLuaAppEdpMediaGalleryFullScreen
 		or FFlagLuaAppEdpConsoleMediaGalleryVideo
-		or FFlagLuaAppEnableHomepageOneByTwoTile
+		or FFlagLuaAppEnableNxMRoduxApportioning
 	then
 		ref = React.useRef(nil)
 	else
@@ -265,7 +265,7 @@ local function VideoPlayer(props)
 		useEffect(fn, { shouldStartPlayback, onVideoProgressChanged, showProgressBar, v6 })
 	end
 
-	if FFlagLuaAppEnableHomepageOneByTwoTile then
+	if FFlagLuaAppEnableNxMRoduxApportioning then
 		React.useEffect(function()
 			local onAspectRatioChanged = props.onAspectRatioChanged
 			local current = ref and ref.current
@@ -615,7 +615,7 @@ local function VideoPlayer(props)
 		FFlagLuaAppEdpMediaGalleryAutoAdvance
 		or FFlagLuaAppEdpMediaGalleryFullScreen
 		or FFlagLuaAppEdpConsoleMediaGalleryVideo
-		or FFlagLuaAppEnableHomepageOneByTwoTile
+		or FFlagLuaAppEnableNxMRoduxApportioning
 	then
 		ref2 = ref
 	end
@@ -629,7 +629,7 @@ local function VideoPlayer(props)
 	}
 	local playButton
 
-	if not ((FFlagLuaAppVideoTileHideCenterPlayButton or FFlagLuaAppEnableHomepageOneByTwoTile) and props.hideCenterPlayButton or not (FFlagLuaAppEdpMediaGalleryFullScreen or FFlagLuaAppMediaGalleryGamepadSupport) or not state or state3 or FFlagLuaAppMediaGalleryGamepadSupport and v6 == nil) then
+	if not ((FFlagLuaAppVideoTileHideCenterPlayButton or FFlagLuaAppEnableNxMRoduxApportioning) and props.hideCenterPlayButton or not (FFlagLuaAppEdpMediaGalleryFullScreen or FFlagLuaAppMediaGalleryGamepadSupport) or not state or state3 or FFlagLuaAppMediaGalleryGamepadSupport and v6 == nil) then
 		playButton = React.createElement(RoundIconButton, {
 			icon = "play-large",
 			AnchorPoint = Vector2.new(0.5, 0.5),

@@ -27,10 +27,7 @@ local SharedFlags4 = require(parent.SharedFlags)
 local FFlagSduiPerSectionPoolSizing = SharedFlags4.FFlagSduiPerSectionPoolSizing
 
 local SharedFlags5 = require(parent.SharedFlags)
-local FFlagSduiVerticalFeedProgressiveFillOnScroll = SharedFlags5.FFlagSduiVerticalFeedProgressiveFillOnScroll
-
-local SharedFlags6 = require(parent.SharedFlags)
-local FFlagLuaAppEnableOneByTwoTileFunnelTelemetrySdui = SharedFlags6.FFlagLuaAppEnableOneByTwoTileFunnelTelemetrySdui
+local FFlagLuaAppEnableOneByTwoTileFunnelTelemetrySdui = SharedFlags5.FFlagLuaAppEnableOneByTwoTileFunnelTelemetrySdui
 
 local frozen = table.freeze({})
 
@@ -568,7 +565,7 @@ local function createSduiPoolStore(p: string?)
 		return computed
 	end
 
-	local sduiPoolStore = {
+	return {
 		getSectionInfo = function(p2: string)
 			return Signals.createComputed(function(p3)
 				if getOrCreateSectionConfigSignal(p2).get(p3) == nil then -- inferred equivalent call
@@ -625,93 +622,77 @@ local function createSduiPoolStore(p: string?)
 			end)
 		end,
 		getSectionStartRow = fn3,
-		getSectionRowCount = 0,
-		getSectionCells = 0,
-		setSectionDisplayedRowCount = 0,
-		setPools = 0,
-		setSections = 0,
-		setLayoutStore = 0,
-		setOneByTwoTileFunnelListener = 0
+		getSectionRowCount = getRowCountComputed,
+		getSectionCells = function(p2: string)
+			local v7 = v4[p2]
+
+			if v7 ~= nil then
+				return v7
+			end
+
+			local computed = Signals.createComputed(function(p3)
+				local v8 = fn2(p2)(p3)
+				return if v8 == nil then EMPTY_CELLS else v8.cells
+			end, cellsEqual)
+
+			v4[p2] = computed
+			return computed
+		end,
+		setSectionDisplayedRowCount = FFlagSduiCollectionGridRevealRows and function(p2: string, p3: number?)
+			fn(p2).set(p3)
+		end or nil,
+		setPools = function(items)
+			for k, item in items do
+				getOrCreatePoolSignal(k).set(item) -- inferred equivalent call
+			end
+		end,
+		setSections = function(items)
+			local prevSectionId = nil
+			local sectionIdsByPoolId = {}
+
+			for _, item in items do
+				local sectionId = item.sectionId
+				local poolId = item.poolId
+				local prevSectionInPoolId
+
+				if poolId ~= nil then
+					prevSectionInPoolId = sectionIdsByPoolId[poolId]
+					sectionIdsByPoolId[poolId] = sectionId
+				end
+
+				local set = getOrCreateSectionConfigSignal(sectionId).set -- inferred equivalent call
+				local v7 = {
+					poolId = poolId,
+					numberOfRows = item.numberOfRows,
+					doesNotAdvanceStartRow = 0,
+					entryCollectionItemSize = 0,
+					templateCollectionItemSize = 0,
+					prevSectionInPoolId = 0,
+					prevSectionId = 0
+				}
+				local doesNotAdvanceStartRow
+
+				if FFlagSduiSkipFeedAnalyticsPosition then
+					doesNotAdvanceStartRow = item.doesNotAdvanceStartRow
+				end
+
+				v7.doesNotAdvanceStartRow = doesNotAdvanceStartRow
+
+				v7.entryCollectionItemSize = item.entryCollectionItemSize
+				v7.templateCollectionItemSize = item.templateCollectionItemSize
+				v7.prevSectionInPoolId = prevSectionInPoolId
+				v7.prevSectionId = prevSectionId
+				set(v7)
+				prevSectionId = sectionId
+			end
+		end,
+		setLayoutStore = function(p2)
+			v5(p2)
+		end,
+		setOneByTwoTileFunnelListener = FFlagLuaAppEnableOneByTwoTileFunnelTelemetrySdui and function(p2)
+			v6 = p2
+		end or nil
 	}
-
-	if not FFlagSduiVerticalFeedProgressiveFillOnScroll then
-		getRowCountComputed = nil
-	end
-
-	sduiPoolStore.getSectionRowCount = getRowCountComputed
-
-	function sduiPoolStore.getSectionCells(p2: string)
-		local v7 = v4[p2]
-
-		if v7 ~= nil then
-			return v7
-		end
-
-		local computed = Signals.createComputed(function(p3)
-			local v8 = fn2(p2)(p3)
-			return if v8 == nil then EMPTY_CELLS else v8.cells
-		end, cellsEqual)
-
-		v4[p2] = computed
-		return computed
-	end
-	sduiPoolStore.setSectionDisplayedRowCount = FFlagSduiCollectionGridRevealRows and function(p2: string, p3: number?)
-		fn(p2).set(p3)
-	end or nil
-
-	function sduiPoolStore.setPools(items)
-		for k, item in items do
-			getOrCreatePoolSignal(k).set(item) -- inferred equivalent call
-		end
-	end
-
-	function sduiPoolStore.setSections(items)
-		local prevSectionId = nil
-		local sectionIdsByPoolId = {}
-
-		for _, item in items do
-			local sectionId = item.sectionId
-			local poolId = item.poolId
-			local prevSectionInPoolId
-
-			if poolId ~= nil then
-				prevSectionInPoolId = sectionIdsByPoolId[poolId]
-				sectionIdsByPoolId[poolId] = sectionId
-			end
-
-			local set = getOrCreateSectionConfigSignal(sectionId).set -- inferred equivalent call
-			local v7 = {
-				poolId = poolId,
-				numberOfRows = item.numberOfRows,
-				doesNotAdvanceStartRow = 0,
-				entryCollectionItemSize = 0,
-				templateCollectionItemSize = 0,
-				prevSectionInPoolId = 0,
-				prevSectionId = 0
-			}
-			local doesNotAdvanceStartRow
-
-			if FFlagSduiSkipFeedAnalyticsPosition then
-				doesNotAdvanceStartRow = item.doesNotAdvanceStartRow
-			end
-
-			v7.doesNotAdvanceStartRow = doesNotAdvanceStartRow
-
-			v7.entryCollectionItemSize = item.entryCollectionItemSize
-			v7.templateCollectionItemSize = item.templateCollectionItemSize
-			v7.prevSectionInPoolId = prevSectionInPoolId
-			v7.prevSectionId = prevSectionId
-			set(v7)
-			prevSectionId = sectionId
-		end
-	end
-	function sduiPoolStore.setLayoutStore(p2)
-		v5(p2)
-	end
-	sduiPoolStore.setOneByTwoTileFunnelListener = FFlagLuaAppEnableOneByTwoTileFunnelTelemetrySdui and function(p2)
-		v6 = p2
-	end or nil
-	return sduiPoolStore
 end
 
 local object = setmetatable({}, { __mode = "v" })

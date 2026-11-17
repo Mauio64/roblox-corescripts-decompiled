@@ -18,10 +18,9 @@ local displayLocation = ServiceContractsProto.apppageplatform.shared.display_loc
 local template_api_messages = ServiceContractsProto.apppageplatform.templates.template_api_messages
 
 local SharedFlags = require(parent.SharedFlags)
-local FFlagSduiTemplateApiPostRequest = SharedFlags.FFlagSduiTemplateApiPostRequest
 local FFlagSduiAdvertiseRuntimeSupportSets = SharedFlags.FFlagSduiAdvertiseRuntimeSupportSets
 
-local function getTemplatesUrl() -- 3 equivalent calls inferred from this helper
+local function getTemplatesUrl() -- 2 equivalent calls inferred from this helper
 	return `{UrlBuilder.UrlBase.APIS}/landing-page-api/v1/templates`
 end
 
@@ -100,25 +99,14 @@ local function resolveSurfaceKeys(surfaceKeys)
 	return nil
 end
 
-local function getDisplayLocationValues(list) -- 3 equivalent calls inferred from this helper
-	local displayLocationValues = table.create(#list)
+local function getDisplayLocationValues(displayLocationNumbers) -- 2 equivalent calls inferred from this helper
+	local displayLocationValues = table.create(#displayLocationNumbers)
 
-	for _, item in list do
+	for _, item in displayLocationNumbers do
 		table.insert(displayLocationValues, (tostring(item)))
 	end
 
 	return displayLocationValues
-end
-
-local function buildGetUrl(displayLocationNumbers, locale: string, capabilities)
-	local v = {
-		displayLocations = table.concat(getDisplayLocationValues(displayLocationNumbers), ","), -- inferred equivalent call
-		platform = "App",
-		locale = locale
-	}
-
-	SduiCapabilities.addToQueryParams(v, capabilities)
-	return UrlBuilder.UrlBuilder.addQueryString(getTemplatesUrl(), v) -- inferred equivalent call
 end
 
 local function buildCachedComponentMappings(displayLocationNumbers, surfaceKeysByDisplayLocation)
@@ -228,61 +216,23 @@ function SduiTemplateApi.createRequest(data)
 		local clone = table.clone(SduiCapabilities.getEnabledCapabilities())
 		table.sort(clone)
 		local clientCapabilities = SduiCapabilities.buildClientCapabilities()
-		local url
-
-		if FFlagSduiTemplateApiPostRequest then
-			url = getTemplatesUrl() -- inferred equivalent call
-		else
-			url = buildGetUrl(surfaceKeys.displayLocationNumbers, locale, capabilities)
-		end
-
-		local v = {
-			url = url,
+		return {
+			url = getTemplatesUrl(), -- inferred equivalent call
 			cacheKey = `sdui-template-api:{table.concat(getDisplayLocationValues(surfaceKeys.displayLocationNumbers), ",")}:{locale}:{table.concat(clone, ",")}`,
-			postConfig = 0,
-			responseProto = 0,
-			surfaceKeysByDisplayLocation = 0
-		} -- inferred equivalent call
-		local postConfig
-
-		if FFlagSduiTemplateApiPostRequest then
-			postConfig = buildPostConfigWithRuntimeSupport(surfaceKeys, locale, clientCapabilities)
-		end
-
-		v.postConfig = postConfig
-
-		v.responseProto = template_api_messages.GetTemplatesResponse
-		v.surfaceKeysByDisplayLocation = surfaceKeys.surfaceKeysByDisplayLocation
-		return v
+			postConfig = buildPostConfigWithRuntimeSupport(surfaceKeys, locale, clientCapabilities),
+			responseProto = template_api_messages.GetTemplatesResponse,
+			surfaceKeysByDisplayLocation = surfaceKeys.surfaceKeysByDisplayLocation
+		}
 	else
 		local clone = table.clone(capabilities)
 		table.sort(clone)
-		local url
-
-		if FFlagSduiTemplateApiPostRequest then
-			url = getTemplatesUrl() -- inferred equivalent call
-		else
-			url = buildGetUrl(surfaceKeys.displayLocationNumbers, locale, capabilities)
-		end
-
-		local v = {
-			url = url,
+		return {
+			url = getTemplatesUrl(), -- inferred equivalent call
 			cacheKey = `sdui-template-api:{table.concat(getDisplayLocationValues(surfaceKeys.displayLocationNumbers), ",")}:{locale}:{table.concat(clone, ",")}`,
-			postConfig = 0,
-			responseProto = 0,
-			surfaceKeysByDisplayLocation = 0
-		} -- inferred equivalent call
-		local postConfig
-
-		if FFlagSduiTemplateApiPostRequest then
-			postConfig = buildPostConfig(surfaceKeys, locale, capabilities)
-		end
-
-		v.postConfig = postConfig
-
-		v.responseProto = template_api_messages.GetTemplatesResponse
-		v.surfaceKeysByDisplayLocation = surfaceKeys.surfaceKeysByDisplayLocation
-		return v
+			postConfig = buildPostConfig(surfaceKeys, locale, capabilities),
+			responseProto = template_api_messages.GetTemplatesResponse,
+			surfaceKeysByDisplayLocation = surfaceKeys.surfaceKeysByDisplayLocation
+		}
 	end
 end
 

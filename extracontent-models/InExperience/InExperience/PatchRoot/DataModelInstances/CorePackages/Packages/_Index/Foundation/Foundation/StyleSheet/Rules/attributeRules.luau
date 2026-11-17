@@ -130,49 +130,38 @@ local function SizeRules(sizes)
 	return result
 end
 
-local function TypographyRules(typography, nominalScale: number, flag: boolean?)
+local function TypographyRules(typography, nominalScale: number)
 	local result = {}
 
 	for k, item in typography do
 		local v = kebabToPascal(k)
 		local textPadding = getTextPadding(item, nominalScale) -- inferred equivalent call
-		local v2 = { tag = `text-{k}`, properties = 0, attributes = 0, children = 0 }
-		local font
-
-		if not flag then
-			font = `$Font{v}`
-		end
-
-		local fontFace
-
-		if flag then
-			fontFace = `$Font{v}`
-		end
-
-		v2.properties = {
-			Font = font,
-			FontFace = fontFace,
-			TextSize = `$TextSize{v}`,
-			LineHeight = item.LineHeight
-		}
-
-		v2.attributes = {
-			{ name = `Font{v}`, value = item.Font },
-			{ name = `TextSize{v}`, value = item.TextSize }
-		}
-
-		v2.children = {
-			{
-				tag = `text-{k}`,
-				pseudo = "UIPadding",
-				priority = 0,
-				properties = { PaddingTop = `$TextPadding{v}`, PaddingBottom = `$TextPadding{v}` },
-				attributes = {
-					{ name = `TextPadding{v}`, value = textPadding }
+		table.insert(result, {
+			tag = `text-{k}`,
+			properties = {
+				FontFace = `$Font{v}`,
+				TextSize = `$TextSize{v}`,
+				LineHeight = item.LineHeight
+			},
+			attributes = {
+				{ name = `Font{v}`, value = item.Font },
+				{ name = `TextSize{v}`, value = item.TextSize }
+			},
+			children = {
+				{
+					tag = `text-{k}`,
+					pseudo = "UIPadding",
+					priority = 0,
+					properties = {
+						PaddingTop = `$TextPadding{v}`,
+						PaddingBottom = `$TextPadding{v}`
+					},
+					attributes = {
+						{ name = `TextPadding{v}`, value = textPadding }
+					}
 				}
 			}
-		}
-		table.insert(result, v2)
+		})
 	end
 
 	return result
@@ -287,15 +276,12 @@ local function GuiObjectDefaultRules()
 	}
 end
 
-local function DefaultFontRules(p, flag: boolean?)
+local function DefaultFontRules(p)
 	return {
 		{
 			tag = "text-defaults",
 			priority = -1,
-			properties = {
-				Font = not flag and "$FontBodyLarge" or nil,
-				FontFace = flag and "$FontBodyLarge" or nil
-			},
+			properties = { FontFace = "$FontBodyLarge" },
 			attributes = {
 				{ name = "FontBodyLarge", value = p.Typography.BodyLarge.Font }
 			}
@@ -887,7 +873,7 @@ local function AspectRatioRules()
 end
 
 return {
-	rulesGenerator = function(p, data, flag: boolean?)
+	rulesGenerator = function(p, data)
 		local colors = data.colors
 		local variants = data.variants
 		local gaps = data.gaps
@@ -927,9 +913,9 @@ return {
 				ContentRules(colors, variants)
 			),
 			(Dash.joinArrays(
-				DefaultFontRules(p, flag),
+				DefaultFontRules(p),
 				DefaultSizeRules(typography["body-large"], p.Config.Text.NominalScale),
-				TypographyRules(typography, p.Config.Text.NominalScale, flag)
+				TypographyRules(typography, p.Config.Text.NominalScale)
 			))
 	end
 }

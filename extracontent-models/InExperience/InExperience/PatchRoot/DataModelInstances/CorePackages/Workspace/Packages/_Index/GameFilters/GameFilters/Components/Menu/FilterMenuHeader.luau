@@ -8,7 +8,6 @@ local React = require(parent.React)
 local Responsive = require(parent.Responsive)
 local SharedFlags = require(parent.SharedFlags)
 local FFlagLuaAppChartsFilterOptionTextTag = SharedFlags.FFlagLuaAppChartsFilterOptionTextTag
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 return function(props)
 	local v = useTokens()
@@ -46,43 +45,20 @@ return function(props)
 			HorizontalFlex = Enum.UIFlexAlignment.SpaceBetween,
 			SortOrder = Enum.SortOrder.LayoutOrder
 		}),
-		Title = 0,
+		Title = React.createElement("TextLabel", {
+			BackgroundTransparency = 1,
+			AutomaticSize = Enum.AutomaticSize.XY,
+			LayoutOrder = 1,
+			Text = props.title,
+			FontFace = normalizeFontFace(headingSmall.Font),
+			TextSize = headingSmall.FontSize,
+			TextColor3 = emphasis.Color3,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextYAlignment = Enum.TextYAlignment.Center,
+			TextWrapped = true
+		}),
 		CloseButton = 0
 	}
-
-	local createElement2 = React.createElement
-	local v5 = {
-		BackgroundTransparency = 1,
-		AutomaticSize = Enum.AutomaticSize.XY,
-		LayoutOrder = 1,
-		Text = props.title,
-		Font = 0,
-		FontFace = 0,
-		TextSize = 0,
-		TextColor3 = 0,
-		TextXAlignment = 0,
-		TextYAlignment = 0,
-		TextWrapped = true
-	}
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = headingSmall.Font
-	end
-
-	v5.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(headingSmall.Font)
-	end
-
-	v5.FontFace = fontFace
-	v5.TextSize = headingSmall.FontSize
-	v5.TextColor3 = emphasis.Color3
-	v5.TextXAlignment = Enum.TextXAlignment.Left
-	v5.TextYAlignment = Enum.TextYAlignment.Center
-	v4.Title = createElement2("TextLabel", v5)
 	local closeButton
 
 	if not v2 then

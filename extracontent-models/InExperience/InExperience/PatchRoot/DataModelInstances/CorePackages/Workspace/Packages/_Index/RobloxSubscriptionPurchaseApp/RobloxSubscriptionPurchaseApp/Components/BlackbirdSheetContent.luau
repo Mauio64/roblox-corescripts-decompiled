@@ -44,6 +44,9 @@ local pictogramsplus_robux = FoundationCloudAssets.Assets["pictograms/plus_robux
 FoundationCloudAssets.preloadAsset("pictograms/plus_robux")
 local FFlagRobloxPlusDynamicFreeTrialLength = require(RobloxSubscriptionPurchaseApp.Flags.FFlagRobloxPlusDynamicFreeTrialLength)
 local FFlagEnablePlusReferralLegalDisclosure = require(RobloxSubscriptionPurchaseApp.Flags.FFlagEnablePlusReferralLegalDisclosure)
+local FFlagTTOnboardingSheet = require(RobloxSubscriptionPurchaseApp.Flags.FFlagTTOnboardingSheet)
+local RobloxPlusSheetKind = require(RobloxSubscriptionPurchaseApp.Enums.RobloxPlusSheetKind)
+local TTSheetSlots = require(script.Parent.TTSheetSlots)
 local GuiService = game:GetService("GuiService")
 
 local set = {
@@ -55,50 +58,50 @@ local function useBlackbirdSheetSlots()
 	local v = RobloxSubscriptionStore.get()
 	local v2 = v.getOnCtaOverride()
 
-	local v3 = SignalsReact.useSignalState(v.getPurchaseUIOptions)
-	local v4 = SignalsReact.useSignalState(v.getPromptState)
+	local purchaseUIOptions = SignalsReact.useSignalState(v.getPurchaseUIOptions)
+	local v3 = SignalsReact.useSignalState(v.getPromptState)
+	local v4
+
+	if FFlagEnablePlusReferralLandingSheet then
+		v4 = SignalsReact.useSignalState(v.getReferrerId)
+	end
+
 	local v5
 
 	if FFlagEnablePlusReferralLandingSheet then
-		v5 = SignalsReact.useSignalState(v.getReferrerId)
+		v5 = useReferrerName(v4)
 	end
 
-	local v6
-
-	if FFlagEnablePlusReferralLandingSheet then
-		v6 = useReferrerName(v5)
-	end
-
-	local v7 = useLocalization({
+	local v6 = useLocalization({
 		title = "Feature.RobloxSubscription.Title.GetBlackbird",
 		buttonText = "Feature.RobloxSubscription.Action.Subscribe",
 		getFreeTrialText = "Feature.RobloxSubscription.Action.TryItForFree",
 		referralTitle = FFlagEnablePlusReferralLandingSheet and "Feature.RobloxSubscription.Heading.ReferralRecipientJoin" or nil,
 		referralInvite = FFlagEnablePlusReferralLandingSheet and {
 			"Feature.RobloxSubscription.Description.ReferralRecipientInvite",
-			username = v6 or "",
+			username = v5 or "",
 			amount = tostring(FIntPlusReferralRewardRobux)
 		} or nil
 	})
 
-	local v8 = SignalsReact.useSignalState(v.getRobloxSubscriptionProduct)
-	local robloxSubscriptionProductFreeTrial = isRobloxSubscriptionProductFreeTrial(v8)
-	local v9
+	local v7 = SignalsReact.useSignalState(v.getRobloxSubscriptionProduct)
+	local robloxSubscriptionProductFreeTrial = isRobloxSubscriptionProductFreeTrial(v7)
+	local v8
 
 	if FFlagRobloxPlusDynamicFreeTrialLength then
-		v9 = getFreeTrialOffer(v8)
+		v8 = getFreeTrialOffer(v7)
 	end
 
 	local referralInvite
 
-	if FFlagEnablePlusReferralLandingSheet and v6 and v6 ~= "" then
-		referralInvite = v7.referralInvite
+	if FFlagEnablePlusReferralLandingSheet and v5 and v5 ~= "" then
+		referralInvite = v6.referralInvite
 	end
 
 	local text
 
-	if v3.description then
-		text = v3.description
+	if purchaseUIOptions.description then
+		text = purchaseUIOptions.description
 	else
 		text = FFlagEnablePlusReferralLandingSheet and referralInvite or nil
 	end
@@ -106,21 +109,21 @@ local function useBlackbirdSheetSlots()
 	local ctaText
 
 	if robloxSubscriptionProductFreeTrial then
-		ctaText = v7.getFreeTrialText
+		ctaText = v6.getFreeTrialText
 	else
-		ctaText = v7.buttonText
+		ctaText = v6.buttonText
 	end
 
-	local v10 = v3.showLegalDisclosure == nil or v3.showLegalDisclosure
-	local v11
+	local v9 = purchaseUIOptions.showLegalDisclosure == nil or purchaseUIOptions.showLegalDisclosure
+	local v10
 
-	if v3.noPurchaseMethodRequired == nil then
-		v11 = false
+	if purchaseUIOptions.noPurchaseMethodRequired == nil then
+		v10 = false
 	else
-		v11 = v3.noPurchaseMethodRequired
+		v10 = purchaseUIOptions.noPurchaseMethodRequired
 	end
 
-	local ref = React.useCallback(function(p)
+	local v11 = React.useCallback(function(p)
 		if p then
 			if FFlagEnableSubscriptionPurchaseFlowEventIngest then
 				logSubscriptionPurchaseFlowEvent("SubscriptionUpsellModalShown")
@@ -151,7 +154,7 @@ local function useBlackbirdSheetSlots()
 		end)
 	end
 
-	local isLoading = set[v4] == true
+	local isLoading = set[v3] == true
 	local isReferral = FFlagEnablePlusReferralLandingSheet and referralInvite ~= nil
 	local v12
 
@@ -159,6 +162,21 @@ local function useBlackbirdSheetSlots()
 		v12 = GuiService.ViewportDisplaySize ~= Enum.DisplaySize.Small
 	else
 		v12 = false
+	end
+
+	local v13
+
+	if FFlagTTOnboardingSheet then
+		v13 = TTSheetSlots({
+			purchaseUIOptions = purchaseUIOptions,
+			isLoading = isLoading,
+			onActivated = onSubscribe,
+			onButtonMounted = v11
+		})
+	end
+
+	if v13 and purchaseUIOptions.sheetKind == RobloxPlusSheetKind.TT then
+		return v13
 	end
 
 	local createElement = React.createElement
@@ -169,7 +187,7 @@ local function useBlackbirdSheetSlots()
 		local createElement2 = React.createElement
 		local backButton
 
-		if v3.showBackButton then
+		if purchaseUIOptions.showBackButton then
 			backButton = React.createElement(Text, {
 				LayoutOrder = 1,
 				Text = `{getIconRichText(IconName.ChevronLargeLeft)}`,
@@ -183,7 +201,7 @@ local function useBlackbirdSheetSlots()
 			BackButton = backButton,
 			Title = React.createElement(Text, {
 				LayoutOrder = 2,
-				Text = `{getIconRichText(IconName.RobloxPlus)} {v3.title or v7.title}`,
+				Text = `{getIconRichText(IconName.RobloxPlus)} {purchaseUIOptions.title or v6.title}`,
 				tag = "auto-xy text-heading-small text-align-x-center content-emphasis",
 				RichText = true
 			})
@@ -200,7 +218,7 @@ local function useBlackbirdSheetSlots()
 	local content = Sheet.Content
 
 	local createElement3 = React.createElement
-	local v13 = {
+	local v14 = {
 		tag = isReferral and not v12 and "col gap-xsmall size-full-0 auto-y padding-bottom-large" or isReferral and v12 and "col gap-xsmall size-full-0" or text == nil and "col" or "col size-full-0 auto-y",
 		Size = 0
 	}
@@ -212,14 +230,14 @@ local function useBlackbirdSheetSlots()
 		udim = UDim2.new(1, 0, 0, 140)
 	end
 
-	v13.Size = udim
+	v14.Size = udim
 	local heroContent
 
 	if isReferral then
 		heroContent = React.createElement(PlusHeroContent, {
 			layoutOrder = 1,
 			pictogram = pictogramsplus_robux,
-			title = `{v7.referralTitle} {getIconRichText(IconName.Robux)} {tostring(FIntPlusReferralRewardRobux)}`,
+			title = `{v6.referralTitle} {getIconRichText(IconName.Robux)} {tostring(FIntPlusReferralRewardRobux)}`,
 			titleRichText = true,
 			subtitle = referralInvite
 		})
@@ -246,12 +264,12 @@ local function useBlackbirdSheetSlots()
 	end
 
 	children.Content = createElement2(content, { LayoutOrder = 2 }, {
-		ContentContainer = createElement3(View, v13, {
+		ContentContainer = createElement3(View, v14, {
 			HeroContent = heroContent,
 			PriceRow = priceRow,
 			FeatureList = React.createElement(RobloxSubscriptionFeatureList, {
 				layoutOrder = FFlagEnablePlusReferralLandingSheet and 5 or 2,
-				noPurchaseMethodRequired = v11,
+				noPurchaseMethodRequired = v10,
 				compact = isReferral and v12
 			})
 		})
@@ -263,12 +281,18 @@ local function useBlackbirdSheetSlots()
 	local createElement5 = React.createElement
 
 	local createElement6 = React.createElement
+	local text2
 
-	local text2 = if v3.ctaText then v3.ctaText else ctaText
-	local v14 = {
+	if purchaseUIOptions.ctaText then
+		text2 = purchaseUIOptions.ctaText
+	else
+		text2 = ctaText
+	end
+
+	local v15 = {
 		SubscribeButton = createElement6(Button, {
 			LayoutOrder = 1,
-			ref = ref,
+			ref = v11,
 			text = text2,
 			onActivated = onSubscribe,
 			fillBehavior = FillBehavior.Fill,
@@ -279,11 +303,11 @@ local function useBlackbirdSheetSlots()
 	}
 	local legalDisclosure
 
-	if v10 then
+	if v9 then
 		local createElement7 = React.createElement
 
-		if v3.ctaText then
-			ctaText = v3.ctaText
+		if purchaseUIOptions.ctaText then
+			ctaText = purchaseUIOptions.ctaText
 		end
 
 		if not FFlagSupportFreeTrial then
@@ -296,20 +320,20 @@ local function useBlackbirdSheetSlots()
 
 		local trialDuration
 
-		if v9 then
-			trialDuration = v9.Duration
+		if v8 then
+			trialDuration = v8.Duration
 		end
 
 		local trialPeriodType
 
-		if v9 then
-			trialPeriodType = v9.PeriodType
+		if v8 then
+			trialPeriodType = v8.PeriodType
 		end
 
 		local billingPeriodType
 
-		if v9 and v8 then
-			billingPeriodType = v8.PeriodType
+		if v8 and v7 then
+			billingPeriodType = v7.PeriodType
 		end
 
 		legalDisclosure = createElement7(LegalDisclosure, {
@@ -317,19 +341,19 @@ local function useBlackbirdSheetSlots()
 			ctaText = ctaText,
 			isFreeTrial = robloxSubscriptionProductFreeTrial,
 			isReferral = isReferral,
-			shortenFreeTrialTerms = v11,
+			shortenFreeTrialTerms = v10,
 			trialDuration = trialDuration,
 			trialPeriodType = trialPeriodType,
 			billingPeriodType = billingPeriodType
 		})
 	end
 
-	v14.LegalDisclosure = legalDisclosure
+	v15.LegalDisclosure = legalDisclosure
 	children.Actions = createElement4(actions, { LayoutOrder = 3 }, {
 		ActionsContainer = createElement5(
 			View,
 			{ LayoutOrder = 1, tag = "row wrap align-x-center gap-medium size-full-0 auto-xy" },
-			v14
+			v15
 		)
 	})
 	return children

@@ -1,0 +1,4 @@
+-- Failed to decompile
+-- Reason: Tovek ran into an unhandled exception, listed below
+-- prototype 6, pc 36: cannot preserve open call results across an operation without a tuple-order proof
+-- last attempted with tovek V2.7-luauforge text:9736c7cc

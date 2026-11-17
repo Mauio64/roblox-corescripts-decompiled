@@ -5,7 +5,6 @@ local React = require(parent.React)
 local UIBlox = require(parent.UIBlox)
 local Foundation = require(parent.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local useStyle = UIBlox.Core.Style.useStyle
 local Localization = require(parent.Localization)
 local useLocalization = Localization.Hooks.useLocalization
@@ -126,87 +125,59 @@ local function VerifyPhoneView(props)
 
 	v4.position = position
 	v4.anchorPoint = props.isKeyboardShowing and Vector2.new(0.5, 1) or nil
-
-	local createElement2 = React.createElement
-	local v5 = {
-		BackgroundTransparency = 1,
-		AutomaticSize = Enum.AutomaticSize.Y,
-		Size = UDim2.new(1, 0, 0, 0)
-	}
-	local children = {
-		ContentPadding = React.createElement("UIPadding", {
-			PaddingTop = UDim.new(0, 24),
-			PaddingBottom = UDim.new(0, 24)
-		}),
-		ListLayout = React.createElement("UIListLayout", {
-			SortOrder = Enum.SortOrder.LayoutOrder,
-			HorizontalAlignment = Enum.HorizontalAlignment.Left,
-			Padding = UDim.new(0, 12)
-		}),
-		BodyText = 0,
-		TextBox = 0,
-		ChangePhoneButton = 0
-	}
-
-	local createElement3 = React.createElement
-	local v6 = {
-		LayoutOrder = 1,
-		BackgroundTransparency = 1,
-		Text = getBodyText(v3.descriptionKey), -- inferred equivalent call
-		TextSize = v.Font.BaseSize,
-		TextColor3 = v.Theme.TextDefault.Color,
-		TextTransparency = v.Theme.TextDefault.Transparency,
-		Font = 0,
-		FontFace = 0,
-		TextXAlignment = 0,
-		AutomaticSize = 0,
-		TextWrapped = true,
-		Size = 0
-	}
-	local font
-
-	if not FoundationFontFaceMigration then
-		font = v.Font.Body.Font
-	end
-
-	v6.Font = font
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(v.Tokens.Typography.BodyLarge.Font)
-	end
-
-	v6.FontFace = fontFace
-
-	v6.TextXAlignment = Enum.TextXAlignment.Left
-	v6.AutomaticSize = Enum.AutomaticSize.Y
-
-	v6.Size = UDim2.new(0, partialPageModalMiddleContentWidth, 0, 0)
-	children.BodyText = createElement3("TextLabel", v6)
-
-	children.TextBox = React.createElement(TextInputBoxWithBorder, {
-		text = props.code,
-		textInputType = props.useOTPInputType and Enum.TextInputType.OneTimePassword or Enum.TextInputType.Number,
-		textInputHeight = 36,
-		layoutOrder = 2,
-		placeholderText = v3.placeholderKey,
-		errorText = props.errorMessage,
-		onChangeTextCallback = props.onCodeTextChange,
-		Size = UDim2.new(1, 0, 0, 0),
-		onFocused = props.onCodeInputFocus,
-		maxLength = 6
-	})
-
-	children.ChangePhoneButton = React.createElement(LinkButton, {
-		text = v3.changePhoneNumberKey,
-		onActivated = props.returnToAddPhone,
-		layoutOrder = 3,
-		fontStyle = "CaptionBody",
-		minPaddingX = 0,
-		minPaddingY = 0
-	})
 	return createElement(PartialPageModal, v4, {
-		Middle = createElement2("Frame", v5, children)
+		Middle = React.createElement(
+			"Frame",
+			{
+				BackgroundTransparency = 1,
+				AutomaticSize = Enum.AutomaticSize.Y,
+				Size = UDim2.new(1, 0, 0, 0)
+			},
+			{
+				ContentPadding = React.createElement("UIPadding", {
+					PaddingTop = UDim.new(0, 24),
+					PaddingBottom = UDim.new(0, 24)
+				}),
+				ListLayout = React.createElement("UIListLayout", {
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					HorizontalAlignment = Enum.HorizontalAlignment.Left,
+					Padding = UDim.new(0, 12)
+				}),
+				BodyText = React.createElement("TextLabel", {
+					LayoutOrder = 1,
+					BackgroundTransparency = 1,
+					Text = getBodyText(v3.descriptionKey), -- inferred equivalent call
+					TextSize = v.Font.BaseSize,
+					TextColor3 = v.Theme.TextDefault.Color,
+					TextTransparency = v.Theme.TextDefault.Transparency,
+					FontFace = normalizeFontFace(v.Tokens.Typography.BodyLarge.Font),
+					TextXAlignment = Enum.TextXAlignment.Left,
+					AutomaticSize = Enum.AutomaticSize.Y,
+					TextWrapped = true,
+					Size = UDim2.new(0, partialPageModalMiddleContentWidth, 0, 0)
+				}),
+				TextBox = React.createElement(TextInputBoxWithBorder, {
+					text = props.code,
+					textInputType = props.useOTPInputType and Enum.TextInputType.OneTimePassword or Enum.TextInputType.Number,
+					textInputHeight = 36,
+					layoutOrder = 2,
+					placeholderText = v3.placeholderKey,
+					errorText = props.errorMessage,
+					onChangeTextCallback = props.onCodeTextChange,
+					Size = UDim2.new(1, 0, 0, 0),
+					onFocused = props.onCodeInputFocus,
+					maxLength = 6
+				}),
+				ChangePhoneButton = React.createElement(LinkButton, {
+					text = v3.changePhoneNumberKey,
+					onActivated = props.returnToAddPhone,
+					layoutOrder = 3,
+					fontStyle = "CaptionBody",
+					minPaddingX = 0,
+					minPaddingY = 0
+				})
+			}
+		)
 	})
 end
 

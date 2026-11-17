@@ -1,1 +1,0 @@
-return { About = require("@game/CorePackages/Workspace/Packages/_Workspace/ProfilePlatform/ProfilePlatform/Components/About/AboutContainer"), parseSectionsFromData = require("@game/CorePackages/Workspace/Packages/_Workspace/ProfilePlatform/ProfilePlatform/Components/About/parseSectionsFromData") }

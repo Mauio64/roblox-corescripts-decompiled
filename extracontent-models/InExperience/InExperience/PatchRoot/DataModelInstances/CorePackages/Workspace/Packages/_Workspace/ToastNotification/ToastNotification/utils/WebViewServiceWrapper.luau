@@ -57,16 +57,17 @@ function WebViewServiceWrapper:open()
 
 	if GetFFlagEnableUnifiedWebViews() then
 		self.webViewService:OpenWindow(self.url, self.title, true)
-	else
-		BrowserService:SendCommand((HttpService:JSONEncode({
-			command = "open",
-			url = self.url,
-			title = self.title,
-			visible = true,
-			isGenericWebview = true,
-			enableOverlayReplacement = true
-		})))
+		return
 	end
+
+	BrowserService:SendCommand((HttpService:JSONEncode({
+		command = "open",
+		url = self.url,
+		title = self.title,
+		visible = true,
+		isGenericWebview = true,
+		enableOverlayReplacement = true
+	})))
 end
 
 function WebViewServiceWrapper:close()

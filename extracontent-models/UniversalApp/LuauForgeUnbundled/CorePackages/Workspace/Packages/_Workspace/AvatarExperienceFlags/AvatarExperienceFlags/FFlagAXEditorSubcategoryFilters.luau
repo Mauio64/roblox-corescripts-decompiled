@@ -1,1 +1,0 @@
-return game:DefineFastFlag("AXEditorSubcategoryFilters2", false)

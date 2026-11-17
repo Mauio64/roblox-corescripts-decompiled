@@ -59,11 +59,11 @@ function getTargetMessageInfo(data)
 	return v2
 end
 
-local function getTargetMessageInfoFromSignals(sender_user_id: string?, targetMessageId: string?, list: string?) -- 2 equivalent calls inferred from this helper
+local function getTargetMessageInfoFromSignals(sender_user_id: string?, targetMessageId: string?, content: string?) -- 2 equivalent calls inferred from this helper
 	return {
 		targetMessageSenderId = sender_user_id,
 		targetMessageId = targetMessageId,
-		targetMessageLength = list and #list or nil
+		targetMessageLength = content and #content or nil
 	}
 end
 

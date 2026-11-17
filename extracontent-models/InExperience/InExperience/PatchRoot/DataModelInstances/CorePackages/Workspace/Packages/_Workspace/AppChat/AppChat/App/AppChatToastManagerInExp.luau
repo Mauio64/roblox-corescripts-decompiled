@@ -8,7 +8,6 @@ local React = require(parent.React)
 local SignalsReact = require(parent.SignalsReact)
 
 local SharedFlags = require(parent.SharedFlags)
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
 local GetFFlagAppChatInExpToastSnoozeMenuDismissFix = SharedFlags.GetFFlagAppChatInExpToastSnoozeMenuDismissFix
 local ExpChatShared = require(parent.ExpChatShared)
 local FriendsSurfaceVisibility = ExpChatShared.FriendsSurfaceVisibility
@@ -17,11 +16,8 @@ local v = { hideAllChatToasts = false, isAppChatVisible = false }
 
 function AppChatToastManagerInExp(p)
 	local joined = Cryo.Dictionary.join(v, p)
-	local visibleFriendsConversationId
 
-	if FFlagExpChatEnableFriendsTab then
-		visibleFriendsConversationId = SignalsReact.useSignalState(FriendsSurfaceVisibility.getVisibleConversationId)
-	end
+	local visibleFriendsConversationId = SignalsReact.useSignalState(FriendsSurfaceVisibility.getVisibleConversationId)
 
 	local navigateToChat = React.useCallback(function(p2: string)
 		joined.navigateToChat(p2)

@@ -80,11 +80,12 @@ function HttpRequest.get(p, url)
 				v = p.http:JSONDecode(p2.Body)
 			end
 
-			if v then
-				callback2((ErrorTransferModel.format(v)))
-			else
+			if not v then
 				callback2({ status = p2.StatusCode, body = p2.Body })
+				return
 			end
+
+			callback2((ErrorTransferModel.format(v)))
 		end)
 	end)
 end
@@ -127,11 +128,12 @@ function HttpRequest.post(p, url, p2)
 				v = p.http:JSONDecode(p3.Body)
 			end
 
-			if v then
-				callback2((ErrorTransferModel.format(v)))
-			else
+			if not v then
 				callback2({ status = p3.StatusCode, body = p3.Body })
+				return
 			end
+
+			callback2((ErrorTransferModel.format(v)))
 		end)
 	end)
 end

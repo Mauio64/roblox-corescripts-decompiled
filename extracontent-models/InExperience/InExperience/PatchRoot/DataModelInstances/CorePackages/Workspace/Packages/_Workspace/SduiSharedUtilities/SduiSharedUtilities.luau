@@ -132,6 +132,7 @@ SduiSharedUtilities.getSduiPageEntrySnackbarStore = require(script.getSduiPageEn
 SduiSharedUtilities.usePageEntrySnackbar = require(script.usePageEntrySnackbar)
 SduiSharedUtilities.useComponentConfig = require(script.hooks.useComponentConfig)
 SduiSharedUtilities.usePreferredTextSizeLineBudget = require(script.hooks.usePreferredTextSizeLineBudget)
+SduiSharedUtilities.usePublishContainerWidth = require(script.hooks.usePublishContainerWidth)
 SduiSharedUtilities.useEntrySurfacing = require(script.hooks.useEntrySurfacing)
 SduiSharedUtilities.useInputData = require(script.hooks.useInputData)
 SduiSharedUtilities.useSduiPageScopeField = require(script.hooks.useSduiPageScopeField)

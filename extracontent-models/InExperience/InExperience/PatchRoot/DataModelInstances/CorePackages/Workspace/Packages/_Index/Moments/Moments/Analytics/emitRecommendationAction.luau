@@ -4,7 +4,9 @@ local Constants = require(Moments.Constants)
 local SharedFlags = require(parent.SharedFlags)
 local FFlagMomentsComments = SharedFlags.FFlagMomentsComments
 require(script.Parent.RecommendationContentType)
+require(Moments.Enums.MomentsFeedType)
 local FFlagMomentsRecommendationContentType = require(Moments.Flags.FFlagMomentsRecommendationContentType)
+local FFlagMomentsRecommendationFeedType = require(Moments.Flags.FFlagMomentsRecommendationFeedType)
 
 local v = {
 	eventName = "RecommendationActionEvent",
@@ -29,6 +31,12 @@ local function emitRecommendationAction(data)
 		contentType = data.contentType
 	end
 
+	local feedType
+
+	if FFlagMomentsRecommendationFeedType then
+		feedType = data.feedType
+	end
+
 	local customFields = {
 		playsessionid = "",
 		universeid = Constants.MOMENTS_UNIVERSE_ID,
@@ -45,7 +53,8 @@ local function emitRecommendationAction(data)
 		comment_section_open_duration_seconds = 0,
 		action_weight = 0,
 		moments_play_intent_id = 0,
-		content_type = 0
+		content_type = 0,
+		feed_type = 0
 	}
 	local destination_placeid
 
@@ -71,6 +80,7 @@ local function emitRecommendationAction(data)
 	customFields.action_weight = action_weight
 	customFields.moments_play_intent_id = moments_play_intent_id
 	customFields.content_type = contentType
+	customFields.feed_type = feedType
 	TelemetryService:LogEvent(v, {
 		standardizedFields = { "addSessionInfo", "addSessionId", "addOSInfo" },
 		customFields = customFields

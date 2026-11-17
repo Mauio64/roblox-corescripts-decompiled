@@ -16,7 +16,6 @@ local normalizeFontFace = Foundation.Utility.normalizeFontFace
 
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagCoreUiMigrateUIBloxToFoundation = SharedFlags.FFlagCoreUiMigrateUIBloxToFoundation
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local v
 
 if FFlagCoreUiMigrateUIBloxToFoundation then
@@ -135,44 +134,36 @@ function extended:renderWithSelectionCursor(callback)
 		},
 		{
 			Slider = Roact.createElement(Slider, joined),
-			TextContainer = withFoundationOrUIBloxStyle(function(p)
-				local tokens
-
-				if FoundationFontFaceMigration then
-					tokens = p
-				end
-
+			TextContainer = withFoundationOrUIBloxStyle(function(tokens)
 				return {
 					Tokens = tokens,
 					Theme = {
 						TextMuted = {
-							Color = p.Color.Content.Muted.Color3,
-							Transparency = p.Color.Content.Muted.Transparency
+							Color = tokens.Color.Content.Muted.Color3,
+							Transparency = tokens.Color.Content.Muted.Transparency
 						},
 						TextDefault = {
-							Color = p.Color.Content.Default.Color3,
-							Transparency = p.Color.Content.Default.Transparency
+							Color = tokens.Color.Content.Default.Color3,
+							Transparency = tokens.Color.Content.Default.Transparency
 						},
 						BackgroundUIContrast = {
-							Color = p.Color.OverMedia.OverMedia_0.Color3,
-							Transparency = p.Color.OverMedia.OverMedia_0.Transparency
+							Color = tokens.Color.OverMedia.OverMedia_0.Color3,
+							Transparency = tokens.Color.OverMedia.OverMedia_0.Transparency
 						}
 					},
 					Font = {
 						BaseSize = 1,
 						Body = {
-							Font = p.Typography.BodyLarge.Font,
-							RelativeSize = p.Typography.BodyLarge.FontSize,
-							RelativeMinSize = p.Typography.BodyLarge.FontSize
+							Font = tokens.Typography.BodyLarge.Font,
+							RelativeSize = tokens.Typography.BodyLarge.FontSize,
+							RelativeMinSize = tokens.Typography.BodyLarge.FontSize
 						}
 					}
 				}
 			end, function(props2)
 				local textMuted = props.disabled and props2.Theme.TextMuted or props2.Theme.TextDefault
 
-				local createElement = Roact.createElement
-				local label = AssetImage.Label
-				local v3 = {
+				return Roact.createElement(AssetImage.Label, {
 					BackgroundTransparency = 1,
 					imageKey = "RoundedRect",
 					ImageTransparency = props2.Theme.BackgroundUIContrast.Transparency,
@@ -180,93 +171,63 @@ function extended:renderWithSelectionCursor(callback)
 					Size = UDim2.new(0, 64, 0, 36),
 					Position = UDim2.new(1, 0, 0.5, 0),
 					AnchorPoint = Vector2.new(1, 0.5)
-				}
-				local v4 = { FocusHandler = self:renderFocusHandler(), Box = 0 }
-				local createElement2 = Roact.createElement
-				local v5 = {
-					["BackgroundTransparency"] = nil,
-					["BackgroundTransparency"] = nil,
-					["BackgroundTransparency"] = nil,
-					["BackgroundTransparency"] = nil,
-					["BackgroundTransparency"] = nil,
-					["BackgroundTransparency"] = nil,
-					["BackgroundTransparency"] = nil,
-					["BackgroundTransparency"] = nil,
-					["BackgroundTransparency"] = nil,
-					["BackgroundTransparency"] = nil,
-					["BackgroundTransparency"] = nil,
-					["BackgroundTransparency"] = nil,
-					["BackgroundTransparency"] = nil,
-					BackgroundTransparency = 1,
-					Size = UDim2.new(1, 0, 1, 0),
-					AnchorPoint = Vector2.new(0.5, 0.5),
-					Position = UDim2.new(0.5, 0, 0.5, 0)
-				}
-				local font
+				}, {
+					FocusHandler = self:renderFocusHandler(),
+					Box = Roact.createElement("TextBox", {
+						BackgroundTransparency = 1,
+						Size = UDim2.new(1, 0, 1, 0),
+						AnchorPoint = Vector2.new(0.5, 0.5),
+						Position = UDim2.new(0.5, 0, 0.5, 0),
+						FontFace = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font),
+						TextScaled = true,
+						ClearTextOnFocus = false,
+						TextEditable = not props.disabled,
+						TextColor3 = textMuted.Color,
+						TextTransparency = textMuted.Transparency,
+						Text = tostring(props.value),
+						NextSelectionLeft = self.props.sliderDotRef,
+						SelectionImageObject = callback(v2.InputFields),
+						[Roact.Event.SelectionLost] = self.props.onSelectionLost,
+						[Roact.Event.SelectionGained] = self.props.onSelectionGained,
+						[Roact.Ref] = self.textBoxRef,
+						[Roact.Event.Focused] = props.disabled and function(object)
+							object:ReleaseFocus(false)
+						end or function()
+							self:setState({ textEntryMode = true })
+						end,
+						[Roact.Event.FocusLost] = function(p, _)
+							self:setState({ textEntryMode = false })
 
-				if not FoundationFontFaceMigration then
-					font = props2.Font.Body.Font
-				end
+							local text = tonumber(p.Text)
 
-				v5.Font = font
-				local fontFace
+							if text ~= props.value then
+								if text == nil then
+									p.Text = tostring(props.value)
+									return
+								end
 
-				if FoundationFontFaceMigration then
-					fontFace = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
-				end
+								local v3 = props.stepInterval
 
-				v5.FontFace = fontFace
+								if props.keyboardInputStepInterval then
+									v3 = props.keyboardInputStepInterval
+								end
 
-				v5.TextScaled = true
-				v5.ClearTextOnFocus = false
-				v5.TextEditable = not props.disabled
-				v5.TextColor3 = textMuted.Color
-				v5.TextTransparency = textMuted.Transparency
-				v5.Text = tostring(props.value)
-				v5.NextSelectionLeft = self.props.sliderDotRef
-				v5.SelectionImageObject = callback(v2.InputFields)
-				v5[Roact.Event.SelectionLost] = self.props.onSelectionLost
-				v5[Roact.Event.SelectionGained] = self.props.onSelectionGained
-				v5[Roact.Ref] = self.textBoxRef
-				v5[Roact.Event.Focused] = props.disabled and function(object)
-					object:ReleaseFocus(false)
-				end or function()
-					self:setState({ textEntryMode = true })
-				end
-				v5[Roact.Event.FocusLost] = function(p, _)
-					self:setState({ textEntryMode = false })
+								local v4 = math.clamp(math.floor(text / v3 + 0.5) * v3, props.min, props.max)
 
-					local text = tonumber(p.Text)
+								p.Text = tostring(v4)
 
-					if text ~= props.value then
-						if text == nil then
-							p.Text = tostring(props.value)
-							return
+								if v4 ~= props.value then
+									props.valueChanged(v4)
+								end
+							end
 						end
-
-						local v6 = props.stepInterval
-
-						if props.keyboardInputStepInterval then
-							v6 = props.keyboardInputStepInterval
-						end
-
-						local v7 = math.clamp(math.floor(text / v6 + 0.5) * v6, props.min, props.max)
-
-						p.Text = tostring(v7)
-
-						if v7 ~= props.value then
-							props.valueChanged(v7)
-						end
-					end
-				end
-
-				v4.Box = createElement2("TextBox", v5, {
-					TextSizeConstraint = Roact.createElement("UITextSizeConstraint", {
-						MinTextSize = props2.Font.Body.RelativeMinSize * props2.Font.BaseSize,
-						MaxTextSize = props2.Font.Body.RelativeSize * props2.Font.BaseSize
+					}, {
+						TextSizeConstraint = Roact.createElement("UITextSizeConstraint", {
+							MinTextSize = props2.Font.Body.RelativeMinSize * props2.Font.BaseSize,
+							MaxTextSize = props2.Font.Body.RelativeSize * props2.Font.BaseSize
+						})
 					})
 				})
-				return createElement(label, v3, v4)
 			end),
 			UserInputConnection = not props.disabled and Roact.createElement(ExternalEventConnection, {
 				event = UserInputService.InputBegan,

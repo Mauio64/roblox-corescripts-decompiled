@@ -1,3 +1,3 @@
-local FFlagLuaAppEnableHomepageOneByTwoTile = require(script.Parent.FFlagLuaAppEnableHomepageOneByTwoTile)
+local FFlagLuaAppEnableNxMRoduxApportioning = require(script.Parent.FFlagLuaAppEnableNxMRoduxApportioning)
 
-return game:DefineFastFlag("LuaAppEnableOneByTwoTileFunnelTelemetry", false) and FFlagLuaAppEnableHomepageOneByTwoTile
+return game:DefineFastFlag("LuaAppEnableOneByTwoTileFunnelTelemetry", false) and FFlagLuaAppEnableNxMRoduxApportioning

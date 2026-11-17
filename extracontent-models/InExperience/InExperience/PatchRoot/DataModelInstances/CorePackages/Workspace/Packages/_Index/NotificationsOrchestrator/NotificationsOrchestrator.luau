@@ -6,6 +6,8 @@ local SlotGroupConfigByGroupId = require(script.Config.SlotGroupConfigByGroupId)
 local SlotConfigBySlotId = require(script.Config.SlotConfigBySlotId)
 local GetNotificationsStore = require(script.Stores.GetNotificationsStore)
 
+local FFlagEnableNotificationsOrchestratorUnifiedLogging = require(script.Flags.FFlagEnableNotificationsOrchestratorUnifiedLogging)
+
 return {
 	SlotId = SlotId,
 	SlotGroup = SlotGroup,
@@ -29,5 +31,11 @@ return {
 	getActiveForSlot = function(p)
 		return GetNotificationsStore(false).getActiveForSlot(p)
 	end,
+	setInExperienceShopOpen = function(flag: boolean)
+		GetNotificationsStore(false).setInExperienceShopOpen(flag)
+	end,
+	Flags = {
+		FFlagEnableNotificationsOrchestratorUnifiedLogging = FFlagEnableNotificationsOrchestratorUnifiedLogging
+	},
 	["jest.config"] = script["jest.config"]
 }

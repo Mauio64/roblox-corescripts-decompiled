@@ -1,3 +1,5 @@
+local ImpressionsTrackerWithoutNavigation = require(script.ImpressionsTrackerWithoutNavigation)
+
 return {
 	["jest.config"] = script["jest.config"],
 	Constants = require(script.Constants),
@@ -9,7 +11,7 @@ return {
 	useImpressionsTagger = require(script.useImpressionsTagger),
 	useBatchedImpressions = require(script.useBatchedImpressions),
 	ImpressionsTracker = require(script.ImpressionsTracker),
-	ImpressionsTrackerWithoutNavigation = require(script.ImpressionsTrackerWithoutNavigation),
+	ImpressionsTrackerWithoutNavigation = ImpressionsTrackerWithoutNavigation,
 	FrameBoundsImpressionsTracker = require(script.FrameBoundsImpressionsTracker),
 	ScreenSizeImpressionsTracker = require(script.ScreenSizeImpressionsTracker),
 	ContentThresholdImpressionsDetector = require(script.ContentThresholdImpressionsDetector),

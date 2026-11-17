@@ -1600,7 +1600,7 @@ local function updateErrorPrompt(p, errorCode, p2)
 	end
 end
 
-local function onErrorMessageChanged() -- 1 equivalent call inferred from this helper
+local function onErrorMessageChanged()
 	updateErrorPrompt(GuiService:GetErrorMessage(), GuiService:GetErrorCode(), GuiService:GetErrorType())
 end
 
@@ -1620,7 +1620,8 @@ local function onScreenSizeChanged()
 end
 
 RobloxGui:GetPropertyChangedSignal("AbsoluteSize"):connect(onScreenSizeChanged)
-onErrorMessageChanged() -- inferred equivalent call
+updateErrorPrompt(GuiService:GetErrorMessage(), GuiService:GetErrorCode(), GuiService:GetErrorType())
+
 GuiService.ErrorMessageChanged:connect(onErrorMessageChanged)
 
 if defineFastFlag2 then

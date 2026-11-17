@@ -1,13 +1,10 @@
 local parent = script:FindFirstAncestor("AppChat").Parent
 
-local AppCommonLib = require(parent.AppCommonLib)
-local Text = AppCommonLib.Text
 local React = require(parent.React)
 local Cryo = require(parent.Cryo)
 local Foundation = require(parent.Foundation)
 local Style = require(parent.Style)
 local GetTextSize = Style.GetTextSize
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local Enums = Foundation.Enums
 
 local useMessageFtuxTooltip = require(script.Parent.useMessageFtuxTooltip)
@@ -24,14 +21,7 @@ local function fn(p)
 
 	React.useEffect(function()
 		local titleSmall = v2.Typography.TitleSmall
-		local v4
-
-		if FoundationFontFaceMigration then
-			v4 = GetTextSize(v3.text, titleSmall.FontSize, titleSmall.Font, Vector2.new(10000, 10000)).X + v2.Padding.Small * 2
-		else
-			v4 = Text.GetTextWidth(v3.text, titleSmall.Font, titleSmall.FontSize) + v2.Padding.Small * 2
-		end
-
+		local v4 = GetTextSize(v3.text, titleSmall.FontSize, titleSmall.Font, Vector2.new(10000, 10000)).X + v2.Padding.Small * 2
 		local v5
 
 		if union.messageRef.current then

@@ -6,6 +6,9 @@ local FlyoutSidePanelIXP = SharedExperimentDefinition.FlyoutSidePanelIXP
 local SharedFlags = require(parent.SharedFlags)
 local FFlagEnableChartsInFlyout = SharedFlags.FFlagEnableChartsInFlyout
 local SharedFlags2 = require(parent.SharedFlags)
+local FFlagUserLibrary = SharedFlags2.FFlagUserLibrary
+local FFlagFlyoutAddAdjustScreen = require(script.Parent.Flags.FFlagFlyoutAddAdjustScreen)
+
 return {
 	FLYOUT_SIDE_PANEL_WIDTH = 351,
 	FLYOUT_SIDE_PADDING = 42,
@@ -17,7 +20,7 @@ return {
 	MAX_SHOWN_STATUS_INDICATOR_COUNT = 99,
 	FLYOUT_DEFAULT_POLICY = {
 		MyLibrary = {
-			SharedFlags2.FFlagUserLibrary and "UserLibrary" or nil,
+			FFlagUserLibrary and "UserLibrary" or nil,
 			"Favorites",
 			"ContinuePlaying",
 			FFlagEnableChartsInFlyout and FlyoutSidePanelIXP.isChartsInFlyoutEnabled() and "Charts" or nil,
@@ -31,6 +34,7 @@ return {
 			"GiftCards",
 			"Redeem",
 			"Settings",
+			FFlagFlyoutAddAdjustScreen and "AdjustScreen" or nil,
 			"HelpAndSafety"
 		},
 		AdditionalNavigation = { "Events", "Moments", "Learn", "CreateGames" }

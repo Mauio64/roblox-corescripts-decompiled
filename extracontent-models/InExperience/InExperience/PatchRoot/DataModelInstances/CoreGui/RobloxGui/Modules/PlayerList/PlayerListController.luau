@@ -19,7 +19,11 @@ local Rodux = require(CorePackages.Packages.Rodux)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local Foundation = require(CorePackages.Packages.Foundation)
+local FoundationProvider = Foundation.FoundationProvider
 local ColorMode = Foundation.Enums.ColorMode
+local React = require(CorePackages.Packages.React)
+local ReactUtils = require(CorePackages.Packages.ReactUtils)
+local useEventConnection = ReactUtils.useEventConnection
 local Constants = UIBlox.App.Style.Constants
 local ApolloClient = require(CoreGui.RobloxGui.Modules.ApolloClient)
 local ApolloClient2 = require(CorePackages.Packages.ApolloClient)
@@ -39,6 +43,9 @@ local PlayerIconInfoStore = require(CorePackages.Workspace.Packages.PlayerIconIn
 local BlockingUtility = require(CorePackages.Workspace.Packages.BlockingUtility)
 local constants = PlayerList.Common.Constants
 local PlayerRelationshipStore = PlayerList.PlayerRelationshipStore
+local PlayerListPanel = PlayerList.Presentation.PlayerListPanel
+local PlayerContextualMenuView = PlayerList.Presentation.PlayerContextualMenuView
+local LeaderboardScrim = PlayerList.Presentation.LeaderboardScrim
 
 local SetPlayerListEnabled = require(parent.Actions.SetPlayerListEnabled)
 local SetPlayerListVisibility = require(parent.Actions.SetPlayerListVisibility)
@@ -76,6 +83,7 @@ local SharedFlags4 = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagPlatformLeaderboardPersistStoreOnRemount = SharedFlags4.FFlagPlatformLeaderboardPersistStoreOnRemount
 
 local FFlagPlayerListReskin = PlayerList.Flags.FFlagPlayerListReskin
+local FFlagPlayerListContrastingTeamText = PlayerList.Flags.FFlagPlayerListContrastingTeamText
 local FFlagPlayerListPersistVisibility = require(parent.Flags.FFlagPlayerListPersistVisibility)
 
 local PlayerListContainer = PlayerList.Container.PlayerListContainer
@@ -341,8 +349,56 @@ if FFlagAddNewPlayerListMobileFocusNav then
 	end
 end
 
+local propertyChangedSignal = UserGameSettings:GetPropertyChangedSignal("PreferredTransparency")
+local function ReskinElement(props)
+	assert(
+		FFlagPlayerListContrastingTeamText,
+		"ReskinElement is only supported when FFlagPlayerListContrastingTeamText is on"
+	)
+
+	local state, setState = React.useState(UserGameSettings.PreferredTransparency)
+	useEventConnection(propertyChangedSignal, function()
+		setState(UserGameSettings.PreferredTransparency)
+	end, { propertyChangedSignal })
+
+	local v = {
+		Scrim = React.createElement(LeaderboardScrim, {
+			isSmallTouchDevice = props.isSmallTouchDevice
+		}),
+		Container = React.createElement(Foundation.View, props.resolveContainerProps(), {
+			ReskinContainer = React.createElement(
+				PlayerListContainer,
+				{
+					leaderboardStore = LeaderboardStoreInstanceManager.getLeaderboardStoreInstance,
+					TopBarConstants = props.TopBarConstants,
+					isTenFoot = props.isTenFoot
+				},
+				{
+					PlayerListPanel = React.createElement(PlayerListPanel, {
+						isSmallTouchDevice = props.isSmallTouchDevice,
+						title = props.leaderboardTitle
+					})
+				}
+			)
+		}),
+		ContextMenu = React.createElement(PlayerContextualMenuView, {
+			isSmallTouchDevice = props.isSmallTouchDevice
+		})
+	}
+
+	return React.createElement(FoundationProvider, {
+		colorMode = ColorMode.Dark,
+		device = props.foundationDevice,
+		preferences = { preferredTransparency = state }
+	}, v)
+end
+
+local function createReskinElement(p) -- 1 equivalent call inferred from this helper
+	return React.createElement(ReskinElement, p)
+end
+
 function PlayerListController:_setupReskin()
-	local React = require(CorePackages.Packages.React)
+	local React2 = require(CorePackages.Packages.React)
 	local ReactRoblox = require(CorePackages.Packages.ReactRoblox)
 	local Constants2 = require(RobloxGui.Modules.TopBar.Constants)
 	local Foundation2 = require(CorePackages.Packages.Foundation)
@@ -350,10 +406,6 @@ function PlayerListController:_setupReskin()
 	local colorMode = Foundation2.Enums.ColorMode
 	local device = Foundation2.Enums.Device
 	local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
-
-	local playerListPanel = PlayerList.Presentation.PlayerListPanel
-	local playerContextualMenuView = PlayerList.Presentation.PlayerContextualMenuView
-	local leaderboardScrim = PlayerList.Presentation.LeaderboardScrim
 	local ContextMenuController = require(parent.ContextMenuController)
 
 	local function translate(p, p2) -- 1 equivalent call inferred from this helper
@@ -368,22 +420,22 @@ function PlayerListController:_setupReskin()
 		return p2
 	end
 
-	local title = translate("InGame.PlayerList.Leaderboard", "Leaderboard") -- inferred equivalent call
+	local v = translate("InGame.PlayerList.Leaderboard", "Leaderboard") -- inferred equivalent call
 	local preferredInput = UserInputService.PreferredInput
 	local isTenFoot = resolveIsTenFoot(preferredInput) -- inferred equivalent call
-	local v = FFlagPlayerListUseMobileOnSmallDisplay and GuiService.ViewportDisplaySize == Enum.DisplaySize.Small
+	local v2 = FFlagPlayerListUseMobileOnSmallDisplay and GuiService.ViewportDisplaySize == Enum.DisplaySize.Small
 	local isSmallTouchDevice = Utility:IsSmallTouchScreen()
 		or isLargeConsoleLayout(preferredInput) -- inferred equivalent call
-		or v and isTouchOrGamepadInput(preferredInput) -- inferred equivalent call
+		or v2 and isTouchOrGamepadInput(preferredInput) -- inferred equivalent call
 		or FStringPlayerListOverrideType == "mobile"
-	local device2
+	local v3
 
 	if isTenFoot then
-		device2 = device.Console
+		v3 = device.Console
 	elseif isLargeConsoleLayout(preferredInput) then -- inferred equivalent call
-		device2 = device.Console
+		v3 = device.Console
 	else
-		device2 = device.Unknown
+		v3 = device.Unknown
 	end
 
 	local function restoreVisibilityOnDismiss()
@@ -468,7 +520,7 @@ function PlayerListController:_setupReskin()
 		return UDim2.new(0.5, 0, 0, topBarHeight + computeMobileTopInset()) -- inferred equivalent call
 	end
 
-	local binding, v2 = React.createBinding(computeMobilePosition())
+	local binding, v4 = React2.createBinding(computeMobilePosition())
 	local function resolveContainerProps()
 		if isSmallTouchDevice then
 			return {
@@ -479,26 +531,26 @@ function PlayerListController:_setupReskin()
 			}
 		end
 
-		local v3 = math.max(4, Constants2.ApplyDisplayScale(4))
+		local v5 = math.max(4, Constants2.ApplyDisplayScale(4))
 		return {
 			AnchorPoint = Vector2.new(1, 0),
-			Position = UDim2.new(1, -v3, 0, v3 + topBarHeight),
+			Position = UDim2.new(1, -v5, 0, v5 + topBarHeight),
 			Size = UDim2.fromOffset(0, 0),
 			tag = "auto-xy"
 		}
 	end
 
 	local function buildReskinElement()
-		return React.createElement(foundationProvider, {
+		return React2.createElement(foundationProvider, {
 			colorMode = colorMode.Dark,
-			device = device2,
+			device = v3,
 			preferences = { preferredTransparency = UserGameSettings.PreferredTransparency }
 		}, {
-			Scrim = React.createElement(leaderboardScrim, {
+			Scrim = React2.createElement(LeaderboardScrim, {
 				isSmallTouchDevice = isSmallTouchDevice
 			}),
-			Container = React.createElement(Foundation2.View, resolveContainerProps(), {
-				ReskinContainer = React.createElement(
+			Container = React2.createElement(Foundation2.View, resolveContainerProps(), {
+				ReskinContainer = React2.createElement(
 					PlayerListContainer,
 					{
 						leaderboardStore = LeaderboardStoreInstanceManager.getLeaderboardStoreInstance,
@@ -506,21 +558,21 @@ function PlayerListController:_setupReskin()
 						isTenFoot = isTenFoot
 					},
 					{
-						PlayerListPanel = React.createElement(playerListPanel, {
+						PlayerListPanel = React2.createElement(PlayerListPanel, {
 							isSmallTouchDevice = isSmallTouchDevice,
-							title = title
+							title = v
 						})
 					}
 				)
 			}),
-			ContextMenu = React.createElement(playerContextualMenuView, {
+			ContextMenu = React2.createElement(PlayerContextualMenuView, {
 				isSmallTouchDevice = isSmallTouchDevice
 			})
 		})
 	end
 
 	local function setupPlayerInfoRequests()
-		local v3 = {
+		local v5 = {
 			getState = function()
 				return { players = Players:GetPlayers() }
 			end,
@@ -542,11 +594,11 @@ function PlayerListController:_setupReskin()
 		}
 
 		local function request(p) -- 2 equivalent calls inferred from this helper
-			MakePlayerInfoRequests(p)(v3)
+			MakePlayerInfoRequests(p)(v5)
 		end
 
-		for _, v4 in ipairs(Players:GetPlayers()) do
-			request(v4) -- inferred equivalent call
+		for _, v6 in ipairs(Players:GetPlayers()) do
+			request(v6) -- inferred equivalent call
 		end
 
 		self._reskinPlayerAddedConn = Players.PlayerAdded:Connect(request)
@@ -563,10 +615,10 @@ function PlayerListController:_setupReskin()
 		end
 
 		self._reskinBlockedStatusConn = BlockingUtility:GetBlockedStatusChangedEvent():Connect(function(p, isBlocked)
-			local v4 = tonumber(p)
+			local v6 = tonumber(p)
 
-			if v4 then
-				PlayerRelationshipStore.patchPlayerRelationship(v4, { isBlocked = isBlocked })
+			if v6 then
+				PlayerRelationshipStore.patchPlayerRelationship(v6, { isBlocked = isBlocked })
 			end
 		end)
 		self._reskinFriendStatusConn = Players.LocalPlayer.FriendStatusChanged:Connect(function(p, friendStatus)
@@ -632,7 +684,23 @@ function PlayerListController:_setupReskin()
 		playerListReskin.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 		playerListReskin.Parent = CoreGui
 		local root = ReactRoblox.createRoot(playerListReskin)
-		root:render(buildReskinElement())
+		local v5
+
+		if FFlagPlayerListContrastingTeamText then
+			v5 = createReskinElement({ -- inferred equivalent call
+				isSmallTouchDevice = isSmallTouchDevice,
+				isTenFoot = isTenFoot,
+				foundationDevice = v3,
+				leaderboardTitle = v,
+				TopBarConstants = Constants2,
+				resolveContainerProps = resolveContainerProps
+			})
+		else
+			v5 = buildReskinElement()
+		end
+
+		root:render(v5)
+
 		self._reskinRoot = root
 		self._reskinScreenGui = playerListReskin
 
@@ -645,9 +713,9 @@ function PlayerListController:_setupReskin()
 
 				if currentCamera then
 					self._reskinViewportConn = currentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
-						v2(computeMobilePosition())
+						v4(computeMobilePosition())
 					end)
-					v2(computeMobilePosition())
+					v4(computeMobilePosition())
 				end
 			end
 			self._reskinCameraConn = workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function()
@@ -714,14 +782,14 @@ function PlayerListController:_setupReskin()
 
 	if FFlagEnableMobilePlayerListOnGamepad then
 		local function onPreferredInputChanged(preferredInput2)
-			local v3 = FFlagPlayerListUseMobileOnSmallDisplay
+			local v5 = FFlagPlayerListUseMobileOnSmallDisplay
 				and GuiService.ViewportDisplaySize == Enum.DisplaySize.Small
-			local v4 = Utility:IsSmallTouchScreen()
+			local v6 = Utility:IsSmallTouchScreen()
 				or isLargeConsoleLayout(preferredInput2) -- inferred equivalent call
-				or v3 and isTouchOrGamepadInput(preferredInput2) -- inferred equivalent call
+				or v5 and isTouchOrGamepadInput(preferredInput2) -- inferred equivalent call
 				or FStringPlayerListOverrideType == "mobile"
 
-			if v4 == isSmallTouchDevice then
+			if v6 == isSmallTouchDevice then
 				return
 			end
 
@@ -729,26 +797,25 @@ function PlayerListController:_setupReskin()
 				PlayerContextualMenuStore.closeContextMenu()
 			end
 
-			isSmallTouchDevice = v4
+			isSmallTouchDevice = v6
 			local largeConsoleLayout = isLargeConsoleLayout(preferredInput2) -- inferred equivalent call
-			local v5
+			local v7
 
 			if largeConsoleLayout then
-				v5 = device.Console
+				v7 = device.Console
 			else
-				v5 = device.Unknown
+				v7 = device.Unknown
 			end
 
-			device2 = v5
-
+			v3 = v7
 			local setOnDismiss = PlayerContextualMenuStore.setOnDismiss
-			local v6
+			local v8
 
 			if isSmallTouchDevice then
-				v6 = restoreVisibilityOnDismiss
+				v8 = restoreVisibilityOnDismiss
 			end
 
-			setOnDismiss(v6)
+			setOnDismiss(v8)
 
 			if self.mounted then
 				unmountReskin()

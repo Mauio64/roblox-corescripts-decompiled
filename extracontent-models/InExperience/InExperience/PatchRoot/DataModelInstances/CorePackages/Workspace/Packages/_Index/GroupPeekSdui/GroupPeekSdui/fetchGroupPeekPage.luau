@@ -20,12 +20,8 @@ local function fetchGroupPeekPage(group_id: string, flag: boolean?)
 
 	local ServiceContractsProto = require(parent.ServiceContractsProto)
 	local group_peek_page = ServiceContractsProto.apppageplatform.groups.group_peek_page
-	local clientCapabilities = ServiceContractsProto.apppageplatform.shared.client_capabilities.ClientCapabilities.new({
-		enabled_capabilities = SduiCapabilities.getEnabledCapabilityNumbers({
-			"CAPABILITY_SUPPORTS_GROUP_ANNOUNCEMENTS",
-			"CAPABILITY_SUPPORTS_GROUP_CONTENT_REACTIONS"
-		})
-	})
+
+	local clientCapabilities = SduiCapabilities.buildClientCapabilities()
 
 	local cachedRobloxComponentToTemplateId = getSduiTemplateStore().getCachedRobloxComponentToTemplateId(appPage)
 

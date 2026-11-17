@@ -7,6 +7,9 @@ local GameJoinCard = script:FindFirstAncestor("GameJoinCard")
 local FFlagMobileGameJoinCardEDPFromTitle = require(GameJoinCard.Flags.FFlagMobileGameJoinCardEDPFromTitle)
 local FFlagMobileGameJoinCardEDPFromThumbnail = require(GameJoinCard.Flags.FFlagMobileGameJoinCardEDPFromThumbnail)
 local FFlagGameJoinCardChatEntryPoint = require(GameJoinCard.Flags.FFlagGameJoinCardChatEntryPoint)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagMobileGameJoinCardVideo = SharedFlags.FFlagMobileGameJoinCardVideo
+local useJoinCardBannerVideoId = require(GameJoinCard.Hooks.useJoinCardBannerVideoId)
 
 local AnalyticsConstants = require(script.Parent.Parent.Parent.Analytics.AnalyticsConstants)
 local GameJoinCardButtonAction = AnalyticsConstants.GameJoinCardButtonAction
@@ -41,20 +44,22 @@ local UserProfiles = require(parent.UserProfiles)
 local SocialCommon = require(parent.SocialCommon)
 local ChatEntryPointNames = SocialCommon.Enums.ChatEntryPointNames
 local EnteredChatFromEntryPoint = SocialCommon.Actions.EnteredChatFromEntryPoint
-local SharedFlags = require(parent.SharedFlags)
+require(parent.VideoUtils)
 
-local FFlagSocialCarouselUseProfileStore = SharedFlags.FFlagSocialCarouselUseProfileStore
-local FFlagUserProfilePlatformProfile = SharedFlags.FFlagUserProfilePlatformProfile
-local FFlagSocialCarouselBuildPresence = SharedFlags.FFlagSocialCarouselBuildPresence
+local SharedFlags2 = require(parent.SharedFlags)
 
-local FFlagFriendSortedByPresenceSignalsImplementation = SharedFlags.FFlagFriendSortedByPresenceSignalsImplementation
-local FFlagEnableSplitPane = SharedFlags.FFlagEnableSplitPane
-local FFlagGameJoinCardAnalyticsCardId = SharedFlags.FFlagGameJoinCardAnalyticsCardId
-local FFlagGameJoinCardSourceAttribution = SharedFlags.FFlagGameJoinCardSourceAttribution
-local FFlagJoinabilityCTARefactor = SharedFlags.FFlagJoinabilityCTARefactor
-local FFlagJoinUserCTAsIxpEnabled = SharedFlags.FFlagJoinUserCTAsIxpEnabled
-local FStringJoinUserCTAsIxpLayer = SharedFlags.FStringJoinUserCTAsIxpLayer
-local FFlagMobileGameJoinCardGamepadSupport = SharedFlags.FFlagMobileGameJoinCardGamepadSupport
+local FFlagSocialCarouselUseProfileStore = SharedFlags2.FFlagSocialCarouselUseProfileStore
+local FFlagUserProfilePlatformProfile = SharedFlags2.FFlagUserProfilePlatformProfile
+local FFlagSocialCarouselBuildPresence = SharedFlags2.FFlagSocialCarouselBuildPresence
+
+local FFlagFriendSortedByPresenceSignalsImplementation = SharedFlags2.FFlagFriendSortedByPresenceSignalsImplementation
+local FFlagEnableSplitPane = SharedFlags2.FFlagEnableSplitPane
+local FFlagGameJoinCardAnalyticsCardId = SharedFlags2.FFlagGameJoinCardAnalyticsCardId
+local FFlagGameJoinCardSourceAttribution = SharedFlags2.FFlagGameJoinCardSourceAttribution
+local FFlagJoinabilityCTARefactor = SharedFlags2.FFlagJoinabilityCTARefactor
+local FFlagJoinUserCTAsIxpEnabled = SharedFlags2.FFlagJoinUserCTAsIxpEnabled
+local FStringJoinUserCTAsIxpLayer = SharedFlags2.FStringJoinUserCTAsIxpLayer
+local FFlagMobileGameJoinCardGamepadSupport = SharedFlags2.FFlagMobileGameJoinCardGamepadSupport
 local ixpServiceWrapper
 
 if FFlagJoinUserCTAsIxpEnabled then
@@ -381,6 +386,22 @@ local function MobileGameJoinCardContainer()
 	v11.onBeforeJoin = onBeforeJoin
 	v11.onAgeCheckCompletion = onAgeCheckCompletion
 	local v12 = useJoinUserInExperience(v5, v11)
+	local bannerVideoId
+
+	if FFlagMobileGameJoinCardVideo then
+		bannerVideoId = useJoinCardBannerVideoId(
+			universeId,
+			v12.cachedPlayabilityStatus,
+			navigation.getParam("isBannerVideoEnabled") == true
+		)
+	end
+
+	local bannerVideoPlaybackContext
+
+	if FFlagMobileGameJoinCardVideo then
+		bannerVideoPlaybackContext = navigation.getParam("videoPlaybackContext")
+	end
+
 	local v13, v14, localized
 
 	if FFlagJoinabilityCTARefactor then
@@ -751,6 +772,8 @@ local function MobileGameJoinCardContainer()
 		experienceName = experienceName,
 		bannerImageUrl = v10.url,
 		thumbnailImageUrl = thumbnailImageUrl,
+		bannerVideoId = bannerVideoId,
+		bannerVideoPlaybackContext = bannerVideoPlaybackContext,
 		isLoading = v12.isLoading,
 		isInExperience = v12.isInExperience,
 		ageCheckRequired = v12.ageCheckRequired,

@@ -131,8 +131,10 @@ return {
 		if loggingTypes.Counter then
 			local counter = loggingTypes.Counter
 			local formatCustomFields = counter.formatCustomFields(p)
+			local counterNamespace = p.counterNamespace or "Unknown"
+
 			default:logRobloxTelemetryCounter({
-				eventName = `Intervention.{p.counterNamespace or "Unknown"}.{counter.counterSuffix}`,
+				eventName = `Intervention.{counterNamespace}.{counter.counterSuffix}`,
 				backends = counter.backends,
 				throttlingPercentage = data.throttlingPercentage,
 				lastUpdated = data.lastUpdated,

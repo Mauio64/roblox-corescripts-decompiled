@@ -34,8 +34,6 @@ else
 	useGetPresenceByUserId = nil
 end
 
-local defineFastFlag = game:DefineFastFlag("RefreshProfileOnTrustedFriendsRtn", false)
-
 local v = { skipFetch = true }
 
 return function()
@@ -163,38 +161,36 @@ return function()
 
 	useEffect2(fn2, { v4, v5, profileId, v6, profileType, v9 })
 
-	if defineFastFlag then
-		local useEffect3 = React.useEffect
-		local function fn3()
-			if profileType ~= Enums.ProfileTypes.User then
-				return
-			end
-
-			local v10 = v4:observeEvent("TrustedConnectionNotifications", function(p)
-				local v10
-
-				if tostring(v6) == tostring(p.Actor) then
-					v10 = tostring(p.Target)
-				else
-					v10 = tostring(p.Actor)
-				end
-
-				if profileId == v10 then
-					v5(refreshProfilePlatformActionInfo(profileId, v7))
-				end
-			end)
-
-			return function()
-				v10:disconnect()
-			end
+	local useEffect3 = React.useEffect
+	local function fn3()
+		if profileType ~= Enums.ProfileTypes.User then
+			return
 		end
 
-		local v10
+		local v10 = v4:observeEvent("TrustedConnectionNotifications", function(p)
+			local v10
 
-		if FFlagProfilePlatformRefreshActionsRespectPolicies then
-			v10 = v7
+			if tostring(v6) == tostring(p.Actor) then
+				v10 = tostring(p.Target)
+			else
+				v10 = tostring(p.Actor)
+			end
+
+			if profileId == v10 then
+				v5(refreshProfilePlatformActionInfo(profileId, v7))
+			end
+		end)
+
+		return function()
+			v10:disconnect()
 		end
-
-		useEffect3(fn3, { v4, v5, profileId, v6, profileType, v10 })
 	end
+
+	local v10
+
+	if FFlagProfilePlatformRefreshActionsRespectPolicies then
+		v10 = v7
+	end
+
+	useEffect3(fn3, { v4, v5, profileId, v6, profileType, v10 })
 end

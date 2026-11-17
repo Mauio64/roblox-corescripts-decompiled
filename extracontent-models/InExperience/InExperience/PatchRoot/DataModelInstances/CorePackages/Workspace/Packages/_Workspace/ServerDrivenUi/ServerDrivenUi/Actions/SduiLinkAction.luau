@@ -82,14 +82,15 @@ return function(p, _, p2)
 	local success2, result2 = pcall(function()
 		linkingProtocol:isURLRegistered(result):andThen(function(p3)
 			if p3 then
-				if linkingProtocol:isInternalDlicEnabled() then
-					linkingProtocol:detectDeeplinkIntent((linkingProtocol:createInternalDlic(
-						result,
-						DeepLinkSource.LuaInternal
-					)))
-				else
+				if not linkingProtocol:isInternalDlicEnabled() then
 					linkingProtocol:detectURL(result)
+					return
 				end
+
+				linkingProtocol:detectDeeplinkIntent((linkingProtocol:createInternalDlic(
+					result,
+					DeepLinkSource.LuaInternal
+				)))
 			else
 				if not isWebViewSupported() then -- inferred equivalent call
 					p2.dependencies.logger.reportCounter(SduiCounterName.WebViewNotSupportedForLink, {

@@ -53,13 +53,7 @@ return function()
 			end
 
 			object:dispatch(CapturesRetrieved(v, selectedCapture))
-		else
-			if not FFlagCaptureServiceRetrieveCapturesSafeguard then
-				object:dispatch(CapturesRetrieved(CaptureService:RetrieveCaptures(), selectedCapture))
-
-				return
-			end
-
+		elseif FFlagCaptureServiceRetrieveCapturesSafeguard then
 			local success, result = pcall(function()
 				return CaptureService:RetrieveCaptures()
 			end)
@@ -69,6 +63,8 @@ return function()
 			else
 				warn("Failed to retrieve captures from gallery")
 			end
+		else
+			object:dispatch(CapturesRetrieved(CaptureService:RetrieveCaptures(), selectedCapture))
 		end
 	end
 end

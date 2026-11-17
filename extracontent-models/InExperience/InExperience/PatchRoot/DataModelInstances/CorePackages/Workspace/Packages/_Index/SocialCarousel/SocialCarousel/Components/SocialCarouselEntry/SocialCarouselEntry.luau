@@ -25,7 +25,11 @@ local defineFastInt = game:DefineFastInt("FriendCarouselRefreshThrottleInterval"
 local SharedFlags = require(parent.SharedFlags)
 local FFlagSocialCarouselShareQREnabled = SharedFlags.FFlagSocialCarouselShareQREnabled
 local SharedFlags2 = require(parent.SharedFlags)
-local FFlagSocialCarouselBuildPresence = SharedFlags2.FFlagSocialCarouselBuildPresence
+local FFlagMobileGameJoinCardVideo = SharedFlags2.FFlagMobileGameJoinCardVideo
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagSocialCarouselBuildPresence = SharedFlags3.FFlagSocialCarouselBuildPresence
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagSocialCarouselInGameTitleMarquee = SharedFlags4.FFlagSocialCarouselInGameTitleMarquee
 
 local Carousel = require(SocialCarousel.Components.Carousel)
 
@@ -43,6 +47,21 @@ return function(props)
 		state2, setState2 = React.useState(nil)
 	end
 
+	local ref2 = React.useRef(nil)
+	local ref3
+
+	if FFlagSocialCarouselInGameTitleMarquee then
+		ref3 = React.useRef(nil)
+	end
+
+	local setOpenGameJoinCardUserId = React.useCallback(function(current)
+		if typeof(current) == "function" then
+			current = current(ref2.current)
+		end
+
+		ref2.current = current
+		setState(current)
+	end, { setState })
 	local unifiedLogging = useSocialCarouselUnifiedLogging(appAnalytics, eventIngest, props.unifiedLogging, v2, ref)
 
 	local v3 = useThrottledCallback(function()
@@ -64,7 +83,9 @@ return function(props)
 		appAnalytics = appAnalytics,
 		hideCarouselHeader = props.hideCarouselHeader,
 		openGameJoinCardUserId = state,
-		setOpenGameJoinCardUserId = setState,
+		joinPopoverUserIdRef = 0,
+		joinSheetUserIdRef = 0,
+		setOpenGameJoinCardUserId = 0,
 		openBuildCardUserId = 0,
 		setOpenBuildCardUserId = 0,
 		unifiedLogging = 0,
@@ -77,8 +98,29 @@ return function(props)
 		onSuccessfulRender = 0,
 		selectionOrderBase = 0,
 		source = 0,
-		navigateToQRCodePage = 0
+		navigateToQRCodePage = 0,
+		isJoinCardVideoEnabled = 0,
+		videoPlaybackContext = 0
 	}
+	local joinPopoverUserIdRef
+
+	if FFlagSocialCarouselInGameTitleMarquee then
+		joinPopoverUserIdRef = ref2
+	end
+
+	v4.joinPopoverUserIdRef = joinPopoverUserIdRef
+
+	if not FFlagSocialCarouselInGameTitleMarquee then
+		ref3 = nil
+	end
+
+	v4.joinSheetUserIdRef = ref3
+
+	if not FFlagSocialCarouselInGameTitleMarquee then
+		setOpenGameJoinCardUserId = setState
+	end
+
+	v4.setOpenGameJoinCardUserId = setOpenGameJoinCardUserId
 
 	if not FFlagSocialCarouselBuildPresence then
 		state2 = nil
@@ -108,6 +150,20 @@ return function(props)
 	end
 
 	v4.navigateToQRCodePage = navigateToQRCodePage
+	local isJoinCardVideoEnabled
+
+	if FFlagMobileGameJoinCardVideo then
+		isJoinCardVideoEnabled = props.isJoinCardVideoEnabled
+	end
+
+	v4.isJoinCardVideoEnabled = isJoinCardVideoEnabled
+	local videoPlaybackContext
+
+	if FFlagMobileGameJoinCardVideo then
+		videoPlaybackContext = props.videoPlaybackContext
+	end
+
+	v4.videoPlaybackContext = videoPlaybackContext
 	return createElement(provider, { value = v4 }, {
 		Carousel = React.createElement(Carousel, {
 			appCompositionEnabled = props.appCompositionEnabled

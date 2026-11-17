@@ -17,15 +17,10 @@ local FFlagAddFriendsPageHighlightUnseenTrustedRequests = SharedFlags2.FFlagAddF
 local FFlagSocialCarouselEnableNewFriendRequestsBadgeForAll = require(SocialCarousel.Flags.FFlagSocialCarouselEnableNewFriendRequestsBadgeForAll)
 
 return function()
-	local v
-
-	if FFlagSocialCarouselEnableNewFriendRequestsBadgeForAll then
-		v = true
-	else
-		v = RoactAppExperiment.useUserExperiment({ FStringNewFriendRequestsBadgeLayer }, function(p)
+	local v = FFlagSocialCarouselEnableNewFriendRequestsBadgeForAll and true
+		or RoactAppExperiment.useUserExperiment({ FStringNewFriendRequestsBadgeLayer }, function(p)
 			return (p[FStringNewFriendRequestsBadgeLayer] or {}).showNewFriendRequestsBadge
 		end)
-	end
 
 	local v2 = useSignalState(React.useMemo(function()
 		if FFlagAddFriendsPageHighlightUnseenTrustedRequests then

@@ -1,12 +1,15 @@
 local AppChat = script:FindFirstAncestor("AppChat")
 local parent = AppChat.Parent
 local AppChatNetworking = require(parent.AppChatNetworking)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAppChatEnableReactions = SharedFlags.FFlagAppChatEnableReactions
 
 local FFlagAppChatPerfTracking = require(AppChat.Flags.FFlagAppChatPerfTracking)
 local FFlagAppChatMessageTTIMilestones = require(AppChat.Flags.FFlagAppChatMessageTTIMilestones)
 local FFlagAppChatIncrementalPaginationProjection = require(AppChat.Flags.FFlagAppChatIncrementalPaginationProjection)
 local AppChatPerfTracker = require(AppChat.Telemetry.AppChatPerfTracker)
 local GetConversationMessageViewModelStore = require(AppChat.Stores.GetConversationMessageViewModelStore)
+local GetMessageReactionsStore = require(AppChat.Stores.GetMessageReactionsStore)
 
 return function(conversationId: string, _, p: string?)
 	return function(object)
@@ -56,6 +59,16 @@ return function(conversationId: string, _, p: string?)
 					AppChatPerfTracker.Milestone.PrimaryDataReady.Subphase.ResponseReceived,
 					v3
 				)
+			end)
+		end
+
+		if FFlagAppChatEnableReactions then
+			v2 = v2:andThen(function(p2)
+				if p2.responseBody then
+					GetMessageReactionsStore(false).ingestMessageReactions(p2.responseBody.messages)
+				end
+
+				return p2
 			end)
 		end
 

@@ -1,0 +1,2 @@
+return game:DefineFastFlag("FriendsDeepLinkInitialFilter", false)
+	and require(script.Parent.FFlagConnectionManagementChips)

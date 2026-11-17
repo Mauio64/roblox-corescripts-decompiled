@@ -7,21 +7,19 @@ local RobloxReplicatedStorage = game:GetService("RobloxReplicatedStorage")
 local SocialContextToasts = require(CorePackages.Workspace.Packages.SocialContextToasts)
 local SocialContextToastContainer = SocialContextToasts.SocialContextToastContainer
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
-local GetFFlagSocialContextToastEventStream = SharedFlags.GetFFlagSocialContextToastEventStream
+local FFlagEnablePartyNudgeAfterJoin = SharedFlags.FFlagEnablePartyNudgeAfterJoin
+
 local SharedFlags2 = require(CorePackages.Workspace.Packages.SharedFlags)
-local FFlagEnablePartyNudgeAfterJoin = SharedFlags2.FFlagEnablePartyNudgeAfterJoin
+local FFlagShowFriendJoinedYouToastForNonReferredJoins = SharedFlags2.FFlagShowFriendJoinedYouToastForNonReferredJoins
 
 local SharedFlags3 = require(CorePackages.Workspace.Packages.SharedFlags)
-local FFlagShowFriendJoinedYouToastForNonReferredJoins = SharedFlags3.FFlagShowFriendJoinedYouToastForNonReferredJoins
+local GetFFlagEnableReferredPlayerJoinRemoteEvent = SharedFlags3.GetFFlagEnableReferredPlayerJoinRemoteEvent
 
 local SharedFlags4 = require(CorePackages.Workspace.Packages.SharedFlags)
-local GetFFlagEnableReferredPlayerJoinRemoteEvent = SharedFlags4.GetFFlagEnableReferredPlayerJoinRemoteEvent
+local GetFIntReferredPlayerJoinRemoteEventTimeout = SharedFlags4.GetFIntReferredPlayerJoinRemoteEventTimeout
 
 local SharedFlags5 = require(CorePackages.Workspace.Packages.SharedFlags)
-local GetFIntReferredPlayerJoinRemoteEventTimeout = SharedFlags5.GetFIntReferredPlayerJoinRemoteEventTimeout
-
-local SharedFlags6 = require(CorePackages.Workspace.Packages.SharedFlags)
-local FFlagLuaAppDefaultHttpRetry = SharedFlags6.FFlagLuaAppDefaultHttpRetry
+local FFlagLuaAppDefaultHttpRetry = SharedFlags5.FFlagLuaAppDefaultHttpRetry
 local HttpRequest = require(CorePackages.Packages.HttpRequest)
 local config = HttpRequest.config
 local v = {
@@ -68,7 +66,7 @@ if FFlagEnablePartyNudgeAfterJoin then
 	showPlayerJoinedFriendsToast = RobloxReplicatedStorage:WaitForChild("ShowPlayerJoinedFriendsToast", defineFastInt)
 end
 
-local v2 = {
+SocialContextToastContainer({
 	networking = networking,
 	playersService = Players,
 	apolloClient = ApolloClient,
@@ -78,21 +76,4 @@ local v2 = {
 	referredPlayerJoinRemoteEvent = referredPlayerJoin,
 	showFriendJoinedPlayerToastRemoteEvent = showFriendJoinedPlayerToast,
 	showPlayerJoinedFriendsToastRemoteEvent = showPlayerJoinedFriendsToast
-}
-local gameId
-
-if GetFFlagSocialContextToastEventStream() then
-	gameId = tostring(game.GameId)
-else
-	gameId = game.GameId
-end
-
-local v3
-
-if GetFFlagSocialContextToastEventStream() then
-	v3 = tostring(game.PlaceId)
-else
-	v3 = game.PlaceId
-end
-
-SocialContextToastContainer(v2, gameId, v3)
+}, tostring(game.GameId), (tostring(game.PlaceId)))

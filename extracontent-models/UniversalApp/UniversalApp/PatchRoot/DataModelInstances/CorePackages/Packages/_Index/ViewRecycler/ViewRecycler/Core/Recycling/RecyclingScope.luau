@@ -1,5 +1,7 @@
 local Flags = require(script:FindFirstAncestor("ViewRecycler").Flags)
-local FFlagViewRecyclerReact08 = Flags.FFlagViewRecyclerReact08
+local FFlagViewRecyclerReact084 = Flags.FFlagViewRecyclerReact084
+local Flags2 = require(script:FindFirstAncestor("ViewRecycler").Flags)
+local FFlagViewRecyclerReact08 = Flags2.FFlagViewRecyclerReact08
 local ViewRecycler = script:FindFirstAncestor("ViewRecycler")
 local Diagnostics = require(ViewRecycler.Core.Diagnostics)
 local frozen = table.freeze({})
@@ -14,7 +16,7 @@ local function validCapacity(capacity: number?): boolean -- 1 equivalent call in
 	end
 end
 
-local function appendChange(list, p, viewType, p2, p3, p4) -- 9 equivalent calls inferred from this helper
+local function appendChange(list, p, viewType, p2, p3, p4) -- 12 equivalent calls inferred from this helper
 	table.insert(list, { p, viewType, p2, p3, p4 })
 end
 
@@ -39,7 +41,7 @@ local function createRecyclingScope(p)
 		return v4
 	end
 
-	local function forget(p2) -- 2 equivalent calls inferred from this helper
+	local function forget(p2) -- 4 equivalent calls inferred from this helper
 		v2[p2] = nil
 	end
 
@@ -156,6 +158,58 @@ local function createRecyclingScope(p)
 		return { acquired = acquired, releasedCount = 0 }
 	end
 
+	local evictDestroyedVacancies = FFlagViewRecyclerReact084 and function(list)
+		local isDestroyed = adapter.isDestroyed
+
+		if isDestroyed == nil or #list == 0 then
+			return
+		end
+
+		local v4 = p.onPoolChanged ~= nil and {} or nil
+		local viewTypeSet = {}
+		local v5 = {}
+
+		for _, item in list do
+			local v6 = v[item.viewType]
+
+			if v6 == nil or viewTypeSet[item.viewType] then
+				continue
+			end
+
+			viewTypeSet[item.viewType] = true
+			local first = v6.first
+
+			for i = v6.first, v6.last do
+				local item2 = v6.items[i]
+				v6.items[i] = nil
+
+				if isDestroyed(item2) then
+					forget(item2) -- inferred equivalent call
+					table.insert(v5, item2)
+
+					if v4 ~= nil then
+						appendChange(v4, Diagnostics.PoolAction.Evict, v6.viewType, 0, -1, -1) -- inferred equivalent call
+					end
+				else
+					v6.items[first] = item2
+					first += 1
+				end
+			end
+
+			v6.last = first - 1
+		end
+
+		if #v5 > 0 then
+			v3 = true
+			local v6, v7 = finalize(v4, v5, nil)
+			v3 = false
+
+			if not v6 then
+				error(v7, 0)
+			end
+		end
+	end or nil
+
 	local set = {}
 	local v4 = {}
 
@@ -251,11 +305,24 @@ local function createRecyclingScope(p)
 			assert(validCapacity(data.capacity), "RecyclingScope: capacity must be a non-negative integer") -- inferred equivalent call
 			local releases = data.releases
 			local requests = data.requests
+			local v5, v6
 
-			local v5 = nil
-			local v6
+			if FFlagViewRecyclerReact084 then
+				if adapter.isDestroyed ~= nil then
+					for _, releas in releases do
+						if not adapter.isDestroyed(releas) then
+							continue
+						end
 
-			if FFlagViewRecyclerReact08 then
+						v5 = v5 or {}
+						v5[releas] = true
+					end
+				end
+
+				if v5 == nil then
+					v6 = uniformDirectReuse(releases, requests)
+				end
+			elseif FFlagViewRecyclerReact08 then
 				if adapter.isDestroyed ~= nil then
 					for _, releas in releases do
 						if not adapter.isDestroyed(releas) then
@@ -275,10 +342,18 @@ local function createRecyclingScope(p)
 			end
 
 			if v6 == nil then
+				if FFlagViewRecyclerReact084 then
+					evictDestroyedVacancies(requests)
+				end
+
 				local v7 = p.onPoolChanged ~= nil and {} or nil
 				local v8
 
-				if FFlagViewRecyclerReact08 then
+				if FFlagViewRecyclerReact084 then
+					if v5 == nil then
+						v8 = exchangeWithoutCreation(releases, requests, v7)
+					end
+				elseif FFlagViewRecyclerReact08 then
 					if v5 == nil then
 						v8 = exchangeWithoutCreation(releases, requests, v7)
 					end
@@ -306,9 +381,22 @@ local function createRecyclingScope(p)
 						end
 
 						releasSet[releas] = true
+						local v11
 
-						if not (not FFlagViewRecyclerReact08 or v5 == nil or not v5[releas]) then
-							continue
+						if FFlagViewRecyclerReact084 then
+							if v5 == nil then
+								v11 = false
+							else
+								v11 = v5[releas]
+							end
+						else
+							v11 = FFlagViewRecyclerReact08
+						end
+
+						if v11 then
+							if FFlagViewRecyclerReact084 or v5 ~= nil and v5[releas] then
+								continue
+							end
 						end
 
 						local releas2 = v9[v10.viewType]
@@ -384,7 +472,30 @@ local function createRecyclingScope(p)
 					local releas = {}
 
 					for _, releas2 in releases do
-						if FFlagViewRecyclerReact08 then
+						if FFlagViewRecyclerReact084 then
+							if v5 == nil or not v5[releas2] then
+								if not set3[releas2] then
+									local v14 = v2[releas2]
+									v14.active = false
+									local pool = v14.pool
+									pool.last += 1
+									pool.items[pool.last] = releas2
+									result2.releasedCount += 1
+
+									if v13 ~= nil then
+										appendChange(v13, Diagnostics.PoolAction.Release, v14.viewType, -1, 1, 0) -- inferred equivalent call
+									end
+								end
+							else
+								local v14 = v2[releas2]
+								forget(releas2) -- inferred equivalent call
+								table.insert(releas, releas2)
+
+								if v13 ~= nil then
+									appendChange(v13, Diagnostics.PoolAction.Evict, v14.viewType, -1, 0, -1) -- inferred equivalent call
+								end
+							end
+						elseif FFlagViewRecyclerReact08 then
 							if v5 == nil or not v5[releas2] then
 								if not set3[releas2] then
 									local v14 = v2[releas2]

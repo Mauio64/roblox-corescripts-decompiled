@@ -15,6 +15,8 @@ return {
 	ModalContextPushEduUpsell = "pushEduUpsell",
 	ModalContextSysUpsell = "pushSysUpsell",
 	ModalContextSettingsUpsell = "pushSettingsUpsell",
+	EntryPointInGameRsvp = "inGameRsvp",
+	EventId = "eventId",
 	OptInEventName = "experienceNotificationClientPromptOptInEvent",
 	OptInPushEventName = "pushNotificationClientPromptOptInEvent",
 	OptInPushUpsellEventName = "pushUpsellNotificationClientEvent",
@@ -22,5 +24,8 @@ return {
 	Button = "btn",
 	UniverseId = "universeId",
 	EntryPoint = "entryPoint",
-	SettingsResult = "settingsResult"
+	SettingsResult = "settingsResult",
+	EntryPointChat = "Chat",
+	Variant = "variant",
+	VariantLegacy = "legacy"
 }

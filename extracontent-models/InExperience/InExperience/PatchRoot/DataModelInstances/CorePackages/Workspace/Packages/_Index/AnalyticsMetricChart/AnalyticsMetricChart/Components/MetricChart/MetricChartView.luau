@@ -1,13 +1,9 @@
-local TextService = game:GetService("TextService")
-
 local parent = script:FindFirstAncestor("AnalyticsMetricChart").Parent
 
 local Foundation = require(parent.Foundation)
 local Graphing = require(parent.Graphing)
 local React = require(parent.React)
 local Style = require(parent.Style)
-
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
 local chartLayout = require(script.Parent.chartLayout)
 
@@ -30,11 +26,11 @@ local PLOT_HEIGHT = chartLayout.PLOT_HEIGHT
 local v = PLOT_HEIGHT - 28
 local v2 = v + -1
 
-local function renderTooltip(position, tooltip, colors, testId: string, icon, onAbsoluteSizeChanged)
+local function renderTooltip(mapped, tooltip, colors, testId: string, icon, onAbsoluteSizeChanged)
 	local createElement = React.createElement
 	local v3 = {
 		Size = UDim2.fromOffset(0, 30),
-		Position = position,
+		Position = mapped,
 		ZIndex = 30,
 		backgroundStyle = colors.tooltipBackground,
 		onAbsoluteSizeChanged = onAbsoluteSizeChanged,
@@ -197,17 +193,12 @@ local function measureGutter(yTicks, labelFontSize: number, labelFont)
 	local maxX = 0
 
 	for _, item in yTicks do
-		local v3
-
-		if FoundationFontFaceMigration then
-			v3 = Style.GetTextSize(item.label, labelFontSize, labelFont, Vector2.new(1000, 100), {
+		maxX = math.max(
+			maxX,
+			Style.GetTextSize(item.label, labelFontSize, labelFont, Vector2.new(1000, 100), {
 				addTemporaryPadding = false
-			})
-		else
-			v3 = TextService:GetTextSize(item.label, labelFontSize, labelFont, Vector2.new(1000, 100))
-		end
-
-		maxX = math.max(maxX, v3.X)
+			}).X
+		)
 	end
 
 	return (math.max(60, math.ceil(maxX) + 2 + 12))
@@ -246,17 +237,10 @@ local function selectXAxisTicks(xAxisLabels, p: number, p2: number, p3)
 	local maxX = 0
 
 	for _, item in xAxisLabels do
-		local v3
-
-		if FoundationFontFaceMigration then
-			v3 = Style.GetTextSize(item, p2, p3, Vector2.new(1000, 100), {
-				addTemporaryPadding = false
-			})
-		else
-			v3 = TextService:GetTextSize(item, p2, p3, Vector2.new(1000, 100))
-		end
-
-		maxX = math.max(maxX, v3.X)
+		maxX = math.max(
+			maxX,
+			Style.GetTextSize(item, p2, p3, Vector2.new(1000, 100), { addTemporaryPadding = false }).X
+		)
 	end
 
 	if p < maxX then
@@ -338,8 +322,13 @@ local function MetricChartView(props)
 	local state, setState = React.useState(0)
 
 	local v3, v4 = React.useBinding(0)
+	local valueRow
 
-	local v5 = { ValueRow = renderValueRow(props, testId) }
+	if not props.hideHeader then
+		valueRow = renderValueRow(props, testId)
+	end
+
+	local v5 = { ValueRow = valueRow }
 
 	if props.hasData then
 		local v6 = measureGutter(props.yTicks, labelFontSize, labelFont)
@@ -470,25 +459,30 @@ local function MetricChartView(props)
 		tag = "col gap-xsmall size-full-0 auto-y",
 		testId = testId
 	}
+	local header
 
-	local createElement2 = React.createElement
+	if not props.hideHeader then
+		local createElement2 = React.createElement
 
-	local v7 = {
-		Title = renderTitleBlock(props, testId), -- inferred equivalent call
-		Summary = 0
-	}
-	local summary
+		local v7 = {
+			Title = renderTitleBlock(props, testId), -- inferred equivalent call
+			Summary = 0
+		}
+		local summary
 
-	if props.summary ~= nil then
-		summary = renderSummary(props, testId) -- inferred equivalent call
-	end
+		if props.summary ~= nil then
+			summary = renderSummary(props, testId) -- inferred equivalent call
+		end
 
-	v7.Summary = summary
-	return createElement(View, v6, {
-		Header = createElement2(View, {
+		v7.Summary = summary
+		header = createElement2(View, {
 			LayoutOrder = 1,
 			tag = "col gap-xxsmall size-full-0 auto-y"
-		}, v7),
+		}, v7)
+	end
+
+	return createElement(View, v6, {
+		Header = header,
 		Slot = React.createElement(View, {
 			LayoutOrder = 2,
 			tag = "col gap-large size-full-0 auto-y"

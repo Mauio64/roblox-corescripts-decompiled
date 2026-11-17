@@ -26,8 +26,9 @@ function extended:init()
 	self.localization = { showMore = "Feature.Friends.Action.ShowMore" }
 
 	function self.onChangeSize(p)
+		local maxWidth = self.props.maxWidth or extended.MAX_WIDTH
 		self:setState({
-			width = math.min(self.props.maxWidth or extended.MAX_WIDTH, p.AbsoluteSize.X)
+			width = math.min(maxWidth, p.AbsoluteSize.X)
 		})
 
 		self.props.onSizeChange(p)

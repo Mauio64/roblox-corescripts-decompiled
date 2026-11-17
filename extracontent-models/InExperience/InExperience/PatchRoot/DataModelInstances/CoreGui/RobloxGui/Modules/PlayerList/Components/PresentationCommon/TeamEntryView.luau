@@ -8,6 +8,8 @@ local SignalsReact = require(CorePackages.Packages.SignalsReact)
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local PlayerList = require(CorePackages.Workspace.Packages.PlayerList)
 require(CorePackages.Workspace.Packages.LeaderboardStore)
+local Chrome = require(CorePackages.Workspace.Packages.Chrome)
+local Enabled = Chrome.Enabled
 local Foundation = require(CorePackages.Packages.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
 local useTokens = Foundation.Hooks.useTokens
@@ -20,9 +22,10 @@ local StatEntryContainer = require(parent2.Components.Container.StatEntryContain
 
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagPlayerListFixLeaderstatsStacking = SharedFlags.FFlagPlayerListFixLeaderstatsStacking
-local foundationFontFaceMigration = SharedFlags.FFlagFontFacePlayerList
-	and Foundation.Utility.Flags.FoundationFontFaceMigration
+local FFlagFontFacePlayerList = SharedFlags.FFlagFontFacePlayerList
 local FFlagEnableMobilePlayerListOnConsole = PlayerList.Flags.FFlagEnableMobilePlayerListOnConsole
+local FFlagPlayerListContrastingTeamText = PlayerList.Flags.FFlagPlayerListContrastingTeamText
+local getContrastingContentStyle = PlayerList.Common.getContrastingContentStyle
 
 local CellExtender = require(parent.Presentation.CellExtender)
 
@@ -31,7 +34,7 @@ local function TeamEntryView(props)
 	local v2 = useStyle()
 	local v3
 
-	if foundationFontFaceMigration then
+	if FFlagFontFacePlayerList or FFlagPlayerListContrastingTeamText then
 		v3 = useTokens()
 	end
 
@@ -49,7 +52,7 @@ local function TeamEntryView(props)
 
 	local fontFace
 
-	if foundationFontFaceMigration then
+	if FFlagFontFacePlayerList then
 		fontFace = normalizeFontFace(v3.Typography.CaptionLarge.Font)
 	else
 		fontFace = v2.Font.CaptionHeader.Font
@@ -59,11 +62,43 @@ local function TeamEntryView(props)
 		textStyle = v.DefaultTextStyle
 		textSize = v.PlayerNameTextSize
 
-		if foundationFontFaceMigration then
+		if FFlagFontFacePlayerList then
 			fontFace = normalizeFontFace(v.TeamEntryFont)
 		else
 			fontFace = v.TeamEntryFont
 		end
+	end
+
+	if FFlagPlayerListContrastingTeamText then
+		local settings = v2.Settings
+		local v4
+
+		if isSmallTouchDevice then
+			v4 = 0.5
+		elseif isDirectionalPreferred then
+			v4 = not v.BackgroundStyle and 0 or v.BackgroundStyle.Default.Transparency
+		else
+			v4 = v.TeamEntryBackgroundTransparency
+		end
+
+		local color
+
+		if Enabled() then
+			color = v2.Theme.BackgroundUIContrast.Color
+		else
+			color = v2.Theme.BackgroundContrast.Color
+		end
+
+		local contrastingContentStyle = getContrastingContentStyle(props.teamColor, v4, {
+			Color3 = color,
+			Transparency = (v.OverrideBackgroundTransparency or 0) * settings.PreferredTransparency
+		}, v3.DarkMode.Content.Emphasis, v3.LightMode.Content.Emphasis)
+		textStyle = {
+			Color = contrastingContentStyle.Color3,
+			Transparency = contrastingContentStyle.Transparency,
+			StrokeColor = textStyle.StrokeColor,
+			StrokeTransparency = textStyle.StrokeTransparency
+		}
 	end
 
 	local backgroundStyle = React.useMemo(function()
@@ -71,7 +106,7 @@ local function TeamEntryView(props)
 			local settings = v2.Settings
 			return {
 				Color = props.teamColor,
-				Transparency = settings.PreferredTransparency * 0.5
+				Transparency = FFlagPlayerListContrastingTeamText and 0.5 or settings.PreferredTransparency * 0.5
 			}
 		end
 
@@ -82,10 +117,17 @@ local function TeamEntryView(props)
 			}
 		end
 
-		return {
-			Color = props.teamColor,
-			Transparency = v.TeamEntryBackgroundTransparency * v2.Settings.PreferredTransparency
-		}
+		local v4 = { Color = props.teamColor, Transparency = 0 }
+		local transparency
+
+		if FFlagPlayerListContrastingTeamText then
+			transparency = v.TeamEntryBackgroundTransparency
+		else
+			transparency = v.TeamEntryBackgroundTransparency * v2.Settings.PreferredTransparency
+		end
+
+		v4.Transparency = transparency
+		return v4
 	end, { isSmallTouchDevice, isDirectionalPreferred, props.teamColor, v2, v })
 
 	local overlayStyle = { Color = Color3.new(1, 1, 1), Transparency = 1 }
@@ -123,13 +165,13 @@ local function TeamEntryView(props)
 		}
 		local font
 
-		if not foundationFontFaceMigration then
+		if not FFlagFontFacePlayerList then
 			font = fontFace
 		end
 
 		v5.Font = font
 
-		if not foundationFontFaceMigration then
+		if not FFlagFontFacePlayerList then
 			fontFace = nil
 		end
 
@@ -254,13 +296,13 @@ local function TeamEntryView(props)
 		}
 		local font
 
-		if not foundationFontFaceMigration then
+		if not FFlagFontFacePlayerList then
 			font = fontFace
 		end
 
 		v8.Font = font
 
-		if not foundationFontFaceMigration then
+		if not FFlagFontFacePlayerList then
 			fontFace = nil
 		end
 

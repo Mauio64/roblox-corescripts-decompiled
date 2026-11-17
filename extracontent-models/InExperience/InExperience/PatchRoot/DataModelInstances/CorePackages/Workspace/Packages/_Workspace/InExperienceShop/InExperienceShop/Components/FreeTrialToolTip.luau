@@ -8,6 +8,7 @@ local Localization = require(parent.Localization)
 local useLocalization = Localization.Hooks.useLocalization
 
 local FFlagEnableExperienceShopGlobalIcon = require(InExperienceShop.Flags.FFlagEnableExperienceShopGlobalIcon)
+local FFlagFixFreeTrialTooltipLocalization = require(InExperienceShop.Flags.FFlagFixFreeTrialTooltipLocalization)
 local GetShopGlobalIconStore = require(InExperienceShop.Stores.GetShopGlobalIconStore)
 local submitFreeTrialTooltips = require(InExperienceShop.submitFreeTrialTooltips)
 
@@ -16,6 +17,39 @@ local OverlayProvider = Foundation.OverlayProvider
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local PopoverSide = Foundation.Enums.PopoverSide
 local PopoverAlign = Foundation.Enums.PopoverAlign
+
+local function createShownTooltip(anchorRef, p: string, text: string, onActivated, callback)
+	return React.createElement(OverlayProvider, nil, {
+		Tooltip = React.createElement(EducationalTooltip, {
+			anchorRef = anchorRef,
+			title = p .. string.rep(" ", 10),
+			side = PopoverSide.Bottom,
+			align = PopoverAlign.Start,
+			isOpen = true,
+			actions = {
+				{
+					text = text,
+					variant = ButtonVariant.Emphasis,
+					onActivated = onActivated,
+					width = UDim.new(1, 0)
+				}
+			},
+			onClose = function()
+				callback("user")
+			end,
+			onPressedOutside = function()
+				callback("user")
+			end,
+			testId = "trial-available-tooltip"
+		})
+	})
+end
+
+local function ShownFreeTrialToolTip(data)
+	local v = useLocalization({ title = data.titleKey, actionText = data.actionTextKey })
+
+	return createShownTooltip(data.anchorRef, v.title, v.actionText, data.onActionActivated, data.dismiss)
+end
 
 local function FreeTrialToolTip(props)
 	local v = SignalsReact.useSignalState(submitFreeTrialTooltips.getActiveTooltip)
@@ -48,7 +82,7 @@ local function FreeTrialToolTip(props)
 	end, { anchorRef, current2, props.anchorRef })
 
 	local state2, setState2 = React.useState(false)
-	local v3 = React.useCallback(function(p: string)
+	local dismiss = React.useCallback(function(p: string)
 		setState2(true)
 		submitFreeTrialTooltips.dismiss(p)
 	end, {})
@@ -68,9 +102,9 @@ local function FreeTrialToolTip(props)
 		gamePassId = v.gamePassId
 	end
 
-	local onActivated = React.useCallback(function()
+	local onActionActivated = React.useCallback(function()
 		submitFreeTrialTooltips.reportActivated()
-		v3("activated")
+		dismiss("activated")
 
 		if action ~= "promptGamePassPurchase" or gamePassId == nil then
 			props.onOpenShop()
@@ -79,12 +113,22 @@ local function FreeTrialToolTip(props)
 
 		local initiateShopItemPurchase = require(InExperienceShop.initiateShopItemPurchase)
 		initiateShopItemPurchase(gamePassId, "GamePass")
-	end, { v3, props.onOpenShop, action, gamePassId })
+	end, { dismiss, props.onOpenShop, action, gamePassId })
+	local v3, v4
 
-	local v4 = useLocalization({
-		title = v == nil and "" or v.title,
-		actionText = v == nil and "" or v.actionText
-	})
+	if FFlagFixFreeTrialTooltipLocalization then
+		v3 = ""
+		v4 = ""
+	else
+		local v5 = useLocalization({
+			title = v == nil and "" or v.title,
+			actionText = v == nil and "" or v.actionText
+		})
+
+		v3 = v5.title
+		v4 = v5.actionText
+	end
+
 	local v5
 
 	if v == nil then
@@ -133,11 +177,11 @@ local function FreeTrialToolTip(props)
 	local ref2 = React.useRef(false)
 	React.useEffect(function()
 		if ref2.current and not current3 and v6 then
-			v3("timeout")
+			dismiss("timeout")
 		end
 
 		ref2.current = current3
-	end, { current3, v6, v3 })
+	end, { current3, v6, dismiss })
 	local v9
 
 	if v6 == true then
@@ -155,34 +199,25 @@ local function FreeTrialToolTip(props)
 		submitFreeTrialTooltips.reportViewed()
 	end, { v9 })
 
-	if v9 and v ~= nil then
-		return React.createElement(OverlayProvider, nil, {
-			Tooltip = React.createElement(EducationalTooltip, {
-				anchorRef = anchorRef,
-				title = v4.title .. string.rep(" ", 10),
-				side = PopoverSide.Bottom,
-				align = PopoverAlign.Start,
-				isOpen = true,
-				actions = {
-					{
-						text = v4.actionText,
-						variant = ButtonVariant.Emphasis,
-						onActivated = onActivated,
-						width = UDim.new(1, 0)
-					}
-				},
-				onClose = function()
-					v3("user")
-				end,
-				onPressedOutside = function()
-					v3("user")
-				end,
-				testId = "trial-available-tooltip"
-			})
-		})
+	if not v9 or v == nil then
+		return nil
 	end
 
-	return nil
+	if not FFlagFixFreeTrialTooltipLocalization then
+		return createShownTooltip(anchorRef, v3, v4, onActionActivated, dismiss)
+	end
+
+	if v.title == "" or v.actionText == "" then
+		return nil
+	end
+
+	return React.createElement(ShownFreeTrialToolTip, {
+		anchorRef = anchorRef,
+		titleKey = v.title,
+		actionTextKey = v.actionText,
+		onActionActivated = onActionActivated,
+		dismiss = dismiss
+	})
 end
 
 return React.memo(FreeTrialToolTip)

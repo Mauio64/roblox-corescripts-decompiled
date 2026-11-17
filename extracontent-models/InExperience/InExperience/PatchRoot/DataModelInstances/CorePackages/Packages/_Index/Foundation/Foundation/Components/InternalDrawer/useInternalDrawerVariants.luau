@@ -1,4 +1,6 @@
 local Foundation = script:FindFirstAncestor("Foundation")
+local parent = Foundation.Parent
+local React = require(parent.React)
 
 local composeStyleVariant = require(Foundation.Utility.composeStyleVariant)
 
@@ -61,7 +63,9 @@ local function useInternalDrawerVariants(p, p2)
 	local v = useTokens()
 	local v2 = VariantsContext.useVariants("InternalDrawer", variantsFactory, v)
 
-	return composeStyleVariant(v2.common, v2.layout[p], v2.side[p2])
+	return React.useMemo(function()
+		return composeStyleVariant(v2.common, v2.layout[p], v2.side[p2])
+	end, { v2, p, p2 })
 end
 
 return useInternalDrawerVariants

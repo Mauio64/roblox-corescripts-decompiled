@@ -1,20 +1,6 @@
-local getFFlagEnableModularExternalNavigationHandler = require(script.Parent.Flags.getFFlagEnableModularExternalNavigationHandler)
-
-local Components = {
+return {
 	ChatConversation = require(script.ChatConversation),
 	EventReceivers = require(script.EventReceivers),
-	ExternalNavigationHandlerContainer = 0,
-	Cells = 0,
-	ChatLanding = 0
+	Cells = require(script.Cells),
+	ChatLanding = require(script.ChatLanding)
 }
-local externalNavigationHandlerContainer
-
-if getFFlagEnableModularExternalNavigationHandler() then
-	externalNavigationHandlerContainer = require(script.ExternalNavigationHandler.Container)
-end
-
-Components.ExternalNavigationHandlerContainer = externalNavigationHandlerContainer
-
-Components.Cells = require(script.Cells)
-Components.ChatLanding = require(script.ChatLanding)
-return Components

@@ -11,7 +11,6 @@ local withStyle = UIBlox.Style.withStyle
 local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
 local CursorKind = UIBlox.App.SelectionImage.CursorKind
 local LoadableImage = UIBlox.App.Loading.LoadableImage
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
 local useTokens = Foundation.Hooks.useTokens
 
@@ -159,75 +158,43 @@ local function SduiSearchAutocompleteSuggestion(data)
 					VerticalAlignment = Enum.VerticalAlignment.Center,
 					Padding = UDim.new(0, 5)
 				}),
-				Title = 0,
+				Title = React.createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					BorderSizePixel = 0,
+					LayoutOrder = 1,
+					Size = UDim2.new(1, 0, 0, 0),
+					AutomaticSize = Enum.AutomaticSize.Y,
+					Text = data.title,
+					FontFace = normalizeFontFace(props.Tokens.Typography.BodyLarge.Font),
+					TextSize = props.Font.BaseSize * props.Font.Body.RelativeSize,
+					TextColor3 = props.Theme.TextDefault.Color,
+					TextTransparency = props.Theme.TextDefault.Transparency,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextYAlignment = Enum.TextYAlignment.Top,
+					TextWrapped = true,
+					[React.Tag] = "data-testid=--sdui-autocomplete-title"
+				}),
 				Category = 0
 			}
-
-			local createElement4 = React.createElement
-			local v10 = {}
-			v10.BackgroundTransparency = 1
-			v10.BorderSizePixel = 0
-			v10.LayoutOrder = 1
-			v10.Size = UDim2.new(1, 0, 0, 0)
-			v10.AutomaticSize = Enum.AutomaticSize.Y
-			v10.Text = data.title
-			local font
-
-			if not FoundationFontFaceMigration then
-				font = props.Font.Body.Font
-			end
-
-			v10.Font = font
-			local fontFace
-
-			if FoundationFontFaceMigration then
-				fontFace = normalizeFontFace(props.Tokens.Typography.BodyLarge.Font)
-			end
-
-			v10.FontFace = fontFace
-
-			v10.TextSize = props.Font.BaseSize * props.Font.Body.RelativeSize
-			v10.TextColor3 = props.Theme.TextDefault.Color
-			v10.TextTransparency = props.Theme.TextDefault.Transparency
-			v10.TextXAlignment = Enum.TextXAlignment.Left
-			v10.TextYAlignment = Enum.TextYAlignment.Top
-			v10.TextWrapped = true
-			v10[React.Tag] = "data-testid=--sdui-autocomplete-title"
-			v9.Title = createElement4("TextLabel", v10)
 			local category
 
 			if isRich then
-				local createElement5 = React.createElement
-				local v11 = {}
-				v11.BackgroundTransparency = 1
-				v11.BorderSizePixel = 0
-				v11.LayoutOrder = 2
-				v11.Size = UDim2.new(1, 0, 0, 0)
-				v11.AutomaticSize = Enum.AutomaticSize.Y
-				v11.Text = v4.category
-				local font2
-
-				if not FoundationFontFaceMigration then
-					font2 = props.Font.CaptionBody.Font
-				end
-
-				v11.Font = font2
-				local fontFace2
-
-				if FoundationFontFaceMigration then
-					fontFace2 = normalizeFontFace(props.Tokens.Typography.BodySmall.Font)
-				end
-
-				v11.FontFace = fontFace2
-
-				v11.TextSize = props.Font.BaseSize * props.Font.CaptionBody.RelativeSize
-				v11.TextColor3 = props.Theme.TextMuted.Color
-				v11.TextTransparency = props.Theme.TextMuted.Transparency
-				v11.TextXAlignment = Enum.TextXAlignment.Left
-				v11.TextYAlignment = Enum.TextYAlignment.Top
-				v11.TextWrapped = true
-				v11[React.Tag] = "data-testid=--sdui-autocomplete-category"
-				category = createElement5("TextLabel", v11)
+				category = React.createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					BorderSizePixel = 0,
+					LayoutOrder = 2,
+					Size = UDim2.new(1, 0, 0, 0),
+					AutomaticSize = Enum.AutomaticSize.Y,
+					Text = v4.category,
+					FontFace = normalizeFontFace(props.Tokens.Typography.BodySmall.Font),
+					TextSize = props.Font.BaseSize * props.Font.CaptionBody.RelativeSize,
+					TextColor3 = props.Theme.TextMuted.Color,
+					TextTransparency = props.Theme.TextMuted.Transparency,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextYAlignment = Enum.TextYAlignment.Top,
+					TextWrapped = true,
+					[React.Tag] = "data-testid=--sdui-autocomplete-category"
+				})
 			end
 
 			v9.Category = category

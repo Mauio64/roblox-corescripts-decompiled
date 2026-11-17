@@ -17485,7 +17485,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.JoinCommunityAction_Params.decode(v5)
+						result.action_params = v.RefreshSearchResultsGuidedPillAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -17558,25 +17558,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.JoinCommunityAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.RefreshSearchResultsGuidedPillAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.JoinCommunityAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.RefreshSearchResultsGuidedPillAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class114.descriptor = {
-			name = "JoinCommunityAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.JoinCommunityAction"
+			name = "RefreshSearchResultsGuidedPillAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.RefreshSearchResultsGuidedPillAction"
 		}
 
-		v.JoinCommunityAction = class114
+		v.RefreshSearchResultsGuidedPillAction = class114
 	end
 
-	typeRegistry.default:register(v.JoinCommunityAction)
+	typeRegistry.default:register(v.RefreshSearchResultsGuidedPillAction)
 
 	do
 		local class115 = {}
@@ -17585,19 +17585,19 @@ do
 		function class115.new(p)
 			local v3
 
-			if not (p == nil or p.community_id == nil) then
-				v3 = p.community_id
+			if not (p == nil or p.selected_option == nil) then
+				v3 = p.selected_option
 			end
 
-			return (setmetatable({ community_id = v3 }, class115))
+			return (setmetatable({ selected_option = v3 }, class115))
 		end
 
 		function class115:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.community_id ~= nil then
-				local encoded = self.community_id:encode()
+			if self.selected_option ~= nil then
+				local encoded = self.selected_option:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
@@ -17622,7 +17622,7 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.community_id = prop_types.StringProp.decode(v5)
+						result.selected_option = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -17645,8 +17645,8 @@ do
 		function class115:jsonEncode()
 			local v2 = {}
 
-			if self.community_id ~= nil then
-				v2.communityId = self.community_id:jsonEncode()
+			if self.selected_option ~= nil then
+				v2.selectedOption = self.selected_option:jsonEncode()
 			end
 
 			return v2
@@ -17655,26 +17655,26 @@ do
 		function class115.jsonDecode(p)
 			local v2 = class115.new()
 
-			if p.community_id ~= nil then
-				v2.community_id = prop_types.StringProp.jsonDecode(p.community_id)
+			if p.selected_option ~= nil then
+				v2.selected_option = prop_types.StringProp.jsonDecode(p.selected_option)
 			end
 
-			if p.communityId ~= nil then
-				v2.community_id = prop_types.StringProp.jsonDecode(p.communityId)
+			if p.selectedOption ~= nil then
+				v2.selected_option = prop_types.StringProp.jsonDecode(p.selectedOption)
 			end
 
 			return v2
 		end
 
 		class115.descriptor = {
-			name = "JoinCommunityAction_Params",
+			name = "RefreshSearchResultsGuidedPillAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.JoinCommunityAction_Params = class115
+		v.RefreshSearchResultsGuidedPillAction_Params = class115
 	end
 
-	typeRegistry.default:register(v.JoinCommunityAction_Params)
+	typeRegistry.default:register(v.RefreshSearchResultsGuidedPillAction_Params)
 
 	do
 		local class116 = {}
@@ -17742,7 +17742,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.ViewCommunityAction_Params.decode(v5)
+						result.action_params = v.JoinCommunityAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -17815,25 +17815,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.ViewCommunityAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.JoinCommunityAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.ViewCommunityAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.JoinCommunityAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class116.descriptor = {
-			name = "ViewCommunityAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.ViewCommunityAction"
+			name = "JoinCommunityAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.JoinCommunityAction"
 		}
 
-		v.ViewCommunityAction = class116
+		v.JoinCommunityAction = class116
 	end
 
-	typeRegistry.default:register(v.ViewCommunityAction)
+	typeRegistry.default:register(v.JoinCommunityAction)
 
 	do
 		local class117 = {}
@@ -17924,14 +17924,14 @@ do
 		end
 
 		class117.descriptor = {
-			name = "ViewCommunityAction_Params",
+			name = "JoinCommunityAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.ViewCommunityAction_Params = class117
+		v.JoinCommunityAction_Params = class117
 	end
 
-	typeRegistry.default:register(v.ViewCommunityAction_Params)
+	typeRegistry.default:register(v.JoinCommunityAction_Params)
 
 	do
 		local class118 = {}
@@ -17999,7 +17999,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.OpenGroupPaneAction_Params.decode(v5)
+						result.action_params = v.ViewCommunityAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -18072,86 +18072,47 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.OpenGroupPaneAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.ViewCommunityAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.OpenGroupPaneAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.ViewCommunityAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class118.descriptor = {
-			name = "OpenGroupPaneAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.OpenGroupPaneAction"
+			name = "ViewCommunityAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.ViewCommunityAction"
 		}
 
-		v.OpenGroupPaneAction = class118
+		v.ViewCommunityAction = class118
 	end
 
-	typeRegistry.default:register(v.OpenGroupPaneAction)
+	typeRegistry.default:register(v.ViewCommunityAction)
 
 	do
 		local class119 = {}
 		class119.__index = class119
 
-		function class119.new(data)
+		function class119.new(p)
 			local v3
 
-			if not (data == nil or data.group_id == nil) then
-				v3 = data.group_id
+			if not (p == nil or p.community_id == nil) then
+				v3 = p.community_id
 			end
 
-			local v4
-
-			if not (data == nil or data.source == nil) then
-				v4 = data.source
-			end
-
-			local v5
-
-			if not (data == nil or data.destination == nil) then
-				v5 = data.destination
-			end
-
-			local v6
-
-			if not (data == nil or data.forum_category_short_id == nil) then
-				v6 = data.forum_category_short_id
-			end
-
-			return (setmetatable(
-				{ group_id = v3, source = v4, destination = v5, forum_category_short_id = v6 },
-				class119
-			))
+			return (setmetatable({ community_id = v3 }, class119))
 		end
 
 		function class119:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.group_id ~= nil then
-				local encoded = self.group_id:encode()
+			if self.community_id ~= nil then
+				local encoded = self.community_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.source ~= nil then
-				local encoded = self.source:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.destination ~= nil then
-				local encoded = self.destination:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.forum_category_short_id ~= nil then
-				local encoded = self.forum_category_short_id:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -18175,19 +18136,7 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.group_id = prop_types.StringProp.decode(v5)
-					elseif v3 == 2 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.source = prop_types.StringProp.decode(v5)
-					elseif v3 == 3 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.destination = prop_types.StringProp.decode(v5)
-					elseif v3 == 4 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.forum_category_short_id = prop_types.StringProp.decode(v5)
+						result.community_id = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -18210,64 +18159,36 @@ do
 		function class119:jsonEncode()
 			local v2 = {}
 
-			if self.group_id ~= nil then
-				v2.groupId = self.group_id:jsonEncode()
-			end
-
-			if self.source ~= nil then
-				v2.source = self.source:jsonEncode()
-			end
-
-			if self.destination ~= nil then
-				v2.destination = self.destination:jsonEncode()
-			end
-
-			if self.forum_category_short_id ~= nil then
-				v2.forumCategoryShortId = self.forum_category_short_id:jsonEncode()
+			if self.community_id ~= nil then
+				v2.communityId = self.community_id:jsonEncode()
 			end
 
 			return v2
 		end
 
-		function class119.jsonDecode(data)
+		function class119.jsonDecode(p)
 			local v2 = class119.new()
 
-			if data.group_id ~= nil then
-				v2.group_id = prop_types.StringProp.jsonDecode(data.group_id)
+			if p.community_id ~= nil then
+				v2.community_id = prop_types.StringProp.jsonDecode(p.community_id)
 			end
 
-			if data.groupId ~= nil then
-				v2.group_id = prop_types.StringProp.jsonDecode(data.groupId)
-			end
-
-			if data.source ~= nil then
-				v2.source = prop_types.StringProp.jsonDecode(data.source)
-			end
-
-			if data.destination ~= nil then
-				v2.destination = prop_types.StringProp.jsonDecode(data.destination)
-			end
-
-			if data.forum_category_short_id ~= nil then
-				v2.forum_category_short_id = prop_types.StringProp.jsonDecode(data.forum_category_short_id)
-			end
-
-			if data.forumCategoryShortId ~= nil then
-				v2.forum_category_short_id = prop_types.StringProp.jsonDecode(data.forumCategoryShortId)
+			if p.communityId ~= nil then
+				v2.community_id = prop_types.StringProp.jsonDecode(p.communityId)
 			end
 
 			return v2
 		end
 
 		class119.descriptor = {
-			name = "OpenGroupPaneAction_Params",
+			name = "ViewCommunityAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.OpenGroupPaneAction_Params = class119
+		v.ViewCommunityAction_Params = class119
 	end
 
-	typeRegistry.default:register(v.OpenGroupPaneAction_Params)
+	typeRegistry.default:register(v.ViewCommunityAction_Params)
 
 	do
 		local class120 = {}
@@ -18335,7 +18256,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.ToggleGamePassVoteAction_Params.decode(v5)
+						result.action_params = v.OpenGroupPaneAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -18408,25 +18329,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.ToggleGamePassVoteAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.OpenGroupPaneAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.ToggleGamePassVoteAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.OpenGroupPaneAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class120.descriptor = {
-			name = "ToggleGamePassVoteAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.ToggleGamePassVoteAction"
+			name = "OpenGroupPaneAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.OpenGroupPaneAction"
 		}
 
-		v.ToggleGamePassVoteAction = class120
+		v.OpenGroupPaneAction = class120
 	end
 
-	typeRegistry.default:register(v.ToggleGamePassVoteAction)
+	typeRegistry.default:register(v.OpenGroupPaneAction)
 
 	do
 		local class121 = {}
@@ -18435,44 +18356,59 @@ do
 		function class121.new(data)
 			local v3
 
-			if not (data == nil or data.game_pass_id == nil) then
-				v3 = data.game_pass_id
+			if not (data == nil or data.group_id == nil) then
+				v3 = data.group_id
 			end
 
 			local v4
 
-			if not (data == nil or data.vote_direction == nil) then
-				v4 = data.vote_direction
+			if not (data == nil or data.source == nil) then
+				v4 = data.source
 			end
 
 			local v5
 
-			if not (data == nil or data.ctx == nil) then
-				v5 = data.ctx
+			if not (data == nil or data.destination == nil) then
+				v5 = data.destination
 			end
 
-			return (setmetatable({ game_pass_id = v3, vote_direction = v4, ctx = v5 }, class121))
+			local v6
+
+			if not (data == nil or data.forum_category_short_id == nil) then
+				v6 = data.forum_category_short_id
+			end
+
+			return (setmetatable(
+				{ group_id = v3, source = v4, destination = v5, forum_category_short_id = v6 },
+				class121
+			))
 		end
 
 		function class121:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.game_pass_id ~= nil then
-				local encoded = self.game_pass_id:encode()
+			if self.group_id ~= nil then
+				local encoded = self.group_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.vote_direction ~= nil then
-				local encoded = self.vote_direction:encode()
+			if self.source ~= nil then
+				local encoded = self.source:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.ctx ~= nil then
-				local encoded = self.ctx:encode()
+			if self.destination ~= nil then
+				local encoded = self.destination:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.forum_category_short_id ~= nil then
+				local encoded = self.forum_category_short_id:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -18496,15 +18432,19 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.game_pass_id = prop_types.StringProp.decode(v5)
+						result.group_id = prop_types.StringProp.decode(v5)
 					elseif v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.vote_direction = prop_types.BoolProp.decode(v5)
+						result.source = prop_types.StringProp.decode(v5)
 					elseif v3 == 3 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.ctx = prop_types.StringProp.decode(v5)
+						result.destination = prop_types.StringProp.decode(v5)
+					elseif v3 == 4 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.forum_category_short_id = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -18527,16 +18467,20 @@ do
 		function class121:jsonEncode()
 			local v2 = {}
 
-			if self.game_pass_id ~= nil then
-				v2.gamePassId = self.game_pass_id:jsonEncode()
+			if self.group_id ~= nil then
+				v2.groupId = self.group_id:jsonEncode()
 			end
 
-			if self.vote_direction ~= nil then
-				v2.voteDirection = self.vote_direction:jsonEncode()
+			if self.source ~= nil then
+				v2.source = self.source:jsonEncode()
 			end
 
-			if self.ctx ~= nil then
-				v2.ctx = self.ctx:jsonEncode()
+			if self.destination ~= nil then
+				v2.destination = self.destination:jsonEncode()
+			end
+
+			if self.forum_category_short_id ~= nil then
+				v2.forumCategoryShortId = self.forum_category_short_id:jsonEncode()
 			end
 
 			return v2
@@ -18545,38 +18489,42 @@ do
 		function class121.jsonDecode(data)
 			local v2 = class121.new()
 
-			if data.game_pass_id ~= nil then
-				v2.game_pass_id = prop_types.StringProp.jsonDecode(data.game_pass_id)
+			if data.group_id ~= nil then
+				v2.group_id = prop_types.StringProp.jsonDecode(data.group_id)
 			end
 
-			if data.gamePassId ~= nil then
-				v2.game_pass_id = prop_types.StringProp.jsonDecode(data.gamePassId)
+			if data.groupId ~= nil then
+				v2.group_id = prop_types.StringProp.jsonDecode(data.groupId)
 			end
 
-			if data.vote_direction ~= nil then
-				v2.vote_direction = prop_types.BoolProp.jsonDecode(data.vote_direction)
+			if data.source ~= nil then
+				v2.source = prop_types.StringProp.jsonDecode(data.source)
 			end
 
-			if data.voteDirection ~= nil then
-				v2.vote_direction = prop_types.BoolProp.jsonDecode(data.voteDirection)
+			if data.destination ~= nil then
+				v2.destination = prop_types.StringProp.jsonDecode(data.destination)
 			end
 
-			if data.ctx ~= nil then
-				v2.ctx = prop_types.StringProp.jsonDecode(data.ctx)
+			if data.forum_category_short_id ~= nil then
+				v2.forum_category_short_id = prop_types.StringProp.jsonDecode(data.forum_category_short_id)
+			end
+
+			if data.forumCategoryShortId ~= nil then
+				v2.forum_category_short_id = prop_types.StringProp.jsonDecode(data.forumCategoryShortId)
 			end
 
 			return v2
 		end
 
 		class121.descriptor = {
-			name = "ToggleGamePassVoteAction_Params",
+			name = "OpenGroupPaneAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.ToggleGamePassVoteAction_Params = class121
+		v.OpenGroupPaneAction_Params = class121
 	end
 
-	typeRegistry.default:register(v.ToggleGamePassVoteAction_Params)
+	typeRegistry.default:register(v.OpenGroupPaneAction_Params)
 
 	do
 		local class122 = {}
@@ -18644,7 +18592,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.RemoveGamePassFromInventoryAction_Params.decode(v5)
+						result.action_params = v.ToggleGamePassVoteAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -18717,44 +18665,50 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.RemoveGamePassFromInventoryAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.ToggleGamePassVoteAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.RemoveGamePassFromInventoryAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.ToggleGamePassVoteAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class122.descriptor = {
-			name = "RemoveGamePassFromInventoryAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.RemoveGamePassFromInventoryAction"
+			name = "ToggleGamePassVoteAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.ToggleGamePassVoteAction"
 		}
 
-		v.RemoveGamePassFromInventoryAction = class122
+		v.ToggleGamePassVoteAction = class122
 	end
 
-	typeRegistry.default:register(v.RemoveGamePassFromInventoryAction)
+	typeRegistry.default:register(v.ToggleGamePassVoteAction)
 
 	do
 		local class123 = {}
 		class123.__index = class123
 
-		function class123.new(p)
+		function class123.new(data)
 			local v3
 
-			if not (p == nil or p.game_pass_id == nil) then
-				v3 = p.game_pass_id
+			if not (data == nil or data.game_pass_id == nil) then
+				v3 = data.game_pass_id
 			end
 
 			local v4
 
-			if not (p == nil or p.universe_id == nil) then
-				v4 = p.universe_id
+			if not (data == nil or data.vote_direction == nil) then
+				v4 = data.vote_direction
 			end
 
-			return (setmetatable({ game_pass_id = v3, universe_id = v4 }, class123))
+			local v5
+
+			if not (data == nil or data.ctx == nil) then
+				v5 = data.ctx
+			end
+
+			return (setmetatable({ game_pass_id = v3, vote_direction = v4, ctx = v5 }, class123))
 		end
 
 		function class123:encode()
@@ -18767,9 +18721,15 @@ do
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.universe_id ~= nil then
-				local encoded = self.universe_id:encode()
+			if self.vote_direction ~= nil then
+				local encoded = self.vote_direction:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.ctx ~= nil then
+				local encoded = self.ctx:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -18797,7 +18757,11 @@ do
 					elseif v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.universe_id = prop_types.StringProp.decode(v5)
+						result.vote_direction = prop_types.BoolProp.decode(v5)
+					elseif v3 == 3 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.ctx = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -18824,8 +18788,12 @@ do
 				v2.gamePassId = self.game_pass_id:jsonEncode()
 			end
 
-			if self.universe_id ~= nil then
-				v2.universeId = self.universe_id:jsonEncode()
+			if self.vote_direction ~= nil then
+				v2.voteDirection = self.vote_direction:jsonEncode()
+			end
+
+			if self.ctx ~= nil then
+				v2.ctx = self.ctx:jsonEncode()
 			end
 
 			return v2
@@ -18842,26 +18810,30 @@ do
 				v2.game_pass_id = prop_types.StringProp.jsonDecode(data.gamePassId)
 			end
 
-			if data.universe_id ~= nil then
-				v2.universe_id = prop_types.StringProp.jsonDecode(data.universe_id)
+			if data.vote_direction ~= nil then
+				v2.vote_direction = prop_types.BoolProp.jsonDecode(data.vote_direction)
 			end
 
-			if data.universeId ~= nil then
-				v2.universe_id = prop_types.StringProp.jsonDecode(data.universeId)
+			if data.voteDirection ~= nil then
+				v2.vote_direction = prop_types.BoolProp.jsonDecode(data.voteDirection)
+			end
+
+			if data.ctx ~= nil then
+				v2.ctx = prop_types.StringProp.jsonDecode(data.ctx)
 			end
 
 			return v2
 		end
 
 		class123.descriptor = {
-			name = "RemoveGamePassFromInventoryAction_Params",
+			name = "ToggleGamePassVoteAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.RemoveGamePassFromInventoryAction_Params = class123
+		v.ToggleGamePassVoteAction_Params = class123
 	end
 
-	typeRegistry.default:register(v.RemoveGamePassFromInventoryAction_Params)
+	typeRegistry.default:register(v.ToggleGamePassVoteAction_Params)
 
 	do
 		local class124 = {}
@@ -18929,7 +18901,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.AnalyticsEventAction_Params.decode(v5)
+						result.action_params = v.RemoveGamePassFromInventoryAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -19002,25 +18974,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.AnalyticsEventAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.RemoveGamePassFromInventoryAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.AnalyticsEventAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.RemoveGamePassFromInventoryAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class124.descriptor = {
-			name = "AnalyticsEventAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.AnalyticsEventAction"
+			name = "RemoveGamePassFromInventoryAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.RemoveGamePassFromInventoryAction"
 		}
 
-		v.AnalyticsEventAction = class124
+		v.RemoveGamePassFromInventoryAction = class124
 	end
 
-	typeRegistry.default:register(v.AnalyticsEventAction)
+	typeRegistry.default:register(v.RemoveGamePassFromInventoryAction)
 
 	do
 		local class125 = {}
@@ -19029,31 +19001,31 @@ do
 		function class125.new(p)
 			local v3
 
-			if not (p == nil or p.event_name == nil) then
-				v3 = p.event_name
+			if not (p == nil or p.game_pass_id == nil) then
+				v3 = p.game_pass_id
 			end
 
 			local v4
 
-			if not (p == nil or p.event_fields == nil) then
-				v4 = p.event_fields
+			if not (p == nil or p.universe_id == nil) then
+				v4 = p.universe_id
 			end
 
-			return (setmetatable({ event_name = v3, event_fields = v4 }, class125))
+			return (setmetatable({ game_pass_id = v3, universe_id = v4 }, class125))
 		end
 
 		function class125:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.event_name ~= nil then
-				local encoded = self.event_name:encode()
+			if self.game_pass_id ~= nil then
+				local encoded = self.game_pass_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.event_fields ~= nil then
-				local encoded = self.event_fields:encode()
+			if self.universe_id ~= nil then
+				local encoded = self.universe_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
@@ -19078,11 +19050,11 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.event_name = prop_types.StringProp.decode(v5)
+						result.game_pass_id = prop_types.StringProp.decode(v5)
 					elseif v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.event_fields = prop_types.StructProp.decode(v5)
+						result.universe_id = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -19105,12 +19077,12 @@ do
 		function class125:jsonEncode()
 			local v2 = {}
 
-			if self.event_name ~= nil then
-				v2.eventName = self.event_name:jsonEncode()
+			if self.game_pass_id ~= nil then
+				v2.gamePassId = self.game_pass_id:jsonEncode()
 			end
 
-			if self.event_fields ~= nil then
-				v2.eventFields = self.event_fields:jsonEncode()
+			if self.universe_id ~= nil then
+				v2.universeId = self.universe_id:jsonEncode()
 			end
 
 			return v2
@@ -19119,34 +19091,34 @@ do
 		function class125.jsonDecode(data)
 			local v2 = class125.new()
 
-			if data.event_name ~= nil then
-				v2.event_name = prop_types.StringProp.jsonDecode(data.event_name)
+			if data.game_pass_id ~= nil then
+				v2.game_pass_id = prop_types.StringProp.jsonDecode(data.game_pass_id)
 			end
 
-			if data.eventName ~= nil then
-				v2.event_name = prop_types.StringProp.jsonDecode(data.eventName)
+			if data.gamePassId ~= nil then
+				v2.game_pass_id = prop_types.StringProp.jsonDecode(data.gamePassId)
 			end
 
-			if data.event_fields ~= nil then
-				v2.event_fields = prop_types.StructProp.jsonDecode(data.event_fields)
+			if data.universe_id ~= nil then
+				v2.universe_id = prop_types.StringProp.jsonDecode(data.universe_id)
 			end
 
-			if data.eventFields ~= nil then
-				v2.event_fields = prop_types.StructProp.jsonDecode(data.eventFields)
+			if data.universeId ~= nil then
+				v2.universe_id = prop_types.StringProp.jsonDecode(data.universeId)
 			end
 
 			return v2
 		end
 
 		class125.descriptor = {
-			name = "AnalyticsEventAction_Params",
+			name = "RemoveGamePassFromInventoryAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.AnalyticsEventAction_Params = class125
+		v.RemoveGamePassFromInventoryAction_Params = class125
 	end
 
-	typeRegistry.default:register(v.AnalyticsEventAction_Params)
+	typeRegistry.default:register(v.RemoveGamePassFromInventoryAction_Params)
 
 	do
 		local class126 = {}
@@ -19214,7 +19186,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.CustomAnalyticsEventAction_Params.decode(v5)
+						result.action_params = v.AnalyticsEventAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -19287,25 +19259,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.CustomAnalyticsEventAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.AnalyticsEventAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.CustomAnalyticsEventAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.AnalyticsEventAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class126.descriptor = {
-			name = "CustomAnalyticsEventAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.CustomAnalyticsEventAction"
+			name = "AnalyticsEventAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.AnalyticsEventAction"
 		}
 
-		v.CustomAnalyticsEventAction = class126
+		v.AnalyticsEventAction = class126
 	end
 
-	typeRegistry.default:register(v.CustomAnalyticsEventAction)
+	typeRegistry.default:register(v.AnalyticsEventAction)
 
 	do
 		local class127 = {}
@@ -19424,14 +19396,14 @@ do
 		end
 
 		class127.descriptor = {
-			name = "CustomAnalyticsEventAction_Params",
+			name = "AnalyticsEventAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.CustomAnalyticsEventAction_Params = class127
+		v.AnalyticsEventAction_Params = class127
 	end
 
-	typeRegistry.default:register(v.CustomAnalyticsEventAction_Params)
+	typeRegistry.default:register(v.AnalyticsEventAction_Params)
 
 	do
 		local class128 = {}
@@ -19499,7 +19471,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.OpenGameInviteAction_Params.decode(v5)
+						result.action_params = v.CustomAnalyticsEventAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -19572,88 +19544,59 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.OpenGameInviteAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.CustomAnalyticsEventAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.OpenGameInviteAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.CustomAnalyticsEventAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class128.descriptor = {
-			name = "OpenGameInviteAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.OpenGameInviteAction"
+			name = "CustomAnalyticsEventAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.CustomAnalyticsEventAction"
 		}
 
-		v.OpenGameInviteAction = class128
+		v.CustomAnalyticsEventAction = class128
 	end
 
-	typeRegistry.default:register(v.OpenGameInviteAction)
+	typeRegistry.default:register(v.CustomAnalyticsEventAction)
 
 	do
 		local class129 = {}
 		class129.__index = class129
 
-		function class129.new(data)
+		function class129.new(p)
 			local v3
 
-			if not (data == nil or data.universe_id == nil) then
-				v3 = data.universe_id
+			if not (p == nil or p.event_name == nil) then
+				v3 = p.event_name
 			end
 
 			local v4
 
-			if not (data == nil or data.root_place_id == nil) then
-				v4 = data.root_place_id
+			if not (p == nil or p.event_fields == nil) then
+				v4 = p.event_fields
 			end
 
-			local v5
-
-			if not (data == nil or data.trigger == nil) then
-				v5 = data.trigger
-			end
-
-			local v6
-
-			if not (data == nil or data.button_name == nil) then
-				v6 = data.button_name
-			end
-
-			return (setmetatable({
-				universe_id = v3,
-				root_place_id = v4,
-				trigger = v5,
-				button_name = v6
-			}, class129))
+			return (setmetatable({ event_name = v3, event_fields = v4 }, class129))
 		end
 
 		function class129:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.universe_id ~= nil then
-				local encoded = self.universe_id:encode()
+			if self.event_name ~= nil then
+				local encoded = self.event_name:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.root_place_id ~= nil then
-				local encoded = self.root_place_id:encode()
+			if self.event_fields ~= nil then
+				local encoded = self.event_fields:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.trigger ~= nil then
-				local encoded = self.trigger:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.button_name ~= nil then
-				local encoded = self.button_name:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -19677,19 +19620,11 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.universe_id = prop_types.StringProp.decode(v5)
+						result.event_name = prop_types.StringProp.decode(v5)
 					elseif v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.root_place_id = prop_types.StringProp.decode(v5)
-					elseif v3 == 3 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.trigger = prop_types.StringProp.decode(v5)
-					elseif v3 == 4 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.button_name = prop_types.StringProp.decode(v5)
+						result.event_fields = prop_types.StructProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -19712,20 +19647,12 @@ do
 		function class129:jsonEncode()
 			local v2 = {}
 
-			if self.universe_id ~= nil then
-				v2.universeId = self.universe_id:jsonEncode()
+			if self.event_name ~= nil then
+				v2.eventName = self.event_name:jsonEncode()
 			end
 
-			if self.root_place_id ~= nil then
-				v2.rootPlaceId = self.root_place_id:jsonEncode()
-			end
-
-			if self.trigger ~= nil then
-				v2.trigger = self.trigger:jsonEncode()
-			end
-
-			if self.button_name ~= nil then
-				v2.buttonName = self.button_name:jsonEncode()
+			if self.event_fields ~= nil then
+				v2.eventFields = self.event_fields:jsonEncode()
 			end
 
 			return v2
@@ -19734,46 +19661,34 @@ do
 		function class129.jsonDecode(data)
 			local v2 = class129.new()
 
-			if data.universe_id ~= nil then
-				v2.universe_id = prop_types.StringProp.jsonDecode(data.universe_id)
+			if data.event_name ~= nil then
+				v2.event_name = prop_types.StringProp.jsonDecode(data.event_name)
 			end
 
-			if data.universeId ~= nil then
-				v2.universe_id = prop_types.StringProp.jsonDecode(data.universeId)
+			if data.eventName ~= nil then
+				v2.event_name = prop_types.StringProp.jsonDecode(data.eventName)
 			end
 
-			if data.root_place_id ~= nil then
-				v2.root_place_id = prop_types.StringProp.jsonDecode(data.root_place_id)
+			if data.event_fields ~= nil then
+				v2.event_fields = prop_types.StructProp.jsonDecode(data.event_fields)
 			end
 
-			if data.rootPlaceId ~= nil then
-				v2.root_place_id = prop_types.StringProp.jsonDecode(data.rootPlaceId)
-			end
-
-			if data.trigger ~= nil then
-				v2.trigger = prop_types.StringProp.jsonDecode(data.trigger)
-			end
-
-			if data.button_name ~= nil then
-				v2.button_name = prop_types.StringProp.jsonDecode(data.button_name)
-			end
-
-			if data.buttonName ~= nil then
-				v2.button_name = prop_types.StringProp.jsonDecode(data.buttonName)
+			if data.eventFields ~= nil then
+				v2.event_fields = prop_types.StructProp.jsonDecode(data.eventFields)
 			end
 
 			return v2
 		end
 
 		class129.descriptor = {
-			name = "OpenGameInviteAction_Params",
+			name = "CustomAnalyticsEventAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.OpenGameInviteAction_Params = class129
+		v.CustomAnalyticsEventAction_Params = class129
 	end
 
-	typeRegistry.default:register(v.OpenGameInviteAction_Params)
+	typeRegistry.default:register(v.CustomAnalyticsEventAction_Params)
 
 	do
 		local class130 = {}
@@ -19841,7 +19756,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.LaunchExperienceAction_Params.decode(v5)
+						result.action_params = v.OpenGameInviteAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -19914,6 +19829,348 @@ do
 			end
 
 			if data.action_params ~= nil then
+				v2.action_params = v.OpenGameInviteAction_Params.jsonDecode(data.action_params)
+			end
+
+			if data.actionParams ~= nil then
+				v2.action_params = v.OpenGameInviteAction_Params.jsonDecode(data.actionParams)
+			end
+
+			return v2
+		end
+
+		class130.descriptor = {
+			name = "OpenGameInviteAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.OpenGameInviteAction"
+		}
+
+		v.OpenGameInviteAction = class130
+	end
+
+	typeRegistry.default:register(v.OpenGameInviteAction)
+
+	do
+		local class131 = {}
+		class131.__index = class131
+
+		function class131.new(data)
+			local v3
+
+			if not (data == nil or data.universe_id == nil) then
+				v3 = data.universe_id
+			end
+
+			local v4
+
+			if not (data == nil or data.root_place_id == nil) then
+				v4 = data.root_place_id
+			end
+
+			local v5
+
+			if not (data == nil or data.trigger == nil) then
+				v5 = data.trigger
+			end
+
+			local v6
+
+			if not (data == nil or data.button_name == nil) then
+				v6 = data.button_name
+			end
+
+			return (setmetatable({
+				universe_id = v3,
+				root_place_id = v4,
+				trigger = v5,
+				button_name = v6
+			}, class131))
+		end
+
+		function class131:encode()
+			local v2 = buffer.create(0)
+			local v3 = 0
+
+			if self.universe_id ~= nil then
+				local encoded = self.universe_id:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.root_place_id ~= nil then
+				local encoded = self.root_place_id:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.trigger ~= nil then
+				local encoded = self.trigger:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.button_name ~= nil then
+				local encoded = self.button_name:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			local buf = buffer.create(v3)
+			buffer.copy(buf, 0, v2, 0, v3)
+			return buf
+		end
+
+		function class131.decode(buf: buffer)
+			local result = class131.new()
+			local v2 = 0
+
+			while v2 < buffer.len(buf) do
+				local v3, v4
+				v3, v4, v2 = proto.readTag(buf, v2)
+
+				if v4 == proto.wireTypes.varint then
+					local v5
+					v5, v2 = proto.readVarInt(buf, v2)
+				elseif v4 == proto.wireTypes.lengthDelimited then
+					if v3 == 1 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.universe_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 2 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.root_place_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 3 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.trigger = prop_types.StringProp.decode(v5)
+					elseif v3 == 4 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.button_name = prop_types.StringProp.decode(v5)
+					else
+						local varInt, v5 = proto.readVarInt(buf, v2)
+
+						v2 = v5 + varInt
+					end
+				elseif v4 == proto.wireTypes.i32 then
+					local v5
+					v5, v2 = proto.readFixed32(buf, v2)
+				elseif v4 == proto.wireTypes.i64 then
+					local v5
+					v5, v2 = proto.readFixed64(buf, v2)
+				else
+					error("Unsupported wire type: " .. v4)
+				end
+			end
+
+			return result
+		end
+
+		function class131:jsonEncode()
+			local v2 = {}
+
+			if self.universe_id ~= nil then
+				v2.universeId = self.universe_id:jsonEncode()
+			end
+
+			if self.root_place_id ~= nil then
+				v2.rootPlaceId = self.root_place_id:jsonEncode()
+			end
+
+			if self.trigger ~= nil then
+				v2.trigger = self.trigger:jsonEncode()
+			end
+
+			if self.button_name ~= nil then
+				v2.buttonName = self.button_name:jsonEncode()
+			end
+
+			return v2
+		end
+
+		function class131.jsonDecode(data)
+			local v2 = class131.new()
+
+			if data.universe_id ~= nil then
+				v2.universe_id = prop_types.StringProp.jsonDecode(data.universe_id)
+			end
+
+			if data.universeId ~= nil then
+				v2.universe_id = prop_types.StringProp.jsonDecode(data.universeId)
+			end
+
+			if data.root_place_id ~= nil then
+				v2.root_place_id = prop_types.StringProp.jsonDecode(data.root_place_id)
+			end
+
+			if data.rootPlaceId ~= nil then
+				v2.root_place_id = prop_types.StringProp.jsonDecode(data.rootPlaceId)
+			end
+
+			if data.trigger ~= nil then
+				v2.trigger = prop_types.StringProp.jsonDecode(data.trigger)
+			end
+
+			if data.button_name ~= nil then
+				v2.button_name = prop_types.StringProp.jsonDecode(data.button_name)
+			end
+
+			if data.buttonName ~= nil then
+				v2.button_name = prop_types.StringProp.jsonDecode(data.buttonName)
+			end
+
+			return v2
+		end
+
+		class131.descriptor = {
+			name = "OpenGameInviteAction_Params",
+			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
+		}
+
+		v.OpenGameInviteAction_Params = class131
+	end
+
+	typeRegistry.default:register(v.OpenGameInviteAction_Params)
+
+	do
+		local class132 = {}
+		class132.__index = class132
+
+		function class132.new(p)
+			local v3
+
+			if p == nil or p.action_type == nil then
+				v3 = assert(v.ActionType.fromNumber(0), "Enum has no 0 default")
+			else
+				v3 = p.action_type
+			end
+
+			local v4
+
+			if not (p == nil or p.action_params == nil) then
+				v4 = p.action_params
+			end
+
+			return (setmetatable({ action_type = v3, action_params = v4 }, class132))
+		end
+
+		function class132:encode()
+			local v2 = buffer.create(0)
+			local v3 = 0
+
+			if
+				self.action_type ~= nil
+				and (self.action_type ~= nil and self.action_type ~= 0 or self.action_type ~= v.ActionType.fromNumber(0))
+			then
+				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.varint)
+				v2, v3 = proto.writeVarInt(v4, v5, v.ActionType.toNumber(self.action_type))
+			end
+
+			if self.action_params ~= nil then
+				local encoded = self.action_params:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			local buf = buffer.create(v3)
+			buffer.copy(buf, 0, v2, 0, v3)
+			return buf
+		end
+
+		function class132.decode(buf: buffer)
+			local result = class132.new()
+			local v2 = 0
+
+			while v2 < buffer.len(buf) do
+				local v3, v4
+				v3, v4, v2 = proto.readTag(buf, v2)
+
+				if v4 == proto.wireTypes.varint then
+					if v3 == 1 then
+						local v5
+						v5, v2 = proto.readVarIntI32(buf, v2)
+						result.action_type = v.ActionType.fromNumber(v5) or v5
+					else
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					end
+				elseif v4 == proto.wireTypes.lengthDelimited then
+					if v3 == 2 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.action_params = v.LaunchExperienceAction_Params.decode(v5)
+					else
+						local varInt, v5 = proto.readVarInt(buf, v2)
+
+						v2 = v5 + varInt
+					end
+				elseif v4 == proto.wireTypes.i32 then
+					local v5
+					v5, v2 = proto.readFixed32(buf, v2)
+				elseif v4 == proto.wireTypes.i64 then
+					local v5
+					v5, v2 = proto.readFixed64(buf, v2)
+				else
+					error("Unsupported wire type: " .. v4)
+				end
+			end
+
+			return result
+		end
+
+		function class132:jsonEncode()
+			local v2 = {}
+
+			if
+				self.action_type ~= nil
+				and (self.action_type ~= nil and self.action_type ~= 0 or self.action_type ~= v.ActionType.fromNumber(0))
+			then
+				local v3
+
+				if typeof(self.action_type) == "number" then
+					v3 = self.action_type
+				else
+					v3 = v.ActionType.toNumber(self.action_type)
+				end
+
+				v2.actionType = v3
+			end
+
+			if self.action_params ~= nil then
+				v2.actionParams = self.action_params:jsonEncode()
+			end
+
+			return v2
+		end
+
+		function class132.jsonDecode(data)
+			local v2 = class132.new()
+
+			if data.action_type ~= nil then
+				local v3
+
+				if typeof(data.action_type) == "number" then
+					v3 = v.ActionType.fromNumber(data.action_type) or data.action_type
+				else
+					v3 = v.ActionType.fromName(data.action_type) or data.action_type
+				end
+
+				v2.action_type = v3
+			end
+
+			if data.actionType ~= nil then
+				local v3
+
+				if typeof(data.actionType) == "number" then
+					v3 = v.ActionType.fromNumber(data.actionType) or data.actionType
+				else
+					v3 = v.ActionType.fromName(data.actionType) or data.actionType
+				end
+
+				v2.action_type = v3
+			end
+
+			if data.action_params ~= nil then
 				v2.action_params = v.LaunchExperienceAction_Params.jsonDecode(data.action_params)
 			end
 
@@ -19924,31 +20181,31 @@ do
 			return v2
 		end
 
-		class130.descriptor = {
+		class132.descriptor = {
 			name = "LaunchExperienceAction",
 			fullName = "roblox.apppageplatform.shared.v1beta1.LaunchExperienceAction"
 		}
 
-		v.LaunchExperienceAction = class130
+		v.LaunchExperienceAction = class132
 	end
 
 	typeRegistry.default:register(v.LaunchExperienceAction)
 
 	do
-		local class131 = {}
-		class131.__index = class131
+		local class133 = {}
+		class133.__index = class133
 
-		function class131.new(p)
+		function class133.new(p)
 			local v3
 
 			if not (p == nil or p.kind == nil) then
 				v3 = p.kind
 			end
 
-			return (setmetatable({ kind = v3 }, class131))
+			return (setmetatable({ kind = v3 }, class133))
 		end
 
-		function class131:encode()
+		function class133:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -19968,8 +20225,8 @@ do
 			return buf
 		end
 
-		function class131.decode(buf: buffer)
-			local result = class131.new()
+		function class133.decode(buf: buffer)
+			local result = class133.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -20010,7 +20267,7 @@ do
 			return result
 		end
 
-		function class131:jsonEncode()
+		function class133:jsonEncode()
 			local v2 = {}
 
 			if self.kind == nil then
@@ -20029,8 +20286,8 @@ do
 			return v2
 		end
 
-		function class131.jsonDecode(data)
-			local v2 = class131.new()
+		function class133.jsonDecode(data)
+			local v2 = class133.new()
 
 			if data.literal ~= nil then
 				v2.kind = {
@@ -20050,21 +20307,21 @@ do
 			return v2
 		end
 
-		class131.descriptor = {
+		class133.descriptor = {
 			name = "LaunchExperienceAction_ExperienceJoinData",
 			fullName = "roblox.apppageplatform.shared.v1beta1.ExperienceJoinData"
 		}
 
-		v.LaunchExperienceAction_ExperienceJoinData = class131
+		v.LaunchExperienceAction_ExperienceJoinData = class133
 	end
 
 	typeRegistry.default:register(v.LaunchExperienceAction_ExperienceJoinData)
 
 	do
-		local class132 = {}
-		class132.__index = class132
+		local class134 = {}
+		class134.__index = class134
 
-		function class132.new(p)
+		function class134.new(p)
 			local v3
 
 			if not (p == nil or p.launch_data == nil) then
@@ -20077,10 +20334,10 @@ do
 				v4 = p.event_id
 			end
 
-			return (setmetatable({ launch_data = v3, event_id = v4 }, class132))
+			return (setmetatable({ launch_data = v3, event_id = v4 }, class134))
 		end
 
-		function class132:encode()
+		function class134:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -20101,8 +20358,8 @@ do
 			return buf
 		end
 
-		function class132.decode(buf: buffer)
-			local result = class132.new()
+		function class134.decode(buf: buffer)
+			local result = class134.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -20140,7 +20397,7 @@ do
 			return result
 		end
 
-		function class132:jsonEncode()
+		function class134:jsonEncode()
 			local v2 = {}
 
 			if self.launch_data ~= nil then
@@ -20154,8 +20411,8 @@ do
 			return v2
 		end
 
-		function class132.jsonDecode(data)
-			local v2 = class132.new()
+		function class134.jsonDecode(data)
+			local v2 = class134.new()
 
 			if data.launch_data ~= nil then
 				v2.launch_data = prop_types.StringProp.jsonDecode(data.launch_data)
@@ -20176,21 +20433,21 @@ do
 			return v2
 		end
 
-		class132.descriptor = {
+		class134.descriptor = {
 			name = "LaunchExperienceAction_ExperienceJoinData_ExperienceJoinDataLiteral",
 			fullName = "roblox.apppageplatform.shared.v1beta1.ExperienceJoinDataLiteral"
 		}
 
-		v.LaunchExperienceAction_ExperienceJoinData_ExperienceJoinDataLiteral = class132
+		v.LaunchExperienceAction_ExperienceJoinData_ExperienceJoinDataLiteral = class134
 	end
 
 	typeRegistry.default:register(v.LaunchExperienceAction_ExperienceJoinData_ExperienceJoinDataLiteral)
 
 	do
-		local class133 = {}
-		class133.__index = class133
+		local class135 = {}
+		class135.__index = class135
 
-		function class133.new(data)
+		function class135.new(data)
 			local v3
 
 			if not (data == nil or data.place_id == nil) then
@@ -20227,10 +20484,10 @@ do
 				launch_source = v5,
 				experience_join_data = v6,
 				check_playability_before_launch = v7
-			}, class133))
+			}, class135))
 		end
 
-		function class133:encode()
+		function class135:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -20269,8 +20526,8 @@ do
 			return buf
 		end
 
-		function class133.decode(buf: buffer)
-			local result = class133.new()
+		function class135.decode(buf: buffer)
+			local result = class135.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -20320,7 +20577,7 @@ do
 			return result
 		end
 
-		function class133:jsonEncode()
+		function class135:jsonEncode()
 			local v2 = {}
 
 			if self.place_id ~= nil then
@@ -20346,8 +20603,8 @@ do
 			return v2
 		end
 
-		function class133.jsonDecode(data)
-			local v2 = class133.new()
+		function class135.jsonDecode(data)
+			local v2 = class135.new()
 
 			if data.place_id ~= nil then
 				v2.place_id = prop_types.StringProp.jsonDecode(data.place_id)
@@ -20392,324 +20649,15 @@ do
 			return v2
 		end
 
-		class133.descriptor = {
+		class135.descriptor = {
 			name = "LaunchExperienceAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.LaunchExperienceAction_Params = class133
+		v.LaunchExperienceAction_Params = class135
 	end
 
 	typeRegistry.default:register(v.LaunchExperienceAction_Params)
-
-	do
-		local class134 = {}
-		class134.__index = class134
-
-		function class134.new(p)
-			local v3
-
-			if p == nil or p.action_type == nil then
-				v3 = assert(v.ActionType.fromNumber(0), "Enum has no 0 default")
-			else
-				v3 = p.action_type
-			end
-
-			local v4
-
-			if not (p == nil or p.action_params == nil) then
-				v4 = p.action_params
-			end
-
-			return (setmetatable({ action_type = v3, action_params = v4 }, class134))
-		end
-
-		function class134:encode()
-			local v2 = buffer.create(0)
-			local v3 = 0
-
-			if
-				self.action_type ~= nil
-				and (self.action_type ~= nil and self.action_type ~= 0 or self.action_type ~= v.ActionType.fromNumber(0))
-			then
-				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.varint)
-				v2, v3 = proto.writeVarInt(v4, v5, v.ActionType.toNumber(self.action_type))
-			end
-
-			if self.action_params ~= nil then
-				local encoded = self.action_params:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			local buf = buffer.create(v3)
-			buffer.copy(buf, 0, v2, 0, v3)
-			return buf
-		end
-
-		function class134.decode(buf: buffer)
-			local result = class134.new()
-			local v2 = 0
-
-			while v2 < buffer.len(buf) do
-				local v3, v4
-				v3, v4, v2 = proto.readTag(buf, v2)
-
-				if v4 == proto.wireTypes.varint then
-					if v3 == 1 then
-						local v5
-						v5, v2 = proto.readVarIntI32(buf, v2)
-						result.action_type = v.ActionType.fromNumber(v5) or v5
-					else
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					end
-				elseif v4 == proto.wireTypes.lengthDelimited then
-					if v3 == 2 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.ToggleExperienceFavoriteAction_Params.decode(v5)
-					else
-						local varInt, v5 = proto.readVarInt(buf, v2)
-
-						v2 = v5 + varInt
-					end
-				elseif v4 == proto.wireTypes.i32 then
-					local v5
-					v5, v2 = proto.readFixed32(buf, v2)
-				elseif v4 == proto.wireTypes.i64 then
-					local v5
-					v5, v2 = proto.readFixed64(buf, v2)
-				else
-					error("Unsupported wire type: " .. v4)
-				end
-			end
-
-			return result
-		end
-
-		function class134:jsonEncode()
-			local v2 = {}
-
-			if
-				self.action_type ~= nil
-				and (self.action_type ~= nil and self.action_type ~= 0 or self.action_type ~= v.ActionType.fromNumber(0))
-			then
-				local v3
-
-				if typeof(self.action_type) == "number" then
-					v3 = self.action_type
-				else
-					v3 = v.ActionType.toNumber(self.action_type)
-				end
-
-				v2.actionType = v3
-			end
-
-			if self.action_params ~= nil then
-				v2.actionParams = self.action_params:jsonEncode()
-			end
-
-			return v2
-		end
-
-		function class134.jsonDecode(data)
-			local v2 = class134.new()
-
-			if data.action_type ~= nil then
-				local v3
-
-				if typeof(data.action_type) == "number" then
-					v3 = v.ActionType.fromNumber(data.action_type) or data.action_type
-				else
-					v3 = v.ActionType.fromName(data.action_type) or data.action_type
-				end
-
-				v2.action_type = v3
-			end
-
-			if data.actionType ~= nil then
-				local v3
-
-				if typeof(data.actionType) == "number" then
-					v3 = v.ActionType.fromNumber(data.actionType) or data.actionType
-				else
-					v3 = v.ActionType.fromName(data.actionType) or data.actionType
-				end
-
-				v2.action_type = v3
-			end
-
-			if data.action_params ~= nil then
-				v2.action_params = v.ToggleExperienceFavoriteAction_Params.jsonDecode(data.action_params)
-			end
-
-			if data.actionParams ~= nil then
-				v2.action_params = v.ToggleExperienceFavoriteAction_Params.jsonDecode(data.actionParams)
-			end
-
-			return v2
-		end
-
-		class134.descriptor = {
-			name = "ToggleExperienceFavoriteAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.ToggleExperienceFavoriteAction"
-		}
-
-		v.ToggleExperienceFavoriteAction = class134
-	end
-
-	typeRegistry.default:register(v.ToggleExperienceFavoriteAction)
-
-	do
-		local class135 = {}
-		class135.__index = class135
-
-		function class135.new(data)
-			local v3
-
-			if not (data == nil or data.universe_id == nil) then
-				v3 = data.universe_id
-			end
-
-			local v4
-
-			if not (data == nil or data.place_id == nil) then
-				v4 = data.place_id
-			end
-
-			local v5
-
-			if not (data == nil or data.ctx == nil) then
-				v5 = data.ctx
-			end
-
-			return (setmetatable({ universe_id = v3, place_id = v4, ctx = v5 }, class135))
-		end
-
-		function class135:encode()
-			local v2 = buffer.create(0)
-			local v3 = 0
-
-			if self.universe_id ~= nil then
-				local encoded = self.universe_id:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.place_id ~= nil then
-				local encoded = self.place_id:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.ctx ~= nil then
-				local encoded = self.ctx:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			local buf = buffer.create(v3)
-			buffer.copy(buf, 0, v2, 0, v3)
-			return buf
-		end
-
-		function class135.decode(buf: buffer)
-			local result = class135.new()
-			local v2 = 0
-
-			while v2 < buffer.len(buf) do
-				local v3, v4
-				v3, v4, v2 = proto.readTag(buf, v2)
-
-				if v4 == proto.wireTypes.varint then
-					local v5
-					v5, v2 = proto.readVarInt(buf, v2)
-				elseif v4 == proto.wireTypes.lengthDelimited then
-					if v3 == 1 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.universe_id = prop_types.StringProp.decode(v5)
-					elseif v3 == 2 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.place_id = prop_types.StringProp.decode(v5)
-					elseif v3 == 3 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.ctx = prop_types.StringProp.decode(v5)
-					else
-						local varInt, v5 = proto.readVarInt(buf, v2)
-
-						v2 = v5 + varInt
-					end
-				elseif v4 == proto.wireTypes.i32 then
-					local v5
-					v5, v2 = proto.readFixed32(buf, v2)
-				elseif v4 == proto.wireTypes.i64 then
-					local v5
-					v5, v2 = proto.readFixed64(buf, v2)
-				else
-					error("Unsupported wire type: " .. v4)
-				end
-			end
-
-			return result
-		end
-
-		function class135:jsonEncode()
-			local v2 = {}
-
-			if self.universe_id ~= nil then
-				v2.universeId = self.universe_id:jsonEncode()
-			end
-
-			if self.place_id ~= nil then
-				v2.placeId = self.place_id:jsonEncode()
-			end
-
-			if self.ctx ~= nil then
-				v2.ctx = self.ctx:jsonEncode()
-			end
-
-			return v2
-		end
-
-		function class135.jsonDecode(data)
-			local v2 = class135.new()
-
-			if data.universe_id ~= nil then
-				v2.universe_id = prop_types.StringProp.jsonDecode(data.universe_id)
-			end
-
-			if data.universeId ~= nil then
-				v2.universe_id = prop_types.StringProp.jsonDecode(data.universeId)
-			end
-
-			if data.place_id ~= nil then
-				v2.place_id = prop_types.StringProp.jsonDecode(data.place_id)
-			end
-
-			if data.placeId ~= nil then
-				v2.place_id = prop_types.StringProp.jsonDecode(data.placeId)
-			end
-
-			if data.ctx ~= nil then
-				v2.ctx = prop_types.StringProp.jsonDecode(data.ctx)
-			end
-
-			return v2
-		end
-
-		class135.descriptor = {
-			name = "ToggleExperienceFavoriteAction_Params",
-			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
-		}
-
-		v.ToggleExperienceFavoriteAction_Params = class135
-	end
-
-	typeRegistry.default:register(v.ToggleExperienceFavoriteAction_Params)
 
 	do
 		local class136 = {}
@@ -20777,7 +20725,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.ToggleExperienceFollowAction_Params.decode(v5)
+						result.action_params = v.ToggleExperienceFavoriteAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -20850,25 +20798,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.ToggleExperienceFollowAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.ToggleExperienceFavoriteAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.ToggleExperienceFollowAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.ToggleExperienceFavoriteAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class136.descriptor = {
-			name = "ToggleExperienceFollowAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.ToggleExperienceFollowAction"
+			name = "ToggleExperienceFavoriteAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.ToggleExperienceFavoriteAction"
 		}
 
-		v.ToggleExperienceFollowAction = class136
+		v.ToggleExperienceFavoriteAction = class136
 	end
 
-	typeRegistry.default:register(v.ToggleExperienceFollowAction)
+	typeRegistry.default:register(v.ToggleExperienceFavoriteAction)
 
 	do
 		local class137 = {}
@@ -20883,8 +20831,8 @@ do
 
 			local v4
 
-			if not (data == nil or data.game_name == nil) then
-				v4 = data.game_name
+			if not (data == nil or data.place_id == nil) then
+				v4 = data.place_id
 			end
 
 			local v5
@@ -20893,7 +20841,7 @@ do
 				v5 = data.ctx
 			end
 
-			return (setmetatable({ universe_id = v3, game_name = v4, ctx = v5 }, class137))
+			return (setmetatable({ universe_id = v3, place_id = v4, ctx = v5 }, class137))
 		end
 
 		function class137:encode()
@@ -20906,8 +20854,8 @@ do
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.game_name ~= nil then
-				local encoded = self.game_name:encode()
+			if self.place_id ~= nil then
+				local encoded = self.place_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
@@ -20942,7 +20890,7 @@ do
 					elseif v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.game_name = prop_types.StringProp.decode(v5)
+						result.place_id = prop_types.StringProp.decode(v5)
 					elseif v3 == 3 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
@@ -20973,8 +20921,8 @@ do
 				v2.universeId = self.universe_id:jsonEncode()
 			end
 
-			if self.game_name ~= nil then
-				v2.gameName = self.game_name:jsonEncode()
+			if self.place_id ~= nil then
+				v2.placeId = self.place_id:jsonEncode()
 			end
 
 			if self.ctx ~= nil then
@@ -20995,12 +20943,12 @@ do
 				v2.universe_id = prop_types.StringProp.jsonDecode(data.universeId)
 			end
 
-			if data.game_name ~= nil then
-				v2.game_name = prop_types.StringProp.jsonDecode(data.game_name)
+			if data.place_id ~= nil then
+				v2.place_id = prop_types.StringProp.jsonDecode(data.place_id)
 			end
 
-			if data.gameName ~= nil then
-				v2.game_name = prop_types.StringProp.jsonDecode(data.gameName)
+			if data.placeId ~= nil then
+				v2.place_id = prop_types.StringProp.jsonDecode(data.placeId)
 			end
 
 			if data.ctx ~= nil then
@@ -21011,14 +20959,14 @@ do
 		end
 
 		class137.descriptor = {
-			name = "ToggleExperienceFollowAction_Params",
+			name = "ToggleExperienceFavoriteAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.ToggleExperienceFollowAction_Params = class137
+		v.ToggleExperienceFavoriteAction_Params = class137
 	end
 
-	typeRegistry.default:register(v.ToggleExperienceFollowAction_Params)
+	typeRegistry.default:register(v.ToggleExperienceFavoriteAction_Params)
 
 	do
 		local class138 = {}
@@ -21086,7 +21034,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.ToggleExperienceVoteAction_Params.decode(v5)
+						result.action_params = v.ToggleExperienceFollowAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -21159,25 +21107,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.ToggleExperienceVoteAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.ToggleExperienceFollowAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.ToggleExperienceVoteAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.ToggleExperienceFollowAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class138.descriptor = {
-			name = "ToggleExperienceVoteAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.ToggleExperienceVoteAction"
+			name = "ToggleExperienceFollowAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.ToggleExperienceFollowAction"
 		}
 
-		v.ToggleExperienceVoteAction = class138
+		v.ToggleExperienceFollowAction = class138
 	end
 
-	typeRegistry.default:register(v.ToggleExperienceVoteAction)
+	typeRegistry.default:register(v.ToggleExperienceFollowAction)
 
 	do
 		local class139 = {}
@@ -21192,23 +21140,17 @@ do
 
 			local v4
 
-			if not (data == nil or data.vote_direction == nil) then
-				v4 = data.vote_direction
+			if not (data == nil or data.game_name == nil) then
+				v4 = data.game_name
 			end
 
 			local v5
 
-			if not (data == nil or data.place_id == nil) then
-				v5 = data.place_id
-			end
-
-			local v6
-
 			if not (data == nil or data.ctx == nil) then
-				v6 = data.ctx
+				v5 = data.ctx
 			end
 
-			return (setmetatable({ universe_id = v3, vote_direction = v4, place_id = v5, ctx = v6 }, class139))
+			return (setmetatable({ universe_id = v3, game_name = v4, ctx = v5 }, class139))
 		end
 
 		function class139:encode()
@@ -21221,21 +21163,15 @@ do
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.vote_direction ~= nil then
-				local encoded = self.vote_direction:encode()
+			if self.game_name ~= nil then
+				local encoded = self.game_name:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.place_id ~= nil then
-				local encoded = self.place_id:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
 			if self.ctx ~= nil then
 				local encoded = self.ctx:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -21263,12 +21199,8 @@ do
 					elseif v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.vote_direction = prop_types.BoolProp.decode(v5)
+						result.game_name = prop_types.StringProp.decode(v5)
 					elseif v3 == 3 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.place_id = prop_types.StringProp.decode(v5)
-					elseif v3 == 4 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
 						result.ctx = prop_types.StringProp.decode(v5)
@@ -21298,12 +21230,8 @@ do
 				v2.universeId = self.universe_id:jsonEncode()
 			end
 
-			if self.vote_direction ~= nil then
-				v2.voteDirection = self.vote_direction:jsonEncode()
-			end
-
-			if self.place_id ~= nil then
-				v2.placeId = self.place_id:jsonEncode()
+			if self.game_name ~= nil then
+				v2.gameName = self.game_name:jsonEncode()
 			end
 
 			if self.ctx ~= nil then
@@ -21324,20 +21252,12 @@ do
 				v2.universe_id = prop_types.StringProp.jsonDecode(data.universeId)
 			end
 
-			if data.vote_direction ~= nil then
-				v2.vote_direction = prop_types.BoolProp.jsonDecode(data.vote_direction)
+			if data.game_name ~= nil then
+				v2.game_name = prop_types.StringProp.jsonDecode(data.game_name)
 			end
 
-			if data.voteDirection ~= nil then
-				v2.vote_direction = prop_types.BoolProp.jsonDecode(data.voteDirection)
-			end
-
-			if data.place_id ~= nil then
-				v2.place_id = prop_types.StringProp.jsonDecode(data.place_id)
-			end
-
-			if data.placeId ~= nil then
-				v2.place_id = prop_types.StringProp.jsonDecode(data.placeId)
+			if data.gameName ~= nil then
+				v2.game_name = prop_types.StringProp.jsonDecode(data.gameName)
 			end
 
 			if data.ctx ~= nil then
@@ -21348,14 +21268,14 @@ do
 		end
 
 		class139.descriptor = {
-			name = "ToggleExperienceVoteAction_Params",
+			name = "ToggleExperienceFollowAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.ToggleExperienceVoteAction_Params = class139
+		v.ToggleExperienceFollowAction_Params = class139
 	end
 
-	typeRegistry.default:register(v.ToggleExperienceVoteAction_Params)
+	typeRegistry.default:register(v.ToggleExperienceFollowAction_Params)
 
 	do
 		local class140 = {}
@@ -21423,7 +21343,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.OpenPurchasePromptAction_Params.decode(v5)
+						result.action_params = v.ToggleExperienceVoteAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -21496,6 +21416,343 @@ do
 			end
 
 			if data.action_params ~= nil then
+				v2.action_params = v.ToggleExperienceVoteAction_Params.jsonDecode(data.action_params)
+			end
+
+			if data.actionParams ~= nil then
+				v2.action_params = v.ToggleExperienceVoteAction_Params.jsonDecode(data.actionParams)
+			end
+
+			return v2
+		end
+
+		class140.descriptor = {
+			name = "ToggleExperienceVoteAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.ToggleExperienceVoteAction"
+		}
+
+		v.ToggleExperienceVoteAction = class140
+	end
+
+	typeRegistry.default:register(v.ToggleExperienceVoteAction)
+
+	do
+		local class141 = {}
+		class141.__index = class141
+
+		function class141.new(data)
+			local v3
+
+			if not (data == nil or data.universe_id == nil) then
+				v3 = data.universe_id
+			end
+
+			local v4
+
+			if not (data == nil or data.vote_direction == nil) then
+				v4 = data.vote_direction
+			end
+
+			local v5
+
+			if not (data == nil or data.place_id == nil) then
+				v5 = data.place_id
+			end
+
+			local v6
+
+			if not (data == nil or data.ctx == nil) then
+				v6 = data.ctx
+			end
+
+			return (setmetatable({ universe_id = v3, vote_direction = v4, place_id = v5, ctx = v6 }, class141))
+		end
+
+		function class141:encode()
+			local v2 = buffer.create(0)
+			local v3 = 0
+
+			if self.universe_id ~= nil then
+				local encoded = self.universe_id:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.vote_direction ~= nil then
+				local encoded = self.vote_direction:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.place_id ~= nil then
+				local encoded = self.place_id:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.ctx ~= nil then
+				local encoded = self.ctx:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			local buf = buffer.create(v3)
+			buffer.copy(buf, 0, v2, 0, v3)
+			return buf
+		end
+
+		function class141.decode(buf: buffer)
+			local result = class141.new()
+			local v2 = 0
+
+			while v2 < buffer.len(buf) do
+				local v3, v4
+				v3, v4, v2 = proto.readTag(buf, v2)
+
+				if v4 == proto.wireTypes.varint then
+					local v5
+					v5, v2 = proto.readVarInt(buf, v2)
+				elseif v4 == proto.wireTypes.lengthDelimited then
+					if v3 == 1 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.universe_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 2 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.vote_direction = prop_types.BoolProp.decode(v5)
+					elseif v3 == 3 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.place_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 4 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.ctx = prop_types.StringProp.decode(v5)
+					else
+						local varInt, v5 = proto.readVarInt(buf, v2)
+
+						v2 = v5 + varInt
+					end
+				elseif v4 == proto.wireTypes.i32 then
+					local v5
+					v5, v2 = proto.readFixed32(buf, v2)
+				elseif v4 == proto.wireTypes.i64 then
+					local v5
+					v5, v2 = proto.readFixed64(buf, v2)
+				else
+					error("Unsupported wire type: " .. v4)
+				end
+			end
+
+			return result
+		end
+
+		function class141:jsonEncode()
+			local v2 = {}
+
+			if self.universe_id ~= nil then
+				v2.universeId = self.universe_id:jsonEncode()
+			end
+
+			if self.vote_direction ~= nil then
+				v2.voteDirection = self.vote_direction:jsonEncode()
+			end
+
+			if self.place_id ~= nil then
+				v2.placeId = self.place_id:jsonEncode()
+			end
+
+			if self.ctx ~= nil then
+				v2.ctx = self.ctx:jsonEncode()
+			end
+
+			return v2
+		end
+
+		function class141.jsonDecode(data)
+			local v2 = class141.new()
+
+			if data.universe_id ~= nil then
+				v2.universe_id = prop_types.StringProp.jsonDecode(data.universe_id)
+			end
+
+			if data.universeId ~= nil then
+				v2.universe_id = prop_types.StringProp.jsonDecode(data.universeId)
+			end
+
+			if data.vote_direction ~= nil then
+				v2.vote_direction = prop_types.BoolProp.jsonDecode(data.vote_direction)
+			end
+
+			if data.voteDirection ~= nil then
+				v2.vote_direction = prop_types.BoolProp.jsonDecode(data.voteDirection)
+			end
+
+			if data.place_id ~= nil then
+				v2.place_id = prop_types.StringProp.jsonDecode(data.place_id)
+			end
+
+			if data.placeId ~= nil then
+				v2.place_id = prop_types.StringProp.jsonDecode(data.placeId)
+			end
+
+			if data.ctx ~= nil then
+				v2.ctx = prop_types.StringProp.jsonDecode(data.ctx)
+			end
+
+			return v2
+		end
+
+		class141.descriptor = {
+			name = "ToggleExperienceVoteAction_Params",
+			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
+		}
+
+		v.ToggleExperienceVoteAction_Params = class141
+	end
+
+	typeRegistry.default:register(v.ToggleExperienceVoteAction_Params)
+
+	do
+		local class142 = {}
+		class142.__index = class142
+
+		function class142.new(p)
+			local v3
+
+			if p == nil or p.action_type == nil then
+				v3 = assert(v.ActionType.fromNumber(0), "Enum has no 0 default")
+			else
+				v3 = p.action_type
+			end
+
+			local v4
+
+			if not (p == nil or p.action_params == nil) then
+				v4 = p.action_params
+			end
+
+			return (setmetatable({ action_type = v3, action_params = v4 }, class142))
+		end
+
+		function class142:encode()
+			local v2 = buffer.create(0)
+			local v3 = 0
+
+			if
+				self.action_type ~= nil
+				and (self.action_type ~= nil and self.action_type ~= 0 or self.action_type ~= v.ActionType.fromNumber(0))
+			then
+				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.varint)
+				v2, v3 = proto.writeVarInt(v4, v5, v.ActionType.toNumber(self.action_type))
+			end
+
+			if self.action_params ~= nil then
+				local encoded = self.action_params:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			local buf = buffer.create(v3)
+			buffer.copy(buf, 0, v2, 0, v3)
+			return buf
+		end
+
+		function class142.decode(buf: buffer)
+			local result = class142.new()
+			local v2 = 0
+
+			while v2 < buffer.len(buf) do
+				local v3, v4
+				v3, v4, v2 = proto.readTag(buf, v2)
+
+				if v4 == proto.wireTypes.varint then
+					if v3 == 1 then
+						local v5
+						v5, v2 = proto.readVarIntI32(buf, v2)
+						result.action_type = v.ActionType.fromNumber(v5) or v5
+					else
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					end
+				elseif v4 == proto.wireTypes.lengthDelimited then
+					if v3 == 2 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.action_params = v.OpenPurchasePromptAction_Params.decode(v5)
+					else
+						local varInt, v5 = proto.readVarInt(buf, v2)
+
+						v2 = v5 + varInt
+					end
+				elseif v4 == proto.wireTypes.i32 then
+					local v5
+					v5, v2 = proto.readFixed32(buf, v2)
+				elseif v4 == proto.wireTypes.i64 then
+					local v5
+					v5, v2 = proto.readFixed64(buf, v2)
+				else
+					error("Unsupported wire type: " .. v4)
+				end
+			end
+
+			return result
+		end
+
+		function class142:jsonEncode()
+			local v2 = {}
+
+			if
+				self.action_type ~= nil
+				and (self.action_type ~= nil and self.action_type ~= 0 or self.action_type ~= v.ActionType.fromNumber(0))
+			then
+				local v3
+
+				if typeof(self.action_type) == "number" then
+					v3 = self.action_type
+				else
+					v3 = v.ActionType.toNumber(self.action_type)
+				end
+
+				v2.actionType = v3
+			end
+
+			if self.action_params ~= nil then
+				v2.actionParams = self.action_params:jsonEncode()
+			end
+
+			return v2
+		end
+
+		function class142.jsonDecode(data)
+			local v2 = class142.new()
+
+			if data.action_type ~= nil then
+				local v3
+
+				if typeof(data.action_type) == "number" then
+					v3 = v.ActionType.fromNumber(data.action_type) or data.action_type
+				else
+					v3 = v.ActionType.fromName(data.action_type) or data.action_type
+				end
+
+				v2.action_type = v3
+			end
+
+			if data.actionType ~= nil then
+				local v3
+
+				if typeof(data.actionType) == "number" then
+					v3 = v.ActionType.fromNumber(data.actionType) or data.actionType
+				else
+					v3 = v.ActionType.fromName(data.actionType) or data.actionType
+				end
+
+				v2.action_type = v3
+			end
+
+			if data.action_params ~= nil then
 				v2.action_params = v.OpenPurchasePromptAction_Params.jsonDecode(data.action_params)
 			end
 
@@ -21506,31 +21763,31 @@ do
 			return v2
 		end
 
-		class140.descriptor = {
+		class142.descriptor = {
 			name = "OpenPurchasePromptAction",
 			fullName = "roblox.apppageplatform.shared.v1beta1.OpenPurchasePromptAction"
 		}
 
-		v.OpenPurchasePromptAction = class140
+		v.OpenPurchasePromptAction = class142
 	end
 
 	typeRegistry.default:register(v.OpenPurchasePromptAction)
 
 	do
-		local class141 = {}
-		class141.__index = class141
+		local class143 = {}
+		class143.__index = class143
 
-		function class141.new(p)
+		function class143.new(p)
 			local v3
 
 			if not (p == nil or p.kind == nil) then
 				v3 = p.kind
 			end
 
-			return (setmetatable({ kind = v3 }, class141))
+			return (setmetatable({ kind = v3 }, class143))
 		end
 
-		function class141:encode()
+		function class143:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -21550,8 +21807,8 @@ do
 			return buf
 		end
 
-		function class141.decode(buf: buffer)
-			local result = class141.new()
+		function class143.decode(buf: buffer)
+			local result = class143.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -21592,7 +21849,7 @@ do
 			return result
 		end
 
-		function class141:jsonEncode()
+		function class143:jsonEncode()
 			local v2 = {}
 
 			if self.kind == nil then
@@ -21611,8 +21868,8 @@ do
 			return v2
 		end
 
-		function class141.jsonDecode(data)
-			local v2 = class141.new()
+		function class143.jsonDecode(data)
+			local v2 = class143.new()
 
 			if data.literal ~= nil then
 				v2.kind = {
@@ -21632,21 +21889,21 @@ do
 			return v2
 		end
 
-		class141.descriptor = {
+		class143.descriptor = {
 			name = "OpenPurchasePromptAction_ProductPayload",
 			fullName = "roblox.apppageplatform.shared.v1beta1.ProductPayload"
 		}
 
-		v.OpenPurchasePromptAction_ProductPayload = class141
+		v.OpenPurchasePromptAction_ProductPayload = class143
 	end
 
 	typeRegistry.default:register(v.OpenPurchasePromptAction_ProductPayload)
 
 	do
-		local class142 = {}
-		class142.__index = class142
+		local class144 = {}
+		class144.__index = class144
 
-		function class142.new(data)
+		function class144.new(data)
 			local v3
 
 			if not (data == nil or data.kind == nil) then
@@ -21718,10 +21975,10 @@ do
 				icon_image_asset_id = v10,
 				is_subscription_in_robux = v11,
 				display_price = v12
-			}, class142))
+			}, class144))
 		end
 
-		function class142:encode()
+		function class144:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -21790,8 +22047,8 @@ do
 			return buf
 		end
 
-		function class142.decode(buf: buffer)
-			local result = class142.new()
+		function class144.decode(buf: buffer)
+			local result = class144.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -21861,7 +22118,7 @@ do
 			return result
 		end
 
-		function class142:jsonEncode()
+		function class144:jsonEncode()
 			local v2 = {}
 
 			if self.kind ~= nil then
@@ -21907,8 +22164,8 @@ do
 			return v2
 		end
 
-		function class142.jsonDecode(data)
-			local v2 = class142.new()
+		function class144.jsonDecode(data)
+			local v2 = class144.new()
 
 			if data.kind ~= nil then
 				v2.kind = prop_types.StringProp.jsonDecode(data.kind)
@@ -21981,31 +22238,31 @@ do
 			return v2
 		end
 
-		class142.descriptor = {
+		class144.descriptor = {
 			name = "OpenPurchasePromptAction_ProductPayload_ProductPayloadLiteral",
 			fullName = "roblox.apppageplatform.shared.v1beta1.ProductPayloadLiteral"
 		}
 
-		v.OpenPurchasePromptAction_ProductPayload_ProductPayloadLiteral = class142
+		v.OpenPurchasePromptAction_ProductPayload_ProductPayloadLiteral = class144
 	end
 
 	typeRegistry.default:register(v.OpenPurchasePromptAction_ProductPayload_ProductPayloadLiteral)
 
 	do
-		local class143 = {}
-		class143.__index = class143
+		local class145 = {}
+		class145.__index = class145
 
-		function class143.new(p)
+		function class145.new(p)
 			local v3
 
 			if not (p == nil or p.kind == nil) then
 				v3 = p.kind
 			end
 
-			return (setmetatable({ kind = v3 }, class143))
+			return (setmetatable({ kind = v3 }, class145))
 		end
 
-		function class143:encode()
+		function class145:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -22025,8 +22282,8 @@ do
 			return buf
 		end
 
-		function class143.decode(buf: buffer)
-			local result = class143.new()
+		function class145.decode(buf: buffer)
+			local result = class145.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -22067,7 +22324,7 @@ do
 			return result
 		end
 
-		function class143:jsonEncode()
+		function class145:jsonEncode()
 			local v2 = {}
 
 			if self.kind == nil then
@@ -22086,8 +22343,8 @@ do
 			return v2
 		end
 
-		function class143.jsonDecode(data)
-			local v2 = class143.new()
+		function class145.jsonDecode(data)
+			local v2 = class145.new()
 
 			if data.literal ~= nil then
 				v2.kind = {
@@ -22107,21 +22364,21 @@ do
 			return v2
 		end
 
-		class143.descriptor = {
+		class145.descriptor = {
 			name = "OpenPurchasePromptAction_DisplayInfo",
 			fullName = "roblox.apppageplatform.shared.v1beta1.DisplayInfo"
 		}
 
-		v.OpenPurchasePromptAction_DisplayInfo = class143
+		v.OpenPurchasePromptAction_DisplayInfo = class145
 	end
 
 	typeRegistry.default:register(v.OpenPurchasePromptAction_DisplayInfo)
 
 	do
-		local class144 = {}
-		class144.__index = class144
+		local class146 = {}
+		class146.__index = class146
 
-		function class144.new(data)
+		function class146.new(data)
 			local v3
 
 			if not (data == nil or data.product_name == nil) then
@@ -22207,10 +22464,10 @@ do
 				product_type = v12,
 				base_price_in_robux = v13,
 				price_discount_details = v14
-			}, class144))
+			}, class146))
 		end
 
-		function class144:encode()
+		function class146:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -22291,8 +22548,8 @@ do
 			return buf
 		end
 
-		function class144.decode(buf: buffer)
-			local result = class144.new()
+		function class146.decode(buf: buffer)
+			local result = class146.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -22370,7 +22627,7 @@ do
 			return result
 		end
 
-		function class144:jsonEncode()
+		function class146:jsonEncode()
 			local v2 = {}
 
 			if self.product_name ~= nil then
@@ -22424,8 +22681,8 @@ do
 			return v2
 		end
 
-		function class144.jsonDecode(data)
-			local v2 = class144.new()
+		function class146.jsonDecode(data)
+			local v2 = class146.new()
 
 			if data.product_name ~= nil then
 				v2.product_name = prop_types.StringProp.jsonDecode(data.product_name)
@@ -22522,31 +22779,31 @@ do
 			return v2
 		end
 
-		class144.descriptor = {
+		class146.descriptor = {
 			name = "OpenPurchasePromptAction_DisplayInfo_DisplayInfoLiteral",
 			fullName = "roblox.apppageplatform.shared.v1beta1.DisplayInfoLiteral"
 		}
 
-		v.OpenPurchasePromptAction_DisplayInfo_DisplayInfoLiteral = class144
+		v.OpenPurchasePromptAction_DisplayInfo_DisplayInfoLiteral = class146
 	end
 
 	typeRegistry.default:register(v.OpenPurchasePromptAction_DisplayInfo_DisplayInfoLiteral)
 
 	do
-		local class145 = {}
-		class145.__index = class145
+		local class147 = {}
+		class147.__index = class147
 
-		function class145.new(p)
+		function class147.new(p)
 			local v3
 
 			if not (p == nil or p.kind == nil) then
 				v3 = p.kind
 			end
 
-			return (setmetatable({ kind = v3 }, class145))
+			return (setmetatable({ kind = v3 }, class147))
 		end
 
-		function class145:encode()
+		function class147:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -22566,8 +22823,8 @@ do
 			return buf
 		end
 
-		function class145.decode(buf: buffer)
-			local result = class145.new()
+		function class147.decode(buf: buffer)
+			local result = class147.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -22608,7 +22865,7 @@ do
 			return result
 		end
 
-		function class145:jsonEncode()
+		function class147:jsonEncode()
 			local v2 = {}
 
 			if self.kind == nil then
@@ -22627,8 +22884,8 @@ do
 			return v2
 		end
 
-		function class145.jsonDecode(data)
-			local v2 = class145.new()
+		function class147.jsonDecode(data)
+			local v2 = class147.new()
 
 			if data.literal ~= nil then
 				v2.kind = {
@@ -22648,21 +22905,21 @@ do
 			return v2
 		end
 
-		class145.descriptor = {
+		class147.descriptor = {
 			name = "OpenPurchasePromptAction_PurchaseOptions",
 			fullName = "roblox.apppageplatform.shared.v1beta1.PurchaseOptions"
 		}
 
-		v.OpenPurchasePromptAction_PurchaseOptions = class145
+		v.OpenPurchasePromptAction_PurchaseOptions = class147
 	end
 
 	typeRegistry.default:register(v.OpenPurchasePromptAction_PurchaseOptions)
 
 	do
-		local class146 = {}
-		class146.__index = class146
+		local class148 = {}
+		class148.__index = class148
 
-		function class146.new(data)
+		function class148.new(data)
 			local v3
 
 			if not (data == nil or data.should_skip_ownership_check == nil) then
@@ -22713,10 +22970,10 @@ do
 				prevent_double_confirm = v7,
 				provided_robux_balance = v8,
 				launch_after_purchase_root_place_id = v9
-			}, class146))
+			}, class148))
 		end
 
-		function class146:encode()
+		function class148:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -22767,8 +23024,8 @@ do
 			return buf
 		end
 
-		function class146.decode(buf: buffer)
-			local result = class146.new()
+		function class148.decode(buf: buffer)
+			local result = class148.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -22826,7 +23083,7 @@ do
 			return result
 		end
 
-		function class146:jsonEncode()
+		function class148:jsonEncode()
 			local v2 = {}
 
 			if self.should_skip_ownership_check ~= nil then
@@ -22860,8 +23117,8 @@ do
 			return v2
 		end
 
-		function class146.jsonDecode(data)
-			local v2 = class146.new()
+		function class148.jsonDecode(data)
+			local v2 = class148.new()
 
 			if data.should_skip_ownership_check ~= nil then
 				v2.should_skip_ownership_check = prop_types.BoolProp.jsonDecode(data.should_skip_ownership_check)
@@ -22922,31 +23179,31 @@ do
 			return v2
 		end
 
-		class146.descriptor = {
+		class148.descriptor = {
 			name = "OpenPurchasePromptAction_PurchaseOptions_PurchaseOptionsLiteral",
 			fullName = "roblox.apppageplatform.shared.v1beta1.PurchaseOptionsLiteral"
 		}
 
-		v.OpenPurchasePromptAction_PurchaseOptions_PurchaseOptionsLiteral = class146
+		v.OpenPurchasePromptAction_PurchaseOptions_PurchaseOptionsLiteral = class148
 	end
 
 	typeRegistry.default:register(v.OpenPurchasePromptAction_PurchaseOptions_PurchaseOptionsLiteral)
 
 	do
-		local class147 = {}
-		class147.__index = class147
+		local class149 = {}
+		class149.__index = class149
 
-		function class147.new(p)
+		function class149.new(p)
 			local v3
 
 			if not (p == nil or p.kind == nil) then
 				v3 = p.kind
 			end
 
-			return (setmetatable({ kind = v3 }, class147))
+			return (setmetatable({ kind = v3 }, class149))
 		end
 
-		function class147:encode()
+		function class149:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -22966,8 +23223,8 @@ do
 			return buf
 		end
 
-		function class147.decode(buf: buffer)
-			local result = class147.new()
+		function class149.decode(buf: buffer)
+			local result = class149.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -23008,7 +23265,7 @@ do
 			return result
 		end
 
-		function class147:jsonEncode()
+		function class149:jsonEncode()
 			local v2 = {}
 
 			if self.kind == nil then
@@ -23027,8 +23284,8 @@ do
 			return v2
 		end
 
-		function class147.jsonDecode(data)
-			local v2 = class147.new()
+		function class149.jsonDecode(data)
+			local v2 = class149.new()
 
 			if data.literal ~= nil then
 				v2.kind = {
@@ -23048,21 +23305,21 @@ do
 			return v2
 		end
 
-		class147.descriptor = {
+		class149.descriptor = {
 			name = "OpenPurchasePromptAction_PurchaseAnalyticsMetadata",
 			fullName = "roblox.apppageplatform.shared.v1beta1.PurchaseAnalyticsMetadata"
 		}
 
-		v.OpenPurchasePromptAction_PurchaseAnalyticsMetadata = class147
+		v.OpenPurchasePromptAction_PurchaseAnalyticsMetadata = class149
 	end
 
 	typeRegistry.default:register(v.OpenPurchasePromptAction_PurchaseAnalyticsMetadata)
 
 	do
-		local class148 = {}
-		class148.__index = class148
+		local class150 = {}
+		class150.__index = class150
 
-		function class148.new(p)
+		function class150.new(p)
 			local v3
 
 			if not (p == nil or p.surface == nil) then
@@ -23075,10 +23332,10 @@ do
 				v4 = p.product_universe_id
 			end
 
-			return (setmetatable({ surface = v3, product_universe_id = v4 }, class148))
+			return (setmetatable({ surface = v3, product_universe_id = v4 }, class150))
 		end
 
-		function class148:encode()
+		function class150:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -23099,8 +23356,8 @@ do
 			return buf
 		end
 
-		function class148.decode(buf: buffer)
-			local result = class148.new()
+		function class150.decode(buf: buffer)
+			local result = class150.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -23138,7 +23395,7 @@ do
 			return result
 		end
 
-		function class148:jsonEncode()
+		function class150:jsonEncode()
 			local v2 = {}
 
 			if self.surface ~= nil then
@@ -23152,8 +23409,8 @@ do
 			return v2
 		end
 
-		function class148.jsonDecode(data)
-			local v2 = class148.new()
+		function class150.jsonDecode(data)
+			local v2 = class150.new()
 
 			if data.surface ~= nil then
 				v2.surface = prop_types.StringProp.jsonDecode(data.surface)
@@ -23170,21 +23427,21 @@ do
 			return v2
 		end
 
-		class148.descriptor = {
+		class150.descriptor = {
 			name = "OpenPurchasePromptAction_PurchaseAnalyticsMetadata_PurchaseAnalyticsMetadataLiteral",
 			fullName = "roblox.apppageplatform.shared.v1beta1.PurchaseAnalyticsMetadataLiteral"
 		}
 
-		v.OpenPurchasePromptAction_PurchaseAnalyticsMetadata_PurchaseAnalyticsMetadataLiteral = class148
+		v.OpenPurchasePromptAction_PurchaseAnalyticsMetadata_PurchaseAnalyticsMetadataLiteral = class150
 	end
 
 	typeRegistry.default:register(v.OpenPurchasePromptAction_PurchaseAnalyticsMetadata_PurchaseAnalyticsMetadataLiteral)
 
 	do
-		local class149 = {}
-		class149.__index = class149
+		local class151 = {}
+		class151.__index = class151
 
-		function class149.new(data)
+		function class151.new(data)
 			local v3
 
 			if not (data == nil or data.product_payload == nil) then
@@ -23221,10 +23478,10 @@ do
 				purchase_options = v5,
 				purchase_analytics_metadata = v6,
 				root_place_id = v7
-			}, class149))
+			}, class151))
 		end
 
-		function class149:encode()
+		function class151:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -23263,8 +23520,8 @@ do
 			return buf
 		end
 
-		function class149.decode(buf: buffer)
-			local result = class149.new()
+		function class151.decode(buf: buffer)
+			local result = class151.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -23314,7 +23571,7 @@ do
 			return result
 		end
 
-		function class149:jsonEncode()
+		function class151:jsonEncode()
 			local v2 = {}
 
 			if self.product_payload ~= nil then
@@ -23340,8 +23597,8 @@ do
 			return v2
 		end
 
-		function class149.jsonDecode(data)
-			local v2 = class149.new()
+		function class151.jsonDecode(data)
+			local v2 = class151.new()
 
 			if data.product_payload ~= nil then
 				v2.product_payload = v.OpenPurchasePromptAction_ProductPayload.jsonDecode(data.product_payload)
@@ -23386,292 +23643,15 @@ do
 			return v2
 		end
 
-		class149.descriptor = {
+		class151.descriptor = {
 			name = "OpenPurchasePromptAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.OpenPurchasePromptAction_Params = class149
+		v.OpenPurchasePromptAction_Params = class151
 	end
 
 	typeRegistry.default:register(v.OpenPurchasePromptAction_Params)
-
-	do
-		local class150 = {}
-		class150.__index = class150
-
-		function class150.new(p)
-			local v3
-
-			if p == nil or p.action_type == nil then
-				v3 = assert(v.ActionType.fromNumber(0), "Enum has no 0 default")
-			else
-				v3 = p.action_type
-			end
-
-			local v4
-
-			if not (p == nil or p.action_params == nil) then
-				v4 = p.action_params
-			end
-
-			return (setmetatable({ action_type = v3, action_params = v4 }, class150))
-		end
-
-		function class150:encode()
-			local v2 = buffer.create(0)
-			local v3 = 0
-
-			if
-				self.action_type ~= nil
-				and (self.action_type ~= nil and self.action_type ~= 0 or self.action_type ~= v.ActionType.fromNumber(0))
-			then
-				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.varint)
-				v2, v3 = proto.writeVarInt(v4, v5, v.ActionType.toNumber(self.action_type))
-			end
-
-			if self.action_params ~= nil then
-				local encoded = self.action_params:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			local buf = buffer.create(v3)
-			buffer.copy(buf, 0, v2, 0, v3)
-			return buf
-		end
-
-		function class150.decode(buf: buffer)
-			local result = class150.new()
-			local v2 = 0
-
-			while v2 < buffer.len(buf) do
-				local v3, v4
-				v3, v4, v2 = proto.readTag(buf, v2)
-
-				if v4 == proto.wireTypes.varint then
-					if v3 == 1 then
-						local v5
-						v5, v2 = proto.readVarIntI32(buf, v2)
-						result.action_type = v.ActionType.fromNumber(v5) or v5
-					else
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					end
-				elseif v4 == proto.wireTypes.lengthDelimited then
-					if v3 == 2 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.ReportSurfaceLoadTimeMilestoneAction_Params.decode(v5)
-					else
-						local varInt, v5 = proto.readVarInt(buf, v2)
-
-						v2 = v5 + varInt
-					end
-				elseif v4 == proto.wireTypes.i32 then
-					local v5
-					v5, v2 = proto.readFixed32(buf, v2)
-				elseif v4 == proto.wireTypes.i64 then
-					local v5
-					v5, v2 = proto.readFixed64(buf, v2)
-				else
-					error("Unsupported wire type: " .. v4)
-				end
-			end
-
-			return result
-		end
-
-		function class150:jsonEncode()
-			local v2 = {}
-
-			if
-				self.action_type ~= nil
-				and (self.action_type ~= nil and self.action_type ~= 0 or self.action_type ~= v.ActionType.fromNumber(0))
-			then
-				local v3
-
-				if typeof(self.action_type) == "number" then
-					v3 = self.action_type
-				else
-					v3 = v.ActionType.toNumber(self.action_type)
-				end
-
-				v2.actionType = v3
-			end
-
-			if self.action_params ~= nil then
-				v2.actionParams = self.action_params:jsonEncode()
-			end
-
-			return v2
-		end
-
-		function class150.jsonDecode(data)
-			local v2 = class150.new()
-
-			if data.action_type ~= nil then
-				local v3
-
-				if typeof(data.action_type) == "number" then
-					v3 = v.ActionType.fromNumber(data.action_type) or data.action_type
-				else
-					v3 = v.ActionType.fromName(data.action_type) or data.action_type
-				end
-
-				v2.action_type = v3
-			end
-
-			if data.actionType ~= nil then
-				local v3
-
-				if typeof(data.actionType) == "number" then
-					v3 = v.ActionType.fromNumber(data.actionType) or data.actionType
-				else
-					v3 = v.ActionType.fromName(data.actionType) or data.actionType
-				end
-
-				v2.action_type = v3
-			end
-
-			if data.action_params ~= nil then
-				v2.action_params = v.ReportSurfaceLoadTimeMilestoneAction_Params.jsonDecode(data.action_params)
-			end
-
-			if data.actionParams ~= nil then
-				v2.action_params = v.ReportSurfaceLoadTimeMilestoneAction_Params.jsonDecode(data.actionParams)
-			end
-
-			return v2
-		end
-
-		class150.descriptor = {
-			name = "ReportSurfaceLoadTimeMilestoneAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.ReportSurfaceLoadTimeMilestoneAction"
-		}
-
-		v.ReportSurfaceLoadTimeMilestoneAction = class150
-	end
-
-	typeRegistry.default:register(v.ReportSurfaceLoadTimeMilestoneAction)
-
-	do
-		local class151 = {}
-		class151.__index = class151
-
-		function class151.new(p)
-			local v3
-
-			if not (p == nil or p.milestone == nil) then
-				v3 = p.milestone
-			end
-
-			local v4
-
-			if not (p == nil or p.metadata == nil) then
-				v4 = p.metadata
-			end
-
-			return (setmetatable({ milestone = v3, metadata = v4 }, class151))
-		end
-
-		function class151:encode()
-			local v2 = buffer.create(0)
-			local v3 = 0
-
-			if self.milestone ~= nil then
-				local encoded = self.milestone:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.metadata ~= nil then
-				local encoded = self.metadata:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			local buf = buffer.create(v3)
-			buffer.copy(buf, 0, v2, 0, v3)
-			return buf
-		end
-
-		function class151.decode(buf: buffer)
-			local result = class151.new()
-			local v2 = 0
-
-			while v2 < buffer.len(buf) do
-				local v3, v4
-				v3, v4, v2 = proto.readTag(buf, v2)
-
-				if v4 == proto.wireTypes.varint then
-					local v5
-					v5, v2 = proto.readVarInt(buf, v2)
-				elseif v4 == proto.wireTypes.lengthDelimited then
-					if v3 == 1 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.milestone = prop_types.StringProp.decode(v5)
-					elseif v3 == 3 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.metadata = prop_types.StructProp.decode(v5)
-					else
-						local varInt, v5 = proto.readVarInt(buf, v2)
-
-						v2 = v5 + varInt
-					end
-				elseif v4 == proto.wireTypes.i32 then
-					local v5
-					v5, v2 = proto.readFixed32(buf, v2)
-				elseif v4 == proto.wireTypes.i64 then
-					local v5
-					v5, v2 = proto.readFixed64(buf, v2)
-				else
-					error("Unsupported wire type: " .. v4)
-				end
-			end
-
-			return result
-		end
-
-		function class151:jsonEncode()
-			local v2 = {}
-
-			if self.milestone ~= nil then
-				v2.milestone = self.milestone:jsonEncode()
-			end
-
-			if self.metadata ~= nil then
-				v2.metadata = self.metadata:jsonEncode()
-			end
-
-			return v2
-		end
-
-		function class151.jsonDecode(p)
-			local v2 = class151.new()
-
-			if p.milestone ~= nil then
-				v2.milestone = prop_types.StringProp.jsonDecode(p.milestone)
-			end
-
-			if p.metadata ~= nil then
-				v2.metadata = prop_types.StructProp.jsonDecode(p.metadata)
-			end
-
-			return v2
-		end
-
-		class151.descriptor = {
-			name = "ReportSurfaceLoadTimeMilestoneAction_Params",
-			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
-		}
-
-		v.ReportSurfaceLoadTimeMilestoneAction_Params = class151
-	end
-
-	typeRegistry.default:register(v.ReportSurfaceLoadTimeMilestoneAction_Params)
 
 	do
 		local class152 = {}
@@ -23739,7 +23719,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.DismissGameFeedbackAction_Params.decode(v5)
+						result.action_params = v.ReportSurfaceLoadTimeMilestoneAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -23812,25 +23792,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.DismissGameFeedbackAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.ReportSurfaceLoadTimeMilestoneAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.DismissGameFeedbackAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.ReportSurfaceLoadTimeMilestoneAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class152.descriptor = {
-			name = "DismissGameFeedbackAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.DismissGameFeedbackAction"
+			name = "ReportSurfaceLoadTimeMilestoneAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.ReportSurfaceLoadTimeMilestoneAction"
 		}
 
-		v.DismissGameFeedbackAction = class152
+		v.ReportSurfaceLoadTimeMilestoneAction = class152
 	end
 
-	typeRegistry.default:register(v.DismissGameFeedbackAction)
+	typeRegistry.default:register(v.ReportSurfaceLoadTimeMilestoneAction)
 
 	do
 		local class153 = {}
@@ -23839,20 +23819,32 @@ do
 		function class153.new(p)
 			local v3
 
-			if not (p == nil or p.root_place_id == nil) then
-				v3 = p.root_place_id
+			if not (p == nil or p.milestone == nil) then
+				v3 = p.milestone
 			end
 
-			return (setmetatable({ root_place_id = v3 }, class153))
+			local v4
+
+			if not (p == nil or p.metadata == nil) then
+				v4 = p.metadata
+			end
+
+			return (setmetatable({ milestone = v3, metadata = v4 }, class153))
 		end
 
 		function class153:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.root_place_id ~= nil then
-				local encoded = self.root_place_id:encode()
+			if self.milestone ~= nil then
+				local encoded = self.milestone:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.metadata ~= nil then
+				local encoded = self.metadata:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -23876,7 +23868,11 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.root_place_id = prop_types.StringProp.decode(v5)
+						result.milestone = prop_types.StringProp.decode(v5)
+					elseif v3 == 3 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.metadata = prop_types.StructProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -23899,8 +23895,12 @@ do
 		function class153:jsonEncode()
 			local v2 = {}
 
-			if self.root_place_id ~= nil then
-				v2.rootPlaceId = self.root_place_id:jsonEncode()
+			if self.milestone ~= nil then
+				v2.milestone = self.milestone:jsonEncode()
+			end
+
+			if self.metadata ~= nil then
+				v2.metadata = self.metadata:jsonEncode()
 			end
 
 			return v2
@@ -23909,26 +23909,26 @@ do
 		function class153.jsonDecode(p)
 			local v2 = class153.new()
 
-			if p.root_place_id ~= nil then
-				v2.root_place_id = prop_types.StringProp.jsonDecode(p.root_place_id)
+			if p.milestone ~= nil then
+				v2.milestone = prop_types.StringProp.jsonDecode(p.milestone)
 			end
 
-			if p.rootPlaceId ~= nil then
-				v2.root_place_id = prop_types.StringProp.jsonDecode(p.rootPlaceId)
+			if p.metadata ~= nil then
+				v2.metadata = prop_types.StructProp.jsonDecode(p.metadata)
 			end
 
 			return v2
 		end
 
 		class153.descriptor = {
-			name = "DismissGameFeedbackAction_Params",
+			name = "ReportSurfaceLoadTimeMilestoneAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.DismissGameFeedbackAction_Params = class153
+		v.ReportSurfaceLoadTimeMilestoneAction_Params = class153
 	end
 
-	typeRegistry.default:register(v.DismissGameFeedbackAction_Params)
+	typeRegistry.default:register(v.ReportSurfaceLoadTimeMilestoneAction_Params)
 
 	do
 		local class154 = {}
@@ -23996,7 +23996,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.OpenGameFeedbackFormAction_Params.decode(v5)
+						result.action_params = v.DismissGameFeedbackAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -24069,25 +24069,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.OpenGameFeedbackFormAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.DismissGameFeedbackAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.OpenGameFeedbackFormAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.DismissGameFeedbackAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class154.descriptor = {
-			name = "OpenGameFeedbackFormAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.OpenGameFeedbackFormAction"
+			name = "DismissGameFeedbackAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.DismissGameFeedbackAction"
 		}
 
-		v.OpenGameFeedbackFormAction = class154
+		v.DismissGameFeedbackAction = class154
 	end
 
-	typeRegistry.default:register(v.OpenGameFeedbackFormAction)
+	typeRegistry.default:register(v.DismissGameFeedbackAction)
 
 	do
 		local class155 = {}
@@ -24096,32 +24096,20 @@ do
 		function class155.new(p)
 			local v3
 
-			if not (p == nil or p.universe_id == nil) then
-				v3 = p.universe_id
-			end
-
-			local v4
-
 			if not (p == nil or p.root_place_id == nil) then
-				v4 = p.root_place_id
+				v3 = p.root_place_id
 			end
 
-			return (setmetatable({ universe_id = v3, root_place_id = v4 }, class155))
+			return (setmetatable({ root_place_id = v3 }, class155))
 		end
 
 		function class155:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.universe_id ~= nil then
-				local encoded = self.universe_id:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
 			if self.root_place_id ~= nil then
 				local encoded = self.root_place_id:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -24143,10 +24131,6 @@ do
 					v5, v2 = proto.readVarInt(buf, v2)
 				elseif v4 == proto.wireTypes.lengthDelimited then
 					if v3 == 1 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.universe_id = prop_types.StringProp.decode(v5)
-					elseif v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
 						result.root_place_id = prop_types.StringProp.decode(v5)
@@ -24172,10 +24156,6 @@ do
 		function class155:jsonEncode()
 			local v2 = {}
 
-			if self.universe_id ~= nil then
-				v2.universeId = self.universe_id:jsonEncode()
-			end
-
 			if self.root_place_id ~= nil then
 				v2.rootPlaceId = self.root_place_id:jsonEncode()
 			end
@@ -24183,37 +24163,29 @@ do
 			return v2
 		end
 
-		function class155.jsonDecode(data)
+		function class155.jsonDecode(p)
 			local v2 = class155.new()
 
-			if data.universe_id ~= nil then
-				v2.universe_id = prop_types.StringProp.jsonDecode(data.universe_id)
+			if p.root_place_id ~= nil then
+				v2.root_place_id = prop_types.StringProp.jsonDecode(p.root_place_id)
 			end
 
-			if data.universeId ~= nil then
-				v2.universe_id = prop_types.StringProp.jsonDecode(data.universeId)
-			end
-
-			if data.root_place_id ~= nil then
-				v2.root_place_id = prop_types.StringProp.jsonDecode(data.root_place_id)
-			end
-
-			if data.rootPlaceId ~= nil then
-				v2.root_place_id = prop_types.StringProp.jsonDecode(data.rootPlaceId)
+			if p.rootPlaceId ~= nil then
+				v2.root_place_id = prop_types.StringProp.jsonDecode(p.rootPlaceId)
 			end
 
 			return v2
 		end
 
 		class155.descriptor = {
-			name = "OpenGameFeedbackFormAction_Params",
+			name = "DismissGameFeedbackAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.OpenGameFeedbackFormAction_Params = class155
+		v.DismissGameFeedbackAction_Params = class155
 	end
 
-	typeRegistry.default:register(v.OpenGameFeedbackFormAction_Params)
+	typeRegistry.default:register(v.DismissGameFeedbackAction_Params)
 
 	do
 		local class156 = {}
@@ -24281,7 +24253,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.AiOverviewFeedbackAction_Params.decode(v5)
+						result.action_params = v.OpenGameFeedbackFormAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -24354,86 +24326,59 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.AiOverviewFeedbackAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.OpenGameFeedbackFormAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.AiOverviewFeedbackAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.OpenGameFeedbackFormAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class156.descriptor = {
-			name = "AiOverviewFeedbackAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.AiOverviewFeedbackAction"
+			name = "OpenGameFeedbackFormAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.OpenGameFeedbackFormAction"
 		}
 
-		v.AiOverviewFeedbackAction = class156
+		v.OpenGameFeedbackFormAction = class156
 	end
 
-	typeRegistry.default:register(v.AiOverviewFeedbackAction)
+	typeRegistry.default:register(v.OpenGameFeedbackFormAction)
 
 	do
 		local class157 = {}
 		class157.__index = class157
 
-		function class157.new(data)
+		function class157.new(p)
 			local v3
 
-			if not (data == nil or data.sentiment == nil) then
-				v3 = data.sentiment
+			if not (p == nil or p.universe_id == nil) then
+				v3 = p.universe_id
 			end
 
 			local v4
 
-			if not (data == nil or data.dialog_title == nil) then
-				v4 = data.dialog_title
+			if not (p == nil or p.root_place_id == nil) then
+				v4 = p.root_place_id
 			end
 
-			local v5
-
-			if not (data == nil or data.dialog_text == nil) then
-				v5 = data.dialog_text
-			end
-
-			local v6
-
-			if not (data == nil or data.placeholder_text == nil) then
-				v6 = data.placeholder_text
-			end
-
-			return (setmetatable(
-				{ sentiment = v3, dialog_title = v4, dialog_text = v5, placeholder_text = v6 },
-				class157
-			))
+			return (setmetatable({ universe_id = v3, root_place_id = v4 }, class157))
 		end
 
 		function class157:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.sentiment ~= nil then
-				local encoded = self.sentiment:encode()
+			if self.universe_id ~= nil then
+				local encoded = self.universe_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.dialog_title ~= nil then
-				local encoded = self.dialog_title:encode()
+			if self.root_place_id ~= nil then
+				local encoded = self.root_place_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.dialog_text ~= nil then
-				local encoded = self.dialog_text:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.placeholder_text ~= nil then
-				local encoded = self.placeholder_text:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -24457,19 +24402,11 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.sentiment = prop_types.StringProp.decode(v5)
+						result.universe_id = prop_types.StringProp.decode(v5)
 					elseif v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.dialog_title = prop_types.StringProp.decode(v5)
-					elseif v3 == 3 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.dialog_text = prop_types.StringProp.decode(v5)
-					elseif v3 == 4 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.placeholder_text = prop_types.StringProp.decode(v5)
+						result.root_place_id = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -24492,20 +24429,12 @@ do
 		function class157:jsonEncode()
 			local v2 = {}
 
-			if self.sentiment ~= nil then
-				v2.sentiment = self.sentiment:jsonEncode()
+			if self.universe_id ~= nil then
+				v2.universeId = self.universe_id:jsonEncode()
 			end
 
-			if self.dialog_title ~= nil then
-				v2.dialogTitle = self.dialog_title:jsonEncode()
-			end
-
-			if self.dialog_text ~= nil then
-				v2.dialogText = self.dialog_text:jsonEncode()
-			end
-
-			if self.placeholder_text ~= nil then
-				v2.placeholderText = self.placeholder_text:jsonEncode()
+			if self.root_place_id ~= nil then
+				v2.rootPlaceId = self.root_place_id:jsonEncode()
 			end
 
 			return v2
@@ -24514,46 +24443,34 @@ do
 		function class157.jsonDecode(data)
 			local v2 = class157.new()
 
-			if data.sentiment ~= nil then
-				v2.sentiment = prop_types.StringProp.jsonDecode(data.sentiment)
+			if data.universe_id ~= nil then
+				v2.universe_id = prop_types.StringProp.jsonDecode(data.universe_id)
 			end
 
-			if data.dialog_title ~= nil then
-				v2.dialog_title = prop_types.StringProp.jsonDecode(data.dialog_title)
+			if data.universeId ~= nil then
+				v2.universe_id = prop_types.StringProp.jsonDecode(data.universeId)
 			end
 
-			if data.dialogTitle ~= nil then
-				v2.dialog_title = prop_types.StringProp.jsonDecode(data.dialogTitle)
+			if data.root_place_id ~= nil then
+				v2.root_place_id = prop_types.StringProp.jsonDecode(data.root_place_id)
 			end
 
-			if data.dialog_text ~= nil then
-				v2.dialog_text = prop_types.StringProp.jsonDecode(data.dialog_text)
-			end
-
-			if data.dialogText ~= nil then
-				v2.dialog_text = prop_types.StringProp.jsonDecode(data.dialogText)
-			end
-
-			if data.placeholder_text ~= nil then
-				v2.placeholder_text = prop_types.StringProp.jsonDecode(data.placeholder_text)
-			end
-
-			if data.placeholderText ~= nil then
-				v2.placeholder_text = prop_types.StringProp.jsonDecode(data.placeholderText)
+			if data.rootPlaceId ~= nil then
+				v2.root_place_id = prop_types.StringProp.jsonDecode(data.rootPlaceId)
 			end
 
 			return v2
 		end
 
 		class157.descriptor = {
-			name = "AiOverviewFeedbackAction_Params",
+			name = "OpenGameFeedbackFormAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.AiOverviewFeedbackAction_Params = class157
+		v.OpenGameFeedbackFormAction_Params = class157
 	end
 
-	typeRegistry.default:register(v.AiOverviewFeedbackAction_Params)
+	typeRegistry.default:register(v.OpenGameFeedbackFormAction_Params)
 
 	do
 		local class158 = {}
@@ -24621,7 +24538,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.EnableEventNotificationsAction_Params.decode(v5)
+						result.action_params = v.AiOverviewFeedbackAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -24694,25 +24611,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.EnableEventNotificationsAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.AiOverviewFeedbackAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.EnableEventNotificationsAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.AiOverviewFeedbackAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class158.descriptor = {
-			name = "EnableEventNotificationsAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.EnableEventNotificationsAction"
+			name = "AiOverviewFeedbackAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.AiOverviewFeedbackAction"
 		}
 
-		v.EnableEventNotificationsAction = class158
+		v.AiOverviewFeedbackAction = class158
 	end
 
-	typeRegistry.default:register(v.EnableEventNotificationsAction)
+	typeRegistry.default:register(v.AiOverviewFeedbackAction)
 
 	do
 		local class159 = {}
@@ -24721,44 +24638,59 @@ do
 		function class159.new(data)
 			local v3
 
-			if not (data == nil or data.event_id == nil) then
-				v3 = data.event_id
+			if not (data == nil or data.sentiment == nil) then
+				v3 = data.sentiment
 			end
 
 			local v4
 
-			if not (data == nil or data.universe_id == nil) then
-				v4 = data.universe_id
+			if not (data == nil or data.dialog_title == nil) then
+				v4 = data.dialog_title
 			end
 
 			local v5
 
-			if not (data == nil or data.channel == nil) then
-				v5 = data.channel
+			if not (data == nil or data.dialog_text == nil) then
+				v5 = data.dialog_text
 			end
 
-			return (setmetatable({ event_id = v3, universe_id = v4, channel = v5 }, class159))
+			local v6
+
+			if not (data == nil or data.placeholder_text == nil) then
+				v6 = data.placeholder_text
+			end
+
+			return (setmetatable(
+				{ sentiment = v3, dialog_title = v4, dialog_text = v5, placeholder_text = v6 },
+				class159
+			))
 		end
 
 		function class159:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.event_id ~= nil then
-				local encoded = self.event_id:encode()
+			if self.sentiment ~= nil then
+				local encoded = self.sentiment:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.universe_id ~= nil then
-				local encoded = self.universe_id:encode()
+			if self.dialog_title ~= nil then
+				local encoded = self.dialog_title:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.channel ~= nil then
-				local encoded = self.channel:encode()
+			if self.dialog_text ~= nil then
+				local encoded = self.dialog_text:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.placeholder_text ~= nil then
+				local encoded = self.placeholder_text:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -24782,15 +24714,19 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.event_id = prop_types.StringProp.decode(v5)
+						result.sentiment = prop_types.StringProp.decode(v5)
 					elseif v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.universe_id = prop_types.StringProp.decode(v5)
+						result.dialog_title = prop_types.StringProp.decode(v5)
 					elseif v3 == 3 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.channel = prop_types.StringProp.decode(v5)
+						result.dialog_text = prop_types.StringProp.decode(v5)
+					elseif v3 == 4 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.placeholder_text = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -24813,16 +24749,20 @@ do
 		function class159:jsonEncode()
 			local v2 = {}
 
-			if self.event_id ~= nil then
-				v2.eventId = self.event_id:jsonEncode()
+			if self.sentiment ~= nil then
+				v2.sentiment = self.sentiment:jsonEncode()
 			end
 
-			if self.universe_id ~= nil then
-				v2.universeId = self.universe_id:jsonEncode()
+			if self.dialog_title ~= nil then
+				v2.dialogTitle = self.dialog_title:jsonEncode()
 			end
 
-			if self.channel ~= nil then
-				v2.channel = self.channel:jsonEncode()
+			if self.dialog_text ~= nil then
+				v2.dialogText = self.dialog_text:jsonEncode()
+			end
+
+			if self.placeholder_text ~= nil then
+				v2.placeholderText = self.placeholder_text:jsonEncode()
 			end
 
 			return v2
@@ -24831,38 +24771,46 @@ do
 		function class159.jsonDecode(data)
 			local v2 = class159.new()
 
-			if data.event_id ~= nil then
-				v2.event_id = prop_types.StringProp.jsonDecode(data.event_id)
+			if data.sentiment ~= nil then
+				v2.sentiment = prop_types.StringProp.jsonDecode(data.sentiment)
 			end
 
-			if data.eventId ~= nil then
-				v2.event_id = prop_types.StringProp.jsonDecode(data.eventId)
+			if data.dialog_title ~= nil then
+				v2.dialog_title = prop_types.StringProp.jsonDecode(data.dialog_title)
 			end
 
-			if data.universe_id ~= nil then
-				v2.universe_id = prop_types.StringProp.jsonDecode(data.universe_id)
+			if data.dialogTitle ~= nil then
+				v2.dialog_title = prop_types.StringProp.jsonDecode(data.dialogTitle)
 			end
 
-			if data.universeId ~= nil then
-				v2.universe_id = prop_types.StringProp.jsonDecode(data.universeId)
+			if data.dialog_text ~= nil then
+				v2.dialog_text = prop_types.StringProp.jsonDecode(data.dialog_text)
 			end
 
-			if data.channel ~= nil then
-				v2.channel = prop_types.StringProp.jsonDecode(data.channel)
+			if data.dialogText ~= nil then
+				v2.dialog_text = prop_types.StringProp.jsonDecode(data.dialogText)
+			end
+
+			if data.placeholder_text ~= nil then
+				v2.placeholder_text = prop_types.StringProp.jsonDecode(data.placeholder_text)
+			end
+
+			if data.placeholderText ~= nil then
+				v2.placeholder_text = prop_types.StringProp.jsonDecode(data.placeholderText)
 			end
 
 			return v2
 		end
 
 		class159.descriptor = {
-			name = "EnableEventNotificationsAction_Params",
+			name = "AiOverviewFeedbackAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.EnableEventNotificationsAction_Params = class159
+		v.AiOverviewFeedbackAction_Params = class159
 	end
 
-	typeRegistry.default:register(v.EnableEventNotificationsAction_Params)
+	typeRegistry.default:register(v.AiOverviewFeedbackAction_Params)
 
 	do
 		local class160 = {}
@@ -24930,7 +24878,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.DismissEventNotificationsModalAction_Params.decode(v5)
+						result.action_params = v.EnableEventNotificationsAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -25003,38 +24951,50 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.DismissEventNotificationsModalAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.EnableEventNotificationsAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.DismissEventNotificationsModalAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.EnableEventNotificationsAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class160.descriptor = {
-			name = "DismissEventNotificationsModalAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.DismissEventNotificationsModalAction"
+			name = "EnableEventNotificationsAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.EnableEventNotificationsAction"
 		}
 
-		v.DismissEventNotificationsModalAction = class160
+		v.EnableEventNotificationsAction = class160
 	end
 
-	typeRegistry.default:register(v.DismissEventNotificationsModalAction)
+	typeRegistry.default:register(v.EnableEventNotificationsAction)
 
 	do
 		local class161 = {}
 		class161.__index = class161
 
-		function class161.new(p)
+		function class161.new(data)
 			local v3
 
-			if not (p == nil or p.event_id == nil) then
-				v3 = p.event_id
+			if not (data == nil or data.event_id == nil) then
+				v3 = data.event_id
 			end
 
-			return (setmetatable({ event_id = v3 }, class161))
+			local v4
+
+			if not (data == nil or data.universe_id == nil) then
+				v4 = data.universe_id
+			end
+
+			local v5
+
+			if not (data == nil or data.channel == nil) then
+				v5 = data.channel
+			end
+
+			return (setmetatable({ event_id = v3, universe_id = v4, channel = v5 }, class161))
 		end
 
 		function class161:encode()
@@ -25044,6 +25004,18 @@ do
 			if self.event_id ~= nil then
 				local encoded = self.event_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.universe_id ~= nil then
+				local encoded = self.universe_id:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.channel ~= nil then
+				local encoded = self.channel:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -25068,6 +25040,14 @@ do
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
 						result.event_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 2 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.universe_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 3 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.channel = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -25094,32 +25074,52 @@ do
 				v2.eventId = self.event_id:jsonEncode()
 			end
 
+			if self.universe_id ~= nil then
+				v2.universeId = self.universe_id:jsonEncode()
+			end
+
+			if self.channel ~= nil then
+				v2.channel = self.channel:jsonEncode()
+			end
+
 			return v2
 		end
 
-		function class161.jsonDecode(p)
+		function class161.jsonDecode(data)
 			local v2 = class161.new()
 
-			if p.event_id ~= nil then
-				v2.event_id = prop_types.StringProp.jsonDecode(p.event_id)
+			if data.event_id ~= nil then
+				v2.event_id = prop_types.StringProp.jsonDecode(data.event_id)
 			end
 
-			if p.eventId ~= nil then
-				v2.event_id = prop_types.StringProp.jsonDecode(p.eventId)
+			if data.eventId ~= nil then
+				v2.event_id = prop_types.StringProp.jsonDecode(data.eventId)
+			end
+
+			if data.universe_id ~= nil then
+				v2.universe_id = prop_types.StringProp.jsonDecode(data.universe_id)
+			end
+
+			if data.universeId ~= nil then
+				v2.universe_id = prop_types.StringProp.jsonDecode(data.universeId)
+			end
+
+			if data.channel ~= nil then
+				v2.channel = prop_types.StringProp.jsonDecode(data.channel)
 			end
 
 			return v2
 		end
 
 		class161.descriptor = {
-			name = "DismissEventNotificationsModalAction_Params",
+			name = "EnableEventNotificationsAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.DismissEventNotificationsModalAction_Params = class161
+		v.EnableEventNotificationsAction_Params = class161
 	end
 
-	typeRegistry.default:register(v.DismissEventNotificationsModalAction_Params)
+	typeRegistry.default:register(v.EnableEventNotificationsAction_Params)
 
 	do
 		local class162 = {}
@@ -25187,7 +25187,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.OpenAmpWizardAction_Params.decode(v5)
+						result.action_params = v.DismissEventNotificationsModalAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -25260,114 +25260,47 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.OpenAmpWizardAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.DismissEventNotificationsModalAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.OpenAmpWizardAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.DismissEventNotificationsModalAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class162.descriptor = {
-			name = "OpenAmpWizardAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.OpenAmpWizardAction"
+			name = "DismissEventNotificationsModalAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.DismissEventNotificationsModalAction"
 		}
 
-		v.OpenAmpWizardAction = class162
+		v.DismissEventNotificationsModalAction = class162
 	end
 
-	typeRegistry.default:register(v.OpenAmpWizardAction)
+	typeRegistry.default:register(v.DismissEventNotificationsModalAction)
 
 	do
 		local class163 = {}
 		class163.__index = class163
 
-		function class163.new(data)
+		function class163.new(p)
 			local v3
 
-			if not (data == nil or data.feature_name == nil) then
-				v3 = data.feature_name
+			if not (p == nil or p.event_id == nil) then
+				v3 = p.event_id
 			end
 
-			local v4
-
-			if not (data == nil or data.name_space == nil) then
-				v4 = data.name_space
-			end
-
-			local v5
-
-			if not (data == nil or data.entry_point_event_ctx == nil) then
-				v5 = data.entry_point_event_ctx
-			end
-
-			local v6
-
-			if not (data == nil or data.skip_facial_age_estimation_web_link_modal == nil) then
-				v6 = data.skip_facial_age_estimation_web_link_modal
-			end
-
-			local v7
-
-			if not (data == nil or data.on_open == nil) then
-				v7 = data.on_open
-			end
-
-			local v8
-
-			if not (data == nil or data.on_success == nil) then
-				v8 = data.on_success
-			end
-
-			return (setmetatable({
-				feature_name = v3,
-				name_space = v4,
-				entry_point_event_ctx = v5,
-				skip_facial_age_estimation_web_link_modal = v6,
-				on_open = v7,
-				on_success = v8
-			}, class163))
+			return (setmetatable({ event_id = v3 }, class163))
 		end
 
 		function class163:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.feature_name ~= nil then
-				local encoded = self.feature_name:encode()
+			if self.event_id ~= nil then
+				local encoded = self.event_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.name_space ~= nil then
-				local encoded = self.name_space:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.entry_point_event_ctx ~= nil then
-				local encoded = self.entry_point_event_ctx:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.skip_facial_age_estimation_web_link_modal ~= nil then
-				local encoded = self.skip_facial_age_estimation_web_link_modal:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.on_open ~= nil then
-				local encoded = self.on_open:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.on_success ~= nil then
-				local encoded = self.on_success:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 6, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -25391,27 +25324,7 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.feature_name = prop_types.StringProp.decode(v5)
-					elseif v3 == 2 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.name_space = prop_types.StringProp.decode(v5)
-					elseif v3 == 3 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.entry_point_event_ctx = prop_types.StringProp.decode(v5)
-					elseif v3 == 4 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.skip_facial_age_estimation_web_link_modal = prop_types.BoolProp.decode(v5)
-					elseif v3 == 5 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.on_open = v.ActionProp.decode(v5)
-					elseif v3 == 6 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.on_success = v.ActionProp.decode(v5)
+						result.event_id = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -25434,96 +25347,36 @@ do
 		function class163:jsonEncode()
 			local v2 = {}
 
-			if self.feature_name ~= nil then
-				v2.featureName = self.feature_name:jsonEncode()
-			end
-
-			if self.name_space ~= nil then
-				v2.nameSpace = self.name_space:jsonEncode()
-			end
-
-			if self.entry_point_event_ctx ~= nil then
-				v2.entryPointEventCtx = self.entry_point_event_ctx:jsonEncode()
-			end
-
-			if self.skip_facial_age_estimation_web_link_modal ~= nil then
-				v2.skipFacialAgeEstimationWebLinkModal = self.skip_facial_age_estimation_web_link_modal:jsonEncode()
-			end
-
-			if self.on_open ~= nil then
-				v2.onOpen = self.on_open:jsonEncode()
-			end
-
-			if self.on_success ~= nil then
-				v2.onSuccess = self.on_success:jsonEncode()
+			if self.event_id ~= nil then
+				v2.eventId = self.event_id:jsonEncode()
 			end
 
 			return v2
 		end
 
-		function class163.jsonDecode(data)
+		function class163.jsonDecode(p)
 			local v2 = class163.new()
 
-			if data.feature_name ~= nil then
-				v2.feature_name = prop_types.StringProp.jsonDecode(data.feature_name)
+			if p.event_id ~= nil then
+				v2.event_id = prop_types.StringProp.jsonDecode(p.event_id)
 			end
 
-			if data.featureName ~= nil then
-				v2.feature_name = prop_types.StringProp.jsonDecode(data.featureName)
-			end
-
-			if data.name_space ~= nil then
-				v2.name_space = prop_types.StringProp.jsonDecode(data.name_space)
-			end
-
-			if data.nameSpace ~= nil then
-				v2.name_space = prop_types.StringProp.jsonDecode(data.nameSpace)
-			end
-
-			if data.entry_point_event_ctx ~= nil then
-				v2.entry_point_event_ctx = prop_types.StringProp.jsonDecode(data.entry_point_event_ctx)
-			end
-
-			if data.entryPointEventCtx ~= nil then
-				v2.entry_point_event_ctx = prop_types.StringProp.jsonDecode(data.entryPointEventCtx)
-			end
-
-			if data.skip_facial_age_estimation_web_link_modal ~= nil then
-				v2.skip_facial_age_estimation_web_link_modal = prop_types.BoolProp.jsonDecode(data.skip_facial_age_estimation_web_link_modal)
-			end
-
-			if data.skipFacialAgeEstimationWebLinkModal ~= nil then
-				v2.skip_facial_age_estimation_web_link_modal = prop_types.BoolProp.jsonDecode(data.skipFacialAgeEstimationWebLinkModal)
-			end
-
-			if data.on_open ~= nil then
-				v2.on_open = v.ActionProp.jsonDecode(data.on_open)
-			end
-
-			if data.onOpen ~= nil then
-				v2.on_open = v.ActionProp.jsonDecode(data.onOpen)
-			end
-
-			if data.on_success ~= nil then
-				v2.on_success = v.ActionProp.jsonDecode(data.on_success)
-			end
-
-			if data.onSuccess ~= nil then
-				v2.on_success = v.ActionProp.jsonDecode(data.onSuccess)
+			if p.eventId ~= nil then
+				v2.event_id = prop_types.StringProp.jsonDecode(p.eventId)
 			end
 
 			return v2
 		end
 
 		class163.descriptor = {
-			name = "OpenAmpWizardAction_Params",
+			name = "DismissEventNotificationsModalAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.OpenAmpWizardAction_Params = class163
+		v.DismissEventNotificationsModalAction_Params = class163
 	end
 
-	typeRegistry.default:register(v.OpenAmpWizardAction_Params)
+	typeRegistry.default:register(v.DismissEventNotificationsModalAction_Params)
 
 	do
 		local class164 = {}
@@ -25591,7 +25444,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.OpenSocialProofUserListSheetAction_Params.decode(v5)
+						result.action_params = v.OpenAmpWizardAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -25664,25 +25517,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.OpenSocialProofUserListSheetAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.OpenAmpWizardAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.OpenSocialProofUserListSheetAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.OpenAmpWizardAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class164.descriptor = {
-			name = "OpenSocialProofUserListSheetAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.OpenSocialProofUserListSheetAction"
+			name = "OpenAmpWizardAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.OpenAmpWizardAction"
 		}
 
-		v.OpenSocialProofUserListSheetAction = class164
+		v.OpenAmpWizardAction = class164
 	end
 
-	typeRegistry.default:register(v.OpenSocialProofUserListSheetAction)
+	typeRegistry.default:register(v.OpenAmpWizardAction)
 
 	do
 		local class165 = {}
@@ -25691,40 +25544,47 @@ do
 		function class165.new(data)
 			local v3
 
-			if not (data == nil or data.universe_id == nil) then
-				v3 = data.universe_id
+			if not (data == nil or data.feature_name == nil) then
+				v3 = data.feature_name
 			end
 
 			local v4
 
-			if not (data == nil or data.place_id == nil) then
-				v4 = data.place_id
+			if not (data == nil or data.name_space == nil) then
+				v4 = data.name_space
 			end
 
 			local v5
 
-			if not (data == nil or data.total_connections == nil) then
-				v5 = data.total_connections
+			if not (data == nil or data.entry_point_event_ctx == nil) then
+				v5 = data.entry_point_event_ctx
 			end
 
 			local v6
 
-			if not (data == nil or data.user_ids == nil) then
-				v6 = data.user_ids
+			if not (data == nil or data.skip_facial_age_estimation_web_link_modal == nil) then
+				v6 = data.skip_facial_age_estimation_web_link_modal
 			end
 
 			local v7
 
-			if not (data == nil or data.sheet_title == nil) then
-				v7 = data.sheet_title
+			if not (data == nil or data.on_open == nil) then
+				v7 = data.on_open
+			end
+
+			local v8
+
+			if not (data == nil or data.on_success == nil) then
+				v8 = data.on_success
 			end
 
 			return (setmetatable({
-				universe_id = v3,
-				place_id = v4,
-				total_connections = v5,
-				user_ids = v6,
-				sheet_title = v7
+				feature_name = v3,
+				name_space = v4,
+				entry_point_event_ctx = v5,
+				skip_facial_age_estimation_web_link_modal = v6,
+				on_open = v7,
+				on_success = v8
 			}, class165))
 		end
 
@@ -25732,33 +25592,39 @@ do
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.universe_id ~= nil then
-				local encoded = self.universe_id:encode()
+			if self.feature_name ~= nil then
+				local encoded = self.feature_name:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.place_id ~= nil then
-				local encoded = self.place_id:encode()
+			if self.name_space ~= nil then
+				local encoded = self.name_space:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.total_connections ~= nil then
-				local encoded = self.total_connections:encode()
+			if self.entry_point_event_ctx ~= nil then
+				local encoded = self.entry_point_event_ctx:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.user_ids ~= nil then
-				local encoded = self.user_ids:encode()
+			if self.skip_facial_age_estimation_web_link_modal ~= nil then
+				local encoded = self.skip_facial_age_estimation_web_link_modal:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.sheet_title ~= nil then
-				local encoded = self.sheet_title:encode()
+			if self.on_open ~= nil then
+				local encoded = self.on_open:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.on_success ~= nil then
+				local encoded = self.on_success:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 6, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -25782,23 +25648,27 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.universe_id = prop_types.StringProp.decode(v5)
+						result.feature_name = prop_types.StringProp.decode(v5)
 					elseif v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.place_id = prop_types.StringProp.decode(v5)
+						result.name_space = prop_types.StringProp.decode(v5)
 					elseif v3 == 3 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.total_connections = prop_types.Int32Prop.decode(v5)
+						result.entry_point_event_ctx = prop_types.StringProp.decode(v5)
 					elseif v3 == 4 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.user_ids = prop_types.ArrayOfAvatarProp.decode(v5)
+						result.skip_facial_age_estimation_web_link_modal = prop_types.BoolProp.decode(v5)
 					elseif v3 == 5 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.sheet_title = prop_types.StringProp.decode(v5)
+						result.on_open = v.ActionProp.decode(v5)
+					elseif v3 == 6 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.on_success = v.ActionProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -25821,24 +25691,28 @@ do
 		function class165:jsonEncode()
 			local v2 = {}
 
-			if self.universe_id ~= nil then
-				v2.universeId = self.universe_id:jsonEncode()
+			if self.feature_name ~= nil then
+				v2.featureName = self.feature_name:jsonEncode()
 			end
 
-			if self.place_id ~= nil then
-				v2.placeId = self.place_id:jsonEncode()
+			if self.name_space ~= nil then
+				v2.nameSpace = self.name_space:jsonEncode()
 			end
 
-			if self.total_connections ~= nil then
-				v2.totalConnections = self.total_connections:jsonEncode()
+			if self.entry_point_event_ctx ~= nil then
+				v2.entryPointEventCtx = self.entry_point_event_ctx:jsonEncode()
 			end
 
-			if self.user_ids ~= nil then
-				v2.userIds = self.user_ids:jsonEncode()
+			if self.skip_facial_age_estimation_web_link_modal ~= nil then
+				v2.skipFacialAgeEstimationWebLinkModal = self.skip_facial_age_estimation_web_link_modal:jsonEncode()
 			end
 
-			if self.sheet_title ~= nil then
-				v2.sheetTitle = self.sheet_title:jsonEncode()
+			if self.on_open ~= nil then
+				v2.onOpen = self.on_open:jsonEncode()
+			end
+
+			if self.on_success ~= nil then
+				v2.onSuccess = self.on_success:jsonEncode()
 			end
 
 			return v2
@@ -25847,58 +25721,66 @@ do
 		function class165.jsonDecode(data)
 			local v2 = class165.new()
 
-			if data.universe_id ~= nil then
-				v2.universe_id = prop_types.StringProp.jsonDecode(data.universe_id)
+			if data.feature_name ~= nil then
+				v2.feature_name = prop_types.StringProp.jsonDecode(data.feature_name)
 			end
 
-			if data.universeId ~= nil then
-				v2.universe_id = prop_types.StringProp.jsonDecode(data.universeId)
+			if data.featureName ~= nil then
+				v2.feature_name = prop_types.StringProp.jsonDecode(data.featureName)
 			end
 
-			if data.place_id ~= nil then
-				v2.place_id = prop_types.StringProp.jsonDecode(data.place_id)
+			if data.name_space ~= nil then
+				v2.name_space = prop_types.StringProp.jsonDecode(data.name_space)
 			end
 
-			if data.placeId ~= nil then
-				v2.place_id = prop_types.StringProp.jsonDecode(data.placeId)
+			if data.nameSpace ~= nil then
+				v2.name_space = prop_types.StringProp.jsonDecode(data.nameSpace)
 			end
 
-			if data.total_connections ~= nil then
-				v2.total_connections = prop_types.Int32Prop.jsonDecode(data.total_connections)
+			if data.entry_point_event_ctx ~= nil then
+				v2.entry_point_event_ctx = prop_types.StringProp.jsonDecode(data.entry_point_event_ctx)
 			end
 
-			if data.totalConnections ~= nil then
-				v2.total_connections = prop_types.Int32Prop.jsonDecode(data.totalConnections)
+			if data.entryPointEventCtx ~= nil then
+				v2.entry_point_event_ctx = prop_types.StringProp.jsonDecode(data.entryPointEventCtx)
 			end
 
-			if data.user_ids ~= nil then
-				v2.user_ids = prop_types.ArrayOfAvatarProp.jsonDecode(data.user_ids)
+			if data.skip_facial_age_estimation_web_link_modal ~= nil then
+				v2.skip_facial_age_estimation_web_link_modal = prop_types.BoolProp.jsonDecode(data.skip_facial_age_estimation_web_link_modal)
 			end
 
-			if data.userIds ~= nil then
-				v2.user_ids = prop_types.ArrayOfAvatarProp.jsonDecode(data.userIds)
+			if data.skipFacialAgeEstimationWebLinkModal ~= nil then
+				v2.skip_facial_age_estimation_web_link_modal = prop_types.BoolProp.jsonDecode(data.skipFacialAgeEstimationWebLinkModal)
 			end
 
-			if data.sheet_title ~= nil then
-				v2.sheet_title = prop_types.StringProp.jsonDecode(data.sheet_title)
+			if data.on_open ~= nil then
+				v2.on_open = v.ActionProp.jsonDecode(data.on_open)
 			end
 
-			if data.sheetTitle ~= nil then
-				v2.sheet_title = prop_types.StringProp.jsonDecode(data.sheetTitle)
+			if data.onOpen ~= nil then
+				v2.on_open = v.ActionProp.jsonDecode(data.onOpen)
+			end
+
+			if data.on_success ~= nil then
+				v2.on_success = v.ActionProp.jsonDecode(data.on_success)
+			end
+
+			if data.onSuccess ~= nil then
+				v2.on_success = v.ActionProp.jsonDecode(data.onSuccess)
 			end
 
 			return v2
 		end
 
 		class165.descriptor = {
-			name = "OpenSocialProofUserListSheetAction_Params",
+			name = "OpenAmpWizardAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.OpenSocialProofUserListSheetAction_Params = class165
+		v.OpenAmpWizardAction_Params = class165
 	end
 
-	typeRegistry.default:register(v.OpenSocialProofUserListSheetAction_Params)
+	typeRegistry.default:register(v.OpenAmpWizardAction_Params)
 
 	do
 		local class166 = {}
@@ -25966,7 +25848,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.OpenSearchResultsTabAction_Params.decode(v5)
+						result.action_params = v.OpenSocialProofUserListSheetAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -26039,47 +25921,101 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.OpenSearchResultsTabAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.OpenSocialProofUserListSheetAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.OpenSearchResultsTabAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.OpenSocialProofUserListSheetAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class166.descriptor = {
-			name = "OpenSearchResultsTabAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.OpenSearchResultsTabAction"
+			name = "OpenSocialProofUserListSheetAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.OpenSocialProofUserListSheetAction"
 		}
 
-		v.OpenSearchResultsTabAction = class166
+		v.OpenSocialProofUserListSheetAction = class166
 	end
 
-	typeRegistry.default:register(v.OpenSearchResultsTabAction)
+	typeRegistry.default:register(v.OpenSocialProofUserListSheetAction)
 
 	do
 		local class167 = {}
 		class167.__index = class167
 
-		function class167.new(p)
+		function class167.new(data)
 			local v3
 
-			if not (p == nil or p.search_type == nil) then
-				v3 = p.search_type
+			if not (data == nil or data.universe_id == nil) then
+				v3 = data.universe_id
 			end
 
-			return (setmetatable({ search_type = v3 }, class167))
+			local v4
+
+			if not (data == nil or data.place_id == nil) then
+				v4 = data.place_id
+			end
+
+			local v5
+
+			if not (data == nil or data.total_connections == nil) then
+				v5 = data.total_connections
+			end
+
+			local v6
+
+			if not (data == nil or data.user_ids == nil) then
+				v6 = data.user_ids
+			end
+
+			local v7
+
+			if not (data == nil or data.sheet_title == nil) then
+				v7 = data.sheet_title
+			end
+
+			return (setmetatable({
+				universe_id = v3,
+				place_id = v4,
+				total_connections = v5,
+				user_ids = v6,
+				sheet_title = v7
+			}, class167))
 		end
 
 		function class167:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.search_type ~= nil then
-				local encoded = self.search_type:encode()
+			if self.universe_id ~= nil then
+				local encoded = self.universe_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.place_id ~= nil then
+				local encoded = self.place_id:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.total_connections ~= nil then
+				local encoded = self.total_connections:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.user_ids ~= nil then
+				local encoded = self.user_ids:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.sheet_title ~= nil then
+				local encoded = self.sheet_title:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -26103,7 +26039,23 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.search_type = prop_types.StringProp.decode(v5)
+						result.universe_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 2 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.place_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 3 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.total_connections = prop_types.Int32Prop.decode(v5)
+					elseif v3 == 4 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.user_ids = prop_types.ArrayOfAvatarProp.decode(v5)
+					elseif v3 == 5 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.sheet_title = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -26126,36 +26078,84 @@ do
 		function class167:jsonEncode()
 			local v2 = {}
 
-			if self.search_type ~= nil then
-				v2.searchType = self.search_type:jsonEncode()
+			if self.universe_id ~= nil then
+				v2.universeId = self.universe_id:jsonEncode()
+			end
+
+			if self.place_id ~= nil then
+				v2.placeId = self.place_id:jsonEncode()
+			end
+
+			if self.total_connections ~= nil then
+				v2.totalConnections = self.total_connections:jsonEncode()
+			end
+
+			if self.user_ids ~= nil then
+				v2.userIds = self.user_ids:jsonEncode()
+			end
+
+			if self.sheet_title ~= nil then
+				v2.sheetTitle = self.sheet_title:jsonEncode()
 			end
 
 			return v2
 		end
 
-		function class167.jsonDecode(p)
+		function class167.jsonDecode(data)
 			local v2 = class167.new()
 
-			if p.search_type ~= nil then
-				v2.search_type = prop_types.StringProp.jsonDecode(p.search_type)
+			if data.universe_id ~= nil then
+				v2.universe_id = prop_types.StringProp.jsonDecode(data.universe_id)
 			end
 
-			if p.searchType ~= nil then
-				v2.search_type = prop_types.StringProp.jsonDecode(p.searchType)
+			if data.universeId ~= nil then
+				v2.universe_id = prop_types.StringProp.jsonDecode(data.universeId)
+			end
+
+			if data.place_id ~= nil then
+				v2.place_id = prop_types.StringProp.jsonDecode(data.place_id)
+			end
+
+			if data.placeId ~= nil then
+				v2.place_id = prop_types.StringProp.jsonDecode(data.placeId)
+			end
+
+			if data.total_connections ~= nil then
+				v2.total_connections = prop_types.Int32Prop.jsonDecode(data.total_connections)
+			end
+
+			if data.totalConnections ~= nil then
+				v2.total_connections = prop_types.Int32Prop.jsonDecode(data.totalConnections)
+			end
+
+			if data.user_ids ~= nil then
+				v2.user_ids = prop_types.ArrayOfAvatarProp.jsonDecode(data.user_ids)
+			end
+
+			if data.userIds ~= nil then
+				v2.user_ids = prop_types.ArrayOfAvatarProp.jsonDecode(data.userIds)
+			end
+
+			if data.sheet_title ~= nil then
+				v2.sheet_title = prop_types.StringProp.jsonDecode(data.sheet_title)
+			end
+
+			if data.sheetTitle ~= nil then
+				v2.sheet_title = prop_types.StringProp.jsonDecode(data.sheetTitle)
 			end
 
 			return v2
 		end
 
 		class167.descriptor = {
-			name = "OpenSearchResultsTabAction_Params",
+			name = "OpenSocialProofUserListSheetAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.OpenSearchResultsTabAction_Params = class167
+		v.OpenSocialProofUserListSheetAction_Params = class167
 	end
 
-	typeRegistry.default:register(v.OpenSearchResultsTabAction_Params)
+	typeRegistry.default:register(v.OpenSocialProofUserListSheetAction_Params)
 
 	do
 		local class168 = {}
@@ -26223,7 +26223,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.DismissPromptAction_Params.decode(v5)
+						result.action_params = v.OpenSearchResultsTabAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -26296,88 +26296,47 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.DismissPromptAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.OpenSearchResultsTabAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.DismissPromptAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.OpenSearchResultsTabAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class168.descriptor = {
-			name = "DismissPromptAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.DismissPromptAction"
+			name = "OpenSearchResultsTabAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.OpenSearchResultsTabAction"
 		}
 
-		v.DismissPromptAction = class168
+		v.OpenSearchResultsTabAction = class168
 	end
 
-	typeRegistry.default:register(v.DismissPromptAction)
+	typeRegistry.default:register(v.OpenSearchResultsTabAction)
 
 	do
 		local class169 = {}
 		class169.__index = class169
 
-		function class169.new(data)
+		function class169.new(p)
 			local v3
 
-			if not (data == nil or data.prompt_type == nil) then
-				v3 = data.prompt_type
+			if not (p == nil or p.search_type == nil) then
+				v3 = p.search_type
 			end
 
-			local v4
-
-			if not (data == nil or data.prompt_id == nil) then
-				v4 = data.prompt_id
-			end
-
-			local v5
-
-			if not (data == nil or data.entity_type == nil) then
-				v5 = data.entity_type
-			end
-
-			local v6
-
-			if not (data == nil or data.entity_id == nil) then
-				v6 = data.entity_id
-			end
-
-			return (setmetatable({
-				prompt_type = v3,
-				prompt_id = v4,
-				entity_type = v5,
-				entity_id = v6
-			}, class169))
+			return (setmetatable({ search_type = v3 }, class169))
 		end
 
 		function class169:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.prompt_type ~= nil then
-				local encoded = self.prompt_type:encode()
+			if self.search_type ~= nil then
+				local encoded = self.search_type:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.prompt_id ~= nil then
-				local encoded = self.prompt_id:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.entity_type ~= nil then
-				local encoded = self.entity_type:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.entity_id ~= nil then
-				local encoded = self.entity_id:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -26401,19 +26360,7 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.prompt_type = prop_types.StringProp.decode(v5)
-					elseif v3 == 2 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.prompt_id = prop_types.StringProp.decode(v5)
-					elseif v3 == 3 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.entity_type = prop_types.StringProp.decode(v5)
-					elseif v3 == 4 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.entity_id = prop_types.StringProp.decode(v5)
+						result.search_type = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -26436,72 +26383,36 @@ do
 		function class169:jsonEncode()
 			local v2 = {}
 
-			if self.prompt_type ~= nil then
-				v2.promptType = self.prompt_type:jsonEncode()
-			end
-
-			if self.prompt_id ~= nil then
-				v2.promptId = self.prompt_id:jsonEncode()
-			end
-
-			if self.entity_type ~= nil then
-				v2.entityType = self.entity_type:jsonEncode()
-			end
-
-			if self.entity_id ~= nil then
-				v2.entityId = self.entity_id:jsonEncode()
+			if self.search_type ~= nil then
+				v2.searchType = self.search_type:jsonEncode()
 			end
 
 			return v2
 		end
 
-		function class169.jsonDecode(data)
+		function class169.jsonDecode(p)
 			local v2 = class169.new()
 
-			if data.prompt_type ~= nil then
-				v2.prompt_type = prop_types.StringProp.jsonDecode(data.prompt_type)
+			if p.search_type ~= nil then
+				v2.search_type = prop_types.StringProp.jsonDecode(p.search_type)
 			end
 
-			if data.promptType ~= nil then
-				v2.prompt_type = prop_types.StringProp.jsonDecode(data.promptType)
-			end
-
-			if data.prompt_id ~= nil then
-				v2.prompt_id = prop_types.StringProp.jsonDecode(data.prompt_id)
-			end
-
-			if data.promptId ~= nil then
-				v2.prompt_id = prop_types.StringProp.jsonDecode(data.promptId)
-			end
-
-			if data.entity_type ~= nil then
-				v2.entity_type = prop_types.StringProp.jsonDecode(data.entity_type)
-			end
-
-			if data.entityType ~= nil then
-				v2.entity_type = prop_types.StringProp.jsonDecode(data.entityType)
-			end
-
-			if data.entity_id ~= nil then
-				v2.entity_id = prop_types.StringProp.jsonDecode(data.entity_id)
-			end
-
-			if data.entityId ~= nil then
-				v2.entity_id = prop_types.StringProp.jsonDecode(data.entityId)
+			if p.searchType ~= nil then
+				v2.search_type = prop_types.StringProp.jsonDecode(p.searchType)
 			end
 
 			return v2
 		end
 
 		class169.descriptor = {
-			name = "DismissPromptAction_Params",
+			name = "OpenSearchResultsTabAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.DismissPromptAction_Params = class169
+		v.OpenSearchResultsTabAction_Params = class169
 	end
 
-	typeRegistry.default:register(v.DismissPromptAction_Params)
+	typeRegistry.default:register(v.OpenSearchResultsTabAction_Params)
 
 	do
 		local class170 = {}
@@ -26569,7 +26480,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.RecordPartyChatConversationUpsellAcknowledgementAction_Params.decode(v5)
+						result.action_params = v.DismissPromptAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -26642,25 +26553,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.RecordPartyChatConversationUpsellAcknowledgementAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.DismissPromptAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.RecordPartyChatConversationUpsellAcknowledgementAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.DismissPromptAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class170.descriptor = {
-			name = "RecordPartyChatConversationUpsellAcknowledgementAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.RecordPartyChatConversationUpsellAcknowledgementAction"
+			name = "DismissPromptAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.DismissPromptAction"
 		}
 
-		v.RecordPartyChatConversationUpsellAcknowledgementAction = class170
+		v.DismissPromptAction = class170
 	end
 
-	typeRegistry.default:register(v.RecordPartyChatConversationUpsellAcknowledgementAction)
+	typeRegistry.default:register(v.DismissPromptAction)
 
 	do
 		local class171 = {}
@@ -26669,40 +26580,33 @@ do
 		function class171.new(data)
 			local v3
 
-			if not (data == nil or data.modal_action == nil) then
-				v3 = data.modal_action
+			if not (data == nil or data.prompt_type == nil) then
+				v3 = data.prompt_type
 			end
 
 			local v4
 
-			if not (data == nil or data.modal_variant == nil) then
-				v4 = data.modal_variant
+			if not (data == nil or data.prompt_id == nil) then
+				v4 = data.prompt_id
 			end
 
 			local v5
 
-			if not (data == nil or data.modal_sequence == nil) then
-				v5 = data.modal_sequence
+			if not (data == nil or data.entity_type == nil) then
+				v5 = data.entity_type
 			end
 
 			local v6
 
-			if not (data == nil or data.conversation_id == nil) then
-				v6 = data.conversation_id
-			end
-
-			local v7
-
-			if not (data == nil or data.friend_id == nil) then
-				v7 = data.friend_id
+			if not (data == nil or data.entity_id == nil) then
+				v6 = data.entity_id
 			end
 
 			return (setmetatable({
-				modal_action = v3,
-				modal_variant = v4,
-				modal_sequence = v5,
-				conversation_id = v6,
-				friend_id = v7
+				prompt_type = v3,
+				prompt_id = v4,
+				entity_type = v5,
+				entity_id = v6
 			}, class171))
 		end
 
@@ -26710,33 +26614,27 @@ do
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.modal_action ~= nil then
-				local encoded = self.modal_action:encode()
+			if self.prompt_type ~= nil then
+				local encoded = self.prompt_type:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.modal_variant ~= nil then
-				local encoded = self.modal_variant:encode()
+			if self.prompt_id ~= nil then
+				local encoded = self.prompt_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.modal_sequence ~= nil then
-				local encoded = self.modal_sequence:encode()
+			if self.entity_type ~= nil then
+				local encoded = self.entity_type:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.conversation_id ~= nil then
-				local encoded = self.conversation_id:encode()
+			if self.entity_id ~= nil then
+				local encoded = self.entity_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.friend_id ~= nil then
-				local encoded = self.friend_id:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -26760,23 +26658,19 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.modal_action = prop_types.StringProp.decode(v5)
+						result.prompt_type = prop_types.StringProp.decode(v5)
 					elseif v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.modal_variant = prop_types.StringProp.decode(v5)
+						result.prompt_id = prop_types.StringProp.decode(v5)
 					elseif v3 == 3 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.modal_sequence = prop_types.StringProp.decode(v5)
+						result.entity_type = prop_types.StringProp.decode(v5)
 					elseif v3 == 4 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.conversation_id = prop_types.StringProp.decode(v5)
-					elseif v3 == 5 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.friend_id = prop_types.StringProp.decode(v5)
+						result.entity_id = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -26799,24 +26693,20 @@ do
 		function class171:jsonEncode()
 			local v2 = {}
 
-			if self.modal_action ~= nil then
-				v2.modalAction = self.modal_action:jsonEncode()
+			if self.prompt_type ~= nil then
+				v2.promptType = self.prompt_type:jsonEncode()
 			end
 
-			if self.modal_variant ~= nil then
-				v2.modalVariant = self.modal_variant:jsonEncode()
+			if self.prompt_id ~= nil then
+				v2.promptId = self.prompt_id:jsonEncode()
 			end
 
-			if self.modal_sequence ~= nil then
-				v2.modalSequence = self.modal_sequence:jsonEncode()
+			if self.entity_type ~= nil then
+				v2.entityType = self.entity_type:jsonEncode()
 			end
 
-			if self.conversation_id ~= nil then
-				v2.conversationId = self.conversation_id:jsonEncode()
-			end
-
-			if self.friend_id ~= nil then
-				v2.friendId = self.friend_id:jsonEncode()
+			if self.entity_id ~= nil then
+				v2.entityId = self.entity_id:jsonEncode()
 			end
 
 			return v2
@@ -26825,58 +26715,50 @@ do
 		function class171.jsonDecode(data)
 			local v2 = class171.new()
 
-			if data.modal_action ~= nil then
-				v2.modal_action = prop_types.StringProp.jsonDecode(data.modal_action)
+			if data.prompt_type ~= nil then
+				v2.prompt_type = prop_types.StringProp.jsonDecode(data.prompt_type)
 			end
 
-			if data.modalAction ~= nil then
-				v2.modal_action = prop_types.StringProp.jsonDecode(data.modalAction)
+			if data.promptType ~= nil then
+				v2.prompt_type = prop_types.StringProp.jsonDecode(data.promptType)
 			end
 
-			if data.modal_variant ~= nil then
-				v2.modal_variant = prop_types.StringProp.jsonDecode(data.modal_variant)
+			if data.prompt_id ~= nil then
+				v2.prompt_id = prop_types.StringProp.jsonDecode(data.prompt_id)
 			end
 
-			if data.modalVariant ~= nil then
-				v2.modal_variant = prop_types.StringProp.jsonDecode(data.modalVariant)
+			if data.promptId ~= nil then
+				v2.prompt_id = prop_types.StringProp.jsonDecode(data.promptId)
 			end
 
-			if data.modal_sequence ~= nil then
-				v2.modal_sequence = prop_types.StringProp.jsonDecode(data.modal_sequence)
+			if data.entity_type ~= nil then
+				v2.entity_type = prop_types.StringProp.jsonDecode(data.entity_type)
 			end
 
-			if data.modalSequence ~= nil then
-				v2.modal_sequence = prop_types.StringProp.jsonDecode(data.modalSequence)
+			if data.entityType ~= nil then
+				v2.entity_type = prop_types.StringProp.jsonDecode(data.entityType)
 			end
 
-			if data.conversation_id ~= nil then
-				v2.conversation_id = prop_types.StringProp.jsonDecode(data.conversation_id)
+			if data.entity_id ~= nil then
+				v2.entity_id = prop_types.StringProp.jsonDecode(data.entity_id)
 			end
 
-			if data.conversationId ~= nil then
-				v2.conversation_id = prop_types.StringProp.jsonDecode(data.conversationId)
-			end
-
-			if data.friend_id ~= nil then
-				v2.friend_id = prop_types.StringProp.jsonDecode(data.friend_id)
-			end
-
-			if data.friendId ~= nil then
-				v2.friend_id = prop_types.StringProp.jsonDecode(data.friendId)
+			if data.entityId ~= nil then
+				v2.entity_id = prop_types.StringProp.jsonDecode(data.entityId)
 			end
 
 			return v2
 		end
 
 		class171.descriptor = {
-			name = "RecordPartyChatConversationUpsellAcknowledgementAction_Params",
+			name = "DismissPromptAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.RecordPartyChatConversationUpsellAcknowledgementAction_Params = class171
+		v.DismissPromptAction_Params = class171
 	end
 
-	typeRegistry.default:register(v.RecordPartyChatConversationUpsellAcknowledgementAction_Params)
+	typeRegistry.default:register(v.DismissPromptAction_Params)
 
 	do
 		local class172 = {}
@@ -26944,7 +26826,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.RequestFriendshipAction_Params.decode(v5)
+						result.action_params = v.RecordPartyChatConversationUpsellAcknowledgementAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -27017,59 +26899,101 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.RequestFriendshipAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.RecordPartyChatConversationUpsellAcknowledgementAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.RequestFriendshipAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.RecordPartyChatConversationUpsellAcknowledgementAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class172.descriptor = {
-			name = "RequestFriendshipAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.RequestFriendshipAction"
+			name = "RecordPartyChatConversationUpsellAcknowledgementAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.RecordPartyChatConversationUpsellAcknowledgementAction"
 		}
 
-		v.RequestFriendshipAction = class172
+		v.RecordPartyChatConversationUpsellAcknowledgementAction = class172
 	end
 
-	typeRegistry.default:register(v.RequestFriendshipAction)
+	typeRegistry.default:register(v.RecordPartyChatConversationUpsellAcknowledgementAction)
 
 	do
 		local class173 = {}
 		class173.__index = class173
 
-		function class173.new(p)
+		function class173.new(data)
 			local v3
 
-			if not (p == nil or p.target_user_id == nil) then
-				v3 = p.target_user_id
+			if not (data == nil or data.modal_action == nil) then
+				v3 = data.modal_action
 			end
 
 			local v4
 
-			if not (p == nil or p.source == nil) then
-				v4 = p.source
+			if not (data == nil or data.modal_variant == nil) then
+				v4 = data.modal_variant
 			end
 
-			return (setmetatable({ target_user_id = v3, source = v4 }, class173))
+			local v5
+
+			if not (data == nil or data.modal_sequence == nil) then
+				v5 = data.modal_sequence
+			end
+
+			local v6
+
+			if not (data == nil or data.conversation_id == nil) then
+				v6 = data.conversation_id
+			end
+
+			local v7
+
+			if not (data == nil or data.friend_id == nil) then
+				v7 = data.friend_id
+			end
+
+			return (setmetatable({
+				modal_action = v3,
+				modal_variant = v4,
+				modal_sequence = v5,
+				conversation_id = v6,
+				friend_id = v7
+			}, class173))
 		end
 
 		function class173:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.target_user_id ~= nil then
-				local encoded = self.target_user_id:encode()
+			if self.modal_action ~= nil then
+				local encoded = self.modal_action:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.source ~= nil then
-				local encoded = self.source:encode()
+			if self.modal_variant ~= nil then
+				local encoded = self.modal_variant:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.modal_sequence ~= nil then
+				local encoded = self.modal_sequence:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.conversation_id ~= nil then
+				local encoded = self.conversation_id:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.friend_id ~= nil then
+				local encoded = self.friend_id:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -27093,11 +27017,23 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.target_user_id = prop_types.StringProp.decode(v5)
+						result.modal_action = prop_types.StringProp.decode(v5)
 					elseif v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.source = prop_types.StringProp.decode(v5)
+						result.modal_variant = prop_types.StringProp.decode(v5)
+					elseif v3 == 3 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.modal_sequence = prop_types.StringProp.decode(v5)
+					elseif v3 == 4 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.conversation_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 5 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.friend_id = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -27120,12 +27056,24 @@ do
 		function class173:jsonEncode()
 			local v2 = {}
 
-			if self.target_user_id ~= nil then
-				v2.targetUserId = self.target_user_id:jsonEncode()
+			if self.modal_action ~= nil then
+				v2.modalAction = self.modal_action:jsonEncode()
 			end
 
-			if self.source ~= nil then
-				v2.source = self.source:jsonEncode()
+			if self.modal_variant ~= nil then
+				v2.modalVariant = self.modal_variant:jsonEncode()
+			end
+
+			if self.modal_sequence ~= nil then
+				v2.modalSequence = self.modal_sequence:jsonEncode()
+			end
+
+			if self.conversation_id ~= nil then
+				v2.conversationId = self.conversation_id:jsonEncode()
+			end
+
+			if self.friend_id ~= nil then
+				v2.friendId = self.friend_id:jsonEncode()
 			end
 
 			return v2
@@ -27134,30 +27082,58 @@ do
 		function class173.jsonDecode(data)
 			local v2 = class173.new()
 
-			if data.target_user_id ~= nil then
-				v2.target_user_id = prop_types.StringProp.jsonDecode(data.target_user_id)
+			if data.modal_action ~= nil then
+				v2.modal_action = prop_types.StringProp.jsonDecode(data.modal_action)
 			end
 
-			if data.targetUserId ~= nil then
-				v2.target_user_id = prop_types.StringProp.jsonDecode(data.targetUserId)
+			if data.modalAction ~= nil then
+				v2.modal_action = prop_types.StringProp.jsonDecode(data.modalAction)
 			end
 
-			if data.source ~= nil then
-				v2.source = prop_types.StringProp.jsonDecode(data.source)
+			if data.modal_variant ~= nil then
+				v2.modal_variant = prop_types.StringProp.jsonDecode(data.modal_variant)
+			end
+
+			if data.modalVariant ~= nil then
+				v2.modal_variant = prop_types.StringProp.jsonDecode(data.modalVariant)
+			end
+
+			if data.modal_sequence ~= nil then
+				v2.modal_sequence = prop_types.StringProp.jsonDecode(data.modal_sequence)
+			end
+
+			if data.modalSequence ~= nil then
+				v2.modal_sequence = prop_types.StringProp.jsonDecode(data.modalSequence)
+			end
+
+			if data.conversation_id ~= nil then
+				v2.conversation_id = prop_types.StringProp.jsonDecode(data.conversation_id)
+			end
+
+			if data.conversationId ~= nil then
+				v2.conversation_id = prop_types.StringProp.jsonDecode(data.conversationId)
+			end
+
+			if data.friend_id ~= nil then
+				v2.friend_id = prop_types.StringProp.jsonDecode(data.friend_id)
+			end
+
+			if data.friendId ~= nil then
+				v2.friend_id = prop_types.StringProp.jsonDecode(data.friendId)
 			end
 
 			return v2
 		end
 
 		class173.descriptor = {
-			name = "RequestFriendshipAction_Params",
+			name = "RecordPartyChatConversationUpsellAcknowledgementAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.RequestFriendshipAction_Params = class173
+		v.RecordPartyChatConversationUpsellAcknowledgementAction_Params = class173
 	end
 
-	typeRegistry.default:register(v.RequestFriendshipAction_Params)
+	typeRegistry.default:register(v.RecordPartyChatConversationUpsellAcknowledgementAction_Params)
 
 	do
 		local class174 = {}
@@ -27225,7 +27201,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.OpenTrustedFriendsUpsellModalAction_Params.decode(v5)
+						result.action_params = v.RequestFriendshipAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -27298,25 +27274,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.OpenTrustedFriendsUpsellModalAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.RequestFriendshipAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.OpenTrustedFriendsUpsellModalAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.RequestFriendshipAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class174.descriptor = {
-			name = "OpenTrustedFriendsUpsellModalAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.OpenTrustedFriendsUpsellModalAction"
+			name = "RequestFriendshipAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.RequestFriendshipAction"
 		}
 
-		v.OpenTrustedFriendsUpsellModalAction = class174
+		v.RequestFriendshipAction = class174
 	end
 
-	typeRegistry.default:register(v.OpenTrustedFriendsUpsellModalAction)
+	typeRegistry.default:register(v.RequestFriendshipAction)
 
 	do
 		local class175 = {}
@@ -27329,7 +27305,13 @@ do
 				v3 = p.target_user_id
 			end
 
-			return (setmetatable({ target_user_id = v3 }, class175))
+			local v4
+
+			if not (p == nil or p.source == nil) then
+				v4 = p.source
+			end
+
+			return (setmetatable({ target_user_id = v3, source = v4 }, class175))
 		end
 
 		function class175:encode()
@@ -27339,6 +27321,12 @@ do
 			if self.target_user_id ~= nil then
 				local encoded = self.target_user_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.source ~= nil then
+				local encoded = self.source:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -27363,6 +27351,10 @@ do
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
 						result.target_user_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 2 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.source = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -27389,32 +27381,40 @@ do
 				v2.targetUserId = self.target_user_id:jsonEncode()
 			end
 
+			if self.source ~= nil then
+				v2.source = self.source:jsonEncode()
+			end
+
 			return v2
 		end
 
-		function class175.jsonDecode(p)
+		function class175.jsonDecode(data)
 			local v2 = class175.new()
 
-			if p.target_user_id ~= nil then
-				v2.target_user_id = prop_types.StringProp.jsonDecode(p.target_user_id)
+			if data.target_user_id ~= nil then
+				v2.target_user_id = prop_types.StringProp.jsonDecode(data.target_user_id)
 			end
 
-			if p.targetUserId ~= nil then
-				v2.target_user_id = prop_types.StringProp.jsonDecode(p.targetUserId)
+			if data.targetUserId ~= nil then
+				v2.target_user_id = prop_types.StringProp.jsonDecode(data.targetUserId)
+			end
+
+			if data.source ~= nil then
+				v2.source = prop_types.StringProp.jsonDecode(data.source)
 			end
 
 			return v2
 		end
 
 		class175.descriptor = {
-			name = "OpenTrustedFriendsUpsellModalAction_Params",
+			name = "RequestFriendshipAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.OpenTrustedFriendsUpsellModalAction_Params = class175
+		v.RequestFriendshipAction_Params = class175
 	end
 
-	typeRegistry.default:register(v.OpenTrustedFriendsUpsellModalAction_Params)
+	typeRegistry.default:register(v.RequestFriendshipAction_Params)
 
 	do
 		local class176 = {}
@@ -27482,7 +27482,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.OpenSearchResultsWithQueryAction_Params.decode(v5)
+						result.action_params = v.OpenTrustedFriendsUpsellModalAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -27555,75 +27555,47 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.OpenSearchResultsWithQueryAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.OpenTrustedFriendsUpsellModalAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.OpenSearchResultsWithQueryAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.OpenTrustedFriendsUpsellModalAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class176.descriptor = {
-			name = "OpenSearchResultsWithQueryAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.OpenSearchResultsWithQueryAction"
+			name = "OpenTrustedFriendsUpsellModalAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.OpenTrustedFriendsUpsellModalAction"
 		}
 
-		v.OpenSearchResultsWithQueryAction = class176
+		v.OpenTrustedFriendsUpsellModalAction = class176
 	end
 
-	typeRegistry.default:register(v.OpenSearchResultsWithQueryAction)
+	typeRegistry.default:register(v.OpenTrustedFriendsUpsellModalAction)
 
 	do
 		local class177 = {}
 		class177.__index = class177
 
-		function class177.new(data)
+		function class177.new(p)
 			local v3
 
-			if not (data == nil or data.search_query == nil) then
-				v3 = data.search_query
+			if not (p == nil or p.target_user_id == nil) then
+				v3 = p.target_user_id
 			end
 
-			local v4
-
-			if not (data == nil or data.search_type == nil) then
-				v4 = data.search_type
-			end
-
-			local v5
-
-			if not (data == nil or data.is_autocomplete_suggestion == nil) then
-				v5 = data.is_autocomplete_suggestion
-			end
-
-			return (setmetatable({
-				search_query = v3,
-				search_type = v4,
-				is_autocomplete_suggestion = v5
-			}, class177))
+			return (setmetatable({ target_user_id = v3 }, class177))
 		end
 
 		function class177:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.search_query ~= nil then
-				local encoded = self.search_query:encode()
+			if self.target_user_id ~= nil then
+				local encoded = self.target_user_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.search_type ~= nil then
-				local encoded = self.search_type:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.is_autocomplete_suggestion ~= nil then
-				local encoded = self.is_autocomplete_suggestion:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -27647,15 +27619,7 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.search_query = prop_types.StringProp.decode(v5)
-					elseif v3 == 2 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.search_type = prop_types.StringProp.decode(v5)
-					elseif v3 == 3 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.is_autocomplete_suggestion = prop_types.BoolProp.decode(v5)
+						result.target_user_id = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -27678,60 +27642,36 @@ do
 		function class177:jsonEncode()
 			local v2 = {}
 
-			if self.search_query ~= nil then
-				v2.searchQuery = self.search_query:jsonEncode()
-			end
-
-			if self.search_type ~= nil then
-				v2.searchType = self.search_type:jsonEncode()
-			end
-
-			if self.is_autocomplete_suggestion ~= nil then
-				v2.isAutocompleteSuggestion = self.is_autocomplete_suggestion:jsonEncode()
+			if self.target_user_id ~= nil then
+				v2.targetUserId = self.target_user_id:jsonEncode()
 			end
 
 			return v2
 		end
 
-		function class177.jsonDecode(data)
+		function class177.jsonDecode(p)
 			local v2 = class177.new()
 
-			if data.search_query ~= nil then
-				v2.search_query = prop_types.StringProp.jsonDecode(data.search_query)
+			if p.target_user_id ~= nil then
+				v2.target_user_id = prop_types.StringProp.jsonDecode(p.target_user_id)
 			end
 
-			if data.searchQuery ~= nil then
-				v2.search_query = prop_types.StringProp.jsonDecode(data.searchQuery)
-			end
-
-			if data.search_type ~= nil then
-				v2.search_type = prop_types.StringProp.jsonDecode(data.search_type)
-			end
-
-			if data.searchType ~= nil then
-				v2.search_type = prop_types.StringProp.jsonDecode(data.searchType)
-			end
-
-			if data.is_autocomplete_suggestion ~= nil then
-				v2.is_autocomplete_suggestion = prop_types.BoolProp.jsonDecode(data.is_autocomplete_suggestion)
-			end
-
-			if data.isAutocompleteSuggestion ~= nil then
-				v2.is_autocomplete_suggestion = prop_types.BoolProp.jsonDecode(data.isAutocompleteSuggestion)
+			if p.targetUserId ~= nil then
+				v2.target_user_id = prop_types.StringProp.jsonDecode(p.targetUserId)
 			end
 
 			return v2
 		end
 
 		class177.descriptor = {
-			name = "OpenSearchResultsWithQueryAction_Params",
+			name = "OpenTrustedFriendsUpsellModalAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.OpenSearchResultsWithQueryAction_Params = class177
+		v.OpenTrustedFriendsUpsellModalAction_Params = class177
 	end
 
-	typeRegistry.default:register(v.OpenSearchResultsWithQueryAction_Params)
+	typeRegistry.default:register(v.OpenTrustedFriendsUpsellModalAction_Params)
 
 	do
 		local class178 = {}
@@ -27799,7 +27739,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.SelectMarketplaceFavoritesCategory_Params.decode(v5)
+						result.action_params = v.OpenSearchResultsWithQueryAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -27872,47 +27812,91 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.SelectMarketplaceFavoritesCategory_Params.jsonDecode(data.action_params)
+				v2.action_params = v.OpenSearchResultsWithQueryAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.SelectMarketplaceFavoritesCategory_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.OpenSearchResultsWithQueryAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class178.descriptor = {
-			name = "SelectMarketplaceFavoritesCategory",
-			fullName = "roblox.apppageplatform.shared.v1beta1.SelectMarketplaceFavoritesCategory"
+			name = "OpenSearchResultsWithQueryAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.OpenSearchResultsWithQueryAction"
 		}
 
-		v.SelectMarketplaceFavoritesCategory = class178
+		v.OpenSearchResultsWithQueryAction = class178
 	end
 
-	typeRegistry.default:register(v.SelectMarketplaceFavoritesCategory)
+	typeRegistry.default:register(v.OpenSearchResultsWithQueryAction)
 
 	do
 		local class179 = {}
 		class179.__index = class179
 
-		function class179.new(p)
+		function class179.new(data)
 			local v3
 
-			if not (p == nil or p.category_id == nil) then
-				v3 = p.category_id
+			if not (data == nil or data.search_query == nil) then
+				v3 = data.search_query
 			end
 
-			return (setmetatable({ category_id = v3 }, class179))
+			local v4
+
+			if not (data == nil or data.search_type == nil) then
+				v4 = data.search_type
+			end
+
+			local v5
+
+			if not (data == nil or data.is_autocomplete_suggestion == nil) then
+				v5 = data.is_autocomplete_suggestion
+			end
+
+			local v6
+
+			if not (data == nil or data.selected_option == nil) then
+				v6 = data.selected_option
+			end
+
+			return (setmetatable(
+				{
+					search_query = v3,
+					search_type = v4,
+					is_autocomplete_suggestion = v5,
+					selected_option = v6
+				},
+				class179
+			))
 		end
 
 		function class179:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.category_id ~= nil then
-				local encoded = self.category_id:encode()
+			if self.search_query ~= nil then
+				local encoded = self.search_query:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.search_type ~= nil then
+				local encoded = self.search_type:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.is_autocomplete_suggestion ~= nil then
+				local encoded = self.is_autocomplete_suggestion:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.selected_option ~= nil then
+				local encoded = self.selected_option:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -27936,7 +27920,19 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.category_id = prop_types.StringProp.decode(v5)
+						result.search_query = prop_types.StringProp.decode(v5)
+					elseif v3 == 2 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.search_type = prop_types.StringProp.decode(v5)
+					elseif v3 == 3 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.is_autocomplete_suggestion = prop_types.BoolProp.decode(v5)
+					elseif v3 == 4 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.selected_option = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -27959,36 +27955,72 @@ do
 		function class179:jsonEncode()
 			local v2 = {}
 
-			if self.category_id ~= nil then
-				v2.categoryId = self.category_id:jsonEncode()
+			if self.search_query ~= nil then
+				v2.searchQuery = self.search_query:jsonEncode()
+			end
+
+			if self.search_type ~= nil then
+				v2.searchType = self.search_type:jsonEncode()
+			end
+
+			if self.is_autocomplete_suggestion ~= nil then
+				v2.isAutocompleteSuggestion = self.is_autocomplete_suggestion:jsonEncode()
+			end
+
+			if self.selected_option ~= nil then
+				v2.selectedOption = self.selected_option:jsonEncode()
 			end
 
 			return v2
 		end
 
-		function class179.jsonDecode(p)
+		function class179.jsonDecode(data)
 			local v2 = class179.new()
 
-			if p.category_id ~= nil then
-				v2.category_id = prop_types.StringProp.jsonDecode(p.category_id)
+			if data.search_query ~= nil then
+				v2.search_query = prop_types.StringProp.jsonDecode(data.search_query)
 			end
 
-			if p.categoryId ~= nil then
-				v2.category_id = prop_types.StringProp.jsonDecode(p.categoryId)
+			if data.searchQuery ~= nil then
+				v2.search_query = prop_types.StringProp.jsonDecode(data.searchQuery)
+			end
+
+			if data.search_type ~= nil then
+				v2.search_type = prop_types.StringProp.jsonDecode(data.search_type)
+			end
+
+			if data.searchType ~= nil then
+				v2.search_type = prop_types.StringProp.jsonDecode(data.searchType)
+			end
+
+			if data.is_autocomplete_suggestion ~= nil then
+				v2.is_autocomplete_suggestion = prop_types.BoolProp.jsonDecode(data.is_autocomplete_suggestion)
+			end
+
+			if data.isAutocompleteSuggestion ~= nil then
+				v2.is_autocomplete_suggestion = prop_types.BoolProp.jsonDecode(data.isAutocompleteSuggestion)
+			end
+
+			if data.selected_option ~= nil then
+				v2.selected_option = prop_types.StringProp.jsonDecode(data.selected_option)
+			end
+
+			if data.selectedOption ~= nil then
+				v2.selected_option = prop_types.StringProp.jsonDecode(data.selectedOption)
 			end
 
 			return v2
 		end
 
 		class179.descriptor = {
-			name = "SelectMarketplaceFavoritesCategory_Params",
+			name = "OpenSearchResultsWithQueryAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.SelectMarketplaceFavoritesCategory_Params = class179
+		v.OpenSearchResultsWithQueryAction_Params = class179
 	end
 
-	typeRegistry.default:register(v.SelectMarketplaceFavoritesCategory_Params)
+	typeRegistry.default:register(v.OpenSearchResultsWithQueryAction_Params)
 
 	do
 		local class180 = {}
@@ -28056,7 +28088,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.SelectMarketplaceFavoritesSubcategory_Params.decode(v5)
+						result.action_params = v.SelectMarketplaceFavoritesCategory_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -28129,25 +28161,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.SelectMarketplaceFavoritesSubcategory_Params.jsonDecode(data.action_params)
+				v2.action_params = v.SelectMarketplaceFavoritesCategory_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.SelectMarketplaceFavoritesSubcategory_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.SelectMarketplaceFavoritesCategory_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class180.descriptor = {
-			name = "SelectMarketplaceFavoritesSubcategory",
-			fullName = "roblox.apppageplatform.shared.v1beta1.SelectMarketplaceFavoritesSubcategory"
+			name = "SelectMarketplaceFavoritesCategory",
+			fullName = "roblox.apppageplatform.shared.v1beta1.SelectMarketplaceFavoritesCategory"
 		}
 
-		v.SelectMarketplaceFavoritesSubcategory = class180
+		v.SelectMarketplaceFavoritesCategory = class180
 	end
 
-	typeRegistry.default:register(v.SelectMarketplaceFavoritesSubcategory)
+	typeRegistry.default:register(v.SelectMarketplaceFavoritesCategory)
 
 	do
 		local class181 = {}
@@ -28156,19 +28188,19 @@ do
 		function class181.new(p)
 			local v3
 
-			if not (p == nil or p.subcategory_id == nil) then
-				v3 = p.subcategory_id
+			if not (p == nil or p.category_id == nil) then
+				v3 = p.category_id
 			end
 
-			return (setmetatable({ subcategory_id = v3 }, class181))
+			return (setmetatable({ category_id = v3 }, class181))
 		end
 
 		function class181:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.subcategory_id ~= nil then
-				local encoded = self.subcategory_id:encode()
+			if self.category_id ~= nil then
+				local encoded = self.category_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
@@ -28193,7 +28225,7 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.subcategory_id = prop_types.StringProp.decode(v5)
+						result.category_id = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -28216,8 +28248,8 @@ do
 		function class181:jsonEncode()
 			local v2 = {}
 
-			if self.subcategory_id ~= nil then
-				v2.subcategoryId = self.subcategory_id:jsonEncode()
+			if self.category_id ~= nil then
+				v2.categoryId = self.category_id:jsonEncode()
 			end
 
 			return v2
@@ -28226,26 +28258,26 @@ do
 		function class181.jsonDecode(p)
 			local v2 = class181.new()
 
-			if p.subcategory_id ~= nil then
-				v2.subcategory_id = prop_types.StringProp.jsonDecode(p.subcategory_id)
+			if p.category_id ~= nil then
+				v2.category_id = prop_types.StringProp.jsonDecode(p.category_id)
 			end
 
-			if p.subcategoryId ~= nil then
-				v2.subcategory_id = prop_types.StringProp.jsonDecode(p.subcategoryId)
+			if p.categoryId ~= nil then
+				v2.category_id = prop_types.StringProp.jsonDecode(p.categoryId)
 			end
 
 			return v2
 		end
 
 		class181.descriptor = {
-			name = "SelectMarketplaceFavoritesSubcategory_Params",
+			name = "SelectMarketplaceFavoritesCategory_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.SelectMarketplaceFavoritesSubcategory_Params = class181
+		v.SelectMarketplaceFavoritesCategory_Params = class181
 	end
 
-	typeRegistry.default:register(v.SelectMarketplaceFavoritesSubcategory_Params)
+	typeRegistry.default:register(v.SelectMarketplaceFavoritesCategory_Params)
 
 	do
 		local class182 = {}
@@ -28313,7 +28345,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.PinExperienceShortcutAction_Params.decode(v5)
+						result.action_params = v.SelectMarketplaceFavoritesSubcategory_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -28386,71 +28418,47 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.PinExperienceShortcutAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.SelectMarketplaceFavoritesSubcategory_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.PinExperienceShortcutAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.SelectMarketplaceFavoritesSubcategory_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class182.descriptor = {
-			name = "PinExperienceShortcutAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.PinExperienceShortcutAction"
+			name = "SelectMarketplaceFavoritesSubcategory",
+			fullName = "roblox.apppageplatform.shared.v1beta1.SelectMarketplaceFavoritesSubcategory"
 		}
 
-		v.PinExperienceShortcutAction = class182
+		v.SelectMarketplaceFavoritesSubcategory = class182
 	end
 
-	typeRegistry.default:register(v.PinExperienceShortcutAction)
+	typeRegistry.default:register(v.SelectMarketplaceFavoritesSubcategory)
 
 	do
 		local class183 = {}
 		class183.__index = class183
 
-		function class183.new(data)
+		function class183.new(p)
 			local v3
 
-			if not (data == nil or data.place_id == nil) then
-				v3 = data.place_id
+			if not (p == nil or p.subcategory_id == nil) then
+				v3 = p.subcategory_id
 			end
 
-			local v4
-
-			if not (data == nil or data.universe_id == nil) then
-				v4 = data.universe_id
-			end
-
-			local v5
-
-			if not (data == nil or data.game_name == nil) then
-				v5 = data.game_name
-			end
-
-			return (setmetatable({ place_id = v3, universe_id = v4, game_name = v5 }, class183))
+			return (setmetatable({ subcategory_id = v3 }, class183))
 		end
 
 		function class183:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.place_id ~= nil then
-				local encoded = self.place_id:encode()
+			if self.subcategory_id ~= nil then
+				local encoded = self.subcategory_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.universe_id ~= nil then
-				local encoded = self.universe_id:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.game_name ~= nil then
-				local encoded = self.game_name:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -28474,15 +28482,7 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.place_id = prop_types.StringProp.decode(v5)
-					elseif v3 == 2 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.universe_id = prop_types.StringProp.decode(v5)
-					elseif v3 == 3 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.game_name = prop_types.StringProp.decode(v5)
+						result.subcategory_id = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -28505,60 +28505,36 @@ do
 		function class183:jsonEncode()
 			local v2 = {}
 
-			if self.place_id ~= nil then
-				v2.placeId = self.place_id:jsonEncode()
-			end
-
-			if self.universe_id ~= nil then
-				v2.universeId = self.universe_id:jsonEncode()
-			end
-
-			if self.game_name ~= nil then
-				v2.gameName = self.game_name:jsonEncode()
+			if self.subcategory_id ~= nil then
+				v2.subcategoryId = self.subcategory_id:jsonEncode()
 			end
 
 			return v2
 		end
 
-		function class183.jsonDecode(data)
+		function class183.jsonDecode(p)
 			local v2 = class183.new()
 
-			if data.place_id ~= nil then
-				v2.place_id = prop_types.StringProp.jsonDecode(data.place_id)
+			if p.subcategory_id ~= nil then
+				v2.subcategory_id = prop_types.StringProp.jsonDecode(p.subcategory_id)
 			end
 
-			if data.placeId ~= nil then
-				v2.place_id = prop_types.StringProp.jsonDecode(data.placeId)
-			end
-
-			if data.universe_id ~= nil then
-				v2.universe_id = prop_types.StringProp.jsonDecode(data.universe_id)
-			end
-
-			if data.universeId ~= nil then
-				v2.universe_id = prop_types.StringProp.jsonDecode(data.universeId)
-			end
-
-			if data.game_name ~= nil then
-				v2.game_name = prop_types.StringProp.jsonDecode(data.game_name)
-			end
-
-			if data.gameName ~= nil then
-				v2.game_name = prop_types.StringProp.jsonDecode(data.gameName)
+			if p.subcategoryId ~= nil then
+				v2.subcategory_id = prop_types.StringProp.jsonDecode(p.subcategoryId)
 			end
 
 			return v2
 		end
 
 		class183.descriptor = {
-			name = "PinExperienceShortcutAction_Params",
+			name = "SelectMarketplaceFavoritesSubcategory_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.PinExperienceShortcutAction_Params = class183
+		v.SelectMarketplaceFavoritesSubcategory_Params = class183
 	end
 
-	typeRegistry.default:register(v.PinExperienceShortcutAction_Params)
+	typeRegistry.default:register(v.SelectMarketplaceFavoritesSubcategory_Params)
 
 	do
 		local class184 = {}
@@ -28626,7 +28602,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.NavigateAction_Params.decode(v5)
+						result.action_params = v.PinExperienceShortcutAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -28699,59 +28675,71 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.NavigateAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.PinExperienceShortcutAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.NavigateAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.PinExperienceShortcutAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class184.descriptor = {
-			name = "NavigateAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.NavigateAction"
+			name = "PinExperienceShortcutAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.PinExperienceShortcutAction"
 		}
 
-		v.NavigateAction = class184
+		v.PinExperienceShortcutAction = class184
 	end
 
-	typeRegistry.default:register(v.NavigateAction)
+	typeRegistry.default:register(v.PinExperienceShortcutAction)
 
 	do
 		local class185 = {}
 		class185.__index = class185
 
-		function class185.new(p)
+		function class185.new(data)
 			local v3
 
-			if not (p == nil or p.destination == nil) then
-				v3 = p.destination
+			if not (data == nil or data.place_id == nil) then
+				v3 = data.place_id
 			end
 
 			local v4
 
-			if not (p == nil or p.source == nil) then
-				v4 = p.source
+			if not (data == nil or data.universe_id == nil) then
+				v4 = data.universe_id
 			end
 
-			return (setmetatable({ destination = v3, source = v4 }, class185))
+			local v5
+
+			if not (data == nil or data.game_name == nil) then
+				v5 = data.game_name
+			end
+
+			return (setmetatable({ place_id = v3, universe_id = v4, game_name = v5 }, class185))
 		end
 
 		function class185:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.destination ~= nil then
-				local encoded = self.destination:encode()
+			if self.place_id ~= nil then
+				local encoded = self.place_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.source ~= nil then
-				local encoded = self.source:encode()
+			if self.universe_id ~= nil then
+				local encoded = self.universe_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.game_name ~= nil then
+				local encoded = self.game_name:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -28775,11 +28763,15 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.destination = prop_types.StringProp.decode(v5)
+						result.place_id = prop_types.StringProp.decode(v5)
 					elseif v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.source = prop_types.StringProp.decode(v5)
+						result.universe_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 3 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.game_name = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -28802,40 +28794,60 @@ do
 		function class185:jsonEncode()
 			local v2 = {}
 
-			if self.destination ~= nil then
-				v2.destination = self.destination:jsonEncode()
+			if self.place_id ~= nil then
+				v2.placeId = self.place_id:jsonEncode()
 			end
 
-			if self.source ~= nil then
-				v2.source = self.source:jsonEncode()
+			if self.universe_id ~= nil then
+				v2.universeId = self.universe_id:jsonEncode()
+			end
+
+			if self.game_name ~= nil then
+				v2.gameName = self.game_name:jsonEncode()
 			end
 
 			return v2
 		end
 
-		function class185.jsonDecode(p)
+		function class185.jsonDecode(data)
 			local v2 = class185.new()
 
-			if p.destination ~= nil then
-				v2.destination = prop_types.StringProp.jsonDecode(p.destination)
+			if data.place_id ~= nil then
+				v2.place_id = prop_types.StringProp.jsonDecode(data.place_id)
 			end
 
-			if p.source ~= nil then
-				v2.source = prop_types.StringProp.jsonDecode(p.source)
+			if data.placeId ~= nil then
+				v2.place_id = prop_types.StringProp.jsonDecode(data.placeId)
+			end
+
+			if data.universe_id ~= nil then
+				v2.universe_id = prop_types.StringProp.jsonDecode(data.universe_id)
+			end
+
+			if data.universeId ~= nil then
+				v2.universe_id = prop_types.StringProp.jsonDecode(data.universeId)
+			end
+
+			if data.game_name ~= nil then
+				v2.game_name = prop_types.StringProp.jsonDecode(data.game_name)
+			end
+
+			if data.gameName ~= nil then
+				v2.game_name = prop_types.StringProp.jsonDecode(data.gameName)
 			end
 
 			return v2
 		end
 
 		class185.descriptor = {
-			name = "NavigateAction_Params",
+			name = "PinExperienceShortcutAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.NavigateAction_Params = class185
+		v.PinExperienceShortcutAction_Params = class185
 	end
 
-	typeRegistry.default:register(v.NavigateAction_Params)
+	typeRegistry.default:register(v.PinExperienceShortcutAction_Params)
 
 	do
 		local class186 = {}
@@ -28903,7 +28915,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.DownloadAppAction_Params.decode(v5)
+						result.action_params = v.NavigateAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -28976,25 +28988,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.DownloadAppAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.NavigateAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.DownloadAppAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.NavigateAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class186.descriptor = {
-			name = "DownloadAppAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.DownloadAppAction"
+			name = "NavigateAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.NavigateAction"
 		}
 
-		v.DownloadAppAction = class186
+		v.NavigateAction = class186
 	end
 
-	typeRegistry.default:register(v.DownloadAppAction)
+	typeRegistry.default:register(v.NavigateAction)
 
 	do
 		local class187 = {}
@@ -29003,31 +29015,31 @@ do
 		function class187.new(p)
 			local v3
 
-			if not (p == nil or p.source == nil) then
-				v3 = p.source
+			if not (p == nil or p.destination == nil) then
+				v3 = p.destination
 			end
 
 			local v4
 
-			if not (p == nil or p.download_type == nil) then
-				v4 = p.download_type
+			if not (p == nil or p.source == nil) then
+				v4 = p.source
 			end
 
-			return (setmetatable({ source = v3, download_type = v4 }, class187))
+			return (setmetatable({ destination = v3, source = v4 }, class187))
 		end
 
 		function class187:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.source ~= nil then
-				local encoded = self.source:encode()
+			if self.destination ~= nil then
+				local encoded = self.destination:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.download_type ~= nil then
-				local encoded = self.download_type:encode()
+			if self.source ~= nil then
+				local encoded = self.source:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
@@ -29052,11 +29064,11 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.source = prop_types.StringProp.decode(v5)
+						result.destination = prop_types.StringProp.decode(v5)
 					elseif v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.download_type = prop_types.StringProp.decode(v5)
+						result.source = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -29079,44 +29091,40 @@ do
 		function class187:jsonEncode()
 			local v2 = {}
 
-			if self.source ~= nil then
-				v2.source = self.source:jsonEncode()
+			if self.destination ~= nil then
+				v2.destination = self.destination:jsonEncode()
 			end
 
-			if self.download_type ~= nil then
-				v2.downloadType = self.download_type:jsonEncode()
+			if self.source ~= nil then
+				v2.source = self.source:jsonEncode()
 			end
 
 			return v2
 		end
 
-		function class187.jsonDecode(data)
+		function class187.jsonDecode(p)
 			local v2 = class187.new()
 
-			if data.source ~= nil then
-				v2.source = prop_types.StringProp.jsonDecode(data.source)
+			if p.destination ~= nil then
+				v2.destination = prop_types.StringProp.jsonDecode(p.destination)
 			end
 
-			if data.download_type ~= nil then
-				v2.download_type = prop_types.StringProp.jsonDecode(data.download_type)
-			end
-
-			if data.downloadType ~= nil then
-				v2.download_type = prop_types.StringProp.jsonDecode(data.downloadType)
+			if p.source ~= nil then
+				v2.source = prop_types.StringProp.jsonDecode(p.source)
 			end
 
 			return v2
 		end
 
 		class187.descriptor = {
-			name = "DownloadAppAction_Params",
+			name = "NavigateAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.DownloadAppAction_Params = class187
+		v.NavigateAction_Params = class187
 	end
 
-	typeRegistry.default:register(v.DownloadAppAction_Params)
+	typeRegistry.default:register(v.NavigateAction_Params)
 
 	do
 		local class188 = {}
@@ -29184,7 +29192,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.ActionSequenceAction_Params.decode(v5)
+						result.action_params = v.DownloadAppAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -29257,46 +29265,60 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.ActionSequenceAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.DownloadAppAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.ActionSequenceAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.DownloadAppAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class188.descriptor = {
-			name = "ActionSequenceAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.ActionSequenceAction"
+			name = "DownloadAppAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.DownloadAppAction"
 		}
 
-		v.ActionSequenceAction = class188
+		v.DownloadAppAction = class188
 	end
 
-	typeRegistry.default:register(v.ActionSequenceAction)
+	typeRegistry.default:register(v.DownloadAppAction)
 
 	do
 		local class189 = {}
 		class189.__index = class189
 
 		function class189.new(p)
-			return (setmetatable({
-				actions = (p == nil or p.actions == nil) and {} or p.actions
-			}, class189))
+			local v3
+
+			if not (p == nil or p.source == nil) then
+				v3 = p.source
+			end
+
+			local v4
+
+			if not (p == nil or p.download_type == nil) then
+				v4 = p.download_type
+			end
+
+			return (setmetatable({ source = v3, download_type = v4 }, class189))
 		end
 
 		function class189:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.actions ~= nil and #self.actions > 0 then
-				for _, action in self.actions do
-					local encoded = action:encode()
-					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-				end
+			if self.source ~= nil then
+				local encoded = self.source:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.download_type ~= nil then
+				local encoded = self.download_type:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
 			local buf = buffer.create(v3)
@@ -29305,85 +29327,85 @@ do
 		end
 
 		function class189.decode(buf: buffer)
-			local v2 = class189.new()
-			local v3 = 0
+			local result = class189.new()
+			local v2 = 0
 
-			while v3 < buffer.len(buf) do
-				local v4, v5
-				v4, v5, v3 = proto.readTag(buf, v3)
+			while v2 < buffer.len(buf) do
+				local v3, v4
+				v3, v4, v2 = proto.readTag(buf, v2)
 
-				if v5 == proto.wireTypes.varint then
-					local v6
-					v6, v3 = proto.readVarInt(buf, v3)
-				elseif v5 == proto.wireTypes.lengthDelimited then
-					if v4 == 1 then
-						local v6
-						v6, v3 = proto.readBuffer(buf, v3)
-						table.insert(v2.actions, v.ActionProp.decode(v6))
+				if v4 == proto.wireTypes.varint then
+					local v5
+					v5, v2 = proto.readVarInt(buf, v2)
+				elseif v4 == proto.wireTypes.lengthDelimited then
+					if v3 == 1 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.source = prop_types.StringProp.decode(v5)
+					elseif v3 == 2 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.download_type = prop_types.StringProp.decode(v5)
 					else
-						local varInt, v6 = proto.readVarInt(buf, v3)
+						local varInt, v5 = proto.readVarInt(buf, v2)
 
-						v3 = v6 + varInt
+						v2 = v5 + varInt
 					end
-				elseif v5 == proto.wireTypes.i32 then
-					local v6
-					v6, v3 = proto.readFixed32(buf, v3)
-				elseif v5 == proto.wireTypes.i64 then
-					local v6
-					v6, v3 = proto.readFixed64(buf, v3)
+				elseif v4 == proto.wireTypes.i32 then
+					local v5
+					v5, v2 = proto.readFixed32(buf, v2)
+				elseif v4 == proto.wireTypes.i64 then
+					local v5
+					v5, v2 = proto.readFixed64(buf, v2)
 				else
-					error("Unsupported wire type: " .. v5)
+					error("Unsupported wire type: " .. v4)
 				end
 			end
 
-			return v2
+			return result
 		end
 
 		function class189:jsonEncode()
 			local v2 = {}
 
-			if self.actions == nil or not (#self.actions > 0) then
-				return v2
+			if self.source ~= nil then
+				v2.source = self.source:jsonEncode()
 			end
 
-			local v3 = {}
-
-			for _, action in self.actions do
-				table.insert(v3, action:jsonEncode())
+			if self.download_type ~= nil then
+				v2.downloadType = self.download_type:jsonEncode()
 			end
-
-			v2.actions = v3
 
 			return v2
 		end
 
-		function class189.jsonDecode(p)
+		function class189.jsonDecode(data)
 			local v2 = class189.new()
 
-			if p.actions == nil then
-				return v2
+			if data.source ~= nil then
+				v2.source = prop_types.StringProp.jsonDecode(data.source)
 			end
 
-			local v3 = {}
-
-			for _, action in p.actions do
-				table.insert(v3, v.ActionProp.jsonDecode(action))
+			if data.download_type ~= nil then
+				v2.download_type = prop_types.StringProp.jsonDecode(data.download_type)
 			end
 
-			v2.actions = v3
+			if data.downloadType ~= nil then
+				v2.download_type = prop_types.StringProp.jsonDecode(data.downloadType)
+			end
 
 			return v2
 		end
 
 		class189.descriptor = {
-			name = "ActionSequenceAction_Params",
+			name = "DownloadAppAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.ActionSequenceAction_Params = class189
+		v.DownloadAppAction_Params = class189
 	end
 
-	typeRegistry.default:register(v.ActionSequenceAction_Params)
+	typeRegistry.default:register(v.DownloadAppAction_Params)
 
 	do
 		local class190 = {}
@@ -29451,7 +29473,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.RefreshFeedEntryFromApiAction_Params.decode(v5)
+						result.action_params = v.ActionSequenceAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -29524,75 +29546,46 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.RefreshFeedEntryFromApiAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.ActionSequenceAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.RefreshFeedEntryFromApiAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.ActionSequenceAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class190.descriptor = {
-			name = "RefreshFeedEntryFromApiAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.RefreshFeedEntryFromApiAction"
+			name = "ActionSequenceAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.ActionSequenceAction"
 		}
 
-		v.RefreshFeedEntryFromApiAction = class190
+		v.ActionSequenceAction = class190
 	end
 
-	typeRegistry.default:register(v.RefreshFeedEntryFromApiAction)
+	typeRegistry.default:register(v.ActionSequenceAction)
 
 	do
 		local class191 = {}
 		class191.__index = class191
 
-		function class191.new(data)
-			local v3
-
-			if not (data == nil or data.page_entry_identifier == nil) then
-				v3 = data.page_entry_identifier
-			end
-
-			local v4
-
-			if not (data == nil or data.feed_entry_identifier == nil) then
-				v4 = data.feed_entry_identifier
-			end
-
-			local v5
-
-			if not (data == nil or data.selected_option_ids == nil) then
-				v5 = data.selected_option_ids
-			end
-
-			return (setmetatable(
-				{ page_entry_identifier = v3, feed_entry_identifier = v4, selected_option_ids = v5 },
-				class191
-			))
+		function class191.new(p)
+			return (setmetatable({
+				actions = (p == nil or p.actions == nil) and {} or p.actions
+			}, class191))
 		end
 
 		function class191:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.page_entry_identifier ~= nil then
-				local encoded = self.page_entry_identifier:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.feed_entry_identifier ~= nil then
-				local encoded = self.feed_entry_identifier:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.selected_option_ids ~= nil then
-				local encoded = self.selected_option_ids:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			if self.actions ~= nil and #self.actions > 0 then
+				for _, action in self.actions do
+					local encoded = action:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				end
 			end
 
 			local buf = buffer.create(v3)
@@ -29601,105 +29594,85 @@ do
 		end
 
 		function class191.decode(buf: buffer)
-			local result = class191.new()
-			local v2 = 0
+			local v2 = class191.new()
+			local v3 = 0
 
-			while v2 < buffer.len(buf) do
-				local v3, v4
-				v3, v4, v2 = proto.readTag(buf, v2)
+			while v3 < buffer.len(buf) do
+				local v4, v5
+				v4, v5, v3 = proto.readTag(buf, v3)
 
-				if v4 == proto.wireTypes.varint then
-					local v5
-					v5, v2 = proto.readVarInt(buf, v2)
-				elseif v4 == proto.wireTypes.lengthDelimited then
-					if v3 == 1 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.page_entry_identifier = prop_types.StringProp.decode(v5)
-					elseif v3 == 2 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.feed_entry_identifier = prop_types.StringProp.decode(v5)
-					elseif v3 == 3 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.selected_option_ids = prop_types.StringArrayProp.decode(v5)
+				if v5 == proto.wireTypes.varint then
+					local v6
+					v6, v3 = proto.readVarInt(buf, v3)
+				elseif v5 == proto.wireTypes.lengthDelimited then
+					if v4 == 1 then
+						local v6
+						v6, v3 = proto.readBuffer(buf, v3)
+						table.insert(v2.actions, v.ActionProp.decode(v6))
 					else
-						local varInt, v5 = proto.readVarInt(buf, v2)
+						local varInt, v6 = proto.readVarInt(buf, v3)
 
-						v2 = v5 + varInt
+						v3 = v6 + varInt
 					end
-				elseif v4 == proto.wireTypes.i32 then
-					local v5
-					v5, v2 = proto.readFixed32(buf, v2)
-				elseif v4 == proto.wireTypes.i64 then
-					local v5
-					v5, v2 = proto.readFixed64(buf, v2)
+				elseif v5 == proto.wireTypes.i32 then
+					local v6
+					v6, v3 = proto.readFixed32(buf, v3)
+				elseif v5 == proto.wireTypes.i64 then
+					local v6
+					v6, v3 = proto.readFixed64(buf, v3)
 				else
-					error("Unsupported wire type: " .. v4)
+					error("Unsupported wire type: " .. v5)
 				end
 			end
 
-			return result
+			return v2
 		end
 
 		function class191:jsonEncode()
 			local v2 = {}
 
-			if self.page_entry_identifier ~= nil then
-				v2.pageEntryIdentifier = self.page_entry_identifier:jsonEncode()
+			if self.actions == nil or not (#self.actions > 0) then
+				return v2
 			end
 
-			if self.feed_entry_identifier ~= nil then
-				v2.feedEntryIdentifier = self.feed_entry_identifier:jsonEncode()
+			local v3 = {}
+
+			for _, action in self.actions do
+				table.insert(v3, action:jsonEncode())
 			end
 
-			if self.selected_option_ids ~= nil then
-				v2.selectedOptionIds = self.selected_option_ids:jsonEncode()
-			end
+			v2.actions = v3
 
 			return v2
 		end
 
-		function class191.jsonDecode(data)
+		function class191.jsonDecode(p)
 			local v2 = class191.new()
 
-			if data.page_entry_identifier ~= nil then
-				v2.page_entry_identifier = prop_types.StringProp.jsonDecode(data.page_entry_identifier)
+			if p.actions == nil then
+				return v2
 			end
 
-			if data.pageEntryIdentifier ~= nil then
-				v2.page_entry_identifier = prop_types.StringProp.jsonDecode(data.pageEntryIdentifier)
+			local v3 = {}
+
+			for _, action in p.actions do
+				table.insert(v3, v.ActionProp.jsonDecode(action))
 			end
 
-			if data.feed_entry_identifier ~= nil then
-				v2.feed_entry_identifier = prop_types.StringProp.jsonDecode(data.feed_entry_identifier)
-			end
-
-			if data.feedEntryIdentifier ~= nil then
-				v2.feed_entry_identifier = prop_types.StringProp.jsonDecode(data.feedEntryIdentifier)
-			end
-
-			if data.selected_option_ids ~= nil then
-				v2.selected_option_ids = prop_types.StringArrayProp.jsonDecode(data.selected_option_ids)
-			end
-
-			if data.selectedOptionIds ~= nil then
-				v2.selected_option_ids = prop_types.StringArrayProp.jsonDecode(data.selectedOptionIds)
-			end
+			v2.actions = v3
 
 			return v2
 		end
 
 		class191.descriptor = {
-			name = "RefreshFeedEntryFromApiAction_Params",
+			name = "ActionSequenceAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.RefreshFeedEntryFromApiAction_Params = class191
+		v.ActionSequenceAction_Params = class191
 	end
 
-	typeRegistry.default:register(v.RefreshFeedEntryFromApiAction_Params)
+	typeRegistry.default:register(v.ActionSequenceAction_Params)
 
 	do
 		local class192 = {}
@@ -29767,7 +29740,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.OpenProfileFramesEditorAction_Params.decode(v5)
+						result.action_params = v.RefreshFeedEntryFromApiAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -29840,25 +29813,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.OpenProfileFramesEditorAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.RefreshFeedEntryFromApiAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.OpenProfileFramesEditorAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.RefreshFeedEntryFromApiAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class192.descriptor = {
-			name = "OpenProfileFramesEditorAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.OpenProfileFramesEditorAction"
+			name = "RefreshFeedEntryFromApiAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.RefreshFeedEntryFromApiAction"
 		}
 
-		v.OpenProfileFramesEditorAction = class192
+		v.RefreshFeedEntryFromApiAction = class192
 	end
 
-	typeRegistry.default:register(v.OpenProfileFramesEditorAction)
+	typeRegistry.default:register(v.RefreshFeedEntryFromApiAction)
 
 	do
 		local class193 = {}
@@ -29867,43 +29840,46 @@ do
 		function class193.new(data)
 			local v3
 
-			if not (data == nil or data.prompt_id == nil) then
-				v3 = data.prompt_id
+			if not (data == nil or data.page_entry_identifier == nil) then
+				v3 = data.page_entry_identifier
 			end
 
 			local v4
 
-			if not (data == nil or data.prompt_type == nil) then
-				v4 = data.prompt_type
+			if not (data == nil or data.feed_entry_identifier == nil) then
+				v4 = data.feed_entry_identifier
 			end
 
 			local v5
 
-			if not (data == nil or data.source == nil) then
-				v5 = data.source
+			if not (data == nil or data.selected_option_ids == nil) then
+				v5 = data.selected_option_ids
 			end
 
-			return (setmetatable({ prompt_id = v3, prompt_type = v4, source = v5 }, class193))
+			return (setmetatable(
+				{ page_entry_identifier = v3, feed_entry_identifier = v4, selected_option_ids = v5 },
+				class193
+			))
 		end
 
 		function class193:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.prompt_id ~= nil then
-				local encoded = self.prompt_id:encode()
+			if self.page_entry_identifier ~= nil then
+				local encoded = self.page_entry_identifier:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.prompt_type ~= nil then
-				local encoded = self.prompt_type:encode()
+			if self.feed_entry_identifier ~= nil then
+				local encoded = self.feed_entry_identifier:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.source ~= nil then
-				local encoded = self.source:encode()
+			if self.selected_option_ids ~= nil then
+				local encoded = self.selected_option_ids:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
@@ -29928,15 +29904,15 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.prompt_id = prop_types.StringProp.decode(v5)
+						result.page_entry_identifier = prop_types.StringProp.decode(v5)
 					elseif v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.prompt_type = prop_types.StringProp.decode(v5)
+						result.feed_entry_identifier = prop_types.StringProp.decode(v5)
 					elseif v3 == 3 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.source = prop_types.StringProp.decode(v5)
+						result.selected_option_ids = prop_types.StringArrayProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -29959,16 +29935,16 @@ do
 		function class193:jsonEncode()
 			local v2 = {}
 
-			if self.prompt_id ~= nil then
-				v2.promptId = self.prompt_id:jsonEncode()
+			if self.page_entry_identifier ~= nil then
+				v2.pageEntryIdentifier = self.page_entry_identifier:jsonEncode()
 			end
 
-			if self.prompt_type ~= nil then
-				v2.promptType = self.prompt_type:jsonEncode()
+			if self.feed_entry_identifier ~= nil then
+				v2.feedEntryIdentifier = self.feed_entry_identifier:jsonEncode()
 			end
 
-			if self.source ~= nil then
-				v2.source = self.source:jsonEncode()
+			if self.selected_option_ids ~= nil then
+				v2.selectedOptionIds = self.selected_option_ids:jsonEncode()
 			end
 
 			return v2
@@ -29977,38 +29953,42 @@ do
 		function class193.jsonDecode(data)
 			local v2 = class193.new()
 
-			if data.prompt_id ~= nil then
-				v2.prompt_id = prop_types.StringProp.jsonDecode(data.prompt_id)
+			if data.page_entry_identifier ~= nil then
+				v2.page_entry_identifier = prop_types.StringProp.jsonDecode(data.page_entry_identifier)
 			end
 
-			if data.promptId ~= nil then
-				v2.prompt_id = prop_types.StringProp.jsonDecode(data.promptId)
+			if data.pageEntryIdentifier ~= nil then
+				v2.page_entry_identifier = prop_types.StringProp.jsonDecode(data.pageEntryIdentifier)
 			end
 
-			if data.prompt_type ~= nil then
-				v2.prompt_type = prop_types.StringProp.jsonDecode(data.prompt_type)
+			if data.feed_entry_identifier ~= nil then
+				v2.feed_entry_identifier = prop_types.StringProp.jsonDecode(data.feed_entry_identifier)
 			end
 
-			if data.promptType ~= nil then
-				v2.prompt_type = prop_types.StringProp.jsonDecode(data.promptType)
+			if data.feedEntryIdentifier ~= nil then
+				v2.feed_entry_identifier = prop_types.StringProp.jsonDecode(data.feedEntryIdentifier)
 			end
 
-			if data.source ~= nil then
-				v2.source = prop_types.StringProp.jsonDecode(data.source)
+			if data.selected_option_ids ~= nil then
+				v2.selected_option_ids = prop_types.StringArrayProp.jsonDecode(data.selected_option_ids)
+			end
+
+			if data.selectedOptionIds ~= nil then
+				v2.selected_option_ids = prop_types.StringArrayProp.jsonDecode(data.selectedOptionIds)
 			end
 
 			return v2
 		end
 
 		class193.descriptor = {
-			name = "OpenProfileFramesEditorAction_Params",
+			name = "RefreshFeedEntryFromApiAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.OpenProfileFramesEditorAction_Params = class193
+		v.RefreshFeedEntryFromApiAction_Params = class193
 	end
 
-	typeRegistry.default:register(v.OpenProfileFramesEditorAction_Params)
+	typeRegistry.default:register(v.RefreshFeedEntryFromApiAction_Params)
 
 	do
 		local class194 = {}
@@ -30076,7 +30056,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.ApplyDevStoreSeeAllCategoryFilterAction_Params.decode(v5)
+						result.action_params = v.OpenProfileFramesEditorAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -30149,47 +30129,86 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.ApplyDevStoreSeeAllCategoryFilterAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.OpenProfileFramesEditorAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.ApplyDevStoreSeeAllCategoryFilterAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.OpenProfileFramesEditorAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class194.descriptor = {
-			name = "ApplyDevStoreSeeAllCategoryFilterAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.ApplyDevStoreSeeAllCategoryFilterAction"
+			name = "OpenProfileFramesEditorAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.OpenProfileFramesEditorAction"
 		}
 
-		v.ApplyDevStoreSeeAllCategoryFilterAction = class194
+		v.OpenProfileFramesEditorAction = class194
 	end
 
-	typeRegistry.default:register(v.ApplyDevStoreSeeAllCategoryFilterAction)
+	typeRegistry.default:register(v.OpenProfileFramesEditorAction)
 
 	do
 		local class195 = {}
 		class195.__index = class195
 
-		function class195.new(p)
+		function class195.new(data)
 			local v3
 
-			if not (p == nil or p.selected_category_id == nil) then
-				v3 = p.selected_category_id
+			if not (data == nil or data.prompt_id == nil) then
+				v3 = data.prompt_id
 			end
 
-			return (setmetatable({ selected_category_id = v3 }, class195))
+			local v4
+
+			if not (data == nil or data.prompt_type == nil) then
+				v4 = data.prompt_type
+			end
+
+			local v5
+
+			if not (data == nil or data.source == nil) then
+				v5 = data.source
+			end
+
+			local v6
+
+			if not (data == nil or data.skip_prompt_impression == nil) then
+				v6 = data.skip_prompt_impression
+			end
+
+			return (setmetatable(
+				{ prompt_id = v3, prompt_type = v4, source = v5, skip_prompt_impression = v6 },
+				class195
+			))
 		end
 
 		function class195:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.selected_category_id ~= nil then
-				local encoded = self.selected_category_id:encode()
+			if self.prompt_id ~= nil then
+				local encoded = self.prompt_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.prompt_type ~= nil then
+				local encoded = self.prompt_type:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.source ~= nil then
+				local encoded = self.source:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.skip_prompt_impression ~= nil then
+				local encoded = self.skip_prompt_impression:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -30213,7 +30232,19 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.selected_category_id = prop_types.StringProp.decode(v5)
+						result.prompt_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 2 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.prompt_type = prop_types.StringProp.decode(v5)
+					elseif v3 == 3 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.source = prop_types.StringProp.decode(v5)
+					elseif v3 == 4 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.skip_prompt_impression = prop_types.BoolProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -30236,36 +30267,68 @@ do
 		function class195:jsonEncode()
 			local v2 = {}
 
-			if self.selected_category_id ~= nil then
-				v2.selectedCategoryId = self.selected_category_id:jsonEncode()
+			if self.prompt_id ~= nil then
+				v2.promptId = self.prompt_id:jsonEncode()
+			end
+
+			if self.prompt_type ~= nil then
+				v2.promptType = self.prompt_type:jsonEncode()
+			end
+
+			if self.source ~= nil then
+				v2.source = self.source:jsonEncode()
+			end
+
+			if self.skip_prompt_impression ~= nil then
+				v2.skipPromptImpression = self.skip_prompt_impression:jsonEncode()
 			end
 
 			return v2
 		end
 
-		function class195.jsonDecode(p)
+		function class195.jsonDecode(data)
 			local v2 = class195.new()
 
-			if p.selected_category_id ~= nil then
-				v2.selected_category_id = prop_types.StringProp.jsonDecode(p.selected_category_id)
+			if data.prompt_id ~= nil then
+				v2.prompt_id = prop_types.StringProp.jsonDecode(data.prompt_id)
 			end
 
-			if p.selectedCategoryId ~= nil then
-				v2.selected_category_id = prop_types.StringProp.jsonDecode(p.selectedCategoryId)
+			if data.promptId ~= nil then
+				v2.prompt_id = prop_types.StringProp.jsonDecode(data.promptId)
+			end
+
+			if data.prompt_type ~= nil then
+				v2.prompt_type = prop_types.StringProp.jsonDecode(data.prompt_type)
+			end
+
+			if data.promptType ~= nil then
+				v2.prompt_type = prop_types.StringProp.jsonDecode(data.promptType)
+			end
+
+			if data.source ~= nil then
+				v2.source = prop_types.StringProp.jsonDecode(data.source)
+			end
+
+			if data.skip_prompt_impression ~= nil then
+				v2.skip_prompt_impression = prop_types.BoolProp.jsonDecode(data.skip_prompt_impression)
+			end
+
+			if data.skipPromptImpression ~= nil then
+				v2.skip_prompt_impression = prop_types.BoolProp.jsonDecode(data.skipPromptImpression)
 			end
 
 			return v2
 		end
 
 		class195.descriptor = {
-			name = "ApplyDevStoreSeeAllCategoryFilterAction_Params",
+			name = "OpenProfileFramesEditorAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.ApplyDevStoreSeeAllCategoryFilterAction_Params = class195
+		v.OpenProfileFramesEditorAction_Params = class195
 	end
 
-	typeRegistry.default:register(v.ApplyDevStoreSeeAllCategoryFilterAction_Params)
+	typeRegistry.default:register(v.OpenProfileFramesEditorAction_Params)
 
 	do
 		local class196 = {}
@@ -30333,7 +30396,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.SetPageScopeFieldAction_Params.decode(v5)
+						result.action_params = v.ApplyDevStoreSeeAllCategoryFilterAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -30406,71 +30469,47 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.SetPageScopeFieldAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.ApplyDevStoreSeeAllCategoryFilterAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.SetPageScopeFieldAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.ApplyDevStoreSeeAllCategoryFilterAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class196.descriptor = {
-			name = "SetPageScopeFieldAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.SetPageScopeFieldAction"
+			name = "ApplyDevStoreSeeAllCategoryFilterAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.ApplyDevStoreSeeAllCategoryFilterAction"
 		}
 
-		v.SetPageScopeFieldAction = class196
+		v.ApplyDevStoreSeeAllCategoryFilterAction = class196
 	end
 
-	typeRegistry.default:register(v.SetPageScopeFieldAction)
+	typeRegistry.default:register(v.ApplyDevStoreSeeAllCategoryFilterAction)
 
 	do
 		local class197 = {}
 		class197.__index = class197
 
-		function class197.new(data)
+		function class197.new(p)
 			local v3
 
-			if not (data == nil or data.field_name == nil) then
-				v3 = data.field_name
+			if not (p == nil or p.selected_category_id == nil) then
+				v3 = p.selected_category_id
 			end
 
-			local v4
-
-			if not (data == nil or data.value == nil) then
-				v4 = data.value
-			end
-
-			local v5
-
-			if not (data == nil or data.set_if_unset == nil) then
-				v5 = data.set_if_unset
-			end
-
-			return (setmetatable({ field_name = v3, value = v4, set_if_unset = v5 }, class197))
+			return (setmetatable({ selected_category_id = v3 }, class197))
 		end
 
 		function class197:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.field_name ~= nil then
-				local encoded = self.field_name:encode()
+			if self.selected_category_id ~= nil then
+				local encoded = self.selected_category_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.value ~= nil then
-				local encoded = self.value:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.set_if_unset ~= nil then
-				local encoded = self.set_if_unset:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -30494,15 +30533,7 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.field_name = prop_types.StringProp.decode(v5)
-					elseif v3 == 2 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.value = prop_types.StringProp.decode(v5)
-					elseif v3 == 3 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.set_if_unset = prop_types.BoolProp.decode(v5)
+						result.selected_category_id = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -30525,56 +30556,36 @@ do
 		function class197:jsonEncode()
 			local v2 = {}
 
-			if self.field_name ~= nil then
-				v2.fieldName = self.field_name:jsonEncode()
-			end
-
-			if self.value ~= nil then
-				v2.value = self.value:jsonEncode()
-			end
-
-			if self.set_if_unset ~= nil then
-				v2.setIfUnset = self.set_if_unset:jsonEncode()
+			if self.selected_category_id ~= nil then
+				v2.selectedCategoryId = self.selected_category_id:jsonEncode()
 			end
 
 			return v2
 		end
 
-		function class197.jsonDecode(data)
+		function class197.jsonDecode(p)
 			local v2 = class197.new()
 
-			if data.field_name ~= nil then
-				v2.field_name = prop_types.StringProp.jsonDecode(data.field_name)
+			if p.selected_category_id ~= nil then
+				v2.selected_category_id = prop_types.StringProp.jsonDecode(p.selected_category_id)
 			end
 
-			if data.fieldName ~= nil then
-				v2.field_name = prop_types.StringProp.jsonDecode(data.fieldName)
-			end
-
-			if data.value ~= nil then
-				v2.value = prop_types.StringProp.jsonDecode(data.value)
-			end
-
-			if data.set_if_unset ~= nil then
-				v2.set_if_unset = prop_types.BoolProp.jsonDecode(data.set_if_unset)
-			end
-
-			if data.setIfUnset ~= nil then
-				v2.set_if_unset = prop_types.BoolProp.jsonDecode(data.setIfUnset)
+			if p.selectedCategoryId ~= nil then
+				v2.selected_category_id = prop_types.StringProp.jsonDecode(p.selectedCategoryId)
 			end
 
 			return v2
 		end
 
 		class197.descriptor = {
-			name = "SetPageScopeFieldAction_Params",
+			name = "ApplyDevStoreSeeAllCategoryFilterAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.SetPageScopeFieldAction_Params = class197
+		v.ApplyDevStoreSeeAllCategoryFilterAction_Params = class197
 	end
 
-	typeRegistry.default:register(v.SetPageScopeFieldAction_Params)
+	typeRegistry.default:register(v.ApplyDevStoreSeeAllCategoryFilterAction_Params)
 
 	do
 		local class198 = {}
@@ -30642,7 +30653,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.SetGameTileNotInterestedAction_Params.decode(v5)
+						result.action_params = v.SetPageScopeFieldAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -30715,25 +30726,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.SetGameTileNotInterestedAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.SetPageScopeFieldAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.SetGameTileNotInterestedAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.SetPageScopeFieldAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class198.descriptor = {
-			name = "SetGameTileNotInterestedAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.SetGameTileNotInterestedAction"
+			name = "SetPageScopeFieldAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.SetPageScopeFieldAction"
 		}
 
-		v.SetGameTileNotInterestedAction = class198
+		v.SetPageScopeFieldAction = class198
 	end
 
-	typeRegistry.default:register(v.SetGameTileNotInterestedAction)
+	typeRegistry.default:register(v.SetPageScopeFieldAction)
 
 	do
 		local class199 = {}
@@ -30742,61 +30753,44 @@ do
 		function class199.new(data)
 			local v3
 
-			if not (data == nil or data.universe_id == nil) then
-				v3 = data.universe_id
+			if not (data == nil or data.field_name == nil) then
+				v3 = data.field_name
 			end
 
 			local v4
 
-			if not (data == nil or data.place_id == nil) then
-				v4 = data.place_id
+			if not (data == nil or data.value == nil) then
+				v4 = data.value
 			end
 
 			local v5
 
-			if not (data == nil or data.collection_id == nil) then
-				v5 = data.collection_id
+			if not (data == nil or data.set_if_unset == nil) then
+				v5 = data.set_if_unset
 			end
 
-			local v6
-
-			if not (data == nil or data.is_sponsored == nil) then
-				v6 = data.is_sponsored
-			end
-
-			return (setmetatable({
-				universe_id = v3,
-				place_id = v4,
-				collection_id = v5,
-				is_sponsored = v6
-			}, class199))
+			return (setmetatable({ field_name = v3, value = v4, set_if_unset = v5 }, class199))
 		end
 
 		function class199:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.universe_id ~= nil then
-				local encoded = self.universe_id:encode()
+			if self.field_name ~= nil then
+				local encoded = self.field_name:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.place_id ~= nil then
-				local encoded = self.place_id:encode()
+			if self.value ~= nil then
+				local encoded = self.value:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.collection_id ~= nil then
-				local encoded = self.collection_id:encode()
+			if self.set_if_unset ~= nil then
+				local encoded = self.set_if_unset:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.is_sponsored ~= nil then
-				local encoded = self.is_sponsored:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -30820,19 +30814,15 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.universe_id = prop_types.StringProp.decode(v5)
+						result.field_name = prop_types.StringProp.decode(v5)
 					elseif v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.place_id = prop_types.StringProp.decode(v5)
+						result.value = prop_types.StringProp.decode(v5)
 					elseif v3 == 3 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.collection_id = prop_types.StringProp.decode(v5)
-					elseif v3 == 4 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.is_sponsored = prop_types.BoolProp.decode(v5)
+						result.set_if_unset = prop_types.BoolProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -30855,20 +30845,16 @@ do
 		function class199:jsonEncode()
 			local v2 = {}
 
-			if self.universe_id ~= nil then
-				v2.universeId = self.universe_id:jsonEncode()
+			if self.field_name ~= nil then
+				v2.fieldName = self.field_name:jsonEncode()
 			end
 
-			if self.place_id ~= nil then
-				v2.placeId = self.place_id:jsonEncode()
+			if self.value ~= nil then
+				v2.value = self.value:jsonEncode()
 			end
 
-			if self.collection_id ~= nil then
-				v2.collectionId = self.collection_id:jsonEncode()
-			end
-
-			if self.is_sponsored ~= nil then
-				v2.isSponsored = self.is_sponsored:jsonEncode()
+			if self.set_if_unset ~= nil then
+				v2.setIfUnset = self.set_if_unset:jsonEncode()
 			end
 
 			return v2
@@ -30877,50 +30863,38 @@ do
 		function class199.jsonDecode(data)
 			local v2 = class199.new()
 
-			if data.universe_id ~= nil then
-				v2.universe_id = prop_types.StringProp.jsonDecode(data.universe_id)
+			if data.field_name ~= nil then
+				v2.field_name = prop_types.StringProp.jsonDecode(data.field_name)
 			end
 
-			if data.universeId ~= nil then
-				v2.universe_id = prop_types.StringProp.jsonDecode(data.universeId)
+			if data.fieldName ~= nil then
+				v2.field_name = prop_types.StringProp.jsonDecode(data.fieldName)
 			end
 
-			if data.place_id ~= nil then
-				v2.place_id = prop_types.StringProp.jsonDecode(data.place_id)
+			if data.value ~= nil then
+				v2.value = prop_types.StringProp.jsonDecode(data.value)
 			end
 
-			if data.placeId ~= nil then
-				v2.place_id = prop_types.StringProp.jsonDecode(data.placeId)
+			if data.set_if_unset ~= nil then
+				v2.set_if_unset = prop_types.BoolProp.jsonDecode(data.set_if_unset)
 			end
 
-			if data.collection_id ~= nil then
-				v2.collection_id = prop_types.StringProp.jsonDecode(data.collection_id)
-			end
-
-			if data.collectionId ~= nil then
-				v2.collection_id = prop_types.StringProp.jsonDecode(data.collectionId)
-			end
-
-			if data.is_sponsored ~= nil then
-				v2.is_sponsored = prop_types.BoolProp.jsonDecode(data.is_sponsored)
-			end
-
-			if data.isSponsored ~= nil then
-				v2.is_sponsored = prop_types.BoolProp.jsonDecode(data.isSponsored)
+			if data.setIfUnset ~= nil then
+				v2.set_if_unset = prop_types.BoolProp.jsonDecode(data.setIfUnset)
 			end
 
 			return v2
 		end
 
 		class199.descriptor = {
-			name = "SetGameTileNotInterestedAction_Params",
+			name = "SetPageScopeFieldAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.SetGameTileNotInterestedAction_Params = class199
+		v.SetPageScopeFieldAction_Params = class199
 	end
 
-	typeRegistry.default:register(v.SetGameTileNotInterestedAction_Params)
+	typeRegistry.default:register(v.SetPageScopeFieldAction_Params)
 
 	do
 		local class200 = {}
@@ -30988,7 +30962,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.UndoGameTileNotInterestedAction_Params.decode(v5)
+						result.action_params = v.SetGameTileNotInterestedAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -31061,44 +31035,61 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.UndoGameTileNotInterestedAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.SetGameTileNotInterestedAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.UndoGameTileNotInterestedAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.SetGameTileNotInterestedAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class200.descriptor = {
-			name = "UndoGameTileNotInterestedAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.UndoGameTileNotInterestedAction"
+			name = "SetGameTileNotInterestedAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.SetGameTileNotInterestedAction"
 		}
 
-		v.UndoGameTileNotInterestedAction = class200
+		v.SetGameTileNotInterestedAction = class200
 	end
 
-	typeRegistry.default:register(v.UndoGameTileNotInterestedAction)
+	typeRegistry.default:register(v.SetGameTileNotInterestedAction)
 
 	do
 		local class201 = {}
 		class201.__index = class201
 
-		function class201.new(p)
+		function class201.new(data)
 			local v3
 
-			if not (p == nil or p.universe_id == nil) then
-				v3 = p.universe_id
+			if not (data == nil or data.universe_id == nil) then
+				v3 = data.universe_id
 			end
 
 			local v4
 
-			if not (p == nil or p.collection_id == nil) then
-				v4 = p.collection_id
+			if not (data == nil or data.place_id == nil) then
+				v4 = data.place_id
 			end
 
-			return (setmetatable({ universe_id = v3, collection_id = v4 }, class201))
+			local v5
+
+			if not (data == nil or data.collection_id == nil) then
+				v5 = data.collection_id
+			end
+
+			local v6
+
+			if not (data == nil or data.is_sponsored == nil) then
+				v6 = data.is_sponsored
+			end
+
+			return (setmetatable({
+				universe_id = v3,
+				place_id = v4,
+				collection_id = v5,
+				is_sponsored = v6
+			}, class201))
 		end
 
 		function class201:encode()
@@ -31111,9 +31102,21 @@ do
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
+			if self.place_id ~= nil then
+				local encoded = self.place_id:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
 			if self.collection_id ~= nil then
 				local encoded = self.collection_id:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.is_sponsored ~= nil then
+				local encoded = self.is_sponsored:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -31141,7 +31144,15 @@ do
 					elseif v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
+						result.place_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 3 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
 						result.collection_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 4 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.is_sponsored = prop_types.BoolProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -31168,8 +31179,16 @@ do
 				v2.universeId = self.universe_id:jsonEncode()
 			end
 
+			if self.place_id ~= nil then
+				v2.placeId = self.place_id:jsonEncode()
+			end
+
 			if self.collection_id ~= nil then
 				v2.collectionId = self.collection_id:jsonEncode()
+			end
+
+			if self.is_sponsored ~= nil then
+				v2.isSponsored = self.is_sponsored:jsonEncode()
 			end
 
 			return v2
@@ -31186,6 +31205,14 @@ do
 				v2.universe_id = prop_types.StringProp.jsonDecode(data.universeId)
 			end
 
+			if data.place_id ~= nil then
+				v2.place_id = prop_types.StringProp.jsonDecode(data.place_id)
+			end
+
+			if data.placeId ~= nil then
+				v2.place_id = prop_types.StringProp.jsonDecode(data.placeId)
+			end
+
 			if data.collection_id ~= nil then
 				v2.collection_id = prop_types.StringProp.jsonDecode(data.collection_id)
 			end
@@ -31194,18 +31221,26 @@ do
 				v2.collection_id = prop_types.StringProp.jsonDecode(data.collectionId)
 			end
 
+			if data.is_sponsored ~= nil then
+				v2.is_sponsored = prop_types.BoolProp.jsonDecode(data.is_sponsored)
+			end
+
+			if data.isSponsored ~= nil then
+				v2.is_sponsored = prop_types.BoolProp.jsonDecode(data.isSponsored)
+			end
+
 			return v2
 		end
 
 		class201.descriptor = {
-			name = "UndoGameTileNotInterestedAction_Params",
+			name = "SetGameTileNotInterestedAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.UndoGameTileNotInterestedAction_Params = class201
+		v.SetGameTileNotInterestedAction_Params = class201
 	end
 
-	typeRegistry.default:register(v.UndoGameTileNotInterestedAction_Params)
+	typeRegistry.default:register(v.SetGameTileNotInterestedAction_Params)
 
 	do
 		local class202 = {}
@@ -31273,7 +31308,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.OpenWhyThisAdAction_Params.decode(v5)
+						result.action_params = v.UndoGameTileNotInterestedAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -31346,59 +31381,44 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.OpenWhyThisAdAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.UndoGameTileNotInterestedAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.OpenWhyThisAdAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.UndoGameTileNotInterestedAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class202.descriptor = {
-			name = "OpenWhyThisAdAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.OpenWhyThisAdAction"
+			name = "UndoGameTileNotInterestedAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.UndoGameTileNotInterestedAction"
 		}
 
-		v.OpenWhyThisAdAction = class202
+		v.UndoGameTileNotInterestedAction = class202
 	end
 
-	typeRegistry.default:register(v.OpenWhyThisAdAction)
+	typeRegistry.default:register(v.UndoGameTileNotInterestedAction)
 
 	do
 		local class203 = {}
 		class203.__index = class203
 
-		function class203.new(data)
+		function class203.new(p)
 			local v3
 
-			if not (data == nil or data.universe_id == nil) then
-				v3 = data.universe_id
+			if not (p == nil or p.universe_id == nil) then
+				v3 = p.universe_id
 			end
 
 			local v4
 
-			if not (data == nil or data.payer_name == nil) then
-				v4 = data.payer_name
+			if not (p == nil or p.collection_id == nil) then
+				v4 = p.collection_id
 			end
 
-			local v5
-
-			if not (data == nil or data.sponsored_user_cohort == nil) then
-				v5 = data.sponsored_user_cohort
-			end
-
-			local v6
-
-			if not (data == nil or data.content_type == nil) then
-				v6 = data.content_type
-			end
-
-			return (setmetatable(
-				{ universe_id = v3, payer_name = v4, sponsored_user_cohort = v5, content_type = v6 },
-				class203
-			))
+			return (setmetatable({ universe_id = v3, collection_id = v4 }, class203))
 		end
 
 		function class203:encode()
@@ -31411,21 +31431,9 @@ do
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.payer_name ~= nil then
-				local encoded = self.payer_name:encode()
+			if self.collection_id ~= nil then
+				local encoded = self.collection_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.sponsored_user_cohort ~= nil then
-				local encoded = self.sponsored_user_cohort:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.content_type ~= nil then
-				local encoded = self.content_type:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -31453,15 +31461,7 @@ do
 					elseif v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.payer_name = prop_types.StringProp.decode(v5)
-					elseif v3 == 3 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.sponsored_user_cohort = prop_types.StringProp.decode(v5)
-					elseif v3 == 4 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.content_type = prop_types.StringProp.decode(v5)
+						result.collection_id = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -31488,16 +31488,8 @@ do
 				v2.universeId = self.universe_id:jsonEncode()
 			end
 
-			if self.payer_name ~= nil then
-				v2.payerName = self.payer_name:jsonEncode()
-			end
-
-			if self.sponsored_user_cohort ~= nil then
-				v2.sponsoredUserCohort = self.sponsored_user_cohort:jsonEncode()
-			end
-
-			if self.content_type ~= nil then
-				v2.contentType = self.content_type:jsonEncode()
+			if self.collection_id ~= nil then
+				v2.collectionId = self.collection_id:jsonEncode()
 			end
 
 			return v2
@@ -31514,42 +31506,26 @@ do
 				v2.universe_id = prop_types.StringProp.jsonDecode(data.universeId)
 			end
 
-			if data.payer_name ~= nil then
-				v2.payer_name = prop_types.StringProp.jsonDecode(data.payer_name)
+			if data.collection_id ~= nil then
+				v2.collection_id = prop_types.StringProp.jsonDecode(data.collection_id)
 			end
 
-			if data.payerName ~= nil then
-				v2.payer_name = prop_types.StringProp.jsonDecode(data.payerName)
-			end
-
-			if data.sponsored_user_cohort ~= nil then
-				v2.sponsored_user_cohort = prop_types.StringProp.jsonDecode(data.sponsored_user_cohort)
-			end
-
-			if data.sponsoredUserCohort ~= nil then
-				v2.sponsored_user_cohort = prop_types.StringProp.jsonDecode(data.sponsoredUserCohort)
-			end
-
-			if data.content_type ~= nil then
-				v2.content_type = prop_types.StringProp.jsonDecode(data.content_type)
-			end
-
-			if data.contentType ~= nil then
-				v2.content_type = prop_types.StringProp.jsonDecode(data.contentType)
+			if data.collectionId ~= nil then
+				v2.collection_id = prop_types.StringProp.jsonDecode(data.collectionId)
 			end
 
 			return v2
 		end
 
 		class203.descriptor = {
-			name = "OpenWhyThisAdAction_Params",
+			name = "UndoGameTileNotInterestedAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.OpenWhyThisAdAction_Params = class203
+		v.UndoGameTileNotInterestedAction_Params = class203
 	end
 
-	typeRegistry.default:register(v.OpenWhyThisAdAction_Params)
+	typeRegistry.default:register(v.UndoGameTileNotInterestedAction_Params)
 
 	do
 		local class204 = {}
@@ -31617,7 +31593,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.RequestPushNotificationPermissionAction_Params.decode(v5)
+						result.action_params = v.OpenWhyThisAdAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -31690,47 +31666,86 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.RequestPushNotificationPermissionAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.OpenWhyThisAdAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.RequestPushNotificationPermissionAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.OpenWhyThisAdAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class204.descriptor = {
-			name = "RequestPushNotificationPermissionAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.RequestPushNotificationPermissionAction"
+			name = "OpenWhyThisAdAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.OpenWhyThisAdAction"
 		}
 
-		v.RequestPushNotificationPermissionAction = class204
+		v.OpenWhyThisAdAction = class204
 	end
 
-	typeRegistry.default:register(v.RequestPushNotificationPermissionAction)
+	typeRegistry.default:register(v.OpenWhyThisAdAction)
 
 	do
 		local class205 = {}
 		class205.__index = class205
 
-		function class205.new(p)
+		function class205.new(data)
 			local v3
 
-			if not (p == nil or p.source == nil) then
-				v3 = p.source
+			if not (data == nil or data.universe_id == nil) then
+				v3 = data.universe_id
 			end
 
-			return (setmetatable({ source = v3 }, class205))
+			local v4
+
+			if not (data == nil or data.payer_name == nil) then
+				v4 = data.payer_name
+			end
+
+			local v5
+
+			if not (data == nil or data.sponsored_user_cohort == nil) then
+				v5 = data.sponsored_user_cohort
+			end
+
+			local v6
+
+			if not (data == nil or data.content_type == nil) then
+				v6 = data.content_type
+			end
+
+			return (setmetatable(
+				{ universe_id = v3, payer_name = v4, sponsored_user_cohort = v5, content_type = v6 },
+				class205
+			))
 		end
 
 		function class205:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.source ~= nil then
-				local encoded = self.source:encode()
+			if self.universe_id ~= nil then
+				local encoded = self.universe_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.payer_name ~= nil then
+				local encoded = self.payer_name:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.sponsored_user_cohort ~= nil then
+				local encoded = self.sponsored_user_cohort:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.content_type ~= nil then
+				local encoded = self.content_type:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -31754,7 +31769,19 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.source = prop_types.StringProp.decode(v5)
+						result.universe_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 2 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.payer_name = prop_types.StringProp.decode(v5)
+					elseif v3 == 3 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.sponsored_user_cohort = prop_types.StringProp.decode(v5)
+					elseif v3 == 4 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.content_type = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -31777,32 +31804,72 @@ do
 		function class205:jsonEncode()
 			local v2 = {}
 
-			if self.source ~= nil then
-				v2.source = self.source:jsonEncode()
+			if self.universe_id ~= nil then
+				v2.universeId = self.universe_id:jsonEncode()
+			end
+
+			if self.payer_name ~= nil then
+				v2.payerName = self.payer_name:jsonEncode()
+			end
+
+			if self.sponsored_user_cohort ~= nil then
+				v2.sponsoredUserCohort = self.sponsored_user_cohort:jsonEncode()
+			end
+
+			if self.content_type ~= nil then
+				v2.contentType = self.content_type:jsonEncode()
 			end
 
 			return v2
 		end
 
-		function class205.jsonDecode(p)
+		function class205.jsonDecode(data)
 			local v2 = class205.new()
 
-			if p.source ~= nil then
-				v2.source = prop_types.StringProp.jsonDecode(p.source)
+			if data.universe_id ~= nil then
+				v2.universe_id = prop_types.StringProp.jsonDecode(data.universe_id)
+			end
+
+			if data.universeId ~= nil then
+				v2.universe_id = prop_types.StringProp.jsonDecode(data.universeId)
+			end
+
+			if data.payer_name ~= nil then
+				v2.payer_name = prop_types.StringProp.jsonDecode(data.payer_name)
+			end
+
+			if data.payerName ~= nil then
+				v2.payer_name = prop_types.StringProp.jsonDecode(data.payerName)
+			end
+
+			if data.sponsored_user_cohort ~= nil then
+				v2.sponsored_user_cohort = prop_types.StringProp.jsonDecode(data.sponsored_user_cohort)
+			end
+
+			if data.sponsoredUserCohort ~= nil then
+				v2.sponsored_user_cohort = prop_types.StringProp.jsonDecode(data.sponsoredUserCohort)
+			end
+
+			if data.content_type ~= nil then
+				v2.content_type = prop_types.StringProp.jsonDecode(data.content_type)
+			end
+
+			if data.contentType ~= nil then
+				v2.content_type = prop_types.StringProp.jsonDecode(data.contentType)
 			end
 
 			return v2
 		end
 
 		class205.descriptor = {
-			name = "RequestPushNotificationPermissionAction_Params",
+			name = "OpenWhyThisAdAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.RequestPushNotificationPermissionAction_Params = class205
+		v.OpenWhyThisAdAction_Params = class205
 	end
 
-	typeRegistry.default:register(v.RequestPushNotificationPermissionAction_Params)
+	typeRegistry.default:register(v.OpenWhyThisAdAction_Params)
 
 	do
 		local class206 = {}
@@ -31870,7 +31937,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.OpenBuildCreationChatAction_Params.decode(v5)
+						result.action_params = v.RequestPushNotificationPermissionAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -31943,101 +32010,47 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.OpenBuildCreationChatAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.RequestPushNotificationPermissionAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.OpenBuildCreationChatAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.RequestPushNotificationPermissionAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class206.descriptor = {
-			name = "OpenBuildCreationChatAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.OpenBuildCreationChatAction"
+			name = "RequestPushNotificationPermissionAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.RequestPushNotificationPermissionAction"
 		}
 
-		v.OpenBuildCreationChatAction = class206
+		v.RequestPushNotificationPermissionAction = class206
 	end
 
-	typeRegistry.default:register(v.OpenBuildCreationChatAction)
+	typeRegistry.default:register(v.RequestPushNotificationPermissionAction)
 
 	do
 		local class207 = {}
 		class207.__index = class207
 
-		function class207.new(data)
+		function class207.new(p)
 			local v3
 
-			if not (data == nil or data.experience_name == nil) then
-				v3 = data.experience_name
+			if not (p == nil or p.source == nil) then
+				v3 = p.source
 			end
 
-			local v4
-
-			if not (data == nil or data.universe_id == nil) then
-				v4 = data.universe_id
-			end
-
-			local v5
-
-			if not (data == nil or data.session_id == nil) then
-				v5 = data.session_id
-			end
-
-			local v6
-
-			if not (data == nil or data.place_id == nil) then
-				v6 = data.place_id
-			end
-
-			local v7
-
-			if not (data == nil or data.creator_name == nil) then
-				v7 = data.creator_name
-			end
-
-			return (setmetatable({
-				experience_name = v3,
-				universe_id = v4,
-				session_id = v5,
-				place_id = v6,
-				creator_name = v7
-			}, class207))
+			return (setmetatable({ source = v3 }, class207))
 		end
 
 		function class207:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.experience_name ~= nil then
-				local encoded = self.experience_name:encode()
+			if self.source ~= nil then
+				local encoded = self.source:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.universe_id ~= nil then
-				local encoded = self.universe_id:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.session_id ~= nil then
-				local encoded = self.session_id:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.place_id ~= nil then
-				local encoded = self.place_id:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.creator_name ~= nil then
-				local encoded = self.creator_name:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -32061,23 +32074,7 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.experience_name = prop_types.StringProp.decode(v5)
-					elseif v3 == 2 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.universe_id = prop_types.StringProp.decode(v5)
-					elseif v3 == 3 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.session_id = prop_types.StringProp.decode(v5)
-					elseif v3 == 4 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.place_id = prop_types.StringProp.decode(v5)
-					elseif v3 == 5 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.creator_name = prop_types.StringProp.decode(v5)
+						result.source = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -32100,84 +32097,32 @@ do
 		function class207:jsonEncode()
 			local v2 = {}
 
-			if self.experience_name ~= nil then
-				v2.experienceName = self.experience_name:jsonEncode()
-			end
-
-			if self.universe_id ~= nil then
-				v2.universeId = self.universe_id:jsonEncode()
-			end
-
-			if self.session_id ~= nil then
-				v2.sessionId = self.session_id:jsonEncode()
-			end
-
-			if self.place_id ~= nil then
-				v2.placeId = self.place_id:jsonEncode()
-			end
-
-			if self.creator_name ~= nil then
-				v2.creatorName = self.creator_name:jsonEncode()
+			if self.source ~= nil then
+				v2.source = self.source:jsonEncode()
 			end
 
 			return v2
 		end
 
-		function class207.jsonDecode(data)
+		function class207.jsonDecode(p)
 			local v2 = class207.new()
 
-			if data.experience_name ~= nil then
-				v2.experience_name = prop_types.StringProp.jsonDecode(data.experience_name)
-			end
-
-			if data.experienceName ~= nil then
-				v2.experience_name = prop_types.StringProp.jsonDecode(data.experienceName)
-			end
-
-			if data.universe_id ~= nil then
-				v2.universe_id = prop_types.StringProp.jsonDecode(data.universe_id)
-			end
-
-			if data.universeId ~= nil then
-				v2.universe_id = prop_types.StringProp.jsonDecode(data.universeId)
-			end
-
-			if data.session_id ~= nil then
-				v2.session_id = prop_types.StringProp.jsonDecode(data.session_id)
-			end
-
-			if data.sessionId ~= nil then
-				v2.session_id = prop_types.StringProp.jsonDecode(data.sessionId)
-			end
-
-			if data.place_id ~= nil then
-				v2.place_id = prop_types.StringProp.jsonDecode(data.place_id)
-			end
-
-			if data.placeId ~= nil then
-				v2.place_id = prop_types.StringProp.jsonDecode(data.placeId)
-			end
-
-			if data.creator_name ~= nil then
-				v2.creator_name = prop_types.StringProp.jsonDecode(data.creator_name)
-			end
-
-			if data.creatorName ~= nil then
-				v2.creator_name = prop_types.StringProp.jsonDecode(data.creatorName)
+			if p.source ~= nil then
+				v2.source = prop_types.StringProp.jsonDecode(p.source)
 			end
 
 			return v2
 		end
 
 		class207.descriptor = {
-			name = "OpenBuildCreationChatAction_Params",
+			name = "RequestPushNotificationPermissionAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.OpenBuildCreationChatAction_Params = class207
+		v.RequestPushNotificationPermissionAction_Params = class207
 	end
 
-	typeRegistry.default:register(v.OpenBuildCreationChatAction_Params)
+	typeRegistry.default:register(v.RequestPushNotificationPermissionAction_Params)
 
 	do
 		local class208 = {}
@@ -32245,7 +32190,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.OpenCatalogItemDetailsAction_Params.decode(v5)
+						result.action_params = v.OpenBuildCreationChatAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -32318,25 +32263,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.OpenCatalogItemDetailsAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.OpenBuildCreationChatAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.OpenCatalogItemDetailsAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.OpenBuildCreationChatAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class208.descriptor = {
-			name = "OpenCatalogItemDetailsAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.OpenCatalogItemDetailsAction"
+			name = "OpenBuildCreationChatAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.OpenBuildCreationChatAction"
 		}
 
-		v.OpenCatalogItemDetailsAction = class208
+		v.OpenBuildCreationChatAction = class208
 	end
 
-	typeRegistry.default:register(v.OpenCatalogItemDetailsAction)
+	typeRegistry.default:register(v.OpenBuildCreationChatAction)
 
 	do
 		local class209 = {}
@@ -32345,44 +32290,74 @@ do
 		function class209.new(data)
 			local v3
 
-			if not (data == nil or data.item_id == nil) then
-				v3 = data.item_id
+			if not (data == nil or data.experience_name == nil) then
+				v3 = data.experience_name
 			end
 
 			local v4
 
-			if not (data == nil or data.item_type == nil) then
-				v4 = data.item_type
+			if not (data == nil or data.universe_id == nil) then
+				v4 = data.universe_id
 			end
 
 			local v5
 
-			if not (data == nil or data.item_sub_type == nil) then
-				v5 = data.item_sub_type
+			if not (data == nil or data.session_id == nil) then
+				v5 = data.session_id
 			end
 
-			return (setmetatable({ item_id = v3, item_type = v4, item_sub_type = v5 }, class209))
+			local v6
+
+			if not (data == nil or data.place_id == nil) then
+				v6 = data.place_id
+			end
+
+			local v7
+
+			if not (data == nil or data.creator_name == nil) then
+				v7 = data.creator_name
+			end
+
+			return (setmetatable({
+				experience_name = v3,
+				universe_id = v4,
+				session_id = v5,
+				place_id = v6,
+				creator_name = v7
+			}, class209))
 		end
 
 		function class209:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.item_id ~= nil then
-				local encoded = self.item_id:encode()
+			if self.experience_name ~= nil then
+				local encoded = self.experience_name:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.item_type ~= nil then
-				local encoded = self.item_type:encode()
+			if self.universe_id ~= nil then
+				local encoded = self.universe_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.item_sub_type ~= nil then
-				local encoded = self.item_sub_type:encode()
+			if self.session_id ~= nil then
+				local encoded = self.session_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.place_id ~= nil then
+				local encoded = self.place_id:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.creator_name ~= nil then
+				local encoded = self.creator_name:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -32406,15 +32381,23 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.item_id = prop_types.StringProp.decode(v5)
+						result.experience_name = prop_types.StringProp.decode(v5)
 					elseif v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.item_type = prop_types.StringProp.decode(v5)
+						result.universe_id = prop_types.StringProp.decode(v5)
 					elseif v3 == 3 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.item_sub_type = prop_types.StringProp.decode(v5)
+						result.session_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 4 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.place_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 5 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.creator_name = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -32437,16 +32420,24 @@ do
 		function class209:jsonEncode()
 			local v2 = {}
 
-			if self.item_id ~= nil then
-				v2.itemId = self.item_id:jsonEncode()
+			if self.experience_name ~= nil then
+				v2.experienceName = self.experience_name:jsonEncode()
 			end
 
-			if self.item_type ~= nil then
-				v2.itemType = self.item_type:jsonEncode()
+			if self.universe_id ~= nil then
+				v2.universeId = self.universe_id:jsonEncode()
 			end
 
-			if self.item_sub_type ~= nil then
-				v2.itemSubType = self.item_sub_type:jsonEncode()
+			if self.session_id ~= nil then
+				v2.sessionId = self.session_id:jsonEncode()
+			end
+
+			if self.place_id ~= nil then
+				v2.placeId = self.place_id:jsonEncode()
+			end
+
+			if self.creator_name ~= nil then
+				v2.creatorName = self.creator_name:jsonEncode()
 			end
 
 			return v2
@@ -32455,42 +32446,58 @@ do
 		function class209.jsonDecode(data)
 			local v2 = class209.new()
 
-			if data.item_id ~= nil then
-				v2.item_id = prop_types.StringProp.jsonDecode(data.item_id)
+			if data.experience_name ~= nil then
+				v2.experience_name = prop_types.StringProp.jsonDecode(data.experience_name)
 			end
 
-			if data.itemId ~= nil then
-				v2.item_id = prop_types.StringProp.jsonDecode(data.itemId)
+			if data.experienceName ~= nil then
+				v2.experience_name = prop_types.StringProp.jsonDecode(data.experienceName)
 			end
 
-			if data.item_type ~= nil then
-				v2.item_type = prop_types.StringProp.jsonDecode(data.item_type)
+			if data.universe_id ~= nil then
+				v2.universe_id = prop_types.StringProp.jsonDecode(data.universe_id)
 			end
 
-			if data.itemType ~= nil then
-				v2.item_type = prop_types.StringProp.jsonDecode(data.itemType)
+			if data.universeId ~= nil then
+				v2.universe_id = prop_types.StringProp.jsonDecode(data.universeId)
 			end
 
-			if data.item_sub_type ~= nil then
-				v2.item_sub_type = prop_types.StringProp.jsonDecode(data.item_sub_type)
+			if data.session_id ~= nil then
+				v2.session_id = prop_types.StringProp.jsonDecode(data.session_id)
 			end
 
-			if data.itemSubType ~= nil then
-				v2.item_sub_type = prop_types.StringProp.jsonDecode(data.itemSubType)
+			if data.sessionId ~= nil then
+				v2.session_id = prop_types.StringProp.jsonDecode(data.sessionId)
+			end
+
+			if data.place_id ~= nil then
+				v2.place_id = prop_types.StringProp.jsonDecode(data.place_id)
+			end
+
+			if data.placeId ~= nil then
+				v2.place_id = prop_types.StringProp.jsonDecode(data.placeId)
+			end
+
+			if data.creator_name ~= nil then
+				v2.creator_name = prop_types.StringProp.jsonDecode(data.creator_name)
+			end
+
+			if data.creatorName ~= nil then
+				v2.creator_name = prop_types.StringProp.jsonDecode(data.creatorName)
 			end
 
 			return v2
 		end
 
 		class209.descriptor = {
-			name = "OpenCatalogItemDetailsAction_Params",
+			name = "OpenBuildCreationChatAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.OpenCatalogItemDetailsAction_Params = class209
+		v.OpenBuildCreationChatAction_Params = class209
 	end
 
-	typeRegistry.default:register(v.OpenCatalogItemDetailsAction_Params)
+	typeRegistry.default:register(v.OpenBuildCreationChatAction_Params)
 
 	do
 		local class210 = {}
@@ -32558,7 +32565,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.OpenItemInfoRowPromptAction_Params.decode(v5)
+						result.action_params = v.OpenCatalogItemDetailsAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -32631,25 +32638,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.OpenItemInfoRowPromptAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.OpenCatalogItemDetailsAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.OpenItemInfoRowPromptAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.OpenCatalogItemDetailsAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class210.descriptor = {
-			name = "OpenItemInfoRowPromptAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.OpenItemInfoRowPromptAction"
+			name = "OpenCatalogItemDetailsAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.OpenCatalogItemDetailsAction"
 		}
 
-		v.OpenItemInfoRowPromptAction = class210
+		v.OpenCatalogItemDetailsAction = class210
 	end
 
-	typeRegistry.default:register(v.OpenItemInfoRowPromptAction)
+	typeRegistry.default:register(v.OpenCatalogItemDetailsAction)
 
 	do
 		local class211 = {}
@@ -32658,43 +32665,43 @@ do
 		function class211.new(data)
 			local v3
 
-			if not (data == nil or data.title == nil) then
-				v3 = data.title
+			if not (data == nil or data.item_id == nil) then
+				v3 = data.item_id
 			end
 
 			local v4
 
-			if not (data == nil or data.message == nil) then
-				v4 = data.message
+			if not (data == nil or data.item_type == nil) then
+				v4 = data.item_type
 			end
 
 			local v5
 
-			if not (data == nil or data.sections == nil) then
-				v5 = data.sections
+			if not (data == nil or data.item_sub_type == nil) then
+				v5 = data.item_sub_type
 			end
 
-			return (setmetatable({ title = v3, message = v4, sections = v5 }, class211))
+			return (setmetatable({ item_id = v3, item_type = v4, item_sub_type = v5 }, class211))
 		end
 
 		function class211:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.title ~= nil then
-				local encoded = self.title:encode()
+			if self.item_id ~= nil then
+				local encoded = self.item_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.message ~= nil then
-				local encoded = self.message:encode()
+			if self.item_type ~= nil then
+				local encoded = self.item_type:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.sections ~= nil then
-				local encoded = self.sections:encode()
+			if self.item_sub_type ~= nil then
+				local encoded = self.item_sub_type:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
@@ -32719,15 +32726,15 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.title = prop_types.StringProp.decode(v5)
+						result.item_id = prop_types.StringProp.decode(v5)
 					elseif v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.message = prop_types.StringProp.decode(v5)
+						result.item_type = prop_types.StringProp.decode(v5)
 					elseif v3 == 3 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.sections = prop_types.ArrayOfStructProp.decode(v5)
+						result.item_sub_type = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -32750,16 +32757,16 @@ do
 		function class211:jsonEncode()
 			local v2 = {}
 
-			if self.title ~= nil then
-				v2.title = self.title:jsonEncode()
+			if self.item_id ~= nil then
+				v2.itemId = self.item_id:jsonEncode()
 			end
 
-			if self.message ~= nil then
-				v2.message = self.message:jsonEncode()
+			if self.item_type ~= nil then
+				v2.itemType = self.item_type:jsonEncode()
 			end
 
-			if self.sections ~= nil then
-				v2.sections = self.sections:jsonEncode()
+			if self.item_sub_type ~= nil then
+				v2.itemSubType = self.item_sub_type:jsonEncode()
 			end
 
 			return v2
@@ -32768,30 +32775,42 @@ do
 		function class211.jsonDecode(data)
 			local v2 = class211.new()
 
-			if data.title ~= nil then
-				v2.title = prop_types.StringProp.jsonDecode(data.title)
+			if data.item_id ~= nil then
+				v2.item_id = prop_types.StringProp.jsonDecode(data.item_id)
 			end
 
-			if data.message ~= nil then
-				v2.message = prop_types.StringProp.jsonDecode(data.message)
+			if data.itemId ~= nil then
+				v2.item_id = prop_types.StringProp.jsonDecode(data.itemId)
 			end
 
-			if data.sections ~= nil then
-				v2.sections = prop_types.ArrayOfStructProp.jsonDecode(data.sections)
+			if data.item_type ~= nil then
+				v2.item_type = prop_types.StringProp.jsonDecode(data.item_type)
+			end
+
+			if data.itemType ~= nil then
+				v2.item_type = prop_types.StringProp.jsonDecode(data.itemType)
+			end
+
+			if data.item_sub_type ~= nil then
+				v2.item_sub_type = prop_types.StringProp.jsonDecode(data.item_sub_type)
+			end
+
+			if data.itemSubType ~= nil then
+				v2.item_sub_type = prop_types.StringProp.jsonDecode(data.itemSubType)
 			end
 
 			return v2
 		end
 
 		class211.descriptor = {
-			name = "OpenItemInfoRowPromptAction_Params",
+			name = "OpenCatalogItemDetailsAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.OpenItemInfoRowPromptAction_Params = class211
+		v.OpenCatalogItemDetailsAction_Params = class211
 	end
 
-	typeRegistry.default:register(v.OpenItemInfoRowPromptAction_Params)
+	typeRegistry.default:register(v.OpenCatalogItemDetailsAction_Params)
 
 	do
 		local class212 = {}
@@ -32859,7 +32878,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.ToggleCatalogItemFavoriteAction_Params.decode(v5)
+						result.action_params = v.OpenItemInfoRowPromptAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -32932,59 +32951,71 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.ToggleCatalogItemFavoriteAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.OpenItemInfoRowPromptAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.ToggleCatalogItemFavoriteAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.OpenItemInfoRowPromptAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class212.descriptor = {
-			name = "ToggleCatalogItemFavoriteAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.ToggleCatalogItemFavoriteAction"
+			name = "OpenItemInfoRowPromptAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.OpenItemInfoRowPromptAction"
 		}
 
-		v.ToggleCatalogItemFavoriteAction = class212
+		v.OpenItemInfoRowPromptAction = class212
 	end
 
-	typeRegistry.default:register(v.ToggleCatalogItemFavoriteAction)
+	typeRegistry.default:register(v.OpenItemInfoRowPromptAction)
 
 	do
 		local class213 = {}
 		class213.__index = class213
 
-		function class213.new(p)
+		function class213.new(data)
 			local v3
 
-			if not (p == nil or p.item_id == nil) then
-				v3 = p.item_id
+			if not (data == nil or data.title == nil) then
+				v3 = data.title
 			end
 
 			local v4
 
-			if not (p == nil or p.item_type == nil) then
-				v4 = p.item_type
+			if not (data == nil or data.message == nil) then
+				v4 = data.message
 			end
 
-			return (setmetatable({ item_id = v3, item_type = v4 }, class213))
+			local v5
+
+			if not (data == nil or data.sections == nil) then
+				v5 = data.sections
+			end
+
+			return (setmetatable({ title = v3, message = v4, sections = v5 }, class213))
 		end
 
 		function class213:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.item_id ~= nil then
-				local encoded = self.item_id:encode()
+			if self.title ~= nil then
+				local encoded = self.title:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.item_type ~= nil then
-				local encoded = self.item_type:encode()
+			if self.message ~= nil then
+				local encoded = self.message:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.sections ~= nil then
+				local encoded = self.sections:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -33008,11 +33039,15 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.item_id = prop_types.StringProp.decode(v5)
+						result.title = prop_types.StringProp.decode(v5)
 					elseif v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.item_type = prop_types.StringProp.decode(v5)
+						result.message = prop_types.StringProp.decode(v5)
+					elseif v3 == 3 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.sections = prop_types.ArrayOfStructProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -33035,12 +33070,16 @@ do
 		function class213:jsonEncode()
 			local v2 = {}
 
-			if self.item_id ~= nil then
-				v2.itemId = self.item_id:jsonEncode()
+			if self.title ~= nil then
+				v2.title = self.title:jsonEncode()
 			end
 
-			if self.item_type ~= nil then
-				v2.itemType = self.item_type:jsonEncode()
+			if self.message ~= nil then
+				v2.message = self.message:jsonEncode()
+			end
+
+			if self.sections ~= nil then
+				v2.sections = self.sections:jsonEncode()
 			end
 
 			return v2
@@ -33049,34 +33088,30 @@ do
 		function class213.jsonDecode(data)
 			local v2 = class213.new()
 
-			if data.item_id ~= nil then
-				v2.item_id = prop_types.StringProp.jsonDecode(data.item_id)
+			if data.title ~= nil then
+				v2.title = prop_types.StringProp.jsonDecode(data.title)
 			end
 
-			if data.itemId ~= nil then
-				v2.item_id = prop_types.StringProp.jsonDecode(data.itemId)
+			if data.message ~= nil then
+				v2.message = prop_types.StringProp.jsonDecode(data.message)
 			end
 
-			if data.item_type ~= nil then
-				v2.item_type = prop_types.StringProp.jsonDecode(data.item_type)
-			end
-
-			if data.itemType ~= nil then
-				v2.item_type = prop_types.StringProp.jsonDecode(data.itemType)
+			if data.sections ~= nil then
+				v2.sections = prop_types.ArrayOfStructProp.jsonDecode(data.sections)
 			end
 
 			return v2
 		end
 
 		class213.descriptor = {
-			name = "ToggleCatalogItemFavoriteAction_Params",
+			name = "OpenItemInfoRowPromptAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.ToggleCatalogItemFavoriteAction_Params = class213
+		v.OpenItemInfoRowPromptAction_Params = class213
 	end
 
-	typeRegistry.default:register(v.ToggleCatalogItemFavoriteAction_Params)
+	typeRegistry.default:register(v.OpenItemInfoRowPromptAction_Params)
 
 	do
 		local class214 = {}
@@ -33144,7 +33179,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.OpenCatalogItemExperiencesAction_Params.decode(v5)
+						result.action_params = v.ToggleCatalogItemFavoriteAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -33217,61 +33252,44 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.OpenCatalogItemExperiencesAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.ToggleCatalogItemFavoriteAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.OpenCatalogItemExperiencesAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.ToggleCatalogItemFavoriteAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class214.descriptor = {
-			name = "OpenCatalogItemExperiencesAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.OpenCatalogItemExperiencesAction"
+			name = "ToggleCatalogItemFavoriteAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.ToggleCatalogItemFavoriteAction"
 		}
 
-		v.OpenCatalogItemExperiencesAction = class214
+		v.ToggleCatalogItemFavoriteAction = class214
 	end
 
-	typeRegistry.default:register(v.OpenCatalogItemExperiencesAction)
+	typeRegistry.default:register(v.ToggleCatalogItemFavoriteAction)
 
 	do
 		local class215 = {}
 		class215.__index = class215
 
-		function class215.new(data)
+		function class215.new(p)
 			local v3
 
-			if not (data == nil or data.item_id == nil) then
-				v3 = data.item_id
+			if not (p == nil or p.item_id == nil) then
+				v3 = p.item_id
 			end
 
 			local v4
 
-			if not (data == nil or data.item_type == nil) then
-				v4 = data.item_type
+			if not (p == nil or p.item_type == nil) then
+				v4 = p.item_type
 			end
 
-			local v5
-
-			if not (data == nil or data.collectible_item_id == nil) then
-				v5 = data.collectible_item_id
-			end
-
-			local v6
-
-			if not (data == nil or data.is_limited == nil) then
-				v6 = data.is_limited
-			end
-
-			return (setmetatable({
-				item_id = v3,
-				item_type = v4,
-				collectible_item_id = v5,
-				is_limited = v6
-			}, class215))
+			return (setmetatable({ item_id = v3, item_type = v4 }, class215))
 		end
 
 		function class215:encode()
@@ -33287,18 +33305,6 @@ do
 			if self.item_type ~= nil then
 				local encoded = self.item_type:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.collectible_item_id ~= nil then
-				local encoded = self.collectible_item_id:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.is_limited ~= nil then
-				local encoded = self.is_limited:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -33327,14 +33333,6 @@ do
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
 						result.item_type = prop_types.StringProp.decode(v5)
-					elseif v3 == 3 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.collectible_item_id = prop_types.StringProp.decode(v5)
-					elseif v3 == 4 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.is_limited = prop_types.BoolProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -33365,14 +33363,6 @@ do
 				v2.itemType = self.item_type:jsonEncode()
 			end
 
-			if self.collectible_item_id ~= nil then
-				v2.collectibleItemId = self.collectible_item_id:jsonEncode()
-			end
-
-			if self.is_limited ~= nil then
-				v2.isLimited = self.is_limited:jsonEncode()
-			end
-
 			return v2
 		end
 
@@ -33395,34 +33385,18 @@ do
 				v2.item_type = prop_types.StringProp.jsonDecode(data.itemType)
 			end
 
-			if data.collectible_item_id ~= nil then
-				v2.collectible_item_id = prop_types.StringProp.jsonDecode(data.collectible_item_id)
-			end
-
-			if data.collectibleItemId ~= nil then
-				v2.collectible_item_id = prop_types.StringProp.jsonDecode(data.collectibleItemId)
-			end
-
-			if data.is_limited ~= nil then
-				v2.is_limited = prop_types.BoolProp.jsonDecode(data.is_limited)
-			end
-
-			if data.isLimited ~= nil then
-				v2.is_limited = prop_types.BoolProp.jsonDecode(data.isLimited)
-			end
-
 			return v2
 		end
 
 		class215.descriptor = {
-			name = "OpenCatalogItemExperiencesAction_Params",
+			name = "ToggleCatalogItemFavoriteAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.OpenCatalogItemExperiencesAction_Params = class215
+		v.ToggleCatalogItemFavoriteAction_Params = class215
 	end
 
-	typeRegistry.default:register(v.OpenCatalogItemExperiencesAction_Params)
+	typeRegistry.default:register(v.ToggleCatalogItemFavoriteAction_Params)
 
 	do
 		local class216 = {}
@@ -33490,7 +33464,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.OpenCatalogItemCreatorProfileAction_Params.decode(v5)
+						result.action_params = v.OpenCatalogItemExperiencesAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -33563,59 +33537,88 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.OpenCatalogItemCreatorProfileAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.OpenCatalogItemExperiencesAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.OpenCatalogItemCreatorProfileAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.OpenCatalogItemExperiencesAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class216.descriptor = {
-			name = "OpenCatalogItemCreatorProfileAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.OpenCatalogItemCreatorProfileAction"
+			name = "OpenCatalogItemExperiencesAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.OpenCatalogItemExperiencesAction"
 		}
 
-		v.OpenCatalogItemCreatorProfileAction = class216
+		v.OpenCatalogItemExperiencesAction = class216
 	end
 
-	typeRegistry.default:register(v.OpenCatalogItemCreatorProfileAction)
+	typeRegistry.default:register(v.OpenCatalogItemExperiencesAction)
 
 	do
 		local class217 = {}
 		class217.__index = class217
 
-		function class217.new(p)
+		function class217.new(data)
 			local v3
 
-			if not (p == nil or p.creator_id == nil) then
-				v3 = p.creator_id
+			if not (data == nil or data.item_id == nil) then
+				v3 = data.item_id
 			end
 
 			local v4
 
-			if not (p == nil or p.creator_type == nil) then
-				v4 = p.creator_type
+			if not (data == nil or data.item_type == nil) then
+				v4 = data.item_type
 			end
 
-			return (setmetatable({ creator_id = v3, creator_type = v4 }, class217))
+			local v5
+
+			if not (data == nil or data.collectible_item_id == nil) then
+				v5 = data.collectible_item_id
+			end
+
+			local v6
+
+			if not (data == nil or data.is_limited == nil) then
+				v6 = data.is_limited
+			end
+
+			return (setmetatable({
+				item_id = v3,
+				item_type = v4,
+				collectible_item_id = v5,
+				is_limited = v6
+			}, class217))
 		end
 
 		function class217:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.creator_id ~= nil then
-				local encoded = self.creator_id:encode()
+			if self.item_id ~= nil then
+				local encoded = self.item_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.creator_type ~= nil then
-				local encoded = self.creator_type:encode()
+			if self.item_type ~= nil then
+				local encoded = self.item_type:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.collectible_item_id ~= nil then
+				local encoded = self.collectible_item_id:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.is_limited ~= nil then
+				local encoded = self.is_limited:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -33639,11 +33642,19 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.creator_id = prop_types.StringProp.decode(v5)
+						result.item_id = prop_types.StringProp.decode(v5)
 					elseif v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.creator_type = prop_types.StringProp.decode(v5)
+						result.item_type = prop_types.StringProp.decode(v5)
+					elseif v3 == 3 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.collectible_item_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 4 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.is_limited = prop_types.BoolProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -33666,12 +33677,20 @@ do
 		function class217:jsonEncode()
 			local v2 = {}
 
-			if self.creator_id ~= nil then
-				v2.creatorId = self.creator_id:jsonEncode()
+			if self.item_id ~= nil then
+				v2.itemId = self.item_id:jsonEncode()
 			end
 
-			if self.creator_type ~= nil then
-				v2.creatorType = self.creator_type:jsonEncode()
+			if self.item_type ~= nil then
+				v2.itemType = self.item_type:jsonEncode()
+			end
+
+			if self.collectible_item_id ~= nil then
+				v2.collectibleItemId = self.collectible_item_id:jsonEncode()
+			end
+
+			if self.is_limited ~= nil then
+				v2.isLimited = self.is_limited:jsonEncode()
 			end
 
 			return v2
@@ -33680,34 +33699,50 @@ do
 		function class217.jsonDecode(data)
 			local v2 = class217.new()
 
-			if data.creator_id ~= nil then
-				v2.creator_id = prop_types.StringProp.jsonDecode(data.creator_id)
+			if data.item_id ~= nil then
+				v2.item_id = prop_types.StringProp.jsonDecode(data.item_id)
 			end
 
-			if data.creatorId ~= nil then
-				v2.creator_id = prop_types.StringProp.jsonDecode(data.creatorId)
+			if data.itemId ~= nil then
+				v2.item_id = prop_types.StringProp.jsonDecode(data.itemId)
 			end
 
-			if data.creator_type ~= nil then
-				v2.creator_type = prop_types.StringProp.jsonDecode(data.creator_type)
+			if data.item_type ~= nil then
+				v2.item_type = prop_types.StringProp.jsonDecode(data.item_type)
 			end
 
-			if data.creatorType ~= nil then
-				v2.creator_type = prop_types.StringProp.jsonDecode(data.creatorType)
+			if data.itemType ~= nil then
+				v2.item_type = prop_types.StringProp.jsonDecode(data.itemType)
+			end
+
+			if data.collectible_item_id ~= nil then
+				v2.collectible_item_id = prop_types.StringProp.jsonDecode(data.collectible_item_id)
+			end
+
+			if data.collectibleItemId ~= nil then
+				v2.collectible_item_id = prop_types.StringProp.jsonDecode(data.collectibleItemId)
+			end
+
+			if data.is_limited ~= nil then
+				v2.is_limited = prop_types.BoolProp.jsonDecode(data.is_limited)
+			end
+
+			if data.isLimited ~= nil then
+				v2.is_limited = prop_types.BoolProp.jsonDecode(data.isLimited)
 			end
 
 			return v2
 		end
 
 		class217.descriptor = {
-			name = "OpenCatalogItemCreatorProfileAction_Params",
+			name = "OpenCatalogItemExperiencesAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.OpenCatalogItemCreatorProfileAction_Params = class217
+		v.OpenCatalogItemExperiencesAction_Params = class217
 	end
 
-	typeRegistry.default:register(v.OpenCatalogItemCreatorProfileAction_Params)
+	typeRegistry.default:register(v.OpenCatalogItemExperiencesAction_Params)
 
 	do
 		local class218 = {}
@@ -33775,7 +33810,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.PlayCatalogItemAttributionExperienceAction_Params.decode(v5)
+						result.action_params = v.OpenCatalogItemCreatorProfileAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -33848,25 +33883,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.PlayCatalogItemAttributionExperienceAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.OpenCatalogItemCreatorProfileAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.PlayCatalogItemAttributionExperienceAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.OpenCatalogItemCreatorProfileAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class218.descriptor = {
-			name = "PlayCatalogItemAttributionExperienceAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.PlayCatalogItemAttributionExperienceAction"
+			name = "OpenCatalogItemCreatorProfileAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.OpenCatalogItemCreatorProfileAction"
 		}
 
-		v.PlayCatalogItemAttributionExperienceAction = class218
+		v.OpenCatalogItemCreatorProfileAction = class218
 	end
 
-	typeRegistry.default:register(v.PlayCatalogItemAttributionExperienceAction)
+	typeRegistry.default:register(v.OpenCatalogItemCreatorProfileAction)
 
 	do
 		local class219 = {}
@@ -33875,20 +33910,32 @@ do
 		function class219.new(p)
 			local v3
 
-			if not (p == nil or p.universe_id == nil) then
-				v3 = p.universe_id
+			if not (p == nil or p.creator_id == nil) then
+				v3 = p.creator_id
 			end
 
-			return (setmetatable({ universe_id = v3 }, class219))
+			local v4
+
+			if not (p == nil or p.creator_type == nil) then
+				v4 = p.creator_type
+			end
+
+			return (setmetatable({ creator_id = v3, creator_type = v4 }, class219))
 		end
 
 		function class219:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.universe_id ~= nil then
-				local encoded = self.universe_id:encode()
+			if self.creator_id ~= nil then
+				local encoded = self.creator_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.creator_type ~= nil then
+				local encoded = self.creator_type:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -33912,7 +33959,11 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.universe_id = prop_types.StringProp.decode(v5)
+						result.creator_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 2 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.creator_type = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -33935,36 +33986,48 @@ do
 		function class219:jsonEncode()
 			local v2 = {}
 
-			if self.universe_id ~= nil then
-				v2.universeId = self.universe_id:jsonEncode()
+			if self.creator_id ~= nil then
+				v2.creatorId = self.creator_id:jsonEncode()
+			end
+
+			if self.creator_type ~= nil then
+				v2.creatorType = self.creator_type:jsonEncode()
 			end
 
 			return v2
 		end
 
-		function class219.jsonDecode(p)
+		function class219.jsonDecode(data)
 			local v2 = class219.new()
 
-			if p.universe_id ~= nil then
-				v2.universe_id = prop_types.StringProp.jsonDecode(p.universe_id)
+			if data.creator_id ~= nil then
+				v2.creator_id = prop_types.StringProp.jsonDecode(data.creator_id)
 			end
 
-			if p.universeId ~= nil then
-				v2.universe_id = prop_types.StringProp.jsonDecode(p.universeId)
+			if data.creatorId ~= nil then
+				v2.creator_id = prop_types.StringProp.jsonDecode(data.creatorId)
+			end
+
+			if data.creator_type ~= nil then
+				v2.creator_type = prop_types.StringProp.jsonDecode(data.creator_type)
+			end
+
+			if data.creatorType ~= nil then
+				v2.creator_type = prop_types.StringProp.jsonDecode(data.creatorType)
 			end
 
 			return v2
 		end
 
 		class219.descriptor = {
-			name = "PlayCatalogItemAttributionExperienceAction_Params",
+			name = "OpenCatalogItemCreatorProfileAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.PlayCatalogItemAttributionExperienceAction_Params = class219
+		v.OpenCatalogItemCreatorProfileAction_Params = class219
 	end
 
-	typeRegistry.default:register(v.PlayCatalogItemAttributionExperienceAction_Params)
+	typeRegistry.default:register(v.OpenCatalogItemCreatorProfileAction_Params)
 
 	do
 		local class220 = {}
@@ -34032,7 +34095,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.OpenCatalogItemResellersAction_Params.decode(v5)
+						result.action_params = v.PlayCatalogItemAttributionExperienceAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -34105,71 +34168,47 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.OpenCatalogItemResellersAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.PlayCatalogItemAttributionExperienceAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.OpenCatalogItemResellersAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.PlayCatalogItemAttributionExperienceAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class220.descriptor = {
-			name = "OpenCatalogItemResellersAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.OpenCatalogItemResellersAction"
+			name = "PlayCatalogItemAttributionExperienceAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.PlayCatalogItemAttributionExperienceAction"
 		}
 
-		v.OpenCatalogItemResellersAction = class220
+		v.PlayCatalogItemAttributionExperienceAction = class220
 	end
 
-	typeRegistry.default:register(v.OpenCatalogItemResellersAction)
+	typeRegistry.default:register(v.PlayCatalogItemAttributionExperienceAction)
 
 	do
 		local class221 = {}
 		class221.__index = class221
 
-		function class221.new(data)
+		function class221.new(p)
 			local v3
 
-			if not (data == nil or data.item_id == nil) then
-				v3 = data.item_id
+			if not (p == nil or p.universe_id == nil) then
+				v3 = p.universe_id
 			end
 
-			local v4
-
-			if not (data == nil or data.item_type == nil) then
-				v4 = data.item_type
-			end
-
-			local v5
-
-			if not (data == nil or data.collectible_item_id == nil) then
-				v5 = data.collectible_item_id
-			end
-
-			return (setmetatable({ item_id = v3, item_type = v4, collectible_item_id = v5 }, class221))
+			return (setmetatable({ universe_id = v3 }, class221))
 		end
 
 		function class221:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.item_id ~= nil then
-				local encoded = self.item_id:encode()
+			if self.universe_id ~= nil then
+				local encoded = self.universe_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.item_type ~= nil then
-				local encoded = self.item_type:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.collectible_item_id ~= nil then
-				local encoded = self.collectible_item_id:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -34193,15 +34232,7 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.item_id = prop_types.StringProp.decode(v5)
-					elseif v3 == 2 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.item_type = prop_types.StringProp.decode(v5)
-					elseif v3 == 3 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.collectible_item_id = prop_types.StringProp.decode(v5)
+						result.universe_id = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -34224,60 +34255,36 @@ do
 		function class221:jsonEncode()
 			local v2 = {}
 
-			if self.item_id ~= nil then
-				v2.itemId = self.item_id:jsonEncode()
-			end
-
-			if self.item_type ~= nil then
-				v2.itemType = self.item_type:jsonEncode()
-			end
-
-			if self.collectible_item_id ~= nil then
-				v2.collectibleItemId = self.collectible_item_id:jsonEncode()
+			if self.universe_id ~= nil then
+				v2.universeId = self.universe_id:jsonEncode()
 			end
 
 			return v2
 		end
 
-		function class221.jsonDecode(data)
+		function class221.jsonDecode(p)
 			local v2 = class221.new()
 
-			if data.item_id ~= nil then
-				v2.item_id = prop_types.StringProp.jsonDecode(data.item_id)
+			if p.universe_id ~= nil then
+				v2.universe_id = prop_types.StringProp.jsonDecode(p.universe_id)
 			end
 
-			if data.itemId ~= nil then
-				v2.item_id = prop_types.StringProp.jsonDecode(data.itemId)
-			end
-
-			if data.item_type ~= nil then
-				v2.item_type = prop_types.StringProp.jsonDecode(data.item_type)
-			end
-
-			if data.itemType ~= nil then
-				v2.item_type = prop_types.StringProp.jsonDecode(data.itemType)
-			end
-
-			if data.collectible_item_id ~= nil then
-				v2.collectible_item_id = prop_types.StringProp.jsonDecode(data.collectible_item_id)
-			end
-
-			if data.collectibleItemId ~= nil then
-				v2.collectible_item_id = prop_types.StringProp.jsonDecode(data.collectibleItemId)
+			if p.universeId ~= nil then
+				v2.universe_id = prop_types.StringProp.jsonDecode(p.universeId)
 			end
 
 			return v2
 		end
 
 		class221.descriptor = {
-			name = "OpenCatalogItemResellersAction_Params",
+			name = "PlayCatalogItemAttributionExperienceAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.OpenCatalogItemResellersAction_Params = class221
+		v.PlayCatalogItemAttributionExperienceAction_Params = class221
 	end
 
-	typeRegistry.default:register(v.OpenCatalogItemResellersAction_Params)
+	typeRegistry.default:register(v.PlayCatalogItemAttributionExperienceAction_Params)
 
 	do
 		local class222 = {}
@@ -34345,7 +34352,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.PurchaseCatalogItemFromStockAction_Params.decode(v5)
+						result.action_params = v.OpenCatalogItemResellersAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -34418,25 +34425,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.PurchaseCatalogItemFromStockAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.OpenCatalogItemResellersAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.PurchaseCatalogItemFromStockAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.OpenCatalogItemResellersAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class222.descriptor = {
-			name = "PurchaseCatalogItemFromStockAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.PurchaseCatalogItemFromStockAction"
+			name = "OpenCatalogItemResellersAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.OpenCatalogItemResellersAction"
 		}
 
-		v.PurchaseCatalogItemFromStockAction = class222
+		v.OpenCatalogItemResellersAction = class222
 	end
 
-	typeRegistry.default:register(v.PurchaseCatalogItemFromStockAction)
+	typeRegistry.default:register(v.OpenCatalogItemResellersAction)
 
 	do
 		local class223 = {}
@@ -34457,29 +34464,11 @@ do
 
 			local v5
 
-			if not (data == nil or data.price == nil) then
-				v5 = data.price
+			if not (data == nil or data.collectible_item_id == nil) then
+				v5 = data.collectible_item_id
 			end
 
-			local v6
-
-			if not (data == nil or data.seller_id == nil) then
-				v6 = data.seller_id
-			end
-
-			local v7
-
-			if not (data == nil or data.seller_name == nil) then
-				v7 = data.seller_name
-			end
-
-			return (setmetatable({
-				item_id = v3,
-				item_type = v4,
-				price = v5,
-				seller_id = v6,
-				seller_name = v7
-			}, class223))
+			return (setmetatable({ item_id = v3, item_type = v4, collectible_item_id = v5 }, class223))
 		end
 
 		function class223:encode()
@@ -34498,21 +34487,9 @@ do
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.price ~= nil then
-				local encoded = self.price:encode()
+			if self.collectible_item_id ~= nil then
+				local encoded = self.collectible_item_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.seller_id ~= nil then
-				local encoded = self.seller_id:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.seller_name ~= nil then
-				local encoded = self.seller_name:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -34544,15 +34521,7 @@ do
 					elseif v3 == 3 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.price = prop_types.Int64Prop.decode(v5)
-					elseif v3 == 4 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.seller_id = prop_types.StringProp.decode(v5)
-					elseif v3 == 5 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.seller_name = prop_types.StringProp.decode(v5)
+						result.collectible_item_id = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -34583,16 +34552,8 @@ do
 				v2.itemType = self.item_type:jsonEncode()
 			end
 
-			if self.price ~= nil then
-				v2.price = self.price:jsonEncode()
-			end
-
-			if self.seller_id ~= nil then
-				v2.sellerId = self.seller_id:jsonEncode()
-			end
-
-			if self.seller_name ~= nil then
-				v2.sellerName = self.seller_name:jsonEncode()
+			if self.collectible_item_id ~= nil then
+				v2.collectibleItemId = self.collectible_item_id:jsonEncode()
 			end
 
 			return v2
@@ -34617,38 +34578,26 @@ do
 				v2.item_type = prop_types.StringProp.jsonDecode(data.itemType)
 			end
 
-			if data.price ~= nil then
-				v2.price = prop_types.Int64Prop.jsonDecode(data.price)
+			if data.collectible_item_id ~= nil then
+				v2.collectible_item_id = prop_types.StringProp.jsonDecode(data.collectible_item_id)
 			end
 
-			if data.seller_id ~= nil then
-				v2.seller_id = prop_types.StringProp.jsonDecode(data.seller_id)
-			end
-
-			if data.sellerId ~= nil then
-				v2.seller_id = prop_types.StringProp.jsonDecode(data.sellerId)
-			end
-
-			if data.seller_name ~= nil then
-				v2.seller_name = prop_types.StringProp.jsonDecode(data.seller_name)
-			end
-
-			if data.sellerName ~= nil then
-				v2.seller_name = prop_types.StringProp.jsonDecode(data.sellerName)
+			if data.collectibleItemId ~= nil then
+				v2.collectible_item_id = prop_types.StringProp.jsonDecode(data.collectibleItemId)
 			end
 
 			return v2
 		end
 
 		class223.descriptor = {
-			name = "PurchaseCatalogItemFromStockAction_Params",
+			name = "OpenCatalogItemResellersAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.PurchaseCatalogItemFromStockAction_Params = class223
+		v.OpenCatalogItemResellersAction_Params = class223
 	end
 
-	typeRegistry.default:register(v.PurchaseCatalogItemFromStockAction_Params)
+	typeRegistry.default:register(v.OpenCatalogItemResellersAction_Params)
 
 	do
 		local class224 = {}
@@ -34716,7 +34665,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.OpenCatalogItemOwnershipAction_Params.decode(v5)
+						result.action_params = v.PurchaseCatalogItemFromStockAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -34789,25 +34738,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.OpenCatalogItemOwnershipAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.PurchaseCatalogItemFromStockAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.OpenCatalogItemOwnershipAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.PurchaseCatalogItemFromStockAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class224.descriptor = {
-			name = "OpenCatalogItemOwnershipAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.OpenCatalogItemOwnershipAction"
+			name = "PurchaseCatalogItemFromStockAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.PurchaseCatalogItemFromStockAction"
 		}
 
-		v.OpenCatalogItemOwnershipAction = class224
+		v.PurchaseCatalogItemFromStockAction = class224
 	end
 
-	typeRegistry.default:register(v.OpenCatalogItemOwnershipAction)
+	typeRegistry.default:register(v.PurchaseCatalogItemFromStockAction)
 
 	do
 		local class225 = {}
@@ -34828,11 +34777,29 @@ do
 
 			local v5
 
-			if not (data == nil or data.collectible_item_id == nil) then
-				v5 = data.collectible_item_id
+			if not (data == nil or data.price == nil) then
+				v5 = data.price
 			end
 
-			return (setmetatable({ item_id = v3, item_type = v4, collectible_item_id = v5 }, class225))
+			local v6
+
+			if not (data == nil or data.seller_id == nil) then
+				v6 = data.seller_id
+			end
+
+			local v7
+
+			if not (data == nil or data.seller_name == nil) then
+				v7 = data.seller_name
+			end
+
+			return (setmetatable({
+				item_id = v3,
+				item_type = v4,
+				price = v5,
+				seller_id = v6,
+				seller_name = v7
+			}, class225))
 		end
 
 		function class225:encode()
@@ -34851,9 +34818,21 @@ do
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.collectible_item_id ~= nil then
-				local encoded = self.collectible_item_id:encode()
+			if self.price ~= nil then
+				local encoded = self.price:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.seller_id ~= nil then
+				local encoded = self.seller_id:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.seller_name ~= nil then
+				local encoded = self.seller_name:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -34885,7 +34864,15 @@ do
 					elseif v3 == 3 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.collectible_item_id = prop_types.StringProp.decode(v5)
+						result.price = prop_types.Int64Prop.decode(v5)
+					elseif v3 == 4 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.seller_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 5 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.seller_name = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -34916,8 +34903,16 @@ do
 				v2.itemType = self.item_type:jsonEncode()
 			end
 
-			if self.collectible_item_id ~= nil then
-				v2.collectibleItemId = self.collectible_item_id:jsonEncode()
+			if self.price ~= nil then
+				v2.price = self.price:jsonEncode()
+			end
+
+			if self.seller_id ~= nil then
+				v2.sellerId = self.seller_id:jsonEncode()
+			end
+
+			if self.seller_name ~= nil then
+				v2.sellerName = self.seller_name:jsonEncode()
 			end
 
 			return v2
@@ -34942,26 +34937,38 @@ do
 				v2.item_type = prop_types.StringProp.jsonDecode(data.itemType)
 			end
 
-			if data.collectible_item_id ~= nil then
-				v2.collectible_item_id = prop_types.StringProp.jsonDecode(data.collectible_item_id)
+			if data.price ~= nil then
+				v2.price = prop_types.Int64Prop.jsonDecode(data.price)
 			end
 
-			if data.collectibleItemId ~= nil then
-				v2.collectible_item_id = prop_types.StringProp.jsonDecode(data.collectibleItemId)
+			if data.seller_id ~= nil then
+				v2.seller_id = prop_types.StringProp.jsonDecode(data.seller_id)
+			end
+
+			if data.sellerId ~= nil then
+				v2.seller_id = prop_types.StringProp.jsonDecode(data.sellerId)
+			end
+
+			if data.seller_name ~= nil then
+				v2.seller_name = prop_types.StringProp.jsonDecode(data.seller_name)
+			end
+
+			if data.sellerName ~= nil then
+				v2.seller_name = prop_types.StringProp.jsonDecode(data.sellerName)
 			end
 
 			return v2
 		end
 
 		class225.descriptor = {
-			name = "OpenCatalogItemOwnershipAction_Params",
+			name = "PurchaseCatalogItemFromStockAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.OpenCatalogItemOwnershipAction_Params = class225
+		v.PurchaseCatalogItemFromStockAction_Params = class225
 	end
 
-	typeRegistry.default:register(v.OpenCatalogItemOwnershipAction_Params)
+	typeRegistry.default:register(v.PurchaseCatalogItemFromStockAction_Params)
 
 	do
 		local class226 = {}
@@ -35029,7 +35036,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.TryOnCatalogItemAction_Params.decode(v5)
+						result.action_params = v.OpenCatalogItemOwnershipAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -35102,25 +35109,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.TryOnCatalogItemAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.OpenCatalogItemOwnershipAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.TryOnCatalogItemAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.OpenCatalogItemOwnershipAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class226.descriptor = {
-			name = "TryOnCatalogItemAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.TryOnCatalogItemAction"
+			name = "OpenCatalogItemOwnershipAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.OpenCatalogItemOwnershipAction"
 		}
 
-		v.TryOnCatalogItemAction = class226
+		v.OpenCatalogItemOwnershipAction = class226
 	end
 
-	typeRegistry.default:register(v.TryOnCatalogItemAction)
+	typeRegistry.default:register(v.OpenCatalogItemOwnershipAction)
 
 	do
 		local class227 = {}
@@ -35141,14 +35148,327 @@ do
 
 			local v5
 
+			if not (data == nil or data.collectible_item_id == nil) then
+				v5 = data.collectible_item_id
+			end
+
+			return (setmetatable({ item_id = v3, item_type = v4, collectible_item_id = v5 }, class227))
+		end
+
+		function class227:encode()
+			local v2 = buffer.create(0)
+			local v3 = 0
+
+			if self.item_id ~= nil then
+				local encoded = self.item_id:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.item_type ~= nil then
+				local encoded = self.item_type:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.collectible_item_id ~= nil then
+				local encoded = self.collectible_item_id:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			local buf = buffer.create(v3)
+			buffer.copy(buf, 0, v2, 0, v3)
+			return buf
+		end
+
+		function class227.decode(buf: buffer)
+			local result = class227.new()
+			local v2 = 0
+
+			while v2 < buffer.len(buf) do
+				local v3, v4
+				v3, v4, v2 = proto.readTag(buf, v2)
+
+				if v4 == proto.wireTypes.varint then
+					local v5
+					v5, v2 = proto.readVarInt(buf, v2)
+				elseif v4 == proto.wireTypes.lengthDelimited then
+					if v3 == 1 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.item_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 2 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.item_type = prop_types.StringProp.decode(v5)
+					elseif v3 == 3 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.collectible_item_id = prop_types.StringProp.decode(v5)
+					else
+						local varInt, v5 = proto.readVarInt(buf, v2)
+
+						v2 = v5 + varInt
+					end
+				elseif v4 == proto.wireTypes.i32 then
+					local v5
+					v5, v2 = proto.readFixed32(buf, v2)
+				elseif v4 == proto.wireTypes.i64 then
+					local v5
+					v5, v2 = proto.readFixed64(buf, v2)
+				else
+					error("Unsupported wire type: " .. v4)
+				end
+			end
+
+			return result
+		end
+
+		function class227:jsonEncode()
+			local v2 = {}
+
+			if self.item_id ~= nil then
+				v2.itemId = self.item_id:jsonEncode()
+			end
+
+			if self.item_type ~= nil then
+				v2.itemType = self.item_type:jsonEncode()
+			end
+
+			if self.collectible_item_id ~= nil then
+				v2.collectibleItemId = self.collectible_item_id:jsonEncode()
+			end
+
+			return v2
+		end
+
+		function class227.jsonDecode(data)
+			local v2 = class227.new()
+
+			if data.item_id ~= nil then
+				v2.item_id = prop_types.StringProp.jsonDecode(data.item_id)
+			end
+
+			if data.itemId ~= nil then
+				v2.item_id = prop_types.StringProp.jsonDecode(data.itemId)
+			end
+
+			if data.item_type ~= nil then
+				v2.item_type = prop_types.StringProp.jsonDecode(data.item_type)
+			end
+
+			if data.itemType ~= nil then
+				v2.item_type = prop_types.StringProp.jsonDecode(data.itemType)
+			end
+
+			if data.collectible_item_id ~= nil then
+				v2.collectible_item_id = prop_types.StringProp.jsonDecode(data.collectible_item_id)
+			end
+
+			if data.collectibleItemId ~= nil then
+				v2.collectible_item_id = prop_types.StringProp.jsonDecode(data.collectibleItemId)
+			end
+
+			return v2
+		end
+
+		class227.descriptor = {
+			name = "OpenCatalogItemOwnershipAction_Params",
+			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
+		}
+
+		v.OpenCatalogItemOwnershipAction_Params = class227
+	end
+
+	typeRegistry.default:register(v.OpenCatalogItemOwnershipAction_Params)
+
+	do
+		local class228 = {}
+		class228.__index = class228
+
+		function class228.new(p)
+			local v3
+
+			if p == nil or p.action_type == nil then
+				v3 = assert(v.ActionType.fromNumber(0), "Enum has no 0 default")
+			else
+				v3 = p.action_type
+			end
+
+			local v4
+
+			if not (p == nil or p.action_params == nil) then
+				v4 = p.action_params
+			end
+
+			return (setmetatable({ action_type = v3, action_params = v4 }, class228))
+		end
+
+		function class228:encode()
+			local v2 = buffer.create(0)
+			local v3 = 0
+
+			if
+				self.action_type ~= nil
+				and (self.action_type ~= nil and self.action_type ~= 0 or self.action_type ~= v.ActionType.fromNumber(0))
+			then
+				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.varint)
+				v2, v3 = proto.writeVarInt(v4, v5, v.ActionType.toNumber(self.action_type))
+			end
+
+			if self.action_params ~= nil then
+				local encoded = self.action_params:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			local buf = buffer.create(v3)
+			buffer.copy(buf, 0, v2, 0, v3)
+			return buf
+		end
+
+		function class228.decode(buf: buffer)
+			local result = class228.new()
+			local v2 = 0
+
+			while v2 < buffer.len(buf) do
+				local v3, v4
+				v3, v4, v2 = proto.readTag(buf, v2)
+
+				if v4 == proto.wireTypes.varint then
+					if v3 == 1 then
+						local v5
+						v5, v2 = proto.readVarIntI32(buf, v2)
+						result.action_type = v.ActionType.fromNumber(v5) or v5
+					else
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					end
+				elseif v4 == proto.wireTypes.lengthDelimited then
+					if v3 == 2 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.action_params = v.TryOnCatalogItemAction_Params.decode(v5)
+					else
+						local varInt, v5 = proto.readVarInt(buf, v2)
+
+						v2 = v5 + varInt
+					end
+				elseif v4 == proto.wireTypes.i32 then
+					local v5
+					v5, v2 = proto.readFixed32(buf, v2)
+				elseif v4 == proto.wireTypes.i64 then
+					local v5
+					v5, v2 = proto.readFixed64(buf, v2)
+				else
+					error("Unsupported wire type: " .. v4)
+				end
+			end
+
+			return result
+		end
+
+		function class228:jsonEncode()
+			local v2 = {}
+
+			if
+				self.action_type ~= nil
+				and (self.action_type ~= nil and self.action_type ~= 0 or self.action_type ~= v.ActionType.fromNumber(0))
+			then
+				local v3
+
+				if typeof(self.action_type) == "number" then
+					v3 = self.action_type
+				else
+					v3 = v.ActionType.toNumber(self.action_type)
+				end
+
+				v2.actionType = v3
+			end
+
+			if self.action_params ~= nil then
+				v2.actionParams = self.action_params:jsonEncode()
+			end
+
+			return v2
+		end
+
+		function class228.jsonDecode(data)
+			local v2 = class228.new()
+
+			if data.action_type ~= nil then
+				local v3
+
+				if typeof(data.action_type) == "number" then
+					v3 = v.ActionType.fromNumber(data.action_type) or data.action_type
+				else
+					v3 = v.ActionType.fromName(data.action_type) or data.action_type
+				end
+
+				v2.action_type = v3
+			end
+
+			if data.actionType ~= nil then
+				local v3
+
+				if typeof(data.actionType) == "number" then
+					v3 = v.ActionType.fromNumber(data.actionType) or data.actionType
+				else
+					v3 = v.ActionType.fromName(data.actionType) or data.actionType
+				end
+
+				v2.action_type = v3
+			end
+
+			if data.action_params ~= nil then
+				v2.action_params = v.TryOnCatalogItemAction_Params.jsonDecode(data.action_params)
+			end
+
+			if data.actionParams ~= nil then
+				v2.action_params = v.TryOnCatalogItemAction_Params.jsonDecode(data.actionParams)
+			end
+
+			return v2
+		end
+
+		class228.descriptor = {
+			name = "TryOnCatalogItemAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.TryOnCatalogItemAction"
+		}
+
+		v.TryOnCatalogItemAction = class228
+	end
+
+	typeRegistry.default:register(v.TryOnCatalogItemAction)
+
+	do
+		local class229 = {}
+		class229.__index = class229
+
+		function class229.new(data)
+			local v3
+
+			if not (data == nil or data.item_id == nil) then
+				v3 = data.item_id
+			end
+
+			local v4
+
+			if not (data == nil or data.item_type == nil) then
+				v4 = data.item_type
+			end
+
+			local v5
+
 			if not (data == nil or data.item_sub_type == nil) then
 				v5 = data.item_sub_type
 			end
 
-			return (setmetatable({ item_id = v3, item_type = v4, item_sub_type = v5 }, class227))
+			return (setmetatable({ item_id = v3, item_type = v4, item_sub_type = v5 }, class229))
 		end
 
-		function class227:encode()
+		function class229:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -35175,8 +35495,8 @@ do
 			return buf
 		end
 
-		function class227.decode(buf: buffer)
-			local result = class227.new()
+		function class229.decode(buf: buffer)
+			local result = class229.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -35218,7 +35538,7 @@ do
 			return result
 		end
 
-		function class227:jsonEncode()
+		function class229:jsonEncode()
 			local v2 = {}
 
 			if self.item_id ~= nil then
@@ -35236,8 +35556,8 @@ do
 			return v2
 		end
 
-		function class227.jsonDecode(data)
-			local v2 = class227.new()
+		function class229.jsonDecode(data)
+			local v2 = class229.new()
 
 			if data.item_id ~= nil then
 				v2.item_id = prop_types.StringProp.jsonDecode(data.item_id)
@@ -35266,31 +35586,31 @@ do
 			return v2
 		end
 
-		class227.descriptor = {
+		class229.descriptor = {
 			name = "TryOnCatalogItemAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.TryOnCatalogItemAction_Params = class227
+		v.TryOnCatalogItemAction_Params = class229
 	end
 
 	typeRegistry.default:register(v.TryOnCatalogItemAction_Params)
 
 	do
-		local class228 = {}
-		class228.__index = class228
+		local class230 = {}
+		class230.__index = class230
 
-		function class228.new(p)
+		function class230.new(p)
 			local v3
 
 			if not (p == nil or p.oneof_prop == nil) then
 				v3 = p.oneof_prop
 			end
 
-			return (setmetatable({ oneof_prop = v3 }, class228))
+			return (setmetatable({ oneof_prop = v3 }, class230))
 		end
 
-		function class228:encode()
+		function class230:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -35311,8 +35631,8 @@ do
 			return buf
 		end
 
-		function class228.decode(buf: buffer)
-			local result = class228.new()
+		function class230.decode(buf: buffer)
+			local result = class230.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -35353,7 +35673,7 @@ do
 			return result
 		end
 
-		function class228:jsonEncode()
+		function class230:jsonEncode()
 			local v2 = {}
 
 			if self.oneof_prop == nil then
@@ -35372,8 +35692,8 @@ do
 			return v2
 		end
 
-		function class228.jsonDecode(p)
-			local v2 = class228.new()
+		function class230.jsonDecode(p)
+			local v2 = class230.new()
 
 			if p.value ~= nil then
 				v2.oneof_prop = {
@@ -35392,21 +35712,21 @@ do
 			return v2
 		end
 
-		class228.descriptor = {
+		class230.descriptor = {
 			name = "ExperimentalActionProp",
 			fullName = "roblox.apppageplatform.shared.v1beta1.ExperimentalActionProp"
 		}
 
-		v.ExperimentalActionProp = class228
+		v.ExperimentalActionProp = class230
 	end
 
 	typeRegistry.default:register(v.ExperimentalActionProp)
 
 	do
-		local class229 = {}
-		class229.__index = class229
+		local class231 = {}
+		class231.__index = class231
 
-		function class229.new(data)
+		function class231.new(data)
 			local v3
 
 			if data == nil or data.action_type == nil then
@@ -35420,10 +35740,10 @@ do
 				action_params = (data == nil or data.action_params == nil) and {} or data.action_params,
 				experimental_type = (data == nil or data.experimental_type == nil) and "" or data.experimental_type
 			}
-			return (setmetatable(v2, class229))
+			return (setmetatable(v2, class231))
 		end
 
-		function class229:encode()
+		function class231:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -35459,8 +35779,8 @@ do
 			return buf
 		end
 
-		function class229.decode(buf: buffer)
-			local result = class229.new()
+		function class231.decode(buf: buffer)
+			local result = class231.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -35509,7 +35829,7 @@ do
 			return result
 		end
 
-		function class229:jsonEncode()
+		function class231:jsonEncode()
 			local v2 = {}
 
 			if
@@ -35544,8 +35864,8 @@ do
 			return v2
 		end
 
-		function class229.jsonDecode(data)
-			local v2 = class229.new()
+		function class231.jsonDecode(data)
+			local v2 = class231.new()
 
 			if data.action_type ~= nil then
 				local v3
@@ -35602,21 +35922,21 @@ do
 			return v2
 		end
 
-		class229.descriptor = {
+		class231.descriptor = {
 			name = "ExperimentalAction",
 			fullName = "roblox.apppageplatform.shared.v1beta1.ExperimentalAction"
 		}
 
-		v.ExperimentalAction = class229
+		v.ExperimentalAction = class231
 	end
 
 	typeRegistry.default:register(v.ExperimentalAction)
 
 	do
-		local class230 = {}
-		class230.__index = class230
+		local class232 = {}
+		class232.__index = class232
 
-		function class230.new(p)
+		function class232.new(p)
 			local v2 = {
 				key = (p == nil or p.key == nil) and "" or p.key,
 				value = 0
@@ -35628,10 +35948,10 @@ do
 			end
 
 			v2.value = v3
-			return (setmetatable(v2, class230))
+			return (setmetatable(v2, class232))
 		end
 
-		function class230:encode()
+		function class232:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -35651,8 +35971,8 @@ do
 			return buf
 		end
 
-		function class230.decode(buf: buffer)
-			local result = class230.new()
+		function class232.decode(buf: buffer)
+			local result = class232.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -35690,7 +36010,7 @@ do
 			return result
 		end
 
-		function class230:jsonEncode()
+		function class232:jsonEncode()
 			local v2 = {}
 
 			if self.key ~= nil and self.key ~= "" then
@@ -35704,8 +36024,8 @@ do
 			return v2
 		end
 
-		function class230.jsonDecode(p)
-			local v2 = class230.new()
+		function class232.jsonDecode(p)
+			local v2 = class232.new()
 
 			if p.key ~= nil then
 				v2.key = p.key
@@ -35718,352 +36038,15 @@ do
 			return v2
 		end
 
-		class230.descriptor = {
+		class232.descriptor = {
 			name = "ExperimentalAction_ActionParamsEntry",
 			fullName = "roblox.apppageplatform.shared.v1beta1.ActionParamsEntry"
 		}
 
-		v.ExperimentalAction_ActionParamsEntry = class230
+		v.ExperimentalAction_ActionParamsEntry = class232
 	end
 
 	typeRegistry.default:register(v.ExperimentalAction_ActionParamsEntry)
-
-	do
-		local class231 = {}
-		class231.__index = class231
-
-		function class231.new(p)
-			local v3
-
-			if p == nil or p.action_type == nil then
-				v3 = assert(v.ActionType.fromNumber(0), "Enum has no 0 default")
-			else
-				v3 = p.action_type
-			end
-
-			local v4
-
-			if not (p == nil or p.action_params == nil) then
-				v4 = p.action_params
-			end
-
-			return (setmetatable({ action_type = v3, action_params = v4 }, class231))
-		end
-
-		function class231:encode()
-			local v2 = buffer.create(0)
-			local v3 = 0
-
-			if
-				self.action_type ~= nil
-				and (self.action_type ~= nil and self.action_type ~= 0 or self.action_type ~= v.ActionType.fromNumber(0))
-			then
-				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.varint)
-				v2, v3 = proto.writeVarInt(v4, v5, v.ActionType.toNumber(self.action_type))
-			end
-
-			if self.action_params ~= nil then
-				local encoded = self.action_params:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			local buf = buffer.create(v3)
-			buffer.copy(buf, 0, v2, 0, v3)
-			return buf
-		end
-
-		function class231.decode(buf: buffer)
-			local result = class231.new()
-			local v2 = 0
-
-			while v2 < buffer.len(buf) do
-				local v3, v4
-				v3, v4, v2 = proto.readTag(buf, v2)
-
-				if v4 == proto.wireTypes.varint then
-					if v3 == 1 then
-						local v5
-						v5, v2 = proto.readVarIntI32(buf, v2)
-						result.action_type = v.ActionType.fromNumber(v5) or v5
-					else
-						local v5
-						v5, v2 = proto.readVarInt(buf, v2)
-					end
-				elseif v4 == proto.wireTypes.lengthDelimited then
-					if v3 == 2 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.SubmitCustomFormResponseAction_Params.decode(v5)
-					else
-						local varInt, v5 = proto.readVarInt(buf, v2)
-
-						v2 = v5 + varInt
-					end
-				elseif v4 == proto.wireTypes.i32 then
-					local v5
-					v5, v2 = proto.readFixed32(buf, v2)
-				elseif v4 == proto.wireTypes.i64 then
-					local v5
-					v5, v2 = proto.readFixed64(buf, v2)
-				else
-					error("Unsupported wire type: " .. v4)
-				end
-			end
-
-			return result
-		end
-
-		function class231:jsonEncode()
-			local v2 = {}
-
-			if
-				self.action_type ~= nil
-				and (self.action_type ~= nil and self.action_type ~= 0 or self.action_type ~= v.ActionType.fromNumber(0))
-			then
-				local v3
-
-				if typeof(self.action_type) == "number" then
-					v3 = self.action_type
-				else
-					v3 = v.ActionType.toNumber(self.action_type)
-				end
-
-				v2.actionType = v3
-			end
-
-			if self.action_params ~= nil then
-				v2.actionParams = self.action_params:jsonEncode()
-			end
-
-			return v2
-		end
-
-		function class231.jsonDecode(data)
-			local v2 = class231.new()
-
-			if data.action_type ~= nil then
-				local v3
-
-				if typeof(data.action_type) == "number" then
-					v3 = v.ActionType.fromNumber(data.action_type) or data.action_type
-				else
-					v3 = v.ActionType.fromName(data.action_type) or data.action_type
-				end
-
-				v2.action_type = v3
-			end
-
-			if data.actionType ~= nil then
-				local v3
-
-				if typeof(data.actionType) == "number" then
-					v3 = v.ActionType.fromNumber(data.actionType) or data.actionType
-				else
-					v3 = v.ActionType.fromName(data.actionType) or data.actionType
-				end
-
-				v2.action_type = v3
-			end
-
-			if data.action_params ~= nil then
-				v2.action_params = v.SubmitCustomFormResponseAction_Params.jsonDecode(data.action_params)
-			end
-
-			if data.actionParams ~= nil then
-				v2.action_params = v.SubmitCustomFormResponseAction_Params.jsonDecode(data.actionParams)
-			end
-
-			return v2
-		end
-
-		class231.descriptor = {
-			name = "SubmitCustomFormResponseAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.SubmitCustomFormResponseAction"
-		}
-
-		v.SubmitCustomFormResponseAction = class231
-	end
-
-	typeRegistry.default:register(v.SubmitCustomFormResponseAction)
-
-	do
-		local class232 = {}
-		class232.__index = class232
-
-		function class232.new(data)
-			local v3
-
-			if not (data == nil or data.entity_id == nil) then
-				v3 = data.entity_id
-			end
-
-			local v4
-
-			if not (data == nil or data.form_id == nil) then
-				v4 = data.form_id
-			end
-
-			local v5
-
-			if not (data == nil or data.cf_vertical == nil) then
-				v5 = data.cf_vertical
-			end
-
-			local v6
-
-			if not (data == nil or data.response == nil) then
-				v6 = data.response
-			end
-
-			return (setmetatable({ entity_id = v3, form_id = v4, cf_vertical = v5, response = v6 }, class232))
-		end
-
-		function class232:encode()
-			local v2 = buffer.create(0)
-			local v3 = 0
-
-			if self.entity_id ~= nil then
-				local encoded = self.entity_id:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.form_id ~= nil then
-				local encoded = self.form_id:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.cf_vertical ~= nil then
-				local encoded = self.cf_vertical:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.response ~= nil then
-				local encoded = self.response:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			local buf = buffer.create(v3)
-			buffer.copy(buf, 0, v2, 0, v3)
-			return buf
-		end
-
-		function class232.decode(buf: buffer)
-			local result = class232.new()
-			local v2 = 0
-
-			while v2 < buffer.len(buf) do
-				local v3, v4
-				v3, v4, v2 = proto.readTag(buf, v2)
-
-				if v4 == proto.wireTypes.varint then
-					local v5
-					v5, v2 = proto.readVarInt(buf, v2)
-				elseif v4 == proto.wireTypes.lengthDelimited then
-					if v3 == 1 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.entity_id = prop_types.StringProp.decode(v5)
-					elseif v3 == 2 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.form_id = prop_types.StringProp.decode(v5)
-					elseif v3 == 3 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.cf_vertical = prop_types.StringProp.decode(v5)
-					elseif v3 == 4 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.response = prop_types.StructProp.decode(v5)
-					else
-						local varInt, v5 = proto.readVarInt(buf, v2)
-
-						v2 = v5 + varInt
-					end
-				elseif v4 == proto.wireTypes.i32 then
-					local v5
-					v5, v2 = proto.readFixed32(buf, v2)
-				elseif v4 == proto.wireTypes.i64 then
-					local v5
-					v5, v2 = proto.readFixed64(buf, v2)
-				else
-					error("Unsupported wire type: " .. v4)
-				end
-			end
-
-			return result
-		end
-
-		function class232:jsonEncode()
-			local v2 = {}
-
-			if self.entity_id ~= nil then
-				v2.entityId = self.entity_id:jsonEncode()
-			end
-
-			if self.form_id ~= nil then
-				v2.formId = self.form_id:jsonEncode()
-			end
-
-			if self.cf_vertical ~= nil then
-				v2.cfVertical = self.cf_vertical:jsonEncode()
-			end
-
-			if self.response ~= nil then
-				v2.response = self.response:jsonEncode()
-			end
-
-			return v2
-		end
-
-		function class232.jsonDecode(data)
-			local v2 = class232.new()
-
-			if data.entity_id ~= nil then
-				v2.entity_id = prop_types.StringProp.jsonDecode(data.entity_id)
-			end
-
-			if data.entityId ~= nil then
-				v2.entity_id = prop_types.StringProp.jsonDecode(data.entityId)
-			end
-
-			if data.form_id ~= nil then
-				v2.form_id = prop_types.StringProp.jsonDecode(data.form_id)
-			end
-
-			if data.formId ~= nil then
-				v2.form_id = prop_types.StringProp.jsonDecode(data.formId)
-			end
-
-			if data.cf_vertical ~= nil then
-				v2.cf_vertical = prop_types.StringProp.jsonDecode(data.cf_vertical)
-			end
-
-			if data.cfVertical ~= nil then
-				v2.cf_vertical = prop_types.StringProp.jsonDecode(data.cfVertical)
-			end
-
-			if data.response ~= nil then
-				v2.response = prop_types.StructProp.jsonDecode(data.response)
-			end
-
-			return v2
-		end
-
-		class232.descriptor = {
-			name = "SubmitCustomFormResponseAction_Params",
-			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
-		}
-
-		v.SubmitCustomFormResponseAction_Params = class232
-	end
-
-	typeRegistry.default:register(v.SubmitCustomFormResponseAction_Params)
 
 	do
 		local class233 = {}
@@ -36131,7 +36114,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.RefreshCustomFormResultsAction_Params.decode(v5)
+						result.action_params = v.SubmitCustomFormResponseAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -36204,25 +36187,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.RefreshCustomFormResultsAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.SubmitCustomFormResponseAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.RefreshCustomFormResultsAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.SubmitCustomFormResponseAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class233.descriptor = {
-			name = "RefreshCustomFormResultsAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.RefreshCustomFormResultsAction"
+			name = "SubmitCustomFormResponseAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.SubmitCustomFormResponseAction"
 		}
 
-		v.RefreshCustomFormResultsAction = class233
+		v.SubmitCustomFormResponseAction = class233
 	end
 
-	typeRegistry.default:register(v.RefreshCustomFormResultsAction)
+	typeRegistry.default:register(v.SubmitCustomFormResponseAction)
 
 	do
 		local class234 = {}
@@ -36247,7 +36230,13 @@ do
 				v5 = data.cf_vertical
 			end
 
-			return (setmetatable({ entity_id = v3, form_id = v4, cf_vertical = v5 }, class234))
+			local v6
+
+			if not (data == nil or data.response == nil) then
+				v6 = data.response
+			end
+
+			return (setmetatable({ entity_id = v3, form_id = v4, cf_vertical = v5, response = v6 }, class234))
 		end
 
 		function class234:encode()
@@ -36269,6 +36258,12 @@ do
 			if self.cf_vertical ~= nil then
 				local encoded = self.cf_vertical:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.response ~= nil then
+				local encoded = self.response:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -36301,6 +36296,10 @@ do
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
 						result.cf_vertical = prop_types.StringProp.decode(v5)
+					elseif v3 == 4 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.response = prop_types.StructProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -36335,6 +36334,10 @@ do
 				v2.cfVertical = self.cf_vertical:jsonEncode()
 			end
 
+			if self.response ~= nil then
+				v2.response = self.response:jsonEncode()
+			end
+
 			return v2
 		end
 
@@ -36365,18 +36368,22 @@ do
 				v2.cf_vertical = prop_types.StringProp.jsonDecode(data.cfVertical)
 			end
 
+			if data.response ~= nil then
+				v2.response = prop_types.StructProp.jsonDecode(data.response)
+			end
+
 			return v2
 		end
 
 		class234.descriptor = {
-			name = "RefreshCustomFormResultsAction_Params",
+			name = "SubmitCustomFormResponseAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.RefreshCustomFormResultsAction_Params = class234
+		v.SubmitCustomFormResponseAction_Params = class234
 	end
 
-	typeRegistry.default:register(v.RefreshCustomFormResultsAction_Params)
+	typeRegistry.default:register(v.SubmitCustomFormResponseAction_Params)
 
 	do
 		local class235 = {}
@@ -36444,7 +36451,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.OpenUserLibraryCollectionAction_Params.decode(v5)
+						result.action_params = v.RefreshCustomFormResultsAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -36517,47 +36524,71 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.OpenUserLibraryCollectionAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.RefreshCustomFormResultsAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.OpenUserLibraryCollectionAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.RefreshCustomFormResultsAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class235.descriptor = {
-			name = "OpenUserLibraryCollectionAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.OpenUserLibraryCollectionAction"
+			name = "RefreshCustomFormResultsAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.RefreshCustomFormResultsAction"
 		}
 
-		v.OpenUserLibraryCollectionAction = class235
+		v.RefreshCustomFormResultsAction = class235
 	end
 
-	typeRegistry.default:register(v.OpenUserLibraryCollectionAction)
+	typeRegistry.default:register(v.RefreshCustomFormResultsAction)
 
 	do
 		local class236 = {}
 		class236.__index = class236
 
-		function class236.new(p)
+		function class236.new(data)
 			local v3
 
-			if not (p == nil or p.collection_id == nil) then
-				v3 = p.collection_id
+			if not (data == nil or data.entity_id == nil) then
+				v3 = data.entity_id
 			end
 
-			return (setmetatable({ collection_id = v3 }, class236))
+			local v4
+
+			if not (data == nil or data.form_id == nil) then
+				v4 = data.form_id
+			end
+
+			local v5
+
+			if not (data == nil or data.cf_vertical == nil) then
+				v5 = data.cf_vertical
+			end
+
+			return (setmetatable({ entity_id = v3, form_id = v4, cf_vertical = v5 }, class236))
 		end
 
 		function class236:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.collection_id ~= nil then
-				local encoded = self.collection_id:encode()
+			if self.entity_id ~= nil then
+				local encoded = self.entity_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.form_id ~= nil then
+				local encoded = self.form_id:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.cf_vertical ~= nil then
+				local encoded = self.cf_vertical:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -36581,7 +36612,15 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.collection_id = prop_types.StringProp.decode(v5)
+						result.entity_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 2 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.form_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 3 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.cf_vertical = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -36604,36 +36643,60 @@ do
 		function class236:jsonEncode()
 			local v2 = {}
 
-			if self.collection_id ~= nil then
-				v2.collectionId = self.collection_id:jsonEncode()
+			if self.entity_id ~= nil then
+				v2.entityId = self.entity_id:jsonEncode()
+			end
+
+			if self.form_id ~= nil then
+				v2.formId = self.form_id:jsonEncode()
+			end
+
+			if self.cf_vertical ~= nil then
+				v2.cfVertical = self.cf_vertical:jsonEncode()
 			end
 
 			return v2
 		end
 
-		function class236.jsonDecode(p)
+		function class236.jsonDecode(data)
 			local v2 = class236.new()
 
-			if p.collection_id ~= nil then
-				v2.collection_id = prop_types.StringProp.jsonDecode(p.collection_id)
+			if data.entity_id ~= nil then
+				v2.entity_id = prop_types.StringProp.jsonDecode(data.entity_id)
 			end
 
-			if p.collectionId ~= nil then
-				v2.collection_id = prop_types.StringProp.jsonDecode(p.collectionId)
+			if data.entityId ~= nil then
+				v2.entity_id = prop_types.StringProp.jsonDecode(data.entityId)
+			end
+
+			if data.form_id ~= nil then
+				v2.form_id = prop_types.StringProp.jsonDecode(data.form_id)
+			end
+
+			if data.formId ~= nil then
+				v2.form_id = prop_types.StringProp.jsonDecode(data.formId)
+			end
+
+			if data.cf_vertical ~= nil then
+				v2.cf_vertical = prop_types.StringProp.jsonDecode(data.cf_vertical)
+			end
+
+			if data.cfVertical ~= nil then
+				v2.cf_vertical = prop_types.StringProp.jsonDecode(data.cfVertical)
 			end
 
 			return v2
 		end
 
 		class236.descriptor = {
-			name = "OpenUserLibraryCollectionAction_Params",
+			name = "RefreshCustomFormResultsAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.OpenUserLibraryCollectionAction_Params = class236
+		v.RefreshCustomFormResultsAction_Params = class236
 	end
 
-	typeRegistry.default:register(v.OpenUserLibraryCollectionAction_Params)
+	typeRegistry.default:register(v.RefreshCustomFormResultsAction_Params)
 
 	do
 		local class237 = {}
@@ -36701,7 +36764,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.RemoveFromUserLibraryCollectionAction_Params.decode(v5)
+						result.action_params = v.OpenUserLibraryCollectionAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -36774,25 +36837,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.RemoveFromUserLibraryCollectionAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.OpenUserLibraryCollectionAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.RemoveFromUserLibraryCollectionAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.OpenUserLibraryCollectionAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class237.descriptor = {
-			name = "RemoveFromUserLibraryCollectionAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.RemoveFromUserLibraryCollectionAction"
+			name = "OpenUserLibraryCollectionAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.OpenUserLibraryCollectionAction"
 		}
 
-		v.RemoveFromUserLibraryCollectionAction = class237
+		v.OpenUserLibraryCollectionAction = class237
 	end
 
-	typeRegistry.default:register(v.RemoveFromUserLibraryCollectionAction)
+	typeRegistry.default:register(v.OpenUserLibraryCollectionAction)
 
 	do
 		local class238 = {}
@@ -36805,13 +36868,7 @@ do
 				v3 = p.collection_id
 			end
 
-			local v4
-
-			if not (p == nil or p.saved_id == nil) then
-				v4 = p.saved_id
-			end
-
-			return (setmetatable({ collection_id = v3, saved_id = v4 }, class238))
+			return (setmetatable({ collection_id = v3 }, class238))
 		end
 
 		function class238:encode()
@@ -36821,12 +36878,6 @@ do
 			if self.collection_id ~= nil then
 				local encoded = self.collection_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.saved_id ~= nil then
-				local encoded = self.saved_id:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -36851,10 +36902,6 @@ do
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
 						result.collection_id = prop_types.StringProp.decode(v5)
-					elseif v3 == 2 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.saved_id = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -36881,44 +36928,32 @@ do
 				v2.collectionId = self.collection_id:jsonEncode()
 			end
 
-			if self.saved_id ~= nil then
-				v2.savedId = self.saved_id:jsonEncode()
-			end
-
 			return v2
 		end
 
-		function class238.jsonDecode(data)
+		function class238.jsonDecode(p)
 			local v2 = class238.new()
 
-			if data.collection_id ~= nil then
-				v2.collection_id = prop_types.StringProp.jsonDecode(data.collection_id)
+			if p.collection_id ~= nil then
+				v2.collection_id = prop_types.StringProp.jsonDecode(p.collection_id)
 			end
 
-			if data.collectionId ~= nil then
-				v2.collection_id = prop_types.StringProp.jsonDecode(data.collectionId)
-			end
-
-			if data.saved_id ~= nil then
-				v2.saved_id = prop_types.StringProp.jsonDecode(data.saved_id)
-			end
-
-			if data.savedId ~= nil then
-				v2.saved_id = prop_types.StringProp.jsonDecode(data.savedId)
+			if p.collectionId ~= nil then
+				v2.collection_id = prop_types.StringProp.jsonDecode(p.collectionId)
 			end
 
 			return v2
 		end
 
 		class238.descriptor = {
-			name = "RemoveFromUserLibraryCollectionAction_Params",
+			name = "OpenUserLibraryCollectionAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.RemoveFromUserLibraryCollectionAction_Params = class238
+		v.OpenUserLibraryCollectionAction_Params = class238
 	end
 
-	typeRegistry.default:register(v.RemoveFromUserLibraryCollectionAction_Params)
+	typeRegistry.default:register(v.OpenUserLibraryCollectionAction_Params)
 
 	do
 		local class239 = {}
@@ -36986,7 +37021,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.UnsaveUserLibraryItemAction_Params.decode(v5)
+						result.action_params = v.RemoveFromUserLibraryCollectionAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -37059,25 +37094,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.UnsaveUserLibraryItemAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.RemoveFromUserLibraryCollectionAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.UnsaveUserLibraryItemAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.RemoveFromUserLibraryCollectionAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class239.descriptor = {
-			name = "UnsaveUserLibraryItemAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.UnsaveUserLibraryItemAction"
+			name = "RemoveFromUserLibraryCollectionAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.RemoveFromUserLibraryCollectionAction"
 		}
 
-		v.UnsaveUserLibraryItemAction = class239
+		v.RemoveFromUserLibraryCollectionAction = class239
 	end
 
-	typeRegistry.default:register(v.UnsaveUserLibraryItemAction)
+	typeRegistry.default:register(v.RemoveFromUserLibraryCollectionAction)
 
 	do
 		local class240 = {}
@@ -37086,20 +37121,32 @@ do
 		function class240.new(p)
 			local v3
 
-			if not (p == nil or p.saved_id == nil) then
-				v3 = p.saved_id
+			if not (p == nil or p.collection_id == nil) then
+				v3 = p.collection_id
 			end
 
-			return (setmetatable({ saved_id = v3 }, class240))
+			local v4
+
+			if not (p == nil or p.saved_id == nil) then
+				v4 = p.saved_id
+			end
+
+			return (setmetatable({ collection_id = v3, saved_id = v4 }, class240))
 		end
 
 		function class240:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
+			if self.collection_id ~= nil then
+				local encoded = self.collection_id:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
 			if self.saved_id ~= nil then
 				local encoded = self.saved_id:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -37121,6 +37168,10 @@ do
 					v5, v2 = proto.readVarInt(buf, v2)
 				elseif v4 == proto.wireTypes.lengthDelimited then
 					if v3 == 1 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.collection_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
 						result.saved_id = prop_types.StringProp.decode(v5)
@@ -37146,6 +37197,10 @@ do
 		function class240:jsonEncode()
 			local v2 = {}
 
+			if self.collection_id ~= nil then
+				v2.collectionId = self.collection_id:jsonEncode()
+			end
+
 			if self.saved_id ~= nil then
 				v2.savedId = self.saved_id:jsonEncode()
 			end
@@ -37153,29 +37208,37 @@ do
 			return v2
 		end
 
-		function class240.jsonDecode(p)
+		function class240.jsonDecode(data)
 			local v2 = class240.new()
 
-			if p.saved_id ~= nil then
-				v2.saved_id = prop_types.StringProp.jsonDecode(p.saved_id)
+			if data.collection_id ~= nil then
+				v2.collection_id = prop_types.StringProp.jsonDecode(data.collection_id)
 			end
 
-			if p.savedId ~= nil then
-				v2.saved_id = prop_types.StringProp.jsonDecode(p.savedId)
+			if data.collectionId ~= nil then
+				v2.collection_id = prop_types.StringProp.jsonDecode(data.collectionId)
+			end
+
+			if data.saved_id ~= nil then
+				v2.saved_id = prop_types.StringProp.jsonDecode(data.saved_id)
+			end
+
+			if data.savedId ~= nil then
+				v2.saved_id = prop_types.StringProp.jsonDecode(data.savedId)
 			end
 
 			return v2
 		end
 
 		class240.descriptor = {
-			name = "UnsaveUserLibraryItemAction_Params",
+			name = "RemoveFromUserLibraryCollectionAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.UnsaveUserLibraryItemAction_Params = class240
+		v.RemoveFromUserLibraryCollectionAction_Params = class240
 	end
 
-	typeRegistry.default:register(v.UnsaveUserLibraryItemAction_Params)
+	typeRegistry.default:register(v.RemoveFromUserLibraryCollectionAction_Params)
 
 	do
 		local class241 = {}
@@ -37243,7 +37306,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.AddToUserLibraryCollectionAction_Params.decode(v5)
+						result.action_params = v.UnsaveUserLibraryItemAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -37316,25 +37379,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.AddToUserLibraryCollectionAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.UnsaveUserLibraryItemAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.AddToUserLibraryCollectionAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.UnsaveUserLibraryItemAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class241.descriptor = {
-			name = "AddToUserLibraryCollectionAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.AddToUserLibraryCollectionAction"
+			name = "UnsaveUserLibraryItemAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.UnsaveUserLibraryItemAction"
 		}
 
-		v.AddToUserLibraryCollectionAction = class241
+		v.UnsaveUserLibraryItemAction = class241
 	end
 
-	typeRegistry.default:register(v.AddToUserLibraryCollectionAction)
+	typeRegistry.default:register(v.UnsaveUserLibraryItemAction)
 
 	do
 		local class242 = {}
@@ -37425,14 +37488,14 @@ do
 		end
 
 		class242.descriptor = {
-			name = "AddToUserLibraryCollectionAction_Params",
+			name = "UnsaveUserLibraryItemAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.AddToUserLibraryCollectionAction_Params = class242
+		v.UnsaveUserLibraryItemAction_Params = class242
 	end
 
-	typeRegistry.default:register(v.AddToUserLibraryCollectionAction_Params)
+	typeRegistry.default:register(v.UnsaveUserLibraryItemAction_Params)
 
 	do
 		local class243 = {}
@@ -37500,7 +37563,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.ReportUserLibraryItemAction_Params.decode(v5)
+						result.action_params = v.AddToUserLibraryCollectionAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -37573,101 +37636,47 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.ReportUserLibraryItemAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.AddToUserLibraryCollectionAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.ReportUserLibraryItemAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.AddToUserLibraryCollectionAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class243.descriptor = {
-			name = "ReportUserLibraryItemAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.ReportUserLibraryItemAction"
+			name = "AddToUserLibraryCollectionAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.AddToUserLibraryCollectionAction"
 		}
 
-		v.ReportUserLibraryItemAction = class243
+		v.AddToUserLibraryCollectionAction = class243
 	end
 
-	typeRegistry.default:register(v.ReportUserLibraryItemAction)
+	typeRegistry.default:register(v.AddToUserLibraryCollectionAction)
 
 	do
 		local class244 = {}
 		class244.__index = class244
 
-		function class244.new(data)
+		function class244.new(p)
 			local v3
 
-			if not (data == nil or data.target_type == nil) then
-				v3 = data.target_type
+			if not (p == nil or p.saved_id == nil) then
+				v3 = p.saved_id
 			end
 
-			local v4
-
-			if not (data == nil or data.target_id == nil) then
-				v4 = data.target_id
-			end
-
-			local v5
-
-			if not (data == nil or data.abuse_vector == nil) then
-				v5 = data.abuse_vector
-			end
-
-			local v6
-
-			if not (data == nil or data.look_asset_ids == nil) then
-				v6 = data.look_asset_ids
-			end
-
-			local v7
-
-			if not (data == nil or data.album_art_asset_id == nil) then
-				v7 = data.album_art_asset_id
-			end
-
-			return (setmetatable({
-				target_type = v3,
-				target_id = v4,
-				abuse_vector = v5,
-				look_asset_ids = v6,
-				album_art_asset_id = v7
-			}, class244))
+			return (setmetatable({ saved_id = v3 }, class244))
 		end
 
 		function class244:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.target_type ~= nil then
-				local encoded = self.target_type:encode()
+			if self.saved_id ~= nil then
+				local encoded = self.saved_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.target_id ~= nil then
-				local encoded = self.target_id:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.abuse_vector ~= nil then
-				local encoded = self.abuse_vector:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.look_asset_ids ~= nil then
-				local encoded = self.look_asset_ids:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.album_art_asset_id ~= nil then
-				local encoded = self.album_art_asset_id:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -37691,23 +37700,7 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.target_type = prop_types.StringProp.decode(v5)
-					elseif v3 == 2 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.target_id = prop_types.StringProp.decode(v5)
-					elseif v3 == 3 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.abuse_vector = prop_types.StringProp.decode(v5)
-					elseif v3 == 4 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.look_asset_ids = prop_types.StringArrayProp.decode(v5)
-					elseif v3 == 5 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.album_art_asset_id = prop_types.StringProp.decode(v5)
+						result.saved_id = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -37730,84 +37723,36 @@ do
 		function class244:jsonEncode()
 			local v2 = {}
 
-			if self.target_type ~= nil then
-				v2.targetType = self.target_type:jsonEncode()
-			end
-
-			if self.target_id ~= nil then
-				v2.targetId = self.target_id:jsonEncode()
-			end
-
-			if self.abuse_vector ~= nil then
-				v2.abuseVector = self.abuse_vector:jsonEncode()
-			end
-
-			if self.look_asset_ids ~= nil then
-				v2.lookAssetIds = self.look_asset_ids:jsonEncode()
-			end
-
-			if self.album_art_asset_id ~= nil then
-				v2.albumArtAssetId = self.album_art_asset_id:jsonEncode()
+			if self.saved_id ~= nil then
+				v2.savedId = self.saved_id:jsonEncode()
 			end
 
 			return v2
 		end
 
-		function class244.jsonDecode(data)
+		function class244.jsonDecode(p)
 			local v2 = class244.new()
 
-			if data.target_type ~= nil then
-				v2.target_type = prop_types.StringProp.jsonDecode(data.target_type)
+			if p.saved_id ~= nil then
+				v2.saved_id = prop_types.StringProp.jsonDecode(p.saved_id)
 			end
 
-			if data.targetType ~= nil then
-				v2.target_type = prop_types.StringProp.jsonDecode(data.targetType)
-			end
-
-			if data.target_id ~= nil then
-				v2.target_id = prop_types.StringProp.jsonDecode(data.target_id)
-			end
-
-			if data.targetId ~= nil then
-				v2.target_id = prop_types.StringProp.jsonDecode(data.targetId)
-			end
-
-			if data.abuse_vector ~= nil then
-				v2.abuse_vector = prop_types.StringProp.jsonDecode(data.abuse_vector)
-			end
-
-			if data.abuseVector ~= nil then
-				v2.abuse_vector = prop_types.StringProp.jsonDecode(data.abuseVector)
-			end
-
-			if data.look_asset_ids ~= nil then
-				v2.look_asset_ids = prop_types.StringArrayProp.jsonDecode(data.look_asset_ids)
-			end
-
-			if data.lookAssetIds ~= nil then
-				v2.look_asset_ids = prop_types.StringArrayProp.jsonDecode(data.lookAssetIds)
-			end
-
-			if data.album_art_asset_id ~= nil then
-				v2.album_art_asset_id = prop_types.StringProp.jsonDecode(data.album_art_asset_id)
-			end
-
-			if data.albumArtAssetId ~= nil then
-				v2.album_art_asset_id = prop_types.StringProp.jsonDecode(data.albumArtAssetId)
+			if p.savedId ~= nil then
+				v2.saved_id = prop_types.StringProp.jsonDecode(p.savedId)
 			end
 
 			return v2
 		end
 
 		class244.descriptor = {
-			name = "ReportUserLibraryItemAction_Params",
+			name = "AddToUserLibraryCollectionAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.ReportUserLibraryItemAction_Params = class244
+		v.AddToUserLibraryCollectionAction_Params = class244
 	end
 
-	typeRegistry.default:register(v.ReportUserLibraryItemAction_Params)
+	typeRegistry.default:register(v.AddToUserLibraryCollectionAction_Params)
 
 	do
 		local class245 = {}
@@ -37875,7 +37820,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.CreateUserLibraryCollectionAction_Params.decode(v5)
+						result.action_params = v.ReportUserLibraryItemAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -37948,88 +37893,241 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.CreateUserLibraryCollectionAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.ReportUserLibraryItemAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.CreateUserLibraryCollectionAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.ReportUserLibraryItemAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class245.descriptor = {
-			name = "CreateUserLibraryCollectionAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.CreateUserLibraryCollectionAction"
+			name = "ReportUserLibraryItemAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.ReportUserLibraryItemAction"
 		}
 
-		v.CreateUserLibraryCollectionAction = class245
+		v.ReportUserLibraryItemAction = class245
 	end
 
-	typeRegistry.default:register(v.CreateUserLibraryCollectionAction)
+	typeRegistry.default:register(v.ReportUserLibraryItemAction)
 
 	do
 		local class246 = {}
 		class246.__index = class246
 
-		function class246.new(_)
-			return (setmetatable({}, class246))
+		function class246.new(data)
+			local v3
+
+			if not (data == nil or data.target_type == nil) then
+				v3 = data.target_type
+			end
+
+			local v4
+
+			if not (data == nil or data.target_id == nil) then
+				v4 = data.target_id
+			end
+
+			local v5
+
+			if not (data == nil or data.abuse_vector == nil) then
+				v5 = data.abuse_vector
+			end
+
+			local v6
+
+			if not (data == nil or data.look_asset_ids == nil) then
+				v6 = data.look_asset_ids
+			end
+
+			local v7
+
+			if not (data == nil or data.album_art_asset_id == nil) then
+				v7 = data.album_art_asset_id
+			end
+
+			return (setmetatable({
+				target_type = v3,
+				target_id = v4,
+				abuse_vector = v5,
+				look_asset_ids = v6,
+				album_art_asset_id = v7
+			}, class246))
 		end
 
 		function class246:encode()
-			local buf = buffer.create(0)
+			local v2 = buffer.create(0)
+			local v3 = 0
 
-			local buf2 = buffer.create(0)
-			buffer.copy(buf2, 0, buf, 0, 0)
-			return buf2
+			if self.target_type ~= nil then
+				local encoded = self.target_type:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.target_id ~= nil then
+				local encoded = self.target_id:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.abuse_vector ~= nil then
+				local encoded = self.abuse_vector:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.look_asset_ids ~= nil then
+				local encoded = self.look_asset_ids:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.album_art_asset_id ~= nil then
+				local encoded = self.album_art_asset_id:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			local buf = buffer.create(v3)
+			buffer.copy(buf, 0, v2, 0, v3)
+			return buf
 		end
 
 		function class246.decode(buf: buffer)
-			local v2 = class246.new()
-			local v3 = 0
+			local result = class246.new()
+			local v2 = 0
 
-			while v3 < buffer.len(buf) do
-				local v4, v5
-				v4, v5, v3 = proto.readTag(buf, v3)
+			while v2 < buffer.len(buf) do
+				local v3, v4
+				v3, v4, v2 = proto.readTag(buf, v2)
 
-				if v5 == proto.wireTypes.varint then
-					local v6
-					v6, v3 = proto.readVarInt(buf, v3)
-				elseif v5 == proto.wireTypes.lengthDelimited then
-					local varInt, v6 = proto.readVarInt(buf, v3)
+				if v4 == proto.wireTypes.varint then
+					local v5
+					v5, v2 = proto.readVarInt(buf, v2)
+				elseif v4 == proto.wireTypes.lengthDelimited then
+					if v3 == 1 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.target_type = prop_types.StringProp.decode(v5)
+					elseif v3 == 2 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.target_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 3 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.abuse_vector = prop_types.StringProp.decode(v5)
+					elseif v3 == 4 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.look_asset_ids = prop_types.StringArrayProp.decode(v5)
+					elseif v3 == 5 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.album_art_asset_id = prop_types.StringProp.decode(v5)
+					else
+						local varInt, v5 = proto.readVarInt(buf, v2)
 
-					v3 = v6 + varInt
-				elseif v5 == proto.wireTypes.i32 then
-					local v6
-					v6, v3 = proto.readFixed32(buf, v3)
-				elseif v5 == proto.wireTypes.i64 then
-					local v6
-					v6, v3 = proto.readFixed64(buf, v3)
+						v2 = v5 + varInt
+					end
+				elseif v4 == proto.wireTypes.i32 then
+					local v5
+					v5, v2 = proto.readFixed32(buf, v2)
+				elseif v4 == proto.wireTypes.i64 then
+					local v5
+					v5, v2 = proto.readFixed64(buf, v2)
 				else
-					error("Unsupported wire type: " .. v5)
+					error("Unsupported wire type: " .. v4)
 				end
+			end
+
+			return result
+		end
+
+		function class246:jsonEncode()
+			local v2 = {}
+
+			if self.target_type ~= nil then
+				v2.targetType = self.target_type:jsonEncode()
+			end
+
+			if self.target_id ~= nil then
+				v2.targetId = self.target_id:jsonEncode()
+			end
+
+			if self.abuse_vector ~= nil then
+				v2.abuseVector = self.abuse_vector:jsonEncode()
+			end
+
+			if self.look_asset_ids ~= nil then
+				v2.lookAssetIds = self.look_asset_ids:jsonEncode()
+			end
+
+			if self.album_art_asset_id ~= nil then
+				v2.albumArtAssetId = self.album_art_asset_id:jsonEncode()
 			end
 
 			return v2
 		end
 
-		function class246:jsonEncode()
-			return {}
-		end
+		function class246.jsonDecode(data)
+			local v2 = class246.new()
 
-		function class246.jsonDecode(_)
-			return (class246.new())
+			if data.target_type ~= nil then
+				v2.target_type = prop_types.StringProp.jsonDecode(data.target_type)
+			end
+
+			if data.targetType ~= nil then
+				v2.target_type = prop_types.StringProp.jsonDecode(data.targetType)
+			end
+
+			if data.target_id ~= nil then
+				v2.target_id = prop_types.StringProp.jsonDecode(data.target_id)
+			end
+
+			if data.targetId ~= nil then
+				v2.target_id = prop_types.StringProp.jsonDecode(data.targetId)
+			end
+
+			if data.abuse_vector ~= nil then
+				v2.abuse_vector = prop_types.StringProp.jsonDecode(data.abuse_vector)
+			end
+
+			if data.abuseVector ~= nil then
+				v2.abuse_vector = prop_types.StringProp.jsonDecode(data.abuseVector)
+			end
+
+			if data.look_asset_ids ~= nil then
+				v2.look_asset_ids = prop_types.StringArrayProp.jsonDecode(data.look_asset_ids)
+			end
+
+			if data.lookAssetIds ~= nil then
+				v2.look_asset_ids = prop_types.StringArrayProp.jsonDecode(data.lookAssetIds)
+			end
+
+			if data.album_art_asset_id ~= nil then
+				v2.album_art_asset_id = prop_types.StringProp.jsonDecode(data.album_art_asset_id)
+			end
+
+			if data.albumArtAssetId ~= nil then
+				v2.album_art_asset_id = prop_types.StringProp.jsonDecode(data.albumArtAssetId)
+			end
+
+			return v2
 		end
 
 		class246.descriptor = {
-			name = "CreateUserLibraryCollectionAction_Params",
+			name = "ReportUserLibraryItemAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.CreateUserLibraryCollectionAction_Params = class246
+		v.ReportUserLibraryItemAction_Params = class246
 	end
 
-	typeRegistry.default:register(v.CreateUserLibraryCollectionAction_Params)
+	typeRegistry.default:register(v.ReportUserLibraryItemAction_Params)
 
 	do
 		local class247 = {}
@@ -38097,7 +38195,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.OpenUserLibraryCollectionOptionsAction_Params.decode(v5)
+						result.action_params = v.CreateUserLibraryCollectionAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -38170,123 +38268,88 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.OpenUserLibraryCollectionOptionsAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.CreateUserLibraryCollectionAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.OpenUserLibraryCollectionOptionsAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.CreateUserLibraryCollectionAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class247.descriptor = {
-			name = "OpenUserLibraryCollectionOptionsAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.OpenUserLibraryCollectionOptionsAction"
+			name = "CreateUserLibraryCollectionAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.CreateUserLibraryCollectionAction"
 		}
 
-		v.OpenUserLibraryCollectionOptionsAction = class247
+		v.CreateUserLibraryCollectionAction = class247
 	end
 
-	typeRegistry.default:register(v.OpenUserLibraryCollectionOptionsAction)
+	typeRegistry.default:register(v.CreateUserLibraryCollectionAction)
 
 	do
 		local class248 = {}
 		class248.__index = class248
 
-		function class248.new(p)
-			local v3
-
-			if not (p == nil or p.collection_id == nil) then
-				v3 = p.collection_id
-			end
-
-			return (setmetatable({ collection_id = v3 }, class248))
+		function class248.new(_)
+			return (setmetatable({}, class248))
 		end
 
 		function class248:encode()
-			local v2 = buffer.create(0)
-			local v3 = 0
+			local buf = buffer.create(0)
 
-			if self.collection_id ~= nil then
-				local encoded = self.collection_id:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			local buf = buffer.create(v3)
-			buffer.copy(buf, 0, v2, 0, v3)
-			return buf
+			local buf2 = buffer.create(0)
+			buffer.copy(buf2, 0, buf, 0, 0)
+			return buf2
 		end
 
 		function class248.decode(buf: buffer)
-			local result = class248.new()
-			local v2 = 0
+			local v2 = class248.new()
+			local v3 = 0
 
-			while v2 < buffer.len(buf) do
-				local v3, v4
-				v3, v4, v2 = proto.readTag(buf, v2)
+			while v3 < buffer.len(buf) do
+				local v4, v5
+				v4, v5, v3 = proto.readTag(buf, v3)
 
-				if v4 == proto.wireTypes.varint then
-					local v5
-					v5, v2 = proto.readVarInt(buf, v2)
-				elseif v4 == proto.wireTypes.lengthDelimited then
-					if v3 == 1 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.collection_id = prop_types.StringProp.decode(v5)
-					else
-						local varInt, v5 = proto.readVarInt(buf, v2)
+				if v5 == proto.wireTypes.varint then
+					local v6
+					v6, v3 = proto.readVarInt(buf, v3)
+				elseif v5 == proto.wireTypes.lengthDelimited then
+					local varInt, v6 = proto.readVarInt(buf, v3)
 
-						v2 = v5 + varInt
-					end
-				elseif v4 == proto.wireTypes.i32 then
-					local v5
-					v5, v2 = proto.readFixed32(buf, v2)
-				elseif v4 == proto.wireTypes.i64 then
-					local v5
-					v5, v2 = proto.readFixed64(buf, v2)
+					v3 = v6 + varInt
+				elseif v5 == proto.wireTypes.i32 then
+					local v6
+					v6, v3 = proto.readFixed32(buf, v3)
+				elseif v5 == proto.wireTypes.i64 then
+					local v6
+					v6, v3 = proto.readFixed64(buf, v3)
 				else
-					error("Unsupported wire type: " .. v4)
+					error("Unsupported wire type: " .. v5)
 				end
 			end
 
-			return result
+			return v2
 		end
 
 		function class248:jsonEncode()
-			local v2 = {}
-
-			if self.collection_id ~= nil then
-				v2.collectionId = self.collection_id:jsonEncode()
-			end
-
-			return v2
+			return {}
 		end
 
-		function class248.jsonDecode(p)
-			local v2 = class248.new()
-
-			if p.collection_id ~= nil then
-				v2.collection_id = prop_types.StringProp.jsonDecode(p.collection_id)
-			end
-
-			if p.collectionId ~= nil then
-				v2.collection_id = prop_types.StringProp.jsonDecode(p.collectionId)
-			end
-
-			return v2
+		function class248.jsonDecode(_)
+			return (class248.new())
 		end
 
 		class248.descriptor = {
-			name = "OpenUserLibraryCollectionOptionsAction_Params",
+			name = "CreateUserLibraryCollectionAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.OpenUserLibraryCollectionOptionsAction_Params = class248
+		v.CreateUserLibraryCollectionAction_Params = class248
 	end
 
-	typeRegistry.default:register(v.OpenUserLibraryCollectionOptionsAction_Params)
+	typeRegistry.default:register(v.CreateUserLibraryCollectionAction_Params)
 
 	do
 		local class249 = {}
@@ -38354,7 +38417,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.EditUserLibraryCollectionAction_Params.decode(v5)
+						result.action_params = v.OpenUserLibraryCollectionOptionsAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -38427,25 +38490,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.EditUserLibraryCollectionAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.OpenUserLibraryCollectionOptionsAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.EditUserLibraryCollectionAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.OpenUserLibraryCollectionOptionsAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class249.descriptor = {
-			name = "EditUserLibraryCollectionAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.EditUserLibraryCollectionAction"
+			name = "OpenUserLibraryCollectionOptionsAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.OpenUserLibraryCollectionOptionsAction"
 		}
 
-		v.EditUserLibraryCollectionAction = class249
+		v.OpenUserLibraryCollectionOptionsAction = class249
 	end
 
-	typeRegistry.default:register(v.EditUserLibraryCollectionAction)
+	typeRegistry.default:register(v.OpenUserLibraryCollectionOptionsAction)
 
 	do
 		local class250 = {}
@@ -38536,14 +38599,14 @@ do
 		end
 
 		class250.descriptor = {
-			name = "EditUserLibraryCollectionAction_Params",
+			name = "OpenUserLibraryCollectionOptionsAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.EditUserLibraryCollectionAction_Params = class250
+		v.OpenUserLibraryCollectionOptionsAction_Params = class250
 	end
 
-	typeRegistry.default:register(v.EditUserLibraryCollectionAction_Params)
+	typeRegistry.default:register(v.OpenUserLibraryCollectionOptionsAction_Params)
 
 	do
 		local class251 = {}
@@ -38611,7 +38674,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.DeleteUserLibraryCollectionAction_Params.decode(v5)
+						result.action_params = v.EditUserLibraryCollectionAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -38684,25 +38747,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.DeleteUserLibraryCollectionAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.EditUserLibraryCollectionAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.DeleteUserLibraryCollectionAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.EditUserLibraryCollectionAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class251.descriptor = {
-			name = "DeleteUserLibraryCollectionAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.DeleteUserLibraryCollectionAction"
+			name = "EditUserLibraryCollectionAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.EditUserLibraryCollectionAction"
 		}
 
-		v.DeleteUserLibraryCollectionAction = class251
+		v.EditUserLibraryCollectionAction = class251
 	end
 
-	typeRegistry.default:register(v.DeleteUserLibraryCollectionAction)
+	typeRegistry.default:register(v.EditUserLibraryCollectionAction)
 
 	do
 		local class252 = {}
@@ -38793,14 +38856,14 @@ do
 		end
 
 		class252.descriptor = {
-			name = "DeleteUserLibraryCollectionAction_Params",
+			name = "EditUserLibraryCollectionAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.DeleteUserLibraryCollectionAction_Params = class252
+		v.EditUserLibraryCollectionAction_Params = class252
 	end
 
-	typeRegistry.default:register(v.DeleteUserLibraryCollectionAction_Params)
+	typeRegistry.default:register(v.EditUserLibraryCollectionAction_Params)
 
 	do
 		local class253 = {}
@@ -38868,7 +38931,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.IncrementMilestoneCountAction_Params.decode(v5)
+						result.action_params = v.DeleteUserLibraryCollectionAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -38941,25 +39004,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.IncrementMilestoneCountAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.DeleteUserLibraryCollectionAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.IncrementMilestoneCountAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.DeleteUserLibraryCollectionAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class253.descriptor = {
-			name = "IncrementMilestoneCountAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.IncrementMilestoneCountAction"
+			name = "DeleteUserLibraryCollectionAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.DeleteUserLibraryCollectionAction"
 		}
 
-		v.IncrementMilestoneCountAction = class253
+		v.DeleteUserLibraryCollectionAction = class253
 	end
 
-	typeRegistry.default:register(v.IncrementMilestoneCountAction)
+	typeRegistry.default:register(v.DeleteUserLibraryCollectionAction)
 
 	do
 		local class254 = {}
@@ -38968,19 +39031,19 @@ do
 		function class254.new(p)
 			local v3
 
-			if not (p == nil or p.milestone_id == nil) then
-				v3 = p.milestone_id
+			if not (p == nil or p.collection_id == nil) then
+				v3 = p.collection_id
 			end
 
-			return (setmetatable({ milestone_id = v3 }, class254))
+			return (setmetatable({ collection_id = v3 }, class254))
 		end
 
 		function class254:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.milestone_id ~= nil then
-				local encoded = self.milestone_id:encode()
+			if self.collection_id ~= nil then
+				local encoded = self.collection_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
@@ -39005,7 +39068,7 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.milestone_id = prop_types.StringProp.decode(v5)
+						result.collection_id = prop_types.StringProp.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -39028,8 +39091,8 @@ do
 		function class254:jsonEncode()
 			local v2 = {}
 
-			if self.milestone_id ~= nil then
-				v2.milestoneId = self.milestone_id:jsonEncode()
+			if self.collection_id ~= nil then
+				v2.collectionId = self.collection_id:jsonEncode()
 			end
 
 			return v2
@@ -39038,26 +39101,26 @@ do
 		function class254.jsonDecode(p)
 			local v2 = class254.new()
 
-			if p.milestone_id ~= nil then
-				v2.milestone_id = prop_types.StringProp.jsonDecode(p.milestone_id)
+			if p.collection_id ~= nil then
+				v2.collection_id = prop_types.StringProp.jsonDecode(p.collection_id)
 			end
 
-			if p.milestoneId ~= nil then
-				v2.milestone_id = prop_types.StringProp.jsonDecode(p.milestoneId)
+			if p.collectionId ~= nil then
+				v2.collection_id = prop_types.StringProp.jsonDecode(p.collectionId)
 			end
 
 			return v2
 		end
 
 		class254.descriptor = {
-			name = "IncrementMilestoneCountAction_Params",
+			name = "DeleteUserLibraryCollectionAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.IncrementMilestoneCountAction_Params = class254
+		v.DeleteUserLibraryCollectionAction_Params = class254
 	end
 
-	typeRegistry.default:register(v.IncrementMilestoneCountAction_Params)
+	typeRegistry.default:register(v.DeleteUserLibraryCollectionAction_Params)
 
 	do
 		local class255 = {}
@@ -39125,7 +39188,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.SetMilestoneCountAction_Params.decode(v5)
+						result.action_params = v.IncrementMilestoneCountAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -39198,25 +39261,25 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.SetMilestoneCountAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.IncrementMilestoneCountAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.SetMilestoneCountAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.IncrementMilestoneCountAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class255.descriptor = {
-			name = "SetMilestoneCountAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.SetMilestoneCountAction"
+			name = "IncrementMilestoneCountAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.IncrementMilestoneCountAction"
 		}
 
-		v.SetMilestoneCountAction = class255
+		v.IncrementMilestoneCountAction = class255
 	end
 
-	typeRegistry.default:register(v.SetMilestoneCountAction)
+	typeRegistry.default:register(v.IncrementMilestoneCountAction)
 
 	do
 		local class256 = {}
@@ -39229,13 +39292,7 @@ do
 				v3 = p.milestone_id
 			end
 
-			local v4
-
-			if not (p == nil or p.count == nil) then
-				v4 = p.count
-			end
-
-			return (setmetatable({ milestone_id = v3, count = v4 }, class256))
+			return (setmetatable({ milestone_id = v3 }, class256))
 		end
 
 		function class256:encode()
@@ -39245,12 +39302,6 @@ do
 			if self.milestone_id ~= nil then
 				local encoded = self.milestone_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.count ~= nil then
-				local encoded = self.count:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -39275,10 +39326,6 @@ do
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
 						result.milestone_id = prop_types.StringProp.decode(v5)
-					elseif v3 == 2 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.count = prop_types.Int32Prop.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -39305,40 +39352,32 @@ do
 				v2.milestoneId = self.milestone_id:jsonEncode()
 			end
 
-			if self.count ~= nil then
-				v2.count = self.count:jsonEncode()
-			end
-
 			return v2
 		end
 
-		function class256.jsonDecode(data)
+		function class256.jsonDecode(p)
 			local v2 = class256.new()
 
-			if data.milestone_id ~= nil then
-				v2.milestone_id = prop_types.StringProp.jsonDecode(data.milestone_id)
+			if p.milestone_id ~= nil then
+				v2.milestone_id = prop_types.StringProp.jsonDecode(p.milestone_id)
 			end
 
-			if data.milestoneId ~= nil then
-				v2.milestone_id = prop_types.StringProp.jsonDecode(data.milestoneId)
-			end
-
-			if data.count ~= nil then
-				v2.count = prop_types.Int32Prop.jsonDecode(data.count)
+			if p.milestoneId ~= nil then
+				v2.milestone_id = prop_types.StringProp.jsonDecode(p.milestoneId)
 			end
 
 			return v2
 		end
 
 		class256.descriptor = {
-			name = "SetMilestoneCountAction_Params",
+			name = "IncrementMilestoneCountAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.SetMilestoneCountAction_Params = class256
+		v.IncrementMilestoneCountAction_Params = class256
 	end
 
-	typeRegistry.default:register(v.SetMilestoneCountAction_Params)
+	typeRegistry.default:register(v.IncrementMilestoneCountAction_Params)
 
 	do
 		local class257 = {}
@@ -39406,7 +39445,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.ToggleContentReactionAction_Params.decode(v5)
+						result.action_params = v.SetMilestoneCountAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -39479,83 +39518,59 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.ToggleContentReactionAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.SetMilestoneCountAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.ToggleContentReactionAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.SetMilestoneCountAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class257.descriptor = {
-			name = "ToggleContentReactionAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.ToggleContentReactionAction"
+			name = "SetMilestoneCountAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.SetMilestoneCountAction"
 		}
 
-		v.ToggleContentReactionAction = class257
+		v.SetMilestoneCountAction = class257
 	end
 
-	typeRegistry.default:register(v.ToggleContentReactionAction)
+	typeRegistry.default:register(v.SetMilestoneCountAction)
 
 	do
 		local class258 = {}
 		class258.__index = class258
 
-		function class258.new(data)
+		function class258.new(p)
 			local v3
 
-			if not (data == nil or data.entity_id == nil) then
-				v3 = data.entity_id
+			if not (p == nil or p.milestone_id == nil) then
+				v3 = p.milestone_id
 			end
 
 			local v4
 
-			if not (data == nil or data.vertical == nil) then
-				v4 = data.vertical
+			if not (p == nil or p.count == nil) then
+				v4 = p.count
 			end
 
-			local v5
-
-			if not (data == nil or data.emote_id == nil) then
-				v5 = data.emote_id
-			end
-
-			local v6
-
-			if not (data == nil or data.should_add == nil) then
-				v6 = data.should_add
-			end
-
-			return (setmetatable({ entity_id = v3, vertical = v4, emote_id = v5, should_add = v6 }, class258))
+			return (setmetatable({ milestone_id = v3, count = v4 }, class258))
 		end
 
 		function class258:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
-			if self.entity_id ~= nil then
-				local encoded = self.entity_id:encode()
+			if self.milestone_id ~= nil then
+				local encoded = self.milestone_id:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
-			if self.vertical ~= nil then
-				local encoded = self.vertical:encode()
+			if self.count ~= nil then
+				local encoded = self.count:encode()
 				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.emote_id ~= nil then
-				local encoded = self.emote_id:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.should_add ~= nil then
-				local encoded = self.should_add:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
 				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 			end
 
@@ -39579,19 +39594,11 @@ do
 					if v3 == 1 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.entity_id = prop_types.StringProp.decode(v5)
+						result.milestone_id = prop_types.StringProp.decode(v5)
 					elseif v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.vertical = prop_types.StringProp.decode(v5)
-					elseif v3 == 3 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.emote_id = prop_types.StringProp.decode(v5)
-					elseif v3 == 4 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.should_add = prop_types.BoolProp.decode(v5)
+						result.count = prop_types.Int32Prop.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -39614,20 +39621,12 @@ do
 		function class258:jsonEncode()
 			local v2 = {}
 
-			if self.entity_id ~= nil then
-				v2.entityId = self.entity_id:jsonEncode()
+			if self.milestone_id ~= nil then
+				v2.milestoneId = self.milestone_id:jsonEncode()
 			end
 
-			if self.vertical ~= nil then
-				v2.vertical = self.vertical:jsonEncode()
-			end
-
-			if self.emote_id ~= nil then
-				v2.emoteId = self.emote_id:jsonEncode()
-			end
-
-			if self.should_add ~= nil then
-				v2.shouldAdd = self.should_add:jsonEncode()
+			if self.count ~= nil then
+				v2.count = self.count:jsonEncode()
 			end
 
 			return v2
@@ -39636,46 +39635,30 @@ do
 		function class258.jsonDecode(data)
 			local v2 = class258.new()
 
-			if data.entity_id ~= nil then
-				v2.entity_id = prop_types.StringProp.jsonDecode(data.entity_id)
+			if data.milestone_id ~= nil then
+				v2.milestone_id = prop_types.StringProp.jsonDecode(data.milestone_id)
 			end
 
-			if data.entityId ~= nil then
-				v2.entity_id = prop_types.StringProp.jsonDecode(data.entityId)
+			if data.milestoneId ~= nil then
+				v2.milestone_id = prop_types.StringProp.jsonDecode(data.milestoneId)
 			end
 
-			if data.vertical ~= nil then
-				v2.vertical = prop_types.StringProp.jsonDecode(data.vertical)
-			end
-
-			if data.emote_id ~= nil then
-				v2.emote_id = prop_types.StringProp.jsonDecode(data.emote_id)
-			end
-
-			if data.emoteId ~= nil then
-				v2.emote_id = prop_types.StringProp.jsonDecode(data.emoteId)
-			end
-
-			if data.should_add ~= nil then
-				v2.should_add = prop_types.BoolProp.jsonDecode(data.should_add)
-			end
-
-			if data.shouldAdd ~= nil then
-				v2.should_add = prop_types.BoolProp.jsonDecode(data.shouldAdd)
+			if data.count ~= nil then
+				v2.count = prop_types.Int32Prop.jsonDecode(data.count)
 			end
 
 			return v2
 		end
 
 		class258.descriptor = {
-			name = "ToggleContentReactionAction_Params",
+			name = "SetMilestoneCountAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.ToggleContentReactionAction_Params = class258
+		v.SetMilestoneCountAction_Params = class258
 	end
 
-	typeRegistry.default:register(v.ToggleContentReactionAction_Params)
+	typeRegistry.default:register(v.SetMilestoneCountAction_Params)
 
 	do
 		local class259 = {}
@@ -39743,7 +39726,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.OpenSignUpModalAction_Params.decode(v5)
+						result.action_params = v.ToggleContentReactionAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -39816,88 +39799,203 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.OpenSignUpModalAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.ToggleContentReactionAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.OpenSignUpModalAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.ToggleContentReactionAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class259.descriptor = {
-			name = "OpenSignUpModalAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.OpenSignUpModalAction"
+			name = "ToggleContentReactionAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.ToggleContentReactionAction"
 		}
 
-		v.OpenSignUpModalAction = class259
+		v.ToggleContentReactionAction = class259
 	end
 
-	typeRegistry.default:register(v.OpenSignUpModalAction)
+	typeRegistry.default:register(v.ToggleContentReactionAction)
 
 	do
 		local class260 = {}
 		class260.__index = class260
 
-		function class260.new(_)
-			return (setmetatable({}, class260))
+		function class260.new(data)
+			local v3
+
+			if not (data == nil or data.entity_id == nil) then
+				v3 = data.entity_id
+			end
+
+			local v4
+
+			if not (data == nil or data.vertical == nil) then
+				v4 = data.vertical
+			end
+
+			local v5
+
+			if not (data == nil or data.emote_id == nil) then
+				v5 = data.emote_id
+			end
+
+			local v6
+
+			if not (data == nil or data.should_add == nil) then
+				v6 = data.should_add
+			end
+
+			return (setmetatable({ entity_id = v3, vertical = v4, emote_id = v5, should_add = v6 }, class260))
 		end
 
 		function class260:encode()
-			local buf = buffer.create(0)
+			local v2 = buffer.create(0)
+			local v3 = 0
 
-			local buf2 = buffer.create(0)
-			buffer.copy(buf2, 0, buf, 0, 0)
-			return buf2
+			if self.entity_id ~= nil then
+				local encoded = self.entity_id:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.vertical ~= nil then
+				local encoded = self.vertical:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.emote_id ~= nil then
+				local encoded = self.emote_id:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.should_add ~= nil then
+				local encoded = self.should_add:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			local buf = buffer.create(v3)
+			buffer.copy(buf, 0, v2, 0, v3)
+			return buf
 		end
 
 		function class260.decode(buf: buffer)
-			local v2 = class260.new()
-			local v3 = 0
+			local result = class260.new()
+			local v2 = 0
 
-			while v3 < buffer.len(buf) do
-				local v4, v5
-				v4, v5, v3 = proto.readTag(buf, v3)
+			while v2 < buffer.len(buf) do
+				local v3, v4
+				v3, v4, v2 = proto.readTag(buf, v2)
 
-				if v5 == proto.wireTypes.varint then
-					local v6
-					v6, v3 = proto.readVarInt(buf, v3)
-				elseif v5 == proto.wireTypes.lengthDelimited then
-					local varInt, v6 = proto.readVarInt(buf, v3)
+				if v4 == proto.wireTypes.varint then
+					local v5
+					v5, v2 = proto.readVarInt(buf, v2)
+				elseif v4 == proto.wireTypes.lengthDelimited then
+					if v3 == 1 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.entity_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 2 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.vertical = prop_types.StringProp.decode(v5)
+					elseif v3 == 3 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.emote_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 4 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.should_add = prop_types.BoolProp.decode(v5)
+					else
+						local varInt, v5 = proto.readVarInt(buf, v2)
 
-					v3 = v6 + varInt
-				elseif v5 == proto.wireTypes.i32 then
-					local v6
-					v6, v3 = proto.readFixed32(buf, v3)
-				elseif v5 == proto.wireTypes.i64 then
-					local v6
-					v6, v3 = proto.readFixed64(buf, v3)
+						v2 = v5 + varInt
+					end
+				elseif v4 == proto.wireTypes.i32 then
+					local v5
+					v5, v2 = proto.readFixed32(buf, v2)
+				elseif v4 == proto.wireTypes.i64 then
+					local v5
+					v5, v2 = proto.readFixed64(buf, v2)
 				else
-					error("Unsupported wire type: " .. v5)
+					error("Unsupported wire type: " .. v4)
 				end
+			end
+
+			return result
+		end
+
+		function class260:jsonEncode()
+			local v2 = {}
+
+			if self.entity_id ~= nil then
+				v2.entityId = self.entity_id:jsonEncode()
+			end
+
+			if self.vertical ~= nil then
+				v2.vertical = self.vertical:jsonEncode()
+			end
+
+			if self.emote_id ~= nil then
+				v2.emoteId = self.emote_id:jsonEncode()
+			end
+
+			if self.should_add ~= nil then
+				v2.shouldAdd = self.should_add:jsonEncode()
 			end
 
 			return v2
 		end
 
-		function class260:jsonEncode()
-			return {}
-		end
+		function class260.jsonDecode(data)
+			local v2 = class260.new()
 
-		function class260.jsonDecode(_)
-			return (class260.new())
+			if data.entity_id ~= nil then
+				v2.entity_id = prop_types.StringProp.jsonDecode(data.entity_id)
+			end
+
+			if data.entityId ~= nil then
+				v2.entity_id = prop_types.StringProp.jsonDecode(data.entityId)
+			end
+
+			if data.vertical ~= nil then
+				v2.vertical = prop_types.StringProp.jsonDecode(data.vertical)
+			end
+
+			if data.emote_id ~= nil then
+				v2.emote_id = prop_types.StringProp.jsonDecode(data.emote_id)
+			end
+
+			if data.emoteId ~= nil then
+				v2.emote_id = prop_types.StringProp.jsonDecode(data.emoteId)
+			end
+
+			if data.should_add ~= nil then
+				v2.should_add = prop_types.BoolProp.jsonDecode(data.should_add)
+			end
+
+			if data.shouldAdd ~= nil then
+				v2.should_add = prop_types.BoolProp.jsonDecode(data.shouldAdd)
+			end
+
+			return v2
 		end
 
 		class260.descriptor = {
-			name = "OpenSignUpModalAction_Params",
+			name = "ToggleContentReactionAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.OpenSignUpModalAction_Params = class260
+		v.ToggleContentReactionAction_Params = class260
 	end
 
-	typeRegistry.default:register(v.OpenSignUpModalAction_Params)
+	typeRegistry.default:register(v.ToggleContentReactionAction_Params)
 
 	do
 		local class261 = {}
@@ -39965,7 +40063,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.RunStreamNotificationItemAction_Params.decode(v5)
+						result.action_params = v.OpenSignUpModalAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -40038,183 +40136,88 @@ do
 			end
 
 			if data.action_params ~= nil then
-				v2.action_params = v.RunStreamNotificationItemAction_Params.jsonDecode(data.action_params)
+				v2.action_params = v.OpenSignUpModalAction_Params.jsonDecode(data.action_params)
 			end
 
 			if data.actionParams ~= nil then
-				v2.action_params = v.RunStreamNotificationItemAction_Params.jsonDecode(data.actionParams)
+				v2.action_params = v.OpenSignUpModalAction_Params.jsonDecode(data.actionParams)
 			end
 
 			return v2
 		end
 
 		class261.descriptor = {
-			name = "RunStreamNotificationItemAction",
-			fullName = "roblox.apppageplatform.shared.v1beta1.RunStreamNotificationItemAction"
+			name = "OpenSignUpModalAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.OpenSignUpModalAction"
 		}
 
-		v.RunStreamNotificationItemAction = class261
+		v.OpenSignUpModalAction = class261
 	end
 
-	typeRegistry.default:register(v.RunStreamNotificationItemAction)
+	typeRegistry.default:register(v.OpenSignUpModalAction)
 
 	do
 		local class262 = {}
 		class262.__index = class262
 
-		function class262.new(data)
-			local v3
-
-			if not (data == nil or data.notification_id == nil) then
-				v3 = data.notification_id
-			end
-
-			local v4
-
-			if not (data == nil or data.visual_item_name == nil) then
-				v4 = data.visual_item_name
-			end
-
-			local v5
-
-			if not (data == nil or data.page_entry_identifier == nil) then
-				v5 = data.page_entry_identifier
-			end
-
-			return (setmetatable({
-				notification_id = v3,
-				visual_item_name = v4,
-				page_entry_identifier = v5
-			}, class262))
+		function class262.new(_)
+			return (setmetatable({}, class262))
 		end
 
 		function class262:encode()
-			local v2 = buffer.create(0)
-			local v3 = 0
+			local buf = buffer.create(0)
 
-			if self.notification_id ~= nil then
-				local encoded = self.notification_id:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.visual_item_name ~= nil then
-				local encoded = self.visual_item_name:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			if self.page_entry_identifier ~= nil then
-				local encoded = self.page_entry_identifier:encode()
-				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
-				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
-			end
-
-			local buf = buffer.create(v3)
-			buffer.copy(buf, 0, v2, 0, v3)
-			return buf
+			local buf2 = buffer.create(0)
+			buffer.copy(buf2, 0, buf, 0, 0)
+			return buf2
 		end
 
 		function class262.decode(buf: buffer)
-			local result = class262.new()
-			local v2 = 0
+			local v2 = class262.new()
+			local v3 = 0
 
-			while v2 < buffer.len(buf) do
-				local v3, v4
-				v3, v4, v2 = proto.readTag(buf, v2)
+			while v3 < buffer.len(buf) do
+				local v4, v5
+				v4, v5, v3 = proto.readTag(buf, v3)
 
-				if v4 == proto.wireTypes.varint then
-					local v5
-					v5, v2 = proto.readVarInt(buf, v2)
-				elseif v4 == proto.wireTypes.lengthDelimited then
-					if v3 == 1 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.notification_id = prop_types.StringProp.decode(v5)
-					elseif v3 == 2 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.visual_item_name = prop_types.StringProp.decode(v5)
-					elseif v3 == 3 then
-						local v5
-						v5, v2 = proto.readBuffer(buf, v2)
-						result.page_entry_identifier = prop_types.StringProp.decode(v5)
-					else
-						local varInt, v5 = proto.readVarInt(buf, v2)
+				if v5 == proto.wireTypes.varint then
+					local v6
+					v6, v3 = proto.readVarInt(buf, v3)
+				elseif v5 == proto.wireTypes.lengthDelimited then
+					local varInt, v6 = proto.readVarInt(buf, v3)
 
-						v2 = v5 + varInt
-					end
-				elseif v4 == proto.wireTypes.i32 then
-					local v5
-					v5, v2 = proto.readFixed32(buf, v2)
-				elseif v4 == proto.wireTypes.i64 then
-					local v5
-					v5, v2 = proto.readFixed64(buf, v2)
+					v3 = v6 + varInt
+				elseif v5 == proto.wireTypes.i32 then
+					local v6
+					v6, v3 = proto.readFixed32(buf, v3)
+				elseif v5 == proto.wireTypes.i64 then
+					local v6
+					v6, v3 = proto.readFixed64(buf, v3)
 				else
-					error("Unsupported wire type: " .. v4)
+					error("Unsupported wire type: " .. v5)
 				end
 			end
 
-			return result
+			return v2
 		end
 
 		function class262:jsonEncode()
-			local v2 = {}
-
-			if self.notification_id ~= nil then
-				v2.notificationId = self.notification_id:jsonEncode()
-			end
-
-			if self.visual_item_name ~= nil then
-				v2.visualItemName = self.visual_item_name:jsonEncode()
-			end
-
-			if self.page_entry_identifier ~= nil then
-				v2.pageEntryIdentifier = self.page_entry_identifier:jsonEncode()
-			end
-
-			return v2
+			return {}
 		end
 
-		function class262.jsonDecode(data)
-			local v2 = class262.new()
-
-			if data.notification_id ~= nil then
-				v2.notification_id = prop_types.StringProp.jsonDecode(data.notification_id)
-			end
-
-			if data.notificationId ~= nil then
-				v2.notification_id = prop_types.StringProp.jsonDecode(data.notificationId)
-			end
-
-			if data.visual_item_name ~= nil then
-				v2.visual_item_name = prop_types.StringProp.jsonDecode(data.visual_item_name)
-			end
-
-			if data.visualItemName ~= nil then
-				v2.visual_item_name = prop_types.StringProp.jsonDecode(data.visualItemName)
-			end
-
-			if data.page_entry_identifier ~= nil then
-				v2.page_entry_identifier = prop_types.StringProp.jsonDecode(data.page_entry_identifier)
-			end
-
-			if data.pageEntryIdentifier ~= nil then
-				v2.page_entry_identifier = prop_types.StringProp.jsonDecode(data.pageEntryIdentifier)
-			end
-
-			return v2
+		function class262.jsonDecode(_)
+			return (class262.new())
 		end
 
 		class262.descriptor = {
-			name = "RunStreamNotificationItemAction_Params",
+			name = "OpenSignUpModalAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.RunStreamNotificationItemAction_Params = class262
+		v.OpenSignUpModalAction_Params = class262
 	end
 
-	typeRegistry.default:register(v.RunStreamNotificationItemAction_Params)
+	typeRegistry.default:register(v.OpenSignUpModalAction_Params)
 
 	do
 		local class263 = {}
@@ -40282,7 +40285,7 @@ do
 					if v3 == 2 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
-						result.action_params = v.ToggleStreamNotificationBundleAction_Params.decode(v5)
+						result.action_params = v.RunStreamNotificationItemAction_Params.decode(v5)
 					else
 						local varInt, v5 = proto.readVarInt(buf, v2)
 
@@ -40355,6 +40358,323 @@ do
 			end
 
 			if data.action_params ~= nil then
+				v2.action_params = v.RunStreamNotificationItemAction_Params.jsonDecode(data.action_params)
+			end
+
+			if data.actionParams ~= nil then
+				v2.action_params = v.RunStreamNotificationItemAction_Params.jsonDecode(data.actionParams)
+			end
+
+			return v2
+		end
+
+		class263.descriptor = {
+			name = "RunStreamNotificationItemAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.RunStreamNotificationItemAction"
+		}
+
+		v.RunStreamNotificationItemAction = class263
+	end
+
+	typeRegistry.default:register(v.RunStreamNotificationItemAction)
+
+	do
+		local class264 = {}
+		class264.__index = class264
+
+		function class264.new(data)
+			local v3
+
+			if not (data == nil or data.notification_id == nil) then
+				v3 = data.notification_id
+			end
+
+			local v4
+
+			if not (data == nil or data.visual_item_name == nil) then
+				v4 = data.visual_item_name
+			end
+
+			local v5
+
+			if not (data == nil or data.page_entry_identifier == nil) then
+				v5 = data.page_entry_identifier
+			end
+
+			return (setmetatable({
+				notification_id = v3,
+				visual_item_name = v4,
+				page_entry_identifier = v5
+			}, class264))
+		end
+
+		function class264:encode()
+			local v2 = buffer.create(0)
+			local v3 = 0
+
+			if self.notification_id ~= nil then
+				local encoded = self.notification_id:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.visual_item_name ~= nil then
+				local encoded = self.visual_item_name:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.page_entry_identifier ~= nil then
+				local encoded = self.page_entry_identifier:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			local buf = buffer.create(v3)
+			buffer.copy(buf, 0, v2, 0, v3)
+			return buf
+		end
+
+		function class264.decode(buf: buffer)
+			local result = class264.new()
+			local v2 = 0
+
+			while v2 < buffer.len(buf) do
+				local v3, v4
+				v3, v4, v2 = proto.readTag(buf, v2)
+
+				if v4 == proto.wireTypes.varint then
+					local v5
+					v5, v2 = proto.readVarInt(buf, v2)
+				elseif v4 == proto.wireTypes.lengthDelimited then
+					if v3 == 1 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.notification_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 2 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.visual_item_name = prop_types.StringProp.decode(v5)
+					elseif v3 == 3 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.page_entry_identifier = prop_types.StringProp.decode(v5)
+					else
+						local varInt, v5 = proto.readVarInt(buf, v2)
+
+						v2 = v5 + varInt
+					end
+				elseif v4 == proto.wireTypes.i32 then
+					local v5
+					v5, v2 = proto.readFixed32(buf, v2)
+				elseif v4 == proto.wireTypes.i64 then
+					local v5
+					v5, v2 = proto.readFixed64(buf, v2)
+				else
+					error("Unsupported wire type: " .. v4)
+				end
+			end
+
+			return result
+		end
+
+		function class264:jsonEncode()
+			local v2 = {}
+
+			if self.notification_id ~= nil then
+				v2.notificationId = self.notification_id:jsonEncode()
+			end
+
+			if self.visual_item_name ~= nil then
+				v2.visualItemName = self.visual_item_name:jsonEncode()
+			end
+
+			if self.page_entry_identifier ~= nil then
+				v2.pageEntryIdentifier = self.page_entry_identifier:jsonEncode()
+			end
+
+			return v2
+		end
+
+		function class264.jsonDecode(data)
+			local v2 = class264.new()
+
+			if data.notification_id ~= nil then
+				v2.notification_id = prop_types.StringProp.jsonDecode(data.notification_id)
+			end
+
+			if data.notificationId ~= nil then
+				v2.notification_id = prop_types.StringProp.jsonDecode(data.notificationId)
+			end
+
+			if data.visual_item_name ~= nil then
+				v2.visual_item_name = prop_types.StringProp.jsonDecode(data.visual_item_name)
+			end
+
+			if data.visualItemName ~= nil then
+				v2.visual_item_name = prop_types.StringProp.jsonDecode(data.visualItemName)
+			end
+
+			if data.page_entry_identifier ~= nil then
+				v2.page_entry_identifier = prop_types.StringProp.jsonDecode(data.page_entry_identifier)
+			end
+
+			if data.pageEntryIdentifier ~= nil then
+				v2.page_entry_identifier = prop_types.StringProp.jsonDecode(data.pageEntryIdentifier)
+			end
+
+			return v2
+		end
+
+		class264.descriptor = {
+			name = "RunStreamNotificationItemAction_Params",
+			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
+		}
+
+		v.RunStreamNotificationItemAction_Params = class264
+	end
+
+	typeRegistry.default:register(v.RunStreamNotificationItemAction_Params)
+
+	do
+		local class265 = {}
+		class265.__index = class265
+
+		function class265.new(p)
+			local v3
+
+			if p == nil or p.action_type == nil then
+				v3 = assert(v.ActionType.fromNumber(0), "Enum has no 0 default")
+			else
+				v3 = p.action_type
+			end
+
+			local v4
+
+			if not (p == nil or p.action_params == nil) then
+				v4 = p.action_params
+			end
+
+			return (setmetatable({ action_type = v3, action_params = v4 }, class265))
+		end
+
+		function class265:encode()
+			local v2 = buffer.create(0)
+			local v3 = 0
+
+			if
+				self.action_type ~= nil
+				and (self.action_type ~= nil and self.action_type ~= 0 or self.action_type ~= v.ActionType.fromNumber(0))
+			then
+				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.varint)
+				v2, v3 = proto.writeVarInt(v4, v5, v.ActionType.toNumber(self.action_type))
+			end
+
+			if self.action_params ~= nil then
+				local encoded = self.action_params:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			local buf = buffer.create(v3)
+			buffer.copy(buf, 0, v2, 0, v3)
+			return buf
+		end
+
+		function class265.decode(buf: buffer)
+			local result = class265.new()
+			local v2 = 0
+
+			while v2 < buffer.len(buf) do
+				local v3, v4
+				v3, v4, v2 = proto.readTag(buf, v2)
+
+				if v4 == proto.wireTypes.varint then
+					if v3 == 1 then
+						local v5
+						v5, v2 = proto.readVarIntI32(buf, v2)
+						result.action_type = v.ActionType.fromNumber(v5) or v5
+					else
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					end
+				elseif v4 == proto.wireTypes.lengthDelimited then
+					if v3 == 2 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.action_params = v.ToggleStreamNotificationBundleAction_Params.decode(v5)
+					else
+						local varInt, v5 = proto.readVarInt(buf, v2)
+
+						v2 = v5 + varInt
+					end
+				elseif v4 == proto.wireTypes.i32 then
+					local v5
+					v5, v2 = proto.readFixed32(buf, v2)
+				elseif v4 == proto.wireTypes.i64 then
+					local v5
+					v5, v2 = proto.readFixed64(buf, v2)
+				else
+					error("Unsupported wire type: " .. v4)
+				end
+			end
+
+			return result
+		end
+
+		function class265:jsonEncode()
+			local v2 = {}
+
+			if
+				self.action_type ~= nil
+				and (self.action_type ~= nil and self.action_type ~= 0 or self.action_type ~= v.ActionType.fromNumber(0))
+			then
+				local v3
+
+				if typeof(self.action_type) == "number" then
+					v3 = self.action_type
+				else
+					v3 = v.ActionType.toNumber(self.action_type)
+				end
+
+				v2.actionType = v3
+			end
+
+			if self.action_params ~= nil then
+				v2.actionParams = self.action_params:jsonEncode()
+			end
+
+			return v2
+		end
+
+		function class265.jsonDecode(data)
+			local v2 = class265.new()
+
+			if data.action_type ~= nil then
+				local v3
+
+				if typeof(data.action_type) == "number" then
+					v3 = v.ActionType.fromNumber(data.action_type) or data.action_type
+				else
+					v3 = v.ActionType.fromName(data.action_type) or data.action_type
+				end
+
+				v2.action_type = v3
+			end
+
+			if data.actionType ~= nil then
+				local v3
+
+				if typeof(data.actionType) == "number" then
+					v3 = v.ActionType.fromNumber(data.actionType) or data.actionType
+				else
+					v3 = v.ActionType.fromName(data.actionType) or data.actionType
+				end
+
+				v2.action_type = v3
+			end
+
+			if data.action_params ~= nil then
 				v2.action_params = v.ToggleStreamNotificationBundleAction_Params.jsonDecode(data.action_params)
 			end
 
@@ -40365,31 +40685,31 @@ do
 			return v2
 		end
 
-		class263.descriptor = {
+		class265.descriptor = {
 			name = "ToggleStreamNotificationBundleAction",
 			fullName = "roblox.apppageplatform.shared.v1beta1.ToggleStreamNotificationBundleAction"
 		}
 
-		v.ToggleStreamNotificationBundleAction = class263
+		v.ToggleStreamNotificationBundleAction = class265
 	end
 
 	typeRegistry.default:register(v.ToggleStreamNotificationBundleAction)
 
 	do
-		local class264 = {}
-		class264.__index = class264
+		local class266 = {}
+		class266.__index = class266
 
-		function class264.new(p)
+		function class266.new(p)
 			local v3
 
 			if not (p == nil or p.bundle_key == nil) then
 				v3 = p.bundle_key
 			end
 
-			return (setmetatable({ bundle_key = v3 }, class264))
+			return (setmetatable({ bundle_key = v3 }, class266))
 		end
 
-		function class264:encode()
+		function class266:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -40404,8 +40724,8 @@ do
 			return buf
 		end
 
-		function class264.decode(buf: buffer)
-			local result = class264.new()
+		function class266.decode(buf: buffer)
+			local result = class266.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -40439,7 +40759,7 @@ do
 			return result
 		end
 
-		function class264:jsonEncode()
+		function class266:jsonEncode()
 			local v2 = {}
 
 			if self.bundle_key ~= nil then
@@ -40449,8 +40769,8 @@ do
 			return v2
 		end
 
-		function class264.jsonDecode(p)
-			local v2 = class264.new()
+		function class266.jsonDecode(p)
+			local v2 = class266.new()
 
 			if p.bundle_key ~= nil then
 				v2.bundle_key = prop_types.StringProp.jsonDecode(p.bundle_key)
@@ -40463,21 +40783,740 @@ do
 			return v2
 		end
 
-		class264.descriptor = {
+		class266.descriptor = {
 			name = "ToggleStreamNotificationBundleAction_Params",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
 		}
 
-		v.ToggleStreamNotificationBundleAction_Params = class264
+		v.ToggleStreamNotificationBundleAction_Params = class266
 	end
 
 	typeRegistry.default:register(v.ToggleStreamNotificationBundleAction_Params)
 
 	do
-		local class265 = {}
-		class265.__index = class265
+		local class267 = {}
+		class267.__index = class267
 
-		function class265.new(data)
+		function class267.new(p)
+			local v3
+
+			if p == nil or p.action_type == nil then
+				v3 = assert(v.ActionType.fromNumber(0), "Enum has no 0 default")
+			else
+				v3 = p.action_type
+			end
+
+			local v4
+
+			if not (p == nil or p.action_params == nil) then
+				v4 = p.action_params
+			end
+
+			return (setmetatable({ action_type = v3, action_params = v4 }, class267))
+		end
+
+		function class267:encode()
+			local v2 = buffer.create(0)
+			local v3 = 0
+
+			if
+				self.action_type ~= nil
+				and (self.action_type ~= nil and self.action_type ~= 0 or self.action_type ~= v.ActionType.fromNumber(0))
+			then
+				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.varint)
+				v2, v3 = proto.writeVarInt(v4, v5, v.ActionType.toNumber(self.action_type))
+			end
+
+			if self.action_params ~= nil then
+				local encoded = self.action_params:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			local buf = buffer.create(v3)
+			buffer.copy(buf, 0, v2, 0, v3)
+			return buf
+		end
+
+		function class267.decode(buf: buffer)
+			local result = class267.new()
+			local v2 = 0
+
+			while v2 < buffer.len(buf) do
+				local v3, v4
+				v3, v4, v2 = proto.readTag(buf, v2)
+
+				if v4 == proto.wireTypes.varint then
+					if v3 == 1 then
+						local v5
+						v5, v2 = proto.readVarIntI32(buf, v2)
+						result.action_type = v.ActionType.fromNumber(v5) or v5
+					else
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					end
+				elseif v4 == proto.wireTypes.lengthDelimited then
+					if v3 == 2 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.action_params = v.OpenAccountSettingsAction_Params.decode(v5)
+					else
+						local varInt, v5 = proto.readVarInt(buf, v2)
+
+						v2 = v5 + varInt
+					end
+				elseif v4 == proto.wireTypes.i32 then
+					local v5
+					v5, v2 = proto.readFixed32(buf, v2)
+				elseif v4 == proto.wireTypes.i64 then
+					local v5
+					v5, v2 = proto.readFixed64(buf, v2)
+				else
+					error("Unsupported wire type: " .. v4)
+				end
+			end
+
+			return result
+		end
+
+		function class267:jsonEncode()
+			local v2 = {}
+
+			if
+				self.action_type ~= nil
+				and (self.action_type ~= nil and self.action_type ~= 0 or self.action_type ~= v.ActionType.fromNumber(0))
+			then
+				local v3
+
+				if typeof(self.action_type) == "number" then
+					v3 = self.action_type
+				else
+					v3 = v.ActionType.toNumber(self.action_type)
+				end
+
+				v2.actionType = v3
+			end
+
+			if self.action_params ~= nil then
+				v2.actionParams = self.action_params:jsonEncode()
+			end
+
+			return v2
+		end
+
+		function class267.jsonDecode(data)
+			local v2 = class267.new()
+
+			if data.action_type ~= nil then
+				local v3
+
+				if typeof(data.action_type) == "number" then
+					v3 = v.ActionType.fromNumber(data.action_type) or data.action_type
+				else
+					v3 = v.ActionType.fromName(data.action_type) or data.action_type
+				end
+
+				v2.action_type = v3
+			end
+
+			if data.actionType ~= nil then
+				local v3
+
+				if typeof(data.actionType) == "number" then
+					v3 = v.ActionType.fromNumber(data.actionType) or data.actionType
+				else
+					v3 = v.ActionType.fromName(data.actionType) or data.actionType
+				end
+
+				v2.action_type = v3
+			end
+
+			if data.action_params ~= nil then
+				v2.action_params = v.OpenAccountSettingsAction_Params.jsonDecode(data.action_params)
+			end
+
+			if data.actionParams ~= nil then
+				v2.action_params = v.OpenAccountSettingsAction_Params.jsonDecode(data.actionParams)
+			end
+
+			return v2
+		end
+
+		class267.descriptor = {
+			name = "OpenAccountSettingsAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.OpenAccountSettingsAction"
+		}
+
+		v.OpenAccountSettingsAction = class267
+	end
+
+	typeRegistry.default:register(v.OpenAccountSettingsAction)
+
+	do
+		local class268 = {}
+		class268.__index = class268
+
+		function class268.new(p)
+			local v3
+
+			if not (p == nil or p.surface_key == nil) then
+				v3 = p.surface_key
+			end
+
+			return (setmetatable({ surface_key = v3 }, class268))
+		end
+
+		function class268:encode()
+			local v2 = buffer.create(0)
+			local v3 = 0
+
+			if self.surface_key ~= nil then
+				local encoded = self.surface_key:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			local buf = buffer.create(v3)
+			buffer.copy(buf, 0, v2, 0, v3)
+			return buf
+		end
+
+		function class268.decode(buf: buffer)
+			local result = class268.new()
+			local v2 = 0
+
+			while v2 < buffer.len(buf) do
+				local v3, v4
+				v3, v4, v2 = proto.readTag(buf, v2)
+
+				if v4 == proto.wireTypes.varint then
+					local v5
+					v5, v2 = proto.readVarInt(buf, v2)
+				elseif v4 == proto.wireTypes.lengthDelimited then
+					if v3 == 1 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.surface_key = prop_types.StringProp.decode(v5)
+					else
+						local varInt, v5 = proto.readVarInt(buf, v2)
+
+						v2 = v5 + varInt
+					end
+				elseif v4 == proto.wireTypes.i32 then
+					local v5
+					v5, v2 = proto.readFixed32(buf, v2)
+				elseif v4 == proto.wireTypes.i64 then
+					local v5
+					v5, v2 = proto.readFixed64(buf, v2)
+				else
+					error("Unsupported wire type: " .. v4)
+				end
+			end
+
+			return result
+		end
+
+		function class268:jsonEncode()
+			local v2 = {}
+
+			if self.surface_key ~= nil then
+				v2.surfaceKey = self.surface_key:jsonEncode()
+			end
+
+			return v2
+		end
+
+		function class268.jsonDecode(p)
+			local v2 = class268.new()
+
+			if p.surface_key ~= nil then
+				v2.surface_key = prop_types.StringProp.jsonDecode(p.surface_key)
+			end
+
+			if p.surfaceKey ~= nil then
+				v2.surface_key = prop_types.StringProp.jsonDecode(p.surfaceKey)
+			end
+
+			return v2
+		end
+
+		class268.descriptor = {
+			name = "OpenAccountSettingsAction_Params",
+			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
+		}
+
+		v.OpenAccountSettingsAction_Params = class268
+	end
+
+	typeRegistry.default:register(v.OpenAccountSettingsAction_Params)
+
+	do
+		local class269 = {}
+		class269.__index = class269
+
+		function class269.new(p)
+			local v3
+
+			if p == nil or p.action_type == nil then
+				v3 = assert(v.ActionType.fromNumber(0), "Enum has no 0 default")
+			else
+				v3 = p.action_type
+			end
+
+			local v4
+
+			if not (p == nil or p.action_params == nil) then
+				v4 = p.action_params
+			end
+
+			return (setmetatable({ action_type = v3, action_params = v4 }, class269))
+		end
+
+		function class269:encode()
+			local v2 = buffer.create(0)
+			local v3 = 0
+
+			if
+				self.action_type ~= nil
+				and (self.action_type ~= nil and self.action_type ~= 0 or self.action_type ~= v.ActionType.fromNumber(0))
+			then
+				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.varint)
+				v2, v3 = proto.writeVarInt(v4, v5, v.ActionType.toNumber(self.action_type))
+			end
+
+			if self.action_params ~= nil then
+				local encoded = self.action_params:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			local buf = buffer.create(v3)
+			buffer.copy(buf, 0, v2, 0, v3)
+			return buf
+		end
+
+		function class269.decode(buf: buffer)
+			local result = class269.new()
+			local v2 = 0
+
+			while v2 < buffer.len(buf) do
+				local v3, v4
+				v3, v4, v2 = proto.readTag(buf, v2)
+
+				if v4 == proto.wireTypes.varint then
+					if v3 == 1 then
+						local v5
+						v5, v2 = proto.readVarIntI32(buf, v2)
+						result.action_type = v.ActionType.fromNumber(v5) or v5
+					else
+						local v5
+						v5, v2 = proto.readVarInt(buf, v2)
+					end
+				elseif v4 == proto.wireTypes.lengthDelimited then
+					if v3 == 2 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.action_params = v.ClaimEventItemAction_Params.decode(v5)
+					else
+						local varInt, v5 = proto.readVarInt(buf, v2)
+
+						v2 = v5 + varInt
+					end
+				elseif v4 == proto.wireTypes.i32 then
+					local v5
+					v5, v2 = proto.readFixed32(buf, v2)
+				elseif v4 == proto.wireTypes.i64 then
+					local v5
+					v5, v2 = proto.readFixed64(buf, v2)
+				else
+					error("Unsupported wire type: " .. v4)
+				end
+			end
+
+			return result
+		end
+
+		function class269:jsonEncode()
+			local v2 = {}
+
+			if
+				self.action_type ~= nil
+				and (self.action_type ~= nil and self.action_type ~= 0 or self.action_type ~= v.ActionType.fromNumber(0))
+			then
+				local v3
+
+				if typeof(self.action_type) == "number" then
+					v3 = self.action_type
+				else
+					v3 = v.ActionType.toNumber(self.action_type)
+				end
+
+				v2.actionType = v3
+			end
+
+			if self.action_params ~= nil then
+				v2.actionParams = self.action_params:jsonEncode()
+			end
+
+			return v2
+		end
+
+		function class269.jsonDecode(data)
+			local v2 = class269.new()
+
+			if data.action_type ~= nil then
+				local v3
+
+				if typeof(data.action_type) == "number" then
+					v3 = v.ActionType.fromNumber(data.action_type) or data.action_type
+				else
+					v3 = v.ActionType.fromName(data.action_type) or data.action_type
+				end
+
+				v2.action_type = v3
+			end
+
+			if data.actionType ~= nil then
+				local v3
+
+				if typeof(data.actionType) == "number" then
+					v3 = v.ActionType.fromNumber(data.actionType) or data.actionType
+				else
+					v3 = v.ActionType.fromName(data.actionType) or data.actionType
+				end
+
+				v2.action_type = v3
+			end
+
+			if data.action_params ~= nil then
+				v2.action_params = v.ClaimEventItemAction_Params.jsonDecode(data.action_params)
+			end
+
+			if data.actionParams ~= nil then
+				v2.action_params = v.ClaimEventItemAction_Params.jsonDecode(data.actionParams)
+			end
+
+			return v2
+		end
+
+		class269.descriptor = {
+			name = "ClaimEventItemAction",
+			fullName = "roblox.apppageplatform.shared.v1beta1.ClaimEventItemAction"
+		}
+
+		v.ClaimEventItemAction = class269
+	end
+
+	typeRegistry.default:register(v.ClaimEventItemAction)
+
+	do
+		local class270 = {}
+		class270.__index = class270
+
+		function class270.new(data)
+			local v3
+
+			if not (data == nil or data.event_type == nil) then
+				v3 = data.event_type
+			end
+
+			local v4
+
+			if not (data == nil or data.subscription_product_type == nil) then
+				v4 = data.subscription_product_type
+			end
+
+			local v5
+
+			if not (data == nil or data.subscription_product_id == nil) then
+				v5 = data.subscription_product_id
+			end
+
+			local v6
+
+			if not (data == nil or data.asset_id == nil) then
+				v6 = data.asset_id
+			end
+
+			local v7
+
+			if not (data == nil or data.on_claimed == nil) then
+				v7 = data.on_claimed
+			end
+
+			local v8
+
+			if not (data == nil or data.on_not_subscribed == nil) then
+				v8 = data.on_not_subscribed
+			end
+
+			local v9
+
+			if not (data == nil or data.on_failure == nil) then
+				v9 = data.on_failure
+			end
+
+			local v10
+
+			if not (data == nil or data.loading_page_scope_field == nil) then
+				v10 = data.loading_page_scope_field
+			end
+
+			return (setmetatable({
+				event_type = v3,
+				subscription_product_type = v4,
+				subscription_product_id = v5,
+				asset_id = v6,
+				on_claimed = v7,
+				on_not_subscribed = v8,
+				on_failure = v9,
+				loading_page_scope_field = v10
+			}, class270))
+		end
+
+		function class270:encode()
+			local v2 = buffer.create(0)
+			local v3 = 0
+
+			if self.event_type ~= nil then
+				local encoded = self.event_type:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.subscription_product_type ~= nil then
+				local encoded = self.subscription_product_type:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.subscription_product_id ~= nil then
+				local encoded = self.subscription_product_id:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.asset_id ~= nil then
+				local encoded = self.asset_id:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.on_claimed ~= nil then
+				local encoded = self.on_claimed:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.on_not_subscribed ~= nil then
+				local encoded = self.on_not_subscribed:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 6, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.on_failure ~= nil then
+				local encoded = self.on_failure:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 7, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			if self.loading_page_scope_field ~= nil then
+				local encoded = self.loading_page_scope_field:encode()
+				local v4, v5 = proto.writeTag(v2, v3, 8, proto.wireTypes.lengthDelimited)
+				v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+			end
+
+			local buf = buffer.create(v3)
+			buffer.copy(buf, 0, v2, 0, v3)
+			return buf
+		end
+
+		function class270.decode(buf: buffer)
+			local result = class270.new()
+			local v2 = 0
+
+			while v2 < buffer.len(buf) do
+				local v3, v4
+				v3, v4, v2 = proto.readTag(buf, v2)
+
+				if v4 == proto.wireTypes.varint then
+					local v5
+					v5, v2 = proto.readVarInt(buf, v2)
+				elseif v4 == proto.wireTypes.lengthDelimited then
+					if v3 == 1 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.event_type = prop_types.StringProp.decode(v5)
+					elseif v3 == 2 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.subscription_product_type = prop_types.StringProp.decode(v5)
+					elseif v3 == 3 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.subscription_product_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 4 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.asset_id = prop_types.StringProp.decode(v5)
+					elseif v3 == 5 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.on_claimed = v.ActionProp.decode(v5)
+					elseif v3 == 6 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.on_not_subscribed = v.ActionProp.decode(v5)
+					elseif v3 == 7 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.on_failure = v.ActionProp.decode(v5)
+					elseif v3 == 8 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.loading_page_scope_field = prop_types.StringProp.decode(v5)
+					else
+						local varInt, v5 = proto.readVarInt(buf, v2)
+
+						v2 = v5 + varInt
+					end
+				elseif v4 == proto.wireTypes.i32 then
+					local v5
+					v5, v2 = proto.readFixed32(buf, v2)
+				elseif v4 == proto.wireTypes.i64 then
+					local v5
+					v5, v2 = proto.readFixed64(buf, v2)
+				else
+					error("Unsupported wire type: " .. v4)
+				end
+			end
+
+			return result
+		end
+
+		function class270:jsonEncode()
+			local v2 = {}
+
+			if self.event_type ~= nil then
+				v2.eventType = self.event_type:jsonEncode()
+			end
+
+			if self.subscription_product_type ~= nil then
+				v2.subscriptionProductType = self.subscription_product_type:jsonEncode()
+			end
+
+			if self.subscription_product_id ~= nil then
+				v2.subscriptionProductId = self.subscription_product_id:jsonEncode()
+			end
+
+			if self.asset_id ~= nil then
+				v2.assetId = self.asset_id:jsonEncode()
+			end
+
+			if self.on_claimed ~= nil then
+				v2.onClaimed = self.on_claimed:jsonEncode()
+			end
+
+			if self.on_not_subscribed ~= nil then
+				v2.onNotSubscribed = self.on_not_subscribed:jsonEncode()
+			end
+
+			if self.on_failure ~= nil then
+				v2.onFailure = self.on_failure:jsonEncode()
+			end
+
+			if self.loading_page_scope_field ~= nil then
+				v2.loadingPageScopeField = self.loading_page_scope_field:jsonEncode()
+			end
+
+			return v2
+		end
+
+		function class270.jsonDecode(data)
+			local v2 = class270.new()
+
+			if data.event_type ~= nil then
+				v2.event_type = prop_types.StringProp.jsonDecode(data.event_type)
+			end
+
+			if data.eventType ~= nil then
+				v2.event_type = prop_types.StringProp.jsonDecode(data.eventType)
+			end
+
+			if data.subscription_product_type ~= nil then
+				v2.subscription_product_type = prop_types.StringProp.jsonDecode(data.subscription_product_type)
+			end
+
+			if data.subscriptionProductType ~= nil then
+				v2.subscription_product_type = prop_types.StringProp.jsonDecode(data.subscriptionProductType)
+			end
+
+			if data.subscription_product_id ~= nil then
+				v2.subscription_product_id = prop_types.StringProp.jsonDecode(data.subscription_product_id)
+			end
+
+			if data.subscriptionProductId ~= nil then
+				v2.subscription_product_id = prop_types.StringProp.jsonDecode(data.subscriptionProductId)
+			end
+
+			if data.asset_id ~= nil then
+				v2.asset_id = prop_types.StringProp.jsonDecode(data.asset_id)
+			end
+
+			if data.assetId ~= nil then
+				v2.asset_id = prop_types.StringProp.jsonDecode(data.assetId)
+			end
+
+			if data.on_claimed ~= nil then
+				v2.on_claimed = v.ActionProp.jsonDecode(data.on_claimed)
+			end
+
+			if data.onClaimed ~= nil then
+				v2.on_claimed = v.ActionProp.jsonDecode(data.onClaimed)
+			end
+
+			if data.on_not_subscribed ~= nil then
+				v2.on_not_subscribed = v.ActionProp.jsonDecode(data.on_not_subscribed)
+			end
+
+			if data.onNotSubscribed ~= nil then
+				v2.on_not_subscribed = v.ActionProp.jsonDecode(data.onNotSubscribed)
+			end
+
+			if data.on_failure ~= nil then
+				v2.on_failure = v.ActionProp.jsonDecode(data.on_failure)
+			end
+
+			if data.onFailure ~= nil then
+				v2.on_failure = v.ActionProp.jsonDecode(data.onFailure)
+			end
+
+			if data.loading_page_scope_field ~= nil then
+				v2.loading_page_scope_field = prop_types.StringProp.jsonDecode(data.loading_page_scope_field)
+			end
+
+			if data.loadingPageScopeField ~= nil then
+				v2.loading_page_scope_field = prop_types.StringProp.jsonDecode(data.loadingPageScopeField)
+			end
+
+			return v2
+		end
+
+		class270.descriptor = {
+			name = "ClaimEventItemAction_Params",
+			fullName = "roblox.apppageplatform.shared.v1beta1.Params"
+		}
+
+		v.ClaimEventItemAction_Params = class270
+	end
+
+	typeRegistry.default:register(v.ClaimEventItemAction_Params)
+
+	do
+		local class271 = {}
+		class271.__index = class271
+
+		function class271.new(data)
 			local v3
 
 			if not (data == nil or data.kind == nil) then
@@ -40514,10 +41553,10 @@ do
 				accessibility_label = v5,
 				skip_unified_logging = v6,
 				action_event_name = v7
-			}, class265))
+			}, class271))
 		end
 
-		function class265:encode()
+		function class271:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -41026,6 +42065,18 @@ do
 					local encoded = self.kind.value:encode()
 					local v4, v5 = proto.writeTag(v2, v3, 126, proto.wireTypes.lengthDelimited)
 					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				elseif self.kind.type == "open_account_settings_action" then
+					local encoded = self.kind.value:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 127, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				elseif self.kind.type == "refresh_search_results_guided_pill_action" then
+					local encoded = self.kind.value:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 128, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+				elseif self.kind.type == "claim_event_item_action" then
+					local encoded = self.kind.value:encode()
+					local v4, v5 = proto.writeTag(v2, v3, 130, proto.wireTypes.lengthDelimited)
+					v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 				end
 			end
 
@@ -41058,8 +42109,8 @@ do
 			return buf
 		end
 
-		function class265.decode(buf: buffer)
-			local result = class265.new()
+		function class271.decode(buf: buffer)
+			local result = class271.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -41946,6 +42997,27 @@ do
 							type = "remove_game_pass_from_inventory_action",
 							value = v.RemoveGamePassFromInventoryAction.decode(v5)
 						}
+					elseif v3 == 127 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.kind = {
+							type = "open_account_settings_action",
+							value = v.OpenAccountSettingsAction.decode(v5)
+						}
+					elseif v3 == 128 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.kind = {
+							type = "refresh_search_results_guided_pill_action",
+							value = v.RefreshSearchResultsGuidedPillAction.decode(v5)
+						}
+					elseif v3 == 130 then
+						local v5
+						v5, v2 = proto.readBuffer(buf, v2)
+						result.kind = {
+							type = "claim_event_item_action",
+							value = v.ClaimEventItemAction.decode(v5)
+						}
 					elseif v3 == 1000 then
 						local v5
 						v5, v2 = proto.readBuffer(buf, v2)
@@ -41981,7 +43053,7 @@ do
 			return result
 		end
 
-		function class265:jsonEncode()
+		function class271:jsonEncode()
 			local v2 = {}
 
 			if self.kind ~= nil then
@@ -42237,6 +43309,12 @@ do
 					v2.toggleGamePassVoteAction = self.kind.value:jsonEncode()
 				elseif self.kind.type == "remove_game_pass_from_inventory_action" then
 					v2.removeGamePassFromInventoryAction = self.kind.value:jsonEncode()
+				elseif self.kind.type == "open_account_settings_action" then
+					v2.openAccountSettingsAction = self.kind.value:jsonEncode()
+				elseif self.kind.type == "refresh_search_results_guided_pill_action" then
+					v2.refreshSearchResultsGuidedPillAction = self.kind.value:jsonEncode()
+				elseif self.kind.type == "claim_event_item_action" then
+					v2.claimEventItemAction = self.kind.value:jsonEncode()
 				end
 			end
 
@@ -42259,8 +43337,8 @@ do
 			return v2
 		end
 
-		function class265.jsonDecode(data)
-			local v2 = class265.new()
+		function class271.jsonDecode(data)
+			local v2 = class271.new()
 
 			if data.dismiss_dialog_action ~= nil then
 				v2.kind = {
@@ -44026,6 +45104,48 @@ do
 				}
 			end
 
+			if data.open_account_settings_action ~= nil then
+				v2.kind = {
+					type = "open_account_settings_action",
+					value = v.OpenAccountSettingsAction.jsonDecode(data.open_account_settings_action)
+				}
+			end
+
+			if data.openAccountSettingsAction ~= nil then
+				v2.kind = {
+					type = "open_account_settings_action",
+					value = v.OpenAccountSettingsAction.jsonDecode(data.openAccountSettingsAction)
+				}
+			end
+
+			if data.refresh_search_results_guided_pill_action ~= nil then
+				v2.kind = {
+					type = "refresh_search_results_guided_pill_action",
+					value = v.RefreshSearchResultsGuidedPillAction.jsonDecode(data.refresh_search_results_guided_pill_action)
+				}
+			end
+
+			if data.refreshSearchResultsGuidedPillAction ~= nil then
+				v2.kind = {
+					type = "refresh_search_results_guided_pill_action",
+					value = v.RefreshSearchResultsGuidedPillAction.jsonDecode(data.refreshSearchResultsGuidedPillAction)
+				}
+			end
+
+			if data.claim_event_item_action ~= nil then
+				v2.kind = {
+					type = "claim_event_item_action",
+					value = v.ClaimEventItemAction.jsonDecode(data.claim_event_item_action)
+				}
+			end
+
+			if data.claimEventItemAction ~= nil then
+				v2.kind = {
+					type = "claim_event_item_action",
+					value = v.ClaimEventItemAction.jsonDecode(data.claimEventItemAction)
+				}
+			end
+
 			if data.telemetry_handler ~= nil then
 				v2.telemetry_handler = prop_types.StringProp.jsonDecode(data.telemetry_handler)
 			end
@@ -44061,31 +45181,31 @@ do
 			return v2
 		end
 
-		class265.descriptor = {
+		class271.descriptor = {
 			name = "Action",
 			fullName = "roblox.apppageplatform.shared.v1beta1.Action"
 		}
 
-		v.Action = class265
+		v.Action = class271
 	end
 
 	typeRegistry.default:register(v.Action)
 
 	do
-		local class266 = {}
-		class266.__index = class266
+		local class272 = {}
+		class272.__index = class272
 
-		function class266.new(p)
+		function class272.new(p)
 			local v3
 
 			if not (p == nil or p.kind == nil) then
 				v3 = p.kind
 			end
 
-			return (setmetatable({ kind = v3 }, class266))
+			return (setmetatable({ kind = v3 }, class272))
 		end
 
-		function class266:encode()
+		function class272:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -44106,8 +45226,8 @@ do
 			return buf
 		end
 
-		function class266.decode(buf: buffer)
-			local result = class266.new()
+		function class272.decode(buf: buffer)
+			local result = class272.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -44148,7 +45268,7 @@ do
 			return result
 		end
 
-		function class266:jsonEncode()
+		function class272:jsonEncode()
 			local v2 = {}
 
 			if self.kind == nil then
@@ -44167,8 +45287,8 @@ do
 			return v2
 		end
 
-		function class266.jsonDecode(p)
-			local v2 = class266.new()
+		function class272.jsonDecode(p)
+			local v2 = class272.new()
 
 			if p.value ~= nil then
 				v2.kind = { type = "value", value = v.Action.jsonDecode(p.value) }
@@ -44184,21 +45304,21 @@ do
 			return v2
 		end
 
-		class266.descriptor = {
+		class272.descriptor = {
 			name = "ActionProp",
 			fullName = "roblox.apppageplatform.shared.v1beta1.ActionProp"
 		}
 
-		v.ActionProp = class266
+		v.ActionProp = class272
 	end
 
 	typeRegistry.default:register(v.ActionProp)
 
 	do
-		local class267 = {}
-		class267.__index = class267
+		local class273 = {}
+		class273.__index = class273
 
-		function class267.new(p)
+		function class273.new(p)
 			local v3
 
 			if not (p == nil or p.condition == nil) then
@@ -44211,10 +45331,10 @@ do
 				v4 = p.kind
 			end
 
-			return (setmetatable({ condition = v3, kind = v4 }, class267))
+			return (setmetatable({ condition = v3, kind = v4 }, class273))
 		end
 
-		function class267:encode()
+		function class273:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -44235,8 +45355,8 @@ do
 			return buf
 		end
 
-		function class267.decode(buf: buffer)
-			local result = class267.new()
+		function class273.decode(buf: buffer)
+			local result = class273.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -44274,7 +45394,7 @@ do
 			return result
 		end
 
-		function class267:jsonEncode()
+		function class273:jsonEncode()
 			local v2 = {}
 
 			if self.condition ~= nil then
@@ -44288,8 +45408,8 @@ do
 			return v2
 		end
 
-		function class267.jsonDecode(p)
-			local v2 = class267.new()
+		function class273.jsonDecode(p)
+			local v2 = class273.new()
 
 			if p.condition ~= nil then
 				v2.condition = prop_condition.PropCondition.jsonDecode(p.condition)
@@ -44302,27 +45422,27 @@ do
 			return v2
 		end
 
-		class267.descriptor = {
+		class273.descriptor = {
 			name = "ActionProp_ConditionalOption",
 			fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
 		}
 
-		v.ActionProp_ConditionalOption = class267
+		v.ActionProp_ConditionalOption = class273
 	end
 
 	typeRegistry.default:register(v.ActionProp_ConditionalOption)
 
 	do
-		local class268 = {}
-		class268.__index = class268
+		local class274 = {}
+		class274.__index = class274
 
-		function class268.new(p)
+		function class274.new(p)
 			return (setmetatable({
 				options = (p == nil or p.options == nil) and {} or p.options
-			}, class268))
+			}, class274))
 		end
 
-		function class268:encode()
+		function class274:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -44339,8 +45459,8 @@ do
 			return buf
 		end
 
-		function class268.decode(buf: buffer)
-			local v2 = class268.new()
+		function class274.decode(buf: buffer)
+			local v2 = class274.new()
 			local v3 = 0
 
 			while v3 < buffer.len(buf) do
@@ -44374,7 +45494,7 @@ do
 			return v2
 		end
 
-		function class268:jsonEncode()
+		function class274:jsonEncode()
 			local v2 = {}
 
 			if self.options == nil or not (#self.options > 0) then
@@ -44392,8 +45512,8 @@ do
 			return v2
 		end
 
-		function class268.jsonDecode(p)
-			local v2 = class268.new()
+		function class274.jsonDecode(p)
+			local v2 = class274.new()
 
 			if p.options == nil then
 				return v2
@@ -44410,31 +45530,31 @@ do
 			return v2
 		end
 
-		class268.descriptor = {
+		class274.descriptor = {
 			name = "ActionProp_ConditionalOptions",
 			fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
 		}
 
-		v.ActionProp_ConditionalOptions = class268
+		v.ActionProp_ConditionalOptions = class274
 	end
 
 	typeRegistry.default:register(v.ActionProp_ConditionalOptions)
 
 	do
-		local class269 = {}
-		class269.__index = class269
+		local class275 = {}
+		class275.__index = class275
 
-		function class269.new(p)
+		function class275.new(p)
 			local v3
 
 			if not (p == nil or p.kind == nil) then
 				v3 = p.kind
 			end
 
-			return (setmetatable({ kind = v3 }, class269))
+			return (setmetatable({ kind = v3 }, class275))
 		end
 
-		function class269:encode()
+		function class275:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -44458,8 +45578,8 @@ do
 			return buf
 		end
 
-		function class269.decode(buf: buffer)
-			local result = class269.new()
+		function class275.decode(buf: buffer)
+			local result = class275.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -44507,7 +45627,7 @@ do
 			return result
 		end
 
-		function class269:jsonEncode()
+		function class275:jsonEncode()
 			local v2 = {}
 
 			if self.kind == nil then
@@ -44531,8 +45651,8 @@ do
 			return v2
 		end
 
-		function class269.jsonDecode(data)
-			local v2 = class269.new()
+		function class275.jsonDecode(data)
+			local v2 = class275.new()
 
 			if data.literal ~= nil then
 				v2.kind = {
@@ -44559,21 +45679,21 @@ do
 			return v2
 		end
 
-		class269.descriptor = {
+		class275.descriptor = {
 			name = "FocusNavActionsProp",
 			fullName = "roblox.apppageplatform.shared.v1beta1.FocusNavActionsProp"
 		}
 
-		v.FocusNavActionsProp = class269
+		v.FocusNavActionsProp = class275
 	end
 
 	typeRegistry.default:register(v.FocusNavActionsProp)
 
 	do
-		local class270 = {}
-		class270.__index = class270
+		local class276 = {}
+		class276.__index = class276
 
-		function class270.new(p)
+		function class276.new(p)
 			local v3
 
 			if not (p == nil or p.condition == nil) then
@@ -44586,10 +45706,10 @@ do
 				v4 = p.kind
 			end
 
-			return (setmetatable({ condition = v3, kind = v4 }, class270))
+			return (setmetatable({ condition = v3, kind = v4 }, class276))
 		end
 
-		function class270:encode()
+		function class276:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -44615,8 +45735,8 @@ do
 			return buf
 		end
 
-		function class270.decode(buf: buffer)
-			local result = class270.new()
+		function class276.decode(buf: buffer)
+			local result = class276.new()
 			local v2 = 0
 
 			while v2 < buffer.len(buf) do
@@ -44661,7 +45781,7 @@ do
 			return result
 		end
 
-		function class270:jsonEncode()
+		function class276:jsonEncode()
 			local v2 = {}
 
 			if self.condition ~= nil then
@@ -44682,8 +45802,8 @@ do
 			return v2
 		end
 
-		function class270.jsonDecode(data)
-			local v2 = class270.new()
+		function class276.jsonDecode(data)
+			local v2 = class276.new()
 
 			if data.condition ~= nil then
 				v2.condition = prop_condition.PropCondition.jsonDecode(data.condition)
@@ -44707,27 +45827,27 @@ do
 			return v2
 		end
 
-		class270.descriptor = {
+		class276.descriptor = {
 			name = "FocusNavActionsProp_ConditionalOption",
 			fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
 		}
 
-		v.FocusNavActionsProp_ConditionalOption = class270
+		v.FocusNavActionsProp_ConditionalOption = class276
 	end
 
 	typeRegistry.default:register(v.FocusNavActionsProp_ConditionalOption)
 
 	do
-		local class271 = {}
-		class271.__index = class271
+		local class277 = {}
+		class277.__index = class277
 
-		function class271.new(p)
+		function class277.new(p)
 			return (setmetatable({
 				options = (p == nil or p.options == nil) and {} or p.options
-			}, class271))
+			}, class277))
 		end
 
-		function class271:encode()
+		function class277:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -44744,8 +45864,8 @@ do
 			return buf
 		end
 
-		function class271.decode(buf: buffer)
-			local v2 = class271.new()
+		function class277.decode(buf: buffer)
+			local v2 = class277.new()
 			local v3 = 0
 
 			while v3 < buffer.len(buf) do
@@ -44779,7 +45899,7 @@ do
 			return v2
 		end
 
-		function class271:jsonEncode()
+		function class277:jsonEncode()
 			local v2 = {}
 
 			if self.options == nil or not (#self.options > 0) then
@@ -44797,8 +45917,8 @@ do
 			return v2
 		end
 
-		function class271.jsonDecode(p)
-			local v2 = class271.new()
+		function class277.jsonDecode(p)
+			local v2 = class277.new()
 
 			if p.options == nil then
 				return v2
@@ -44815,28 +45935,28 @@ do
 			return v2
 		end
 
-		class271.descriptor = {
+		class277.descriptor = {
 			name = "FocusNavActionsProp_ConditionalOptions",
 			fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
 		}
 
-		v.FocusNavActionsProp_ConditionalOptions = class271
+		v.FocusNavActionsProp_ConditionalOptions = class277
 	end
 
 	typeRegistry.default:register(v.FocusNavActionsProp_ConditionalOptions)
 
 	do
-		local class272 = {}
-		class272.__index = class272
+		local class278 = {}
+		class278.__index = class278
 
-		function class272.new(p)
+		function class278.new(p)
 			return (setmetatable({
 				keys = (p == nil or p.keys == nil) and {} or p.keys,
 				events = (p == nil or p.events == nil) and {} or p.events
-			}, class272))
+			}, class278))
 		end
 
-		function class272:encode()
+		function class278:encode()
 			local v2 = buffer.create(0)
 			local v3 = 0
 
@@ -44873,8 +45993,8 @@ do
 			return buf
 		end
 
-		function class272.decode(buf: buffer)
-			local v2 = class272.new()
+		function class278.decode(buf: buffer)
+			local v2 = class278.new()
 			local v3 = 0
 
 			while v3 < buffer.len(buf) do
@@ -44922,7 +46042,7 @@ do
 			return v2
 		end
 
-		function class272:jsonEncode()
+		function class278:jsonEncode()
 			local v2 = {}
 
 			if self.keys ~= nil and next(self.keys) ~= nil then
@@ -44950,8 +46070,8 @@ do
 			return v2
 		end
 
-		function class272.jsonDecode(p)
-			local v2 = class272.new()
+		function class278.jsonDecode(p)
+			local v2 = class278.new()
 
 			if p.keys ~= nil then
 				local v3 = {}
@@ -44978,20 +46098,20 @@ do
 			return v2
 		end
 
-		class272.descriptor = {
+		class278.descriptor = {
 			name = "FocusNavActionsProp_FocusNavData",
 			fullName = "roblox.apppageplatform.shared.v1beta1.FocusNavData"
 		}
 
-		v.FocusNavActionsProp_FocusNavData = class272
+		v.FocusNavActionsProp_FocusNavData = class278
 	end
 
 	typeRegistry.default:register(v.FocusNavActionsProp_FocusNavData)
 
-	local class273 = {}
-	class273.__index = class273
+	local class279 = {}
+	class279.__index = class279
 
-	function class273.new(p)
+	function class279.new(p)
 		local v2 = {
 			key = (p == nil or p.key == nil) and "" or p.key,
 			value = 0
@@ -45003,10 +46123,10 @@ do
 		end
 
 		v2.value = v3
-		return (setmetatable(v2, class273))
+		return (setmetatable(v2, class279))
 	end
 
-	function class273:encode()
+	function class279:encode()
 		local v2 = buffer.create(0)
 		local v3 = 0
 
@@ -45026,8 +46146,8 @@ do
 		return buf
 	end
 
-	function class273.decode(buf: buffer)
-		local result = class273.new()
+	function class279.decode(buf: buffer)
+		local result = class279.new()
 		local v2 = 0
 
 		while v2 < buffer.len(buf) do
@@ -45065,7 +46185,7 @@ do
 		return result
 	end
 
-	function class273:jsonEncode()
+	function class279:jsonEncode()
 		local v2 = {}
 
 		if self.key ~= nil and self.key ~= "" then
@@ -45079,8 +46199,8 @@ do
 		return v2
 	end
 
-	function class273.jsonDecode(p)
-		local v2 = class273.new()
+	function class279.jsonDecode(p)
+		local v2 = class279.new()
 
 		if p.key ~= nil then
 			v2.key = p.key
@@ -45093,21 +46213,21 @@ do
 		return v2
 	end
 
-	class273.descriptor = {
+	class279.descriptor = {
 		name = "FocusNavActionsProp_FocusNavData_KeysEntry",
 		fullName = "roblox.apppageplatform.shared.v1beta1.KeysEntry"
 	}
 
-	v.FocusNavActionsProp_FocusNavData_KeysEntry = class273
+	v.FocusNavActionsProp_FocusNavData_KeysEntry = class279
 end
 
 typeRegistry.default:register(v.FocusNavActionsProp_FocusNavData_KeysEntry)
 
 do
-	local class274 = {}
-	class274.__index = class274
+	local class280 = {}
+	class280.__index = class280
 
-	function class274.new(p)
+	function class280.new(p)
 		local v2 = {
 			key = (p == nil or p.key == nil) and "" or p.key,
 			value = 0
@@ -45119,10 +46239,10 @@ do
 		end
 
 		v2.value = v3
-		return (setmetatable(v2, class274))
+		return (setmetatable(v2, class280))
 	end
 
-	function class274:encode()
+	function class280:encode()
 		local v2 = buffer.create(0)
 		local v3 = 0
 
@@ -45142,8 +46262,8 @@ do
 		return buf
 	end
 
-	function class274.decode(buf: buffer)
-		local result = class274.new()
+	function class280.decode(buf: buffer)
+		local result = class280.new()
 		local v2 = 0
 
 		while v2 < buffer.len(buf) do
@@ -45181,7 +46301,7 @@ do
 		return result
 	end
 
-	function class274:jsonEncode()
+	function class280:jsonEncode()
 		local v2 = {}
 
 		if self.key ~= nil and self.key ~= "" then
@@ -45195,8 +46315,8 @@ do
 		return v2
 	end
 
-	function class274.jsonDecode(p)
-		local v2 = class274.new()
+	function class280.jsonDecode(p)
+		local v2 = class280.new()
 
 		if p.key ~= nil then
 			v2.key = p.key
@@ -45209,12 +46329,12 @@ do
 		return v2
 	end
 
-	class274.descriptor = {
+	class280.descriptor = {
 		name = "FocusNavActionsProp_FocusNavData_EventsEntry",
 		fullName = "roblox.apppageplatform.shared.v1beta1.EventsEntry"
 	}
 
-	v.FocusNavActionsProp_FocusNavData_EventsEntry = class274
+	v.FocusNavActionsProp_FocusNavData_EventsEntry = class280
 end
 
 typeRegistry.default:register(v.FocusNavActionsProp_FocusNavData_EventsEntry)
@@ -45475,6 +46595,12 @@ v.ActionType = {
 			return "ACTION_TYPE_TOGGLE_GAME_PASS_VOTE"
 		elseif p == 126 then
 			return "ACTION_TYPE_REMOVE_GAME_PASS_FROM_INVENTORY"
+		elseif p == 127 then
+			return "ACTION_TYPE_OPEN_ACCOUNT_SETTINGS"
+		elseif p == 128 then
+			return "ACTION_TYPE_REFRESH_SEARCH_RESULTS_GUIDED_PILL"
+		elseif p == 130 then
+			return "ACTION_TYPE_CLAIM_EVENT_ITEM"
 		end
 
 		return nil
@@ -45734,6 +46860,12 @@ v.ActionType = {
 			return 125
 		elseif p == "ACTION_TYPE_REMOVE_GAME_PASS_FROM_INVENTORY" then
 			return 126
+		elseif p == "ACTION_TYPE_OPEN_ACCOUNT_SETTINGS" then
+			return 127
+		elseif p == "ACTION_TYPE_REFRESH_SEARCH_RESULTS_GUIDED_PILL" then
+			return 128
+		elseif p == "ACTION_TYPE_CLAIM_EVENT_ITEM" then
+			return 130
 		end
 
 		return p
@@ -45993,6 +47125,12 @@ v.ActionType = {
 			return "ACTION_TYPE_TOGGLE_GAME_PASS_VOTE"
 		elseif p == "ACTION_TYPE_REMOVE_GAME_PASS_FROM_INVENTORY" then
 			return "ACTION_TYPE_REMOVE_GAME_PASS_FROM_INVENTORY"
+		elseif p == "ACTION_TYPE_OPEN_ACCOUNT_SETTINGS" then
+			return "ACTION_TYPE_OPEN_ACCOUNT_SETTINGS"
+		elseif p == "ACTION_TYPE_REFRESH_SEARCH_RESULTS_GUIDED_PILL" then
+			return "ACTION_TYPE_REFRESH_SEARCH_RESULTS_GUIDED_PILL"
+		elseif p == "ACTION_TYPE_CLAIM_EVENT_ITEM" then
+			return "ACTION_TYPE_CLAIM_EVENT_ITEM"
 		end
 
 		return nil
@@ -46113,6 +47251,8 @@ return {
 	ApplyChartsFilterAction_Params = v.ApplyChartsFilterAction_Params,
 	RefreshChartsSortDetailAction = v.RefreshChartsSortDetailAction,
 	RefreshChartsSortDetailAction_Params = v.RefreshChartsSortDetailAction_Params,
+	RefreshSearchResultsGuidedPillAction = v.RefreshSearchResultsGuidedPillAction,
+	RefreshSearchResultsGuidedPillAction_Params = v.RefreshSearchResultsGuidedPillAction_Params,
 	JoinCommunityAction = v.JoinCommunityAction,
 	JoinCommunityAction_Params = v.JoinCommunityAction_Params,
 	ViewCommunityAction = v.ViewCommunityAction,
@@ -46263,6 +47403,10 @@ return {
 	RunStreamNotificationItemAction_Params = v.RunStreamNotificationItemAction_Params,
 	ToggleStreamNotificationBundleAction = v.ToggleStreamNotificationBundleAction,
 	ToggleStreamNotificationBundleAction_Params = v.ToggleStreamNotificationBundleAction_Params,
+	OpenAccountSettingsAction = v.OpenAccountSettingsAction,
+	OpenAccountSettingsAction_Params = v.OpenAccountSettingsAction_Params,
+	ClaimEventItemAction = v.ClaimEventItemAction,
+	ClaimEventItemAction_Params = v.ClaimEventItemAction_Params,
 	Action = v.Action,
 	ActionProp = v.ActionProp,
 	ActionProp_ConditionalOption = v.ActionProp_ConditionalOption,

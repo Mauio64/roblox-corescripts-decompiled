@@ -6,13 +6,11 @@ require(parent.SocialCommon)
 local EnteredChatFromEntryPoint = require(AppChat.Actions.EnteredChatFromEntryPoint)
 
 local FFlagAppChatPerfTracking = require(AppChat.Flags.FFlagAppChatPerfTracking)
-local SharedFlags = require(parent.SharedFlags)
-local FFlagSharedChatEntryPointAction = SharedFlags.FFlagSharedChatEntryPointAction
 local trackChatLanding = require(AppChat.Telemetry.trackChatLanding)
 
 return Rodux.createReducer("NotSet", {
 	[EnteredChatFromEntryPoint.name] = function(_, p)
-		if FFlagSharedChatEntryPointAction and FFlagAppChatPerfTracking then
+		if FFlagAppChatPerfTracking then
 			trackChatLanding(p.entryPoint)
 		end
 

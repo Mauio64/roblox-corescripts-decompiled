@@ -6,7 +6,6 @@ local React = require(parent.React)
 local UIBlox = require(parent.UIBlox)
 local Foundation = require(parent.Foundation)
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local useStyle = UIBlox.Core.Style.useStyle
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local Images = UIBlox.App.ImageSet.Images
@@ -113,24 +112,10 @@ local function EditSocialNetworksItem(props)
 		PaddingBottom = paddingBottom
 	})
 
-	local createElement3 = React.createElement
-	local font2
-
-	if not FoundationFontFaceMigration then
-		font2 = font.Body.Font
-	end
-
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(v.Tokens.Typography.BodyLarge.Font)
-	end
-
-	children.NetworkLabel = createElement3("TextLabel", {
+	children.NetworkLabel = React.createElement("TextLabel", {
 		LayoutOrder = 1,
 		BackgroundTransparency = 1,
-		Font = font2,
-		FontFace = fontFace,
+		FontFace = normalizeFontFace(v.Tokens.Typography.BodyLarge.Font),
 		Text = props.networkTitle,
 		TextSize = v2,
 		TextColor3 = theme.TextDefault.Color,
@@ -138,7 +123,7 @@ local function EditSocialNetworksItem(props)
 		RichText = true
 	})
 
-	local createElement4 = React.createElement
+	local createElement3 = React.createElement
 	local v8 = {
 		Size = UDim2.new(1, 0, 0, v2 + 20),
 		BackgroundTransparency = 1,
@@ -150,7 +135,7 @@ local function EditSocialNetworksItem(props)
 		SliceCenter = Rect.new(8, 8, 9, 9)
 	}
 
-	local createElement5 = React.createElement
+	local createElement4 = React.createElement
 	local v9 = {
 		Size = UDim2.new(1, 0, 0, v2 + 20),
 		BackgroundTransparency = 1,
@@ -168,7 +153,7 @@ local function EditSocialNetworksItem(props)
 		TextBox = 0
 	}
 
-	local createElement6 = React.createElement
+	local createElement5 = React.createElement
 	local v11 = {
 		captureFocusOnMount = props.focusOn,
 		clearButtonDisabled = false,
@@ -219,9 +204,9 @@ local function EditSocialNetworksItem(props)
 
 	v11.placeholderTextTransparency = placeholderTextTransparency
 	v11.textChangedCallback = props.textChanged
-	v10.TextBox = createElement6(callbackInputBox, v11)
-	children.InputBackground = createElement4(ImageSetLabel, v8, {
-		InputBorder = createElement5(ImageSetLabel, v9, v10)
+	v10.TextBox = createElement5(callbackInputBox, v11)
+	children.InputBackground = createElement3(ImageSetLabel, v8, {
+		InputBorder = createElement4(ImageSetLabel, v9, v10)
 	})
 	return createElement("Frame", v7, children)
 end

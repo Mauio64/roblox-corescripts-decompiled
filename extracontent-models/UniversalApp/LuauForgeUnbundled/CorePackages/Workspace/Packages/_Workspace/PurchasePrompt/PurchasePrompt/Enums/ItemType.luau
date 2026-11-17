@@ -1,1 +1,0 @@
-return (require("@game/CorePackages/Workspace/Packages/_Workspace/PurchasePrompt/PurchasePrompt/Enums/createEnum")("ItemType", { "Asset", "GamePass", "Product", "Bundle" }))

@@ -3,7 +3,6 @@ local React = require(parent.React)
 local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
 local normalizeFontFace = Foundation.Utility.normalizeFontFace
-local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local Localization = require(parent.Localization)
 local useLocalization = Localization.Hooks.useLocalization
 
@@ -15,14 +14,7 @@ local v = {
 local function SearchInputView(props)
 	local v2 = useTokens()
 	local v3 = useLocalization(v)
-	local fontFace
-
-	if FoundationFontFaceMigration then
-		fontFace = normalizeFontFace(v2.Typography.BodyMedium.Font)
-	else
-		fontFace = Font.fromEnum(v2.Typography.BodyMedium.Font)
-	end
-
+	local fontFace = normalizeFontFace(v2.Typography.BodyMedium.Font)
 	local fontSize = v2.Typography.BodyMedium.FontSize
 
 	return React.createElement(

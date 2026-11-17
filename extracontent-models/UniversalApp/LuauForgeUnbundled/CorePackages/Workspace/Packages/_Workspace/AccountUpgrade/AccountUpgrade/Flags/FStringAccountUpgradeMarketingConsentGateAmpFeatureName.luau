@@ -1,4 +1,0 @@
-return game:DefineFastString(
-	"AccountUpgradeMarketingConsentGateAmpFeatureName",
-	"MarketingEmailOptInEnabled"
-)

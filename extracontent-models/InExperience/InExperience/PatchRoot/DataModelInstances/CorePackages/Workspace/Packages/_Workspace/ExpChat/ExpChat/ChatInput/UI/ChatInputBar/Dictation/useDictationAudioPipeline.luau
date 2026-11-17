@@ -5,6 +5,8 @@ local ExpChat = script:FindFirstAncestor("ExpChat")
 local parent = ExpChat.Parent
 
 local React = require(parent.React)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagDictationAudioDeviceInputEnabled = SharedFlags.FFlagDictationAudioDeviceInputEnabled
 local finishDictationInput = require(script.Parent.finishDictationInput)
 local prepareDictationInput = require(script.Parent.prepareDictationInput)
 local setDictationUsageType = require(script.Parent.setDictationUsageType)
@@ -123,6 +125,13 @@ local function useDictationAudioPipeline()
 		v.container.current = expChatDictation
 
 		local audioDeviceInput = Instance.new("AudioDeviceInput")
+
+		if FFlagDictationAudioDeviceInputEnabled then
+			pcall(function()
+				audioDeviceInput.DictationEnabled = true
+			end)
+		end
+
 		audioDeviceInput.Player = localPlayer
 		audioDeviceInput.Muted = false
 

@@ -7,17 +7,13 @@ local FriendsChatTabName = require(parent.FriendsChat.FriendsChatTabName)
 local requestSelectTab = require(ExpChat.ExternalNavigation.requestSelectTab)
 
 local FriendsChatChannelSelected = ExpChatShared.Actions.FriendsChatChannelSelected
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
 local FFlagExpChatUseChannelTabsStore = SharedFlags.FFlagExpChatUseChannelTabsStore
+local FFlagExpChatStickyTabs = SharedFlags.FFlagExpChatStickyTabs
 
 local function requestSelectFriendsTab(): boolean
-	if not FFlagExpChatEnableFriendsTab then
-		return false
-	end
-
 	local store = ExpChatShared.context.store
 
-	if not (store ~= nil and requestSelectTab(FriendsChatTabName)) then
+	if not (store ~= nil and requestSelectTab(FriendsChatTabName, FFlagExpChatStickyTabs and true or nil)) then
 		return false
 	end
 

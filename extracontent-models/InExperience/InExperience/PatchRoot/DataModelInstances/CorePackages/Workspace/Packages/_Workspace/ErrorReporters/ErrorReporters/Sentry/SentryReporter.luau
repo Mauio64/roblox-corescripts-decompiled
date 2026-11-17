@@ -56,8 +56,8 @@ end
 local SentryReporter = {}
 SentryReporter.__index = SentryReporter
 
-local function createSentryClient(dsn: string, environment: string?, release: string?, p)
-	return Client:new({ dsn = dsn, environment = environment, release = release }, p)
+local function createSentryClient(dsn: string, environment: string?, release: string?, httpService) -- 1 equivalent call inferred from this helper
+	return Client:new({ dsn = dsn, environment = environment, release = release }, httpService)
 end
 
 local function buildErrorKey(value: string, value2: string) -- 1 equivalent call inferred from this helper
@@ -115,10 +115,7 @@ function SentryReporter.new(data)
 		_dsn = data.dsn,
 		_environment = data.environment,
 		_release = data.release,
-		_sentryClient = Client:new(
-			{ dsn = data.dsn, environment = data.environment, release = data.release },
-			data.httpService
-		),
+		_sentryClient = createSentryClient(data.dsn, data.environment, data.release, data.httpService), -- inferred equivalent call
 		_errorQueuedCallback = data.errorQueuedCallback or nil,
 		_errorFlushedCallback = data.errorFlushedCallback or nil,
 		_sentryClientSuccessCallback = data.sentryClientSuccessCallback or nil,

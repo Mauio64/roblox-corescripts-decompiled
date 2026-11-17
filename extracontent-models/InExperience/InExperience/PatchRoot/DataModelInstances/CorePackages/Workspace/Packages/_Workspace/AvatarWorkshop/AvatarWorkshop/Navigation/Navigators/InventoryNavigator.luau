@@ -46,4 +46,4 @@ return createPagesNavigator(TabsNavigatorView, {
 		createInventoryPageRoute(Inventory.Animations.Swim, InventoryGridContainer)
 	}),
 	createInventoryPageRoute(Inventory.Emotes, InventoryGridContainer)
-})
+}, { initialRouteName = Inventory.Body.Root })

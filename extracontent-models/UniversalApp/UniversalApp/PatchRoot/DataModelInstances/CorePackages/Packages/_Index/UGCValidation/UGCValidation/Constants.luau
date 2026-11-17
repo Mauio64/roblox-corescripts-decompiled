@@ -11,6 +11,9 @@ local defineFastFlag = game:DefineFastFlag("UGCValidateMakeupDecalUVProperties",
 local getFFlagUGCValidateMakeupCategoryParity = require(parent.flags.getFFlagUGCValidateMakeupCategoryParity)
 local getFFlagUGCValidateDisallowAeroMeshData = require(parent.flags.getFFlagUGCValidateDisallowAeroMeshData)
 
+local getFFlagUGCValidateWrapLayerDeformationMapsEmpty = require(parent.flags.getFFlagUGCValidateWrapLayerDeformationMapsEmpty)
+local engineHasWrapLayerDeformationMaps = require(parent.util.engineHasWrapLayerDeformationMaps)
+
 local function convertArrayToTable(items) -- 1 equivalent call inferred from this helper
 	local result = {}
 
@@ -264,6 +267,8 @@ setmetatable(Constants.INCLUSION_METHODS, {
 	end
 })
 
+local v = getFFlagUGCValidateWrapLayerDeformationMapsEmpty() and engineHasWrapLayerDeformationMaps()
+
 local decal = { Color3 = Color3.new(1, 1, 1), Transparency = 0, UVOffset = 0, UVScale = 0 }
 local uvOffset
 
@@ -385,7 +390,7 @@ properties.SurfaceAppearance = {
 	}
 }
 
-properties.WrapLayer = {
+local wrapLayer = {
 	Enabled = true,
 	CageOrigin = {
 		PositionMagnitude = { [Constants.COMPARISON_METHODS.SMALLER_EQ] = 10 },
@@ -401,8 +406,25 @@ properties.WrapLayer = {
 	BindOffset = {
 		Position = { [Constants.COMPARISON_METHODS.EXACT_EQ] = Vector3.new(0, 0, 0) },
 		Orientation = { [Constants.COMPARISON_METHODS.EXACT_EQ] = Vector3.new(0, 0, 0) }
-	}
+	},
+	RotateScaleDeformationMap = 0,
+	ScaleOnlyDeformationMap = 0
 }
+local rotateScaleDeformationMap
+
+if v then
+	rotateScaleDeformationMap = Content.none
+end
+
+wrapLayer.RotateScaleDeformationMap = rotateScaleDeformationMap
+local scaleOnlyDeformationMap
+
+if v then
+	scaleOnlyDeformationMap = Content.none
+end
+
+wrapLayer.ScaleOnlyDeformationMap = scaleOnlyDeformationMap
+properties.WrapLayer = wrapLayer
 
 properties.WrapTarget = {
 	CageOrigin = {
@@ -614,8 +636,8 @@ table.insert(Constants.AllBundleUploadCategories, ValidationEnums.UploadCategory
 
 Constants.AllUploadCategories = {}
 
-for _, v in ValidationEnums.UploadCategory do
-	table.insert(Constants.AllUploadCategories, v)
+for _, v2 in ValidationEnums.UploadCategory do
+	table.insert(Constants.AllUploadCategories, v2)
 end
 
 local set = {

@@ -2,6 +2,7 @@ local Foundation = script:FindFirstAncestor("Foundation")
 local parent = Foundation.Parent
 
 local Constants = require(Foundation.Constants)
+local Flags = require(Foundation.Utility.Flags)
 
 local getMainGui = require(Foundation.Utility.getMainGui)
 local withDefaults = require(Foundation.Utility.withDefaults)
@@ -10,7 +11,9 @@ local useStyleSheet = StyleSheetContext.useStyleSheet
 require(Foundation.Components.Types)
 
 local OverlayContext = require(script.Parent.OverlayContext)
+local ViewportBreakpointContext = require(script.Parent.ViewportBreakpointContext)
 local useKeyboardAwareSize = require(script.Parent.useKeyboardAwareSize)
+local useSharedViewportBreakpoint = require(script.Parent.useSharedViewportBreakpoint)
 
 local React = require(parent.React)
 local ReactRoblox = require(parent.ReactRoblox)
@@ -61,7 +64,13 @@ local function OverlayProvider(p)
 		screen = v2.gui
 	end
 
-	local v4 = React.useMemo(function()
+	local v4
+
+	if Flags.FoundationSharedViewportBreakpoint then
+		v4 = useSharedViewportBreakpoint(screen)
+	end
+
+	local v5 = React.useMemo(function()
 		return { requestOverlay = requestOverlay, instance = state, screen = screen }
 	end, { requestOverlay, state, screen })
 
@@ -88,9 +97,17 @@ local function OverlayProvider(p)
 		}), v3)
 	end
 
-	return createElement(provider, { value = v4 }, {
+	local children
+
+	if Flags.FoundationSharedViewportBreakpoint then
+		children = React.createElement(ViewportBreakpointContext.Provider, { value = v4 }, v2.children)
+	else
+		children = React.createElement(React.Fragment, nil, v2.children)
+	end
+
+	return createElement(provider, { value = v5 }, {
 		FoundationOverlay = foundationOverlay,
-		Children = React.createElement(React.Fragment, nil, v2.children)
+		Children = children
 	})
 end
 
