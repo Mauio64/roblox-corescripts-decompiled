@@ -1,0 +1,3 @@
+local FFlagPushNotificationsUpsellPassClientAttributesToPrompts = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagPushNotificationsUpsellPassClientAttributesToPrompts")
+
+return game:DefineFastFlag("PushNotificationsUpsellHomePromptsExperiment", false) and FFlagPushNotificationsUpsellPassClientAttributesToPrompts

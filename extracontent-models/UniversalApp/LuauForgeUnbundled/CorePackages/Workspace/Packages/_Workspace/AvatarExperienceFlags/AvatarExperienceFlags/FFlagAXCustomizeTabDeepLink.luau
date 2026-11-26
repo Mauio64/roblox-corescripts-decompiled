@@ -1,0 +1,1 @@
+return game:DefineFastFlag("AXCustomizeTabDeepLink2", false)

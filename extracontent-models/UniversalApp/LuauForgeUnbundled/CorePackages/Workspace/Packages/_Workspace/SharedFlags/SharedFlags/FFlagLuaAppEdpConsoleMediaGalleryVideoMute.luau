@@ -1,0 +1,1 @@
+return require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagLuaAppEdpConsoleMediaGalleryVideo") and game:DefineFastFlag("LuaAppEdpConsoleMediaGalleryVideoMute", false)

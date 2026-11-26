@@ -1,0 +1,20 @@
+return {
+	ParticipantAdded = require("@game/CorePackages/Workspace/Packages/_Workspace/CrossExperience/CrossExperience/Actions/ParticipantAdded"),
+	ParticipantRemoved = require("@game/CorePackages/Workspace/Packages/_Workspace/CrossExperience/CrossExperience/Actions/ExperienceJoined"),
+	ParticipantWasMuted = require("@game/CorePackages/Workspace/Packages/_Workspace/CrossExperience/CrossExperience/Actions/MuteParticipant"),
+	ParticipantWasUnmuted = require("@game/CorePackages/Workspace/Packages/_Workspace/CrossExperience/CrossExperience/Actions/ParticipantAudioFocusChanged"),
+	VoiceChangerWasEnabled = require("@game/CorePackages/Workspace/Packages/_Workspace/CrossExperience/CrossExperience/Actions/ParticipantIsActive"),
+	VoiceChangerWasDisabled = require("@game/CorePackages/Workspace/Packages/_Workspace/CrossExperience/CrossExperience/Actions/ParticipantIsInactive"),
+	VoicePackWasSet = require("@game/CorePackages/Workspace/Packages/_Workspace/CrossExperience/CrossExperience/Actions/ParticipantRemoved"),
+	VoiceChangerFeedbackWasEnabled = require("@game/CorePackages/Workspace/Packages/_Workspace/CrossExperience/CrossExperience/Actions/ParticipantWasMuted"),
+	VoiceChangerFeedbackWasDisabled = require("@luauforge/bundled/bqe"),
+	ParticipantIsActive = require("@luauforge/bundled/bqf"),
+	ParticipantIsInactive = require("@luauforge/bundled/bqg"),
+	ExperienceLeft = require("@luauforge/bundled/bqh"),
+	ExperienceJoined = require("@luauforge/bundled/bqi"),
+	VoiceStatusChanged = require("@luauforge/bundled/bqj"),
+	RestoreState = require("@luauforge/bundled/bqk"),
+	ParticipantAudioFocusChanged = require("@luauforge/bundled/bql"),
+	MuteParticipant = require("@luauforge/bundled/bqm"),
+	UnmuteParticipant = require("@luauforge/bundled/bqn")
+}

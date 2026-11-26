@@ -1,0 +1,1 @@
+return game:DefineFastFlag("AXAddSearchTrendingChips4", false)

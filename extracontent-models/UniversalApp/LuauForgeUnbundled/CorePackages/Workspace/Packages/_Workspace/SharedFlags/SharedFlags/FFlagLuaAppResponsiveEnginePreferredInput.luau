@@ -1,0 +1,2 @@
+return game:DefineFastFlag("LuaAppResponsiveEnginePreferredInput", false)
+	and game:GetEngineFeature("EnablePreferredInput")

@@ -1,0 +1,2 @@
+return game:DefineFastFlag("AXSupportRentalPurchaseInUnifiedProductPurchaseFlow3", false)
+	and game:GetEngineFeature("SupportTimedOptionsinPerformPurchase")

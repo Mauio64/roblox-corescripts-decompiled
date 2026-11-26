@@ -1,0 +1,2 @@
+return game:DefineFastFlag("SkipVoiceInTeamCreateViewer", false)
+	and game:GetEngineFeature("IsTeamCreateViewerEnabled")

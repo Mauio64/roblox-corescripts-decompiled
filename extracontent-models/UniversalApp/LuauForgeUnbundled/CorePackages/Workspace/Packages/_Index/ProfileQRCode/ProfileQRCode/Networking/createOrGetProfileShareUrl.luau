@@ -1,0 +1,1 @@
+return require("@game/CorePackages/Workspace/Packages/_Index/ProfileQRCode/ProfileQRCode/Networking/setupCreateOrGetProfileShareUrl").setupRequest((require("@game/CorePackages/Workspace/Packages/_Index/ProfileQRCode/ProfileQRCode/Networking/configuredRoduxNetworking")))

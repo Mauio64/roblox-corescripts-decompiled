@@ -1,0 +1,31 @@
+local completeRobloxSubscriptionUpsellFlow = require("@game/CorePackages/Workspace/Packages/_Index/RobloxSubscriptionPurchaseApp/RobloxSubscriptionPurchaseApp/Actions/completeRobloxSubscriptionUpsellFlow")
+local useNativePurchaseFinishedListener = require("@game/CorePackages/Workspace/Packages/_Index/RobloxSubscriptionPurchaseApp/RobloxSubscriptionPurchaseApp/Hooks/useNativePurchaseFinishedListener")
+
+local FFlagEnableHeadlessSubscriptionNativePurchaseCancelCallback = require("@game/CorePackages/Workspace/Packages/_Index/RobloxSubscriptionPurchaseApp/RobloxSubscriptionPurchaseApp/Flags/FFlagEnableHeadlessSubscriptionNativePurchaseCancelCallback")
+local useRobloxSubscriptionChangedListener = require("@game/CorePackages/Workspace/Packages/_Index/RobloxSubscriptionPurchaseApp/RobloxSubscriptionPurchaseApp/Hooks/useRobloxSubscriptionChangedListener")
+local useSubscriptionPollingTimeoutGuard = require("@game/CorePackages/Workspace/Packages/_Index/RobloxSubscriptionPurchaseApp/RobloxSubscriptionPurchaseApp/Hooks/useSubscriptionPollingTimeoutGuard")
+local useMembershipConfigChangePoller = require("@game/CorePackages/Workspace/Packages/_Index/RobloxSubscriptionPurchaseApp/RobloxSubscriptionPurchaseApp/Hooks/useMembershipConfigChangePoller")
+local fFlagPlusMembershipConfigChangeCheck = require("@game/CorePackages/Workspace/Packages/_Workspace/RobloxSubscriptionPurchaseApp/SharedFlags").FFlagPlusMembershipConfigChangeCheck
+local useHeadlessSubscriptionErrorCompletion = require("@game/CorePackages/Workspace/Packages/_Index/RobloxSubscriptionPurchaseApp/RobloxSubscriptionPurchaseApp/Hooks/useHeadlessSubscriptionErrorCompletion")
+
+local function RobloxSubscriptionHeadlessListenerHost(): nil
+	if FFlagEnableHeadlessSubscriptionNativePurchaseCancelCallback then
+		useNativePurchaseFinishedListener(nil, nil, function()
+			completeRobloxSubscriptionUpsellFlow()
+		end)
+	else
+		useNativePurchaseFinishedListener()
+	end
+
+	useRobloxSubscriptionChangedListener()
+	useSubscriptionPollingTimeoutGuard()
+
+	if fFlagPlusMembershipConfigChangeCheck then
+		useMembershipConfigChangePoller()
+	end
+
+	useHeadlessSubscriptionErrorCompletion()
+	return nil
+end
+
+return RobloxSubscriptionHeadlessListenerHost

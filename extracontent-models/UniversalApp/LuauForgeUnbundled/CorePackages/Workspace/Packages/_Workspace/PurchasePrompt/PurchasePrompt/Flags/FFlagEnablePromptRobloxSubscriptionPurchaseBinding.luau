@@ -1,0 +1,2 @@
+return game:DefineFastFlag("EnablePromptRobloxSubscriptionPurchaseBinding2", false)
+	and game:GetEngineFeature("EnablePromptRobloxSubscriptionPurchase")

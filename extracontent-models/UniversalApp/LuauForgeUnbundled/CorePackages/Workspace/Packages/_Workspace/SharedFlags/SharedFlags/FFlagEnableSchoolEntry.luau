@@ -1,0 +1,4 @@
+return game:DefineFastFlag("EnableSchoolEntry", false)
+	and require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagConnectionChannelsTileSize")
+	and game:GetEngineFeature("SchoolEntryTooltipSeenStorageKey")
+	and game:GetEngineFeature("SchoolEntryLiveTooltipSeenStorageKey")

@@ -1,0 +1,15 @@
+local CHAT_PLATFORM_BASE_URL = require("@game/CorePackages/Workspace/Packages/_Workspace/AppChatNetworking/AppChatNetworking/url/CHAT_PLATFORM_BASE_URL")
+
+local RoduxNetworking = require("@game/CorePackages/Workspace/Packages/_Workspace/AppChatNetworking/AppChatNetworking/rodux/RoduxNetworking")
+
+local getFFlagEnableSocialCards = require("@game/CorePackages/Workspace/Packages/_Workspace/AppChatNetworking/SharedFlags").GetFFlagEnableSocialCards
+local fFlagAppChatEnableReactions = require("@game/CorePackages/Workspace/Packages/_Workspace/AppChatNetworking/SharedFlags").FFlagAppChatEnableReactions
+
+return RoduxNetworking.GET("GetOlderMessages", function(callback, p2, p3)
+	return callback(CHAT_PLATFORM_BASE_URL):path("v1"):path("get-conversation-messages"):queryArgs({
+		conversation_id = p2,
+		cursor = p3,
+		include_cards = getFFlagEnableSocialCards() and true or false,
+		include_reactions = fFlagAppChatEnableReactions and true or nil
+	}):setStatusIds({ p2 })
+end)

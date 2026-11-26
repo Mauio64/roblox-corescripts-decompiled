@@ -1,0 +1,12 @@
+local CorePackages = game:GetService("CorePackages")
+
+local Cryo = require(CorePackages.Packages.Cryo)
+
+local module = require("@luauforge/bundled/dWL")
+local Rodux = require(CorePackages.Packages.Rodux)
+
+return (Rodux.createReducer({}, {
+	[module.name] = function(p2, p3)
+		return (Cryo.Dictionary.join(p2, { [p3.prefix] = p3.autocompleteSuggestions }))
+	end
+}))

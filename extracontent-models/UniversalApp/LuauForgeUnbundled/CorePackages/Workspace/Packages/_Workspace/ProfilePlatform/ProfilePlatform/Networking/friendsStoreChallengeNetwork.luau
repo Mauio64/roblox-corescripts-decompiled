@@ -1,0 +1,1 @@
+return require("@game/CorePackages/Workspace/Packages/_Workspace/ProfilePlatform/GenericChallenges").Middleware.ChallengeRequestWrapper(require("@game/CorePackages/Workspace/Packages/_Workspace/ProfilePlatform/DataHydration").Friends.httpRequest)

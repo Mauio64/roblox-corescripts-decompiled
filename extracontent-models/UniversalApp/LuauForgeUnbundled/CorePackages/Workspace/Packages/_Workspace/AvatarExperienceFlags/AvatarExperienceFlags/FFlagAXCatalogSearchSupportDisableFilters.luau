@@ -1,0 +1,3 @@
+local FFlagAXCatalogSupportDisableFilters = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagAXCatalogSupportDisableFilters")
+
+return game:DefineFastFlag("AXCatalogSearchSupportDisableFilters", false) and FFlagAXCatalogSupportDisableFilters

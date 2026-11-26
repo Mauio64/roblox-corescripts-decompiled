@@ -1,0 +1,1 @@
+return require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagAXMISEnableMultiShopping") and game:DefineFastFlag("AXMISEnableMultiShoppingUnifiedEvents2", false)

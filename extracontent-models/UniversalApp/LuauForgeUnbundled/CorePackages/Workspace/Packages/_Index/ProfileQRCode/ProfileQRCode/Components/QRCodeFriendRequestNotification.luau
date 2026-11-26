@@ -1,0 +1,8 @@
+local QRCodeFriendRequestNotification = require("@game/CorePackages/Workspace/Packages/_Index/ProfileQRCode/ProfileQRCode/Components/QRCodeFriendRequestNotification/QRCodeFriendRequestNotification")
+local QRCodeFriendRequestNotificationV2 = require("@game/CorePackages/Workspace/Packages/_Index/ProfileQRCode/ProfileQRCode/Components/QRCodeFriendRequestNotification/QRCodeFriendRequestNotificationV2")
+
+if require("@game/CorePackages/Workspace/Packages/_Index/ProfileQRCode/ProfileQRCode/Flags/FFlagQRCodeFriendRequestNotificationV2") then
+	return QRCodeFriendRequestNotificationV2
+end
+
+return QRCodeFriendRequestNotification

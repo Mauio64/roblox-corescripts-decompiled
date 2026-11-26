@@ -1,0 +1,18 @@
+local module = require("@luauforge/bundled/gkC")
+local HttpService = game:GetService("HttpService")
+local urlBuilder = module.UrlBuilder.UrlBuilder
+local urlBase = module.UrlBuilder.UrlBase
+require("@luauforge/bundled/gkT")
+
+local v5 = urlBuilder.new({ base = urlBase.APIS, path = "otp-service/v1/validateCode" })
+
+return function(callback, data)
+	local jsonEncode = HttpService:JSONEncode({
+		origin = data.origin,
+		contactType = data.contactType,
+		passCode = data.passCode,
+		otpSessionToken = data.otpSessionToken
+	})
+
+	return callback(v5(), "POST", { postBody = jsonEncode })
+end

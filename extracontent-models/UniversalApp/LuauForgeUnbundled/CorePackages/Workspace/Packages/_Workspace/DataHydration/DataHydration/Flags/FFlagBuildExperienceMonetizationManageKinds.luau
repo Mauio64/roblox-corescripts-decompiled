@@ -1,0 +1,9 @@
+local FFlagBuildExperienceMonetizationMultiKind = require("@game/CorePackages/Workspace/Packages/_Workspace/DataHydration/DataHydration/Flags/FFlagBuildExperienceMonetizationMultiKind")
+local FFlagBuildExperienceMonetizationNativeUI = require("@game/CorePackages/Workspace/Packages/_Workspace/DataHydration/DataHydration/Flags/FFlagBuildExperienceMonetizationNativeUI")
+
+local FFlagBuildExperienceMonetizationProductEditing = require("@game/CorePackages/Workspace/Packages/_Workspace/DataHydration/DataHydration/Flags/FFlagBuildExperienceMonetizationProductEditing")
+
+return game:DefineFastFlag("BuildExperienceMonetizationManageKinds", false)
+	and FFlagBuildExperienceMonetizationMultiKind
+	and FFlagBuildExperienceMonetizationNativeUI
+	and FFlagBuildExperienceMonetizationProductEditing

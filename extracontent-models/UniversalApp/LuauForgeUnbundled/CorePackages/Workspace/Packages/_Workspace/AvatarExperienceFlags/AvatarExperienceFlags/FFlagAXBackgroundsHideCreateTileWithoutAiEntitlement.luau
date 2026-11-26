@@ -1,0 +1,5 @@
+local FFlagAXBackgroundGeneration = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagAXBackgroundGeneration")
+
+local FFlagAXBackgroundsHidePlusUpsellsWhenGuacDisabled = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagAXBackgroundsHidePlusUpsellsWhenGuacDisabled")
+
+return game:DefineFastFlag("AXBackgroundsHideCreateTileWithoutAiEntitlement", false) and FFlagAXBackgroundGeneration and FFlagAXBackgroundsHidePlusUpsellsWhenGuacDisabled

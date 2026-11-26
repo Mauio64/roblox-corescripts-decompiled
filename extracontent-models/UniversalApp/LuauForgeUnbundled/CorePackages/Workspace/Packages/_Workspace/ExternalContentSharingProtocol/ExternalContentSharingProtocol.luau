@@ -1,0 +1,3 @@
+require("@game/CorePackages/Workspace/Packages/_Workspace/ExternalContentSharingProtocol/ExternalContentSharingProtocol/ExternalContentSharingProtocolTypes")
+
+return { ExternalContentSharingProtocol = require("@game/CorePackages/Workspace/Packages/_Workspace/ExternalContentSharingProtocol/ExternalContentSharingProtocol/ExternalContentSharingProtocol") }

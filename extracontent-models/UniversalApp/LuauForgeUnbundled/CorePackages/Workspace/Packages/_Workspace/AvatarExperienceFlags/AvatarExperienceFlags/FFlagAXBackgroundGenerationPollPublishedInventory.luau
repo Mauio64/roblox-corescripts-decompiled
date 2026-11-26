@@ -1,0 +1,3 @@
+local FFlagAXRefetchInventoryOnUpdate = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagAXRefetchInventoryOnUpdate")
+
+return game:DefineFastFlag("AXBackgroundGenerationPollPublishedInventory", false) and FFlagAXRefetchInventoryOnUpdate

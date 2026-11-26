@@ -1,0 +1,3 @@
+local FFlagBuildExperienceMonetizationManageKinds = require("@game/CorePackages/Workspace/Packages/_Workspace/BuildExperience/BuildExperience/Flags/FFlagBuildExperienceMonetizationManageKinds")
+
+return game:DefineFastFlag("BuildExperienceMonetizationKindRegionalPricing", false) and FFlagBuildExperienceMonetizationManageKinds

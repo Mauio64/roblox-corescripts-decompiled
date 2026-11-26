@@ -1,0 +1,5 @@
+local FFlagAXRootRFYMigration = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagAXRootRFYMigration")
+local FFlagAXUnifiedMarketplaceResultsFetcher = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagAXUnifiedMarketplaceResultsFetcher")
+local FFlagAXResetFetchMarketplaceLogic = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagAXResetFetchMarketplaceLogic")
+
+return FFlagAXRootRFYMigration and FFlagAXUnifiedMarketplaceResultsFetcher and FFlagAXResetFetchMarketplaceLogic and game:DefineFastFlag("AXPassScreenSizeToWidgetApi5", false)

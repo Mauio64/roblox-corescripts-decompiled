@@ -1,0 +1,1 @@
+return { makeBackButton = require("@game/CorePackages/Workspace/Packages/_Workspace/AppHeaderBar/AppHeaderBar/Utils/makeBackButton"), makeCloseButton = require("@game/CorePackages/Workspace/Packages/_Workspace/AppHeaderBar/AppHeaderBar/Utils/makeCloseButton") }

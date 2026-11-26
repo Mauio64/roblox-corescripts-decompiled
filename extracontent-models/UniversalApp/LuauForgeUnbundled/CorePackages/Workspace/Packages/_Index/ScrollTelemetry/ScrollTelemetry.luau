@@ -1,0 +1,1 @@
+return { feedScroll = require("@game/CorePackages/Workspace/Packages/_Index/ScrollTelemetry/ScrollTelemetry/feedScroll"), ScrollDetector = require("@game/CorePackages/Workspace/Packages/_Index/ScrollTelemetry/ScrollTelemetry/ScrollDetector") }

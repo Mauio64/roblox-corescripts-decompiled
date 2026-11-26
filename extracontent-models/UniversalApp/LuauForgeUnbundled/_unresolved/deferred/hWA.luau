@@ -1,0 +1,7 @@
+local SharedFlags = require("@game/CorePackages/Workspace/Packages/SharedFlags")
+local fFlagFriendsStoreSortOnlineFriendsByRank = SharedFlags.FFlagFriendsStoreSortOnlineFriendsByRank
+local fFlagDataHydrationAccountReset = SharedFlags.FFlagDataHydrationAccountReset
+
+return game:DefineFastFlag("PlacesListMigrateOffLegacyPresence2", false)
+	and fFlagFriendsStoreSortOnlineFriendsByRank
+	and fFlagDataHydrationAccountReset

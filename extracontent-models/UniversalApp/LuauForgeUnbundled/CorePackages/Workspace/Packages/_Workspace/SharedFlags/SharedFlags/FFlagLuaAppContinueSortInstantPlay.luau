@@ -1,0 +1,3 @@
+local FFlagLuaAppGameTileExtractGameDetailsCallback = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagLuaAppGameTileExtractGameDetailsCallback")
+
+return game:DefineFastFlag("LuaAppContinueSortInstantPlay", false) and FFlagLuaAppGameTileExtractGameDetailsCallback

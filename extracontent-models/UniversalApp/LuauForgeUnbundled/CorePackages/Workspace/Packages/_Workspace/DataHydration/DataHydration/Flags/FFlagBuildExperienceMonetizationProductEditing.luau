@@ -1,0 +1,3 @@
+local FFlagBuildExperienceMonetizationNativeUI = require("@game/CorePackages/Workspace/Packages/_Workspace/DataHydration/DataHydration/Flags/FFlagBuildExperienceMonetizationNativeUI")
+
+return game:DefineFastFlag("BuildExperienceMonetizationProductEditing", false) and FFlagBuildExperienceMonetizationNativeUI

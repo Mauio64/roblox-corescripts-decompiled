@@ -1,0 +1,5 @@
+local FFlagEnablePlayWithRewardComponent = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagEnablePlayWithRewardComponent")
+
+local FFlagLuaAppEdpUseHidePlayWithRewardVisibilityVariable = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagLuaAppEdpUseHidePlayWithRewardVisibilityVariable")
+
+return FFlagEnablePlayWithRewardComponent and FFlagLuaAppEdpUseHidePlayWithRewardVisibilityVariable and game:DefineFastFlag("LuaAppExtendPlayWithRewardPeekView", false)

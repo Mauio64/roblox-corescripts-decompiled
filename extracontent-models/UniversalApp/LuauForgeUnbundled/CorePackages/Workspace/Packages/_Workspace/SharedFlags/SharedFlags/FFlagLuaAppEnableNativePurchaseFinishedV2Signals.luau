@@ -1,0 +1,2 @@
+return game:DefineFastFlag("LuaAppEnableNativePurchaseFinishedV2Signals", false)
+	and game:GetEngineFeature("SignalCheckoutSessionIdOnPurchaseEnabled")

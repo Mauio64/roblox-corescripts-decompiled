@@ -1,0 +1,1 @@
+return { Screen = require("@game/CorePackages/Workspace/Packages/_Index/TrustedContacts/TrustedContacts/Components/TrustedContactsModal/TrustedContactsModalScreen"), Container = require("@game/CorePackages/Workspace/Packages/_Index/TrustedContacts/TrustedContacts/Components/TrustedContactsModal/TrustedContactsModalContainer") }

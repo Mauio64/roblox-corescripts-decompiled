@@ -1,0 +1,2 @@
+local FFlagEnablePlusReferralLandingSheet = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagEnablePlusReferralLandingSheet")
+return game:DefineFastFlag("EnablePlusReferralRecipientFlyoutEntry", false) and FFlagEnablePlusReferralLandingSheet

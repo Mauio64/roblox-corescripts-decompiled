@@ -1,0 +1,4 @@
+local FFlagFriendsStoreSortOnlineFriendsByRank = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagFriendsStoreSortOnlineFriendsByRank")
+local FFlagDataHydrationAccountReset = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagDataHydrationAccountReset")
+
+return game:DefineFastFlag("SduiSocialDataMigrateOffLegacyPresence2", false) and FFlagFriendsStoreSortOnlineFriendsByRank and FFlagDataHydrationAccountReset

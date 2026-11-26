@@ -1,0 +1,1 @@
+return { CallStatus = require("@game/CorePackages/Workspace/Packages/_Workspace/CallProtocol/CallProtocol/Enums/CallStatus"), MessageType = require("@game/CorePackages/Workspace/Packages/_Workspace/CallProtocol/CallProtocol/Enums/MessageType") }

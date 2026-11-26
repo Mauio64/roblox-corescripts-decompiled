@@ -1,0 +1,266 @@
+local RunService = game:GetService("RunService")
+local UserGameSettings = UserSettings():GetService("UserGameSettings")
+
+local React = require("@game/CorePackages/Workspace/Packages/_Workspace/VideoPlayer/React")
+local ArgCheck = require("@game/CorePackages/Workspace/Packages/_Index/VideoPlayer/ArgCheck")
+
+local VideoPlayerWrapper = require("@game/CorePackages/Workspace/Packages/_Index/VideoPlayer/VideoPlayer/VideoPlayerWrapper")
+local VideoLoadingState = require("@game/CorePackages/Workspace/Packages/_Index/VideoPlayer/VideoPlayer/VideoLoadingState")
+
+local function VideoDisplay(props)
+	local ref = React.useRef(nil)
+	local ref2 = React.useRef(nil)
+	local videoPlayerRef = props.videoPlayerRef or ref2
+	local ref3 = React.useRef(0)
+	local ref4 = React.useRef(0)
+	local ref5 = React.useRef(false)
+	local state, setState = React.useState(false)
+	local state2, setState2 = React.useState(VideoLoadingState.Idle)
+	local shouldStartPlayback = props.shouldStartPlayback or props.loadImmediately == true
+
+	local ref6 = React.useRef(nil)
+	ref6.current = props.onLoadingStateChanged
+	local ref7 = React.useRef(nil)
+	ref7.current = props.onVideoLoaded
+	local ref8 = React.useRef(nil)
+	ref8.current = props.onAspectRatioChanged
+	local ref9 = React.useRef(nil)
+	ref9.current = props.onVideoProgressChanged
+
+	local ref10 = React.useRef(props.startPlaybackProgress)
+	ref10.current = props.startPlaybackProgress
+	local ref11 = React.useRef(false)
+
+	local v5 = React.useCallback(function(p2)
+		setState2(p2)
+
+		if ref6.current then
+			ref6.current(p2)
+		end
+	end, {})
+
+	local v6 = React.useCallback(function()
+		ref3.current += 1
+
+		if props.onVideoLooped then
+			props.onVideoLooped()
+		end
+	end, { props.onVideoLooped })
+
+	React.useEffect(function()
+		ref3.current = 0
+		ref4.current = 0
+		ref5.current = false
+	end, { props.video })
+
+	React.useEffect(function()
+		local videoPlaybackStateRef = props.videoPlaybackStateRef
+
+		if videoPlaybackStateRef == nil then
+			return
+		end
+
+		local function fn()
+			local current = videoPlayerRef.current
+
+			if not current then
+				return nil
+			end
+
+			local v7 = {
+				isPlaying = current.IsPlaying,
+				playbackPositionMs = math.round(math.max(0, current.TimePosition) * 1000),
+				videoLengthMs = 0,
+				loopCount = 0,
+				endedCount = 0,
+				audioLevel = 0
+			}
+			local v8 = if current.TimeLength > 0 then math.round(current.TimeLength * 1000) else nil
+			v7.videoLengthMs = v8
+			v7.loopCount = ref3.current
+			v7.endedCount = ref4.current
+			v7.audioLevel = math.clamp(current.Volume * UserGameSettings.MasterVolume, 0, 1)
+			return v7
+		end
+
+		videoPlaybackStateRef.current = fn
+
+		return function()
+			if videoPlaybackStateRef.current == fn then
+				videoPlaybackStateRef.current = nil
+			end
+		end
+	end, { props.videoPlaybackStateRef })
+
+	React.useEffect(function()
+		setState(false)
+
+		if not shouldStartPlayback then
+			v5(VideoLoadingState.Idle)
+			return
+		end
+
+		local current = videoPlayerRef.current
+		ArgCheck.assert(current ~= nil, "VideoDisplay expects videoPlayer ref to be set before loading")
+		v5(VideoLoadingState.Loading)
+		local flag = false
+		task.spawn(function()
+			local lastTime = tick()
+			local success, result = pcall(function()
+				return current:LoadAsync()
+			end)
+
+			if flag then
+				return
+			end
+
+			if not success or result ~= Enum.AssetFetchStatus.Success then
+				v5(VideoLoadingState.Failed)
+				return
+			end
+
+			local current2 = ref10.current
+
+			if current2 ~= nil then
+				current.TimePosition = math.clamp(current2, 0, 1) * current.TimeLength
+				ref11.current = true
+			end
+
+			if ref7.current then
+				ref7.current(current.TimeLength, tick() - lastTime)
+			end
+
+			local resolution = current.Resolution
+
+			if ref8.current and resolution and resolution.Y > 0 then
+				ref8.current(resolution.X / resolution.Y)
+			end
+
+			setState(true)
+			v5(VideoLoadingState.Loaded)
+		end)
+		return function()
+			flag = true
+		end
+	end, { props.video, shouldStartPlayback })
+
+	local v7 = React.useCallback(function()
+		ref5.current = true
+		ref4.current += 1
+
+		if props.onVideoEnded then
+			props.onVideoEnded()
+		end
+	end, { props.onVideoEnded })
+
+	React.useEffect(function()
+		if not state then
+			return
+		end
+
+		local current = videoPlayerRef.current
+		ArgCheck.assert(current ~= nil, "VideoDisplay expects videoPlayer ref to be set before playback")
+
+		if ref11.current then
+			ref11.current = false
+		elseif ref5.current and props.shouldStartPlayback then
+			current.TimePosition = 0
+			ref5.current = false
+		elseif props.shouldStartPlayback and not props.preservePlaybackPosition then
+			current.TimePosition = 0
+		end
+
+		if props.shouldStartPlayback then
+			current:Play()
+		else
+			current:Pause()
+		end
+	end, { state, props.preservePlaybackPosition, props.shouldStartPlayback })
+
+	React.useEffect(function()
+		if not state then
+			return
+		end
+
+		local current = videoPlayerRef.current
+		ArgCheck.assert(
+			current ~= nil,
+			"VideoDisplay expects videoPlayer ref to be set before reporting progress"
+		)
+		local renderSteppedConnection = RunService.RenderStepped:Connect(function()
+			local current2 = ref9.current
+
+			if current2 then
+				current2(not (current.TimeLength > 0) and 0 or current.TimePosition / current.TimeLength)
+			end
+		end)
+		return function()
+			renderSteppedConnection:Disconnect()
+		end
+	end, { state })
+
+	local createElement = React.createElement
+	local v9 = {
+		Size = props.Size,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		ClipsDescendants = true,
+		ZIndex = props.ZIndex,
+		Selectable = false
+	}
+
+	local v11 = if props.cornerRadius then React.createElement("UICorner", {
+		CornerRadius = UDim.new(0, props.cornerRadius)
+	}) else nil
+	local v12
+
+	if props.thumbnail and props.thumbnail ~= "" then
+		local createElement2 = React.createElement
+		local v14 = {
+			Image = props.thumbnail,
+			Size = UDim2.fromScale(1, 1),
+			ScaleType = props.ScaleType,
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			ZIndex = 1
+		}
+
+		local v16 = if props.cornerRadius then React.createElement("UICorner", {
+			CornerRadius = UDim.new(0, props.cornerRadius)
+		}) else nil
+		v12 = createElement2("ImageLabel", v14, { Corner = v16 })
+	end
+
+	local createElement2 = React.createElement
+	local v14 = {
+		Size = UDim2.fromScale(1, 1),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		ScaleType = props.ScaleType,
+		Visible = state2 ~= VideoLoadingState.Failed and (props.shouldStartPlayback or props.showVideoWhenPaused == true),
+		ZIndex = 2,
+		ref = ref
+	}
+
+	local v17 = if props.cornerRadius then React.createElement("UICorner", {
+		CornerRadius = UDim.new(0, props.cornerRadius)
+	}) else nil
+	return createElement("Frame", v9, {
+		Corner = v11,
+		Thumbnail = v12,
+		VideoDisplay = createElement2("VideoDisplay", v14, {
+			Corner = v17,
+			VideoPlayer = React.createElement(VideoPlayerWrapper, {
+				video = props.video,
+				muted = props.muted,
+				looped = props.looped,
+				videoPlayerRef = videoPlayerRef,
+				videoDisplayRef = ref,
+				onVideoLooped = v6,
+				onVideoEnded = v7
+			})
+		})
+	})
+end
+
+return VideoDisplay

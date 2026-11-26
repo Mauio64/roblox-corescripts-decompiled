@@ -1,0 +1,1 @@
+return (game:DefineFastFlag("IEMTabFocusNav2", false))

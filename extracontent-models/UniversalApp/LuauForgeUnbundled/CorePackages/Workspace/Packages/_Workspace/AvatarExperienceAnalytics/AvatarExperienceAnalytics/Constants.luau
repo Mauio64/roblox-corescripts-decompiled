@@ -1,0 +1,90 @@
+local UnifiedEventLogEnums = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceAnalytics/AvatarExperienceAnalytics/UnifiedEventLogEnums")
+
+return {
+	AVATAR_EVENT_COUNTER_NAME = {
+		AXEquipAsset = "AXEquipAsset",
+		AXUnequipAsset = "AXUnequipAsset",
+		AXEquipBackground = "AXEquipBackground",
+		AXUnequipBackground = "AXUnequipBackground",
+		AXTryOnBackground = "AXTryOnBackground",
+		AXRemoveTryOnBackground = "AXRemoveTryOnBackground",
+		AXCreateCostume = "AXCreateCostume",
+		AXCreateMakeupLook = "AXCreateMakeupLook",
+		AXColorPickerChanged = "AXColorPickerChanged",
+		AXCameraEnabled = "AXCameraEnabled",
+		AXCameraDisabled = "AXCameraDisabled",
+		AXUpdateProfilePicture = "AXUpdateProfilePicture",
+		AXPurchaseAsset = "AXPurchaseAsset",
+		AXPurchaseBundle = "AXPurchaseBundle",
+		CatalogPurchaseShownEnableTwoStepAuth = "CatalogPurchaseShownEnableTwoStepAuth",
+		CatalogPurchaseShownTwoStepAuth = "CatalogPurchaseShownTwoStepAuth",
+		CatalogPurchaseFailedShowTwoStepAuth = "CatalogPurchaseFailedShowTwoStepAuth",
+		CatalogPurchaseCompletedTwoStepAuth = "CatalogPurchaseCompletedTwoStepAuth",
+		CatalogPurchaseInvalidatedTwoStepAuth = "CatalogPurchaseInvalidatedTwoStepAuth",
+		CatalogPurchaseAbandonedTwoStepAuth = "CatalogPurchaseAbandonedTwoStepAuth",
+		CatalogPurchaseLoadFailedTwoStepAuth = "CatalogPurchaseLoadFailedTwoStepAuth",
+		SupportRegionAvatarOverlayControlPressed = "SupportRegionAvatarOverlay_ControlPressed",
+		SupportRegionAvatarOverlayDialogShown = "SupportRegionAvatarOverlay_DialogShown",
+		SupportRegionAvatarOverlayPageView = "SupportRegionAvatarOverlay_PageView"
+	},
+	AVATAR_EDITOR_SERVICE_ERRORS = {
+		GetRecommendedAssets = "AvatarEditorServiceGetRecommendedAssetsError",
+		GetOutfits = "AvatarEditorServiceGetOutfitsError",
+		CreateOutfit = "AvatarEditorServiceCreateOutfitError",
+		GetAvatarRules = "AvatarEditorServiceGetAvatarRulesError",
+		GetInventory = "AvatarEditorServiceGetInventoryError",
+		SearchCatalog = "AvatarEditorServiceSearchCatalogError",
+		GetBatchItemDetails = "AvatarEditorServiceGetBatchItemDetailsError",
+		GetRecommendedBundles = "AvatarEditorServiceGetRecommendedBundlesError",
+		NoPromptSetFavorite = "AvatarEditorServiceNoPromptSetFavoriteError",
+		NoPromptSaveAvatarThumbnailCustomization = "AvatarEditorServiceNoPromptSaveAvatarThumbnailCustomizationError",
+		NoPromptCreateOutfit = "AvatarEditorServiceNoPromptCreateOutfitError",
+		GetOutfitDetails = "AvatarEditorServiceGetOutfitDetailsError",
+		FetchAssetOrBundleInfo = "AvatarEditorServiceFetchAssetOrBundleInfoError",
+		FetchBundleInfo = "AvatarEditorServiceFetchBundleInfoError",
+		GetAssetFavorite = "AvatarEditorServiceGetAssetFavoriteError",
+		GetBundleFavorite = "AvatarEditorServiceGetBundleFavoriteError",
+		SetBundleFavorite = "AvatarEditorServiceSetBundleFavoriteError",
+		SetAssetFavorite = "AvatarEditorServiceSetAssetFavoriteError",
+		ConformToAvatarRules = "AvatarEditorServiceConformToAvatarRulesError",
+		NoPromptSaveAvatar = "AvatarEditorServiceNoPromptSaveAvatarError",
+		PromptSaveAvatarCompleted = "AvatarEditorServicePromptSaveAvatarCompletedError",
+		NoPromptApplyProfileConfiguration = "AvatarEditorServiceNoPromptApplyProfileConfigurationError",
+		PromptApplyProfileConfigurationCompleted = "AvatarEditorServicePromptApplyProfileConfigurationCompletedError",
+		GetProfileConfiguration = "AvatarEditorServiceGetProfileConfigurationError"
+	},
+	AVATAR_EDITOR_SERVICE_EVENTS = {
+		GetRecommendedAssets = "AvatarEditorServiceGetRecommendedAssets",
+		GetOutfits = "AvatarEditorServiceGetOutfits",
+		NoPromptCreateOutfit = "AvatarEditorServiceNoPromptCreateOutfit",
+		GetAvatarRules = "AvatarEditorServiceGetAvatarRules",
+		GetInventory = "AvatarEditorServiceGetInventory",
+		SearchCatalog = "AvatarEditorServiceSearchCatalog",
+		GetBatchItemDetails = "AvatarEditorServiceGetBatchItemDetails",
+		GetRecommendedBundles = "AvatarEditorServiceGetRecommendedBundles",
+		NoPromptSetFavorite = "AvatarEditorServiceNoPromptSetFavorite",
+		NoPromptSaveAvatarThumbnailCustomization = "AvatarEditorServiceNoPromptSaveAvatarThumbnailCustomization",
+		GetOutfitDetails = "AvatarEditorServiceGetOutfitDetails",
+		GetItemDetails = "AvatarEditorServiceGetItemDetails",
+		GetFavorite = "AvatarEditorServiceGetFavorite",
+		CheckApplyDefaultClothing = "AvatarEditorServiceCheckApplyDefaultClothing",
+		NoPromptSaveAvatar = "AvatarEditorServiceNoPromptSaveAvatar",
+		NoPromptApplyProfileConfiguration = "AvatarEditorServiceNoPromptApplyProfileConfiguration",
+		GetProfileConfiguration = "AvatarEditorServiceGetProfileConfiguration",
+		CreateMakeupLook = "AvatarEditorServiceCreateMakeupLook"
+	},
+	AVATAR_EDITOR_SERVICE_COUNTER_STATUS = {
+		Request = "request",
+		Success = "success",
+		Error = "error"
+	},
+	IMPRESSIONS_EVENTS = {
+		AvatarItems = "avatarItemImpressions",
+		AvatarItemsCatalog = "avatarItemImpressionsCatalog"
+	},
+	TIMED_OPTION_BY_DAYS = {
+		[3] = UnifiedEventLogEnums.MarketplaceTimedOption.DAYS_3,
+		[7] = UnifiedEventLogEnums.MarketplaceTimedOption.DAYS_7,
+		[14] = UnifiedEventLogEnums.MarketplaceTimedOption.DAYS_14
+	}
+}

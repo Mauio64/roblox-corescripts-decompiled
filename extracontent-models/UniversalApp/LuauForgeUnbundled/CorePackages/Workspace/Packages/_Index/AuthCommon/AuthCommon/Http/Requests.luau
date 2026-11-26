@@ -1,0 +1,20 @@
+return {
+	AccountUpgradeRequest = require("@game/CorePackages/Workspace/Packages/_Index/AuthCommon/AuthCommon/Http/Requests/AccountUpgradeRequest"),
+	GetAuthMetaData = require("@game/CorePackages/Workspace/Packages/_Index/AuthCommon/AuthCommon/Http/Requests/GetAuthMetaData"),
+	GetCountryCodes = require("@game/CorePackages/Workspace/Packages/_Index/AuthCommon/AuthCommon/Http/Requests/GetCountryCodes"),
+	GetGameMedia = require("@game/CorePackages/Workspace/Packages/_Index/AuthCommon/AuthCommon/Http/Requests/GetGameMedia"),
+	GetLoggedInUsersMetadataRequest = require("@game/CorePackages/Workspace/Packages/_Index/AuthCommon/AuthCommon/Http/Requests/GetLoggedInUsersMetadataRequest"),
+	GetUserAppLaunchInfo = require("@game/CorePackages/Workspace/Packages/_Index/AuthCommon/AuthCommon/Http/Requests/GetUserAppLaunchInfo"),
+	GetUserByIdRequest = require("@game/CorePackages/Workspace/Packages/_Index/AuthCommon/AuthCommon/Http/Requests/GetUserByIdRequest"),
+	LoginRequests = require("@game/CorePackages/Workspace/Packages/_Index/AuthCommon/AuthCommon/Http/Requests/LoginRequests"),
+	PostGetUserByUsername = require("@game/CorePackages/Workspace/Packages/_Index/AuthCommon/AuthCommon/Http/Requests/PostGetUserByUsername"),
+	PostPasswordValid = require("@game/CorePackages/Workspace/Packages/_Index/AuthCommon/AuthCommon/Http/Requests/PostPasswordValid"),
+	RedeemAuthenticationTicket = require("@game/CorePackages/Workspace/Packages/_Index/AuthCommon/AuthCommon/Http/Requests/RedeemAuthenticationTicket"),
+	LogoutAllLoggedInUsersRequest = require("@game/CorePackages/Workspace/Packages/_Index/AuthCommon/AuthCommon/Http/Requests/LogoutAllLoggedInUsersRequest"),
+	LogoutFromAllSessionsAndReauthenticateRequest = require("@game/CorePackages/Workspace/Packages/_Index/AuthCommon/AuthCommon/Http/Requests/LogoutFromAllSessionsAndReauthenticateRequest"),
+	LogoutRequest = require("@game/CorePackages/Workspace/Packages/_Index/AuthCommon/AuthCommon/Http/Requests/LogoutRequest"),
+	PostUsernameValid = require("@game/CorePackages/Workspace/Packages/_Index/AuthCommon/AuthCommon/Http/Requests/PostUsernameValid"),
+	TwoStepRequests = require("@game/CorePackages/Workspace/Packages/_Index/AuthCommon/AuthCommon/Http/Requests/TwoStepRequests"),
+	AuthPlatformDisconnect = require("@game/CorePackages/Workspace/Packages/_Index/AuthCommon/AuthCommon/Http/Requests/AuthPlatformDisconnect"),
+	AuthSessionRefresh = require("@game/CorePackages/Workspace/Packages/_Index/AuthCommon/AuthCommon/Http/Requests/AuthSessionRefresh")
+}

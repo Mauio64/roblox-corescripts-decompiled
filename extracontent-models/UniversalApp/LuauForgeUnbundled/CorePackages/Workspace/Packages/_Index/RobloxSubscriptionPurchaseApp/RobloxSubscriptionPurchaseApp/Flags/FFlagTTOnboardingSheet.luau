@@ -1,0 +1,3 @@
+local fFlagSubscriptionSheetCampaignLocalizations = require("@game/CorePackages/Workspace/Packages/_Workspace/RobloxSubscriptionPurchaseApp/SharedFlags").FFlagSubscriptionSheetCampaignLocalizations
+
+return game:DefineFastFlag("TTOnboardingSheet2", false) and fFlagSubscriptionSheetCampaignLocalizations

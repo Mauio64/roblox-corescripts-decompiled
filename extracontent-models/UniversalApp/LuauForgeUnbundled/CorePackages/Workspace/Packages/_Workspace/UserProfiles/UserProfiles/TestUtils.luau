@@ -1,0 +1,1 @@
+return { writeProfileDataToCache = require("@game/CorePackages/Workspace/Packages/_Workspace/UserProfiles/UserProfiles/TestUtils/writeProfileDataToCache") }

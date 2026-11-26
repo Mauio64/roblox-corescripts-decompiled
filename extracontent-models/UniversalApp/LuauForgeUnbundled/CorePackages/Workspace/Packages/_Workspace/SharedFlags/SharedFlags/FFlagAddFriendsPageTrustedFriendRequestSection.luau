@@ -1,0 +1,1 @@
+return require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagAddFriendsUserListEnabled") and game:DefineFastFlag("AddFriendsPageTrustedFriendRequestSection_v10", false)

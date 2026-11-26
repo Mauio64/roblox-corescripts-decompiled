@@ -1,0 +1,1 @@
+return { config = require("@game/CorePackages/Workspace/Packages/_Index/NetworkingSquads/NetworkingSquads/createRequestThunks"), networkingSquadTypes = require("@game/CorePackages/Workspace/Packages/_Index/NetworkingSquads/NetworkingSquads/networkingSquadTypes") }

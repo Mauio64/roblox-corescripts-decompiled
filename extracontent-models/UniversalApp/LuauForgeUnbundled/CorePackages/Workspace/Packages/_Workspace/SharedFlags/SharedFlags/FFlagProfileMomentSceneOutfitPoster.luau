@@ -1,0 +1,2 @@
+return game:DefineFastFlag("ProfileMomentSceneOutfitPoster", false)
+	and game:GetEngineFeature("MomentsServiceFetchPostApi")

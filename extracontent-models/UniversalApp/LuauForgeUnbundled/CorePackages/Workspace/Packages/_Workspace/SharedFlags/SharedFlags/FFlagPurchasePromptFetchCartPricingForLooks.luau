@@ -1,0 +1,1 @@
+return game:DefineFastFlag("PurchasePromptFetchCartPricingForLooks3", false)
